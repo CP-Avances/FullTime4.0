@@ -14,6 +14,7 @@ import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.serv
 })
 
 export class EditarTituloComponent implements OnInit {
+  ips_locales: any = '';
 
   cgTitulos: any = [];
 
@@ -41,6 +42,9 @@ export class EditarTituloComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerTitulos();
   }
@@ -52,7 +56,7 @@ export class EditarTituloComponent implements OnInit {
       id_empleado: this.titulo.id_empleado,
       id_titulo: form.idTituloForm,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     // VERIFICAR TITULO SIMILAR AL REGISTRO
     if (titulo.id_titulo === this.titulo.id_titulo) {

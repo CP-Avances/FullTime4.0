@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
-
 export class EmpresaService {
 
   constructor(
@@ -82,13 +81,7 @@ export class EmpresaService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/credenciales/${id_empresa}`, data);
   }
 
-  // ACTUALIZAR EMPRESA INDIAR USO DE ACCIONES
-  ActualizarAccionesTimbres(formData: any) {
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/acciones-timbre`, formData);
-  }
-  
   //Empresas
-
   ConsultarEmpresas() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas`);
   }

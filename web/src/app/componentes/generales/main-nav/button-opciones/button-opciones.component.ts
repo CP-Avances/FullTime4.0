@@ -3,9 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
 
-import { AccionesTimbresComponent } from 'src/app/componentes/generales/preferencias/acciones-timbres/acciones-timbres.component';
 import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar-notificaciones/settings/settings.component';
-import { AyudaComponent } from '../../preferencias/ayuda/ayuda.component';
+import { AyudaComponent } from '../../ayuda/ayuda.component';
+import { Router } from '@angular/router';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-button-opciones',
@@ -16,7 +17,9 @@ import { AyudaComponent } from '../../preferencias/ayuda/ayuda.component';
 export class ButtonOpcionesComponent implements OnInit {
 
   constructor(
+    public router: Router,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
     public loginService: LoginService,
   ) { }
 
@@ -24,13 +27,10 @@ export class ButtonOpcionesComponent implements OnInit {
   }
 
   AbrirSettings() {
-    const id_empleado = parseInt(localStorage.getItem('empleado') as string);
-    this.ventana.open(SettingsComponent, { width: '350px', data: { id_empleado } });
-  }
 
-  AbrirAccionesTimbres() {
-    const id_empresa = parseInt(localStorage.getItem('empresa') as string);
-    this.ventana.open(AccionesTimbresComponent, { width: '350px', data: { id_empresa } });
+    let dato = this.validar.EncriptarDato(localStorage.getItem('empleado') as string);
+    return this.router.navigate(['/configuraciones-alertas/', dato]);
+    //this.ventana.open(SettingsComponent, { width: '650px', data: { id_empleado } });
   }
 
   AbrirVentanaAyuda() {

@@ -15,6 +15,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class AutorizaSolicitudComponent implements OnInit {
+  ips_locales: any = '';
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
@@ -43,7 +44,10 @@ export class AutorizaSolicitudComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
@@ -136,7 +140,7 @@ export class AutorizaSolicitudComponent implements OnInit {
       aprobada: estado,
       id: datos.id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPlan.AprobarComida(datosEstado).subscribe(alimentacion => {
       if (estado === true) {
@@ -165,7 +169,7 @@ export class AutorizaSolicitudComponent implements OnInit {
       hora_fin: this.data.datosMultiple.hora_fin,
       fecha: this.data.datosMultiple.fec_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restPlan.CrearComidaAprobada(datosPlanEmpleado).subscribe(res => {
       this.NotificarAprobacion(estado, alimentacion);
@@ -182,7 +186,7 @@ export class AutorizaSolicitudComponent implements OnInit {
         verificar: 'Si',
         id: obj.id,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.restPlan.AprobarComida(datosEstado).subscribe(alimentacion => {
         contador = contador + 1;
@@ -196,7 +200,7 @@ export class AutorizaSolicitudComponent implements OnInit {
             hora_fin: obj.hora_fin,
             consumido: false,
             user_name: this.user_name,
-            ip: this.ip,
+            ip: this.ip, ip_local: this.ips_locales,
           }
           this.restPlan.CrearComidaAprobada(datosPlanEmpleado).subscribe(res => {
             contador_plan = contador_plan + 1;
@@ -339,7 +343,7 @@ export class AutorizaSolicitudComponent implements OnInit {
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

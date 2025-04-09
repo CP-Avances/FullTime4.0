@@ -51,7 +51,6 @@ class RegimenRuta {
         this.router.get('/antiguedad-vacaciones/:id', verificarToken_1.TokenValidation, catRegimenControlador_1.default.ListarAntiguedad);
         // ELIMINAR REGISTRO ANTIGUEDAD DE VACACIONES  **USADOO
         this.router.delete('/antiguedad-vacaciones/eliminar/:id', verificarToken_1.TokenValidation, catRegimenControlador_1.default.EliminarAntiguedad);
-        this.router.get('/sucursal-regimen/:id', verificarToken_1.TokenValidation, catRegimenControlador_1.default.ListarRegimenSucursal);
     }
 }
 const REGIMEN_RUTA = new RegimenRuta();

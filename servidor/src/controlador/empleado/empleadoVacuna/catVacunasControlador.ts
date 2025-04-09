@@ -5,7 +5,7 @@ import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 
 class VacunaControlador {
 
@@ -30,7 +30,7 @@ class VacunaControlador {
     // METODO PARA REGISTRAR TIPO VACUNA   **USADO
     public async CrearVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { vacuna, user_name, ip } = req.body;
+            const { vacuna, user_name, ip, ip_local } = req.body;
             var VERIFICAR_VACUNA = await pool.query(
                 `
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
@@ -59,7 +59,8 @@ class VacunaControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(vacunaInsertada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 })
 
@@ -85,7 +86,7 @@ class VacunaControlador {
     // METODO PARA EDITAR VACUNA    **USADO
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, nombre, user_name, ip } = req.body;
+            const { id, nombre, user_name, ip, ip_local } = req.body;
 
             var VERIFICAR_VACUNA = await pool.query(
                 `
@@ -111,6 +112,7 @@ class VacunaControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
 
@@ -135,7 +137,8 @@ class VacunaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(vacunaActualizada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -163,7 +166,7 @@ class VacunaControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -184,7 +187,8 @@ class VacunaControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                 });
 
@@ -206,7 +210,8 @@ class VacunaControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosVacuna),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -227,60 +232,81 @@ class VacunaControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_VACUNA');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
-
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     vacuna: '',
                     observacion: ''
                 };
-
                 var listaVacunas: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
 
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach(async (dato: any) => {
-                    var { ITEM, VACUNA } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (VACUNA != undefined && VACUNA != '')) {
-                        data.fila = ITEM;
-                        data.vacuna = VACUNA;
-                        data.observacion = 'no registrada';
-
-                        listaVacunas.push(data);
-
-                    } else {
-                        data.fila = ITEM;
-                        data.vacuna = VACUNA;
-                        data.observacion = 'no registrada';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (VACUNA == undefined) {
-                            data.vacuna = 'No registrado';
-                            data.observacion = 'Vacuna ' + data.observacion;
-                        }
-
-                        listaVacunas.push(data);
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['VACUNA']
+                    ) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
 
-                    data = {};
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const VACUNA = row.getCell(headers['VACUNA']).value;
 
-                });
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (VACUNA != undefined && VACUNA != '')) {
+                            data.fila = ITEM;
+                            data.vacuna = VACUNA;
+                            data.observacion = 'no registrada';
 
+                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.vacuna = data.vacuna.trim();
+
+                            listaVacunas.push(data);
+
+                        } else {
+                            data.fila = ITEM;
+                            data.vacuna = VACUNA;
+                            data.observacion = 'no registrada';
+
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (VACUNA == undefined) {
+                                data.vacuna = 'No registrado';
+                                data.observacion = 'Vacuna ' + data.observacion;
+                            }
+
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.vacuna = data.vacuna.trim();
+
+                            listaVacunas.push(data);
+                        }
+                        data = {};
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -289,7 +315,6 @@ class VacunaControlador {
                         fs.unlinkSync(ruta);
                     }
                 });
-
                 // VALIDACINES DE LOS DATOS DE LA PLANTILLA
                 listaVacunas.forEach(async (item: any) => {
                     if (item.observacion == 'no registrada') {
@@ -360,7 +385,7 @@ class VacunaControlador {
 
     // REGISTRAR PLANTILLA TIPO VACUNA    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -388,7 +413,8 @@ class VacunaControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(vacuna_emp),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

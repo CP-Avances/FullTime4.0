@@ -6,6 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const accionPersonalControlador_1 = __importDefault(require("../../../controlador/modulos/acciones-personal/accionPersonalControlador"));
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const multer_1 = __importDefault(require("multer"));
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+const upload = (0, multer_1.default)({ storage: storage });
 class DepartamentoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -22,16 +34,6 @@ class DepartamentoRutas {
         /** TABLA TIPO_ACCION */
         this.router.get('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccion);
         this.router.post('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearTipoAccion);
-        /** TABLA CARGO_PROPUESTO */
-        this.router.get('/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarCargoPropuestos);
-        this.router.post('/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearCargoPropuesto);
-        this.router.get('/tipo/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarUltimoCargoP);
-        this.router.get('/cargo/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarUnCargoPropuestos);
-        /** TABLA CONTEXTO LEGAL */
-        this.router.get('/decreto', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarDecretos);
-        this.router.get('/decreto/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarUnDecreto);
-        this.router.post('/decreto', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearDecreto);
-        this.router.get('/tipo/decreto', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarUltimoDecreto);
         /** TABLA PEDIDO_ACCION_EMPLEADO */
         this.router.post('/pedido/accion', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearPedidoAccionPersonal);
         this.router.put('/pedido/accion/editar', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ActualizarPedidoAccionPersonal);
@@ -43,6 +45,10 @@ class DepartamentoRutas {
         this.router.get('/pedidos/ciudad/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarDatosCiudades);
         this.router.get('/pedido/informacion/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarPedidoAccion);
         this.router.get('/lista/procesos/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarProcesosRecursivos);
+        // METODO PARA LEER DATOS DE PLANTILLA    **USADO
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], accionPersonalControlador_1.default.RevisarDatos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
+        this.router.post('/cargar_plantilla', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CargarPlantilla);
     }
 }
 const ACCION_PERSONAL_RUTAS = new DepartamentoRutas();

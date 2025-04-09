@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TITULO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -51,7 +51,7 @@ class TituloControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -66,7 +66,8 @@ class TituloControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el título con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -83,7 +84,8 @@ class TituloControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -101,7 +103,7 @@ class TituloControlador {
     ActualizarTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_nivel, id, user_name, ip } = req.body;
+                const { nombre, id_nivel, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -115,7 +117,8 @@ class TituloControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el título con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -132,7 +135,8 @@ class TituloControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -150,7 +154,7 @@ class TituloControlador {
     CrearTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_nivel, user_name, ip } = req.body;
+                const { nombre, id_nivel, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
@@ -163,7 +167,8 @@ class TituloControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -184,14 +189,15 @@ class TituloControlador {
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-            const workbook = xlsx_1.default.readFile(ruta);
+            const workbook = new exceljs_1.default.Workbook();
+            yield workbook.xlsx.readFile(ruta);
             let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TITULOS');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data = {
                     fila: '',
                     titulo: '',
@@ -201,80 +207,67 @@ class TituloControlador {
                 var listTitulosProfesionales = [];
                 var duplicados = [];
                 var mensaje = 'correcto';
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                    var { NOMBRE, NIVEL } = dato;
-                    data.fila = dato.ITEM;
-                    data.titulo = dato.NOMBRE;
-                    data.nivel = dato.NIVEL;
-                    if ((data.fila != undefined && data.fila != '') &&
-                        (data.titulo != undefined && data.titulo != '') &&
-                        (data.nivel != undefined && data.nivel != '')) {
-                        // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-                        const existe_nivel = yield database_1.default.query(`
-            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
-            `, [NIVEL]);
-                        var id_nivel = existe_nivel.rows[0];
-                        if (id_nivel != undefined && id_nivel != '') {
-                            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
-                            const VERIFICAR_Titulos = yield database_1.default.query(`
-              SELECT * FROM et_titulos
-              WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
-              `, [NOMBRE, id_nivel.id]);
-                            if (VERIFICAR_Titulos.rowCount == 0) {
-                                data.fila = dato.ITEM;
-                                data.titulo = dato.NOMBRE;
-                                data.nivel = dato.NIVEL;
-                                if (duplicados.find((p) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
-                                    p.NIVEL.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
-                                    data.observacion = 'ok';
-                                    duplicados.push(dato);
-                                }
-                                listTitulosProfesionales.push(data);
-                            }
-                            else {
-                                data.fila = dato.ITEM;
-                                data.titulo = NOMBRE;
-                                data.nivel = NIVEL;
-                                data.observacion = 'Ya existe en el sistema';
-                                listTitulosProfesionales.push(data);
-                            }
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['NIVEL']) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                    }
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => __awaiter(this, void 0, void 0, function* () {
+                        var _a, _b;
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1)
+                            return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                        const NIVEL = (_b = row.getCell(headers['NIVEL']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                        const dato = {
+                            ITEM: ITEM,
+                            NOMBRE: NOMBRE,
+                            NIVEL: NIVEL,
+                        };
+                        data.fila = ITEM;
+                        data.titulo = NOMBRE;
+                        data.nivel = NIVEL;
+                        data.observacion = 'no registrado';
+                        if ((data.fila != undefined && data.fila != '') &&
+                            (data.titulo != undefined && data.titulo != '') &&
+                            (data.nivel != undefined && data.nivel != '')) {
+                            listTitulosProfesionales.push(data);
                         }
                         else {
-                            data.fila = dato.ITEM;
-                            data.titulo = dato.NOMBRE;
-                            data.nivel = dato.NIVEL;
+                            data.fila = ITEM;
+                            data.titulo = NOMBRE;
+                            data.nivel = NIVEL;
+                            data.observacion = 'no registrado';
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error';
+                            }
+                            if (data.titulo == '' || data.titulo == undefined) {
+                                data.titulo = 'No registrado';
+                                data.observacion = 'Título no registrado';
+                            }
                             if (data.nivel == '' || data.nivel == undefined) {
                                 data.nivel = 'No registrado';
                                 data.observacion = 'Nivel no registrado';
                             }
-                            data.observacion = 'Nivel no existe en el sistema';
+                            if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
+                                data.observacion = 'Título y Nivel no registrado';
+                            }
                             listTitulosProfesionales.push(data);
                         }
-                    }
-                    else {
-                        data.fila = dato.ITEM;
-                        data.titulo = dato.NOMBRE;
-                        data.nivel = dato.NIVEL;
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error';
-                        }
-                        if (data.titulo == '' || data.titulo == undefined) {
-                            data.titulo = 'No registrado';
-                            data.observacion = 'Título no registrado';
-                        }
-                        if (data.nivel == '' || data.nivel == undefined) {
-                            data.nivel = 'No registrado';
-                            data.observacion = 'Nivel no registrado';
-                        }
-                        if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
-                            data.observacion = 'Título y Nivel no registrado';
-                        }
-                        listTitulosProfesionales.push(data);
-                    }
-                    data = {};
-                }));
+                        data = {};
+                    }));
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -284,6 +277,38 @@ class TituloControlador {
                         fs_1.default.unlinkSync(ruta);
                     }
                 });
+                listTitulosProfesionales.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
+                    if (item.observacion == 'no registrado') {
+                        // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
+                        const existe_nivel = yield database_1.default.query(`
+            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+            `, [item.nivel]);
+                        var id_nivel = existe_nivel.rows[0];
+                        if (id_nivel != undefined && id_nivel != '') {
+                            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
+                            const VERIFICAR_Titulos = yield database_1.default.query(`
+              SELECT * FROM et_titulos
+              WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
+              `, [item.titulo, id_nivel.id]);
+                            if (VERIFICAR_Titulos.rowCount == 0) {
+                                if (duplicados.find((p) => p.titulo.toLowerCase() === item.titulo.toLowerCase() &&
+                                    p.nivel.toLowerCase() === item.nivel.toLowerCase()) == undefined) {
+                                    item.observacion = 'ok';
+                                    duplicados.push(item);
+                                }
+                                else {
+                                    item.observacion = '1';
+                                }
+                            }
+                            else {
+                                item.observacion = 'Ya existe en el sistema';
+                            }
+                        }
+                        else {
+                            item.observacion = 'Nivel no existe en el sistema';
+                        }
+                    }
+                }));
                 setTimeout(() => {
                     listTitulosProfesionales.sort((a, b) => {
                         // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -297,7 +322,7 @@ class TituloControlador {
                     });
                     var filaDuplicada = 0;
                     listTitulosProfesionales.forEach((item) => {
-                        if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
+                        if (item.observacion == '1') {
                             item.observacion = 'Registro duplicado';
                         }
                         // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
@@ -323,7 +348,7 @@ class TituloControlador {
     // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA   **USADO
     RegistrarTitulosPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { titulos, user_name, ip } = req.body;
+            const { titulos, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const titulo of titulos) {
                 const { nombre, id_nivel } = titulo;
@@ -340,7 +365,8 @@ class TituloControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

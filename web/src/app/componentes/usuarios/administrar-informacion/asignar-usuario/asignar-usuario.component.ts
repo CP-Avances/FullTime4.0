@@ -16,6 +16,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { PrincipalSucursalUsuarioComponent } from '../../../usuarios/administrar-informacion/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { VisualizarAsignacionesComponent } from '../visualizar-asignaciones/visualizar-asignaciones.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service'; 
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -24,6 +25,8 @@ import { VisualizarAsignacionesComponent } from '../visualizar-asignaciones/visu
 })
 
 export class AsignarUsuarioComponent implements OnInit {
+  ips_locales: any = '';
+
 
   @Input() pagina_: string;
   @Input() data: any;
@@ -71,13 +74,17 @@ export class AsignarUsuarioComponent implements OnInit {
     public toastr: ToastrService,
     private usuario: UsuarioService,
     private asignacionesService: AsignacionesService,
+    public validar: ValidacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.name_sucursal = this.data.nombre.toUpperCase();
     this.BuscarUsuariosSucursal();
@@ -282,7 +289,7 @@ export class AsignarUsuarioComponent implements OnInit {
       departamentos_seleccionados: this.departamentosSeleccionados,
       isPersonal: this.isPersonal,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.usuario.RegistrarUsuarioDepartamentoMultiple(datos).subscribe({
@@ -423,7 +430,7 @@ export class AsignarUsuarioComponent implements OnInit {
     const datos = {
       nombre: `${usuario.nombre} ${usuario.apellido}`,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       id: usuario.id
     }
     this.ventana.open(VisualizarAsignacionesComponent, {

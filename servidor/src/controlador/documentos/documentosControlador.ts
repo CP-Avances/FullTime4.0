@@ -89,7 +89,7 @@ class DocumentosControlador {
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION     **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             let { id, documento } = req.params;
 
             // INICIAR TRANSACCION
@@ -107,7 +107,8 @@ class DocumentosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el documento con id ${id}. Registro no encontrado.`
                 });
 
@@ -129,7 +130,8 @@ class DocumentosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -150,7 +152,7 @@ class DocumentosControlador {
             });
 
             return res.jsonp({ message: 'Registro eliminado.' });
-            
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -161,7 +163,7 @@ class DocumentosControlador {
     // METODO PARA REGISTRAR UN DOCUMENTO    **USADO
     public async CrearDocumento(req: Request, res: Response): Promise<void> {
         try {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // FECHA DEL SISTEMA
             var fecha = DateTime.now();
@@ -187,7 +189,8 @@ class DocumentosControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify({ documento }),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

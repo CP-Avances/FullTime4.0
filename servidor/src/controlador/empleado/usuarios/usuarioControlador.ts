@@ -21,7 +21,7 @@ class UsuarioControlador {
   // CREAR REGISTRO DE USUARIOS    **USADO
   public async CrearUsuario(req: Request, res: Response) {
     try {
-      const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
+      const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip, ip_local } = req.body;
 
       let contrasena_encriptado = FUNCIONES_LLAVES.encriptarLogin(contrasena);
 
@@ -42,7 +42,8 @@ class UsuarioControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(response.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -114,7 +115,7 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
     try {
-      const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip } = req.body;
+      const { usuario, contrasena, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -130,7 +131,8 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
         });
 
@@ -153,7 +155,8 @@ class UsuarioControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -172,7 +175,7 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR CONTRASEÑA    **USADO
   public async CambiarPasswordUsuario(req: Request, res: Response): Promise<Response> {
     try {
-      const { contrasena, id_empleado, user_name, ip } = req.body;
+      const { contrasena, id_empleado, user_name, ip, ip_local } = req.body;
       let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
   
       // INICIAR TRANSACCION
@@ -189,7 +192,8 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
         });
 
@@ -212,6 +216,7 @@ class UsuarioControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{contrasena: ${contrasena_encriptada}}`,
         ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -230,7 +235,7 @@ class UsuarioControlador {
   // ADMINISTRACION DEL MODULO DE ALIMENTACION
   public async RegistrarAdminComida(req: Request, res: Response): Promise<Response> {
     try {
-      const { admin_comida, id_empleado, user_name, ip } = req.body;
+      const { admin_comida, id_empleado, user_name, ip, ip_local } = req.body;
 
       const adminComida = await admin_comida.toLowerCase() === 'si' ? true : false;
 
@@ -249,7 +254,8 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
         });
 
@@ -273,7 +279,8 @@ class UsuarioControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -294,7 +301,7 @@ class UsuarioControlador {
   // METODO PARA GUARDAR FRASE DE SEGURIDAD
   public async ActualizarFrase(req: Request, res: Response): Promise<Response> {
     try {
-      const { frase, id_empleado, user_name, ip } = req.body;
+      const { frase, id_empleado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -310,7 +317,8 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
         });
 
@@ -332,7 +340,8 @@ class UsuarioControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{frase: ${frase}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -372,18 +381,20 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB    **USADO
   public async ActualizarEstadoTimbreWeb(req: Request, res: Response) {
     try {
-      const { array, web_habilita, user_name, ip } = req.body;
+      const { array, web_habilita, user_name, ip, ip_local } = req.body;
       console.log("ver req.body", req.body)
       const ids_empleados = array.map((empl: any) => empl.id);
-      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+      console.log("ver ids_empleados", ids_empleados )
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
+      console.log("ver datos originales: ",  datosOriginales)
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
 
       const response: QueryResult = await pool.query(
         `
-            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = ANY($2::int[])
+            UPDATE eu_usuarios SET web_habilita = $1 WHERE id_empleado = ANY($2::int[])
           `
         , [!web_habilita, ids_empleados]);
 
@@ -397,11 +408,12 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: JSON.stringify(item),
           datosNuevos: `{"web_habilita": ${!item.web_habilita}}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         }
       ));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       if (rowsAffected > 0) {
         return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
@@ -410,6 +422,7 @@ class UsuarioControlador {
         return res.status(404).jsonp({ message: 'error' })
       }
     } catch (error) {
+      console.log('Ver error:',error)
       return res.status(500).jsonp({ message: error })
     }
   }
@@ -460,18 +473,18 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {
     try {
-      const { array, app_habilita, user_name, ip } = req.body;
+      const { array, app_habilita, user_name, ip, ip_local } = req.body;
       console.log("ver req.body", req.body)
       const ids_empleados = array.map((empl: any) => empl.id);
-      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = ANY($1::int[])`, [ids_empleados]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
-      
+
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
 
       const response: QueryResult = await pool.query(
         `
-            UPDATE eu_usuarios SET app_habilita = $1 WHERE id = ANY($2::int[])
+            UPDATE eu_usuarios SET app_habilita = $1 WHERE id_empleado = ANY($2::int[])
           `
         , [!app_habilita, ids_empleados]);
 
@@ -485,11 +498,12 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: JSON.stringify(item),
           datosNuevos: `{"app_habilita": ${!item.app_habilita}}`,
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         }
       ));
-      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip);
+      await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
       if (rowsAffected > 0) {
         return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
@@ -531,7 +545,7 @@ class UsuarioControlador {
   // METODO PARA ELIMINAR REGISTROS DE DISPOSITIVOS MOVILES    **USADO
   public async EliminarDispositivoMovil(req: Request, res: Response) {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       const array = req.params.dispositivo;
 
@@ -555,7 +569,8 @@ class UsuarioControlador {
               accion: 'D',
               datosOriginales: '',
               datosNuevos: '',
-              ip,
+              ip: ip,
+              ip_local: ip_local,
               observacion: `Error al eliminar dispositivo con id: ${id_dispo}. Registro no encontrado.`
             });
 
@@ -578,7 +593,8 @@ class UsuarioControlador {
             accion: 'D',
             datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: '',
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
           });
 
@@ -708,7 +724,7 @@ class UsuarioControlador {
   public async CambiarFrase(req: Request, res: Response): Promise<Response> {
     var token = req.body.token;
     var frase = req.body.frase;
-    const { user_name, ip } = req.body;
+    const { user_name, ip, ip_local } = req.body;
     try {
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
@@ -727,7 +743,8 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
         });
 
@@ -749,7 +766,8 @@ class UsuarioControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{"frase": "${frase}"}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -769,31 +787,10 @@ class UsuarioControlador {
    ** **                           METODOS TABLA USUARIO - DEPARTAMENTO                               ** **
    ** ************************************************************************************************** */
 
-  // BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACION USUARIO - DEPARTAMENTO
-  public async BuscarUsuarioSucursal(req: Request, res: Response) {
-    const { id_empleado } = req.body;
-    const USUARIOS = await pool.query(
-      `
-      SELECT DISTINCT d.id_sucursal
-      FROM eu_usuario_departamento AS ud
-      JOIN ed_departamentos AS d ON ud.id_departamento = d.id 
-      WHERE id_empleado = $1
-      `,
-      [id_empleado]
-    );
-    if (USUARIOS.rowCount != 0) {
-      return res.jsonp(USUARIOS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-
   // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO    **USADO
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
-      const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body
+      const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = req.body
 
       // INICIA TRANSACCION
       await pool.query('BEGIN');
@@ -812,7 +809,8 @@ class UsuarioControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}, "administra": ${administra}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -852,24 +850,6 @@ class UsuarioControlador {
     }
   }
 
-  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
-  public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
-    const { id_empleado } = req.body;
-    const USUARIOS = await pool.query(
-      `
-      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
-      AND principal = true
-      `
-      , [id_empleado]
-    );
-    if (USUARIOS.rowCount != 0) {
-      return res.jsonp(USUARIOS.rows)
-    }
-    else {
-      return res.jsonp(null);
-    }
-  }
-
   // BUSCAR TODAS LAS ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO
   public async BuscarAsignacionesUsuario(req: Request, res: Response) {
     const { id_empleado } = req.body;
@@ -890,7 +870,7 @@ class UsuarioControlador {
   // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO   **USADO
   public async ActualizarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
-      const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
+      const { id, id_departamento, principal, personal, administra, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -906,7 +886,8 @@ class UsuarioControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -929,7 +910,8 @@ class UsuarioControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosActuales.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -949,7 +931,7 @@ class UsuarioControlador {
   // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO   **USADO
   public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip, id } = req.body;
+      const { user_name, ip, id, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -965,7 +947,8 @@ class UsuarioControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar eu_usuario_departamento con id: ${id}. Registro no encontrado.`
         });
 
@@ -987,7 +970,8 @@ class UsuarioControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -1108,7 +1092,7 @@ class UsuarioControlador {
   // METODO PARA REGISTRAR EL DISPOSITIVO
   public async ingresarIDdispositivo(req: Request, res: Response) {
     try {
-      const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones } = req.body;
+      const { id_empleado, id_celular, modelo_dispositivo, user_name, ip, terminos_condiciones, ip_local } = req.body;
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
@@ -1126,6 +1110,7 @@ class UsuarioControlador {
         datosOriginales: "",
         datosNuevos: JSON.stringify(objetoDispositivos),
         ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -1147,20 +1132,33 @@ class UsuarioControlador {
   //  METODO PARA OBTENER LOS USUARIOS DE LA EMPRESA
   public async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
     try {
-      const response: QueryResult = await pool.query('SELECT e.cedula, e.codigo,  e.nombre, e.apellido, ' +
-        '( e.apellido || \' \' || e.nombre) as fullname, e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol ' +
-        'FROM informacion_general AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
+      const query = `
+        SELECT e.cedula, e.codigo, e.nombre, e.apellido,
+               (e.apellido || ' ' || e.nombre) AS fullname,
+               e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol,
+               e.domicilio, e.ciudad, e.name_suc, e.name_dep, e.name_regimen,
+               g.genero AS nombre_genero,
+               n.nombre AS nombre_nacionalidad
+        FROM informacion_general AS e
+        JOIN eu_usuarios AS u ON e.id = u.id_empleado
+        LEFT JOIN e_genero AS g ON e.genero = g.id
+        LEFT JOIN e_cat_nacionalidades AS n ON e.id_nacionalidad = n.id
+        WHERE e.estado = 1
+        ORDER BY fullname
+      `;
+      
+      const response: QueryResult = await pool.query(query);
       const empleados: any[] = response.rows;
       return res.status(200).jsonp(empleados);
+  
     } catch (error) {
       console.log(error);
-      return res.status(500).
-        jsonp({
-          message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
-            'o https://casapazmino.com.ec'
-        });
+      return res.status(500).jsonp({
+        message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec'
+      });
     }
-  };
+  }
+  
 
   // METODO PARA OBTENER LA INFORMACION DEL USUARIO
   public async getUserById(req: Request, res: Response): Promise<Response> {
@@ -1218,7 +1216,7 @@ async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: 
 // METODO PARA REGISTRAR UNA ASIGNACION
 async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
-    const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+    const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
 
     // INICIA TRANSACCION
     await pool.query('BEGIN');
@@ -1239,7 +1237,8 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
       accion: 'I',
       datosOriginales: '',
       datosNuevos: JSON.stringify(datosNuevos),
-      ip,
+      ip: ip,
+      ip_local: ip_local,
       observacion: null
     });
 
@@ -1254,7 +1253,7 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
 // METODO PARA EDITAR UNA ASIGNACION
 async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
-    const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+    const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
 
     // INICIAR TRANSACCION
     await pool.query('BEGIN');
@@ -1274,7 +1273,8 @@ async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
         accion: 'U',
         datosOriginales: '',
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: `Error al actualizar registro con id_empleado: ${id_empleado} y id_departamento: ${id_departamento}. Registro no encontrado.`
       });
 
@@ -1299,7 +1299,8 @@ async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
       accion: 'U',
       datosOriginales: JSON.stringify(datosOriginales),
       datosNuevos: JSON.stringify(datosNuevos),
-      ip,
+      ip: ip,
+      ip_local: ip_local,
       observacion: null
     });
 

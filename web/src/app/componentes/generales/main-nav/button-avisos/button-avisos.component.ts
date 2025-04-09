@@ -6,6 +6,8 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { ChangeDetectorRef } from '@angular/core';
+const { DateTime } = require("luxon");
 
 @Component({
   selector: 'app-button-avisos',
@@ -14,6 +16,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 })
 
 export class ButtonAvisosComponent implements OnInit {
+  ips_locales: any = '';
 
   estado: boolean = true;
 
@@ -33,6 +36,7 @@ export class ButtonAvisosComponent implements OnInit {
     private socket: Socket,
     private aviso: TimbresService,
     private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     /** ********************************************************************************** **
      ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
@@ -42,15 +46,21 @@ export class ButtonAvisosComponent implements OnInit {
     if (this.loginService.loggedIn()) {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
       this.socket.on('recibir_aviso', (data: any) => {
-        //console.log('Escuchando aviso', data);
+        console.log('Escuchando aviso', data);
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
         if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
+          console.log("se esjecuta")
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
-            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd');
+            console.log("ver res ObtenerUnAviso: ", res)
+
+
+            let fecha = this.validar.DarFormatoFecha(res.fecha_hora.split('T')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
             res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-            res.hora_ = this.validar.FormatearHora(res.create_at.split(' ')[1], this.formato_hora);
+
+           
+            res.hora_ = this.validar.FormatearHora( DateTime.fromISO(res.fecha_hora).toFormat("HH:mm:ss"), this.formato_hora);
 
             if (res.tipo != 6) {
               if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {
@@ -74,6 +84,8 @@ export class ButtonAvisosComponent implements OnInit {
               this.avisos.pop();
             }
             this.num_timbre_false = this.num_timbre_false + 1;
+
+            this.cdr.detectChanges()
           })
         }
       });
@@ -82,8 +94,12 @@ export class ButtonAvisosComponent implements OnInit {
 
   ngOnInit(): void {
     this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
+    console.log("ver id_empleado_logueado: ", this.id_empleado_logueado)
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.BuscarParametro();
   }
 
@@ -166,7 +182,7 @@ export class ButtonAvisosComponent implements OnInit {
     const datos = {
       visto: true,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.aviso.ActualizarVistaAvisos(data.id, datos).subscribe(res => {
       this.LeerAvisos(this.formato_fecha, this.formato_hora);

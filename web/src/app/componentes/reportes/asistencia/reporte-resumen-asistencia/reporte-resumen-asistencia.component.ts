@@ -6,7 +6,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 
 // IMPORTAR SERVICIOS
 import { TiempoLaboradoService } from 'src/app/servicios/reportes/tiempoLaborado/tiempo-laborado.service';
@@ -24,6 +25,17 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
 
@@ -104,6 +116,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
 
   constructor(
     private reportesTiempoLaborado: TiempoLaboradoService,
@@ -125,6 +138,28 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarTolerancia();
     this.BuscarParametro();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy(): void {
@@ -292,8 +327,9 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     this.data_pdf = []
     this.reportesTiempoLaborado.ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
+      console.log("ver datos del RESUMEN GENERAL DE ASISTENCIA: ", this.data_pdf)
       switch (accion) {
-        case 'excel': this.ExportarExcel(); break;
+        case 'excel': this.generarExcel(); break;
         case 'ver': this.verDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -673,26 +709,34 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
                   : '';
                 const entrada = lab.entrada.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(lab.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT');
+                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA');
                 const salida = lab.salida.fecha_hora_timbre != null
                   ? this.validar.FormatearHora(lab.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT');
+                  : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA');
                 const inicioAlimentacion = lab.tipo == 'EAS'
                   ? (lab.inicioAlimentacion.fecha_hora_timbre != null
                     ? this.validar.FormatearHora(lab.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT'))
+                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA'))
                   : '';
                 const finAlimentacion = lab.tipo == 'EAS'
                   ? (lab.finAlimentacion.fecha_hora_timbre != null
                     ? this.validar.FormatearHora(lab.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : 'FT'))
+                    : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA'))
                   : '';
                 const alimentacion_asignada = lab.tipo == 'EAS' ? lab.inicioAlimentacion.minutos_alimentacion : 0;
                 const diferenciaEnMinutos = this.CalcularDiferenciaFechas(lab);
                 const minutosAlimentacion = diferenciaEnMinutos[0];
                 const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
-                const minutosLaborados = diferenciaEnMinutos[1];
-                const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                let minutosLaborados = 0
+                let tiempoLaborado = ''
+                if (lab.control) {
+                  minutosLaborados = diferenciaEnMinutos[1];
+                  tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                } else {
+                  minutosLaborados = diferenciaEnMinutos[4];
+                  tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+                }
+
                 const minutosAtraso = diferenciaEnMinutos[2];
                 const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
                 const minutosSalidaAnticipada = diferenciaEnMinutos[3];
@@ -856,21 +900,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
-  ExportarExcel(): void {
-    const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Resumen_asistencia');
-    xlsx.writeFile(wb_regimen_cargo, `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-  }
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
 
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let n = 0;
-    array.forEach((data: any) => {
+
+    this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.tLaborado.forEach((t: any) => {
-          n++;
-          //CAMBIO DE FORMATO EN HORAS (HORARIO Y TIMBRE)
+
           const entradaHorario = this.validar.FormatearHora(t.entrada.fecha_hora_horario.split(' ')[1], this.formato_hora);
           const salidaHorario = this.validar.FormatearHora(t.salida.fecha_hora_horario.split(' ')[1], this.formato_hora);
           const inicioAlimentacionHorario = t.tipo == 'EAS'
@@ -881,19 +919,19 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
             : '';
           const entrada = t.entrada.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const salida = t.salida.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const inicioAlimentacion = t.tipo == 'EAS'
             ? (t.inicioAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
           const finAlimentacion = t.tipo == 'EAS'
             ? (t.finAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
 
           let alimentacion_asignada = t.tipo == 'EAS' ? t.inicioAlimentacion.minutos_alimentacion : 0;
@@ -902,44 +940,188 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(t);
           const minutosAlimentacion = diferenciaEnMinutos[0];
           const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
-          const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          let minutosLaborados = 0
+          let tiempoLaborado = ''
+          if (t.control) {
+            minutosLaborados = diferenciaEnMinutos[1];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          } else {
+            minutosLaborados = diferenciaEnMinutos[4];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          }
           const minutosAtraso = diferenciaEnMinutos[2];
           const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
           const minutosSalidaAnticipada = diferenciaEnMinutos[3];
           const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
 
-          let ele = {
-            'N°': n,
-            'Código': usu.codigo,
-            'Cédula': usu.cedula,
-            'Nombre Empleado': usu.apellido + ' ' + usu.nombre,
-            'Ciudad': usu.ciudad,
-            'Sucursal': usu.sucursal,
-            'Régimen': usu.regimne,
-            'Departamento': usu.departamento,
-            'Cargo': usu.cargo,
-            'Fecha': new Date(t.entrada.fecha_hora_horario),
-            'Horario Entrada': entradaHorario,
-            'Timbre Entrada': entrada,
-            'Horario Inicio Alimentación': inicioAlimentacionHorario,
-            'Timbre Inicio Alimentación': inicioAlimentacion,
-            'Horario Fin Alimentación': finAlimentacionHorario,
-            'Timbre Fin Alimentación': finAlimentacion,
-            'Horario Salida': salidaHorario,
-            'Timbre Salida': salida,
-            'Atraso': tiempoAtraso,
-            'Salida Anticipada': tiempoSalidaAnticipada,
-            'Tiempo Alimentación Asignado': alimentacion_asignada,
-            'Tiempo Alimentación HH:MM:SS': tiempoAlimentacion,
-            'Tiempo Laborado HH:MM:SS': tiempoLaborado,
-          }
-          nuevo.push(ele);
-        })
+          datos.push([
+            n++,
+            usu.cedula,
+            usu.codigo,
+            usu.apellido + ' ' + usu.nombre,
+            usu.ciudad,
+            usu.sucursal,
+            usu.regimen,
+            usu.departamento,
+            usu.cargo,
+            t.entrada.fecha_hora_horario,
+            entradaHorario,
+            entrada,
+            inicioAlimentacionHorario,
+            inicioAlimentacion,
+            finAlimentacionHorario,
+            finAlimentacion,
+            salidaHorario,
+            salida,
+            tiempoAtraso,
+            tiempoSalidaAnticipada,
+            alimentacion_asignada,
+            tiempoAlimentacion,
+            tiempoLaborado,
+          ])
+        });
       })
-    })
-    return nuevo;
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Resumen_asistencia");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:W1");
+    worksheet.mergeCells("B2:W2");
+    worksheet.mergeCells("B3:W3");
+    worksheet.mergeCells("B4:W4");
+    worksheet.mergeCells("B5:W5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Resumen de asistencia'.toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${this.rangoFechas.fec_inico} AL ${this.rangoFechas.fec_final}`;
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2", "B3"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "fecha_hora_horario", width: 20 },
+      { key: "entradaHorario", width: 20 },
+      { key: "entrada", width: 20 },
+      { key: "inicioAlimentacionHorario", width: 20 },
+      { key: "inicioAlimentacion", width: 20 },
+      { key: "finAlimentacionHorario", width: 20 },
+      { key: "finAlimentacion", width: 20 },
+      { key: "salidaHorario", width: 20 },
+      { key: "salida", width: 20 },
+      { key: "tiempoAtraso", width: 20 },
+      { key: "tiempoSalidaAnticipada", width: 40 },
+      { key: "alimentacion_asignada", width: 40 },
+      { key: "tiempoAlimentacion", width: 40 },
+      { key: "tiempoLaborado", width: 40 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA", totalsRowLabel: "", filterButton: true },
+      { name: "HORARIO ENTRADA", totalsRowLabel: "", filterButton: true },
+      { name: "TIMBRE ENTRADA", totalsRowLabel: "", filterButton: true },
+      { name: "HORARIO INICIO ALIMENTACIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "TIMBRE INICIO ALIMENTACIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "HORARIO FIN ALIMENTACIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "TIMBRE FIN ALIMENTACIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "HORARIO SALIDA", totalsRowLabel: "", filterButton: true },
+      { name: "TIMBRE SALIDA", totalsRowLabel: "", filterButton: true },
+      { name: "ATRASO", totalsRowLabel: "", filterButton: true },
+      { name: "SALIDA ANTICIPADA", totalsRowLabel: "", filterButton: true },
+      { name: "TIEMPO ALIMENTACIÓN ASIGNADO", totalsRowLabel: "", filterButton: true },
+      { name: "TIEMPO ALIMENTACIÓN HH:MM:SS", totalsRowLabel: "", filterButton: true },
+      { name: "TIEMPO LABORADO HH:MM:SS", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "ResumenGeneralReporteTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 23; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
+
 
   /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
@@ -963,19 +1145,19 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
             : '';
           const entrada = t.entrada.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.entrada.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const salida = t.salida.fecha_hora_timbre != null
             ? this.validar.FormatearHora(t.salida.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT');
+            : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA');
           const inicioAlimentacion = t.tipo == 'EAS'
             ? (t.inicioAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
           const finAlimentacion = t.tipo == 'EAS'
             ? (t.finAlimentacion.fecha_hora_timbre != null
               ? this.validar.FormatearHora(t.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : 'FT'))
+              : (t.origen === 'L' || t.origen === 'FD' ? t.origen : t.control ? 'FT' : 'SCA'))
             : '';
 
           let alimentacion_asignada = t.tipo == 'EAS' ? t.inicioAlimentacion.minutos_alimentacion : 0;
@@ -984,8 +1166,16 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(t);
           const minutosAlimentacion = diferenciaEnMinutos[0];
           const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
-          const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          let minutosLaborados = 0
+          let tiempoLaborado = ''
+          if (t.control) {
+            minutosLaborados = diferenciaEnMinutos[1];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          } else {
+            minutosLaborados = diferenciaEnMinutos[4];
+            tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
+          }
+
           const minutosAtraso = diferenciaEnMinutos[2];
           const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
           const minutosSalidaAnticipada = diferenciaEnMinutos[3];
@@ -1033,9 +1223,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     let minutosLaborados = 0;
     let minutosAtrasos = 0;
     let minutosSalidasAnticipadas = 0;
+    let minutosPlanificados = 0;
 
     if (timbre.origen === 'L' || timbre.origen === 'FD') {
-      return [0, 0, 0, 0];
+      return [0, 0, 0, 0, 0];
     }
 
     if (timbre.tipo === 'ES') {
@@ -1044,6 +1235,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
         minutosLaborados = Number(this.CalcularMinutosDiferencia(entrada.fecha_hora_timbre, salida.fecha_hora_timbre).toFixed(2));
         minutosAtrasos = Number(this.CalcularMinutosAtraso(entrada.fecha_hora_horario, entrada.fecha_hora_timbre, entrada.tolerancia));
         minutosSalidasAnticipadas = Number(this.CalcularMinutosSalidaAnticipada(salida.fecha_hora_horario, salida.fecha_hora_timbre).toFixed(2));
+        minutosPlanificados = this.CalcularMinutosDiferencia(entrada.fecha_hora_horario, salida.fecha_hora_horario);
+
       }
     }
     else {
@@ -1057,12 +1250,13 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
       minutosAlimentacion = inicioAlimentacion.fecha_hora_timbre !== null && finAlimentacion.fecha_hora_timbre !== null
         ? Number(this.CalcularMinutosDiferencia(inicioAlimentacion.fecha_hora_timbre, finAlimentacion.fecha_hora_timbre).toFixed(2))
         : min_alimentacion;
+      minutosPlanificados = Number((this.CalcularMinutosDiferencia(entrada.fecha_hora_horario, salida.fecha_hora_horario) - min_alimentacion).toFixed(2));
 
       if (minutosLaborados > 0) {
         minutosLaborados = Number((minutosLaborados - minutosAlimentacion).toFixed(2));
       }
     }
-    return [minutosAlimentacion, minutosLaborados, minutosAtrasos, minutosSalidasAnticipadas];
+    return [minutosAlimentacion, minutosLaborados, minutosAtrasos, minutosSalidasAnticipadas, minutosPlanificados];
   }
 
   CalcularMinutosDiferencia(inicio: any, fin: any): number {

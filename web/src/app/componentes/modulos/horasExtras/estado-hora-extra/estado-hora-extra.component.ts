@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { ToastrService } from 'ngx-toastr';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 interface Estados {
   valor: number;
@@ -18,6 +19,7 @@ interface Estados {
 })
 
 export class EstadoHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -31,7 +33,7 @@ export class EstadoHoraExtraComponent implements OnInit {
 
   estados: Estados[] = [
     { valor: 1, nombre: 'Pendiente' },
-    { valor: 2, nombre: 'Pre-Autorizado'},
+    { valor: 2, nombre: 'Pre-Autorizado' },
     { valor: 3, nombre: 'Aceptado' },
     { valor: 4, nombre: 'Rechazado' }
   ];
@@ -45,25 +47,29 @@ export class EstadoHoraExtraComponent implements OnInit {
     private restH: PedHoraExtraService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<EstadoHoraExtraComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip'); 
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.tiempo();
     this.llenarForm();
   }
 
-  tiempo () {
+  tiempo() {
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
     console.log('fecha Actual', this.FechaActual);
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  llenarForm(){
+  llenarForm() {
     this.HoraExtraForm.patchValue({
       estadoForm: this.data.estado
     });
@@ -76,7 +82,7 @@ export class EstadoHoraExtraComponent implements OnInit {
       id_hora_extra: this.data.id,
       id_departamento: this.data.id_departamento,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
 
     this.restH.ActualizarEstado(this.data.id, datosHorasExtras).subscribe(res => {
@@ -101,7 +107,7 @@ export class EstadoHoraExtraComponent implements OnInit {
         id_vacaciones: null,
         id_hora_extra: this.data.id,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       console.log(notificacion);
 

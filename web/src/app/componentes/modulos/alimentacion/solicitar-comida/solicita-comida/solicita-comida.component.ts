@@ -20,6 +20,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class SolicitaComidaComponent implements OnInit {
+  ips_locales: any = '';
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
@@ -79,7 +80,10 @@ export class SolicitaComidaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
@@ -217,7 +221,7 @@ export class SolicitaComidaComponent implements OnInit {
       fecha: form.fechaForm,
       extra: form.extraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     // VERIFICAR SI EXISTE UNA SOLICITUD O PLANIFICACION REGISTRADA
     let datosDuplicados = {
@@ -264,7 +268,7 @@ export class SolicitaComidaComponent implements OnInit {
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
       id_comida: alimentacion.id_comida,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {

@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
@@ -14,6 +14,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
   styleUrls: ['./recuperar-frase.component.css']
 })
 export class RecuperarFraseComponent implements OnInit {
+  ips_locales: any = '';
 
   token: string;
 
@@ -41,7 +42,8 @@ export class RecuperarFraseComponent implements OnInit {
     private restLogin: LoginService,
     private restEmpresa: EmpresaService,
     public router: Router,
-    public location: Location
+    public location: Location,
+    public validar: ValidacionesService,
   ) {
     var urlToken = this.location.prepareExternalUrl(this.location.path());
     this.token = urlToken.slice(1).split("/")[1];
@@ -49,6 +51,11 @@ export class RecuperarFraseComponent implements OnInit {
 
   ngOnInit(): void {
     this.VerRuta();
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   IngresarFrase(form: any) {
@@ -86,7 +93,10 @@ export class RecuperarFraseComponent implements OnInit {
             //inicio recuperacion Frase proceso normal
             let data = {
               token: this.token,
-              frase: form.nFrase
+              frase: form.nFrase,
+              user_name: this.user_name,
+              ip: this.ip, 
+              ip_local: this.ips_locales
             };
         
             this.rest.CambiarFrase(data).subscribe(res => {

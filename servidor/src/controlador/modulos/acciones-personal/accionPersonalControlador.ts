@@ -1,4 +1,5 @@
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
@@ -6,6 +7,8 @@ import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import pool from '../../../database';
 import path from 'path';
+import Excel from 'exceljs';
+import fs from 'fs';
 
 class AccionPersonalControlador {
 
@@ -25,7 +28,7 @@ class AccionPersonalControlador {
 
     public async CrearTipoAccion(req: Request, res: Response) {
         try {
-            const { descripcion, user_name, ip } = req.body;
+            const { descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -46,7 +49,8 @@ class AccionPersonalControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -68,18 +72,16 @@ class AccionPersonalControlador {
     public async CrearTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
 
         try {
-            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion,
-                tipo_situacion_propuesta, user_name, ip } = req.body;
+            const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal, tipo_permiso, 
-                    tipo_vacacion, tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6) RETURNING*
+                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES($1, $2, $3) RETURNING*
                 `
-                , [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
+                , [id_tipo, descripcion, base_legal]);
 
             const [datos] = response.rows;
 
@@ -93,13 +95,12 @@ class AccionPersonalControlador {
                     datosNuevos:
                         `
                         {
-                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                            "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
-                            "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
                         }
                         `
                     ,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -117,173 +118,11 @@ class AccionPersonalControlador {
         }
     }
 
-    // TABLA CARGO_PROPUESTO
-    public async ListarCargoPropuestos(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT * FROM map_cargo_propuesto
-            `
-        );
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async CrearCargoPropuesto(req: Request, res: Response): Promise<Response> {
-        try {
-            const { descripcion, user_name, ip } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            await pool.query(
-                `
-                INSERT INTO map_cargo_propuesto (descripcion) VALUES($1)
-                `
-                , [descripcion]);
-
-            // INSERTAR REGISTRO DE AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'map_cargo_propuesto',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `{"descripcion": "${descripcion}"}`,
-                ip,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-
-            return res.jsonp({ message: 'Registro guardado.' });
-        } catch (error) {
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
-        }
-    }
-
-    public async EncontrarUltimoCargoP(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT MAX(id) AS id FROM map_cargo_propuesto
-            `
-        );
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async ListarUnCargoPropuestos(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const ACCION = await pool.query(
-                `
-                SELECT * FROM map_cargo_propuesto WHERE id = $1
-                `
-                , [id]);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows)
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        } catch (error) {
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
-        }
-
-    }
-
-    // TABLA CONTEXTO_LEGAL 
-    public async ListarDecretos(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT * FROM map_contexto_legal
-            `
-        );
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async CrearDecreto(req: Request, res: Response): Promise<Response> {
-        try {
-            const { descripcion, user_name, ip } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            await pool.query(
-                `
-                INSERT INTO map_contexto_legal (descripcion) VALUES($1)
-                `
-                , [descripcion]);
-
-            // INSERTAR REGISTRO DE AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'map_contexto_legal',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `{"descripcion": "${descripcion}"}`,
-                ip,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.jsonp({ message: 'Registro guardado.' });
-        } catch (error) {
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
-        }
-    }
-
-    public async EncontrarUltimoDecreto(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT MAX(id) AS id FROM map_contexto_legal
-            `
-        );
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async ListarUnDecreto(req: Request, res: Response) {
-        const { id } = req.params;
-        const ACCION = await pool.query(
-            `
-            SELECT * FROM map_contexto_legal WHERE id = $1
-            `
-            , [id]);
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
     // TABLA TIPO_ACCION_PERSONAL 
     public async ListarTipoAccionPersonal(req: Request, res: Response) {
         const ACCION = await pool.query(
             `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal,
-                dtap.tipo_permiso, dtap.tipo_vacacion, dtap.tipo_situacion_propuesta, tap.descripcion AS nombre 
+            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE tap.id = dtap.id_tipo_accion_personal
             `
@@ -315,8 +154,7 @@ class AccionPersonalControlador {
         const { id } = req.params;
         const ACCION = await pool.query(
             `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal,
-                dtap.tipo_permiso, dtap.tipo_vacacion, dtap.tipo_situacion_propuesta, tap.descripcion AS nombre 
+            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
             `
@@ -331,8 +169,7 @@ class AccionPersonalControlador {
 
     public async ActualizarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta,
-                id, user_name, ip } = req.body;
+            const { id_tipo, descripcion, base_legal, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -352,7 +189,8 @@ class AccionPersonalControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -362,10 +200,10 @@ class AccionPersonalControlador {
 
             await pool.query(
                 `
-                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
-                    tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7
+                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
+                     WHERE id = $4
                 `
-                , [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
+                , [id_tipo, descripcion, base_legal, id]);
 
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -376,13 +214,12 @@ class AccionPersonalControlador {
                 datosNuevos:
                     `
                     {
-                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                        "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
-                        "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}"
                     }
                     `
                 ,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -399,7 +236,7 @@ class AccionPersonalControlador {
     public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -419,7 +256,8 @@ class AccionPersonalControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -440,7 +278,8 @@ class AccionPersonalControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -462,7 +301,7 @@ class AccionPersonalControlador {
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
                 fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip } = req.body;
+                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip, ip_local } = req.body;
 
             let datosNuevos = req.body;
 
@@ -513,7 +352,8 @@ class AccionPersonalControlador {
                     fecha_acta_final_concurso: ${fecha_acta_final_concurso}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                     numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                     descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -533,7 +373,7 @@ class AccionPersonalControlador {
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
                 fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip } = req.body;
+                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip, ip_local } = req.body;
 
             let datosNuevos = req.body;
 
@@ -555,7 +395,8 @@ class AccionPersonalControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
@@ -617,7 +458,8 @@ class AccionPersonalControlador {
                 fecha_acta_final_concurso: ${fecha_acta_final_concursoN}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                 numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                 descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -747,6 +589,282 @@ class AccionPersonalControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros' });
         }
     }
+
+
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
+  public async RevisarDatos(req: Request, res: Response): Promise<any> {
+    try {
+        const documento = req.file?.originalname;
+        let separador = path.sep;
+        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+        const workbook = new Excel.Workbook();
+        await workbook.xlsx.readFile(ruta);
+        let verificador = ObtenerIndicePlantilla(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
+        if (verificador === false) {
+            return res.jsonp({ message: 'no_existe', data: undefined });
+        }
+        else {
+            const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+            const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+
+            let data: any = {
+                fila: '',
+                tipo_accion_personal: '',
+                descripcion: '',
+                base_legal: '',
+                observacion: ''
+            };
+
+            var listaAccionPersonal: any = [];
+            var duplicados: any = [];
+            var mensaje: string = 'correcto';
+
+            if (plantilla) {
+                // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                const headerRow = plantilla.getRow(1);
+                const headers: any = {};
+                // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                headerRow.eachCell((cell: any, colNumber) => {
+                    headers[cell.value.toString().toUpperCase()] = colNumber;
+                });
+                // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']
+                ) {
+                    return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                }
+
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla.eachRow((row, rowNumber) => {
+                    // SALTAR LA FILA DE LAS CABECERAS
+                    if (rowNumber === 1) return;
+                    // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                    const ITEM = row.getCell(headers['ITEM']).value;
+                    const TIPO_ACCION_PERSONAL = row.getCell(headers['TIPO_ACCION_PERSONAL']).value?.toString().trim();
+                    const DESCRIPCION = row.getCell(headers['DESCRIPCION']).value?.toString().trim();
+                    const BASE_LEGAL = row.getCell(headers['BASE_LEGAL']).value?.toString().trim();
+
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
+                        (DESCRIPCION != undefined && DESCRIPCION != '') &&
+                        (BASE_LEGAL != undefined && BASE_LEGAL != '') ) {
+
+                        data.fila = ITEM;
+                        data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                        data.descripcion = DESCRIPCION;
+                        data.base_legal = BASE_LEGAL;
+                        data.observacion = 'no registrado';
+
+                        listaAccionPersonal.push(data);
+
+                    } else {
+                        data.fila = ITEM;
+                        data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                        data.descripcion = DESCRIPCION;
+                        data.base_legal = BASE_LEGAL;
+                        data.observacion = 'no registrado';
+
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
+
+                        if (TIPO_ACCION_PERSONAL == undefined) {
+                            data.tipo_accion_personal = 'No registrado';
+                            data.observacion = 'Tipo de acción de personal ' + data.observacion;
+                        }
+
+                        if (DESCRIPCION == undefined) {
+                          data.descripcion = 'No registrado';
+                          data.observacion = 'Descripción ' + data.observacion;
+                        }
+
+                        if (BASE_LEGAL == undefined) {
+                          data.base_legal= '-';
+                        }
+
+                        listaAccionPersonal.push(data);
+                    }
+                    data = {};
+                });
+            }
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
+
+            // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+            listaAccionPersonal.forEach(async (item: any, index: number) => {
+                if (item.observacion == 'no registrado') {
+                  const VERIFICAR_TIPO_ACCION = await pool.query(
+                    `
+                    SELECT * FROM map_tipo_accion_personal 
+                    WHERE UPPER(descripcion) = UPPER($1)
+                    `
+                    , [item.tipo_accion_personal]);
+    
+                  if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
+                    item.observacion = 'No existe el tipo de acción de personal en el sistema'
+                  }else{
+
+                    // const VERIFICAR_ACCION = await pool.query(
+                    //     `
+                    //     SELECT * FROM map_detalle_tipo_accion_personal
+                    //     WHERE id_tipo_accion_personal = $1
+                    //     `
+                    //     , [VERIFICAR_TIPO_ACCION.rows[0].id]);
+                       
+                    // if (VERIFICAR_ACCION.rowCount === 0) {
+                        
+                    //     // DISCRIMINACION DE ELEMENTOS IGUALES
+                    //     if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
+                    //         duplicados.push(item);
+                    //     } else {
+                    //         item.observacion = '1';
+                    //     }
+                    // }else{
+                    //     item.observacion = 'Ya existe en el sistema'  
+                    // }
+  
+                  }
+                }
+            });
+
+            setTimeout(() => {
+                listaAccionPersonal.sort((a: any, b: any) => {
+                    // COMPARA LOS NUMEROS DE LOS OBJETOS
+                    if (a.fila < b.fila) {
+                        return -1;
+                    }
+                    if (a.fila > b.fila) {
+                        return 1;
+                    }
+                    return 0; // SON IGUALES
+                });
+
+                var filaDuplicada: number = 0;
+
+                listaAccionPersonal.forEach(async (item: any) => {
+                    if (item.observacion == '1') {
+                        item.observacion = 'Registro duplicado'
+                    }else if(item.observacion == 'no registrado'){
+                      item.observacion = 'ok'
+                    }
+
+                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                        if (item.fila == filaDuplicada) {
+                            mensaje = 'error';
+                        }
+                    } else {
+                        return mensaje = 'error';
+                    }
+
+                    filaDuplicada = item.fila;
+
+                });
+
+                if (mensaje == 'error') {
+                    listaAccionPersonal = undefined;
+                }
+                return res.jsonp({ message: mensaje, data: listaAccionPersonal });
+            }, 1000)
+        }
+
+    } catch (error) {
+        return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+    }
+}
+
+  // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
+  public async CargarPlantilla(req: Request, res: Response) {
+    const { plantilla, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+    var listaProcesosInsertados: any = [];
+
+    for(const item of plantilla){
+        const { tipo_accion_personal, descripcion, base_legal } = item;
+        console.log('items: ',item)
+
+        try {
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+              `
+              SELECT * FROM map_tipo_accion_personal 
+                    WHERE UPPER(descripcion) = UPPER($1)
+              `
+              , [tipo_accion_personal]);
+    
+            const [tipo_acciones] = response.rows;
+    
+            console.log('response: ',response)
+
+              // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response_accion: QueryResult = await pool.query(
+          `
+          INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
+          `
+          , [response.rows[0].id, descripcion, base_legal ]);
+        const [detalleAccion] = response_accion.rows;
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+             tabla: 'map_detalle_tipo_accion_personal',
+             usuario: user_name,
+             accion: 'I',
+             datosOriginales: '',
+             datosNuevos: JSON.stringify(detalleAccion),
+             ip: ip,
+             ip_local: ip_local,
+             observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_tipo_accion_personal',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(tipo_acciones),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+    
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+
+
+
+
+          } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            error = true;
+          }
+
+    }
+
+    if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+    }
+    return res.status(200).jsonp({ message: 'ok' });
+  }
 
 }
 

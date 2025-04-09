@@ -50,7 +50,7 @@
                             <mat-form-field class="input-tables cedula">
                                 <input matInput placeholder="Buscar" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                    [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-error *ngIf="cedula.invalid">
                                     Indispensable ingresar dos valores
                                 </mat-error>
@@ -59,7 +59,7 @@
                         <td>
                             <mat-form-field class="input-tables codigo">
                                 <input matInput placeholder="Buscar" [formControl]="codigo"
-                                    (keypress)="IngresarSoloNumeros($event)">
+                                    >
                             </mat-form-field>
                         </td>
                         <td>
@@ -110,11 +110,11 @@
                 matTooltip="Descargar Lista de Dispositivos en formato PDF.">
                 <p>PDF</p>
             </i>
-            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+            <i (click)="generarExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Dispositivos en formato EXCEL.">
                 <p>XLSL</p>
             </i>
-            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+            <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Dispositivos en formato CSV.">
                 <p>CSV</p>
             </i>

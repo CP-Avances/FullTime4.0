@@ -142,7 +142,7 @@ export class ReporteAuditoriaComponent implements OnInit {
         { nombre: "Provincias", tabla: "e_provincias", modulo: "", disponibilidad: true },
         { nombre: "Ciudades", tabla: "e_ciudades", modulo: "", disponibilidad: true },
         { nombre: "Empresa", tabla: "e_empresa", modulo: "", disponibilidad: true },
-        { nombre: "Mensaje de Cumpleaños", tabla: "e_message_birthday", modulo: "", disponibilidad: true },
+        { nombre: "Mensaje de Notificaciones", tabla: "e_message_notificaciones", modulo: "", disponibilidad: true },
         { nombre: "Documentacion", tabla: "e_documentacion", modulo: "", disponibilidad: true },
         { nombre: "Detalles de Parámetros", tabla: "ep_detalle_parametro", modulo: "", disponibilidad: true },
         { nombre: "Roles", tabla: "ero_cat_roles", modulo: "", disponibilidad: true },
@@ -234,7 +234,13 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
-        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
+        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' ) return this.toastr.error('Ingresar fechas de búsqueda.');
+        if (this.accionesSeleccionadas.length == 0) return this.toastr.error('Ingresar acciones.');
+        if (this.tablasSolicitadas.length == 0)  return this.toastr.error(
+            'No a seleccionado ninguna.',
+            'Seleccione tablas.'
+          );
+
         this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
     }
 
@@ -372,15 +378,20 @@ export class ReporteAuditoriaComponent implements OnInit {
             console.log("quiero ver los datos", this.data_pdf);
             this.datosPdF = this.data_pdf;
             
-            // REALIZAR LA ACCIÓN CORRESPONDIENTE
-            switch (accion) {
-                case 'ver':
-                    this.VerDatos();
-                    break;
-                default:
-                    this.GenerarPDF(this.datosPdF, accion);
-                    break;
+            if( this.datosPdF.length != 0){
+                switch (accion) {
+                    case 'ver':
+                        this.VerDatos();
+                        break;
+                    default:
+                        this.GenerarPDF(this.datosPdF, accion);
+                        break;
+                }
+            }else{
+                this.toastr.error("No existen registros de auditoría.")
             }
+            // REALIZAR LA ACCIÓN CORRESPONDIENTE
+         
         } finally {
             this.habilitarprogress = false
         }

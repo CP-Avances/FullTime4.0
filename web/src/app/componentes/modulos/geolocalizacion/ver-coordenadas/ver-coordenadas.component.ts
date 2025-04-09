@@ -23,6 +23,9 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { Observable, map, startWith  } from 'rxjs';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -39,6 +42,7 @@ export interface EmpleadoElemento {
 })
 
 export class VerCoordenadasComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idUbicacion: number;
 
@@ -51,7 +55,11 @@ export class VerCoordenadasComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
+
+  filteredRoles!: Observable<any[]>;
+  roles: any = [];
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -127,6 +135,9 @@ export class VerCoordenadasComponent implements OnInit {
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.filtros.filtroNombreReg };
 
+  //FILTRO ROL
+  get filtroRolEmp() { return this.filtros.filtroRolEmp };  
+
   coordenadas: any = [];
   datosUsuarios: any = [];
 
@@ -150,6 +161,7 @@ export class VerCoordenadasComponent implements OnInit {
     public informacion: DatosGeneralesService,
     public componentec: ListarCoordenadasComponent,
     private asignaciones: AsignacionesService,
+    private restRoles: RolesService
   ) { }
 
   ngOnInit(): void {
@@ -157,13 +169,34 @@ export class VerCoordenadasComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip'); 
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.ConsultarDatos();
+
+    this, this.restRoles.BuscarRoles().subscribe((respuesta: any) => {
+      this.roles = respuesta
+      console.log('this.listaRoles: ', this.roles)
+    });
+
+        this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+          startWith(''),
+          map(value => this.filtrarRoles(value || ''))
+        );
+
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
+
+
+
   }
 
   // METODO PARA CONSULTAR INFORMACION
@@ -191,6 +224,14 @@ export class VerCoordenadasComponent implements OnInit {
       this.btnCheckHabilitar = false;
       this.auto_individual = true;
     }
+  }
+
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.roles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
   }
 
   // METODO PARA MANEJAR PAGINACION DE TABLAS
@@ -244,7 +285,7 @@ export class VerCoordenadasComponent implements OnInit {
   EliminarRegistro(id_emplu: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       ids: [id_emplu]
     }
     this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
@@ -387,6 +428,7 @@ export class VerCoordenadasComponent implements OnInit {
       case 5: this.filtros.setFiltroCedula(e); break;
       case 6: this.filtros.setFiltroNombreEmp(e); break;
       case 7: this.filtros.setFiltroNombreReg(e); break;
+      case 8: this.filtros.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -729,7 +771,7 @@ export class VerCoordenadasComponent implements OnInit {
         id_empl: arrayIds,
         id_ubicacion: this.idUbicacion,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
         this.cont = this.cont + 1;
@@ -809,23 +851,23 @@ export class VerCoordenadasComponent implements OnInit {
 
   // METODO PARA ELIMNAR REGISTROS DE UBICACION
   Remover() {
-    
+
     if (this.selectionUno.selected.length > 0) {
 
       const ids: number[] = this.selectionUno.selected.map((obj: any) => obj.id_emplu).filter((id) => id !== undefined);
 
       const datos = {
         user_name: this.user_name,
-        ip: this.ip, 
+        ip: this.ip, ip_local: this.ips_locales,
         ids: ids
       };
-      this.restU.EliminarCoordenadasUsuario( datos).subscribe(res => {
+      this.restU.EliminarCoordenadasUsuario(datos).subscribe(res => {
         this.ConsultarDatos();
         this.toastr.error('Registros removidos de la lista.', '', {
           timeOut: 6000,
         });
       });
-      
+
       this.HabilitarSeleccion();
       this.selectionUno.clear();
     }

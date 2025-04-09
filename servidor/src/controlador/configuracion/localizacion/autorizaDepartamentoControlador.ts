@@ -57,7 +57,7 @@ class AutorizaDepartamentoControlador {
     // METODO PARA REGISTRAR AUTORIZACION
     public async CrearAutorizaDepartamento(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar, user_name, ip } = req.body;
+            const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -78,7 +78,8 @@ class AutorizaDepartamentoControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -96,7 +97,7 @@ class AutorizaDepartamentoControlador {
     // METODO PARA ACTUALIZAR REGISTRO
     public async ActualizarAutorizaDepartamento(req: Request, res: Response): Promise<Response> {
         try {
-            const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar, user_name, ip } = req.body;
+            const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -112,7 +113,8 @@ class AutorizaDepartamentoControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar registro con id: ${id}`
                 });
 
@@ -138,7 +140,8 @@ class AutorizaDepartamentoControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -157,7 +160,7 @@ class AutorizaDepartamentoControlador {
     public async EliminarAutorizacionDepartamento(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -173,7 +176,8 @@ class AutorizaDepartamentoControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar registro con id: ${id}`
                 });
 
@@ -195,7 +199,8 @@ class AutorizaDepartamentoControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datos),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

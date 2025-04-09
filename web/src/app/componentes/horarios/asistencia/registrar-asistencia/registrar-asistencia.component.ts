@@ -19,6 +19,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class RegistrarAsistenciaComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() informacion: any;
 
@@ -43,7 +44,10 @@ export class RegistrarAsistenciaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarParametro();
   }
 
@@ -140,7 +144,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
       id_timbre: seleccionado.id,
       codigo: this.informacion.detalle.codigo,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     //console.log('ver ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {

@@ -10,7 +10,7 @@ import indexRutas from './rutas/indexRutas';
 import PROVINCIA_RUTA from './rutas/configuracion/localizacion/catProvinciaRutas';
 import CIUDAD_RUTAS from './rutas/configuracion/localizacion/ciudadesRutas';
 import EMPRESA_RUTAS from './rutas/configuracion/parametrizacion/catEmpresaRutas';
-import BIRTHDAY_RUTAS from './rutas/notificaciones/birthdayRutas';
+import MENSAJES_NOTIFICACIONES_RUTAS from './rutas/notificaciones/mensajesNotificacionesRutas';
 import DOCUMENTOS_RUTAS from './rutas/documentos/documentosRutas';
 import PARAMETROS_RUTAS from './rutas/configuracion/parametrizacion/parametrosRutas';
 import ROLES_RUTAS from './rutas/configuracion/parametrizacion/catRolesRutas';
@@ -49,6 +49,8 @@ import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
 import FUNCIONES_RUTAS from './rutas/funciones/funcionRutas';
+import GENERO_RUTAS  from './rutas/empleado/generos/catGeneroRutas'
+import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
 import AUTORIZACIONES_RUTAS from './rutas/autorizaciones/autorizacionesRutas';
@@ -71,6 +73,9 @@ import ALIMENTACION_RUTAS from './rutas/reportes/alimentacionRutas';
 import PROCESO_RUTA from './rutas/modulos/acciones-personal/catProcesoRutas';
 import EMPLEADO_PROCESO_RUTAS from './rutas/modulos/acciones-personal/empleProcesosRutas';
 import ACCION_PERSONAL_RUTAS from './rutas/modulos/acciones-personal/accionPersonalRutas';
+import GRADO_RUTAS from './rutas/modulos/acciones-personal/gradoRutas';
+import GRUPO_OCUPACIONAL_RUTAS from './rutas/modulos/acciones-personal/grupoOcupacional';
+
 // MODULO GEOLOCALIZACION
 import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
 // MODULO RELOJ VIRTUAL
@@ -91,13 +96,14 @@ import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas
 import REPORTE_HORA_EXTRA_RUTAS from './rutas/reportes/reporteHoraExtraRutas';
 
 import { createServer, Server } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
-var io: any;
-
+//var io: any;
 class Servidor {
 
     public app: Application;
     public server: Server;
+    public io: SocketIOServer;
 
     constructor() {
         this.app = express();
@@ -105,11 +111,25 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = createServer(this.app);
-        io = require('socket.io')(this.server, {
+        /*
+        this.io = require('socket.io')(this.server, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
             }
+        });
+*/
+        this.io = new SocketIOServer(this.server, {
+            cors: {
+                origin: '*', // Permitir todas las conexiones (ajustar según necesidades)
+                methods: ['GET', 'POST'],
+            },
+        });
+        this.io.on('connection', (socket: any) => {
+            // console.log('Cliente conectado:', socket.id);  // Verifica la conexión
+            socket.on('disconnect', () => {
+                console.log('Cliente desconectado:', socket.id);
+            });
         });
 
     }
@@ -160,7 +180,7 @@ class Servidor {
         this.app.use(`/${ruta}/discapacidades`, DISCAPACIDADES_RUTAS);
         this.app.use(`/${ruta}/vacunasTipos`, TIPO_VACUNAS_RUTAS);
         this.app.use(`/${ruta}/archivosCargados`, DOCUMENTOS_RUTAS);
-        this.app.use(`/${ruta}/birthday`, BIRTHDAY_RUTAS);
+        this.app.use(`/${ruta}/mensajes_notificaciones`, MENSAJES_NOTIFICACIONES_RUTAS);
         // EMPLEADOS
         this.app.use(`/${ruta}/empleado`, EMPLEADO_RUTAS);
         this.app.use(`/${ruta}/usuarios`, USUARIO_RUTA);
@@ -175,6 +195,9 @@ class Servidor {
         this.app.use(`/${ruta}/generalidades`, DATOS_GENERALES_RUTAS);
         this.app.use(`/${ruta}/notificacionSistema`, NOTIFICACION_RUTAS);
         this.app.use(`/${ruta}/metricas`, GRAFICAS_RUTAS);
+        this.app.use(`/${ruta}/generos`, GENERO_RUTAS);
+        this.app.use(`/${ruta}/estado-civil`, ESTADO_CIVIL_RUTAS);
+
         // CON MODULOS
         this.app.use(`/${ruta}/autorizaciones`, AUTORIZACIONES_RUTAS);
         this.app.use(`/${ruta}/noti-real-time`, NOTIFICACION_TIEMPO_REAL_RUTAS);
@@ -194,6 +217,9 @@ class Servidor {
         this.app.use(`/${ruta}/proceso`, PROCESO_RUTA);
         this.app.use(`/${ruta}/empleadoProcesos`, EMPLEADO_PROCESO_RUTAS);
         this.app.use(`/${ruta}/accionPersonal`, ACCION_PERSONAL_RUTAS);
+        this.app.use(`/${ruta}/grado`, GRADO_RUTAS);
+        this.app.use(`/${ruta}/grupoOcupacional`, GRUPO_OCUPACIONAL_RUTAS);
+
         // MODULO ALIMENTACION
         this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
         this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);
@@ -233,7 +259,7 @@ class Servidor {
         })
 
 
-        io.on('connection', (socket: any) => {
+        this.io.on('connection', (socket: any) => {
             console.log('Conexion con el socket ', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data: any) => {
                 let data_llega = {
@@ -256,6 +282,8 @@ class Servidor {
             });
 
             socket.on("nuevo_aviso", (data: any) => {
+                console.log('Datos recibidos en "nuevo_aviso":', data);
+
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -278,8 +306,6 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 
-import { cumpleanios } from './libs/sendBirthday';
-
 import { beforeFiveDays, beforeTwoDays, Peri_Vacacion_Automatico } from './libs/avisoVacaciones';
 
 import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
@@ -287,18 +313,37 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
 
 
+import { atrasosDiarios, atrasosSemanal } from './libs/sendAtraso';
+import { aniversario } from './libs/sendAniversario';
+import { cumpleanios } from './libs/sendBirthday';
+import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
+import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
+
+
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
  ** **************************************************************************************************** **/
 
- // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
+// METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
+export const io = SERVIDOR.io;
+
+setInterval(async () => {
+    atrasosDiarios();
+    atrasosSemanal();
+    faltasDiarios();
+    faltasSemanal();
+    salidasAnticipadasSemanal();
+    salidasAnticipadasDiarios();
+}, 2700000);
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
-cumpleanios();
+aniversario();
 
 // LLAMA AL METODO DE AVISOS DE VACACIONES
+cumpleanios();
+
 //beforeFiveDays();
 //beforeTwoDays();
 
@@ -310,4 +355,5 @@ cumpleanios();
 // ----------// conteoPermisos();
 
 
-//generarTimbres('1', '2023-11-01', '2023-11-02');
+//generarTimbres('1', '2023-11-01', '2023-11-02');//
+

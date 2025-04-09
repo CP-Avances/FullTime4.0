@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 interface Estados {
   valor: number;
@@ -17,6 +18,7 @@ interface Estados {
   styleUrls: ['./estado-vacaciones.component.css']
 })
 export class EstadoVacacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   estados: Estados[] = [
     { valor: 1, nombre: 'Pendiente' },
@@ -43,12 +45,16 @@ export class EstadoVacacionesComponent implements OnInit {
     private restV: VacacionesService,
     private realTime: RealTimeService,
     public dialogRef: MatDialogRef<EstadoVacacionesComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toformat('yyyy-MM-dd');
@@ -70,7 +76,7 @@ export class EstadoVacacionesComponent implements OnInit {
       id_rece_emp: this.data.vacacion.id_empleado,
       id_depa_send: this.data.depa[0].id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restV.ActualizarEstado(this.data.vacacion.id, datosVacacion).subscribe(respon => {
@@ -87,7 +93,7 @@ export class EstadoVacacionesComponent implements OnInit {
         id_vacaciones: this.data.vacacion.id,
         id_permiso: null,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       console.log(notificacion);
 

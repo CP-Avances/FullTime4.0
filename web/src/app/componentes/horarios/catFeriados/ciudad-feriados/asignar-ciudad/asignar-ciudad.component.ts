@@ -10,7 +10,7 @@ import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados
 
 import { ListarCiudadFeriadosComponent } from '../listar-ciudad-feriados/listar-ciudad-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 @Component({
   selector: 'app-asignar-ciudad',
   templateUrl: './asignar-ciudad.component.html',
@@ -18,6 +18,7 @@ import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-f
 })
 
 export class AsignarCiudadComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() id_feriado: number;
   @Input() pagina: string;
@@ -67,11 +68,15 @@ export class AsignarCiudadComponent implements OnInit {
     private feriado_: FeriadosService,
     public componentec: ListarCiudadFeriadosComponent,
     public componentef: ListarFeriadosComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerContinentes();
     this.BuscarDatosFeriado(this.id_feriado);
@@ -248,7 +253,7 @@ export class AsignarCiudadComponent implements OnInit {
           id_feriado: this.id_feriado,
           id_ciudad: obj.id,
           user_name: this.user_name,
-          ip: this.ip,
+          ip: this.ip, ip_local: this.ips_locales,
         }
         // BUSCAR ID DE CIUDADES EXISTENTES
         this.ciudadFeriados = [];

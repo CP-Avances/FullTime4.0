@@ -6,7 +6,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -16,6 +17,10 @@ import { ValidacionesService } from '../../../../servicios/generales/validacione
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -25,6 +30,18 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() {
@@ -125,6 +142,11 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() {
     return this.reporteService.filtroNombreEmp;
   }
+  get filtroRolEmp() { 
+    return this.reporteService.filtroRolEmp;
+  }
+
+
 
   constructor(
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
@@ -134,16 +156,67 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
     public validar: ValidacionesService,
+    private restP: ParametrosService,
+    private restGenero: GenerosService,
+    private resNacionalidades: NacionalidadService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
+    this.ObtenerGeneros();
+    this.ObtenerNacionalidades();
   }
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
+    // METODO PARA LISTAR PARÁMETROS
+    parametros: any = [];
+    ObtenerParametros() {
+      this.parametros = [];
+      this.numero_pagina = 1;
+      this.restP.ListarParametros().subscribe(datos => {
+        datos.sort((a: any, b: any) => a.id - b.id);
+        this.parametros = datos;
+        this.ObtenerDetallesParametro();
+      });
+    }
+  
+    // METOOD PARA OBTENER DETALLES DE PARAMETROS
+    detalles: any = [];
+    ObtenerDetallesParametro() {
+      this.detalles = [];
+      this.restP.BuscarDetallesParametros().subscribe(datos => {
+        datos.sort((a: any, b: any) => a.id - b.id);
+        this.detalles = datos;
+        this.parametros.forEach((parametro: any) => {
+          parametro.detalles = this.detalles.filter((detalle: any) => detalle.id_parametro === parametro.id);
+        });
+      });
+    }
 
   ngOnDestroy() {
     this.departamentos = [];
@@ -153,6 +226,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.cargos = [];
     this.arr_emp = [];
   }
+
 
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
@@ -272,7 +346,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.data_pdf = seleccionados;
     switch (accion) {
-      case 'excel': this.ExportarExcel(); break;
+      case 'excel': this.generarExcel(); break;
       case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
@@ -427,58 +501,80 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         },
       });
 
-      // PRESENTACION DE LA INFORMACION
-      let arr_emp: any = [];
-      selec.empleados.forEach((empl: any) => {
-        arr_emp.push(empl)
-      });
 
-      arr_emp.sort(function (a: any, b: any) {
-        return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
-      });
+    // PRESENTACIÓN DE LA INFORMACIÓN
+    let arr_emp: any[] = [];
 
-      n.push({
-        style: 'tableMargin',
-        table: {
-          widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-          headerRows: 1,
-          body: [
-            [
-              { text: 'N°', style: 'tableHeader' },
-              { text: 'CÉDULA', style: 'tableHeader' },
-              { text: 'CÓDIGO', style: 'tableHeader' },
-              { text: 'EMPLEADO', style: 'tableHeader' },
-              { text: 'GÉNERO', style: 'tableHeader' },
-              { text: 'CIUDAD', style: 'tableHeader' },
-              { text: 'SUCURSAL', style: 'tableHeader' },
-              { text: 'RÉGIMEN', style: 'tableHeader' },
-              { text: 'DEPARTAMENTO', style: 'tableHeader' },
-              { text: 'CARGO', style: 'tableHeader' },
-              { text: 'CORREO', style: 'tableHeader' }
-            ],
-            ...arr_emp.map((usu: any) => {
-              return [
-                { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-                { style: 'itemsTable', text: usu.cedula },
-                { style: 'itemsTableCentrado', text: usu.codigo },
-                { style: 'itemsTable', text: usu.apellido + ' ' + usu.nombre },
-                { style: 'itemsTableCentrado', text: usu.genero == 1 ? 'M' : 'F' },
-                { style: 'itemsTable', text: usu.ciudad },
-                { style: 'itemsTable', text: usu.sucursal },
-                { style: 'itemsTable', text: usu.regimen },
-                { style: 'itemsTable', text: usu.departamento },
-                { style: 'itemsTable', text: usu.cargo },
-                { style: 'itemsTable', text: usu.correo },
-              ]
-            }),
-          ]
+    selec.empleados.forEach((empl: any) => {
+      let generoObj = this.generos.find((g: any) => g.id === empl.genero);
+      let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+      let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+      let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
+      arr_emp.push({
+        ...empl,
+        genero: nombreGenero,
+        nacionalidad: nombreNacionalidad
+      });
+    });
+
+    // Construcción de la tabla
+    n.push({
+      style: 'tableMargin',
+      table: {
+        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto','auto','auto','auto'],
+        headerRows: 1,
+        body: [
+          [
+            { text: 'N°', style: 'tableHeader' },
+            { text: 'CÉDULA', style: 'tableHeader' },
+            { text: 'CÓDIGO', style: 'tableHeader' },
+            { text: 'EMPLEADO', style: 'tableHeader' },
+            { text: 'USUARIO', style: 'tableHeader' },
+            { text: 'GÉNERO', style: 'tableHeader' },
+            { text: 'NACIONALIDAD', style: 'tableHeader' },
+            { text: 'CIUDAD', style: 'tableHeader' },
+            { text: 'SUCURSAL', style: 'tableHeader' },
+            { text: 'RÉGIMEN', style: 'tableHeader' },
+            { text: 'DEPARTAMENTO', style: 'tableHeader' },
+            { text: 'CARGO', style: 'tableHeader' },
+            { text: 'ROL', style: 'tableHeader' },
+            { text: 'CORREO', style: 'tableHeader' }
+          ],
+          ...arr_emp.map((usu: any) => {
+            return [
+              { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
+              { style: 'itemsTableCentrado', text: usu.cedula },
+              { style: 'itemsTableCentrado', text: usu.codigo },
+              { style: 'itemsTable', text: `${usu.apellido} ${usu.nombre}` },
+              { style: 'itemsTableCentrado', text: usu.usuario },
+              { style: 'itemsTableCentrado', text: usu.genero },
+              { style: 'itemsTableCentrado', text: usu.nacionalidad },
+              { style: 'itemsTableCentrado', text: usu.ciudad },
+              { style: 'itemsTableCentrado', text: usu.sucursal },
+              { style: 'itemsTableCentrado', text: usu.regimen },
+              { style: 'itemsTableCentrado', text: usu.departamento },
+              { style: 'itemsTableCentrado', text: usu.cargo },
+              { style: 'itemsTableCentrado', text: usu.rol },
+              { style: 'itemsTable', text: usu.correo }
+            ];
+          })
+        ]
+      },
+      layout: {
+        fillColor: function (rowIndex: any) {
+          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
         },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-          }
-        }
-      });
+        paddingLeft: function () { return 2; }, // Reduce el margen izquierdo en las celdas
+        paddingRight: function () { return 2; }, // Reduce el margen derecho en las celdas
+        paddingTop: function () { return 1; }, // Reduce el margen superior en las celdas
+        paddingBottom: function () { return 1; }, // Reduce el margen inferior en las celdas
+        columnGap: 2 // 🔹 Ajusta el espacio entre columnas (pruébalo con valores entre 1 y 4)
+      }
+    });
+    
+
     })
     return n;
   }
@@ -487,46 +583,169 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
 
-  ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xls`);
-  }
+   nacionalidades: any=[];
+   ObtenerNacionalidades(){
+    this.resNacionalidades.ListarNacionalidad().subscribe(datos => {
+      this.nacionalidades = datos;
+    })
+   }
 
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let usuarios: any[] = [];
-    let c = 0;
-    array.forEach((empl) => {
-      empl.empleados.forEach((usu: any) => {
-        let ele = {
-          'Cédula': usu.cedula,
-          'Código': usu.codigo,
-          'Apellido': usu.apellido,
-          'Nombre': usu.nombre,
-          'Género': usu.genero == 1 ? 'M' : 'F',
-          'Ciudad': usu.ciudad,
-          'Sucursal': usu.sucursal,
-          'Régimen': usu.regimen,
-          'Departamento': usu.departamento,
-          'Cargo': usu.cargo,
-          'Correo': usu.correo,
-        }
-        nuevo.push(ele)
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.data_pdf.forEach((empl) => {
+      empl.empleados.map((usu: any) => {
+        
+        let generoObj = this.generos.find((g: any) => g.id == usu.genero);
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+        let nacionalidadObj = this.nacionalidades.find((na: any) => na.id == usu.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
+        datos.push([
+          n++,
+          usu.cedula,
+          usu.codigo,
+          usu.apellido,
+          usu.nombre,
+          usu.usuario,
+          nombreGenero,
+          nombreNacionalidad,
+          usu.ciudad,
+          usu.sucursal,
+          usu.regimen,
+          usu.departamento,
+          usu.cargo,
+          usu.rol,
+          usu.correo,
+        ])
       })
     });
-    nuevo.sort(function (a: any, b: any) {
-      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
-    });
-    nuevo.forEach((u: any) => {
-      c = c + 1;
-      const usuarioNuevo = Object.assign({ 'N°': c }, u);
-      usuarios.push(usuarioNuevo);
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Usuarios");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
     });
 
-    return usuarios;
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:L1");
+    worksheet.mergeCells("B2:L2");
+    worksheet.mergeCells("B3:L3");
+    worksheet.mergeCells("B4:L4");
+    worksheet.mergeCells("B5:L5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Usuarios'.toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 30 },
+      { key: "apellido", width: 30 },
+      { key: "nombre", width: 20 },
+      { key: "usuario", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "nacionalidad", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "rol", width: 20 },
+      { key: "correo", width: 35 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "USUARIO", totalsRowLabel: "", filterButton: true },
+      { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "ROL", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "UsuariosexcelTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 12; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob,`Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **
@@ -538,7 +757,16 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     let n = 0;
     this.data_pdf.forEach((selec: any) => {
       selec.empleados.forEach((e: any) => {
-        this.arr_emp.push(e);
+        let generoObj = this.generos.find((g: any) => g.id == e.genero);
+        let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === e.id_nacionalidad);
+        let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
+        let nombreGenero = generoObj ? generoObj.genero : "No especificado";
+        this.arr_emp.push({
+          ...e, 
+          genero: nombreGenero,
+          nacionalidad: nombreNacionalidad
+        });
       })
     });
     this.arr_emp.sort(function (a: any, b: any) {

@@ -22,7 +22,7 @@ class RegimenControlador {
     CrearRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, user_name, ip } = req.body;
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
@@ -67,6 +67,7 @@ class RegimenControlador {
                     datosOriginales: "",
                     datosNuevos: JSON.stringify(regimen),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -89,7 +90,7 @@ class RegimenControlador {
     ActualizarRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, user_name, ip } = req.body;
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -106,6 +107,7 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -154,6 +156,7 @@ class RegimenControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -233,7 +236,7 @@ class RegimenControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
@@ -251,6 +254,7 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -268,6 +272,7 @@ class RegimenControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: "",
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -288,7 +293,7 @@ class RegimenControlador {
     CrearPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_regimen, descripcion, dias_vacacion, user_name, ip } = req.body;
+                const { id_regimen, descripcion, dias_vacacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
@@ -304,6 +309,7 @@ class RegimenControlador {
                     datosOriginales: "",
                     datosNuevos: JSON.stringify(periodo),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION 
@@ -326,7 +332,7 @@ class RegimenControlador {
     ActualizarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, dias_vacacion, id, user_name, ip } = req.body;
+                const { descripcion, dias_vacacion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -343,6 +349,7 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -360,6 +367,7 @@ class RegimenControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{"descripcion": "${descripcion}", "dias_vacacion": "${dias_vacacion}"}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -393,7 +401,7 @@ class RegimenControlador {
     EliminarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
@@ -411,6 +419,7 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -428,6 +437,7 @@ class RegimenControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: "",
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 return res.jsonp({ message: "Registro eliminado." });
@@ -446,7 +456,7 @@ class RegimenControlador {
     CrearAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { anio_desde, anio_hasta, dias_antiguedad, id_regimen, user_name, ip } = req.body;
+                const { anio_desde, anio_hasta, dias_antiguedad, id_regimen, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
@@ -462,6 +472,7 @@ class RegimenControlador {
                     datosOriginales: "",
                     datosNuevos: JSON.stringify(antiguedad),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -484,7 +495,7 @@ class RegimenControlador {
     ActualizarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { anio_desde, anio_hasta, dias_antiguedad, id, user_name, ip } = req.body;
+                const { anio_desde, anio_hasta, dias_antiguedad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -501,6 +512,7 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -518,6 +530,7 @@ class RegimenControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{"anio_desde": "${anio_desde}", "anio_hasta": "${anio_hasta}", "dias_antiguedad": "${dias_antiguedad}"}`,
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -550,7 +563,7 @@ class RegimenControlador {
     EliminarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
@@ -568,6 +581,7 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
@@ -585,6 +599,7 @@ class RegimenControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: "",
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null,
                 });
                 // FINALIZAR TRANSACCION
@@ -595,23 +610,6 @@ class RegimenControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query("ROLLBACK");
                 return res.status(500).jsonp({ message: error });
-            }
-        });
-    }
-    ListarRegimenSucursal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const REGIMEN = yield database_1.default.query(`
-      SELECT r.id, r.descripcion 
-      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c 
-      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_sucursal = $1
-      GROUP BY r.id, r.descripcion
-      `, [id]);
-            if (REGIMEN.rowCount != 0) {
-                return res.jsonp(REGIMEN.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: "No se encuentran registros." });
             }
         });
     }

@@ -24,6 +24,7 @@ import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciud
 })
 
 export class CrearPedidoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
   filtroNombreH: Observable<any[]>;
@@ -161,6 +162,9 @@ export class CrearPedidoAccionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem("usuario");
     this.ip = localStorage.getItem("ip");
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {
@@ -184,16 +188,10 @@ export class CrearPedidoAccionComponent implements OnInit {
       // INVOCACION A LOS METODOS PARA CARGAR DATOS
       this.ObtenerTiposAccion();
       this.ObtenerEmpleados();
-      this.ObtenerDecretos();
       this.ObtenerCiudades();
       this.ObtenerProcesos();
-      this.ObtenerCargos();
       this.MostrarDatos();
-
-      // DATOS VACIOS INDICAR LA OPCION OTRO
-      this.decretos[this.decretos.length] = { descripcion: "OTRO" };
-      this.cargos[this.cargos.length] = { descripcion: "OTRO" };
-    }
+}
   }
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
@@ -239,16 +237,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     });
   }
 
-  // BUSQUEDA DE DATOS DE LA TABLA DECRETOS_ACUERDOS_RESOL
-  decretos: any = [];
-  ObtenerDecretos() {
-    this.decretos = [];
-    this.restAccion.ConsultarDecreto().subscribe((datos) => {
-      this.decretos = datos;
-      this.decretos[this.decretos.length] = { descripcion: "OTRO" };
-    });
-  }
-
   // METODO PARA ACTIVAR FORMULARIO NOMBRE DE OTRA OPCION
   IngresarOtro(form1: any) {
     if (form1.tipoDecretoForm === undefined) {
@@ -278,16 +266,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-    });
-  }
-
-  // METODO PARA BUSQUEDA DE DATOS DE LA TABLA CARGO_PROPUESTO
-  cargos: any = [];
-  ObtenerCargos() {
-    this.cargos = [];
-    this.restAccion.ConsultarCargoPropuesto().subscribe((datos) => {
-      this.cargos = datos;
-      this.cargos[this.cargos.length] = { descripcion: "OTRO" };
     });
   }
 
@@ -476,7 +454,7 @@ export class CrearPedidoAccionComponent implements OnInit {
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
               user_name: this.user_name,
-              ip: this.ip,
+              ip: this.ip, ip_local: this.ips_locales,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
             if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
@@ -520,19 +498,19 @@ export class CrearPedidoAccionComponent implements OnInit {
       form2.tipoCargoForm != undefined
     ) {
       console.log("INGRESA 2", datosAccion);
-      this.IngresarNuevoDecreto(form1, form2, datosAccion, "1");
+
     } else if (
       form1.tipoDecretoForm != undefined &&
       form2.tipoCargoForm === undefined
     ) {
       console.log("INGRESA 3", datosAccion);
-      this.IngresarNuevoCargo(form2, datosAccion, "1");
+     
     } else if (
       form1.tipoDecretoForm === undefined &&
       form2.tipoCargoForm === undefined
     ) {
       console.log("INGRESA 5", datosAccion);
-      this.IngresarNuevoDecreto(form1, form2, datosAccion, "2");
+
     } else {
       console.log("INGRESA 9", datosAccion);
       this.GuardarDatos(datosAccion);
@@ -579,73 +557,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     });
   }
 
-  // METODO PARA INGRESAR NUEVO TIPO DE DECRETO - ACUERDO - RESOLUCION
-  IngresarNuevoDecreto(form1: any, form2: any, datos: any, opcion: string) {
-    if (form1.otroDecretoForm != "") {
-      let acuerdo = {
-        descripcion: form1.otroDecretoForm,
-        user_name: this.user_name,
-        ip: this.ip,
-      };
-      this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
-        // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCIÓN - OTROS
-        this.restAccion.BuscarIdDecreto().subscribe((max) => {
-          datos.decre_acue_resol = max[0].id;
-          // INGRESAR PEDIDO DE ACCION DE PERSONAL
-          if (opcion === "1") {
-            this.GuardarDatos(datos);
-          } else if (opcion === "2" || opcion === "3") {
-            this.IngresarNuevoCargo(form2, datos, "1");
-          }
-          // else if (opcion === '3') {
-          //   this.IngresarNuevoCargo(form, datos, '1');
-          // }
-          else if (opcion === "4") {
-            //this.IngresarNuevoProceso(form, datos, '1');
-          }
-        });
-      });
-    } else {
-      this.toastr.info(
-        "Ingresar una nueva opción o seleccionar una de la lista",
-        "Verificar datos",
-        {
-          timeOut: 6000,
-        }
-      );
-    }
-  }
-
-  // METODO PARA INGRESAR NUEVO CARGO PROPUESTO
-  IngresarNuevoCargo(form2: any, datos: any, opcion: string) {
-    if (form2.otroCargoForm != "") {
-      let cargo = {
-        descripcion: form2.otroCargoForm,
-        user_name: this.user_name,
-        ip: this.ip,
-      };
-      this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
-        // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS
-        this.restAccion.BuscarIdCargoPropuesto().subscribe((max) => {
-          datos.cargo_propuesto = max[0].id;
-          // INGRESAR PEDIDO DE ACCION DE PERSONAL
-          if (opcion === "1") {
-            this.GuardarDatos(datos);
-          } else if (opcion === "2") {
-            //this.IngresarNuevoProceso(form, datos, '1');
-          }
-        });
-      });
-    } else {
-      this.toastr.info(
-        "Ingresar una nueva opción o seleccionar una de la lista",
-        "Verificar datos",
-        {
-          timeOut: 6000,
-        }
-      );
-    }
-  }
 
   // METODO PARA INGRESAR SOLO LETRAS
   IngresarSoloLetras(e: any) {

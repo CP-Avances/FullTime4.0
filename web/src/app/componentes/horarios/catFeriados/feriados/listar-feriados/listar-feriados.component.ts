@@ -7,9 +7,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 // IMPORTACION DE COMPONENTES
 import { EditarFeriadosComponent } from '../editar-feriados/editar-feriados.component';
@@ -32,6 +32,19 @@ import { ITableFeriados } from 'src/app/model/reportes.model';
 })
 
 export class ListarFeriadosComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -102,10 +115,35 @@ export class ListarFeriadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   /** **************************************************************************************** **
@@ -374,7 +412,7 @@ export class ListarFeriadosComponent implements OnInit {
     const data = {
       plantilla: this.listaFerediadCiudadCorrectos,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.rest.Crear_feriados_ciudad(data).subscribe();
   }
@@ -398,7 +436,7 @@ export class ListarFeriadosComponent implements OnInit {
       const data = {
         plantilla: this.listFeriadosCorrectos,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.Crear_feriados(data).subscribe({
         next: (response) => {
@@ -467,7 +505,10 @@ export class ListarFeriadosComponent implements OnInit {
     }
     else if (observacion == 'La ciudad no existe en el sistema' ||
       observacion == 'La provincia no existe en el sistema') {
-      return 'rgb(255, 192, 203';
+      return 'rgb(255, 192, 203)';
+    }
+    else if (observacion == 'La ciudad no pertenece a la provincia'){
+      return 'rgb(238, 34, 207)';
     }
     else {
       return 'white'
@@ -581,27 +622,119 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.feriados);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
+
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.feriados.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.descripcion,
+        obj.fecha_,
+        obj.fec_recuperacion_
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Feriados");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:E1");
+    worksheet.mergeCells("B2:E2");
+    worksheet.mergeCells("B3:E3");
+    worksheet.mergeCells("B4:E4");
+    worksheet.mergeCells("B5:E5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Feriados'.toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "feriado", width: 20 },
+      { key: "fecha", width: 20 },
+      { key: "fecha_recupera", width: 30 },
+
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "FERIADO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA_RECUPERA", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "FeriadosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 5; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.feriados[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
     }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA FERIADOS');
-    xlsx.writeFile(wb, "FeriadosEXCEL" + '.xlsx');
-    this.BuscarParametro();
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "FeriadosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************* **
@@ -658,19 +791,36 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
+
+  ExportToCSV() {
+    // 1. Crear un nuevo workbook
     this.OrdenarDatos(this.feriados);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
-      }
-    }));
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
+    const workbook = new ExcelJS.Workbook();
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('FeriadosCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'CODIGO', key: 'codigo', width: 10 },
+      { header: 'FERIADO', key: 'feriado', width: 30 },
+      { header: 'FECHA', key: 'fecha', width: 15 },
+      { header: 'FECHA_RECUPERA', key: 'fecha_recupera', width: 15 }
+    ];
+    // 4. Llenar las filas con los datos
+    this.feriados.forEach((obj: any) => {
+      worksheet.addRow({
+        codigo: obj.id,
+        feriado: obj.descripcion,
+        fecha: obj.fecha_,
+        fecha_recupera: obj.fec_recuperacion_
+      }).commit();
+    });
+  
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "FeriadosCSV.csv");
+    });
     this.BuscarParametro();
   }
 
@@ -794,7 +944,7 @@ export class ListarFeriadosComponent implements OnInit {
   Eliminar(id_feriado: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarFeriado(id_feriado, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -833,7 +983,7 @@ export class ListarFeriadosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

@@ -14,20 +14,20 @@ export class CatModalidadLaboralService {
   listaModalidad_laboral(){
     return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/modalidadLaboral');
   }
-  
+
   // METODO PARA REGISTRAR UNA MODALIDAD LABORAL   **USADO
   CrearModalidadLaboral(modalidad: any){
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/crearModalidad`, modalidad).pipe(
       catchError(modalidad)
     );
   }
-  
+
   // METODO PARA ACTUALIZAR REGISTRO    **USADO
   ActualizarModalidadLab(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral`, datos)
     .pipe(catchError(datos));
   }
-  
+
   // METODO PARA ELIMINAR DATOS
   Eliminar(id: any, datos: any){
     const url = `${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/eliminar/${id}`;
@@ -41,8 +41,8 @@ export class CatModalidadLaboralService {
   RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/modalidadLaboral/upload/revision', formData);
   }
-Ç
-// METODO PARA SUBR DATOS AL SISTEMA    **USADO
+
+  // METODO PARA SUBR DATOS AL SISTEMA    **USADO
   SubirArchivoExcel(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/cargar_plantilla`, formData);
   }

@@ -16,6 +16,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class EditarPeriodoVacacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
   @Input() pagina: any;
@@ -60,11 +61,15 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     private toastr: ToastrService,
     public componentev: VerEmpleadoComponent,
     public validar: ValidacionesService,
+    
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     //console.log('ver data ', this.data)
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ImprimirDatos();
@@ -127,7 +132,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       horas_vacaciones: form.horaVacacionForm,
       min_vacaciones: form.minVacacionForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     console.log('ver dara ', datosPerVacaciones)
     this.restV.ActualizarPeriodoV(datosPerVacaciones).subscribe(response => {

@@ -191,6 +191,11 @@ export class BuscarAsistenciaComponent implements OnInit {
     this.asistencia = [];
   }
 
+  // METODO PARA VALIDAR INGRESO DE NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
+  }
+
   //CONTROL BOTONES
   getRevisarRegistro(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');

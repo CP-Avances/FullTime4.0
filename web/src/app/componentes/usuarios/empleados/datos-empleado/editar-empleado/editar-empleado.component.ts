@@ -1,6 +1,5 @@
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit,Input } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
@@ -8,9 +7,13 @@ import { Router } from '@angular/router';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-editar-empleado',
@@ -19,6 +22,10 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 })
 
 export class EditarEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
+
+  @Input() empleado: any;
+  @Input() pagina:any;
 
   nacionalidades: any = [];
   private idNacionalidad: number;
@@ -42,38 +49,47 @@ export class EditarEmpleadoComponent implements OnInit {
   ip: string | null;
 
   constructor(
+    public componentev: VerEmpleadoComponent,
     private _formBuilder: FormBuilder,
     private toastr: ToastrService,
     private rest: EmpleadoService,
     private user: UsuarioService,
     private rol: RolesService,
     public router: Router,
-    public ventana: MatDialogRef<EditarEmpleadoComponent>,
     public validar: ValidacionesService,
     public loginService: LoginService,
-    @Inject(MAT_DIALOG_DATA) public empleado: any
+    public generoS: GenerosService,
+    public estadoS: EstadoCivilService,
   ) {
-    this.idEmpleado = this.empleado.id;
     this.empleado_inicia = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+    this.idEmpleado = this.empleado.id;
     this.CargarRoles();
     this.VerificarFormulario();
     this.ObtenerNacionalidades();
+    this.ObtenerEstadoCivil();
+    this.ObtenerGeneros();
     this.VerificarCodigo();
   }
 
   // METODO PARA FILTRAR DATOS DE NACIONALIDAD
-  private _filter(value: string): any {
-    if (value != null) {
+  private _filter(value: any): any {
+    if (typeof value === 'string') {
       const filterValue = value.toLowerCase();
-      return this.nacionalidades.filter((nacionalidades: any) => nacionalidades.nombre.toLowerCase().includes(filterValue));
+      return this.nacionalidades.filter((nacionalidad: any) =>
+        nacionalidad.nombre.toLowerCase().includes(filterValue)
+      );
     }
+    return this.nacionalidades; 
   }
+  
 
   // METODO PARA LISTAR ROLES
   CargarRoles() {
@@ -94,10 +110,10 @@ export class EditarEmpleadoComponent implements OnInit {
     });
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
-      estadoCivilForm: ['', Validators.required],
+      estadoCivilForm: [0, Validators.required],
       domicilioForm: [''],
       telefonoForm: [''],
-      generoForm: ['', Validators.required],
+      generoForm: [0, Validators.required],
       estadoForm: ['', Validators.required],
     });
     this.terceroFormGroup = this._formBuilder.group({
@@ -111,10 +127,33 @@ export class EditarEmpleadoComponent implements OnInit {
     this.rest.BuscarNacionalidades().subscribe(res => {
       this.nacionalidades = res;
       this.ObtenerEmpleado();
+      console.log(this.nacionalidades)
       this.filteredOptions = this.NacionalidadControl.valueChanges.pipe(
         startWith(''),
         map((value: any) => this._filter(value))
       );
+      
+    });
+  }
+
+  estados_civil: any = []
+  // METODO PARA LISTAR NACIONALIDADES
+  ObtenerEstadoCivil() {
+    this.estadoS.ListarEstadoCivil().subscribe(res => {
+      this.estados_civil = res;
+      this.ObtenerEmpleado();
+
+    });
+  }
+
+  // METODO PARA LISTAR NACIONALIDADES
+  generos: any = []
+
+  ObtenerGeneros() {
+    this.generoS.ListarGeneros().subscribe(res => {
+      this.generos = res;
+      this.ObtenerEmpleado();
+
     });
   }
 
@@ -122,6 +161,7 @@ export class EditarEmpleadoComponent implements OnInit {
   ObtenerEmpleado() {
     const { apellido, cedula, codigo, correo, domicilio, estado_civil, estado, fecha_nacimiento, genero,
       id, id_nacionalidad, nombre, telefono } = this.empleado;
+
 
     this.primeroFormGroup.setValue({
       apellidoForm: apellido,
@@ -179,7 +219,7 @@ export class EditarEmpleadoComponent implements OnInit {
         timeOut: 6000,
       });
       this.router.navigate(['/codigo/']);
-      this.Cancelar();
+      this.Cancelar(2);
     });
   }
 
@@ -233,7 +273,7 @@ export class EditarEmpleadoComponent implements OnInit {
       estado: form2.estadoForm,
       codigo: form1.codigoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOLA VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -242,17 +282,20 @@ export class EditarEmpleadoComponent implements OnInit {
         (response: any) => {
           if (response.message === 'Registro actualizado.') {
             this.ActualizarUser(form3, form1, form2);
+            this.Cancelar(2);
           }
         },
         error => {
           this.toastr.error(error.error.message, 'Upss!!! algo salió mal.', {
             timeOut: 6000,
           });
+          this.Cancelar(2);
         }
       );
     }
     else {
       this.ActualizarUser(form3, form1, form2);
+      this.Cancelar(2);
     }
   }
 
@@ -271,7 +314,7 @@ export class EditarEmpleadoComponent implements OnInit {
       id_rol: form3.rolForm,
       estado: estado_user,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.user.ActualizarDatos(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -297,7 +340,6 @@ export class EditarEmpleadoComponent implements OnInit {
       if (form3.userForm != this.usuario[0].usuario || form3.rolForm != this.usuario[0].id_rol
         || estado != this.usuario[0].estado
       ) {
-        this.ventana.close(false);
         this.loginService.logout();
       }
       else {
@@ -316,7 +358,7 @@ export class EditarEmpleadoComponent implements OnInit {
         valor: codigo,
         id: 1,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })
@@ -370,12 +412,33 @@ export class EditarEmpleadoComponent implements OnInit {
     this.primeroFormGroup.reset();
     this.segundoFormGroup.reset();
     this.terceroFormGroup.reset();
-    this.ventana.close(true)
+  
   }
 
   // METODO PARA CERRAR VENTANA
-  Cancelar() {
-    this.ventana.close(false);
+  Cancelar(opcion: any) {
+    this.componentev.ver_empleado = true;
+    
+    if (this.pagina === 'ver-empleado') {
+      this.componentev.editar_empleado = false;
+      
+      if (opcion === 2) {
+        this.componentev.VerEmpleado(this.componentev.formato_fecha);
+  
+        setTimeout(() => {
+          const divMapa = document.getElementById('geolocalizacion');
+  
+          if (divMapa) {
+            var empleado = this.componentev.empleadoUno[0].nombre + ' ' + this.componentev.empleadoUno[0].apellido;
+            this.componentev.MapGeolocalizar(
+              this.componentev.empleadoUno[0].latitud,
+              this.componentev.empleadoUno[0].longitud,
+              empleado
+            );
+          } 
+        }, 200);
+      }
+    }
   }
 
 }

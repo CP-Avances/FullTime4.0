@@ -48,40 +48,6 @@ export class AccionPersonalService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/accion/tipo`, datos);
   }
 
-  /** SERVICIOS PARA TABLA CARGO_PROPUESTO*/
-  ConsultarCargoPropuesto() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/cargo`);
-  }
-
-  ConsultarUnCargoPropuesto(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/cargo/${id}`);
-  }
-
-  IngresarCargoPropuesto(datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/cargo`, datos);
-  }
-
-  BuscarIdCargoPropuesto() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/tipo/cargo`);
-  }
-
-  /** SERVICIOS PARA TABLA CONTEXTO LEGAL*/
-  ConsultarDecreto() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto`);
-  }
-
-  ConsultarUnDecreto(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto/${id}`);
-  }
-
-  IngresarDecreto(datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto`, datos);
-  }
-
-  BuscarIdDecreto() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/tipo/decreto`);
-  }
-
   /** SERVICIOS PARA TABLA PEDIDO_ACCION_EMPLEADO */
   IngresarPedidoAccion(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion`, datos);
@@ -119,5 +85,15 @@ export class AccionPersonalService {
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/xmlDownload`, data);
+  }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormato(formData: any) {
+      return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/upload/revision', formData);
+  }
+  
+  // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA   **USADO
+  RegistrarPlantilla(data: any) {
+      return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/cargar_plantilla', data);
   }
 }

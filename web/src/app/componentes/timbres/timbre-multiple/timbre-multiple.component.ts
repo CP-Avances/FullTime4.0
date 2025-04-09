@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Observable, map, startWith } from 'rxjs';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -16,6 +17,8 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+
 
 // IMPORTAR COMPONENTES
 import { FraseSeguridadComponent } from '../../usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
@@ -52,8 +55,12 @@ export class TimbreMultipleComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
 
   habilitado: any;
+  filteredRoles!: Observable<any[]>;
+  listaRoles: any = [];
+
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -115,6 +122,7 @@ export class TimbreMultipleComponent implements OnInit {
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
+  get filtroRolEmp() { return this.restR.filtroRolEmp};
 
   // FILTRO CARGOS
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
@@ -136,6 +144,7 @@ export class TimbreMultipleComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private restR: ReportesService,
+    private restRol: RolesService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -149,12 +158,33 @@ export class TimbreMultipleComponent implements OnInit {
 
     this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.BuscarInformacionGeneral();
+
+    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+      this.listaRoles = respuesta
+      console.log('this.listaRoles: ', this.listaRoles)
+    });
+
+    this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
   }
 
   ngOnDestroy() {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
+  }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.listaRoles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
   }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
@@ -286,6 +316,7 @@ export class TimbreMultipleComponent implements OnInit {
       case 5: this.restR.setFiltroCedula(e); break;
       case 6: this.restR.setFiltroNombreEmp(e); break;
       case 7: this.restR.setFiltroNombreReg(e); break;
+      case 8: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -696,6 +727,7 @@ export class TimbreMultipleComponent implements OnInit {
       this.cedula.reset();
       this.nombre_emp.reset();
       this.nombre_suc.reset();
+      this.nombre_rol.reset();
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -704,6 +736,7 @@ export class TimbreMultipleComponent implements OnInit {
       this.Filtrar('', 4);
       this.Filtrar('', 5);
       this.Filtrar('', 6);
+      this.Filtrar('', 8);
     }
   }
 

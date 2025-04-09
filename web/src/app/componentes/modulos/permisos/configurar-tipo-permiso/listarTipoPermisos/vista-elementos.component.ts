@@ -8,7 +8,6 @@ import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
 import * as FileSaver from 'file-saver';
-import * as xlsx from 'xlsx';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -25,6 +24,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class VistaElementosComponent implements OnInit {
+  ips_locales: any = '';
 
   tipoPermiso: any = [];
   filtroDescripcion = '';
@@ -77,7 +77,10 @@ export class VistaElementosComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerTipoPermiso();
@@ -140,7 +143,7 @@ export class VistaElementosComponent implements OnInit {
   Eliminar(id_permiso: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {
@@ -324,10 +327,12 @@ export class VistaElementosComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoPermiso);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'TipoPermisos');
     xlsx.writeFile(wb, "TipoPermisos" + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -335,10 +340,12 @@ export class VistaElementosComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
+    /*
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoPermiso);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "TipoPermisosCSV" + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

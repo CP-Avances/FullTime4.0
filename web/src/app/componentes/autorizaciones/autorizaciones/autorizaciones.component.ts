@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';;
 import { PageEvent } from "@angular/material/paginator";
 import { MatSelect } from '@angular/material/select';
 import { DateTime } from 'luxon';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
@@ -29,6 +29,8 @@ interface Estado {
   styleUrls: ['./autorizaciones.component.css'],
 })
 export class AutorizacionesComponent implements OnInit {
+  ips_locales: any = '';
+
 
   @Input() data: any = [];
   @Input() filtroDepa: any = [];
@@ -63,7 +65,7 @@ export class AutorizacionesComponent implements OnInit {
 
   public ArrayAutorizacionTipos: any = [];
   public nuevoAutorizacionTipos: any = [];
-  public gerencia:boolean = false;
+  public gerencia: boolean = false;
   autorizaDirecto: boolean = false;
   InfoListaAutoriza: any = [];
   id_depart: any;
@@ -91,33 +93,38 @@ export class AutorizacionesComponent implements OnInit {
     private plangeneral: PlanGeneralService,
     public informacion: DatosGeneralesService,
     public configNoti: RealTimeService,
+    public validar: ValidacionesService,
+
   ) { }
 
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
-    if(this.filtroDepa != '' && this.filtroDepa != undefined){
+    if (this.filtroDepa != '' && this.filtroDepa != undefined) {
       this.id_depart = this.data.datosPermiso[0].id_depa;
       this.obtenerAutorizacion();
       this.ocultar = false;
 
-    }else{
+    } else {
       var ListaConteoDepa: any = [];
-      this.data.datosPermiso.filter(function(elemento, indice, array) {
-        if(ListaConteoDepa.find(p => p.nombre_depa == elemento.nombre_depa) == undefined){
+      this.data.datosPermiso.filter(function (elemento, indice, array) {
+        if (ListaConteoDepa.find(p => p.nombre_depa == elemento.nombre_depa) == undefined) {
           ListaConteoDepa.push(elemento);
         }
       });
 
-      if(ListaConteoDepa.length < 2){
+      if (ListaConteoDepa.length < 2) {
         this.id_depart = this.data.datosPermiso[0].id_depa;
         this.departamentoChange.depa_autoriza = this.data.datosPermiso[0].nombre_depa;
         this.ocultar = false;
         this.oculDepa = true;
         this.obtenerAutorizacion();
-      }else{
+      } else {
         this.oculDepa = false;
         this.ocultar = true;
       }
@@ -151,62 +158,62 @@ export class AutorizacionesComponent implements OnInit {
     }
   }
 
-  BuscarTipoAutorizacion(){
+  BuscarTipoAutorizacion() {
     this.ArrayAutorizacionTipos = [];
     this.nuevoAutorizacionTipos = [];
     var i = 0;
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.id_empleado_loggin).subscribe(
       (res) => {
-      this.ArrayAutorizacionTipos = res;
-      this.nuevoAutorizacionTipos = this.ArrayAutorizacionTipos.filter(item => {
-        i += 1;
-        return item.estado == true
-      });
-
-      if(i == this.ArrayAutorizacionTipos.length){
-        if(this.nuevoAutorizacionTipos.length < 2){
-          this.oculDepa = true;
-          this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
-          this.obtenerAutorizacion();
-        }
-
-        this.nuevoAutorizacionTipos.forEach(x => {
-          if(x.nombre == 'GERENCIA' && x.estado == true){
-            console.log('entro en gerencia');
-            this.gerencia = true;
-            this.autorizaDirecto = false;
-            this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
-              this.estados = [
-                { id: 3, nombre: 'Autorizado' },
-                { id: 4, nombre: 'Negado' }
-              ];
-            }else if(x.preautorizar == true){
-              this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' },
-                { id: 4, nombre: 'Negado'}
-              ];
-            }
-          }
-          else if((this.gerencia == false) && (x.estado == true) && (x.id_departamento == this.id_depart)){
-            console.log('esta fuera de gerencia');
-            this.autorizaDirecto = true;
-            this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
-            this.estados = [
-              { id: 3, nombre: 'Autorizado' },
-              { id: 4, nombre: 'Negado' }
-            ];
-          }else if(x.preautorizar == true){
-            this.estados = [
-              { id: 2, nombre: 'Pre-autorizado' },
-              { id: 4, nombre: 'Negado'}
-            ];
-          }
-        }
+        this.ArrayAutorizacionTipos = res;
+        this.nuevoAutorizacionTipos = this.ArrayAutorizacionTipos.filter(item => {
+          i += 1;
+          return item.estado == true
         });
-      }
-    });
+
+        if (i == this.ArrayAutorizacionTipos.length) {
+          if (this.nuevoAutorizacionTipos.length < 2) {
+            this.oculDepa = true;
+            this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
+            this.obtenerAutorizacion();
+          }
+
+          this.nuevoAutorizacionTipos.forEach(x => {
+            if (x.nombre == 'GERENCIA' && x.estado == true) {
+              console.log('entro en gerencia');
+              this.gerencia = true;
+              this.autorizaDirecto = false;
+              this.InfoListaAutoriza = x;
+              if (x.autorizar == true) {
+                this.estados = [
+                  { id: 3, nombre: 'Autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              } else if (x.preautorizar == true) {
+                this.estados = [
+                  { id: 2, nombre: 'Pre-autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              }
+            }
+            else if ((this.gerencia == false) && (x.estado == true) && (x.id_departamento == this.id_depart)) {
+              console.log('esta fuera de gerencia');
+              this.autorizaDirecto = true;
+              this.InfoListaAutoriza = x;
+              if (x.autorizar == true) {
+                this.estados = [
+                  { id: 3, nombre: 'Autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              } else if (x.preautorizar == true) {
+                this.estados = [
+                  { id: 2, nombre: 'Pre-autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              }
+            }
+          });
+        }
+      });
   }
 
   departamentoChange: any = [];
@@ -243,11 +250,11 @@ export class AutorizacionesComponent implements OnInit {
   info_correo: string = '';
   listaCorreosEnviar: any = [];
   num: number = 0;
-  obtenerAutorizacion(){
+  obtenerAutorizacion() {
     this.cont_correo = 0;
     this.info_correo = '';
     this.listaCorreosEnviar = [];
-    if(this.data.carga === 'multiple'){
+    if (this.data.carga === 'multiple') {
       var contador = 0;
       this.ListaPermisos = [];
       this.listafiltrada = [];
@@ -259,8 +266,8 @@ export class AutorizacionesComponent implements OnInit {
       })
 
       this.cont = 0;
-      if(this.data.datosPermiso.length == contador){
-        if(this.ListaPermisos.length != 0){
+      if (this.data.datosPermiso.length == contador) {
+        if (this.ListaPermisos.length != 0) {
           this.listadoDepaAutoriza = [];
           this.lectura = 1;
           this.ListaPermisos.forEach(o => {
@@ -280,12 +287,12 @@ export class AutorizacionesComponent implements OnInit {
                       this.estado_auto = 'Preautorizado';
                     }
 
-                    if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+                    if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
                       //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(res => {
                         this.listadoDepaAutoriza = res;
                         this.listadoDepaAutoriza.forEach((item: any) => {
-                          if((this.id_empleado_loggin == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
+                          if ((this.id_empleado_loggin == item.id_empleado) && (autorizaciones.length == item.nivel)) {
                             this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
                             this.listafiltrada.push(o);
                             this.ConfiguracionCorreo(o);
@@ -294,24 +301,23 @@ export class AutorizacionesComponent implements OnInit {
                         })
 
 
-                        if(this.ListaPermisos.length == this.cont){
-                          if(this.listafiltrada.length == 0){
-                            this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
+                        if (this.ListaPermisos.length == this.cont) {
+                          if (this.listafiltrada.length == 0) {
+                            this.mensaje = 'Las solicitudes seleccionadas del departamento de ' + this.departamentoChange.depa_autoriza + ' no corresponde a su nivel de aprobación';
                             this.ocultar = true;
                             return
-                          }else{
+                          } else {
                             //Listado para eliminar el usuario duplicado
                             var ListaSinDuplicadosPendie: any = [];
                             var cont = 0;
-                            this.listafiltrada.forEach(function(elemento, indice, array) {
+                            this.listafiltrada.forEach(function (elemento, indice, array) {
                               cont = cont + 1;
-                              if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                              {
+                              if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
                                 ListaSinDuplicadosPendie.push(elemento);
                               }
                             });
 
-                            if(this.listafiltrada.length == cont){
+                            if (this.listafiltrada.length == cont) {
                               this.listafiltrada = [];
                               this.listafiltrada = ListaSinDuplicadosPendie;
                               this.listafiltrada.sort((a, b) => b.id - a.id);
@@ -321,18 +327,18 @@ export class AutorizacionesComponent implements OnInit {
                         }
 
                       });
-                    }else{
+                    } else {
                       this.ocultar = true;
                     }
 
-                  }else{
-                    if(autorizaciones.length < 2){
+                  } else {
+                    if (autorizaciones.length < 2) {
                       //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(
                         res => {
                           this.listadoDepaAutoriza = res;
                           this.listadoDepaAutoriza.forEach((valor: any) => {
-                            if((this.id_empleado_loggin == valor.id_empleado) && (autorizaciones.length ==  valor.nivel)){
+                            if ((this.id_empleado_loggin == valor.id_empleado) && (autorizaciones.length == valor.nivel)) {
                               this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.id_empleado, o);
                               this.listafiltrada.push(o);
                               this.ConfiguracionCorreo(o);
@@ -340,23 +346,23 @@ export class AutorizacionesComponent implements OnInit {
                             }
                           });
 
-                          if(this.ListaPermisos.length == this.cont){
-                            if(this.listafiltrada.length == 0){
-                              this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
+                          if (this.ListaPermisos.length == this.cont) {
+                            if (this.listafiltrada.length == 0) {
+                              this.mensaje = 'Las solicitudes seleccionadas del departamento de ' + this.departamentoChange.depa_autoriza + ' no corresponde a su nivel de aprobación';
                               this.ocultar = true;
                               return
-                            }else{
+                            } else {
                               //Listado para eliminar el usuario duplicado
                               var ListaSinDuplicadosPendie: any = [];
                               var cont = 0;
-                              this.listafiltrada.forEach(function(elemento, indice, array) {
+                              this.listafiltrada.forEach(function (elemento, indice, array) {
                                 cont = cont + 1;
-                                if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined){
+                                if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
                                   ListaSinDuplicadosPendie.push(elemento);
                                 }
                               });
 
-                              if(this.listafiltrada.length == cont){
+                              if (this.listafiltrada.length == cont) {
                                 this.listafiltrada = [];
                                 this.listafiltrada = ListaSinDuplicadosPendie;
                                 this.listafiltrada.sort((a, b) => b.id - a.id);
@@ -370,7 +376,7 @@ export class AutorizacionesComponent implements OnInit {
                     }
                   }
                 });
-              },error => {
+              }, error => {
                 o.observacion = 'La solicitud tiene problemas con el registro de autorización';
                 o.aprobar = 'SI';
                 this.listafiltrada.push(o);
@@ -380,13 +386,13 @@ export class AutorizacionesComponent implements OnInit {
           })
 
           return
-        }else{
-          this.mensaje = 'No hay solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza;
+        } else {
+          this.mensaje = 'No hay solicitudes seleccionadas del departamento de ' + this.departamentoChange.depa_autoriza;
           this.ocultar = true;
           return
         }
-      }else{
-        this.mensaje = 'No ha seleccionado solicitudes del departamento de '+this.departamentoChange.depa_autoriza;
+      } else {
+        this.mensaje = 'No ha seleccionado solicitudes del departamento de ' + this.departamentoChange.depa_autoriza;
         this.ocultar = true;
         return
       }
@@ -395,25 +401,25 @@ export class AutorizacionesComponent implements OnInit {
 
   listahorario: any = [];
   i: number = 0;
-  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, id_empleado: any, solicitud: any){
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, id_empleado: any, solicitud: any) {
     var datos = {
       fecha_inicio: fecha_i,
       fecha_final: fehca_f,
-      id_empleado: '\''+id_empleado+'\''
+      id_empleado: '\'' + id_empleado + '\''
     }
 
     this.i = 0;
     this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {
       this.listahorario = res;
-      if(this.listahorario.data.length == 0){
+      if (this.listahorario.data.length == 0) {
         solicitud.observacion = 'No tiene registrado una planificacion';
         return solicitud.aprobar = 'NO';
-      }else{
+      } else {
         solicitud.observacion = 'Sin novedad';
         return solicitud.aprobar = 'SI';
       }
 
-    },error => {
+    }, error => {
       solicitud.observacion = 'No tiene registrado una planificacion';
       return solicitud.aprobar = 'NO';
     });
@@ -437,15 +443,15 @@ export class AutorizacionesComponent implements OnInit {
     this.no_aprobar = 0;
     this.NuevaListaAprobada = this.listafiltrada.filter(valor => {
       this.a += 1;
-      if(valor.aprobar == 'NO' || valor.aprobar == 'no'){ this.no_aprobar += 1}
+      if (valor.aprobar == 'NO' || valor.aprobar == 'no') { this.no_aprobar += 1 }
       return valor.aprobar == 'SI' || valor.aprobar == 'si';
     });
 
-    if(this.listafiltrada.length == this.a ){
-      if(this.NuevaListaAprobada.length == 0){
+    if (this.listafiltrada.length == this.a) {
+      if (this.NuevaListaAprobada.length == 0) {
         this.toastr.error("No se han podido aprobar las solicitudes debido a que tiene observaciones que no permiten enviar");
-      }else{
-        if(this.no_aprobar > 0){
+      } else {
+        if (this.no_aprobar > 0) {
           this.toastr.error("Algunas solicitudes no se enviaron debido algun problema, revisar la observacion de la solicitud");
         }
 
@@ -474,7 +480,7 @@ export class AutorizacionesComponent implements OnInit {
                   this.ActualizarDatos(form, documento, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
                 })
               }, err => {
-                this.toastr.error("No existe autorizacion en el permiso "+obj.id);
+                this.toastr.error("No existe autorizacion en el permiso " + obj.id);
                 this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
                   this.departamentos = res;
                   this.IngresarDatos(form, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
@@ -491,6 +497,7 @@ export class AutorizacionesComponent implements OnInit {
     }
   }
 
+
   IngresarDatos(form, id_permiso: number, id_departamento: number, empleado_solicita: number) {
     // Arreglo de datos para ingresar una autorización
     let newAutorizaciones = {
@@ -503,7 +510,7 @@ export class AutorizacionesComponent implements OnInit {
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
 
@@ -520,7 +527,7 @@ export class AutorizacionesComponent implements OnInit {
       estado: form.estadoF,
       id_permiso: id_permiso,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
 
@@ -538,17 +545,17 @@ export class AutorizacionesComponent implements OnInit {
       id_departamento: id_departamento,
       id_empleado: id_empleado,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // Actualizar estado del permiso
     var estado_letras: string = '';
     if (estado_permiso === 1) {
       estado_letras = 'Pendiente';
-    }else if (estado_permiso === 2) {
+    } else if (estado_permiso === 2) {
       estado_letras = 'Pre-autorizado';
-    }else if (estado_permiso === 3) {
+    } else if (estado_permiso === 3) {
       estado_letras = 'Autorizado';
-    }else if (estado_permiso === 4) {
+    } else if (estado_permiso === 4) {
       estado_letras = 'Negado';
     }
 
@@ -567,7 +574,7 @@ export class AutorizacionesComponent implements OnInit {
         id_vacaciones: null,
         id_hora_extra: null,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
 
       // Enviar la respectiva notificación de cambio de estado del permiso
@@ -600,9 +607,9 @@ export class AutorizacionesComponent implements OnInit {
     }
   }
 
-  ConfiguracionCorreo(solicitud: any){
+  ConfiguracionCorreo(solicitud: any) {
     this.configNoti.ObtenerConfiguracionEmpleado(solicitud.id_contrato).subscribe(res_config => {
-      if(res_config[0].permiso_mail == true){
+      if (res_config[0].permiso_mail == true) {
         this.listaCorreosEnviar.push(solicitud);
       }
     });
@@ -615,18 +622,17 @@ export class AutorizacionesComponent implements OnInit {
     this.listapermisosActualizada = [];
     this.CorreosUsuariosAutorizanDepa = '';
     var nuevalista: any = [];
-    permisos.forEach(function(elemento, indice, array) {
-      if(nuevalista.find(p=>p.id_emple_solicita == elemento.id_emple_solicita) == undefined)
-      {
+    permisos.forEach(function (elemento, indice, array) {
+      if (nuevalista.find(p => p.id_emple_solicita == elemento.id_emple_solicita) == undefined) {
         return nuevalista.push(elemento);
       }
     });
 
     //Correos de los usuarios que autorizan las solicitudes
     this.listadoDepaAutoriza.forEach(valor => {
-      if(this.CorreosUsuariosAutorizanDepa == ''){
+      if (this.CorreosUsuariosAutorizanDepa == '') {
         this.CorreosUsuariosAutorizanDepa = valor.correo;
-      }else{
+      } else {
         this.CorreosUsuariosAutorizanDepa = this.CorreosUsuariosAutorizanDepa + ', ' + valor.correo;
       }
     });
@@ -647,7 +653,7 @@ export class AutorizacionesComponent implements OnInit {
 
 
     this.listafiltrada.forEach((item: any) => {
-      if(item.aprobar == "SI"){
+      if (item.aprobar == "SI") {
         item.estado = estado_letras;
       }
     });
@@ -671,7 +677,7 @@ export class AutorizacionesComponent implements OnInit {
       solicitudes: permisos
     };
 
-    console.log('datosEnvia: ',datosEnvia);
+    console.log('datosEnvia: ', datosEnvia);
 
     this.realTime.EnviarCorreoMultiple(datosEnvia).subscribe(envio => {
       if (envio.message === 'ok') {

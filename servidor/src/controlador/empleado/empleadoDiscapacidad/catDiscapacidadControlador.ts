@@ -2,10 +2,10 @@ import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
-import excel from 'xlsx';
+import pool from '../../../database';
+import Excel from 'exceljs';
 
 class DiscapacidadControlador {
 
@@ -30,7 +30,7 @@ class DiscapacidadControlador {
     // METODO PARA REGISTRAR UN TIPO DE DISCAPACIDAD    **USADO
     public async CrearDiscapacidad(req: Request, res: Response): Promise<Response> {
         try {
-            const { discapacidad, user_name, ip } = req.body;
+            const { discapacidad, user_name, ip, ip_local } = req.body;
             var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
@@ -59,7 +59,8 @@ class DiscapacidadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(discapacidadInsertada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -85,7 +86,7 @@ class DiscapacidadControlador {
     // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD    **USADO
     public async EditarDiscapacidad(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, nombre, user_name, ip } = req.body;
+            const { id, nombre, user_name, ip, ip_local } = req.body;
             var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
@@ -101,7 +102,8 @@ class DiscapacidadControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                 });
 
@@ -131,7 +133,8 @@ class DiscapacidadControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(discapacidadEditada),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -158,7 +161,7 @@ class DiscapacidadControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -179,7 +182,8 @@ class DiscapacidadControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                 });
 
@@ -201,7 +205,8 @@ class DiscapacidadControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -222,58 +227,80 @@ class DiscapacidadControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_DISCAPACIDAD');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     discapacidad: '',
                     observacion: ''
                 };
-
                 var listaDiscapacidad: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
-
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach(async (dato: any) => {
-                    var { ITEM, DISCAPACIDAD } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
-                        data.fila = ITEM;
-                        data.discapacidad = DISCAPACIDAD;
-                        data.observacion = 'no registrada';
-
-                        listaDiscapacidad.push(data);
-
-                    } else {
-                        data.fila = ITEM;
-                        data.discapacidad = DISCAPACIDAD;
-                        data.observacion = 'no registrada';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (DISCAPACIDAD == undefined) {
-                            data.discapacidad = 'No registrado';
-                            data.observacion = 'Discapacidad no registrada';
-                        }
-
-                        listaDiscapacidad.push(data);
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['DISCAPACIDAD']
+                    ) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const DISCAPACIDAD = row.getCell(headers['DISCAPACIDAD']).value;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
+                            data.observacion = 'no registrada';
 
-                    data = {};
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.discapacidad = data.discapacidad.trim();
 
-                });
+                            listaDiscapacidad.push(data);
 
+                        } else {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
+                            data.observacion = 'no registrada';
+
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (DISCAPACIDAD == undefined) {
+                                data.discapacidad = 'No registrado';
+                                data.observacion = 'Discapacidad no registrada';
+                            }
+
+                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                             data.discapacidad = data.discapacidad.trim();
+
+                            listaDiscapacidad.push(data);
+                        }
+
+                        data = {};
+
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -353,7 +380,7 @@ class DiscapacidadControlador {
     // REGISTRAR PLANTILLA MODALIDAD_CARGO    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
 
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -379,7 +406,8 @@ class DiscapacidadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(discapacidad_emp),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

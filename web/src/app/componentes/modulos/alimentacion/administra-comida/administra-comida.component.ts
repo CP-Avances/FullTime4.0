@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-administra-comida',
@@ -13,6 +14,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class AdministraComidaComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES DE ALMACENAMIENTO
   empleados: any = [];
@@ -36,12 +38,16 @@ export class AdministraComidaComponent implements OnInit {
     private restU: UsuarioService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<AdministraComidaComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public datoEmpleado: any,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.MostrarDatos();
@@ -87,7 +93,7 @@ export class AdministraComidaComponent implements OnInit {
       admin_comida: form.comidaForm,
       id_empleado: this.datoEmpleado.idEmpleado,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restU.RegistrarAdminComida(control).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {

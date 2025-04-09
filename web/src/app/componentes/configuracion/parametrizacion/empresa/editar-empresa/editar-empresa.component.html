@@ -36,7 +36,7 @@
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>RUC</mat-label>
-                                    <input matInput placeholder="Ingresar RUC" [formControl]="rucF" maxlength="13"
+                                    <input matInput type="tel" placeholder="Ingresar RUC" [formControl]="rucF" maxlength="13"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         (keypress)="IngresarSoloNumeros($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -46,7 +46,7 @@
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Número partida presupuestaria</mat-label>
-                                    <input matInput placeholder="Nº partida" [formControl]="numeroF"
+                                    <input matInput type="tel" placeholder="Nº partida" [formControl]="numeroF"
                                         (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el número de la partida presupuestaria de la entidad.">
@@ -59,7 +59,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <mat-label>Teléfono empresarial</mat-label>
-                                    <input matInput placeholder="Ingresar teléfono" [formControl]="telefonoF"
+                                    <input matInput type="tel" placeholder="Ingresar teléfono" [formControl]="telefonoF"
                                         maxlength="10" (keypress)="IngresarSoloNumeros($event)"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         required>
@@ -240,7 +240,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field *ngIf="habilitarDias" id="campos">
                                     <mat-label id="letras">No. días previos a la fecha*</mat-label>
-                                    <input (keypress)="IngresarSoloNumeros($event)" matInput
+                                    <input type="tel" (keypress)="IngresarSoloNumeros($event)" matInput
                                         placeholder="Días previos a la fecha" [formControl]="dias_cambioF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el número de días que tendra para realizar un cambio en la aprobación de solicitud de permisos, vacaciones u horas extras antes de la fecha de su cumplimiento.">

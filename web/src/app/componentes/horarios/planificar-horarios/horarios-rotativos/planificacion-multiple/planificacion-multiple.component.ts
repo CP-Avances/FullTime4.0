@@ -25,9 +25,9 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class PlanificacionMultipleComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datosSeleccionados: any;
-
 
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl;
@@ -61,7 +61,10 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarHorarios();
     this.BuscarHora();
     this.InicialiciarDatos();
@@ -1176,7 +1179,7 @@ GuardarPlanificacion() {
       let datos = {
         id_plan:  res.map(item => item.id),
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
 
       this.restP.EliminarRegistro(datos).subscribe(datos => {
@@ -1203,7 +1206,7 @@ RegistrarPlanificacionMultiple() {
   const datos = {
     plan_general: this.plan_general,
     user_name: this.user_name,
-    ip: this.ip,
+    ip: this.ip, ip_local: this.ips_locales,
   };
   // Dividir el objeto plan_general en partes más pequeñas
   const partes = this.dividirPlanGeneral(datos.plan_general);
@@ -1218,7 +1221,7 @@ enviarParte(partes: any[], parteIndex: number, totalPartes: number) {
   const datosParcial = {
     parte: partes[parteIndex],
     user_name: this.user_name,
-    ip: this.ip,
+    ip: this.ip, ip_local: this.ips_locales,
     parteIndex: parteIndex, // Enviar el índice de la parte actual
     totalPartes: totalPartes // Enviar el total de partes
   };

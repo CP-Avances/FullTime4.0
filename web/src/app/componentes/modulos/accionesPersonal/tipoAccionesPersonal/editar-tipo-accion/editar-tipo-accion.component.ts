@@ -14,6 +14,7 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 })
 
 export class EditarTipoAccionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data: any;
   @Input() pagina: any;
@@ -33,8 +34,8 @@ export class EditarTipoAccionComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
-  baseLegalF = new FormControl('', [Validators.required]);
-  tipoAccionF = new FormControl('');
+  baseLegalF = new FormControl('');
+  tipoAccionF = new FormControl('', [Validators.required]);
   tipoF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
@@ -56,14 +57,16 @@ export class EditarTipoAccionComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerTiposAccionPersonal();
     this.ObtenerTiposAccion();
-    this.tipos[this.tipos.length] = { descripcion: "OTRO" };
     this.CargarDatos();
   }
 
   // METODO PARA MOSTRAR DATOS
   CargarDatos() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.selec1 = false;
     this.selec2 = false;
     this.selec3 = false;
@@ -97,9 +100,9 @@ export class EditarTipoAccionComponent implements OnInit {
       tipo_situacion_propuesta: this.selec3,
       id: this.data.id,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
-    if (form.tipoAccionForm != undefined) {
+    if (form.tipoAccionForm != undefined && form.tipoAccionForm != 20) {
       this.GuardarInformacion(datosAccion);
     }
     else {
@@ -112,12 +115,12 @@ export class EditarTipoAccionComponent implements OnInit {
   GuardarInformacion(datosAccion: any) {
     this.contador = 0;
     this.tipos_acciones.map((obj: any) => {
-      if (obj.id_tipo === datosAccion.id_tipo) {
+      if (obj.id_tipo_accion_personal === datosAccion.id_tipo) {
         this.contador = this.contador + 1;
       }
     });
     if (this.contador != 0) {
-      this.toastr.error('El tipo de acción de personal seleccionado ya se encuentra registrado.',
+      this.toastr.error('El tipo de acción personal seleccionado ya se encuentra registrado.',
         'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
@@ -201,13 +204,12 @@ export class EditarTipoAccionComponent implements OnInit {
     this.tipos = [];
     this.rest.ConsultarTipoAccion().subscribe(datos => {
       this.tipos = datos;
-      this.tipos[this.tipos.length] = { descripcion: "OTRO" };
     })
   }
 
   // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO_ACCION
-  IngresarTipoAccion(form: any) {
-    if (form.tipoAccionForm === undefined) {
+  IngresarTipoAccion(form: any, descripcion: string) {
+    if (descripcion.toLocaleLowerCase() === 'otro') {
       this.formulario.patchValue({
         otroTipoForm: '',
       });
@@ -234,7 +236,7 @@ export class EditarTipoAccionComponent implements OnInit {
       let tipo = {
         descripcion: form.otroTipoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }
@@ -248,23 +250,30 @@ export class EditarTipoAccionComponent implements OnInit {
   // METODO PARA VERIFICAR DUPLICIDAD
   contar: number = 0;
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
-    this.contar = 0;
-    this.tipos.map((obj: any) => {
-      if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
-        this.contar = this.contar + 1;
-      }
+
+    this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
+      datos.id_tipo = resol.id;
+      // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
+      this.GuardarInformacion(datos);
     });
-    if (this.contar != 0) {
-      this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-        'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      })
-    } else {
-      this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
-        datos.id_tipo = resol.id;
-        // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
-        this.GuardarInformacion(datos);
-      });
-    }
+
+    // this.contar = 0;
+    // this.tipos.map((obj: any) => {
+    //   if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
+    //     this.contar = this.contar + 1;
+    //   }
+    // });
+    // if (this.contar != 0) {
+    //   this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
+    //     'Ups!!! algo salio mal.', {
+    //     timeOut: 6000,
+    //   })
+    // } else {
+    //   this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
+    //     datos.id_tipo = resol.id;
+    //     // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
+    //     this.GuardarInformacion(datos);
+    //   });
+    // }
   }
 }

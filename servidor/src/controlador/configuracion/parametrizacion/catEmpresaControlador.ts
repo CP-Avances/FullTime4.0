@@ -3,11 +3,10 @@ import { ObtenerRutaLeerPlantillas, ObtenerRutaLogos } from '../../../libs/acces
 import { ComprimirImagen, ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { DateTime } from 'luxon';
+import sharp from 'sharp';
 import path from 'path';
 import pool from '../../../database';
 import fs from 'fs';
-
-const sharp = require('sharp');
 
 class EmpresaControlador {
 
@@ -70,7 +69,7 @@ class EmpresaControlador {
         let comprimir = await ComprimirImagen(ruta_temporal, ruta_guardar);
 
         if (comprimir != false) {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // CONSULTAR SI EXISTE UNA IMAGEN
             const logo_name = await pool.query(
@@ -86,7 +85,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar logo de empresa con id: ${id}`
                 });
 
@@ -124,7 +124,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(obj),
                         datosNuevos: `{"logo": "${logo}"}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
 
@@ -166,7 +167,7 @@ class EmpresaControlador {
     public async ActualizarEmpresa(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante,
-                establecimiento, dias_cambio, cambios, num_partida, id, user_name, ip } = req.body;
+                establecimiento, dias_cambio, cambios, num_partida, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -185,7 +186,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar datos de empresa con id: ${id}`
                 });
 
@@ -209,7 +211,8 @@ class EmpresaControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                 datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -226,7 +229,7 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR DATOS DE COLORES DE EMPRESA **USADO
     public async ActualizarColores(req: Request, res: Response): Promise<Response> {
         try {
-            const { color_p, color_s, id, user_name, ip } = req.body;
+            const { color_p, color_s, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -245,7 +248,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar colores de empresa con id: ${id}`
                 });
 
@@ -266,7 +270,8 @@ class EmpresaControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                 datosNuevos: `{"color_principal": "${color_p}", "color_secundario": "${color_s}"}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -283,7 +288,7 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTES **USADO
     public async ActualizarMarcaAgua(req: Request, res: Response): Promise<Response> {
         try {
-            const { marca_agua, id, user_name, ip } = req.body;
+            const { marca_agua, id, user_name, ip, ip_local } = req.body;
 
             // INICAIAR TRANSACCION
             await pool.query('BEGIN');
@@ -302,7 +307,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar marca de agua de empresa con id: ${id}. Registro no encontrado.`
                 });
 
@@ -323,7 +329,8 @@ class EmpresaControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                 datosNuevos: `{"marca_agua": "${marca_agua}"}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -340,7 +347,7 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR NIVELES DE SEGURIDAD  **USADO
     public async ActualizarSeguridad(req: Request, res: Response): Promise<Response> {
         try {
-            const { seg_contrasena, seg_frase, seg_ninguna, id, user_name, ip } = req.body;
+            const { seg_contrasena, seg_frase, seg_ninguna, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -359,7 +366,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar niveles de seguridad de empresa con id: ${id}. Registro no encontrado.`
                 });
 
@@ -381,7 +389,8 @@ class EmpresaControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                 datosNuevos: `{"seguridad_contrasena": "${seg_contrasena}", "seguridad_frase": "${seg_frase}", "seguridad_ninguna": "${seg_ninguna}"}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -398,7 +407,7 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
     public async ActualizarCabeceraCorreo(req: Request, res: Response): Promise<any> {
         sharp.cache(false);
-        
+
         const fecha = DateTime.now();
         const anio = fecha.toFormat('yyyy');
         const mes = fecha.toFormat('MM');
@@ -417,7 +426,7 @@ class EmpresaControlador {
 
         if (comprimir != false) {
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             const logo_name = await pool.query(
                 `
@@ -432,7 +441,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar cabecera de correo de empresa con id: ${id}`
                 });
 
@@ -459,8 +469,8 @@ class EmpresaControlador {
                     // ACTUALIZAR REGISTRO DE IMAGEN
                     await pool.query(
                         `
-                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
-                    `
+                        UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
+                        `
                         , [id, logo]);
 
                     // AUDITORIA
@@ -470,7 +480,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(obj),
                         datosNuevos: `{"cabecera_firma": "${logo}"}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
 
@@ -535,7 +546,7 @@ class EmpresaControlador {
 
         if (comprimir != false) {
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             const logo_name = await pool.query(
                 `
@@ -550,7 +561,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
                 });
 
@@ -588,7 +600,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: JSON.stringify(obj),
                         datosNuevos: `{"pie_firma": "${logo}"}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
 
@@ -634,7 +647,7 @@ class EmpresaControlador {
     public async EditarPassword(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id_empresa
-            const { correo, password_correo, servidor, puerto, user_name, ip } = req.body;
+            const { correo, password_correo, servidor, puerto, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -653,7 +666,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar datos de correo de empresa con id: ${id}. Registro no encontrado.`
                 });
 
@@ -675,7 +689,8 @@ class EmpresaControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                 datosNuevos: `{"correo": "${correo}", "password_correo": "${password_correo}", "servidor": "${servidor}", "puerto": "${puerto}"}`,
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -689,65 +704,6 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR USO DE ACCIONES
-    public async ActualizarAccionesTimbres(req: Request, res: Response): Promise<Response> {
-        try {
-            const { id, bool_acciones, user_name, ip } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            // CONSULTAR DATOS ORIGINALES
-            const datosOriginales = await pool.query(
-                `
-                SELECT acciones_timbres FROM e_empresa WHERE id = $1
-                `
-                , [id]);
-
-            if (datosOriginales.rows.length === 0) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: `Error al actualizar acciones de empresa con id: ${id}. Registro no encontrado.`
-                });
-
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'error' });
-            }
-
-            await pool.query(
-                `
-                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
-                `
-                , [bool_acciones, id]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_empresa',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                datosNuevos: `{"acciones_timbres": "${bool_acciones}"}`,
-                ip,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.status(200).jsonp({
-                message: 'Empresa actualizada exitosamente.',
-                title: 'Ingrese nuevamente al sistema.'
-            });
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ error });
-        }
-    }
 
     // METODO PARA LISTAR EMPRESA
     public async ListarEmpresa(req: Request, res: Response) {

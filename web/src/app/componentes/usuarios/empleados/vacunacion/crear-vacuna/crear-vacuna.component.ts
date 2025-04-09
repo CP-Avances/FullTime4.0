@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
 
 import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacuna.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-crear-vacuna',
@@ -16,6 +17,7 @@ import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacu
 })
 
 export class CrearVacunaComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmploy: any;
 
@@ -29,12 +31,16 @@ export class CrearVacunaComponent implements OnInit {
     public toastr: ToastrService, // VARIABLE USADA PARA MENSAJES DE NOTIFICACIONES
     public ventana: MatDialog,
     private ventana_: MatDialogRef<CrearVacunaComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public datos: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.idEmploy = this.datos.idEmpleado;
     this.ObtenerTipoVacunas();
@@ -132,7 +138,7 @@ export class CrearVacunaComponent implements OnInit {
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     // VERIIFCAR EXISTENCIA DEL REGISTRO DE VACUNA
     let vacuna = {
@@ -192,6 +198,8 @@ export class CrearVacunaComponent implements OnInit {
       }
       formData.append('user_name', this.user_name as string);
       formData.append('ip', this.ip as string);
+      formData.append('ip_local', this.ips_locales);
+
       this.restVacuna.SubirDocumento(formData, vacuna.id, this.idEmploy).subscribe(res => {
         this.archivoF.reset();
         this.nameFile = '';

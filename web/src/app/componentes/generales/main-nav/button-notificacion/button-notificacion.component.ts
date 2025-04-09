@@ -18,6 +18,7 @@ import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar
 })
 
 export class ButtonNotificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   estado: boolean = true;
 
@@ -84,7 +85,10 @@ export class ButtonNotificacionComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarParametro();
     this.VerificarConfiguracion(this.idEmpleadoIngresa);
 
@@ -186,6 +190,8 @@ export class ButtonNotificacionComponent implements OnInit {
   ActualizarVista(data: any) {
     data.append('user_name', this.user_name);
     data.append('ip', this.ip);
+    data.append('ip_local', this.ips_locales);
+
     this.realTime.ActualizarVistaNotificacion(data.id, data).subscribe(res => {
       this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
     });
@@ -233,6 +239,6 @@ export class ButtonNotificacionComponent implements OnInit {
   // METODO PARA CONFIGURAR NOTIFICACIONES
   ConfigurarNotificaciones() {
     const id_empleado = parseInt(localStorage.getItem('empleado') as string);
-    this.ventana.open(SettingsComponent, { width: '350px', data: { id_empleado } });
+    this.ventana.open(SettingsComponent, { width: '900px', data: { id_empleado } });
   }
 }

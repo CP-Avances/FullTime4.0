@@ -58,7 +58,7 @@ class CiudadControlador {
     // REGISTRAR CIUDAD   **USADO
     public async CrearCiudad(req: Request, res: Response): Promise<void> {
         try {
-            const { id_provincia, descripcion, user_name, ip } = req.body;
+            const { id_provincia, descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -76,7 +76,8 @@ class CiudadControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -112,7 +113,7 @@ class CiudadControlador {
     // METODO PARA ELIMINAR REGISTRO  **USADO
     public async EliminarCiudad(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             const id = req.params.id;
 
             // INICIAR TRANSACCION
@@ -130,7 +131,8 @@ class CiudadControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar la ciudad con id ${id}. Registro no encontrado.`
                 });
 
@@ -152,7 +154,8 @@ class CiudadControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

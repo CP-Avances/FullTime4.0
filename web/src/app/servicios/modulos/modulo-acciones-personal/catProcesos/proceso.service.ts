@@ -44,4 +44,38 @@ export class ProcesoService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/proceso/xmlDownload`, data);
   }
 
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormato(formData: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/upload/revision', formData);
+  }
+
+  // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA   **USADO
+  RegistrarPlantilla(data: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/cargar_plantilla', data);
+  }
+
+  RegistroProcesos(data: any){
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/registrarProcesos', data)
+  }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  RevisarFormatoEMPLEPROCESO(formData: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/upload/revision_epleadoProceso', formData);
+  }
+
+  RegistrarPlantillaEmpleProce(data: any){
+    console.log('data a enviar: ',data)
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/cargar_plantilla/registro_epleadoProceso', data)
+  }
+
+  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  ActualizarProcesoEmple(formData: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/actualizacionProceso', formData);
+  }
+
+  // METODO PARA ELIMINAR GRUPOS OCUPACIONALES MULTIPLES
+  EliminarProcesoMult(data: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/eliminarProcesoMult', data);
+  }
+  
 }

@@ -64,7 +64,7 @@
                                 matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
                                 help_outline
                             </mat-icon>
-                            <mat-select [formControl]="tipoF">
+                            <mat-select [formControl]="tipoF" required>
                                 <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id"
                                     (click)="IngresarOtro(ContratoForm.value)">
                                     {{tc.descripcion}}

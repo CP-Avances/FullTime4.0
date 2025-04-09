@@ -7,9 +7,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import ExcelJS, { FillPattern } from "exceljs";
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 
@@ -26,8 +26,11 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
 
 import { EmpleadoElemento } from 'src/app/model/empleado.model';
+(ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
 
 @Component({
   selector: 'app-lista-empleados',
@@ -36,9 +39,18 @@ import { EmpleadoElemento } from 'src/app/model/empleado.model';
 })
 
 export class ListaEmpleadosComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
 
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   empleadosEliminarActivos: any = [];
   empleadosEliminarInactivos: any = [];
 
@@ -93,6 +105,9 @@ export class ListaEmpleadosComponent implements OnInit {
 
   usuariosCorrectos: number = 0;
 
+
+  private imagen: any;
+
   constructor(
     public loginService: LoginService,
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -104,17 +119,26 @@ export class ListaEmpleadosComponent implements OnInit {
     private funciones: MainNavService,
     private asignaciones: AsignacionesService,
     private datosGenerales: DatosGeneralesService,
+    private restGenero: GenerosService,
+    private restEstadosCiviles: EstadoCivilService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
+
+
+
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.ValidarCedula('1727193848');
 
     this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
@@ -123,6 +147,32 @@ export class ListaEmpleadosComponent implements OnInit {
     this.DescargarPlantilla();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.ObtenerGeneros();
+    this.ObtenerEstadosCiviles();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
+
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -277,7 +327,7 @@ export class ListaEmpleadosComponent implements OnInit {
             const datos = {
               arrayIdsEmpleados: EmpleadosSeleccionados.map((obj: any) => obj.id),
               user_name: this.user_name,
-              ip: this.ip
+              ip: this.ip, ip_local: this.ips_locales
             }
 
             let res: { message: string | undefined; } = { message: undefined };
@@ -480,7 +530,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
+      if (this.datosCodigo[0].automatico === true) {
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
@@ -496,19 +546,20 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
-          this.numero_paginaMul = 1;
-          this.tamanio_paginaMul = 5;
-          this.VerificarPlantillaManual();
-        } else {
-          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
-            timeOut: 6000,
-          });
-          this.archivoForm.reset();
-          this.nameFile = '';
-          this.LimpiarCampos();
-          this.mostrarbtnsubir = false;
-        }
+     
+          if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+            this.numero_paginaMul = 1;
+            this.tamanio_paginaMul = 5;
+            this.VerificarPlantillaManual();
+          } else {
+            this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
+              timeOut: 6000,
+            });
+            this.archivoForm.reset();
+            this.nameFile = '';
+            this.LimpiarCampos();
+            this.mostrarbtnsubir = false;
+          }
       }
     } else {
       this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
@@ -627,7 +678,7 @@ export class ListaEmpleadosComponent implements OnInit {
       const datos = {
         plantilla: this.listUsuariosCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         this.rest.SubirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
@@ -751,6 +802,7 @@ export class ListaEmpleadosComponent implements OnInit {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
       pageOrientation: 'landscape',
+      pageMargins: [40, 60, 40, 40],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE LA PAGINA
@@ -787,9 +839,8 @@ export class ListaEmpleadosComponent implements OnInit {
     };
   }
 
-  EstadoCivilSelect: any = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Unión de Hecho',];
-  GeneroSelect: any = ['Masculino', 'Femenino'];
   EstadoSelect: any = ['Activo', 'Inactivo'];
+
   PresentarDataPDFEmpleados(numero: any) {
     if (numero === 1) {
       var arreglo = this.empleado
@@ -803,12 +854,12 @@ export class ListaEmpleadosComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 1,
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Apellido', style: 'tableHeader' },
                 { text: 'Cedula', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
@@ -820,8 +871,6 @@ export class ListaEmpleadosComponent implements OnInit {
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
               ...arreglo.map((obj: any) => {
-                var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
-                var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad: any;
                 this.nacionalidades.forEach((element: any) => {
@@ -829,10 +878,25 @@ export class ListaEmpleadosComponent implements OnInit {
                     nacionalidad = element.nombre;
                   }
                 });
+                
+                let genero: any;
+                this.generos.forEach((element: any) => {
+                  if (obj.genero == element.id) {
+                    genero = element.genero;
+                  }
+                });
+
+                let estadoCivil:any;
+                this.estadosCiviles.forEach((element: any) => {
+                  if (obj.estado_civil == element.id) {
+                    estadoCivil = element.estado_civil;
+                  }
+                });
+
+
                 return [
                   { text: obj.codigo, style: 'itemsTableD' },
-                  { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.apellido, style: 'itemsTable' },
+                  { text: `${obj.apellido} ${obj.nombre}`, style: 'itemsTableD'  },
                   { text: obj.cedula, style: 'itemsTableD' },
                   { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
@@ -850,7 +914,12 @@ export class ListaEmpleadosComponent implements OnInit {
           layout: {
             fillColor: function (i: any) {
               return (i % 2 === 0) ? '#CCD1D1' : null;
-            }
+            },
+            paddingLeft: function () { return 2; }, // Reduce margen izquierdo
+            paddingRight: function () { return 2; }, // Reduce margen derecho
+            paddingTop: function () { return 1; }, // Reduce margen superior
+            paddingBottom: function () { return 1; }, // Reduce margen inferior
+            columnGap: 2 // Ajusta espacio entre columnas
           }
         },
         { width: '*', text: '' },
@@ -861,47 +930,200 @@ export class ListaEmpleadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
+  
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
 
-  ExportToExcel(numero: any) {
+   estadosCiviles: any=[];
+   ObtenerEstadosCiviles(){
+     this.restEstadosCiviles.ListarEstadoCivil().subscribe(datos => {
+       this.estadosCiviles = datos;
+     })
+   }
+  
+   async generarExcelEmpleados(numero: any) {
+
+    //const { usuarios, empresa, id_empresa } = datos;
     if (numero === 1) {
       var arreglo = this.empleado
     }
     else {
       arreglo = this.desactivados
     }
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
+
+    var f = DateTime.now();
+    let fecha = f.toFormat('yyyy-MM-dd');
+    let hora = f.toFormat('HH:mm:ss');
+
+    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
+
+    const empleados: any[] = [];
+    arreglo.forEach((usuario: any, index: number) => {
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
-        if (obj.id_nacionalidad == element.id) {
+        if (usuario.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
       });
-      return {
-        CODIGO: obj.codigo,
-        CEDULA: obj.cedula,
-        APELLIDO: obj.apellido,
-        NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
-        GENERO: this.GeneroSelect[obj.genero - 1],
-        CORREO: obj.correo,
-        ESTADO: this.EstadoSelect[obj.estado - 1],
-        DOMICILIO: obj.domicilio,
-        TELEFONO: obj.telefono,
-        NACIONALIDAD: nacionalidad,
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (usuario.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+      let estadoCivil:any;
+      this.estadosCiviles.forEach((element: any) => {
+        if (usuario.estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
+        }
+      });
+      empleados.push([
+        index + 1,
+        usuario.codigo,
+        usuario.cedula,
+        usuario.apellido,
+        usuario.nombre,
+        usuario.fecha_nacimiento.split("T")[0],
+        estadoCivil,
+        genero,
+        usuario.correo,
+        this.EstadoSelect[usuario.estado - 1],
+        usuario.domicilio,
+        usuario.telefono,
+        nacionalidad,
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Empleados");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:M1");
+    worksheet.mergeCells("B2:M2");
+    worksheet.mergeCells("B3:M3");
+    worksheet.mergeCells("B4:M4");
+    worksheet.mergeCells("B5:M5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Empleados".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "cedula", width: 20 },
+      { key: "apellido", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "fecha_nacimiento", width: 20 },
+      { key: "estado_civil", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "correo", width: 20 },
+      { key: "estado", width: 20 },
+      { key: "domicilio", width: 20 },
+      { key: "telefono", width: 20 },
+      { key: "nacionalidad", width: 20 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CEDULA", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA_NACIMIENTO", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO_CIVIL", totalsRowLabel: "", filterButton: true },
+      { name: "GENERO", totalsRowLabel: "", filterButton: true },
+      { name: "CORREO", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO", totalsRowLabel: "", filterButton: true },
+      { name: "DOMICILIO", totalsRowLabel: "", filterButton: true },
+      { name: "TELEFONO", totalsRowLabel: "", filterButton: true },
+      { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
+    ];
+    console.log("ver empleados", empleados);
+    console.log("Columnas:", columnas);
+
+    worksheet.addTable({
+      name: "Empleados",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: empleados,
+    });
+
+
+    const numeroFilas = empleados.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 13; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(arreglo[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
     }
-    wse["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wse, 'LISTA EMPLEADOS');
-    xlsx.writeFile(wb, "EmpleadosEXCEL" + '.xlsx');
+    worksheet.getRow(6).font = this.fontTitulo;
+
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Lista_Empleados.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
+
+
+
 
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **
@@ -918,13 +1140,23 @@ export class ListaEmpleadosComponent implements OnInit {
     var objeto: any;
     var arregloEmpleado: any = [];
     arreglo.forEach((obj: any) => {
-      var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
-      var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
+        }
+      });
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (obj.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+      let estadoCivil:any;
+      this.estadosCiviles.forEach((element: any) => {
+        if (obj.estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
         }
       });
       objeto = {
@@ -975,7 +1207,9 @@ export class ListaEmpleadosComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS(numero: any) {
+
+
+  ExportToCSV(numero: any) {
     if (numero === 1) {
       var arreglo = this.empleado;
     }
@@ -983,31 +1217,70 @@ export class ListaEmpleadosComponent implements OnInit {
       arreglo = this.desactivados;
     }
 
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('EmpleadosCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'CODIGO', key: 'codigo', width: 10 },
+      { header: 'CEDULA', key: 'cedula', width: 30 },
+      { header: 'APELLIDO', key: 'apellido', width: 15 },
+      { header: 'NOMBRE', key: 'nombre', width: 15 },
+      { header: 'FECHA_NACIMIENTO', key: 'fecha_nacimiento', width: 15 },
+      { header: 'ESTADO_CIVIL', key: 'estado_civil', width: 15 },
+      { header: 'GENERO', key: 'genero', width: 15 },
+      { header: 'CORREO', key: 'correo', width: 15 },
+      { header: 'ESTADO', key: 'estado', width: 15 },
+      { header: 'DOMICILIO', key: 'domicilio', width: 15 },
+      { header: 'TELEFONO', key: 'telefono', width: 15 },
+      { header: 'NACIONALIDAD', key: 'nacionalidad', width: 15 }
+
+
+    ];
+    // 4. Llenar las filas con los datos
+    arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
       });
-      return {
-        CODIGO: obj.codigo,
-        CEDULA: obj.cedula,
-        APELLIDO: obj.apellido,
-        NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
-        GENERO: this.GeneroSelect[obj.genero - 1],
-        CORREO: obj.correo,
-        ESTADO: this.EstadoSelect[obj.estado - 1],
-        DOMICILIO: obj.domicilio,
-        TELEFONO: obj.telefono,
-        NACIONALIDAD: nacionalidad,
-      }
-    }));
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EmpleadosCSV" + '.csv');
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (obj.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+      let estadoCivil:any;
+      this.estadosCiviles.forEach((element: any) => {
+        if (obj.estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
+        }
+      });
+
+      worksheet.addRow({
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        apellido: obj.apellido,
+        nombre: obj.nombre,
+        fecha_nacimiento: obj.fecha_nacimiento.split("T")[0],
+        estado_civil: estadoCivil,
+        genero: genero,
+        correo: obj.correo,
+        estado: this.EstadoSelect[obj.estado - 1],
+        domicilio: obj.domicilio,
+        telefono: obj.telefono,
+        nacionalidad: nacionalidad,
+      }).commit();
+    });
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "EmpleadosCSV.csv");
+    });
   }
 
   //CONTROL BOTONES
@@ -1073,7 +1346,7 @@ export class ListaEmpleadosComponent implements OnInit {
     const datos = {
       empleados: empleadosSeleccionados,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
@@ -1100,6 +1373,38 @@ export class ListaEmpleadosComponent implements OnInit {
       }) : this.toastr.info('No ha seleccionado usuarios.', '', {
         timeOut: 6000,
       });
+  }
+
+
+  ValidarCedula(cedula: string) {
+    console.log("entra a validar Cedula")
+    const inputElement = cedula
+
+    const cad: string = inputElement;
+    let total: number = 0;
+    const longitud: number = cad.length;
+    const longcheck: number = longitud - 1;
+
+    if (cad !== "" && longitud === 10) {
+      for (let i = 0; i < longcheck; i++) {
+        let num = parseInt(cad.charAt(i), 10);
+        if (isNaN(num)) return;
+
+        if (i % 2 === 0) {
+          num *= 2;
+          if (num > 9) num -= 9;
+        }
+        total += num;
+      }
+
+      total = total % 10 ? 10 - (total % 10) : 0;
+
+      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
+        console.log("Cédula Válida")
+      } else {
+        console.log("Cédula Inválida")
+      }
+    }
   }
 
 }

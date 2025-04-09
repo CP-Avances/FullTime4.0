@@ -26,6 +26,7 @@ interface Estado {
 })
 
 export class PedidoHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   // TIPOS DE ESTADOS QUE TIENE UNA SOLICITUD DE HORAS EXTRAS
   estados: Estado[] = [
@@ -88,7 +89,10 @@ export class PedidoHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     // OBTENER LA FECHA ACTUAL
     var f = DateTime.now();
@@ -245,7 +249,7 @@ export class PedidoHoraExtraComponent implements OnInit {
       tipo_funcion: 0,
       depa_user_loggin: parseInt(localStorage.getItem('departamento') as string),
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.GuardarInformacion(form1, dataPedirHoraExtra);
   }
@@ -405,7 +409,7 @@ export class PedidoHoraExtraComponent implements OnInit {
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_final,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado
@@ -452,7 +456,7 @@ export class PedidoHoraExtraComponent implements OnInit {
       id_documento: '',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     }, error => { })
@@ -485,6 +489,7 @@ export class PedidoHoraExtraComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();

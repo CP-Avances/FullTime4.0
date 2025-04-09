@@ -1,6 +1,5 @@
 // CONEXION CON LA BASE DE DATOS POSTGRESQL
 import Pool from 'pg-pool';
-
 const pool = new Pool({
   user: 'postgres',
   host: '192.168.0.148',

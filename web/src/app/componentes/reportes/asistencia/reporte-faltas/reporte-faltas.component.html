@@ -235,11 +235,12 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
+                        <th scope="col">Rol</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                        *ngFor="let e of empleados | sucNombre: filtroNombreSuc | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | nombreCompleto: filtroNombreEmp | roles: filtroRolEmp  | paginate:tamanio_pagina_emp:numero_pagina_emp">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"
@@ -250,6 +251,7 @@
                         <td>{{e.cedula}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
+                        <td>{{e.rol}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -280,6 +282,8 @@
                                 <th class="t_horarios" scope="col" rowspan="2">Cédula</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Código</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Empleado</th>
+                                <th class="t_horarios" scope="col" rowspan="2">Género</th>
+                                <th class="t_horarios" scope="col" rowspan="2">Ciudad</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Departamento</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Cargo</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Fecha</th>
@@ -291,6 +295,8 @@
                                 <td class="t_horarios">{{ t.cedula }}</td>
                                 <td class="t_horarios">{{ t.codigo }}</td>
                                 <td class="t_horarios">{{ t.empleado }}</td>
+                                <td class="t_horarios">{{ t.genero }}</td>
+                                <td class="t_horarios">{{ t.ciudad }}</td>
                                 <td class="t_horarios">{{ t.departamento }}</td>
                                 <td class="t_horarios">{{ t.cargo }}</td>
                                 <td class="t_horarios">{{ t.fecha }}</td>
@@ -309,7 +315,7 @@
                     <p>PDF</p>
                 </i>
                 <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel()">
+                    matTooltip="Descargar reporte en formato EXCEL." (click)="generarExcel()">
                     <p>XLSL</p>
                 </i>
             </div>

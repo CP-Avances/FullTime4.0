@@ -109,7 +109,7 @@ class DocumentosControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 let { id, documento } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -124,7 +124,8 @@ class DocumentosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el documento con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -141,7 +142,8 @@ class DocumentosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -171,7 +173,7 @@ class DocumentosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // FECHA DEL SISTEMA
                 var fecha = luxon_1.DateTime.now();
                 var anio = fecha.toFormat('yyyy');
@@ -190,7 +192,8 @@ class DocumentosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify({ documento }),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

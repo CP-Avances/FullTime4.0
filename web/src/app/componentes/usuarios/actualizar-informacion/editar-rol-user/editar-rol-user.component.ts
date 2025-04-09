@@ -55,6 +55,7 @@ export class EditarRolUserComponent implements OnInit {
 
 
   filtro_sucursal: any;
+  filteredRoles!: Observable<any[]>;
 
   //FILTRO ROLES
   // FILTROS SUCURSALES
@@ -170,7 +171,17 @@ export class EditarRolUserComponent implements OnInit {
     this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
       this.listaRoles = respuesta
       console.log('this.listaRoles: ', this.listaRoles)
-    })
+    });
+
+    this.filteredRoles = this.nombre_rolRol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
+
+    this.nombre_rolRol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
+    
 
     this.BuscarInformacionGeneral();
     this.ObtenerSucursales();
@@ -184,6 +195,14 @@ export class EditarRolUserComponent implements OnInit {
       this.Lsucursales = datos;
     });
   }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.listaRoles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
+  }
+
   Ldepatamentos: any;
   selecctSucu(id: any) {
     this.Ldepatamentos = []

@@ -1,0 +1,124 @@
+<div class="mat-elevation-z8" style="background: white;" style="padding-bottom: 5px;">
+    <!--  **************************** LISTA DE USUARIOS QUE PERTENECEN A UNA SUCURSAL *********************************  -->
+    <div style="padding-bottom: 10px;" *ngIf="!infoEmpleProceso">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <span>Usuarios que pertenecen a {{name_sucursal}}</span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <!-- <th>
+                            <mat-checkbox (change)="$event ? masterToggleU() : null"
+                                [checked]="usuariosSeleccionados.hasValue() && isAllSelectedU()"
+                                [indeterminate]="usuariosSeleccionados.hasValue() && !isAllSelectedU()"
+                                [aria-label]="checkboxLabelU()">
+                            </mat-checkbox>
+                        </th> -->
+                        <th scope="col">Rol</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Departamento</th>
+                        <th scope="col">Asignaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!-- <td></td> -->
+                        <td>
+                            <mat-form-field class="input-tables">
+                                <input matInput placeholder="Buscar" type="text" [formControl]="rol">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables">
+                                <input matInput placeholder="Buscar" type="text" [formControl]="nombre">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables">
+                                <input matInput placeholder="Buscar" type="text" [formControl]="departamento">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr
+                        *ngFor="let u of usuarios | roles: rol.value | nombreCompleto: nombre.value | departamento: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
+                        <!-- <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? usuariosSeleccionados.toggle(u) : null"
+                                [checked]="usuariosSeleccionados.isSelected(u)" [aria-label]="checkboxLabelU(u)">
+                            </mat-checkbox>
+                        </td> -->
+                        <td>{{u.name_rol}}</td>
+                        <td>{{u.apellido}} {{u.nombre}} </td>
+                        <td>{{u.name_dep}}</td>
+                        <td class="justify-content-center">
+                            <i matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
+                                class="fas fa-eye" id="t-ver" (click)="Visualizar(u)">
+                                <p>Ver</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="usuarios.length" [pageSize]="tamanio_pagina_p"
+            [pageSizeOptions]="pageSizeOptions_p" (page)="ManejarPaginaPrincipal($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+
+    <!--  **************************** INFORMACION DE EMPLEADO PROCESO *********************************  -->
+    <div style="padding-bottom: 10px;" *ngIf="infoEmpleProceso">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="row w-100">
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2"></div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>{{nombreUsuarioSelect.toLocaleUpperCase()}}</span>
+                </div>
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                        (click)="regresar()">
+                        Regresar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Proceso</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let pro of listaEmpleProce | paginate: tamanio_pagina_p:numero_pagina_p">
+                        <td>{{pro.proceso.toLocaleUpperCase()}} </td>
+                        <td>{{pro.estado ? 'ACTIVO' : 'INACTIVO'}}</td>
+                        <td class="justify-content-center">
+                            <i matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
+                                class="fas fa-pen" id="t-editar" (click)="AbrirVentanaEditar(pro)">
+                                <p>Editar</p>
+                            </i>
+                            <i matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
+                                class="fas fa-trash" id="t-ver" (click)="ConfirmarDelete(pro)">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listaEmpleProce.length" [pageSize]="tamanio_pagina_p"
+            [pageSizeOptions]="pageSizeOptions_p" (page)="ManejarPaginaPrincipal($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+
+</div>

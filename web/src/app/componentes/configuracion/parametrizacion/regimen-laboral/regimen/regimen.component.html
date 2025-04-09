@@ -29,7 +29,7 @@
                                 <mat-form-field>
                                     <mat-label id="letras_4">Seleccionar país</mat-label>
                                     <input type="text" placeholder="Ingresar nombre" aria-label="Number" matInput
-                                        [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
+                                        [formControl]="nombrePaisF" [matAutocomplete]="auto" required >
                                     <mat-autocomplete #auto="matAutocomplete">
                                         <mat-option *ngFor="let option of filtro | async" [value]="option.nombre">
                                             {{option.nombre}}
@@ -52,7 +52,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field id="periodo">
                                     <mat-label id="letras_2">Meses período</mat-label>
-                                    <input matInput [formControl]="mesesF" (keypress)="IngresarSoloNumeros($event)"
+                                    <input matInput type="tel" [formControl]="mesesF" (keypress)="IngresarSoloNumeros($event)"
                                         required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses de duración del período laboral.">
@@ -61,7 +61,7 @@
                                 </mat-form-field>
                                 <mat-form-field id="periodo">
                                     <mat-label id="letras_2">Días por mes</mat-label>
-                                    <input matInput [formControl]="diasF" (keypress)="IngresarSoloNumeros($event)"
+                                    <input matInput type="tel" [formControl]="diasF" (keypress)="IngresarSoloNumeros($event)"
                                         required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de días totales dentro de un mes.">
@@ -104,14 +104,14 @@
                                     <div class="col-md" *ngIf="meses_">
                                         <mat-form-field id="campos">
                                             <mat-label id="letras_2">No. de Meses</mat-label>
-                                            <input matInput [formControl]="minimoMesF" [required]="meses_"
+                                            <input matInput type="tel" [formControl]="minimoMesF" [required]="meses_"
                                                 (keypress)="IngresarSoloNumeros($event)">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-md" *ngIf="horas_">
                                         <mat-form-field id="campos">
                                             <mat-label id="letras_2">No. de Horas</mat-label>
-                                            <input matInput [formControl]="minimoHorasF" [required]="horas_"
+                                            <input matInput type="tel" [formControl]="minimoHorasF" [required]="horas_"
                                                 (keypress)="IngresarSoloNumeros($event)">
                                         </mat-form-field>
                                     </div>
@@ -164,19 +164,19 @@
                                         <div class="d-flex flex-wrap justify-content-start">
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días hábiles</mat-label>
-                                                <input matInput [formControl]="diasLaborablesF"
+                                                <input matInput type="tel" [formControl]="diasLaborablesF"
                                                     (keypress)="IngresarSoloNumeros($event)" [readonly]="escritura_dias"
                                                     required>
                                             </mat-form-field>
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días libres</mat-label>
-                                                <input matInput [formControl]="diasLibresF"
+                                                <input matInput type="tel" [formControl]="diasLibresF"
                                                     (keypress)="IngresarSoloNumeros($event)" [readonly]="escritura_dias"
                                                     required>
                                             </mat-form-field>
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días Calendario</mat-label>
-                                                <input matInput [formControl]="diasCalendarioF"
+                                                <input matInput type="tel" [formControl]="diasCalendarioF"
                                                     (keypress)="IngresarSoloNumeros($event)" [readonly]="escritura_dias"
                                                     required>
                                             </mat-form-field>
@@ -210,7 +210,7 @@
 
                                 <mat-form-field *ngIf="acumular" id="Maximo_dias">
                                     <mat-label id="letras_2">Máximo de días acumulables</mat-label>
-                                    <input matInput [formControl]="diasAcumulacionF"
+                                    <input matInput type="tel" [formControl]="diasAcumulacionF"
                                         (keypress)="IngresarSoloNumeros($event)" [required]="acumular">
                                 </mat-form-field>
                             </div>
@@ -233,7 +233,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field *ngIf="periodo_uno" id="Vacacion_periodo">
                                     <mat-label id="letras_4">1º Periodo</mat-label>
-                                    <input matInput [formControl]="periodoUnoF" [required]="periodo_uno"
+                                    <input matInput type="tel" [formControl]="periodoUnoF" [required]="periodo_uno"
                                         [readonly]="escritura_periodo" (keypress)="IngresarSoloNumeros($event)"
                                         (input)="VerificarPeriodos($event, 1)">
                                     <mat-icon id="cerrar" matSuffix matTooltipPosition="right" *ngIf="delete_uno"
@@ -246,7 +246,7 @@
                                 </mat-form-field>
                                 <mat-form-field *ngIf="periodo_dos" id="Vacacion_periodo">
                                     <mat-label id="letras_4">2º Periodo</mat-label>
-                                    <input matInput [formControl]="periodoDosF" [required]="periodo_dos"
+                                    <input matInput type="tel" [formControl]="periodoDosF" [required]="periodo_dos"
                                         [readonly]="escritura_periodo" (keypress)="IngresarSoloNumeros($event)"
                                         (input)="VerificarPeriodos($event, 2)">
                                     <mat-icon id="cerrar" matSuffix matTooltipPosition="right" *ngIf="delete_dos"
@@ -259,7 +259,7 @@
                                 </mat-form-field>
                                 <mat-form-field *ngIf="periodo_tres" id="Vacacion_periodo">
                                     <mat-label id="letras_4">3º Periodo</mat-label>
-                                    <input matInput [formControl]="periodoTresF" [required]="periodo_tres"
+                                    <input matInput type="tel" [formControl]="periodoTresF" [required]="periodo_tres"
                                         [readonly]="escritura_periodo" (keypress)="IngresarSoloNumeros($event)"
                                         (input)="VerificarPeriodos($event, 3)">
                                     <mat-icon id="cerrar" matSuffix matTooltipPosition="right" *ngIf="delete_tres"
@@ -354,12 +354,12 @@
                                         <div class="d-flex flex-wrap justify-content-start">
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_1">Años antiguedad</mat-label>
-                                                <input matInput [formControl]="aniosAntiguedadF" [required]="fija"
+                                                <input matInput type="tel" [formControl]="aniosAntiguedadF" [required]="fija"
                                                     (keypress)="IngresarSoloNumeros($event)">
                                             </mat-form-field>
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días adicionales</mat-label>
-                                                <input matInput [formControl]="diasAdicionalesF" [required]="fija"
+                                                <input matInput type="tel" [formControl]="diasAdicionalesF" [required]="fija"
                                                     (keypress)="IngresarSoloNumeros($event)">
                                             </mat-form-field>
                                         </div>
@@ -370,12 +370,12 @@
                             <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_uno">
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput [formControl]="desde_unoF" [required]="antiguo_uno"
+                                    <input matInput type="tel" [formControl]="desde_unoF" [required]="antiguo_uno"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad_hasta">
                                     <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput [formControl]="hasta_unoF" [required]="antiguo_uno"
+                                    <input matInput type="tel" [formControl]="hasta_unoF" [required]="antiguo_uno"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-hint align="start" id="error_" *ngIf="hasta_uno">
                                         <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
@@ -383,7 +383,7 @@
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput [formControl]="vacaciones_unoF" [required]="antiguo_uno"
+                                    <input matInput type="tel" [formControl]="vacaciones_unoF" [required]="antiguo_uno"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_uno"
@@ -397,7 +397,7 @@
                             <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_dos">
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput [formControl]="desde_dosF" [required]="antiguo_dos"
+                                    <input matInput type="tel" [formControl]="desde_dosF" [required]="antiguo_dos"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad_hasta">
@@ -410,7 +410,7 @@
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput [formControl]="vacaciones_dosF" [required]="antiguo_dos"
+                                    <input matInput type="tel" [formControl]="vacaciones_dosF" [required]="antiguo_dos"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_dos"
@@ -424,12 +424,12 @@
                             <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_tres">
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput [formControl]="desde_tresF" [required]="antiguo_tres"
+                                    <input matInput type="tel" [formControl]="desde_tresF" [required]="antiguo_tres"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad_hasta">
                                     <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput [formControl]="hasta_tresF" [required]="antiguo_tres"
+                                    <input matInput type="tel" [formControl]="hasta_tresF" [required]="antiguo_tres"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-hint align="start" id="error_" *ngIf="hasta_tres">
                                         <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
@@ -437,7 +437,7 @@
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput [formControl]="vacaciones_tresF" [required]="antiguo_tres"
+                                    <input matInput type="tel" [formControl]="vacaciones_tresF" [required]="antiguo_tres"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_tres"
@@ -451,12 +451,12 @@
                             <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_cuatro">
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput [formControl]="desde_cuatroF" [required]="antiguo_cuatro"
+                                    <input matInput type="tel" [formControl]="desde_cuatroF" [required]="antiguo_cuatro"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad_hasta">
                                     <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput [formControl]="hasta_cuatroF" [required]="antiguo_cuatro"
+                                    <input matInput type="tel" [formControl]="hasta_cuatroF" [required]="antiguo_cuatro"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-hint align="start" id="error_" *ngIf="hasta_cuatro">
                                         <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
@@ -464,7 +464,7 @@
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput [formControl]="vacaciones_cuatroF" [required]="antiguo_cuatro"
+                                    <input matInput type="tel" [formControl]="vacaciones_cuatroF" [required]="antiguo_cuatro"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_cuatro"
@@ -491,7 +491,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field id="campos_calculos">
                                     <mat-label id="letras_2">Meses período</mat-label>
-                                    <input matInput [formControl]="meses_calculoF"
+                                    <input matInput type="tel" [formControl]="meses_calculoF"
                                         (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses considerados para el cálculo.">

@@ -87,6 +87,16 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/nacionalidades`)
   }
 
+  //METODO PARA OBTENER LISTA DE GENERO
+  BuscarGeneros() {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generos`);
+  }
+
+  //METODO PARA OBTENER LISTA DE ESTADOS CIVILES
+  BuscarEstadoCivil() {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/estados-civiles`);
+  }
+
   // METODO PARA LISTAR EMPLEADOS ACTIVOS    **USADO
   ListarEmpleadosActivos() {
     const headers = new HttpHeaders({
@@ -316,11 +326,6 @@ export class EmpleadoService {
   SubirArchivoExcelContrato(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/cargar_plantilla/`, formData);
   }
-
-  BuscarDepartamentoEmpleado(datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/buscarDepartamento`, datos);
-  }
-
 
   // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS    **USADO
   CrearCarpetasUsuarios(data: any) {

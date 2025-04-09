@@ -55,9 +55,7 @@ class RsaKeysService {
     }
     encriptarLogin(password) {
         //Encriptacion con key encriptada para passwords
-        console.log("pass: ", password);
         let aux = CryptoJS.AES.encrypt(password, this.keyLogin, { iv: this.iv }).toString();
-        console.log("aux: ", aux);
         return aux;
     }
     desencriptarLogin(passwordEncrypted) {

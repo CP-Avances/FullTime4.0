@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-empleado-proceso',
@@ -14,6 +15,7 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
 })
 
 export class EditarEmpleadoProcesoComponent implements OnInit {
+  ips_locales: any = '';
 
   empleados: any = [];
   procesos: any = [];
@@ -40,12 +42,16 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
     private restPro: ProcesoService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<EditarEmpleadoProcesoComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ObtenerProcesos();
@@ -84,7 +90,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
       this.InsertarProceso(form);
     }
     else {
-      this.toastr.info('La fecha de finalización debe ser mayor a la fecha de inicio','', {
+      this.toastr.info('La fecha de finalización debe ser mayor a la fecha de inicio', '', {
         timeOut: 6000,
       })
     }
@@ -99,7 +105,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
       id: this.data.datosProcesos.id,
       id_proceso: form.idProcesoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.restP.ActualizarUnProceso(datosProceso).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Proceso del Empleado actualizado', {

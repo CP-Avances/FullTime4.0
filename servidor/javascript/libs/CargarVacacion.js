@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestarPeriodoVacacionAutorizada = void 0;
 const database_1 = __importDefault(require("../database"));
 const auditoriaControlador_1 = __importDefault(require("../controlador/reportes/auditoriaControlador"));
-const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip) {
+const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip, ip_local) {
     return __awaiter(this, void 0, void 0, function* () {
         let vacacion = yield ConsultarVacacion(id_vacacion);
         let num_dias = ContabilizarDiasVacacion(vacacion.fec_inicio, vacacion.fec_final) || 0;
@@ -49,7 +49,8 @@ const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip) {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar periodo de vacaciones con id ${vacacion.id_peri_vacacion}. Registro no encontrado`
                 });
                 // FINALIZAR TRANSACCION
@@ -66,7 +67,8 @@ const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip) {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(response.rows),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
             // FINALIZAR TRANSACCION

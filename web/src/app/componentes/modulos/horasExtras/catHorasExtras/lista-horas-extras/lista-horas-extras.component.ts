@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
@@ -26,6 +25,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class ListaHorasExtrasComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -76,7 +76,10 @@ export class ListaHorasExtrasComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
       this.BuscarHora();
       this.ObtenerLogo();
@@ -198,7 +201,7 @@ export class ListaHorasExtrasComponent implements OnInit {
   Eliminar(id_permiso: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {
@@ -366,6 +369,7 @@ export class ListaHorasExtrasComponent implements OnInit {
    ** **                                  METODO PARA EXPORTAR A EXCEL                            ** **
    ** ********************************************************************************************** **/
   exportToExcel() {
+    /*
     if (Object.keys(this.horasExtras).length === 0) {
       this.toastr.error('No se ha encontrado registro de horas extras.')
     } else {
@@ -374,6 +378,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       xlsx.utils.book_append_sheet(wb, wsr, 'HorasExtras');
       xlsx.writeFile(wb, "HorasExtras" + new Date().getTime() + '.xlsx');
     }
+      */
   }
 
   /** ********************************************************************************************** **
@@ -381,6 +386,7 @@ export class ListaHorasExtrasComponent implements OnInit {
    ** ********************************************************************************************** **/
 
   exportToCVS() {
+    /*
     if (Object.keys(this.horasExtras).length === 0) {
       this.toastr.error('No se ha encontrado registro de horas extras.')
     } else {
@@ -389,6 +395,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "HorasExtrasCSV" + new Date().getTime() + '.csv');
     }
+      */
   }
 
   /** ********************************************************************************************** **

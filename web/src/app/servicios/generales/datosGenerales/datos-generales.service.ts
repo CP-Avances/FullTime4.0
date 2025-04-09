@@ -45,19 +45,7 @@ export class DatosGeneralesService {
   InformarEmpleadoAutoriza(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/empleadoAutoriza/${id_empleado}`);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO
   ListarInformacionActual() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/info_actual`);

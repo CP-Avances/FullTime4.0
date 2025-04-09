@@ -26,7 +26,7 @@ class DiscapacidadControlador {
   // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
   public async RegistrarDiscapacidad(req: Request, res: Response): Promise<void> {
     try {
-      const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
+      const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -53,7 +53,9 @@ class DiscapacidadControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip, observacion: null
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
       });
 
       // FINALIZAR TRANSACCION
@@ -71,7 +73,7 @@ class DiscapacidadControlador {
   public async ActualizarDiscapacidad(req: Request, res: Response): Promise<Response> {
     try {
       const id_empleado = req.params.id_empleado;
-      const { carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
+      const { carn_conadis, porcentaje, tipo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -87,7 +89,8 @@ class DiscapacidadControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar discapacidad con id_empleado: ${id_empleado}`
         });
       }
@@ -106,7 +109,8 @@ class DiscapacidadControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -124,7 +128,7 @@ class DiscapacidadControlador {
   // METODO PARA ELIMINAR REGISTRO   **USADO
   public async EliminarDiscapacidad(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id_empleado = req.params.id_empleado;
 
       // INICIAR TRANSACCION
@@ -141,7 +145,8 @@ class DiscapacidadControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar discapacidad con id_empleado: ${id_empleado}`
         });
 
@@ -163,7 +168,8 @@ class DiscapacidadControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -186,7 +192,7 @@ class DiscapacidadControlador {
   // METODO PARA CREAR TIPO DE DISCAPACIDAD
   public async RegistrarTipo(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, user_name, ip } = req.body;
+      const { nombre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -206,7 +212,8 @@ class DiscapacidadControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: `{nombre: ${nombre}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

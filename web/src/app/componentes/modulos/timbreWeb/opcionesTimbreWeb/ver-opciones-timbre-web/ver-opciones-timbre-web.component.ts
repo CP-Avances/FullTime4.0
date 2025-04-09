@@ -6,7 +6,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
@@ -15,6 +16,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 import { OpcionesTimbreWebComponent } from '../opciones-timbre-web/opciones-timbre-web.component';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 
 
 @Component({
@@ -24,6 +26,19 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class VerOpcionesTimbreWebComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @Input() informacion: any;
   @Input() opcion: any;
@@ -58,18 +73,46 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
     public opciones: TimbresService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
+    private restGenero: GenerosService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     console.log('ver info ', this.informacion)
     this.ObtenerEmpleados(this.idEmpleadoLogueado);
     this.RevisarEmpleados();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.ObtenerGeneros();
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -110,12 +153,14 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
         .filter((info: any) => a.respuesta.some((res: any) => info.id === res.id_empleado)) // FILTRAR LOS QUE ESTAN EN AMBOS ARRAYS
         .map((info: any) => {
           const res = a.respuesta.find((res: any) => res.id_empleado === info.id); // ENCONTRAR LOS DATOS CORRESPONDIENTES
+          
           return {
             ...info,
             // COMBINAR CON LA INFORMACION DE LA CONFIGURACION
             timbre_especial: res.timbre_especial,
             timbre_foto: res.timbre_foto,
             timbre_ubicacion_desconocida: res.timbre_ubicacion_desconocida,
+            opcional_obligatorio: res.opcional_obligatorio,
             n: numero++
           };
         });
@@ -191,17 +236,17 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
   EliminarDetalle(id_opcion: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
       ids: [id_opcion]
     };
     console.log('ver datos ', datos)
     this.opciones.EliminarOpcionesMarcacionWeb(datos).subscribe((res: any) => {
-     
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.RevisarEmpleados();
-      
+
+      this.toastr.error('Registro eliminado.', '', {
+        timeOut: 6000,
+      });
+      this.RevisarEmpleados();
+
     });
   }
 
@@ -227,7 +272,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
       const ids: number[] = this.selectionUsuario.selected.map((obj: any) => obj.id).filter((id) => id !== undefined);
       const data = {
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
         ids: ids,
       };
 
@@ -391,12 +436,19 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
                 { rowSpan: 1, text: 'TIMBRE UBICACIÓN DESCONOCIDA', style: 'tableHeader' },
               ],
               ...this.configuracion.map((obj: any) => {
+                let genero: any;
+                this.generos.forEach((element: any) => {
+                  if (obj.genero == element.id) {
+                    genero = element.genero;
+                  }
+                });
+                console.log(genero)
                 return [
                   { style: 'itemsTableCentrado', text: obj.n },
                   { style: 'itemsTable', text: obj.cedula },
                   { style: 'itemsTableCentrado', text: obj.codigo },
                   { style: 'itemsTable', text: obj.apellido + ' ' + obj.nombre },
-                  { style: 'itemsTableCentrado', text: obj.genero == 1 ? 'M' : 'F' },
+                  { style: 'itemsTableCentrado', text: genero },
                   { style: 'itemsTable', text: obj.ciudad },
                   { style: 'itemsTable', text: obj.sucursal },
                   { style: 'itemsTable', text: obj.regimen },
@@ -425,44 +477,160 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.configuracion));
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, `OpcionesMarcacionMovil.xls`);
+   generos: any=[];
+   ObtenerGeneros(){
+     this.restGenero.ListarGeneros().subscribe(datos => {
+       this.generos = datos;
+     })
+   }
+
+
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.configuracion.map((usu: any) => {
+
+      let genero: any;
+      this.generos.forEach((element: any) => {
+        if (usu.genero == element.id) {
+          genero = element.genero;
+        }
+      });
+
+      datos.push([
+        n++,
+        usu.cedula,
+        usu.codigo,
+        usu.apellido,
+        usu.nombre,
+        genero,
+        usu.ciudad,
+        usu.sucursal,
+        usu.regimen,
+        usu.departamento,
+        usu.cargo,
+        usu.timbre_foto == true ? 'SI' : 'NO',
+        usu.timbre_especial == true ? 'SI' : 'NO',
+        usu.timbre_ubicacion_desconocida == true ? 'SI' : 'NO',
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Opciones Marcacion Web");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:N1");
+    worksheet.mergeCells("B2:N2");
+    worksheet.mergeCells("B3:N3");
+    worksheet.mergeCells("B4:N4");
+    worksheet.mergeCells("B5:N5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Opciones Marcación Web'.toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "cedula", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "apellido", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "genero", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "timbre_foto", width: 20 },
+      { key: "timbre_especial", width: 20 },
+      { key: "timbre_ubicacion_desconocida", width: 35},
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "ENVIAR FOTO", totalsRowLabel: "", filterButton: true },
+      { name: "TIMBRE ESPECIAL", totalsRowLabel: "", filterButton: true },
+      { name: "TIMBRE UBICACIÓN DESCONOCIDA", totalsRowLabel: "", filterButton: true },
+
+    ]
+
+    worksheet.addTable({
+      name: "OpcionesMarcacionWebTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 14; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "OpcionesMarcacionWeb.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
 
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
-    let usuarios: any[] = [];
-    let c = 0;
-    array.forEach((usu) => {
-      let ele = {
-        'Cédula': usu.cedula,
-        'Código': usu.codigo,
-        'Apellido': usu.apellido,
-        'Nombre': usu.nombre,
-        'Género': usu.genero == 1 ? 'M' : 'F',
-        'Ciudad': usu.ciudad,
-        'Sucursal': usu.sucursal,
-        'Régimen': usu.regimen,
-        'Departamento': usu.departamento,
-        'Cargo': usu.cargo,
-        'Enviar Foto': usu.timbre_foto == true ? 'SI' : 'NO',
-        'Timbre Especial': usu.timbre_especial == true ? 'SI' : 'NO',
-        'Timbre Ubicación Desconocida': usu.timbre_ubicacion_desconocida == true ? 'SI' : 'NO',
-      }
-      nuevo.push(ele)
-    });
-    nuevo.sort(function (a: any, b: any) {
-      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
-    });
-    nuevo.forEach((u: any) => {
-      c = c + 1;
-      const usuarioNuevo = Object.assign({ 'N°': c }, u);
-      usuarios.push(usuarioNuevo);
-    });
-    return usuarios;
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   //CONTROL BOTONES
@@ -485,5 +653,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
+
+
 
 }

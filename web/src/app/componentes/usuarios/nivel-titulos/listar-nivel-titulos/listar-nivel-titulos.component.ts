@@ -6,8 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+import ExcelJS, { FillPattern } from "exceljs";
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 
@@ -32,9 +32,21 @@ import { SelectionModel } from '@angular/cdk/collections';
 })
 
 export class ListarNivelTitulosComponent implements OnInit {
+  ips_locales: any = '';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   nivelesEliminar: any = [];
   nivelTitulos: any = [];
@@ -89,10 +101,36 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNiveles();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // EVENTO PARA MOSTRAR NUMERO DE FILAS DE TABLA
@@ -237,7 +275,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       const data = {
         niveles: this.listNivelesCorrectos,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
 
       this.nivel.RegistrarNivelesPlantilla(data).subscribe({
@@ -440,27 +478,118 @@ export class ListarNivelTitulosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS EXCEL                          ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel() {
+  async generarExcelNivelesTitulos() {
     this.OrdenarDatos(this.nivelTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        NIVEL: obj.nombre,
+
+    const niveles: any[] = [];
+    this.nivelTitulos.forEach((nivel: any, index: number) => {
+      niveles.push([
+        index + 1,
+        nivel.id,
+        nivel.nombre,
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Niveles Títulos");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:C1");
+    worksheet.mergeCells("B2:C2");
+    worksheet.mergeCells("B3:C3");
+    worksheet.mergeCells("B4:C4");
+    worksheet.mergeCells("B5:C5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Niveles de Títulos Profesionales".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 20 },
+      { key: "codigo", width: 30 },
+      { key: "nombre", width: 40 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "NivelesTitulosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: niveles,
+    });
+
+
+    const numeroFilas = niveles.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 3; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.nivelTitulos[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
     }
-    wst["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wst, 'LISTAR NIVELES TITULOS');
-    xlsx.writeFile(wb, "NivelesTitulosEXCEL" + '.xlsx');
-    this.ObtenerNiveles();
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "NivelesTitulosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
 
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **
@@ -512,13 +641,22 @@ export class ListarNivelTitulosComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
-    this.OrdenarDatos(this.nivelTitulos);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos);
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "NivelesTitulosCSV" + '.csv');
-    this.ObtenerNiveles();
+  ExportToCSV() {
+  
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('NivelesTitulosCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.nivelTitulos[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    this.nivelTitulos.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "NivelesTitulosCSV.csv");
+    });
+
   }
 
 
@@ -570,7 +708,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   Eliminar(id_nivel: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.nivel.EliminarNivel(id_nivel, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -611,33 +749,42 @@ export class ListarNivelTitulosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
-    this.contador = 0;
+  
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectionNiveles.selected.length;
+  
     this.nivelesEliminar = this.selectionNiveles.selected;
+  
     this.nivelesEliminar.forEach((datos: any) => {
-      this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.nivel.EliminarNivel(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          eliminados++;
+          this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
+        }
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+          this.selectionNiveles.clear();
+          this.nivelesEliminar = [];
           this.ObtenerNiveles();
         }
       });
-    }
-    )
+    });
   }
+  
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {

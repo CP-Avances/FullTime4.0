@@ -21,8 +21,9 @@
                 <div style="text-align: center">
                     <div class="nota" style="text-align: justify;">
                         <span>
-                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                        Guardar.
+                            NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                            botón
+                            Guardar.
                         </span>
                     </div>
                     <span class="nota">Desea subir un archivo (opcional)</span>
@@ -35,18 +36,18 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Seleccionar país</mat-label>
-                                        <input type="text" placeholder="Ingresar nombre" aria-label="Number" matInput
-                                            [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
-                                        <mat-autocomplete #auto="matAutocomplete">
-                                            <mat-option *ngFor="let option of filtro | async" [value]="option.nombre"
-                                                (click)="ObtenerRegimen(formulario.value)">
-                                                {{option.nombre}}
-                                            </mat-option>
-                                        </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Seleccionar uno de los paises de la lista.">
-                                            help_outline
-                                        </mat-icon>
+                                    <input type="text" placeholder="Ingresar nombre" aria-label="Number" matInput
+                                        [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
+                                    <mat-autocomplete #auto="matAutocomplete">
+                                        <mat-option *ngFor="let option of filtro | async" [value]="option.nombre"
+                                            (click)="ObtenerRegimen(formulario.value)">
+                                            {{option.nombre}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Seleccionar uno de los paises de la lista.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field *ngIf="habilitarSeleccion">
                                     <mat-label>Modalidad Laboral</mat-label>
@@ -54,7 +55,7 @@
                                         matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
                                         help_outline
                                     </mat-icon>
-                                    <mat-select [formControl]="tipoF">
+                                    <mat-select [formControl]="tipoF" required>
                                         <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id"
                                             (click)="IngresarOtro(formulario.value)">
                                             {{tc.descripcion}}
@@ -85,20 +86,21 @@
                                 </mat-form-field>
                             </div>
                         </div>
-    
+
                         <div class="col-md">
                             <div class="row">
                                 <div class="col-md">
                                     <div class="d-flex flex-wrap justify-content-center">
-                                            <mat-form-field style="width: 90%">
-                                                <mat-label>Fecha de ingreso</mat-label>
-                                                <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                        <mat-form-field style="width: 90%">
+                                            <mat-label>Fecha de ingreso</mat-label>
+                                            <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                                 [formControl]="fechaIngresoF" required>
-                                                <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
+                                            <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
+                                                matTooltipPosition="right"
                                                 matTooltip="Ingresar la fecha de ingreso del empleado a la empresa. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                                </mat-datepicker-toggle>
-                                                <mat-datepicker touchUi #picker></mat-datepicker>
-                                            </mat-form-field>
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker touchUi #picker></mat-datepicker>
+                                        </mat-form-field>
                                     </div>
                                 </div>
                                 <div class="col-md">
@@ -106,10 +108,10 @@
                                         <mat-form-field style="width: 90%">
                                             <mat-label>Fecha de salida</mat-label>
                                             <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                            [formControl]="fechaSalidaF" required>
+                                                [formControl]="fechaSalidaF" required>
                                             <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
-                                            matTooltipPosition="right"
-                                            matTooltip="Ingresar la fecha estimada de salida del empleado, en caso de conocerla. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                                matTooltipPosition="right"
+                                                matTooltip="Ingresar la fecha estimada de salida del empleado, en caso de conocerla. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                             </mat-datepicker-toggle>
                                             <mat-datepicker touchUi #picker2></mat-datepicker>
                                         </mat-form-field>
@@ -122,26 +124,26 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label
                                     style="padding-top: 10px; padding-bottom: 5px; position: relative; left:15px; font-size: 14px;">
-                                     Controlar asistencia *
+                                    Controlar asistencia *
                                 </label>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
-                                 <mat-radio-group aria-label="Select an option" [formControl]="controlAsistenciaF"
+                                <mat-radio-group aria-label="Select an option" [formControl]="controlAsistenciaF"
                                     [value]="controlAsistenciaF.value" required>
                                     <div class="d-flex justify-content-around">
                                         <mat-radio-button value="true">
-                                           <label id="textoradiobtn">Si</label>
+                                            <label id="textoradiobtn">Si</label>
                                         </mat-radio-button>
-                                         <mat-radio-button value="false">
+                                        <mat-radio-button value="false">
                                             <label id="textoradiobtn">No</label>
-                                         </mat-radio-button>
-                                     </div>
+                                        </mat-radio-button>
+                                    </div>
                                 </mat-radio-group>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label
-                                   style="padding-top: 10px; padding-bottom: 5px; position: relative; left:15px; font-size: 14px;">
-                                   Controlar vacaciones *
+                                    style="padding-top: 10px; padding-bottom: 5px; position: relative; left:15px; font-size: 14px;">
+                                    Controlar vacaciones *
                                 </label>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:15px;">
@@ -149,26 +151,25 @@
                                     [value]="controlVacacionesF.value" required>
                                     <div class="d-flex justify-content-around">
                                         <mat-radio-button matSuffix matTooltipPosition="right"
-                                             matTooltip="No permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
-                                             value="true">
-                                             <label id="textoradiobtn">Si</label>
-                                         </mat-radio-button>
-                                        <mat-radio-button matSuffix matTooltipPosition="right"
-                                             matTooltip="Sí permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
-                                             value="false">
-                                              <label id="textoradiobtn">No</label>
+                                            matTooltip="No permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
+                                            value="true">
+                                            <label id="textoradiobtn">Si</label>
                                         </mat-radio-button>
-                                     </div>
-                                 </mat-radio-group>
+                                        <mat-radio-button matSuffix matTooltipPosition="right"
+                                            matTooltip="Sí permitirá solicitar vacaciones o permisos si el usuario no tienen saldo de vacaciones."
+                                            value="false">
+                                            <label id="textoradiobtn">No</label>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
                             </div>
                         </div>
 
                         <div *ngIf="isChecked" class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around" >
+                            <div class="d-flex flex-wrap justify-content-around">
                                 <div class="separar">
                                     <form method="post" enctype="multipart/form-data">
-                                        <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
-                                            id="file">
+                                        <input (change)="fileChange($event)" type="file" id="file">
                                         <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor"
                                             matSuffix matTooltipPosition="right"
                                             matTooltip="Subir el repectivo documento contrato del empleado">
@@ -187,7 +188,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>  
+                    </div>
                 </form>
 
             </mat-card-content>

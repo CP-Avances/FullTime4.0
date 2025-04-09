@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md">
                 <div id="titulo">
-                    <span>TIPO DE ACCIONES DE PERSONAL</span>
+                    <span>DETALLE TIPO DE ACCIONES DE PERSONAL</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
@@ -19,11 +19,59 @@
                     </div>
                 </mat-card>
             </div>
+            <div class="col-md">
+                <div id="titulo">
+                    <span>CARGAR PLANTILLA DETALLE TIPO ACCIÓN DE PERSONAL</span>
+                </div>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="row">
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <form method="post" class="btn-2" enctype="multipart/form-data">
+                                    <input (change)="FileChange($event)" type="file"
+                                        [formControl]="archivoForm" id="file1"
+                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 65px; padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir plantilla
+                                    </label>
+                                    <label for="file1" matSuffix matTooltipPosition="right" 
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 65px;  padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir nueva plantilla
+                                    </label>
+                                </form>
+                            </div>
+    
+                        </div>
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div *ngIf="!Datos_tipoAccion_personal" class="d-flex flex-wrap justify-content-center m-auto"
+                                style="text-align: center; justify-content: center;">
+                                <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                    matTooltip="Dar click para ver o descargar el documento."
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                    <br> Descargar plantilla
+                                </a>
+                            </div>
+                            <div  class="d-flex flex-wrap justify-content-center m-auto">
+                                <button *ngIf="Datos_tipoAccion_personal && messajeExcel != 'error'" id="descargar" 
+                                    class="btn m-auto" matSuffix matTooltipPosition="right"
+                                    matTooltip="Guardar registro múltiple." (click)="ConfirmarRegistroMultiple()">
+                                    Registrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
         </div>
     </div>
-    <div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div *ngIf="!Datos_tipoAccion_personal" class="container" style="padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="resultados">LISTA TIPOS DE ACCIONES DE PERSONAL</div>
+            <div id="resultados">LISTA DETALLES TIPOS DE ACCIONES DE PERSONAL</div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
@@ -112,3 +160,69 @@
 
 <!--  *********************** PANTALLA DATOS GENERALES DE TIPOS DE ACCION  ****************************  -->
 <app-ver-tipo-accion *ngIf="ver_datos" [idAccion]="accion_id"></app-ver-tipo-accion>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="Datos_tipoAccion_personal && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_tipoAccion_personal && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MÚLTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Tipo de acción de personal</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Base legal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let ac of Datos_tipoAccion_personal | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{ac.fila}}</td>
+                        <td style="font-size: 12px;" class="td_ob">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="EstiloCelda(ac.observacion)"></div>
+                                {{ac.observacion}}
+                            </div>
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(ac.tipo_accion_personal)" style="font-size: 12px;">
+                            {{ac.tipo_accion_personal}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(ac.descripcion)" style="font-size: 12px;">
+                            {{ac.descripcion}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(ac.base_legal)" style="font-size: 12px;">
+                            {{ac.base_legal}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{listaTipoAccionesCorrectasCont}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="Datos_tipoAccion_personal.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+

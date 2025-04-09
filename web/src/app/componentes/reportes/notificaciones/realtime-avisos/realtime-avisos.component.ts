@@ -94,6 +94,7 @@ export class RealtimeAvisosComponent implements OnInit {
     this.timbres_noti = [];
     this.avisos.AvisosTimbresRealtime(id).subscribe(res => {
       this.timbres_noti = res;
+      console.log("ver avisos: ", this.timbres_noti )
     });
   }
 

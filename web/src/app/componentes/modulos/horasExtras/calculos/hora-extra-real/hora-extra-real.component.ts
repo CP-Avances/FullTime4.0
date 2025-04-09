@@ -4,7 +4,6 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -475,10 +474,12 @@ export class HoraExtraRealComponent implements OnInit {
    * ****************************************************************************************************/
 
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.empleado);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'empleados');
     xlsx.writeFile(wb, "EmpleadoEXCEL" + new Date().getTime() + '.xlsx');
+    */
   }
 
   /* ****************************************************************************************************
@@ -527,10 +528,12 @@ export class HoraExtraRealComponent implements OnInit {
    ******************************************************************************************************/
 
   exportToCVS() {
+    /*
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.empleado);
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "EmpleadosCSV" + new Date().getTime() + '.csv');
+    */
   }
 
 

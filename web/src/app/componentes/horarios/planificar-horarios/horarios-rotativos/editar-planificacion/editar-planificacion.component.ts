@@ -26,6 +26,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 })
 
 export class EditarPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() datos_horarios: any;
 
@@ -65,7 +66,10 @@ export class EditarPlanificacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.BuscarHora();
     this.BuscarFeriados();
   }
@@ -770,7 +774,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
@@ -960,7 +964,7 @@ export class EditarPlanificacionComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
@@ -1064,7 +1068,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;

@@ -94,6 +94,7 @@ export class DepartamentosService {
       catchError(data)
     );
   }
+  
   // catalogo de departamentos
   ConsultarDepartamentoPorContrato(id_cargo: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);

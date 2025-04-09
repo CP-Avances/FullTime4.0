@@ -20,6 +20,7 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 })
 
 export class EditarCargoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() idSelectCargo: number;
   @Input() idEmpleado: string;
@@ -53,7 +54,7 @@ export class EditarCargoComponent implements OnInit {
   idSucursal = new FormControl('', [Validators.required]);
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
   jefeF = new FormControl();
   administraF = new FormControl();
   personalF = new FormControl(false);
@@ -90,7 +91,10 @@ export class EditarCargoComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.BuscarUsuarioDepartamento();
@@ -274,7 +278,7 @@ export class EditarCargoComponent implements OnInit {
       cargo: form.tipoForm,
       jefe: form.jefeForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // FORMATEAR HORAS
@@ -367,7 +371,7 @@ export class EditarCargoComponent implements OnInit {
       let tipo_cargo = {
         cargo: form.cargoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.restEmplCargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
@@ -500,7 +504,7 @@ export class EditarCargoComponent implements OnInit {
       personal: form.personalForm,
       administra: form.administraForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
     });
@@ -511,7 +515,7 @@ export class EditarCargoComponent implements OnInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });

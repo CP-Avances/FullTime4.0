@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
 import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
@@ -22,6 +22,7 @@ interface Estado {
 })
 
 export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
+  ips_locales: any = '';
 
   estados: Estado[] = [];
 
@@ -60,6 +61,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     private restV: VacacionesService,
     public ventana: MatDialogRef<EditarEstadoVacacionAutoriacionComponent>,
     public restAutoriza: AutorizaDepartamentoService,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
@@ -68,7 +70,11 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+      
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+  
     if (this.data.auto.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -159,7 +165,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
@@ -173,7 +179,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     let datosVacacion = {
       estado: estado_vacacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restV.ActualizarEstado(id_vacacion, datosVacacion).subscribe(respon => {
     });
@@ -397,7 +403,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
         desde + ' ' + DateTime.fromISO(vacaciones.fec_inicio).toFormat('dd/MM/yyyy') + ' hasta ' +
         hasta + ' ' + DateTime.fromISO(vacaciones.fec_final).toFormat('dd/MM/yyyy'),
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado

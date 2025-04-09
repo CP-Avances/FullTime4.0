@@ -11,6 +11,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro-contrato',
@@ -19,6 +20,8 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 })
 
 export class RegistroContratoComponent implements OnInit {
+
+  ips_locales: any = '';
 
   @Input() datoEmpleado: any;
   @Input() pagina: any;
@@ -49,7 +52,7 @@ export class RegistroContratoComponent implements OnInit {
   idRegimenF = new FormControl('', Validators.required);
   documentoF = new FormControl('');
   contratoF = new FormControl('', Validators.minLength(3));
-  tipoF = new FormControl('');
+  tipoF = new FormControl('', Validators.required);
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
@@ -71,11 +74,15 @@ export class RegistroContratoComponent implements OnInit {
     public restCargo: EmplCargosService,
     public ventana: VerEmpleadoComponent,
     public pais: ProvinciaService,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     console.log('dato ', this.datoEmpleado);
     this.ObtenerPaises();
     this.ObtenerEmpleados();
@@ -178,7 +185,7 @@ export class RegistroContratoComponent implements OnInit {
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -208,7 +215,7 @@ export class RegistroContratoComponent implements OnInit {
       let tipo_contrato = {
         descripcion: form.contratoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       // VERIFICAR DUPLICIDAD DE MODALIDAD LABORAL
       let modalidad = {
@@ -268,7 +275,7 @@ export class RegistroContratoComponent implements OnInit {
     // BUSQUEDA DE CONTRATOS QUE TIENE EL USUARIO
     this.rest.BuscarContratosEmpleado(this.datoEmpleado).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = DateTime.fromISO(datos.fec_ingreso.toISOString()).toFormat('yyyy-MM-dd');
+      var ingreso = DateTime.fromISO(datos.fec_ingreso).toFormat('yyyy-MM-dd');
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
         var fecha_salida = DateTime.fromISO(this.revisarFecha[i].fecha_salida).toFormat('yyyy-MM-dd');
@@ -316,7 +323,7 @@ export class RegistroContratoComponent implements OnInit {
       user_name: this.user_name,
       id_cargo: this.cargo_id,
       estado: false,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     if (this.cargo_id != 0) {
       this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
@@ -335,7 +342,10 @@ export class RegistroContratoComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   fileChange(element: any) {
+    console.log('this.archivoSubido: ',element);
+
     this.archivoSubido = element.target.files;
+    
     if (this.archivoSubido.length != 0) {
       const name = this.archivoSubido[0].name;
       if (this.archivoSubido[0].size <= 2e+6) {
@@ -358,6 +368,7 @@ export class RegistroContratoComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento guardado.', {

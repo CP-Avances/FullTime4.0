@@ -109,7 +109,7 @@ class DetalleCatalogoHorarioControlador {
         try {
             const id = req.params.id;
 
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -125,7 +125,8 @@ class DetalleCatalogoHorarioControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar registro con id ${id}`
                 });
 
@@ -150,7 +151,8 @@ class DetalleCatalogoHorarioControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -170,7 +172,7 @@ class DetalleCatalogoHorarioControlador {
     public async CrearDetalleHorarios(req: Request, res: Response): Promise<void> {
         try {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                min_despues, user_name, ip } = req.body;
+                min_despues, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -196,7 +198,8 @@ class DetalleCatalogoHorarioControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -215,7 +218,7 @@ class DetalleCatalogoHorarioControlador {
     public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<Response> {
         try {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
-                id, user_name, ip } = req.body;
+                id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -231,7 +234,8 @@ class DetalleCatalogoHorarioControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar registro con id ${id}`
                 });
 
@@ -264,7 +268,8 @@ class DetalleCatalogoHorarioControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

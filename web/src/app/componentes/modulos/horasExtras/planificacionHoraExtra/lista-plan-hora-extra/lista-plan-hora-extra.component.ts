@@ -43,6 +43,7 @@ export interface HoraExtraPlanElemento {
 })
 
 export class ListaPlanHoraExtraComponent implements OnInit {
+  ips_locales: any = '';
 
   horas_extras_plan: any = [];
   horas_extras_plan_observacion: any = [];
@@ -82,12 +83,15 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     public toastr: ToastrService,
     private restHEP: PlanHoraExtraService,
     private ventana: MatDialog,
-    private validacionesService: ValidacionesService
+    private validacionesService: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validacionesService.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.obtenerPlanHorasExtras();
     this.obtenerPlanHorasExtrasObservacion();
@@ -414,7 +418,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
       let h = {
         hora: EmpleadosSeleccionados[i].hora_total_timbre,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.restHEP.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id_plan_extra, h).subscribe(res => {
       }, err => {

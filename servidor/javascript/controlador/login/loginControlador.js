@@ -45,6 +45,7 @@ class LoginControlador {
             try {
                 const { nombre_usuario, pass, movil } = req.body;
                 let pass_encriptado = rsa_keys_service_1.default.encriptarLogin(pass);
+                console.log(pass_encriptado);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
@@ -67,6 +68,9 @@ class LoginControlador {
                     if (empleado === 2 && usuario === false) {
                         return res.jsonp({ message: 'inactivo' });
                     }
+                    console.log('web_access: ', web_access);
+                    console.log('app_habilita: ', app_habilita);
+                    console.log('movil: ', movil);
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
                     if (!web_access)
                         return res.status(404).jsonp({ message: "sin_permiso_acceso" });
@@ -82,6 +86,7 @@ class LoginControlador {
                     const EMPRESA = yield database_1.default.query(`
           SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `);
+                    console.log('(process.env.DIRECCIONAMIENTO as string)', process.env.DIRECCIONAMIENTO);
                     const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
                     const licenciaData = yield fetch(`${process.env.DIRECCIONAMIENTO}/licencia`, {
@@ -273,7 +278,7 @@ class LoginControlador {
     // METODO PARA CAMBIAR CONTRASEÑA
     CambiarContrasenia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { token, contrasena, user_name, ip } = req.body;
+            let { token, contrasena, user_name, ip, ip_local } = req.body;
             var contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
             console.log(contrasena, '_', contrasena_encriptada);
             try {
@@ -294,7 +299,8 @@ class LoginControlador {
                             accion: 'U',
                             datosOriginales: '',
                             datosNuevos: '',
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
                         });
                         // FINALIZAR TRANSACCION
@@ -312,6 +318,7 @@ class LoginControlador {
                         datosOriginales: JSON.stringify(contrasenaOriginal),
                         datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`, //FIXME COLOCAR TODA LA DATA DE LA ACTUALIZACION
                         ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

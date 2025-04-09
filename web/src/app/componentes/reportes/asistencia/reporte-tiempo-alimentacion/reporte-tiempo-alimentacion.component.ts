@@ -6,8 +6,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
-
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
@@ -102,6 +100,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+
 
   constructor(
     private restAlimentacion: AlimentacionService,
@@ -663,13 +663,16 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
   ExportarExcel(): void {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Alimentacion');
     xlsx.writeFile(wb, `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    */
   }
 
   EstructurarDatosExcel(array: Array<any>) {
+    /*
     let nuevo: Array<any> = [];
     let n = 0;
     array.forEach((info: any) => {
@@ -707,6 +710,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       })
     })
     return nuevo;
+    */
   }
 
   /** ****************************************************************************************** **

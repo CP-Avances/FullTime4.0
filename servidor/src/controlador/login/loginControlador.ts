@@ -54,6 +54,7 @@ class LoginControlador {
     try {
       const { nombre_usuario, pass, movil } = req.body;
       let pass_encriptado = FUNCIONES_LLAVES.encriptarLogin(pass);
+      console.log(pass_encriptado);
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
@@ -83,7 +84,9 @@ class LoginControlador {
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });
         }
-
+        console.log('web_access: ', web_access);
+        console.log('app_habilita: ', app_habilita);
+        console.log('movil: ', movil);
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
         if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso" })
 
@@ -104,7 +107,7 @@ class LoginControlador {
           SELECT public_key, id AS id_empresa, ruc FROM e_empresa
           `
         );
-
+        console.log('(process.env.DIRECCIONAMIENTO as string)', (process.env.DIRECCIONAMIENTO as string));
         const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
@@ -316,7 +319,7 @@ class LoginControlador {
 
   // METODO PARA CAMBIAR CONTRASEÑA
   public async CambiarContrasenia(req: Request, res: Response): Promise<Response> {
-    let { token, contrasena, user_name, ip } = req.body;
+    let { token, contrasena, user_name, ip, ip_local } = req.body;
 
     var contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
     console.log(contrasena,'_',contrasena_encriptada);
@@ -344,7 +347,8 @@ class LoginControlador {
             accion: 'U',
             datosOriginales: '',
             datosNuevos: '',
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
           });
 
@@ -368,6 +372,7 @@ class LoginControlador {
           datosOriginales: JSON.stringify(contrasenaOriginal),
           datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`,//FIXME COLOCAR TODA LA DATA DE LA ACTUALIZACION
           ip,
+          ip_local: ip_local,
           observacion: null
         });
 

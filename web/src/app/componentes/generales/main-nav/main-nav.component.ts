@@ -115,9 +115,13 @@ export class MainNavComponent implements OnInit {
   subItemModulosAccionPersonal: boolean = false;
   childrenAccionPersonal: any = [];
   vistaModulosAccionPersonalProceso: boolean = false;
+  vistaModulosAccionPersonalGrado: boolean = false;
+  vistaModulosAccionPersonalGrupoOcupacional: boolean = false;
   vistaModulosAccionPersonalAccionesPersonal: boolean = false;
+  vistaModulosAccionPersonalIngresarRegistros: boolean = false;
   vistaModulosAccionPersonalPedidoAccion: boolean = false;
   vistaModulosAccionPersonalListaPedidos: boolean = false;
+
   subItemModulosGeolocalizacion: boolean = false;
   childrenGeolocalizacion: any = [];
   vistaModulosGeolocalizacionCoordenadas: boolean = false;
@@ -999,6 +1003,30 @@ export class MainNavComponent implements OnInit {
                         this.childrenAccionPersonal.push({name: 'Procesos', url: '/proceso', color: true, ver: true}); 
                       }
                       break;
+                    case 'grado':
+                      this.itemModulos = true;
+                      this.subItemModulosAccionPersonal = true;
+                      for (const parametrizacion of this.childrenAccionPersonal) {
+                        if(parametrizacion.url === '/listaGrados'){
+                          this.vistaModulosAccionPersonalGrado = true;
+                        }
+                      }
+                      if(!this.vistaModulosAccionPersonalGrado){
+                        this.childrenAccionPersonal.push({name: 'Grado', url: '/listaGrados', color: true, ver: true}); 
+                      }
+                      break;
+                    case 'grupo-ocupacional':
+                    this.itemModulos = true;
+                    this.subItemModulosAccionPersonal = true;
+                    for (const parametrizacion of this.childrenAccionPersonal) {
+                      if(parametrizacion.url === '/grupo-ocupacional'){
+                        this.vistaModulosAccionPersonalGrupoOcupacional = true;
+                      }
+                    }
+                    if(!this.vistaModulosAccionPersonalGrupoOcupacional){
+                      this.childrenAccionPersonal.push({name: 'Grupo Ocupacional', url: '/grupo-ocupacional', color: true, ver: true}); 
+                    }
+                    break;
                     case 'acciones-personal':
                       this.itemModulos = true;
                       this.subItemModulosAccionPersonal = true;
@@ -1008,7 +1036,7 @@ export class MainNavComponent implements OnInit {
                         }
                       }
                       if(!this.vistaModulosAccionPersonalAccionesPersonal){
-                        this.childrenAccionPersonal.push({name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true});
+                        this.childrenAccionPersonal.push({name: 'Detalle Acción Personal', url: '/acciones-personal', color: true, ver: true});
                       }
                       break;
                     case 'pedidoAccion':
@@ -1021,6 +1049,18 @@ export class MainNavComponent implements OnInit {
                       }
                       if(!this.vistaModulosAccionPersonalPedidoAccion){
                         this.childrenAccionPersonal.push({name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true});
+                      }
+                      break;
+                    case 'IngresarRegistros':
+                      this.itemModulos = true;
+                      this.subItemModulosAccionPersonal = true;
+                      for (const parametrizacion of this.childrenAccionPersonal) {
+                        if(parametrizacion.url === '/IngresarRegistros'){
+                          this.vistaModulosAccionPersonalIngresarRegistros = true;
+                        }
+                      }
+                      if(!this.vistaModulosAccionPersonalIngresarRegistros){
+                        this.childrenAccionPersonal.push({name: 'Asignar Registros', url: '/IngresarRegistros', color: true, ver: true});
                       }
                       break;
                     case 'listaPedidos':

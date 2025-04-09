@@ -1,7 +1,7 @@
 import pool from '../database'
 import AUDITORIA_CONTROLADOR from '../controlador/reportes/auditoriaControlador';
 
-export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: number, user_name: string, ip: string) {
+export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: number, user_name: string, ip: string, ip_local: string) {
 
     let vacacion = await ConsultarVacacion(id_vacacion);
 
@@ -44,10 +44,11 @@ export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: numb
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mv_periodo_vacacion',
                 usuario: user_name,
-                accion:'U',
+                accion: 'U',
                 datosOriginales: '',
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: `Error al actualizar periodo de vacaciones con id ${vacacion.id_peri_vacacion}. Registro no encontrado`
             });
 
@@ -65,10 +66,11 @@ export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: numb
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'mv_periodo_vacacion',
             usuario: user_name,
-            accion:'U',
+            accion: 'U',
             datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: JSON.stringify(response.rows),
-            ip,
+            ip: ip,
+            ip_local: ip_local,
             observacion: null
         });
 

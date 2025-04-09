@@ -90,7 +90,7 @@ class ParametrosControlador {
     // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async EliminarDetalleParametro(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
             const id = req.params.id;
 
             // INICIAR TRANSACCION
@@ -107,7 +107,8 @@ class ParametrosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar detalle tipo parametro con id ${id}`
                 });
 
@@ -129,7 +130,8 @@ class ParametrosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -147,7 +149,7 @@ class ParametrosControlador {
     // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async IngresarDetalleParametro(req: Request, res: Response): Promise<any> {
         try {
-            const { id_tipo, descripcion, observacion, user_name, ip } = req.body;
+            const { id_tipo, descripcion, observacion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -166,7 +168,8 @@ class ParametrosControlador {
                 accion: 'I',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify({ id_tipo, descripcion, observacion }),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -184,7 +187,7 @@ class ParametrosControlador {
     // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async ActualizarDetalleParametro(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, descripcion, observacion, user_name, ip } = req.body;
+            const { id, descripcion, observacion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -204,7 +207,8 @@ class ParametrosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar detalle tipo parametro con id ${id}`
                 });
 
@@ -226,7 +230,8 @@ class ParametrosControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 

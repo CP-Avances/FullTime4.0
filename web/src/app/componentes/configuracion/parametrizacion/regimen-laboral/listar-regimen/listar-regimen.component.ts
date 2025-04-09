@@ -6,10 +6,12 @@ import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
 import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
-import * as xlsx from "xlsx";
 import * as xml2js from 'xml2js';
 import * as FileSaver from "file-saver";
+import ExcelJS, { FillPattern } from "exceljs";
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/metodos.component";
@@ -30,6 +32,19 @@ import { ValidacionesService } from "src/app/servicios/generales/validaciones/va
 })
 
 export class ListarRegimenComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   regimenesEliminar: any = [];
 
@@ -84,10 +99,36 @@ export class ListarRegimenComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -336,43 +377,157 @@ export class ListarRegimenComponent implements OnInit {
    ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.regimen);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.regimen.map((obj: any) => {
-        return {
-          CODIGO: obj.id,
-          DESCRIPCION: obj.descripcion,
-          PAIS: obj.pais,
-          MESES_PERIODO: obj.mes_periodo,
-          DIAS_MES: obj.dias_mes,
-          TRABAJO_MINIMO_MES: obj.trabajo_minimo_mes,
-          TRABAJO_MINIMO_HORA: obj.trabajo_minimo_horas,
-          DIAS_ANIO_VACACION: obj.vacacion_dias_laboral,
-          DIAS_LIBRES: obj.vacacion_dias_libre,
-          DIAS_CALENDARIO_VACACION: obj.vacacion_dias_calendario,
-          MAX_DIAS_ACUMULABLES: obj.dias_maximo_acumulacion,
-          DIAS_LABORALES_GANADOS_MES: obj.vacacion_dias_laboral_mes,
-          DIAS_CALENDARIO_GANADOS_MES: obj.vacacion_dias_calendario_mes,
-          DIAS_LABORALES_GANADOS_DIA: obj.laboral_dias,
-          DIAS_CALENDARIO_GANADOS_DIA: obj.calendario_dias,
-          ANIOS_ANTIGUEDAD: obj.anio_antiguedad,
-          DIA_INCR_ANTIGUEDAD: obj.dias_antiguedad,
-        };
-      })
-    );
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.regimen[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {
-      // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 });
+  async generarExcelRegimen() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.regimen.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.descripcion,
+        obj.pais,
+        obj.mes_periodo,
+        obj.dias_mes,
+        obj.trabajo_minimo_mes,
+        obj.trabajo_minimo_horas,
+        obj.vacacion_dias_laboral,
+        obj.vacacion_dias_libre,
+        obj.vacacion_dias_calendario,
+        obj.dias_maximo_acumulacion,
+        obj.vacacion_dias_laboral_mes,
+        obj.vacacion_dias_calendario_mes,
+        obj.laboral_dias,
+        obj.calendario_dias,
+        obj.anio_antiguedad,
+        obj.dias_antiguedad,
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Régimen");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:R1");
+    worksheet.mergeCells("B2:R2");
+    worksheet.mergeCells("B3:R3");
+    worksheet.mergeCells("B4:R4");
+    worksheet.mergeCells("B5:R5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Régimen Laboral".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "descripcion", width: 20 },
+      { key: "pais", width: 20 },
+      //
+      { key: "mes_periodo", width: 20 },
+      { key: "dias_mes", width: 20 },
+      { key: "trabajo_minimo_mes", width: 30 },
+      { key: "trabajo_minimo_horas", width: 30 },
+      { key: "vacacion_dias_laboral", width: 30 },
+      { key: "vacacion_dias_libre", width: 30 },
+      { key: "vacacion_dias_calendario", width: 30 },      
+      { key: "dias_maximo_acumulacion", width: 30 },
+      { key: "vacacion_dias_laboral_mes", width: 40 },
+      { key: "vacacion_dias_calendario_mes", width: 40 },
+      { key: "laboral_dias", width: 40 },
+      { key: "calendario_dias", width: 40 },
+      { key: "anio_antiguedad", width: 30 },
+      { key: "dias_antiguedad", width: 30 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: false },
+      { name: "DESCRIPCION", totalsRowLabel: "", filterButton: true },
+      { name: "PAÍS", totalsRowLabel: "", filterButton: true },
+      //
+      { name: "MESES_PERIODO", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_MES", totalsRowLabel: "", filterButton: true },
+      { name: "TRABAJO_MINIMO_MES", totalsRowLabel: "", filterButton: true },
+      { name: "TRABAJO_MINIMO_HORA", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_ANIO_VACACION", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_LIBRES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_CALENDARIO_VACACION", totalsRowLabel: "", filterButton: true },
+      { name: "MAX_DIAS_ACUMULABLES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_LABORALES_GANADOS_MES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_CALENDARIO_GANADOS_MES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_LABORALES_GANADOS_DIA", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS_CALENDARIO_GANADOS_DIA", totalsRowLabel: "", filterButton: true },
+      { name: "ANIOS_ANTIGUEDAD", totalsRowLabel: "", filterButton: true },
+      { name: "DIA_INCR_ANTIGUEDAD", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "RegimenTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 18; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
     }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, "LISTAR REGIMEN");
-    xlsx.writeFile(wb, "RegimenEXCEL" + ".xlsx");
-    this.ObtenerRegimen();
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "RegimenEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************* **
@@ -439,15 +594,28 @@ export class ListarRegimenComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
    ** ************************************************************************************************** **/
-
-  ExportToCVS() {
+  ExportToCSV() {
+  
     this.OrdenarDatos(this.regimen);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.regimen);
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], {
-      type: "text/csv;charset=utf-8;",
+  
+    const workbook = new ExcelJS.Workbook();
+  
+    const worksheet = workbook.addWorksheet('RegimenCSV');
+  
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.regimen[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+  
+    // Llenar las filas con los datos
+    this.regimen.forEach((obj: any) => {
+      worksheet.addRow(obj);
     });
-    FileSaver.saveAs(data, "RegimenCSV" + ".csv");
+  
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "RegimenCSV.csv");
+    });
+
     this.ObtenerRegimen();
   }
 
@@ -601,31 +769,37 @@ export class ListarRegimenComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
-    this.ingresar = false;
-    this.contador = 0;
-    this.regimenesEliminar = this.selectionRegimen.selected;
-    this.regimenesEliminar.forEach((datos: any) => {
-      this.regimen = this.regimen.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      //AQUI MODIFICAR EL METODO
-      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
-        if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+
+    const peticiones = this.selectionRegimen.selected.map((datos: any) =>
+      this.rest.EliminarRegistro(datos.id, data).pipe(
+        map((res: any) => ({ success: res.message !== 'error', descripcion: datos.descripcion })),
+        catchError(() => of({ success: false, descripcion: datos.descripcion }))
+      )
+    );
+
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+
+      resultados.forEach(resultado => {
+        if (resultado.success) {
+          eliminados++;
+        } else {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
-        } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-              timeOut: 6000,
-            });
-            this.ingresar = true;
-          }
-          this.ObtenerRegimen();
         }
       });
-    }
-    )
+
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+
+      this.regimenesEliminar = [];
+      this.selectionRegimen.clear();
+      this.ObtenerRegimen();
+    });
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
@@ -656,7 +830,7 @@ export class ListarRegimenComponent implements OnInit {
   Eliminar(id_regimen: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_regimen, datos).subscribe((res: any) => {
       if (res.message === 'error') {

@@ -2,6 +2,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
+import CryptoJS from 'crypto-js';
 
 @Injectable({
   providedIn: 'root'
@@ -35,25 +36,6 @@ export class ValidacionesService {
           }
         });
       this.router.navigate(['/home']);
-    }
-  }
-
-  // REDIRECCIONAMIENTO A LA PAGINA PRINCIPAL DEL EMPLEADO
-  RedireccionarHomeEmpleado(error: any) {
-    const { access, message, url, title } = error;
-    if (access === false) {
-      this.toastr.info(message + ' ' + url, title, {
-        timeOut: 6000,
-        positionClass: 'toast-top-center',
-
-      })
-        .onTap.subscribe(items => {
-          if (url) {
-            window.open(`https://${url}`, "_blank");
-          }
-        });
-        this.router.navigate(['/home']);
-      //this.router.navigate(['/estadisticas']);
     }
   }
 
@@ -154,7 +136,8 @@ export class ValidacionesService {
   }
 
   FormatearHora(hora: string, formato: string) {
-    //console.log('hora ', hora, ' formato ', formato)
+    console.log('hora ', hora, ' formato ', formato)
+
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;
@@ -487,6 +470,8 @@ export class ValidacionesService {
         cedula: obj.cedula,
         correo: obj.correo,
         genero: obj.genero,
+        id_nacionalidad: obj.id_nacionalidad,
+        usuario: obj.usuario,
         id_cargo: obj.id_cargo,
         id_contrato: obj.id_contrato,
         sucursal: obj.name_suc,
@@ -504,7 +489,8 @@ export class ValidacionesService {
         app_habilita: obj.app_habilita,
         web_habilita: obj.web_habilita,
         comunicado_mail: obj.comunicado_mail,
-        comunicado_noti: obj.comunicado_notificacion
+        comunicado_noti: obj.comunicado_notificacion,
+        id_empleado: obj.id_empleado
       })
     })
     return arreglo_procesar;
@@ -655,6 +641,43 @@ export class ValidacionesService {
       peerConnection.createOffer().then((offer) => peerConnection.setLocalDescription(offer));
     });
   };
+
+
+  /** ********************************************************************************* **
+   ** **                             MANEJO DE DATOS EN URL                          ** **
+   ** ********************************************************************************* **/
+
+  private frase: string = 'CasaPazminoSAOPIS';
+
+  EncriptarDato(data: any): string {
+    try {
+      return CryptoJS.AES.encrypt(data, this.frase).toString();
+    } catch (error) {
+      console.error('Error al encriptar datos', error);
+      return '';
+    }
+  }
+
+  DesencriptarDato(data: string): string {
+    try {
+      console.log('dato ', data)
+      const bytes = CryptoJS.AES.decrypt(data, this.frase);
+      const originalData = bytes.toString(CryptoJS.enc.Utf8);
+
+      if (!originalData) {
+        throw new Error('El dato desencriptado es inválido.');
+      }
+
+      return originalData;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error al desencriptar:', error.message);
+      } else {
+        console.error('Error desconocido:', error);
+      }
+      return '';
+    }
+  }
 
 }
 

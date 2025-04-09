@@ -29,8 +29,9 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 })
 
 export class VerEmpresaComponent implements OnInit {
-  sucursalesEliminar: any = [];
+  ips_locales: any = '';
 
+  sucursalesEliminar: any = [];
   idEmpresa: number;
   datosEmpresa: any = [];
   datosSucursales: any = [];
@@ -91,7 +92,10 @@ export class VerEmpresaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.asignaciones.ObtenerEstado();
@@ -254,7 +258,7 @@ export class VerEmpresaComponent implements OnInit {
       color_s: this.secundario.value,
       id: this.datosEmpresa[0].id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.empresa.ActualizarColores(datos).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Colores de reportes configurados.', {
@@ -605,7 +609,7 @@ export class VerEmpresaComponent implements OnInit {
   Eliminar(id_sucursal: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.restS.EliminarRegistro(id_sucursal, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -641,7 +645,7 @@ export class VerEmpresaComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

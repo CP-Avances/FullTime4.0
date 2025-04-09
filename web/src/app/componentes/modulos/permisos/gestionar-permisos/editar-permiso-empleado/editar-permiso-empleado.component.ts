@@ -34,6 +34,7 @@ interface opcionesDiasHoras {
 })
 
 export class EditarPermisoEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() solicita_permiso: any;
 
@@ -141,7 +142,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   ngOnInit(): void {
     console.log('datos permisos ', this.solicita_permiso[0])
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.info = this.solicita_permiso[0].permiso;
@@ -1614,7 +1618,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       id_peri_vacacion: this.periodo_vacaciones,
       fec_edicion: this.FechaActual,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     if (this.info.id_tipo_permiso != datosPermiso.id_tipo_permiso) {
@@ -1779,6 +1783,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
     formData.append('id', id as string);
     formData.append('codigo', codigo as string);
     formData.append('eliminar', true as any);
@@ -1834,7 +1839,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       id: this.info.id,
       codigo: this.empleado.codigo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
       this.toastr.error('Operación exitosa.', 'Documento eliminado.', {
@@ -2056,7 +2061,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO

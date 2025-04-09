@@ -1,6 +1,5 @@
 <div id="titulo" class="row w-100 m-auto">
     <div class="col-2 col-md-2 mb-2 mb-md-0">
-        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
         <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
@@ -8,7 +7,7 @@
         </span>
     </div>
     <div class="col-2 col-md-2 mb-2 mb-md-0">
-        <mat-icon class="float-right" id="cerrar" (click)="Cancelar()">highlight_off</mat-icon>
+        <mat-icon class="float-right" id="cerrar" (click)="Cancelar(2)">highlight_off</mat-icon>
     </div>
 </div>
 <div>
@@ -63,7 +62,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Cédula</mat-label>
-                                <input matInput type="text" placeholder="1788300293" maxlength="10"
+                                <input matInput type="tel" placeholder="1788300293" maxlength="10"
                                     formControlName="cedulaForm"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     (keypress)="IngresarSoloNumeros($event)" required
@@ -132,7 +131,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Teléfono</mat-label>
-                                <input matInput placeholder="0984297443" type="text" maxlength="10"
+                                <input matInput placeholder="0984297443" type="tel" maxlength="10"
                                     formControlName="telefonoForm"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     (keypress)="IngresarSoloNumeros($event)">
@@ -152,11 +151,9 @@
                                     help_outline
                                 </mat-icon>
                                 <mat-select required formControlName="estadoCivilForm">
-                                    <mat-option [value]="1">Soltero/a</mat-option>
-                                    <mat-option [value]="2">Unión de Hecho</mat-option>
-                                    <mat-option [value]="3">Casado/a</mat-option>
-                                    <mat-option [value]="4">Divorciado/a</mat-option>
-                                    <mat-option [value]="5">Viudo/a</mat-option>
+                                    <mat-option *ngFor="let ec of estados_civil" [value]="ec.id">
+                                        {{ec.estado_civil}}
+                                    </mat-option>
                                 </mat-select>
                             </mat-form-field>
                             <mat-form-field>
@@ -166,8 +163,10 @@
                                     help_outline
                                 </mat-icon>
                                 <mat-select required formControlName="generoForm">
-                                    <mat-option [value]="1">Masculino</mat-option>
-                                    <mat-option [value]="2">Femenino</mat-option>
+                                    <mat-option *ngFor="let g of generos" [value]="g.id">
+                                        {{g.genero}}
+                                    </mat-option>
+
                                 </mat-select>
                             </mat-form-field>
                         </div>

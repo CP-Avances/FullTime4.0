@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from "xlsx";
 import * as FileSaver from "file-saver";
 
 // LLAMADO A COMPONENTES
@@ -56,6 +55,8 @@ export interface SolicitudElemento {
 })
 
 export class ListarPlanificacionComponent implements OnInit {
+  ips_locales: any = '';
+
 
   // VARIABLE PARA GUARDAR DATOS DE LISTA DE PLANIFICACIONES
   planificaciones: any = [];
@@ -128,7 +129,10 @@ export class ListarPlanificacionComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
+      this.ip = localStorage.getItem('ip');  
+      this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.BuscarParametro();
     }
@@ -272,7 +276,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // LECTURA DE DATOS DE USUARIO
@@ -348,7 +352,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.restC.ObtenerPlanComidaPorIdPlan(id).subscribe(res => {
@@ -498,7 +502,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const data = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     var usuario = '';
@@ -606,7 +610,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.restC.ObtenerPlanComidaPorIdPlan(id).subscribe(res => {
@@ -686,7 +690,7 @@ export class ListarPlanificacionComponent implements OnInit {
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restC.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
@@ -856,6 +860,7 @@ export class ListarPlanificacionComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
@@ -877,6 +882,7 @@ export class ListarPlanificacionComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA ROLES');
     xlsx.writeFile(wb, 'PAlimentacionEXCEL' + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** **
@@ -884,6 +890,7 @@ export class ListarPlanificacionComponent implements OnInit {
   ** ************************************************************************************************** **/
 
   exportToCVS() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
@@ -898,6 +905,7 @@ export class ListarPlanificacionComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, 'PAlimentacionCSV' + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

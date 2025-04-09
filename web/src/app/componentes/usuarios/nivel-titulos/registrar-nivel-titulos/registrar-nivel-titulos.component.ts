@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 })
 
 export class RegistrarNivelTitulosComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -34,19 +35,26 @@ export class RegistrarNivelTitulosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip')
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
   InsertarNivelTitulo(form: any) {
+    let nombreIngresado = form.nombreForm.trim();
+    let nombre_normalizado = nombreIngresado.charAt(0).toUpperCase() + nombreIngresado.slice(1).toLowerCase(); 
+    let nombre_nivel = nombreIngresado.toUpperCase(); 
+  
     let nivel = {
-      nombre: form.nombreForm,
+      nombre: nombre_normalizado,
       user_name: this.user_name,
       ip: this.ip,
+      ip_local: this.ips_locales,
     };
-    // VERIIFCAR DUPLICIDAD
-    let nombre_nivel = (nivel.nombre).toUpperCase();
+    // VERIFICAR DUPLICIDAD
     this.nivel.BuscarNivelNombre(nombre_nivel).subscribe(response => {
-      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
         timeOut: 3000,
       });
     }, vacio => {

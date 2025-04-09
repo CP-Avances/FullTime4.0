@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 // IMPORTAR SERVICIOS
 import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
 import { CatVacunasService } from 'src/app/servicios/usuarios/catVacunas/cat-vacunas.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-tipo-vacuna',
@@ -15,7 +16,7 @@ import { CatVacunasService } from 'src/app/servicios/usuarios/catVacunas/cat-vac
 })
 
 export class TipoVacunaComponent {
-
+  ips_locales: any = '';
 
   vacuna = new FormControl('', Validators.required);
   // FORMULARIO DENTRO DE UN GRUPO
@@ -32,11 +33,15 @@ export class TipoVacunaComponent {
     public toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES,
     public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   LimpiarCampos() {
@@ -48,7 +53,7 @@ export class TipoVacunaComponent {
     let vacuna = {
       vacuna: form.vacuna,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.rest.CrearVacuna(vacuna).subscribe(response => {
       if (response.status == '200') {

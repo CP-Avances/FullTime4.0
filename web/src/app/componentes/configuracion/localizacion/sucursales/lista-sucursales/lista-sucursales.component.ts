@@ -7,9 +7,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { RegistrarSucursalesComponent } from '../registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/configuracion/localizacion/sucursales/editar-sucursal/editar-sucursal.component';
@@ -32,6 +32,19 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 })
 
 export class ListaSucursalesComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -92,21 +105,44 @@ export class ListaSucursalesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
-
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
-
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSucursal();
     this.ObtenerColores();
     this.ObtenerLogo();
-
-
     this.serviciudades.ListarNombreCiudadProvincia().subscribe(datos => {
       this.datosCiudades = datos;
     });
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -232,7 +268,7 @@ export class ListaSucursalesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
 
-   async GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -325,33 +361,125 @@ export class ListaSucursalesComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
-  exportToExcel() {
-    var listExcelSucursales: any = [];
-    this.sucursales.forEach((item: any) => {
-      var data: any = {
-        id: '',
-        ciudad: '',
-        nombre: '',
+
+  async generarExcelSucursales() {
+
+    const sucursaleslista: any[] = [];
+
+    this.sucursales.forEach((sucursales: any, index: number) => {
+      sucursaleslista.push([
+        index + 1,
+        sucursales.id,
+        sucursales.descripcion,
+        sucursales.nombre,
+      ]);
+    });
+
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Sucursales");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:D1");
+    worksheet.mergeCells("B2:D2");
+    worksheet.mergeCells("B3:D3");
+    worksheet.mergeCells("B4:D4");
+    worksheet.mergeCells("B5:D5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Sucursales".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "id", width: 20 },
+      { key: "cuidad", width: 20 },
+      { key: "nombre", width: 30 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "ID", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "SucursalesTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: sucursaleslista,
+    });
+
+
+    const numeroFilas = sucursaleslista.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 4; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
 
-      data.id = item.id;
-      data.ciudad = item.descripcion;
-      data.nombre = item.nombre;
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Sucursales.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
 
-      listExcelSucursales.push(data);
-    })
-
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(listExcelSucursales);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Establecimientos');
-    xlsx.writeFile(wb, "Establecimientos" + '.xlsx');
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A CSV                              ** **
    ** ************************************************************************************************** **/
-
-  exportToCVS() {
+  ExportToCSV() {
     var listExcelSucursales: any = [];
     this.sucursales.forEach((item: any) => {
       var data: any = {
@@ -363,14 +491,24 @@ export class ListaSucursalesComponent implements OnInit {
       data.id = item.id;
       data.ciudad = item.descripcion;
       data.nombre = item.nombre;
-
       listExcelSucursales.push(data);
     })
 
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(listExcelSucursales);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EstablecimientosCSV" + '.csv');
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('EstablecimientosCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(listExcelSucursales[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    listExcelSucursales.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "EstablecimientosCSV.csv");
+    });
+
   }
 
   /** ************************************************************************************************* **
@@ -559,7 +697,7 @@ export class ListaSucursalesComponent implements OnInit {
       let data = {
         sucursales: this.listSucursalesCorrectas,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.RegistrarSucursales(data).subscribe({
         next: (res: any) => {
@@ -744,7 +882,7 @@ export class ListaSucursalesComponent implements OnInit {
   Eliminar(id_sucursal: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_sucursal, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -784,33 +922,45 @@ export class ListaSucursalesComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
+  
     this.contador = 0;
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectionSucursales.selected.length;
+  
     this.sucursalesEliminar = this.selectionSucursales.selected;
+  
     this.sucursalesEliminar.forEach((datos: any) => {
-      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          eliminados++;
+          this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+        }
+  
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+          this.selectionSucursales.clear();
+          this.sucursalesEliminar = [];
           this.ObtenerSucursal();
         }
       });
-    }
-    )
+    });
   }
+  
+  
 
   // METOOD DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {

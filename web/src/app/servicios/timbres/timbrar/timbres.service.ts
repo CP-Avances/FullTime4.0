@@ -115,8 +115,6 @@ export class TimbresService {
 
   // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
   EliminarOpcionesMarcacionWeb(datos: any) {
-    //return this.http.post<any>(`${environment.url}/timbres/eliminar-opcion-marcacion-web`, datos);
-
     const url = `${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion-web`;
     const httpOtions = {
       body: datos

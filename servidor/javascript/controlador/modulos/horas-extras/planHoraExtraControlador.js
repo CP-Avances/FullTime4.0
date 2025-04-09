@@ -107,7 +107,7 @@ class PlanHoraExtraControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = parseInt(req.params.id);
-                const { hora, user_name, ip } = req.body;
+                const { hora, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -120,7 +120,8 @@ class PlanHoraExtraControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar tiempo autorizado en plan_hora_extra_empleado con id ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -137,7 +138,8 @@ class PlanHoraExtraControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(respuesta.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -155,7 +157,7 @@ class PlanHoraExtraControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { estado, user_name, ip } = req.body;
+                const { estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -168,7 +170,8 @@ class PlanHoraExtraControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar estado en plan_hora_extra_empleado con id ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -185,7 +188,8 @@ class PlanHoraExtraControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(respuesta.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -206,7 +210,7 @@ class PlanHoraExtraControlador {
     CrearPlanHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_planifica, fecha_desde, fecha_hasta, hora_inicio, hora_fin, descripcion, horas_totales, user_name, ip } = req.body;
+                const { id_empl_planifica, fecha_desde, fecha_hasta, hora_inicio, hora_fin, descripcion, horas_totales, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -231,7 +235,8 @@ class PlanHoraExtraControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(planHoraExtra),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -256,7 +261,7 @@ class PlanHoraExtraControlador {
     CrearPlanHoraExtraEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, estado, user_name, ip } = req.body;
+                const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -272,7 +277,8 @@ class PlanHoraExtraControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(planEmpleado),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -328,7 +334,7 @@ class PlanHoraExtraControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -342,7 +348,8 @@ class PlanHoraExtraControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar plan_hora_extra con id ${id}. Registro no encontrado`
                     });
                     // FINALIZAR TRANSACCION
@@ -364,7 +371,8 @@ class PlanHoraExtraControlador {
                     datosOriginales: `{ id_empleado_planifica: ${datosOriginales.id_empleado_planifica}, fecha_desde: ${fecha_DesdeO}, fecha_hasta: ${fecha_HastaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, 
           descripcion: ${datosOriginales.descripcion}, horas_totales: ${datosOriginales.horas_totales}}`,
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -382,7 +390,7 @@ class PlanHoraExtraControlador {
     EliminarPlanEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 const id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
@@ -397,7 +405,8 @@ class PlanHoraExtraControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar mhe_empleado_plan_hora_extra con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -414,7 +423,8 @@ class PlanHoraExtraControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -560,7 +570,7 @@ class PlanHoraExtraControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 var tiempo = (0, settingsMail_1.fechaHora)();
-                const { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip } = req.body;
+                const { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, ip_local } = req.body;
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -576,7 +586,8 @@ class PlanHoraExtraControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(notificiacion),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

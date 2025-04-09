@@ -42,7 +42,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Cédula</mat-label>
-                                <input matInput [formControl]="cedula">
+                                <input matInput type="tel" [formControl]="cedula" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cédula del usuario.">
                                     help_outline
                                 </mat-icon>

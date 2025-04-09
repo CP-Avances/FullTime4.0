@@ -8,9 +8,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
+
 
 // IMPORTAR COMPONENTES
 import { EditarTitulosComponent } from '../editar-titulos/editar-titulos.component';
@@ -33,6 +34,19 @@ import { ITableProvincias } from 'src/app/model/reportes.model';
 })
 
 export class ListarTitulosComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -91,11 +105,37 @@ export class ListarTitulosComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();
     this.ObtenerNiveles();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // EVENTO PARA MOSTRAR NUMERO DE FILAS DETERMINADAS EN LA TABLA
@@ -242,16 +282,6 @@ export class ListarTitulosComponent implements OnInit {
       this.DataTitulosProfesionales = res.data;
       this.messajeExcel = res.message;
 
-      this.DataTitulosProfesionales.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -265,6 +295,17 @@ export class ListarTitulosComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+
+        this.DataTitulosProfesionales.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+
         this.DataTitulosProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
             const nombre = item.titulo;
@@ -334,7 +375,7 @@ export class ListarTitulosComponent implements OnInit {
       const data = {
         titulos: this.listTitulosCorrectos,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.rest.RegistrarTitulosPlantilla(data).subscribe({
         next: (res: any) => {
@@ -460,27 +501,117 @@ export class ListarTitulosComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.verTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map((obj: any) => {
-      return {
-        CODIGO: obj.id,
-        NIVEL: obj.nivel,
-        TITULO: obj.nombre,
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.verTitulos.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.nivel,
+        obj.nombre
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Títulos");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:D1");
+    worksheet.mergeCells("B2:D2");
+    worksheet.mergeCells("B3:D3");
+    worksheet.mergeCells("B4:D4");
+    worksheet.mergeCells("B5:D5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Títulos".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "nivel", width: 30 },
+      { key: "titulo", width: 30 },
+
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "NIVEL", totalsRowLabel: "", filterButton: true },
+      { name: "TÍTULO", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "TitulosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 4; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.verTitulos[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
     }
-    wst["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wst, 'LISTAR TITULOS');
-    xlsx.writeFile(wb, "TitulosEXCEL" + '.xlsx');
-    this.ObtenerTitulos();
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "TitulosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
+
 
   /** ************************************************************************************************* **
    ** **                             PARA LA EXPORTACION DE ARCHIVOS XML                             ** **
@@ -533,13 +664,22 @@ export class ListarTitulosComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
-    this.OrdenarDatos(this.verTitulos);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos);
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "TitulosCSV" + '.csv');
-    this.ObtenerTitulos();
+  ExportToCSV() {
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('TitulosCSV');
+    //  Agregar encabezados dinámicos basados en las claves del primer objeto
+    const keys = Object.keys(this.verTitulos[0] || {}); // Obtener las claves
+    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    // Llenar las filas con los datos
+    this.verTitulos.forEach((obj: any) => {
+      worksheet.addRow(obj);
+    });
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "TitulosCSV.csv");
+    });
+
   }
 
   //CONTROL BOTONES
@@ -642,7 +782,7 @@ export class ListarTitulosComponent implements OnInit {
   Eliminar(id_titulo: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_titulo, data).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -682,33 +822,44 @@ export class ListarTitulosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
-    this.contador = 0;
+  
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectionTitulos.selected.length;
+  
     this.titulosEliminar = this.selectionTitulos.selected;
+  
     this.titulosEliminar.forEach((datos: any) => {
-      this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          eliminados++;
+          this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
+        }
+  
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+  
+          this.selectionTitulos.clear();
+          this.titulosEliminar = [];
           this.ObtenerTitulos();
         }
       });
-    }
-    )
+    });
   }
+  
 
   // METODO DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {

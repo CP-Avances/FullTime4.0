@@ -177,7 +177,7 @@ export class LoginComponent implements OnInit {
       if (datos.message === 'error') {
         const f = DateTime.now();
         const espera = Duration.fromISO('PT1M'); // 1 minuto
-        if (this.intentos === 2) {
+        if (this.intentos === 12) {
           const verificar = f.plus(espera).toFormat('HH:mm:ss');
           localStorage.setItem('time_wait', verificar);
           this.toastr.error('Intentelo más tarde.', 'Ha exedido el número de intentos.', {

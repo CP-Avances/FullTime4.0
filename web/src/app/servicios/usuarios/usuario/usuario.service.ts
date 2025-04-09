@@ -111,11 +111,6 @@ export class UsuarioService {
    ** **                     SERVICIOS DE USUARIO - SUCURSAL - DEPARTAMENTO                        ** **
    ** *********************************************************************************************** */
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO
-  BuscarUsuarioSucursal(id_empleado: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-sucursal`, id_empleado);
-  }
-
   //REGISTRAR USUARIO - DEPARTAMENTO    **USADO
   RegistrarUsuarioDepartamento(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-departamento`, data)
@@ -127,11 +122,6 @@ export class UsuarioService {
   // METODO DE BUSQUEDA DE DATOS DE USUARIO - DEPARTAMENTOS - ASIGNACION DE INFORMACION **USADO
   BuscarUsuarioDepartamento(id_empleado: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-departamento`, id_empleado);
-  }
-
-  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO              
-  BuscarAsignacionUsuarioDepartamento(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-asignacion-usuario-departamento`, data);
   }
 
   // METODO PARA BUSCAR TODAS ASIGNACION DE USUARIO - DEPARTAMENTO   **USADO   

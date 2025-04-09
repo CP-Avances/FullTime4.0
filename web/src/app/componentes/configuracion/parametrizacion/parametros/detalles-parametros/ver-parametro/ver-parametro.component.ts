@@ -11,6 +11,7 @@ import { ListarParametroComponent } from '../../listar-parametro/listar-parametr
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
 
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
@@ -20,12 +21,21 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 })
 
 export class VerParametroComponent implements OnInit {
+  ips_locales: any = '';
 
   formato12: string = 'rgb(80, 87, 97)';
   formato24: string = 'rgb(80, 87, 97)';
   formatoA: string = 'rgb(80, 87, 97)';
   formatoI: string = 'rgb(80, 87, 97)';
   formatoE: string = 'rgb(80, 87, 97)';
+  // DIAS DE LA SEMANA
+  lunes: string = 'rgb(80, 87, 97)';
+  martes: string = 'rgb(80, 87, 97)';
+  miercoles: string = 'rgb(80, 87, 97)';
+  jueves: string = 'rgb(80, 87, 97)';
+  viernes: string = 'rgb(80, 87, 97)';
+  sabado: string = 'rgb(80, 87, 97)';
+  domingo: string = 'rgb(80, 87, 97)';
 
   @Input() idParametro: string;
 
@@ -42,6 +52,9 @@ export class VerParametroComponent implements OnInit {
   ver_detalles: boolean = true;
   boton_registrar: boolean = true;
 
+  // TEXTO DE PARAMETRO
+  nota_parametro: string = '';
+
   // PARAMETRO FECHA
   formato_fecha: boolean = false;
   // PARAMETRO HORA
@@ -50,23 +63,16 @@ export class VerParametroComponent implements OnInit {
   tolerancia_atrasos: boolean = false;
   // PARAMETRO UBICACION
   ubicacion: boolean = false;
-  // PARAMTERO DISPOSITIVOS
-  dispositivos: boolean = false;
-  // PARAMETRO CERTIFICADO SSL
-  certificados: boolean = false;
-  // PARAMETRO CUMPLEANIOS
-  cumpleanios: boolean = false;
-  // PARAMETRO CONSIDERAR SEGUNDOS
-  segundos_timbres: boolean = false;
   // PARAMETRO CARGAR VACACIONES
   carga: boolean = false;
   // PARAMETRO DESCARGAR KARDEX
   kardex: boolean = false;
   // PARAMETRO FORMATO LABORAL - CALENDARIO
   laboral_calendario: boolean = false;
-
-  // PARAMETRO HERRAMIENTA DE ANALISIS DE DATOS
-  analisis: boolean = false;
+  // PARAMETRO SELECCIONAR DIA
+  seleccionar_dia: boolean = false;
+  // IDENTIFICADOR DE HORAS
+  horas: boolean = false;
 
   ingreso: number = 0;
 
@@ -79,16 +85,18 @@ export class VerParametroComponent implements OnInit {
     public ventana: MatDialog,
     public parametro: ParametrosService,
     public componentel: ListarParametroComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.BuscarParametros(this.idParametro);
     this.ListarDetalles(this.idParametro);
     this.ActivarBoton();
-
-    console.log('ver registrar ', this.boton_registrar)
   }
 
   // METODO PARA ACTIVAR BOTONES SEGUN PARAMETRO
@@ -100,58 +108,363 @@ export class VerParametroComponent implements OnInit {
     // FORMATO FECHA
     if (this.idParametro === '1') {
       this.formato_fecha = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar el tipo de formato de fecha con el cual se va a trabajar en el 
+        sistema.
+        `
+        ;
     }
     // FORMATO HORA
     if (this.idParametro === '2') {
       this.formato_hora = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar el tipo de formato de hora con el cual se va a trabajar en el
+        sistema.
+        `
+        ;
     }
     // TOLERANCIA ATRASOS
     if (this.idParametro === '3') {
       this.tolerancia_atrasos = true;
+      this.nota_parametro =
+        `
+        NOTA: Configuración de uso de minutos de tolerancia para cálculo de atrasos.
+        `
+        ;
     }
     // TOLERANCIA UBICACION
     if (this.idParametro === '4') {
       this.ubicacion = true;
+      this.nota_parametro =
+        `
+        NOTA: El usuario podrá realizar su marcación o timbre dentro del perímetro definido.
+        `
+        ;
     }
     // CONSIDERAR SEGUNDOS MARCACIONES
     if (this.idParametro === '5') {
-      this.segundos_timbres = true;
+      this.nota_parametro =
+        `
+        NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
+        cálculos referentes a la asistencia.
+        `
+        ;
     }
     // DISPOSITIVOS MOVILES
     if (this.idParametro === '6') {
-      this.dispositivos = true;
+      this.nota_parametro =
+        `
+        NOTA: Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres
+        en la aplicación móvil.
+        `
+        ;
     }
     // FORMATO CERTIFICADOS SSL
     if (this.idParametro === '7') {
-      this.certificados = true;
+      this.nota_parametro =
+        `
+        NOTA: Revisar el uso de certificados de seguridad(SSL) en el sistema (GEOLOCALIZACIÓN).
+        `
+        ;
     }
-    // FORMATO CERTIFICADOS SSL
+    // ENVIAR MENSAJE DE CUMPLEAÑOS
     if (this.idParametro === '8') {
-      this.cumpleanios = true;
+      this.nota_parametro =
+        `
+        NOTA: Enviar mensajes de felicitaciones de cumpleaños de los colaboradores.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE MENSAJE DE CUMPLEAÑOS
+    if (this.idParametro === '9') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar el mensaje de cumpleaños a los colaboradores. Por ejemplo: 23.
+        `
+        ;
+    }
+    // ENVIAR REPORTE DE ATRASOS DIARIO
+    if (this.idParametro === '10') {
+      this.nota_parametro =
+        `
+        NOTA: Enviar notificaciones diarias con el reporte de atrasos de los colaboradores.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE ATRASOS DIARIO
+    if (this.idParametro === '11') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de atrasos de los 
+        colaboradores. Por ejemplo: 23.
+        `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE ATRASOS DIARIO
+    if (this.idParametro === '12') {
+      this.nota_parametro =
+        `
+        NOTA: Registrar dirección de correo al que se enviará la notificación diaria con el reporte de atrasos 
+        general de los colaboradores.
+        `
+        ;
+    }
+    // ENVIAR REPORTE DE ATRASOS SEMANAL
+    if (this.idParametro === '13') {
+      this.nota_parametro =
+        `
+        NOTA: Enviar notificaciones semanales con el reporte de atrasos de los colaboradores.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE ATRASOS SEMANAL
+    if (this.idParametro === '14') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de atrasos de los 
+        colaboradores. Por ejemplo: 23.
+        `
+        ;
+    }
+    // DIA DE ENVIO DE REPORTE DE ATRASOS SEMANAL
+    if (this.idParametro === '15') {
+      this.seleccionar_dia = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar día en el que se enviará la notificación semanal con el reporte de atrasos 
+        general de los colaboradores.
+        `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE ATRASOS SEMANAL
+    if (this.idParametro === '16') {
+      this.nota_parametro =
+        `
+        NOTA: Registrar dirección de correo al que se enviará la notificación semanal con el reporte de atrasos 
+        general de los colaboradores.
+        `
+        ;
+    }
+    // ENVIAR REPORTE DE FALTAS DIARIO
+    if (this.idParametro === '17') {
+      this.nota_parametro =
+        `
+        NOTA: Enviar notificaciones diarias con el reporte de faltas de los colaboradores.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE FALTAS DIARIO
+    if (this.idParametro === '18') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de faltas de los 
+        colaboradores. Por ejemplo: 23.
+        `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE FALTAS DIARIO
+    if (this.idParametro === '19') {
+      this.nota_parametro =
+        `
+        NOTA: Registrar dirección de correo al que se enviará la notificación diaria con el reporte de faltas 
+        general de los colaboradores.
+        `
+        ;
+    }
+    // ENVIAR REPORTE DE FALTAS SEMANAL
+    if (this.idParametro === '20') {
+      this.nota_parametro =
+        `
+        NOTA: Enviar notificaciones semanales con el reporte de faltas de los colaboradores.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE FALTAS SEMANAL
+    if (this.idParametro === '21') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de faltas de los 
+        colaboradores. Por ejemplo: 23.
+        `
+        ;
+    }
+    // DIA DE ENVIO DE REPORTE DE FALTAS SEMANAL
+    if (this.idParametro === '22') {
+      this.seleccionar_dia = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar día en el que se va a enviar la notificación semanal con el reporte de faltas de los 
+        colaboradores.
+        `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE FALTAS SEMANAL
+    if (this.idParametro === '23') {
+      this.nota_parametro =
+        `
+        NOTA: Registrar dirección de correo al que se enviará la notificación semanal con el reporte de faltas 
+        general de los colaboradores.
+        `
+        ;
+    }
+    // ENVIAR REPORTE DE FALTAS SEMANAL
+    if (this.idParametro === '24') {
+      this.nota_parametro =
+        `
+        NOTA: Enviar mensaje de correo a los colobaradores por su aniversario.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE MENSAJE DE CUMPLEAÑOS
+    if (this.idParametro === '25') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar el mensaje de aniversario a los colaboradores. Por ejemplo: 23.
+        `
+        ;
+    }
+
+    // ENVIAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
+    if (this.idParametro === '26') {
+      this.nota_parametro =
+        `
+          NOTA: Enviar notificaciones diarias con el reporte de salidas anticipadas de los colaboradores.
+          `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS DIARIO
+    if (this.idParametro === '27') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+          NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de salidas anticipadas de los 
+          colaboradores. Por ejemplo: 23.
+          `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS DIARIO
+    if (this.idParametro === '28') {
+      this.nota_parametro =
+        `
+          NOTA: Registrar dirección de correo al que se enviará la notificación diaria con el reporte de faltas 
+          general de los colaboradores.
+          `
+        ;
+    }
+    // ENVIAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '29') {
+      this.nota_parametro =
+        `
+          NOTA: Enviar notificaciones semanales con el reporte de salidas anticipadas de los colaboradores.
+          `
+        ;
+    }
+    // HORA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '30') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+          NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
+          colaboradores. Por ejemplo: 23.
+          `
+        ;
+    }
+    // DIA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '31') {
+      this.seleccionar_dia = true;
+      this.nota_parametro =
+        `
+          NOTA: Seleccionar día en el que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
+          colaboradores.
+          `
+        ;
+    }
+    // CORREO DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    if (this.idParametro === '32') {
+      this.nota_parametro =
+        `
+          NOTA: Registrar dirección de correo al que se enviará la notificación semanal con el reporte de salidas anticipadas 
+          general de los colaboradores.
+          `
+        ;
     }
     // TIPO CARGA VACACIONES
-    if (this.idParametro === '10') {
+    if (this.idParametro === '97') {
       this.carga = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar el tipo de carga de días de vacaciones.
+        `
+        ;
     }
     // DESCARGAR KARDEX
-    if (this.idParametro === '11') {
+    if (this.idParametro === '98') {
       this.kardex = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar el tipo de descarga de Kardex de vacaciones.
+        `
+        ;
     }
     // FORMATO LABORAL CALENDARIO
-    if (this.idParametro === '12') {
+    if (this.idParametro === '99') {
       this.laboral_calendario = true;
+      this.nota_parametro =
+        `
+        NOTA: Seleccionar tipo de formato laboral o calendario para visualización de datos.
+        `
+        ;
     }
     // PARAMETRO DE HERRAMIENTA DE ANALISIS DE DATOS
-    if (this.idParametro === '16') {
-      this.analisis = true;
+    if (this.idParametro === '100') {
+      this.nota_parametro =
+        `
+        NOTA: Registrar la URL de la herramienta de análisis de datos.
+        `
+        ;
     }
     // PARAMETROS PARA INGRESAR DETALLE
-    if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '16') {
+    if (this.idParametro === '4'    // ----> TOLERANCIA UBICACION
+      || this.idParametro === '6'   // ----> DISPOSITIVOS MOVILES 
+      || this.idParametro === '9'   // ----> HORA ENVIO CUMPLEAÑOS
+      || this.idParametro === '11'  // ----> HORA ENVIO REPORTE ATRASOS DIARIO
+      || this.idParametro === '12'  // ----> CORREO REPORTE ATRASOS DIARIO
+      || this.idParametro === '14'  // ----> HORA ENVIO REPORTE ATRASOS SEMANAL
+      || this.idParametro === '16'  // ----> CORREO REPORTE ATRASOS SEMANAL
+      || this.idParametro === '18'  // ----> HORA ENVIO REPORTE FALTAS DIARIO
+      || this.idParametro === '19'  // ----> CORREO REPORTE FALTAS DIARIO
+      || this.idParametro === '21'  // ----> HORA ENVIO REPORTE FALTAS SEMANAL
+      || this.idParametro === '23'  // ----> CORREO REPORTE FALTAS SEMANAL
+      || this.idParametro === '25'  // ----> HORA ENVIO ANIVERSARIO
+      || this.idParametro === '27'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.idParametro === '28'  // ----> CORREO REPORTE SALIDAS ANTICIPADAS DIARIO
+      || this.idParametro === '30'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS SEMANAL
+      || this.idParametro === '32'  // ----> CORREO REPORTE SALIDAS ANTICIPADAS SEMANAL
+      || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
+    ) {
       this.ver_editar = true;
       this.ver_detalles = true;
     }
-    // PARAMETROS CON FORMULARIO
-    if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8') {
+    // PARAMETROS CON FORMULARIO DE SELECION
+    if (this.idParametro === '5'   // ----> ACTIVAR SEGUNDOS EN MARCACIONES
+      || this.idParametro === '7'  // ----> ACTIVAR CERTIFICADOS DE SEGURIDAD
+      || this.idParametro === '8'  // ----> ACTIVAR MENSAJE DE CUMPLEAÑOS
+      || this.idParametro === '10' // ----> ACTIVAR REPORTE DE ATRASOS DIARIO
+      || this.idParametro === '13' // ----> ACTIVAR REPORTE DE ATRASOS SEMANAL
+      || this.idParametro === '17' // ----> ACTIVAR REPORTE DE FALTAS DIARIO
+      || this.idParametro === '20' // ----> ACTIVAR REPORTE DE FALTAS SEMANAL
+      || this.idParametro === '24' // ----> ACTIVAR MENSAJE DE ANIVERSARIO
+      || this.idParametro === '26' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
+      || this.idParametro === '29' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+    ) {
       this.ver_formulario = true;
     }
 
@@ -192,34 +505,83 @@ export class VerParametroComponent implements OnInit {
         this.formato24 = '#4194F0';
         this.formato12 = 'rgb(80, 87, 97)';
       }
-      if (this.datosDetalle[0].descripcion === 'DD/MM/YYYY') {
+      if (this.datosDetalle[0].descripcion === 'dd/MM/yyyy') {
         this.formatoA = '#4194F0';
         this.formatoI = 'rgb(80, 87, 97)';
         this.formatoE = 'rgb(80, 87, 97)';
       }
-      if (this.datosDetalle[0].descripcion === 'MM/DD/YYYY') {
+      if (this.datosDetalle[0].descripcion === 'MM/dd/yyyy') {
         this.formatoI = '#4194F0';
         this.formatoA = 'rgb(80, 87, 97)';
         this.formatoE = 'rgb(80, 87, 97)';
       }
-      if (this.datosDetalle[0].descripcion === 'YYYY-MM-DD') {
+      if (this.datosDetalle[0].descripcion === 'yyyy-MM-dd') {
         this.formatoE = '#4194F0';
         this.formatoI = 'rgb(80, 87, 97)';
         this.formatoA = 'rgb(80, 87, 97)';
       }
+      if (this.datosDetalle[0].descripcion === 'Lunes') {
+        this.CambiarColores();
+        this.lunes = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Martes') {
+        this.CambiarColores();
+        this.martes = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Miércoles') {
+        this.CambiarColores();
+        this.miercoles = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Jueves') {
+        this.CambiarColores();
+        this.jueves = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Viernes') {
+        this.CambiarColores();
+        this.viernes = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Sábado') {
+        this.CambiarColores();
+        this.sabado = '#4194F0';
+      }
+      if (this.datosDetalle[0].descripcion === 'Domingo') {
+        this.CambiarColores();
+        this.domingo = '#4194F0';
+      }
 
+      // ----> OPCIONES TOLERANCIA ATRASOS
       if (this.idParametro === '3') {
         this.VerConfiguracionAtrasos();
       }
 
       // PARAMETROS QUE EXISTEN Y NO NECESITAN REGISTRO ADICIONAL
-      if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '16' || this.idParametro === '33') {
+      if (this.idParametro === '4'    // ----> TOLERANCIA UBICACION
+        || this.idParametro === '6'   // ----> DISPOSITIVOS MOVILES 
+        || this.idParametro === '9'   // ----> HORA ENVIO CUMPLEAÑOS
+        || this.idParametro === '11'  // ----> HORA ENVIO REPORTE ATRASOS DIARIO
+        || this.idParametro === '14'  // ----> HORA ENVIO REPORTE ATRASOS SEMANAL
+        || this.idParametro === '18'  // ----> HORA ENVIO REPORTE FALTAS DIARIO
+        || this.idParametro === '21'  // ----> HORA ENVIO REPORTE FALTAS SEMANAL
+        || this.idParametro === '25'  // ----> HORA ENVIO ANIVERSARIO
+        || this.idParametro === '27'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS DIARIO
+        || this.idParametro === '30'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS SEMANAL
+        || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
+      ) {
         this.boton_registrar = false;
       }
 
-      // PARAMETROS CON DETALLES
-      if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9' ||
-        this.idParametro === '13' || this.idParametro === '14' || this.idParametro === '15') {
+      // PARAMETROS CON SELECCION DE OPCIONES
+      if (this.idParametro === '5'   // ----> ACTIVAR SEGUNDOS EN MARCACIONES
+        || this.idParametro === '7'  // ----> ACTIVAR CERTIFICADOS DE SEGURIDAD
+        || this.idParametro === '8'  // ----> ACTIVAR MENSAJE DE CUMPLEAÑOS
+        || this.idParametro === '10' // ----> ACTIVAR REPORTE DE ATRASOS DIARIO
+        || this.idParametro === '13' // ----> ACTIVAR REPORTE DE ATRASOS SEMANAL
+        || this.idParametro === '17' // ----> ACTIVAR REPORTE DE FALTAS DIARIO
+        || this.idParametro === '20' // ----> ACTIVAR REPORTE DE FALTAS SEMANAL
+        || this.idParametro === '24' // ----> ACTIVAR MENSAJE DE ANIVERSARIO
+        || this.idParametro === '26' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
+        || this.idParametro === '29' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+      ) {
         this.VerConfiguracionRegistro();
       }
 
@@ -261,7 +623,7 @@ export class VerParametroComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.parametro.EliminarDetalleParametro(id_detalle, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -311,7 +673,7 @@ export class VerParametroComponent implements OnInit {
       descripcion: detalle,
       observacion: observacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.parametro.IngresarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',
@@ -329,7 +691,7 @@ export class VerParametroComponent implements OnInit {
       descripcion: detalle,
       observacion: observacion,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.parametro.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',
@@ -383,7 +745,7 @@ export class VerParametroComponent implements OnInit {
    ** **        REGISTRAR O EDITAR DETALLE DE PARAMETRO FORMATO DE FECHA Y HORA                ** **
    ** ******************************************************************************************* **/
 
-  GuardarDatos(seleccion: number) {
+  GuardarDatos(seleccion: number, dia: string) {
     let formato = '';
     let observacion = '';
     if (seleccion === 1) {
@@ -406,6 +768,10 @@ export class VerParametroComponent implements OnInit {
       formato = 'HH:mm:ss';
       observacion = 'Formato de 24 horas';
     }
+    else if (seleccion === 6) {
+      formato = dia;
+    }
+
     this.RegistrarValores(formato, observacion);
   }
 
@@ -577,6 +943,20 @@ export class VerParametroComponent implements OnInit {
     this.formulario.reset();
   }
 
+  /** ******************************************************************************************* **
+   ** **                        COLORES DEFAULT DE DIAS DE LA SEMANA                           ** **
+   ** ******************************************************************************************* **/
+  CambiarColores() {
+    this.lunes = 'rgb(80, 87, 97)';
+    this.martes = 'rgb(80, 87, 97)';
+    this.miercoles = 'rgb(80, 87, 97)';
+    this.jueves = 'rgb(80, 87, 97)';
+    this.viernes = 'rgb(80, 87, 97)';
+    this.sabado = 'rgb(80, 87, 97)';
+    this.domingo = 'rgb(80, 87, 97)';
+  }
+
+  //CONTROL BOTONES
   getVerParametroRegistrarDetalleParametro(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){

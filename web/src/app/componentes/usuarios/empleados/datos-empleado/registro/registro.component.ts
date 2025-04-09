@@ -1,17 +1,22 @@
 // SECCION DE LIBRERIAS
-import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, FormControl, FormsModule  } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr'
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Md5 } from 'ts-md5/dist/md5';
+import { MatRadioChange } from '@angular/material/radio';
+import { ChangeDetectorRef } from '@angular/core';
 
 // SECCION DE SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
 
 @Component({
   selector: 'app-registro',
@@ -20,6 +25,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 })
 
 export class RegistroComponent implements OnInit {
+  ips_locales: any = '';
 
   empleadoGuardado: any = [];
   nacionalidades: any = [];
@@ -51,16 +57,28 @@ export class RegistroComponent implements OnInit {
     private _formBuilder: FormBuilder,
     public validar: ValidacionesService,
     public ventana: MatDialog,
-  ) { }
+    public generoS: GenerosService,
+    public estadoS: EstadoCivilService,
+    private cdRef: ChangeDetectorRef
+  ) { 
+   
+  }
+   identificacion ="Cedula"
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.CargarRoles();
     this.VerificarCodigo();
     this.AsignarFormulario();
     this.ObtenerNacionalidades();
+    this.ObtenerEstadoCivil()
+    this.ObtenerGeneros();
+
   }
 
   // METODO DE FILTRACION DE DATOS DE NACIONALIDAD
@@ -127,10 +145,19 @@ export class RegistroComponent implements OnInit {
         this.escritura = true;
       }
       else if (this.datosCodigo.cedula === true) {
-        this.cedula = true;
-        this.escritura = true;
+        console.log("this.identificacion", this.identificacion)
+        if(this.identificacion == 'Pasaporte')
+        {
+          this.escritura = false;
+          this.cedula = false;
+        }else{
+          this.cedula = true;
+          this.escritura = true;
+        }
+    
       }
       else {
+        
         this.escritura = false;
 
       }
@@ -193,7 +220,7 @@ export class RegistroComponent implements OnInit {
       codigo: form1.codigoForm,
       estado: 1,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -228,7 +255,7 @@ export class RegistroComponent implements OnInit {
       id_rol: form3.rolForm,
       estado: true,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.user.RegistrarUsuario(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -261,7 +288,7 @@ export class RegistroComponent implements OnInit {
         valor: codigo,
         id: 1,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })
@@ -283,6 +310,7 @@ export class RegistroComponent implements OnInit {
 
 
   // METODO DE VALIDACION DE INGRESO DE NUMEROS
+  
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
   }
@@ -303,6 +331,7 @@ export class RegistroComponent implements OnInit {
 
   // METODO PARA COLOCAR EL CODIGO SIMILAR AL CAMPO CEDULA
   LlenarCodigo(form1: any) {
+    
     if (this.cedula) {
       let codigo: number = form1.cedulaForm;
       this.primeroFormGroup.patchValue({
@@ -318,6 +347,84 @@ export class RegistroComponent implements OnInit {
     this.segundoFormGroup.reset();
     this.terceroFormGroup.reset();
   }
+
+  estados_civil: any = []
+  // METODO PARA LISTAR NACIONALIDADES
+  ObtenerEstadoCivil() {
+    this.estadoS.ListarEstadoCivil().subscribe(res => {
+      this.estados_civil = res;
+    });
+  }
+
+  // METODO PARA LISTAR NACIONALIDADES
+  generos: any = []
+
+  ObtenerGeneros() {
+    this.generoS.ListarGeneros().subscribe(res => {
+      this.generos = res;
+    });
+  }
+
+  
+
+  CambiarIdentificacion(ob: MatRadioChange){
+    this.identificacion=ob.value;
+  }
+
+  cedulaValida:boolean=false;
+  ValidarCedula(cedula: any) {
+    console.log("entra a validar Cedula", cedula);
+    const inputElement = cedula.cedulaForm;
+  
+    const cad: string = inputElement;
+    let total: number = 0;
+    const longitud: number = cad.length;
+    const longcheck: number = longitud - 1;
+  
+    // 👉 Si es menos de 10 dígitos, marcar como inválido
+    if (longitud < 10) {
+      this.cedulaValida = false;
+      this.cdRef.detectChanges();
+      this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
+      console.log("Cédula con menos de 10 dígitos");
+      return; // salir
+    }
+  
+    // 👉 Validación normal si tiene 10 dígitos
+    if (cad !== "" && longitud === 10) {
+      for (let i = 0; i < longcheck; i++) {
+        let num = parseInt(cad.charAt(i), 10);
+        if (isNaN(num)) return;
+  
+        if (i % 2 === 0) {
+          num *= 2;
+          if (num > 9) num -= 9;
+        }
+        total += num;
+      }
+  
+      total = total % 10 ? 10 - (total % 10) : 0;
+  
+      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
+        this.cedulaValida = true;
+        console.log("Cédula Válida");
+      } else {
+        this.cedulaValida = false;
+        this.cdRef.detectChanges();
+        this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
+        console.log("Cédula Inválida");
+      }
+    }
+  }
+  
+
+
+  pasaporteValida:boolean=false;
+  ValidarPasaporte(pasaporte:any){
+    
+
+  }
+
 
 }
 

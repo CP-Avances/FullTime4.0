@@ -19,6 +19,8 @@ import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.s
 })
 
 export class EditarHorarioComponent implements OnInit {
+  ips_locales: any = '';
+
 
   // VALIDACIONES PARA EL FORMULARIO
   horaTrabajo = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
@@ -63,6 +65,9 @@ export class EditarHorarioComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ImprimirDatos();
   }
@@ -130,7 +135,7 @@ export class EditarHorarioComponent implements OnInit {
       codigo: form.codigoForm,
       default_: tipo,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     // FORMATEAR HORAS
@@ -196,7 +201,7 @@ export class EditarHorarioComponent implements OnInit {
         documento: this.data.horario.documento,
         id: parseInt(this.data.horario.id),
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
       });
@@ -310,6 +315,7 @@ export class EditarHorarioComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.rest.SubirArchivo(formData, id, this.data.horario.documento, this.data.horario.codigo).subscribe(res => {
       this.archivoForm.reset();
@@ -385,7 +391,7 @@ export class EditarHorarioComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
     });

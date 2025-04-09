@@ -7,9 +7,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
+
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -35,6 +36,19 @@ import { ITableHorarios } from 'src/app/model/reportes.model';
 })
 
 export class PrincipalHorarioComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
@@ -115,13 +129,38 @@ export class PrincipalHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.nameFile = '';
     this.ObtenerLogo();
     this.ObtenerColores();
     this.ObtenerHorarios();
     this.ObtenerEmpleados();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -431,7 +470,7 @@ export class PrincipalHorarioComponent implements OnInit {
       horarios: this.listaHorariosCorrectos,
       detalles: this.listaDetalleCorrectos,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
@@ -630,76 +669,199 @@ export class PrincipalHorarioComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
-
-  ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'horarios');
-    xlsx.writeFile(wb, "HorariosEXCEL" + '.xlsx');
-  }
-
-  EstructurarDatosExcel() {
-    let datos: any = [];
+  async generarExcel() {
+    let datos: any[] = [];
     let n: number = 1;
+
     this.horarios.forEach((obj: any) => {
       obj.detalles.forEach((det: any) => {
-        datos.push({
-          'N°': n++,
-          'HORARIO': obj.nombre,
-          'CÓDIGO': obj.codigo,
-          'HORAS DE TRABAJO': obj.hora_trabajo,
-          'MINUTOS DE ALIMENTACIÓN': obj.minutos_comida,
-          'HORARIO NOTURNO': obj.noturno == true ? 'Sí' : 'No',
-          'DOCUMENTO': obj.documento ? obj.documento : '',
-          'ORDEN': det.orden,
-          'HORA': det.hora,
-          'TOLERANCIA': det.tolerancia != null ? det.tolerancia : '',
-          'ACCIÓN': det.tipo_accion_show,
-          'OTRO DÍA': det.segundo_dia == true ? 'Sí' : 'No',
-          'MINUTOS ANTES': det.minutos_antes,
-          'MINUTOS DESPUES': det.minutos_despues,
-        });
+        datos.push([
+          n++,
+          obj.nombre,
+          obj.codigo,
+          obj.hora_trabajo,
+          obj.minutos_comida,
+          obj.noturno == true ? 'Sí' : 'No',
+          obj.documento ? obj.documento : '',
+          det.orden,
+          det.hora,
+          det.tolerancia != null ? det.tolerancia : '',
+          det.tipo_accion_show,
+          det.segundo_dia == true ? 'Sí' : 'No',
+          det.minutos_antes,
+          det.minutos_despues,
+        ]);
       });
     });
 
-    return datos;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Horarios");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:N1");
+    worksheet.mergeCells("B2:N2");
+    worksheet.mergeCells("B3:N3");
+    worksheet.mergeCells("B4:N4");
+    worksheet.mergeCells("B5:N5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = 'Lista de Horarios'.toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "nombre", width: 20 },
+      { key: "codigo", width: 20 },
+      { key: "hora_trabajo", width: 20 },
+      { key: "minutos_comida", width: 20 },
+      { key: "noturno", width: 20 },
+      { key: "documento", width: 20 },
+      { key: "orden", width: 20 },
+      { key: "hora", width: 20 },
+      { key: "tolerancia", width: 20 },
+      { key: "tipo_accion_show", width: 20 },
+      { key: "segundo_dia", width: 20 },
+      { key: "minutos_antes", width: 30 },
+      { key: "minutos_antes", width: 30 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "HORARIO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHORAS DE TRABAJOHA", totalsRowLabel: "", filterButton: true },
+      { name: "MINUTOS DE ALIMENTACIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "HORARIO NOTURNO", totalsRowLabel: "", filterButton: true },
+      { name: "DOCUMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "ORDEN", totalsRowLabel: "", filterButton: true },
+      { name: "HORA", totalsRowLabel: "", filterButton: true },
+      { name: "TOLERANCIA", totalsRowLabel: "", filterButton: true },
+      { name: "ACCIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "OTRO DÍA", totalsRowLabel: "", filterButton: true },
+      { name: "MINUTOS ANTES", totalsRowLabel: "", filterButton: true },
+      { name: "MINUTOS DESPUES", totalsRowLabel: "", filterButton: true },
+    ]
+
+    worksheet.addTable({
+      name: "HorariosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 14; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "HorariosEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************* **
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
 
-  ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "HorariosCSV" + '.csv');
-  }
-
-  EstructurarDatosCSV() {
-    let datos: any = [];
+  ExportToCSV() {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('HorariosCSV');
+    worksheet.columns = [
+      { header: 'n', key: 'n', width: 10 },
+      { header: 'horario', key: 'horario', width: 30 },
+      { header: 'codigo', key: 'codigo', width: 15 },
+      { header: 'horas_trabajo', key: 'horas_trabajo', width: 15 },
+      { header: 'minutos_alimentacion', key: 'minutos_alimentacion', width: 15 },
+      { header: 'horario_noturno', key: 'horario_noturno', width: 15 },
+      { header: 'documento', key: 'documento', width: 15 },
+      { header: 'orden', key: 'orden', width: 15 },
+      { header: 'hora', key: 'hora', width: 15 },
+      { header: 'tolerancia', key: 'tolerancia', width: 15 },
+      { header: 'accion', key: 'accion', width: 15 },
+      { header: 'otro_dia', key: 'otro_dia', width: 15 },
+      { header: 'minutos_antes', key: 'minutos_antes', width: 15 },
+      { header: 'minutos_despues', key: 'minutos_despues', width: 15 },
+    ];
+    // 4. Llenar las filas con los datos
     let n: number = 1;
+
     this.horarios.forEach((obj: any) => {
       obj.detalles.forEach((det: any) => {
-        datos.push({
-          'n': n++,
-          'horario': obj.nombre,
-          'codigo': obj.codigo,
-          'horas_trabajo': obj.hora_trabajo,
-          'minutos_alimentacion': obj.minutos_comida,
-          'horario_noturno': obj.noturno == true ? 'Sí' : 'No',
-          'documento': obj.documento ? obj.documento : '',
-          'orden': det.orden,
-          'hora': det.hora,
-          'tolerancia': det.tolerancia != null ? det.tolerancia : '',
-          'accion': det.tipo_accion,
-          'otro_dia': det.segundo_dia == true ? 'Sí' : 'No',
-          'minutos_antes': det.minutos_antes,
-          'minutos_despues': det.minutos_despues,
-        });
-      });
+        worksheet.addRow({
+          n: n++,
+          horario: obj.nombre,
+          codigo: obj.codigo,
+          horas_trabajo: obj.hora_trabajo,
+          minutos_alimentacion: obj.minutos_comida,
+          horario_noturno: obj.noturno == true ? 'Sí' : 'No',
+          documento: obj.documento ? obj.documento : '',
+          orden: det.orden,
+          hora: det.hora,
+          tolerancia: det.tolerancia != null ? det.tolerancia : '',
+          accion: det.tipo_accion,
+          otro_dia: det.segundo_dia == true ? 'Sí' : 'No',
+          minutos_antes: det.minutos_antes,
+          minutos_despues: det.minutos_despues,
+        }).commit();                                                                                                                                             
+      })
+    })
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "HorariosCSV.csv");
     });
-    return datos;
   }
 
   /** ************************************************************************************************* **
@@ -850,7 +1012,7 @@ export class PrincipalHorarioComponent implements OnInit {
   EliminarDetalle(id_horario: any) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_horario, datos).subscribe((res: any) => {
       if (res.message === 'error') {
@@ -883,33 +1045,44 @@ export class PrincipalHorarioComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
-    this.ingresar = false;
-    this.contador = 0;
+  
+    let eliminados = 0;
+    let totalProcesados = 0;
+    const totalSeleccionados = this.selectionHorarios.selected.length;
+  
     this.horariosEliminar = this.selectionHorarios.selected;
+  
     this.horariosEliminar.forEach((datos: any) => {
-      this.horarios = this.horarios.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
+  
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          eliminados++;
+          this.horarios = this.horarios.filter(item => item.id !== datos.id);
+        }
+  
+        if (totalProcesados === totalSeleccionados) {
+          if (eliminados > 0) {
+            this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
           }
+  
+          this.selectionHorarios.clear();
+          this.horariosEliminar = [];
           this.ObtenerHorarios();
         }
       });
-    }
-    )
+    });
   }
+  
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {

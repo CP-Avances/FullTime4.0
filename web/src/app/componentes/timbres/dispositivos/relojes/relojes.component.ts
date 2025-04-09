@@ -17,6 +17,7 @@ import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.ser
 })
 
 export class RelojesComponent implements OnInit {
+  ips_locales: any = '';
 
   // VARIABLES DE ALMACENAMIENTO
   zonas_horarias: any = [];
@@ -81,7 +82,10 @@ export class RelojesComponent implements OnInit {
   ngOnInit(): void {
     this.totalDispositivos = 15;
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
@@ -228,7 +232,7 @@ export class RelojesComponent implements OnInit {
       formato_gmt_dispositivo: gmt,
       zona_horaria_dispositivo: nombre,
       user_name: this.user_name,
-      user_ip: this.ip,
+      user_ip: this.ip, ip_local: this.ips_locales,
     };
     console.log('form2 ', form2.zonaForm)
     console.log(`Nombre: ${nombre}`);

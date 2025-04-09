@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuscarSalidasAnticipadas = void 0;
 const database_1 = __importDefault(require("../../database"));
 class SalidasAntesControlador {
     // METODO DE REGISTROS DE SALIDAS ANTICIPADAS     **USADO
@@ -21,7 +22,7 @@ class SalidasAntesControlador {
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.salidas = yield BuscarSalidasAnticipadas(desde, hasta, o.id);
+                    o.salidas = yield (0, exports.BuscarSalidasAnticipadas)(desde, hasta, o.id);
                     return o;
                 })));
                 return obj;
@@ -42,18 +43,19 @@ exports.default = SALIDAS_ANTICIPADAS_CONTROLADOR;
 const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR), 
-            EXTRACT(epoch FROM (fecha_hora_horario - fecha_hora_timbre)) AS diferencia, 
-            id_empleado, estado_timbre, tipo_accion AS accion, tipo_dia 
-        FROM eu_asistencia_general 
-        WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%' AND id_empleado = $3 
-            AND fecha_hora_timbre < fecha_hora_horario AND tipo_dia NOT IN ('L', 'FD') 
-            AND tipo_accion = 'S'
-        ORDER BY fecha_hora_horario ASC
+        SELECT CAST(ag.fecha_hora_horario AS VARCHAR), CAST(ag.fecha_hora_timbre AS VARCHAR), 
+            EXTRACT(epoch FROM (ag.fecha_hora_horario - ag.fecha_hora_timbre)) AS diferencia, 
+            ag.id_empleado, ag.estado_timbre, ag.tipo_accion AS accion, ag.tipo_dia 
+        FROM eu_asistencia_general AS ag, eu_empleado_contratos AS ec 
+        WHERE CAST(ag.fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
+            AND ($2::timestamp + '1 DAY') || '%' AND ag.id_empleado = $3 AND ag.id_empleado = $3 AND ec.id_empleado = ag.id_empleado AND ec.controlar_asistencia = true
+            AND ag.fecha_hora_timbre < ag.fecha_hora_horario AND ag.tipo_dia NOT IN ('L', 'FD') 
+            AND ag.tipo_accion = 'S'
+        ORDER BY ag.fecha_hora_horario ASC
         `, [fec_inicio, fec_final, id_empleado])
             .then(res => {
             return res.rows;
         });
     });
 };
+exports.BuscarSalidasAnticipadas = BuscarSalidasAnticipadas;

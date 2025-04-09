@@ -66,7 +66,7 @@ class CiudadControlador {
     CrearCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_provincia, descripcion, user_name, ip } = req.body;
+                const { id_provincia, descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
@@ -79,7 +79,8 @@ class CiudadControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -114,7 +115,7 @@ class CiudadControlador {
     EliminarCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -129,7 +130,8 @@ class CiudadControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar la ciudad con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -146,7 +148,8 @@ class CiudadControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

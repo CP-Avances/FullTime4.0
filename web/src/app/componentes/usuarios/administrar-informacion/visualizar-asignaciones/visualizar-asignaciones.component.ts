@@ -5,6 +5,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-visualizar-asignaciones',
@@ -13,6 +14,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class VisualizarAsignacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   asignaciones: any = [];
   nombre: string;
@@ -31,6 +33,7 @@ export class VisualizarAsignacionesComponent implements OnInit {
     private usuario: UsuarioService,
     public dialogo: MatDialog,
     public ventana: MatDialogRef<VisualizarAsignacionesComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -38,6 +41,9 @@ export class VisualizarAsignacionesComponent implements OnInit {
     this.user_name = this.data.user_name;
     this.nombre = this.data.nombre;
     this.ip = this.data.ip;
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.id = this.data.id;
 
     this.ObtenerAsignaciones();
@@ -81,7 +87,7 @@ export class VisualizarAsignacionesComponent implements OnInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
       this.asignaciones = this.asignaciones.filter((asignacion: any) => asignacion.id !== id);
@@ -98,7 +104,7 @@ export class VisualizarAsignacionesComponent implements OnInit {
       personal: false,
       administra: false,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(data => {
       this.asignaciones = this.asignaciones.map((asignacion: any) => {

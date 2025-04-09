@@ -19,12 +19,12 @@ const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaCon
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 class HorarioControlador {
     // REGISTRAR HORARIO    **USADO
     CrearHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -40,7 +40,8 @@ class HorarioControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(horario),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -83,7 +84,7 @@ class HorarioControlador {
             try {
                 let id = req.params.id;
                 let { archivo, codigo } = req.params;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // FECHA DEL SISTEMA
                 var fecha = luxon_1.DateTime.now();
                 var anio = fecha.toFormat('yyyy');
@@ -107,7 +108,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -125,7 +127,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -157,7 +160,7 @@ class HorarioControlador {
     EditarHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -174,7 +177,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -194,7 +198,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: datosNuevos,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -213,7 +218,7 @@ class HorarioControlador {
     // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR   **USADO
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento, id, user_name, ip } = req.body;
+            let { documento, id, user_name, ip, ip_local } = req.body;
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
@@ -243,7 +248,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -261,7 +267,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -332,7 +339,7 @@ class HorarioControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -349,7 +356,8 @@ class HorarioControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el horario con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -366,7 +374,8 @@ class HorarioControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -399,7 +408,7 @@ class HorarioControlador {
     EditarHorasTrabaja(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { hora_trabajo, user_name, ip } = req.body;
+            const { hora_trabajo, user_name, ip, ip_local } = req.body;
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -416,7 +425,8 @@ class HorarioControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el horario con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -434,7 +444,8 @@ class HorarioControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -470,7 +481,7 @@ class HorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const { horarios, detalles, user_name, } = req.body;
+                const { horarios, detalles, user_name, ip, ip_local } = req.body;
                 let horariosCargados = true;
                 let detallesCargados = true;
                 let codigosHorariosCargados = [];
@@ -522,7 +533,8 @@ class HorarioControlador {
                                 accion: 'I',
                                 datosOriginales: '',
                                 datosNuevos: JSON.stringify(correcto),
-                                ip: '',
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
                             // FINALIZAR TRANSACCION
@@ -612,7 +624,8 @@ class HorarioControlador {
                                 accion: 'I',
                                 datosOriginales: '',
                                 datosNuevos: JSON.stringify(response2.rows),
-                                ip: '',
+                                ip: ip,
+                                ip_local: ip_local,
                                 observacion: null
                             });
                             // FINALIZAR TRANSACCION
@@ -655,7 +668,8 @@ class HorarioControlador {
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 rutaPlantilla = ruta;
-                const workbook = xlsx_1.default.readFile(ruta);
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
                 let verificador_horario = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'HORARIOS');
                 let verificador_detalle = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_HORARIOS');
                 if (verificador_horario === false) {
@@ -669,9 +683,37 @@ class HorarioControlador {
                     res.status(404).jsonp({ mensaje });
                 }
                 else if (verificador_horario != false && verificador_detalle != false) {
-                    const sheet_name_list = workbook.SheetNames;
-                    const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_horario]]);
-                    let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_detalle]]);
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const sheetHorarios = workbook.getWorksheet(sheet_name_list[verificador_horario]);
+                    const sheetDetalles = workbook.getWorksheet(sheet_name_list[verificador_detalle]);
+                    if (!sheetHorarios || !sheetDetalles) {
+                        const mensaje = 'No se encontraron las hojas requeridas';
+                        EliminarPlantilla(ruta);
+                        return res.status(404).json({ mensaje });
+                    }
+                    // CONVERTIR HOJAS A JSON
+                    const plantillaHorarios = [];
+                    sheetHorarios.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+                        if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+                            const rowData = {};
+                            row.eachCell((cell, colIndex) => {
+                                const header = sheetHorarios.getRow(1).getCell(colIndex).text.trim();
+                                rowData[header] = cell.text.trim();
+                            });
+                            plantillaHorarios.push(rowData);
+                        }
+                    });
+                    const plantillaDetalles = [];
+                    sheetDetalles.eachRow({ includeEmpty: false }, (row, rowIndex) => {
+                        if (rowIndex > 1) { // SUPONIENDO QUE LA PRIMERA FILA SON ENCABEZADOS
+                            const rowData = {};
+                            row.eachCell((cell, colIndex) => {
+                                const header = sheetDetalles.getRow(1).getCell(colIndex).text.trim();
+                                rowData[header] = cell.text.trim();
+                            });
+                            plantillaDetalles.push(rowData);
+                        }
+                    });
                     let codigos = [];
                     for (const [index, data] of plantillaHorarios.entries()) {
                         let { CODIGO_HORARIO, MINUTOS_ALIMENTACION, HORARIO_NOCTURNO } = data;

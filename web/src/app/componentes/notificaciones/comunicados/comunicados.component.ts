@@ -34,6 +34,7 @@ export interface EmpleadoElemento {
 })
 
 export class ComunicadosComponent implements OnInit {
+  ips_locales: any = '';
 
   // FORMULARIO FILTROS DE BUSQUEDA
   codigo = new FormControl('');
@@ -149,6 +150,9 @@ export class ComunicadosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
@@ -531,6 +535,7 @@ export class ComunicadosComponent implements OnInit {
   // VALIDACIONES PARA ENVIO DE CORREOS
   cont: number = 0;
   EnviarNotificaciones(data: any, form: any) {
+    console.log("ver datos de empleados para enviar correo: ", data)
     if (data.length > 0) {
       this.LeerCorreos(data);
       this.cont = 0;
@@ -571,10 +576,10 @@ export class ComunicadosComponent implements OnInit {
       mensaje: form.mensajeForm,
       tipo: 6,  // ES EL TIPO DE NOTIFICACION - COMUNICADOS
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
     this.realTime.EnviarMensajeGeneralMultiple(mensaje).subscribe(res => {
-
       res.respuesta.forEach((notificaciones: any) => {
         this.realTime.RecibirNuevosAvisos(notificaciones);
       })
@@ -714,6 +719,8 @@ export class ComunicadosComponent implements OnInit {
       correo: correos,
       asunto: form.tituloForm,
     }
+    console.log("ver datosCorreo: ", datosCorreo)
+
     this.realTime.EnviarCorreoComunicado(datosCorreo).subscribe(envio => {
       if (envio.message === 'ok') {
         this.toastr.success('Mensaje enviado exitosamente.', '', {

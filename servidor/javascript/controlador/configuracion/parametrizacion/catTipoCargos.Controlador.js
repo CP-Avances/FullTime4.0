@@ -18,7 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const exceljs_1 = __importDefault(require("exceljs"));
 class TiposCargosControlador {
     // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE   **USADO
     BuscarTipoCargoNombre(req, res) {
@@ -58,7 +58,7 @@ class TiposCargosControlador {
     CrearCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { cargo, user_name, ip } = req.body;
+                const { cargo, user_name, ip, ip_local } = req.body;
                 var VERIFICAR_CARGO = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `, [cargo.toUpperCase()]);
@@ -77,7 +77,8 @@ class TiposCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(TipoCargos),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FIN DE TRANSACCION
@@ -104,7 +105,7 @@ class TiposCargosControlador {
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, cargo } = req.body;
+                const { id, cargo, ip_local } = req.body;
                 // DAR FORMATO A LA PALABRA CARGO
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                 const tipoCargoExiste = yield database_1.default.query(`
@@ -122,6 +123,7 @@ class TiposCargosControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: req.body.ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
                     // FINALIZAR TRANSACCION
@@ -147,6 +149,7 @@ class TiposCargosControlador {
                         datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(TipoCargos),
                         ip: req.body.ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FIN DE TRANSACCION
@@ -171,7 +174,7 @@ class TiposCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR
@@ -186,7 +189,8 @@ class TiposCargosControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -203,7 +207,8 @@ class TiposCargosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosTiposCargos),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -225,14 +230,15 @@ class TiposCargosControlador {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-                const workbook = xlsx_1.default.readFile(ruta);
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
                 let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TIPO_CARGO');
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
                 else {
-                    const sheet_name_list = workbook.SheetNames;
-                    const plantilla_cargo = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla_cargo = workbook.getWorksheet(sheet_name_list[verificador]);
                     let data = {
                         fila: '',
                         tipo_cargo: '',
@@ -241,33 +247,55 @@ class TiposCargosControlador {
                     var listCargos = [];
                     var duplicados = [];
                     var mensaje = 'correcto';
-                    // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla_cargo.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, CARGO } = dato;
-                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                        if ((ITEM != undefined && ITEM != '') &&
-                            (CARGO != undefined && CARGO != '')) {
-                            data.fila = ITEM;
-                            data.tipo_cargo = CARGO;
-                            data.observacion = 'no registrado';
-                            listCargos.push(data);
+                    if (plantilla_cargo) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla_cargo.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['CARGO']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
-                        else {
-                            data.fila = ITEM;
-                            data.tipo_cargo = CARGO;
-                            data.observacion = 'no registrado';
-                            if (data.fila == '' || data.fila == undefined) {
-                                data.fila = 'error';
-                                mensaje = 'error';
+                        // LECTURA DE LOS DATOS DE LA PLANTILLA
+                        plantilla_cargo.eachRow((row, rowNumber) => {
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const CARGO = row.getCell(headers['CARGO']).value;
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') &&
+                                (CARGO != undefined && CARGO != '')) {
+                                data.fila = ITEM;
+                                data.tipo_cargo = CARGO;
+                                data.observacion = 'no registrado';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.tipo_cargo = data.tipo_cargo.trim();
+                                listCargos.push(data);
                             }
-                            if (data.tipo_cargo == undefined) {
-                                data.tipo_cargo = 'No registrado';
-                                data.observacion = 'Cargo ' + data.observacion;
+                            else {
+                                data.fila = ITEM;
+                                data.tipo_cargo = CARGO;
+                                data.observacion = 'no registrado';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (data.tipo_cargo == undefined) {
+                                    data.tipo_cargo = 'No registrado';
+                                    data.observacion = 'Cargo ' + data.observacion;
+                                }
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.tipo_cargo = data.tipo_cargo.trim();
+                                listCargos.push(data);
                             }
-                            listCargos.push(data);
-                        }
-                        data = {};
-                    }));
+                            data = {};
+                        });
+                    }
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
@@ -340,7 +368,7 @@ class TiposCargosControlador {
     // REGISTRAR PLANTILLA TIPO CARGO    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip } = req.body;
+            const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const data of plantilla) {
                 try {
@@ -361,7 +389,8 @@ class TiposCargosControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(cargos),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FIN DE TRANSACCION

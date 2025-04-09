@@ -20,13 +20,14 @@ interface Nivel {
 
 export class RegistroProcesoComponent implements OnInit {
 
+  ips_locales: any = '';
+
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
-  nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
-  nivel = new FormControl('', Validators.required);
+  nombre = new FormControl('', Validators.required);
   procesoPadre = new FormControl('', Validators.required);
 
   procesos: any = [];
@@ -34,18 +35,8 @@ export class RegistroProcesoComponent implements OnInit {
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     procesoNombreForm: this.nombre,
-    procesoNivelForm: this.nivel,
     procesoProcesoPadreForm: this.procesoPadre
   });
-
-  // ARREGLO DE NIVELES EXISTENTES
-  niveles: Nivel[] = [
-    { valor: '1', nombre: '1' },
-    { valor: '2', nombre: '2' },
-    { valor: '3', nombre: '3' },
-    { valor: '4', nombre: '4' },
-    { valor: '5', nombre: '5' }
-  ];
 
   constructor(
     private rest: ProcesoService,
@@ -58,7 +49,10 @@ export class RegistroProcesoComponent implements OnInit {
   ngOnInit(): void {
     this.Obtenerprocesos();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
   }
 
   // METODO DE VALIDACION DE CAMPOS
@@ -73,37 +67,47 @@ export class RegistroProcesoComponent implements OnInit {
   InsertarProceso(form: any) {
     var procesoPadreId: any;
     var procesoPadreNombre = form.procesoProcesoPadreForm;
+    console.log('procesoPadreNombre: ',procesoPadreNombre);
     if (procesoPadreNombre == 0) {
       let dataProceso = {
         nombre: form.procesoNombreForm,
-        nivel: form.procesoNivelForm,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       };
       this.rest.postProcesoRest(dataProceso)
         .subscribe(response => {
+          console.log('response: ',response);
           this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
           this.LimpiarCampos();
-        }, error => { });
+        }, error => { 
+          this.toastr.error(error.error.message, 'Registro.', {
+            timeOut: 6000,
+          });
+        });
     } else {
       this.rest.getIdProcesoPadre(procesoPadreNombre).subscribe(data => {
         procesoPadreId = data[0].id;
         let dataProceso = {
           nombre: form.procesoNombreForm,
-          nivel: form.procesoNivelForm,
           proc_padre: procesoPadreId,
           user_name: this.user_name,
-          ip: this.ip
+          ip: this.ip, ip_local: this.ips_locales
         };
         this.rest.postProcesoRest(dataProceso)
-          .subscribe(response => {
-            this.toastr.success('Operacion exitosa.', 'Proceso guardado.', {
-              timeOut: 6000,
-            });
-            this.LimpiarCampos();
-          }, error => { });;
+        .subscribe(response => {
+          console.log('response: ',response);
+          this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
+            timeOut: 6000,
+          });
+          this.LimpiarCampos();
+        }, error => { 
+          console.log('error.message: ',error.error.message)
+          this.toastr.error(error.error.message, 'Registro.', {
+            timeOut: 6000,
+          });
+        });
       });
     }
   }

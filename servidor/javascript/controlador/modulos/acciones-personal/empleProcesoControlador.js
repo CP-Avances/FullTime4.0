@@ -15,29 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_PROCESO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
-const settingsMail_1 = require("../../../libs/settingsMail");
 class EmpleadoProcesoControlador {
     CrearEmpleProcesos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, id_empleado, id_empl_cargo, fec_inicio, fec_final, user_name, ip } = req.body;
+                const { id, id_empleado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-        INSERT INTO map_empleado_procesos (id_proceso, id_empleado, id_empleado_cargo, fecha_inicio, fecha_final) 
-        VALUES ($1, $2, $3, $4, $5)
-        `, [id, id_empleado, id_empl_cargo, fec_inicio, fec_final]);
-                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
-                ;
+        INSERT INTO map_empleado_procesos (id_proceso, id_empleado) 
+        VALUES ($1, $2)
+        `, [id, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
-                    ip,
+                    datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}}`,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -55,7 +52,7 @@ class EmpleadoProcesoControlador {
     ActualizarProcesoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, id_empleado_cargo, fec_inicio, fec_final, id_proceso, user_name, ip } = req.body;
+                const { id, id_proceso, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -68,7 +65,8 @@ class EmpleadoProcesoControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar proceso con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -76,17 +74,9 @@ class EmpleadoProcesoControlador {
                     return res.status(404).jsonp({ message: 'Error al actualizar proceso' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE map_empleado_procesos SET id_proceso = $5, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
+        UPDATE map_empleado_procesos SET id_proceso = $2 
         WHERE id = $1 RETURNING *
-        `, [id, id_empleado_cargo, fec_inicio, fec_final, id_proceso]);
-                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
-                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
-                datosOriginales.fecha_inicio = fechaInicioO;
-                datosOriginales.fecha_final = fechaFinalO;
-                datosNuevos.rows[0].fecha_inicio = fechaInicioN;
-                datosNuevos.rows[0].fecha_final = fechaFinalN;
+        `, [id, id_proceso]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
@@ -94,7 +84,8 @@ class EmpleadoProcesoControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -113,21 +104,22 @@ class EmpleadoProcesoControlador {
     BuscarProcesoUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
-            const HORARIO_CARGO = yield database_1.default.query(`
-      SELECT ep.id, ep.id_proceso, ep.id_empleado_cargo, ep.fecha_inicio, ep.fecha_final, cp.nombre AS proceso 
+            console.log('req.params: ', req.params);
+            const EMPLEADO_PROCESOS = yield database_1.default.query(`
+      SELECT ep.id, ep.id_proceso, ep.estado, cp.nombre AS proceso 
       FROM map_empleado_procesos AS ep, map_cat_procesos AS cp 
       WHERE ep.id_empleado = $1 AND ep.id_proceso = cp.id
       `, [id_empleado]);
-            if (HORARIO_CARGO.rowCount != 0) {
-                return res.jsonp(HORARIO_CARGO.rows);
+            if (EMPLEADO_PROCESOS.rowCount != 0) {
+                return res.status(200).jsonp({ procesos: EMPLEADO_PROCESOS.rows, text: 'correcto', status: 200 });
             }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            res.status(404).jsonp({ Procesos: undefined, text: 'Registro no encontrado.', status: 400 });
         });
     }
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -141,7 +133,8 @@ class EmpleadoProcesoControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar proceso con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -151,10 +144,6 @@ class EmpleadoProcesoControlador {
                 yield database_1.default.query(`
         DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
-                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
-                datosOriginales.fecha_inicio = fechaInicioO;
-                datosOriginales.fecha_final = fechaFinalO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
@@ -162,12 +151,13 @@ class EmpleadoProcesoControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                return res.status(200).jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION

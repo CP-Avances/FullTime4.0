@@ -71,9 +71,8 @@ import { TipoSeguridadComponent } from './componentes/configuracion/parametrizac
 import { MainNavComponent } from './componentes/generales/main-nav/main-nav.component';
 import { NavbarComponent } from './componentes/generales/main-nav/navbar/navbar.component';
 import { SearchComponent } from './componentes/generales/main-nav/search/search.component';
-import { AyudaComponent } from './componentes/generales/preferencias/ayuda/ayuda.component';
+import { AyudaComponent } from './componentes/generales/ayuda/ayuda.component';
 import { VistaMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/vista-menu/vista-menu.component';
-import { AccionesTimbresComponent } from './componentes/generales/preferencias/acciones-timbres/acciones-timbres.component';
 import { RegistroModalidadComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/registro-modalidad/registro-modalidad.component';
 import { EditarModalidadComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/editar-modalidad/editar-modalidad.component';
 import { EditarTipoCargoComponent } from './componentes/configuracion/parametrizacion/tipo-cargos/editar-tipo-cargo/editar-tipo-cargo.component';
@@ -241,6 +240,7 @@ import { EditarTipoAccionComponent } from './componentes/modulos/accionesPersona
 import { VerTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/ver-tipo-accion/ver-tipo-accion.component';
 import { EditarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/editar-pedido-accion/editar-pedido-accion.component';
 import { VerPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/ver-pedido-accion/ver-pedido-accion.component';
+
 // MODULO  --GEOLOCALIZACION
 import { CrearCoordenadasComponent } from './componentes/modulos/geolocalizacion/crear-coordenadas/crear-coordenadas.component';
 import { EditarCoordenadasComponent } from './componentes/modulos/geolocalizacion/editar-coordenadas/editar-coordenadas.component';
@@ -277,9 +277,9 @@ import { ListaNotificacionComponent } from './componentes/notificaciones/configu
 import { SubirDocumentoComponent } from './componentes/notificaciones/documentos/subir-documento/subir-documento.component';
 import { VerDocumentosComponent } from './componentes/notificaciones/documentos/ver-documentos/ver-documentos.component';
 import { ListaArchivosComponent } from './componentes/notificaciones/documentos/lista-archivos/lista-archivos.component';
-import { RegistrarBirthdayComponent } from './componentes/notificaciones/cumpleanios/registrar-birthday/registrar-birthday.component';
-import { EditarBirthdayComponent } from './componentes/notificaciones/cumpleanios/editar-birthday/editar-birthday.component';
-import { VerBirthdayComponent } from './componentes/notificaciones/cumpleanios/ver-birthday/ver-birthday.component';
+import { RegistrarBirthdayComponent } from './componentes/notificaciones/configurar-mensajes/cumpleanios/registrar-birthday/registrar-birthday.component';
+import { EditarBirthdayComponent } from './componentes/notificaciones/configurar-mensajes/cumpleanios/editar-birthday/editar-birthday.component';
+import { VerBirthdayComponent } from './componentes/notificaciones/configurar-mensajes/cumpleanios/ver-birthday/ver-birthday.component';
 import { ComunicadosComponent } from './componentes/notificaciones/comunicados/comunicados.component';
 import { RealtimeNotificacionComponent } from './componentes/reportes/notificaciones/realtime-notificacion/realtime-notificacion.component';
 import { RealtimeAvisosComponent } from './componentes/reportes/notificaciones/realtime-avisos/realtime-avisos.component';
@@ -287,6 +287,11 @@ import { EliminarRealtimeComponent } from './componentes/reportes/notificaciones
 import { ButtonNotificacionComponent } from './componentes/generales/main-nav/button-notificacion/button-notificacion.component';
 import { ButtonAvisosComponent } from './componentes/generales/main-nav/button-avisos/button-avisos.component';
 import { ButtonOpcionesComponent } from './componentes/generales/main-nav/button-opciones/button-opciones.component';
+import { MensajesNotificacionesComponent } from './componentes/notificaciones/configurar-mensajes/mensajes-notificaciones/mensajes-notificaciones.component';
+import { VerAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/ver-aniversario/ver-aniversario.component';
+import { RegistrarAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/registrar-aniversario/registrar-aniversario.component';
+import { EditarAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/editar-aniversario/editar-aniversario.component';
+
 // REPORTE
 import { ReportesModule } from './componentes/reportes/reportes.module';
 import { ConfigReportFirmasHorasExtrasComponent } from './componentes/reportes/configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
@@ -317,6 +322,32 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
+import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
+import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { RegistrarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/registrar-estado-civil/registrar-estado-civil.component';
+import { EditarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/editar-estado-civil/editar-estado-civil.component';
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/ingresar-registros/ingresar-registros.component';
+import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
+import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
+import { RegistrarGradoComponent } from './componentes/modulos/accionesPersonal/grados/registrar-grado/registrar-grado.component';
+import { EditarGradoComponent } from './componentes/modulos/accionesPersonal/grados/editar-grado/editar-grado.component';
+import { RegistrarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
+import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/editar-grupo-ocupacional/editar-grupo-ocupacional.component';
+import { RegistroInterfazProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-interfaz/registro-interfaz-proceso.component';
+import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-multiple/registro-multiple-proceso.component';
+import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-interfaz-grado/registro-interfaz-grado.component';
+import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-multiple-grado/registro-multiple-grado.component';
+import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
+import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
+import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/empleado-proceso/empleado-proceso.component';
+import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/empleado-grado/empleado-grado.component';
+import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/empleado-grupo/empleado-grupo.component';
+import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/editar-registro/editar-registro.component';
+import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
+import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
 
 @NgModule({
   declarations: [
@@ -359,7 +390,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     SearchComponent,
     AyudaComponent,
     VistaMenuComponent,
-    AccionesTimbresComponent,
     RegistroModalidadComponent,
     EditarModalidadComponent,
     EditarTipoCargoComponent,
@@ -527,6 +557,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     VerTipoAccionComponent,
     EditarPedidoAccionComponent,
     VerPedidoAccionComponent,
+    EmpleadoProcesoComponent,
 
     CrearCoordenadasComponent,
     EditarCoordenadasComponent,
@@ -557,7 +588,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     VerTimbreComponent,
     VerImagenComponent,
 
-
     SettingsComponent,
     ConfiguracionNotificacionComponent,
     ListaNotificacionComponent,
@@ -574,6 +604,10 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     ButtonNotificacionComponent,
     ButtonAvisosComponent,
     ButtonOpcionesComponent,
+    MensajesNotificacionesComponent,
+    VerAniversarioComponent,
+    RegistrarAniversarioComponent,
+    EditarAniversarioComponent,
 
     ConfigReportFirmasHorasExtrasComponent,
     ConfigEmpleadosComponent,
@@ -593,7 +627,32 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
-
+    RegistrarGeneroComponent,
+    EditarGeneroComponent,
+    ListarGeneroComponent,
+    ListarEstadoCivilComponent,
+    RegistrarEstadoCivilComponent,
+    EditarEstadoCivilComponent,
+    IngresarRegistrosComponent,
+    GradosComponent,
+    GrupoOcupacionalComponent,
+    RegistrarGradoComponent,
+    EditarGradoComponent,
+    RegistrarGrupoOcupacionalComponent,
+    EditarGrupoOcupacionalComponent,
+    RegistroInterfazProcesoComponent,
+    RegistroMultipleProcesoComponent,
+    RegistroInterfazGradoComponent,
+    RegistroMultipleGradoComponent,
+    RegistroMultipleGrupoComponent,
+    RegistroInterfazGrupoComponent,
+    EmpleadoProcesoComponent,
+    EmpleadoGradoComponent,
+    EmpleadoGrupoComponent,
+    EditarRegistroComponent,
+    EditarNacionalidadComponent,
+    ListarNacionalidadComponent,
+    RegistrarNacionalidadComponent,
 
   ],
 
@@ -662,7 +721,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     HorarioMultipleEmpleadoComponent,
     PermisosMultiplesEmpleadosComponent,
   ],
-  exports: [CommonModule, TimbreMultipleComponent],
+  exports: [CommonModule, TimbreMultipleComponent, EmpleadoProcesoComponent],
 
   bootstrap: [AppComponent]
 

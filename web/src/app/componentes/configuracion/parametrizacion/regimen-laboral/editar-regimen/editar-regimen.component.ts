@@ -19,6 +19,7 @@ import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.compone
 })
 
 export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterContentChecked {
+  ips_locales: any = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -102,6 +103,9 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
 
     this.ObtenerPaises();
     this.ObtenerRegimen();
@@ -1417,7 +1421,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         laboral_dias: form3.dias_LaborableForm,
         meses_calculo: form3.meses_calculoForm,
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       };
 
       this.ValidarInformacion(form1, form2, form3, regimen);
@@ -1490,7 +1494,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       descripcion: '',
       dias_vacacion: 0,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.GuardarBDDPeriodo(periodo, form2);
   }
@@ -1610,7 +1614,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   EliminarBDDPeriodo(id: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.rest.EliminarPeriodo(id, datos).subscribe(registro => {
@@ -1633,7 +1637,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       dias_antiguedad: 0,
       id_regimen: regimen,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.RegistrarBDDAntiguedad(antiguedad, form3);
   }
@@ -1799,7 +1803,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   EliminarBDDAntiguedad(id: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     this.rest.EliminarAntiguedad(id, datos).subscribe(registro => {

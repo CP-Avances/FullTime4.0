@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SUCURSAL_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-//import excel from 'xlsx';
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
@@ -40,7 +39,7 @@ class SucursalControlador {
     CrearSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
+                const { nombre, id_ciudad, id_empresa, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -54,7 +53,8 @@ class SucursalControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(sucursal),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -77,7 +77,7 @@ class SucursalControlador {
     ActualizarSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_ciudad, id, user_name, ip } = req.body;
+                const { nombre, id_ciudad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -90,7 +90,8 @@ class SucursalControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -107,7 +108,8 @@ class SucursalControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -157,7 +159,7 @@ class SucursalControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -171,7 +173,8 @@ class SucursalControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -188,7 +191,8 @@ class SucursalControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -258,13 +262,14 @@ class SucursalControlador {
                     }
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla.eachRow((row, rowNumber) => __awaiter(this, void 0, void 0, function* () {
+                        var _a, _b;
                         // SALTAR LA FILA DE LAS CABECERAS
                         if (rowNumber === 1)
                             return;
                         // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                         const ITEM = row.getCell(headers['ITEM']).value;
-                        const NOMBRE = row.getCell(headers['NOMBRE']).value;
-                        const CIUDAD = row.getCell(headers['CIUDAD']).value;
+                        const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                        const CIUDAD = (_b = row.getCell(headers['CIUDAD']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
                         const dato = {
                             ITEM: ITEM,
                             NOMBRE: NOMBRE,
@@ -273,6 +278,7 @@ class SucursalControlador {
                         data.fila = ITEM;
                         data.nom_sucursal = NOMBRE;
                         data.ciudad = CIUDAD;
+                        console.log('dataaaaaaaaaaaaaa: ', data);
                         if ((data.fila != undefined && data.fila != '') &&
                             (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
                             (data.ciudad != undefined && data.ciudad != '')) {
@@ -298,6 +304,10 @@ class SucursalControlador {
                                         data.observacion = 'ok';
                                         duplicados.push(dato);
                                     }
+                                    //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                    data.nom_sucursal = data.nom_sucursal.trim();
+                                    data.ciudad = data.ciudad.trim();
+                                    console.log('dataaa 010101010101: ', data);
                                     listSucursales.push(data);
                                 }
                                 else {
@@ -305,6 +315,10 @@ class SucursalControlador {
                                     data.nom_sucursal = NOMBRE;
                                     data.ciudad = CIUDAD;
                                     data.observacion = 'Ya existe en el sistema';
+                                    //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                    data.nom_sucursal = data.nom_sucursal.trim();
+                                    data.ciudad = data.ciudad.trim();
+                                    console.log('dataaa 000000000: ', data);
                                     listSucursales.push(data);
                                 }
                             }
@@ -316,6 +330,10 @@ class SucursalControlador {
                                     data.ciudad = 'No registrado';
                                 }
                                 data.observacion = 'Ciudad no existe en el sistema';
+                                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                                data.nom_sucursal = data.nom_sucursal.trim();
+                                data.ciudad = data.ciudad.trim();
+                                console.log('dataaa 111111111: ', data);
                                 listSucursales.push(data);
                             }
                         }
@@ -338,6 +356,10 @@ class SucursalControlador {
                             if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
                                 data.observacion = 'Sucursal y ciudad no registrada';
                             }
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.nom_sucursal = data.nom_sucursal.trim();
+                            data.ciudad = data.ciudad.trim();
+                            console.log('dataaa 222222: ', data);
                             listSucursales.push(data);
                         }
                         data = {};
@@ -392,7 +414,7 @@ class SucursalControlador {
     // METODO PARA CARGAR PLANTILLA DE SUCURSALES  **USADO
     RegistrarSucursales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { sucursales, user_name, ip } = req.body;
+            const { sucursales, user_name, ip, ip_local } = req.body;
             let error = false;
             for (const sucursal of sucursales) {
                 const { nombre, id_ciudad, id_empresa } = sucursal;
@@ -410,7 +432,8 @@ class SucursalControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: JSON.stringify(sucursal),
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION

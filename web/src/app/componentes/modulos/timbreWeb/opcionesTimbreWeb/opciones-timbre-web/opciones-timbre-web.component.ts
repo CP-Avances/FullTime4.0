@@ -5,6 +5,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+import { Observable, map, startWith } from 'rxjs';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -16,6 +17,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 @Component({
   selector: 'app-opciones-timbre-web',
@@ -24,6 +26,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 })
 
 export class OpcionesTimbreWebComponent implements OnInit {
+  ips_locales: any = '';
 
   idEmpleadoLogueado: any;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
@@ -57,11 +60,17 @@ export class OpcionesTimbreWebComponent implements OnInit {
   seleccion_opcion = new FormControl('');
   seleccion_especial = new FormControl('');
   seleccion_ubicacion = new FormControl('');
+
+  seleccion_foto_obligatoria = new FormControl('');
+
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol= new FormControl('', [Validators.minLength(2)]);
+
+  filteredRoles!: Observable<any[]>;
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -134,13 +143,22 @@ export class OpcionesTimbreWebComponent implements OnInit {
     return this.restR.filtroNombreReg;
   }
 
+  //FILTRO ROL
+  get filtroRolEmp() { 
+    return this.restR.filtroRolEmp;
+  }
+
+  listaRoles: any = [];
+
+
   constructor(
     private asignaciones: AsignacionesService,
     private restTimbres: TimbresService,
     private restUsuario: UsuarioService,
     private validar: ValidacionesService,
     private toastr: ToastrService,
-    private restR: ReportesService
+    private restR: ReportesService,
+    private restRol: RolesService
   ) {
     this.idEmpleadoLogueado = parseInt(
       localStorage.getItem('empleado') as string
@@ -150,7 +168,10 @@ export class OpcionesTimbreWebComponent implements OnInit {
   ngOnInit(): void {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -168,6 +189,22 @@ export class OpcionesTimbreWebComponent implements OnInit {
       { opcion: 'Timbre Ubicación Desconocida' },
     ];
     this.BuscarInformacionGeneral();
+
+
+    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+      this.listaRoles = respuesta
+      console.log('this.listaRoles: ', this.listaRoles)
+    });
+
+    this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
+
   }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
@@ -185,6 +222,13 @@ export class OpcionesTimbreWebComponent implements OnInit {
       (err) => {
         this.toastr.error(err.error.message);
       }
+    );
+  }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.listaRoles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
     );
   }
 
@@ -333,6 +377,9 @@ export class OpcionesTimbreWebComponent implements OnInit {
       case 7:
         this.restR.setFiltroNombreReg(e);
         break;
+      case 8: 
+        this.restR.setFiltroRolEmp(e); 
+        break;  
       default:
         break;
     }
@@ -586,6 +633,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
     this.seleccion.reset();
+    this.seleccion_foto_obligatoria.reset()
   }
 
   // METODO PARA MOSTRAR LISTA DE DATOS
@@ -633,6 +681,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
       this.cedula.reset();
       this.nombre_emp.reset();
       this.nombre_suc.reset();
+      this.nombre_rol.reset();
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -641,32 +690,38 @@ export class OpcionesTimbreWebComponent implements OnInit {
       this.Filtrar('', 4);
       this.Filtrar('', 5);
       this.Filtrar('', 6);
+      this.Filtrar('', 8);
     }
     this.seleccion_especial.reset();
     this.seleccion_foto.reset();
+    this.seleccion_foto_obligatoria.reset()
     this.seleccion_ubicacion.reset();
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   contador: number = 0;
   RegistrarMultiple(data: any) {
+    console.log("ver seleccion_foto: ", this.seleccion_foto.value)
     
     this.contador = 0;
     var info = {
       id_empleado: '',
       timbre_foto: this.seleccion_foto.value,
+      timbre_foto_obligatoria: this.seleccion_foto_obligatoria.value,
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     var infoActualizar = {
       id_empleado: '',
       timbre_foto: this.seleccion_foto.value,
+      timbre_foto_obligatoria: this.seleccion_foto_obligatoria.value,
+
       timbre_especial: this.seleccion_especial.value,
       timbre_ubicacion_desconocida: this.seleccion_ubicacion.value,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
 
     if (
@@ -734,8 +789,12 @@ export class OpcionesTimbreWebComponent implements OnInit {
       informacion.timbre_especial = false;
     }
     if (this.seleccion_foto.value === null) {
-      informacion.timbre_foto = false;
+      informacion.timbre_foto_ = false;
     }
+    if (this.seleccion_foto_obligatoria.value === null) {
+      informacion.timbre_foto_obligatoria = false;
+    }
+    
     if (this.seleccion_ubicacion.value === null) {
       informacion.timbre_ubicacion_desconocida = false;
     }

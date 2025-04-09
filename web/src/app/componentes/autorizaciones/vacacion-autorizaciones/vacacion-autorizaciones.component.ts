@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
-
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
@@ -25,6 +25,7 @@ interface Estado {
   styleUrls: ['./vacacion-autorizaciones.component.css']
 })
 export class VacacionAutorizacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   // idDocumento = new FormControl('', Validators.required);
   TipoDocumento = new FormControl('');
@@ -79,13 +80,17 @@ export class VacacionAutorizacionesComponent implements OnInit {
     private restV: VacacionesService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<VacacionAutorizacionesComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
@@ -349,7 +354,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.EditarEstadoVacacion(form, id_vacacion, empleado_solicita, id_departamento);
@@ -377,7 +382,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
       id_rece_emp: id_empleado,
       id_depa_send: id_departamento,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restV.ActualizarEstado(id_vacacion, datosVacacion).subscribe(respon => {
       this.resVacacion = respon
@@ -406,7 +411,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
         id_vacaciones: id_vacacion,
         id_permiso: null,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res => {
         this.NotifiRes = res;

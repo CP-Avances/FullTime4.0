@@ -5,7 +5,7 @@ import { QueryResult } from 'pg';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../../database';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 
 class TiposCargosControlador {
 
@@ -47,7 +47,7 @@ class TiposCargosControlador {
     // METODO PARA REGISTRAR TIPO CARGO    **USADO
     public async CrearCargo(req: Request, res: Response): Promise<Response> {
         try {
-            const { cargo, user_name, ip } = req.body;
+            const { cargo, user_name, ip, ip_local } = req.body;
             var VERIFICAR_CARGO = await pool.query(
                 `
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
@@ -77,7 +77,8 @@ class TiposCargosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(TipoCargos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -103,7 +104,7 @@ class TiposCargosControlador {
     // METODO PARA EDITAR TIPO CARGO   **USADO
     public async EditarCargo(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, cargo } = req.body;
+            const { id, cargo, ip_local } = req.body;
             // DAR FORMATO A LA PALABRA CARGO
             const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
             const tipoCargoExiste = await pool.query(
@@ -127,6 +128,7 @@ class TiposCargosControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: req.body.ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                 });
 
@@ -159,6 +161,7 @@ class TiposCargosControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(TipoCargos),
                     ip: req.body.ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -183,7 +186,7 @@ class TiposCargosControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -204,7 +207,8 @@ class TiposCargosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                 });
 
@@ -225,7 +229,8 @@ class TiposCargosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosTiposCargos),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -246,55 +251,77 @@ class TiposCargosControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_CARGO');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla_cargo = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla_cargo = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     tipo_cargo: '',
                     observacion: ''
                 };
-
                 var listCargos: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
-
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_cargo.forEach(async (dato: any) => {
-                    var { ITEM, CARGO } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (CARGO != undefined && CARGO != '')) {
-                        data.fila = ITEM;
-                        data.tipo_cargo = CARGO;
-                        data.observacion = 'no registrado';
-
-                        listCargos.push(data);
-                    } else {
-                        data.fila = ITEM;
-                        data.tipo_cargo = CARGO;
-                        data.observacion = 'no registrado';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (data.tipo_cargo == undefined) {
-                            data.tipo_cargo = 'No registrado';
-                            data.observacion = 'Cargo ' + data.observacion;
-                        }
-
-                        listCargos.push(data);
+                if (plantilla_cargo) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla_cargo.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['CARGO']) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
-                    data = {};
-                });
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla_cargo.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const CARGO = row.getCell(headers['CARGO']).value;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (CARGO != undefined && CARGO != '')) {
 
+                            data.fila = ITEM;
+                            data.tipo_cargo = CARGO;
+                            data.observacion = 'no registrado';
+
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.tipo_cargo = data.tipo_cargo.trim();
+
+                            listCargos.push(data);
+                        } else {
+                            data.fila = ITEM;
+                            data.tipo_cargo = CARGO;
+                            data.observacion = 'no registrado';
+
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (data.tipo_cargo == undefined) {
+                                data.tipo_cargo = 'No registrado';
+                                data.observacion = 'Cargo ' + data.observacion;
+                            }
+
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.tipo_cargo = data.tipo_cargo.trim();
+
+                            listCargos.push(data);
+                        }
+                        data = {};
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -375,7 +402,7 @@ class TiposCargosControlador {
 
     // REGISTRAR PLANTILLA TIPO CARGO    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -403,7 +430,8 @@ class TiposCargosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(cargos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

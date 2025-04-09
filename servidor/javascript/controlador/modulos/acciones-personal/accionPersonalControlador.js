@@ -14,11 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ACCION_PERSONAL_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
+const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
+const exceljs_1 = __importDefault(require("exceljs"));
+const fs_1 = __importDefault(require("fs"));
 class AccionPersonalControlador {
     ListarTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -36,7 +39,7 @@ class AccionPersonalControlador {
     CrearTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, user_name, ip } = req.body;
+                const { descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -51,7 +54,8 @@ class AccionPersonalControlador {
                         accion: 'I',
                         datosOriginales: '',
                         datosNuevos: `{"descripcion": "${descripcion}"}`,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -72,13 +76,12 @@ class AccionPersonalControlador {
     CrearTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, user_name, ip } = req.body;
+                const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal, tipo_permiso, 
-                    tipo_vacacion, tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6) RETURNING*
-                `, [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
+                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES($1, $2, $3) RETURNING*
+                `, [id_tipo, descripcion, base_legal]);
                 const [datos] = response.rows;
                 if (datos) {
                     // INSERTAR REGISTRO DE AUDITORIA
@@ -89,12 +92,11 @@ class AccionPersonalControlador {
                         datosOriginales: '',
                         datosNuevos: `
                         {
-                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                            "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
-                            "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
                         }
                         `,
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -112,158 +114,11 @@ class AccionPersonalControlador {
             }
         });
     }
-    // TABLA CARGO_PROPUESTO
-    ListarCargoPropuestos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT * FROM map_cargo_propuesto
-            `);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    CrearCargoPropuesto(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO map_cargo_propuesto (descripcion) VALUES($1)
-                `, [descripcion]);
-                // INSERTAR REGISTRO DE AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_cargo_propuesto',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    EncontrarUltimoCargoP(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT MAX(id) AS id FROM map_cargo_propuesto
-            `);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ListarUnCargoPropuestos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id } = req.params;
-                const ACCION = yield database_1.default.query(`
-                SELECT * FROM map_cargo_propuesto WHERE id = $1
-                `, [id]);
-                if (ACCION.rowCount != 0) {
-                    return res.jsonp(ACCION.rows);
-                }
-                else {
-                    return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-                }
-            }
-            catch (error) {
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // TABLA CONTEXTO_LEGAL 
-    ListarDecretos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT * FROM map_contexto_legal
-            `);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    CrearDecreto(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO map_contexto_legal (descripcion) VALUES($1)
-                `, [descripcion]);
-                // INSERTAR REGISTRO DE AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_contexto_legal',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    EncontrarUltimoDecreto(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT MAX(id) AS id FROM map_contexto_legal
-            `);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ListarUnDecreto(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const ACCION = yield database_1.default.query(`
-            SELECT * FROM map_contexto_legal WHERE id = $1
-            `, [id]);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     // TABLA TIPO_ACCION_PERSONAL 
     ListarTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ACCION = yield database_1.default.query(`
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal,
-                dtap.tipo_permiso, dtap.tipo_vacacion, dtap.tipo_situacion_propuesta, tap.descripcion AS nombre 
+            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE tap.id = dtap.id_tipo_accion_personal
             `);
@@ -293,8 +148,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const ACCION = yield database_1.default.query(`
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal,
-                dtap.tipo_permiso, dtap.tipo_vacacion, dtap.tipo_situacion_propuesta, tap.descripcion AS nombre 
+            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
             `, [id]);
@@ -309,7 +163,7 @@ class AccionPersonalControlador {
     ActualizarTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id, user_name, ip } = req.body;
+                const { id_tipo, descripcion, base_legal, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
@@ -324,7 +178,8 @@ class AccionPersonalControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -332,9 +187,9 @@ class AccionPersonalControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 yield database_1.default.query(`
-                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
-                    tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7
-                `, [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
+                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
+                     WHERE id = $4
+                `, [id_tipo, descripcion, base_legal, id]);
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_detalle_tipo_accion_personal',
@@ -343,12 +198,11 @@ class AccionPersonalControlador {
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: `
                     {
-                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                        "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
-                        "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}"
                     }
                     `,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -365,7 +219,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
@@ -380,7 +234,8 @@ class AccionPersonalControlador {
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -397,7 +252,8 @@ class AccionPersonalControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(datos),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -414,7 +270,7 @@ class AccionPersonalControlador {
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip } = req.body;
+                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip, ip_local } = req.body;
                 let datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -456,7 +312,8 @@ class AccionPersonalControlador {
                     fecha_acta_final_concurso: ${fecha_acta_final_concurso}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                     numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                     descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -472,7 +329,7 @@ class AccionPersonalControlador {
     ActualizarPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip } = req.body;
+                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip, ip_local } = req.body;
                 let datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -488,7 +345,8 @@ class AccionPersonalControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar el registro con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
@@ -545,7 +403,8 @@ class AccionPersonalControlador {
                 fecha_acta_final_concurso: ${fecha_acta_final_concursoN}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
                 numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
                 descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -562,7 +421,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = 'ministerio_trabajo.png';
             let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name;
+            let ruta = (0, accesoCarpetas_2.ObtenerRutaLogos)() + separador + file_name;
             //console.log( 'solo ruta ', ruta)
             const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
             if (codificado === 0) {
@@ -671,6 +530,239 @@ class AccionPersonalControlador {
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros' });
             }
+        });
+    }
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
+    RevisarDatos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+                let separador = path_1.default.sep;
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
+                if (verificador === false) {
+                    return res.jsonp({ message: 'no_existe', data: undefined });
+                }
+                else {
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+                    let data = {
+                        fila: '',
+                        tipo_accion_personal: '',
+                        descripcion: '',
+                        base_legal: '',
+                        observacion: ''
+                    };
+                    var listaAccionPersonal = [];
+                    var duplicados = [];
+                    var mensaje = 'correcto';
+                    if (plantilla) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                        }
+                        // LECTURA DE LOS DATOS DE LA PLANTILLA
+                        plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c;
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const TIPO_ACCION_PERSONAL = (_a = row.getCell(headers['TIPO_ACCION_PERSONAL']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                            const DESCRIPCION = (_b = row.getCell(headers['DESCRIPCION']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                            const BASE_LEGAL = (_c = row.getCell(headers['BASE_LEGAL']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') &&
+                                (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
+                                (DESCRIPCION != undefined && DESCRIPCION != '') &&
+                                (BASE_LEGAL != undefined && BASE_LEGAL != '')) {
+                                data.fila = ITEM;
+                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                                data.descripcion = DESCRIPCION;
+                                data.base_legal = BASE_LEGAL;
+                                data.observacion = 'no registrado';
+                                listaAccionPersonal.push(data);
+                            }
+                            else {
+                                data.fila = ITEM;
+                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                                data.descripcion = DESCRIPCION;
+                                data.base_legal = BASE_LEGAL;
+                                data.observacion = 'no registrado';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (TIPO_ACCION_PERSONAL == undefined) {
+                                    data.tipo_accion_personal = 'No registrado';
+                                    data.observacion = 'Tipo de acción de personal ' + data.observacion;
+                                }
+                                if (DESCRIPCION == undefined) {
+                                    data.descripcion = 'No registrado';
+                                    data.observacion = 'Descripción ' + data.observacion;
+                                }
+                                if (BASE_LEGAL == undefined) {
+                                    data.base_legal = '-';
+                                }
+                                listaAccionPersonal.push(data);
+                            }
+                            data = {};
+                        });
+                    }
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
+                    // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+                    listaAccionPersonal.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == 'no registrado') {
+                            const VERIFICAR_TIPO_ACCION = yield database_1.default.query(`
+                    SELECT * FROM map_tipo_accion_personal 
+                    WHERE UPPER(descripcion) = UPPER($1)
+                    `, [item.tipo_accion_personal]);
+                            if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
+                                item.observacion = 'No existe el tipo de acción de personal en el sistema';
+                            }
+                            else {
+                                // const VERIFICAR_ACCION = await pool.query(
+                                //     `
+                                //     SELECT * FROM map_detalle_tipo_accion_personal
+                                //     WHERE id_tipo_accion_personal = $1
+                                //     `
+                                //     , [VERIFICAR_TIPO_ACCION.rows[0].id]);
+                                // if (VERIFICAR_ACCION.rowCount === 0) {
+                                //     // DISCRIMINACION DE ELEMENTOS IGUALES
+                                //     if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
+                                //         duplicados.push(item);
+                                //     } else {
+                                //         item.observacion = '1';
+                                //     }
+                                // }else{
+                                //     item.observacion = 'Ya existe en el sistema'  
+                                // }
+                            }
+                        }
+                    }));
+                    setTimeout(() => {
+                        listaAccionPersonal.sort((a, b) => {
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
+                            if (a.fila < b.fila) {
+                                return -1;
+                            }
+                            if (a.fila > b.fila) {
+                                return 1;
+                            }
+                            return 0; // SON IGUALES
+                        });
+                        var filaDuplicada = 0;
+                        listaAccionPersonal.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado';
+                            }
+                            else if (item.observacion == 'no registrado') {
+                                item.observacion = 'ok';
+                            }
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                                if (item.fila == filaDuplicada) {
+                                    mensaje = 'error';
+                                }
+                            }
+                            else {
+                                return mensaje = 'error';
+                            }
+                            filaDuplicada = item.fila;
+                        }));
+                        if (mensaje == 'error') {
+                            listaAccionPersonal = undefined;
+                        }
+                        return res.jsonp({ message: mensaje, data: listaAccionPersonal });
+                    }, 1000);
+                }
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+            }
+        });
+    }
+    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
+    CargarPlantilla(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip, ip_local } = req.body;
+            let error = false;
+            var listaProcesosInsertados = [];
+            for (const item of plantilla) {
+                const { tipo_accion_personal, descripcion, base_legal } = item;
+                console.log('items: ', item);
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+              SELECT * FROM map_tipo_accion_personal 
+                    WHERE UPPER(descripcion) = UPPER($1)
+              `, [tipo_accion_personal]);
+                    const [tipo_acciones] = response.rows;
+                    console.log('response: ', response);
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response_accion = yield database_1.default.query(`
+          INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
+          `, [response.rows[0].id, descripcion, base_legal]);
+                    const [detalleAccion] = response_accion.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_detalle_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(detalleAccion),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(tipo_acciones),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

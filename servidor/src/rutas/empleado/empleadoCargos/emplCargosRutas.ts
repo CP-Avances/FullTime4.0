@@ -46,7 +46,6 @@ class EmpleadosCargpsRutas {
         // METODO PARA BUSCAR CARGOS POR FECHA EDICION    **USADO
         this.router.post('/fecha_cargo/editar', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosFechaEditar);
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
-        this.router.get('/buscar/cargoActual/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargoActual);
         // METODO PARA ELIMINAR EL CARGO REGISTRADO DE LA TABLA EU_EMPLEADOS_CARGOS      **USADO
         this.router.post('/eliminarCargo', [TokenValidation], EMPLEADO_CARGO_CONTROLADOR.EliminarCargo);
 

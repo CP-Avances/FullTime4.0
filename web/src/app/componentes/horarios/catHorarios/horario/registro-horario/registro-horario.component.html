@@ -42,7 +42,7 @@
                         </mat-form-field>
                         <mat-form-field>
                             <mat-label>Minutos de alimentación</mat-label>
-                            <input type="number" matInput placeholder="Ej: 60" [formControl]="minAlmuerzo"
+                            <input type="tel" matInput placeholder="Ej: 60" [formControl]="minAlmuerzo"
                                 (keypress)="IngresarSoloNumerosEnteros($event)">
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar minutos de alimentación que dispondrá el usuario.">

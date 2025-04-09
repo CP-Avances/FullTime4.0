@@ -4,10 +4,13 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
-import * as xlsx from 'xlsx';
+
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { CatModalidadLaboralService } from 'src/app/servicios/configuracion/parametrizacion/catModalidadLaboral/cat-modalidad-laboral.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
@@ -29,6 +32,19 @@ import { RegistroModalidadComponent } from '../registro-modalidad/registro-modal
 })
 
 export class CatModalidaLaboralComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+  
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -86,11 +102,37 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
 
   }
 
@@ -228,6 +270,8 @@ export class CatModalidaLaboralComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    console.log('datossss: ',formData)
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
@@ -312,7 +356,7 @@ export class CatModalidaLaboralComponent implements OnInit {
       const data = {
         plantilla: this.listaModalidadCorrectas,
         user_name: this.user_name,
-        ip: this.ip
+        ip: this.ip, ip_local: this.ips_locales
       }
       this._ModalidaLaboral.SubirArchivoExcel(data).subscribe({
         next: (response: any) => {
@@ -450,25 +494,111 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-  ExportToExcel() {
-    this.OrdenarDatos(this.listaModalida_Laboral);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map((obj: any) => {
-      return {
-        ITEM: obj.id,
-        Modalidad_laboral: obj.descripcion,
+ 
+  async generarExcelModalidad() {
+    let datos: any[] = [];
+    let n: number = 1;
+
+    this.listaModalida_Laboral.map((obj: any) => {
+      datos.push([
+        n++,
+        obj.id,
+        obj.descripcion,
+      ])
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Modalidad Laboral");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:C1");
+    worksheet.mergeCells("B2:C2");
+    worksheet.mergeCells("B3:C3");
+    worksheet.mergeCells("B4:C4");
+    worksheet.mergeCells("B5:C5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Modalidad Laboral".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 20 },
+      { key: "codigo", width: 30 },
+      { key: "descripcion", width: 40 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "DESCRIPCION", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "RegimenTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: datos,
+    });
+
+
+    const numeroFilas = datos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 3; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
       }
-    }));
-    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.listaModalida_Laboral[0]); // NOMBRE DE CABECERAS DE COLUMNAS
-    var wscols: any = [];
-    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
-      wscols.push({ wpx: 100 })
     }
-    wsr["!cols"] = wscols;
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Modalidad laboral');
-    xlsx.writeFile(wb, "ModalidadLaboralEXCEL" + '.xlsx');
-    this.BuscarParametro();
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "ModalidadLaboralEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************* **
@@ -523,19 +653,30 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-  ExportToCVS() {
+  
+  ExportToCSV() {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map((obj: any) => {
-      return {
-        ITEM: obj.id,
-        MODALIDAD_LABORAL: obj.descripcion,
-      }
-    }));
-    const csvDataC = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "Modalidad_laboralCSV" + '.csv');
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Modalidad_laboralCSV');
+    worksheet.columns = [
+      { header: 'ITEM', key: 'n', width: 10 },
+      { header: 'MODALIDAD_LABORAL', key: 'modalidad', width: 30 },
+    ];
+
+    this.listaModalida_Laboral.map((obj: any) => {
+      worksheet.addRow({
+        n: obj.id,
+        modalidad: obj.descripcion,
+      }).commit();
+    });
+
+    workbook.csv.writeBuffer().then((buffer) => {
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "Modalidad_laboralCSV.csv");
+    });
     this.BuscarParametro();
   }
+
 
   /** ************************************************************************************************** **
    ** **                            METODO DE SELECCION MULTIPLE DE DATOS                             ** **
@@ -584,7 +725,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     const mensaje = 'eliminar';
     const data = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -611,38 +752,47 @@ export class CatModalidaLaboralComponent implements OnInit {
       });
   }
 
+
   // METODO DE ELIMINACION MULTIPLE DE DATOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip
-    }
-    this.ingresar = false;
-    this.contador = 0;
-    this.modalidadesEliminar = this.selectionModalidad.selected;
-    this.modalidadesEliminar.forEach((datos: any) => {
-      this.listaModalida_Laboral = this.listaModalida_Laboral.filter(item => item.id !== datos.id);
-      this.contador = this.contador + 1;
-      this._ModalidaLaboral.Eliminar(datos.id, data).subscribe((res: any) => {
-        if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+      ip: this.ip,
+      ip_local: this.ips_locales
+    };
+  
+    const peticiones = this.selectionModalidad.selected.map((datos: any) =>
+      this._ModalidaLaboral.Eliminar(datos.id, data).pipe(
+        map((res: any) => ({ success: res.message !== 'error', descripcion: datos.descripcion })),
+        catchError(() => of({ success: false, descripcion: datos.descripcion }))
+      )
+    );
+  
+    forkJoin(peticiones).subscribe(resultados => {
+      let eliminados = 0;
+  
+      resultados.forEach(resultado => {
+        if (resultado.success) {
+          eliminados++;
+        } else {
+          this.toastr.warning('Existen datos relacionados con ' + resultado.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
-        } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-              timeOut: 6000,
-            });
-            this.ingresar = true;
-          }
-          this.ngOnInit();
         }
       });
-    }
-    );
+  
+      if (eliminados > 0) {
+        this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
+          timeOut: 6000,
+        });
+      }
+  
+      this.modalidadesEliminar = [];
+      this.selectionModalidad.clear();
+      this.ngOnInit();
+    });
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE

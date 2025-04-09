@@ -5,11 +5,10 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
-
 
 class FeriadosControlador {
 
@@ -32,7 +31,7 @@ class FeriadosControlador {
     public async EliminarFeriado(req: Request, res: Response): Promise<any> {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -63,7 +62,8 @@ class FeriadosControlador {
                     accion: 'D',
                     datosOriginales: JSON.stringify(feriado),
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar feriado con id ${id}. Registro no encontrado.`
                 })
 
@@ -85,7 +85,8 @@ class FeriadosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(feriado),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -103,7 +104,7 @@ class FeriadosControlador {
     // METODO PARA CREAR REGISTRO DE FERIADO   **USADO
     public async CrearFeriados(req: Request, res: Response): Promise<Response> {
         try {
-            const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
+            const { fecha, descripcion, fec_recuperacion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -147,7 +148,8 @@ class FeriadosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(feriado),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -186,7 +188,7 @@ class FeriadosControlador {
     // METODO PARA ACTUALIZAR UN FERIADO   **USADO
     public async ActualizarFeriado(req: Request, res: Response): Promise<Response> {
         try {
-            const { fecha, descripcion, fec_recuperacion, id, user_name, ip } = req.body;
+            const { fecha, descripcion, fec_recuperacion, id, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -219,7 +221,8 @@ class FeriadosControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar feriado con id ${id}.`
                     })
 
@@ -260,7 +263,8 @@ class FeriadosControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(feriado),
                     datosNuevos: JSON.stringify(datosNuevos),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -322,7 +326,7 @@ class FeriadosControlador {
     public async FeriadosCiudadMultiplesEmpleados(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, ids } = req.body;
-         
+
             const FERIADO = await pool.query(
                 `
                 SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre, de.id
@@ -408,7 +412,8 @@ class FeriadosControlador {
         const documento = req.file?.originalname;
         let separador = path.sep;
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-        const workbook = excel.readFile(ruta);
+        const workbook = new Excel.Workbook();
+        await workbook.xlsx.readFile(ruta);
 
         let verificador_feriado: any = ObtenerIndicePlantilla(workbook, 'FERIADOS');
         let verificador_ciudad: any = ObtenerIndicePlantilla(workbook, 'CIUDAD_FERIADOS');
@@ -420,9 +425,10 @@ class FeriadosControlador {
             return res.jsonp({ message: 'no_existe_ciudad', data: undefined });
         }
         else if (verificador_feriado != false && verificador_ciudad != false) {
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_feriado]]);
-            const plantilla_feriafoCiudades = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_ciudad]]);
+
+            const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+            const plantilla = workbook.getWorksheet(sheet_name_list[verificador_feriado]);
+            const plantilla_feriafoCiudades = workbook.getWorksheet(sheet_name_list[verificador_ciudad]);
 
             let data: any = {
                 fila: '',
@@ -432,64 +438,94 @@ class FeriadosControlador {
                 observacion: ''
             };
 
-            var fecha_correcta: boolean = false;
             var fec_recuperacion_correcta: boolean = false;
-
             // PROCESO DE HOJA DE FERIADOS DE LA PLANTILLA FERIADOS.XLXS
             var listFeriados: any = [];
             var duplicados: any = [];
             var duplicados1: any = [];
             var fecha_igual: any = [];
             var mensaje: string = 'correcto';
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla.forEach(async (dato: any) => {
-                var { ITEM, FECHA, DESCRIPCION, FECHA_RECUPERACION } = dato;
 
-                if ((ITEM != undefined && ITEM != '') &&
-                    (FECHA != undefined) && (FECHA != '') &&
-                    (DESCRIPCION != undefined) && (DESCRIPCION != '') &&
-                    (FECHA_RECUPERACION != undefined) && (FECHA_RECUPERACION != '')) {
-                    data.fila = ITEM
-                    data.fecha = FECHA;
-                    data.descripcion = DESCRIPCION;
-                    data.fec_recuperacion = FECHA_RECUPERACION;
-                    data.observacion = 'no registrada'
-                    listFeriados.push(data);
+            if (plantilla) {
+                // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                const headerRow = plantilla.getRow(1);
+                const headers: any = {};
+                // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                headerRow.eachCell((cell: any, colNumber) => {
+                    headers[cell.value.toString().toUpperCase()] = colNumber;
+                });
+                // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                if (!headers['ITEM'] || !headers['FECHA'] || !headers['DESCRIPCION'] ||
+                    !headers['FECHA_RECUPERACION']
+                ) {
+                    return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                 }
-                else {
-                    data.fila = ITEM
-                    data.fecha = FECHA;
-                    data.descripcion = DESCRIPCION;
-                    data.fec_recuperacion = FECHA_RECUPERACION;
-                    data.observacion = 'no registrada'
+                plantilla.eachRow((row, rowNumber) => {
+                    // SALTAR LA FILA DE LAS CABECERAS
+                    if (rowNumber === 1) return;
+                    // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                    const ITEM = row.getCell(headers['ITEM']).value;
+                    const FECHA = row.getCell(headers['FECHA']).value?.toString();
+                    const DESCRIPCION = row.getCell(headers['DESCRIPCION']).value?.toString();
+                    const FECHA_RECUPERACION = row.getCell(headers['FECHA_RECUPERACION']).value?.toString();
 
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error'
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (FECHA != undefined) && (FECHA != '') &&
+                        (DESCRIPCION != undefined) && (DESCRIPCION != '') &&
+                        (FECHA_RECUPERACION != undefined) && (FECHA_RECUPERACION != '')) {
+                        data.fila = ITEM
+                        data.fecha = FECHA;
+                        data.descripcion = DESCRIPCION;
+                        data.fec_recuperacion = FECHA_RECUPERACION;
+                        data.observacion = 'no registrada'
+
+                         //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.fecha = data.fecha.trim();
+                        data.descripcion = data.descripcion.trim();
+                        data.fec_recuperacion = data.fec_recuperacion.trim();
+
+                        listFeriados.push(data);
                     }
+                    else {
+                        data.fila = ITEM
+                        data.fecha = FECHA;
+                        data.descripcion = DESCRIPCION;
+                        data.fec_recuperacion = FECHA_RECUPERACION;
+                        data.observacion = 'no registrada'
 
-                    if (data.fecha == undefined || data.descripcion == '') {
-                        data.fecha = 'No registrado';
-                        data.observacion = 'Fecha no registrada';
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
+
+                        if (data.fecha == undefined || data.descripcion == '') {
+                            data.fecha = 'No registrado';
+                            data.observacion = 'Fecha no registrada';
+                        }
+
+                        if (data.descripcion == undefined || data.descripcion == '') {
+                            data.descripcion = 'No registrado';
+                            data.observacion = 'Descripción no registrada';
+                        }
+
+                        if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
+                            data.observacion = 'Fecha y descripción no registrada';
+                        }
+
+                        if (data.fec_recuperacion == undefined) {
+                            data.fec_recuperacion = '-';
+                        }
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data.fecha = data.fecha.trim();
+                        data.descripcion = data.descripcion.trim();
+                        data.fec_recuperacion = data.fec_recuperacion.trim();
+
+                        listFeriados.push(data);
                     }
-
-                    if (data.descripcion == undefined || data.descripcion == '') {
-                        data.descripcion = 'No registrado';
-                        data.observacion = 'Descripción no registrada';
-                    }
-
-                    if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
-                        data.observacion = 'Fecha y descripción no registrada';
-                    }
-
-                    if (data.fec_recuperacion == undefined) {
-                        data.fec_recuperacion = '-';
-                    }
-                    listFeriados.push(data);
-                }
-                data = {};
-            });
-
+                    data = {};
+                });
+            }
 
             // PROCESO DE HOJA DE FERIADOSCIUDADES DE LA PLANTILLA FERIADOS.XLXS
             let data_fC: any = {
@@ -502,52 +538,85 @@ class FeriadosControlador {
 
             var listFeriados_ciudades: any = [];
             var duplicados_fc: any = [];
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla_feriafoCiudades.forEach(async (dato: any, indice: any, array: any) => {
-                var { ITEM, PROVINCIA, CIUDAD, FERIADO } = dato;
 
-                if ((ITEM != undefined && ITEM != '') &&
-                    (PROVINCIA != undefined) && (PROVINCIA != '') &&
-                    (CIUDAD != undefined) && (CIUDAD != '') &&
-                    (FERIADO != undefined) && (FERIADO != '')) {
-                    data_fC.fila = ITEM;
-                    data_fC.provincia = PROVINCIA;
-                    data_fC.ciudad = CIUDAD;
-                    data_fC.feriado = FERIADO;
-                    data_fC.observacion = 'registrado'
-                    listFeriados_ciudades.push(data_fC);
-
-                } else {
-                    data_fC.fila = ITEM;
-                    data_fC.provincia = PROVINCIA;
-                    data_fC.ciudad = CIUDAD;
-                    data_fC.feriado = FERIADO;
-                    data_fC.observacion = 'registrado'
-
-                    if (data_fC.fila == '' || data_fC.fila == undefined) {
-                        data_fC.fila = 'error';
-                        mensaje = 'error'
-                    }
-
-                    if (PROVINCIA == undefined) {
-                        data_fC.provincia = 'No registrado';
-                        data_fC.observacion = 'Provincia no registrado';
-                    }
-                    if (CIUDAD == undefined) {
-                        data_fC.ciudad = 'No registrado';
-                        data_fC.observacion = 'Ciudad no registrado';
-                    }
-                    if (FERIADO == undefined) {
-                        data_fC.feriado = 'No registrado';
-                        data_fC.observacion = 'Feriado no registrado';
-                    }
-
-                    listFeriados_ciudades.push(data_fC);
+            if (plantilla_feriafoCiudades) {
+                // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                const headerRow = plantilla_feriafoCiudades.getRow(1);
+                const headers: any = {};
+                // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                headerRow.eachCell((cell: any, colNumber) => {
+                    headers[cell.value.toString().toUpperCase()] = colNumber;
+                });
+                // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                if (!headers['ITEM'] || !headers['PROVINCIA'] || !headers['CIUDAD'] ||
+                    !headers['FERIADO']
+                ) {
+                    return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                 }
 
-                data_fC = {}
-            });
+                plantilla_feriafoCiudades.eachRow((row, rowNumber) => {
+                    // SALTAR LA FILA DE LAS CABECERAS
+                    if (rowNumber === 1) return;
+                    // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                    const ITEM = row.getCell(headers['ITEM']).value;
+                    const PROVINCIA = row.getCell(headers['PROVINCIA']).value?.toString();
+                    const CIUDAD = row.getCell(headers['CIUDAD']).value?.toString();
+                    const FERIADO = row.getCell(headers['FERIADO']).value?.toString();
 
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (PROVINCIA != undefined) && (PROVINCIA != '') &&
+                        (CIUDAD != undefined) && (CIUDAD != '') &&
+                        (FERIADO != undefined) && (FERIADO != '')) {
+                        data_fC.fila = ITEM;
+                        data_fC.provincia = PROVINCIA;
+                        data_fC.ciudad = CIUDAD;
+                        data_fC.feriado = FERIADO;
+                        data_fC.observacion = 'registrado'
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data_fC.provincia = data_fC.provincia.trim();
+                        data_fC.ciudad = data_fC.ciudad.trim();
+                        data_fC.feriado = data_fC.feriado.trim();
+
+
+                        listFeriados_ciudades.push(data_fC);
+
+                    } else {
+                        data_fC.fila = ITEM;
+                        data_fC.provincia = PROVINCIA;
+                        data_fC.ciudad = CIUDAD;
+                        data_fC.feriado = FERIADO;
+                        data_fC.observacion = 'registrado'
+
+                        if (data_fC.fila == '' || data_fC.fila == undefined) {
+                            data_fC.fila = 'error';
+                            mensaje = 'error'
+                        }
+
+                        if (PROVINCIA == undefined) {
+                            data_fC.provincia = 'No registrado';
+                            data_fC.observacion = 'Provincia no registrado';
+                        }
+                        if (CIUDAD == undefined) {
+                            data_fC.ciudad = 'No registrado';
+                            data_fC.observacion = 'Ciudad no registrado';
+                        }
+                        if (FERIADO == undefined) {
+                            data_fC.feriado = 'No registrado';
+                            data_fC.observacion = 'Feriado no registrado';
+                        }
+
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        data_fC.provincia = data_fC.provincia.trim();
+                        data_fC.ciudad = data_fC.ciudad.trim();
+                        data_fC.feriado = data_fC.feriado.trim();
+
+                        listFeriados_ciudades.push(data_fC);
+                    }
+
+                    data_fC = {}
+                });
+            }
 
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -825,7 +894,7 @@ class FeriadosControlador {
 
     // METODO PARA REGISTRAR DATOS DE FERIADOS DE PLANTILLA   **USADO
     public async RegistrarFeriado(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body
+        const { plantilla, user_name, ip, ip_local } = req.body
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -860,7 +929,8 @@ class FeriadosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(feriado),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -883,7 +953,7 @@ class FeriadosControlador {
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     public async RegistrarFeriado_Ciudad(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body
+        const { plantilla, user_name, ip, ip_local } = req.body
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -921,7 +991,8 @@ class FeriadosControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(ciudad_feria),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

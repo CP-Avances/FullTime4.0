@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 
@@ -32,6 +31,8 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 })
 
 export class ListarTipoComidasComponent implements OnInit {
+
+  ips_locales: any = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
@@ -96,6 +97,9 @@ export class ListarTipoComidasComponent implements OnInit {
     else {
       this.user_name = localStorage.getItem('usuario');
       this.ip = localStorage.getItem('ip');
+      this.validar.ObtenerIPsLocales().then((ips) => {
+        this.ips_locales = ips;
+      });
 
       this.ObtenerEmpleados(this.idEmpleado);
       this.BuscarHora();
@@ -219,7 +223,7 @@ export class ListarTipoComidasComponent implements OnInit {
   Eliminar(id_tipo: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip, ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_tipo, datos).subscribe((res: any) => {
 
@@ -262,7 +266,7 @@ export class ListarTipoComidasComponent implements OnInit {
    ** ********************************************************************************************** **/
 
 
-   async GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -382,6 +386,7 @@ export class ListarTipoComidasComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   ExportToExcel() {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'ServiciosAlimentacion');
@@ -407,16 +412,20 @@ export class ListarTipoComidasComponent implements OnInit {
     });
 
     return datos;
+    */
   }
 
   /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
   ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
+    /*
+    const wse: xlsx.Wor
+    kSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "ServiciosAlimentacionCSV" + '.csv');
+    */
   }
 
   EstructurarDatosCSV() {

@@ -27,11 +27,6 @@ class ProvinciaRutas {
         this.router.get('/buscar/:id', TokenValidation, PROVINCIA_CONTROLADOR.ObtenerProvincia);
         // METODO PARA BUSCAR DATOS DE UN PAIS     *USADO
         this.router.get('/buscar/pais/:id', TokenValidation, PROVINCIA_CONTROLADOR.ObtenerPais);
-
-
-
-
-
     }
 }
 

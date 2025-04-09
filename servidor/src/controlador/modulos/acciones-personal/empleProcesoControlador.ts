@@ -1,28 +1,22 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
-import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 class EmpleadoProcesoControlador {
 
   public async CrearEmpleProcesos(req: Request, res: Response): Promise<void> {
     try {
-      const { id, id_empleado, id_empl_cargo, fec_inicio, fec_final, user_name, ip } = req.body;
+      const { id, id_empleado, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       await pool.query(
         `
-        INSERT INTO map_empleado_procesos (id_proceso, id_empleado, id_empleado_cargo, fecha_inicio, fecha_final) 
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO map_empleado_procesos (id_proceso, id_empleado) 
+        VALUES ($1, $2)
         `
-        , [id, id_empleado, id_empl_cargo, fec_inicio, fec_final])
-
-
-      var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
-      var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');;
-
+        , [id, id_empleado])
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -30,8 +24,9 @@ class EmpleadoProcesoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
-        ip,
+        datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}}`,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -49,7 +44,7 @@ class EmpleadoProcesoControlador {
 
   public async ActualizarProcesoEmpleado(req: Request, res: Response): Promise<Response> {
     try {
-      const { id, id_empleado_cargo, fec_inicio, fec_final, id_proceso, user_name, ip } = req.body;
+      const { id, id_proceso, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -65,7 +60,8 @@ class EmpleadoProcesoControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar proceso con id: ${id}`
         });
 
@@ -76,22 +72,10 @@ class EmpleadoProcesoControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE map_empleado_procesos SET id_proceso = $5, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
+        UPDATE map_empleado_procesos SET id_proceso = $2 
         WHERE id = $1 RETURNING *
         `
-        , [id, id_empleado_cargo, fec_inicio, fec_final, id_proceso]);
-
-      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
-      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
-
-      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-
-      datosOriginales.fecha_inicio = fechaInicioO;
-      datosOriginales.fecha_final = fechaFinalO;
-
-      datosNuevos.rows[0].fecha_inicio = fechaInicioN;
-      datosNuevos.rows[0].fecha_final = fechaFinalN;
+        , [id, id_proceso]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -100,7 +84,8 @@ class EmpleadoProcesoControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -118,24 +103,28 @@ class EmpleadoProcesoControlador {
   // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
   public async BuscarProcesoUsuario(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
-    const HORARIO_CARGO = await pool.query(
+
+    console.log('req.params: ',req.params)
+
+    const EMPLEADO_PROCESOS = await pool.query(
       `
-      SELECT ep.id, ep.id_proceso, ep.id_empleado_cargo, ep.fecha_inicio, ep.fecha_final, cp.nombre AS proceso 
+      SELECT ep.id, ep.id_proceso, ep.estado, cp.nombre AS proceso 
       FROM map_empleado_procesos AS ep, map_cat_procesos AS cp 
       WHERE ep.id_empleado = $1 AND ep.id_proceso = cp.id
       `
       , [id_empleado]);
-    if (HORARIO_CARGO.rowCount != 0) {
-      return res.jsonp(HORARIO_CARGO.rows)
+    if (EMPLEADO_PROCESOS.rowCount != 0) {
+      return res.status(200).jsonp({procesos: EMPLEADO_PROCESOS.rows, text: 'correcto', status: 200})
     }
-    res.status(404).jsonp({ text: 'Registro no encontrado.' });
+
+    res.status(404).jsonp({Procesos: undefined, text: 'Registro no encontrado.', status: 400 });
   }
 
 
 
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -152,7 +141,8 @@ class EmpleadoProcesoControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar proceso con id: ${id}`
         });
 
@@ -165,11 +155,6 @@ class EmpleadoProcesoControlador {
         `
         DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
-      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-
-      datosOriginales.fecha_inicio = fechaInicioO;
-      datosOriginales.fecha_final = fechaFinalO;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -178,13 +163,14 @@ class EmpleadoProcesoControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      return res.jsonp({ message: 'Registro eliminado.' });
+      return res.status(200).jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

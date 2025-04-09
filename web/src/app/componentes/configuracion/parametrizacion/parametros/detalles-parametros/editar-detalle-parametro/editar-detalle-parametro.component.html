@@ -12,9 +12,19 @@
                 <span> {{nota}} <br> {{especificacion}} </span>
             </div>
             <div class="d-flex flex-wrap justify-content-center">
-                <mat-form-field>
+                <mat-form-field *ngIf="texto">
                     <mat-label>Detalle</mat-label>
                     <input matInput [formControl]="descripcion" required>
+                </mat-form-field>
+
+                <mat-form-field *ngIf="hora">
+                    <mat-label>Detalle</mat-label>
+                    <input matInput type="tel" [formControl]="descripcion"  min="1" max="24">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="numeros">
+                    <mat-label>Detalle</mat-label>
+                    <input matInput type="tel" [formControl]="descripcion"  min="1">
                 </mat-form-field>
             </div>
         </div>

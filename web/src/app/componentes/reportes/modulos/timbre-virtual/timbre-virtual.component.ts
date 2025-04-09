@@ -5,8 +5,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
-
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 // IMPORTAR MODELOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -26,6 +26,17 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class TimbreVirtualComponent implements OnInit, OnDestroy {
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
 
@@ -105,6 +116,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
 
   constructor(
     private reporteService: ReportesService,
@@ -128,6 +140,28 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy() {
@@ -282,7 +316,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     this.R_asistencias.ReporteTimbreRelojVirtual(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.ExportarExcel(); break;
+        case 'excel': this.generarExcel(); break;
         case 'ver': this.VerDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -599,23 +633,16 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
-    xlsx.writeFile(wb, `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
-
-  }
-
-  EstructurarDatosExcel(array: Array<any>) {
-    let nuevo: Array<any> = [];
+ 
+  async generarExcel() {
+    let datos: any[] = [];
+    let n: number = 1;
     let accionT = '';
-    let n = 0;
-    array.forEach((data: any) => {
+
+    this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
           n++;
-          let ele: any;
           let servidor_fecha: any = '';
           let servidor_hora = '';
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
@@ -636,38 +663,273 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             case 'HA': accionT = 'Timbre libre'; break;
             default: accionT = 'Desconocido'; break;
           }
-          // OBJETO BASE COMUN PARA AMBAS RAMAS DEL IF-ELSE
-          ele = {
-            'N°': n,
-            'Cédula': usu.cedula,
-            'Código': usu.codigo,
-            'Nombre Empleado': `${usu.apellido} ${usu.nombre}`,
-            'Ciudad': usu.ciudad,
-            'Sucursal': usu.sucursal,
-            'Régimen': usu.regimen,
-            'Departamento': usu.departamento,
-            'Cargo': usu.cargo,
-            'Fecha Timbre': servidor_fecha,
-            'Hora Timbre': servidor_hora,
-            'Reloj': t.id_reloj,
-            'Acción': accionT,
-            'Observación': t.observacion,
-            'Latitud': t.latitud,
-            'Longitud': t.longitud
-          };
-          // AÑADIR PROPIEDADES ADICIONALES SI this.timbreDispositivo ES TRUE
+
           if (this.timbreDispositivo) {
-            Object.assign(ele, {
-              'Fecha Timbre Dispositivo': new Date(t.fecha_hora_timbre),
-              'Hora Timbre Dispositivo': horaTimbre
-            });
+            datos.push([
+              n++,
+              usu.cedula,
+              usu.codigo,
+              `${usu.apellido} ${usu.nombre}`,
+              usu.ciudad,
+              usu.sucursal,
+              usu.regimen,
+              usu.departamento,
+              usu.cargo,
+              servidor_fecha,
+              servidor_hora,
+              t.id_reloj,
+              accionT,
+              t.observacion,
+              t.latitud,
+              t.longitud,
+              new Date(t.fecha_hora_timbre),
+              horaTimbre
+            ])
+          } else {
+            datos.push([
+              n++,
+              usu.cedula,
+              usu.codigo,
+              `${usu.apellido} ${usu.nombre}`,
+              usu.ciudad,
+              usu.sucursal,
+              usu.regimen,
+              usu.departamento,
+              usu.cargo,
+              servidor_fecha,
+              servidor_hora,
+              t.id_reloj,
+              accionT,
+              t.observacion,
+              t.latitud,
+              t.longitud
+            ])
           }
-          // AGREGAR EL OBJETO AL ARRAY NUEVO
-          nuevo.push(ele);
-        })
+
+        });
       })
-    })
-    return nuevo;
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Timbres Virtuales Movil");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+
+
+    if (this.timbreDispositivo) {
+      worksheet.mergeCells("B1:R1");
+      worksheet.mergeCells("B2:R2");
+      worksheet.mergeCells("B3:R3");
+      worksheet.mergeCells("B4:R4");
+      worksheet.mergeCells("B5:R5");
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+      worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
+      worksheet.getCell(
+        "B3"
+      ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
+  
+      worksheet.columns = [
+        { key: "n", width: 10 },
+        { key: "cedula", width: 20 },
+        { key: "codigo", width: 20 },
+        { key: "apenombre", width: 20 },
+        { key: "ciudad", width: 20 },
+        { key: "sucursal", width: 20 },
+        { key: "regimen", width: 20 },
+        { key: "departamento", width: 20 },
+        { key: "cargo", width: 20 },
+        { key: "servidor_fecha", width: 20 },
+        { key: "servidor_hora", width: 20 },
+        { key: "id_reloj", width: 20 },
+        { key: "accionT", width: 20 },
+        { key: "observacion", width: 20 },
+        { key: "latitud", width: 20 },
+        { key: "longitud", width: 20 },
+        { key: "fecha_timbre_dispositivo", width: 40 },
+        { key: "hora_timbre_dispositivo", width: 40 },
+      ]
+  
+      const columnas = [
+        { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+        { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+        { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+        { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+        { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+        { name: "CARGO", totalsRowLabel: "", filterButton: true },
+        { name: "SERVIDOR FECHA", totalsRowLabel: "", filterButton: true },
+        { name: "SERVIDOR HORA", totalsRowLabel: "", filterButton: true },
+        { name: "ID RELOJ", totalsRowLabel: "", filterButton: true },
+        { name: "ACCIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "OBSERVACIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "LATITUD", totalsRowLabel: "", filterButton: true },
+        { name: "LONGITUD", totalsRowLabel: "", filterButton: true },
+        { name: "FECHA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+        { name: "HORA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
+      ]
+  
+      worksheet.addTable({
+        name: "TimbresMovilReporteTabla",
+        ref: "A6",
+        headerRow: true,
+        totalsRow: false,
+        style: {
+          theme: "TableStyleMedium16",
+          showRowStripes: true,
+        },
+        columns: columnas,
+        rows: datos,
+      });
+  
+      const numeroFilas = datos.length;
+      for (let i = 0; i <= numeroFilas; i++) {
+        for (let j = 1; j <= 18; j++) {
+          const cell = worksheet.getRow(i + 6).getCell(j);
+          if (i === 0) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else {
+            cell.alignment = {
+              vertical: "middle",
+              horizontal: this.obtenerAlineacionHorizontal(j),
+            };
+          }
+          cell.border = this.bordeCompleto;
+        }
+      }
+
+    }else{
+      worksheet.mergeCells("B1:P1");
+      worksheet.mergeCells("B2:P2");
+      worksheet.mergeCells("B3:P3");
+      worksheet.mergeCells("B4:P4");
+      worksheet.mergeCells("B5:P5");
+  
+      // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+      worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
+      worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
+      worksheet.getCell(
+        "B3"
+      ).value = `Periodo del reporte: ${this.rangoFechas.fec_inico} al ${this.rangoFechas.fec_final}`;
+      // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+      ["B1", "B2", "B3"].forEach((cell) => {
+        worksheet.getCell(cell).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = { bold: true, size: 14 };
+      });
+  
+
+      worksheet.columns = [
+        { key: "n", width: 10 },
+        { key: "cedula", width: 20 },
+        { key: "codigo", width: 20 },
+        { key: "apenombre", width: 20 },
+        { key: "ciudad", width: 20 },
+        { key: "sucursal", width: 20 },
+        { key: "regimen", width: 20 },
+        { key: "departamento", width: 20 },
+        { key: "cargo", width: 20 },
+        { key: "servidor_fecha", width: 20 },
+        { key: "servidor_hora", width: 20 },
+        { key: "id_reloj", width: 20 },
+        { key: "accionT", width: 20 },
+        { key: "observacion", width: 20 },
+        { key: "latitud", width: 20 },
+        { key: "longitud", width: 20 },
+      ]
+  
+      const columnas = [
+        { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+        { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
+        { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+        { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+        { name: "RÉGIMEN", totalsRowLabel: "", filterButton: true },
+        { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+        { name: "CARGO", totalsRowLabel: "", filterButton: true },
+        { name: "SERVIDOR FECHA", totalsRowLabel: "", filterButton: true },
+        { name: "SERVIDOR HORA", totalsRowLabel: "", filterButton: true },
+        { name: "ID RELOJ", totalsRowLabel: "", filterButton: true },
+        { name: "ACCIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "OBSERVACIÓN", totalsRowLabel: "", filterButton: true },
+        { name: "LATITUD", totalsRowLabel: "", filterButton: true },
+        { name: "LONGITUD", totalsRowLabel: "", filterButton: true },
+      ]
+  
+      worksheet.addTable({
+        name: "TimbresMovilReporteTabla",
+        ref: "A6",
+        headerRow: true,
+        totalsRow: false,
+        style: {
+          theme: "TableStyleMedium16",
+          showRowStripes: true,
+        },
+        columns: columnas,
+        rows: datos,
+      });
+  
+      const numeroFilas = datos.length;
+      for (let i = 0; i <= numeroFilas; i++) {
+        for (let j = 1; j <= 16; j++) {
+          const cell = worksheet.getRow(i + 6).getCell(j);
+          if (i === 0) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else {
+            cell.alignment = {
+              vertical: "middle",
+              horizontal: this.obtenerAlineacionHorizontal(j),
+            };
+          }
+          cell.border = this.bordeCompleto;
+        }
+      }
+
+    }
+    
+
+ 
+
+    worksheet.getRow(6).font = this.fontTitulo;
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **
@@ -707,7 +969,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             n: n,
             cedula: usu.cedula,
             codigo: usu.codigo,
-            empleado: usu.apellido + ' ' + usu.apellido.nombre,
+            empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,
             departamento: usu.departamento,

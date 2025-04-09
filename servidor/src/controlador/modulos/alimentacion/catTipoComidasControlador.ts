@@ -87,7 +87,7 @@ class TipoComidasControlador {
 
   public async CrearTipoComidas(req: Request, res: Response) {
     try {
-      const { nombre, tipo_comida, hora_inicio, hora_fin, user_name, ip } = req.body;
+      const { nombre, tipo_comida, hora_inicio, hora_fin, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -111,7 +111,8 @@ class TipoComidasControlador {
         accion: "I",
         datosOriginales: "",
         datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -132,7 +133,7 @@ class TipoComidasControlador {
 
   public async ActualizarComida(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, tipo_comida, hora_inicio, hora_fin, id, user_name, ip } = req.body;
+      const { nombre, tipo_comida, hora_inicio, hora_fin, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -150,7 +151,8 @@ class TipoComidasControlador {
           accion: "U",
           datosOriginales: "",
           datosNuevos: "",
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`,
         });
 
@@ -183,7 +185,8 @@ class TipoComidasControlador {
         accion: "U",
         datosOriginales: `{nombre: ${datos.nombre}, id_comida: ${datos.id_comida}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}}`,
         datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -200,7 +203,7 @@ class TipoComidasControlador {
 
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -218,7 +221,8 @@ class TipoComidasControlador {
           accion: "D",
           datosOriginales: "",
           datosNuevos: "",
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
         });
 
@@ -244,7 +248,8 @@ class TipoComidasControlador {
         accion: "D",
         datosOriginales: `{nombre: ${datos.nombre}, id_comida: ${datos.id_comida}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}}`,
         datosNuevos: "",
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -262,7 +267,7 @@ class TipoComidasControlador {
   // Registro de detalle de menú - desglose de platos
   public async CrearDetalleMenu(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, valor, observacion, id_menu, user_name, ip } = req.body;
+      const { nombre, valor, observacion, id_menu, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -283,7 +288,8 @@ class TipoComidasControlador {
         accion: "I",
         datosOriginales: "",
         datosNuevos: `{nombre: ${nombre}, valor: ${valor}, observacion: ${observacion}, id_menu: ${id_menu}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -321,7 +327,7 @@ class TipoComidasControlador {
     res: Response
   ): Promise<Response> {
     try {
-      const { nombre, valor, observacion, id, user_name, ip } = req.body;
+      const { nombre, valor, observacion, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
@@ -341,7 +347,8 @@ class TipoComidasControlador {
           accion: "U",
           datosOriginales: "",
           datosNuevos: "",
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`,
         });
 
@@ -365,7 +372,8 @@ class TipoComidasControlador {
         accion: "U",
         datosOriginales: JSON.stringify(datos),
         datosNuevos: `{nombre: ${nombre}, valor: ${valor}, observacion: ${observacion}}`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 
@@ -381,7 +389,7 @@ class TipoComidasControlador {
 
   public async EliminarDetalle(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -402,7 +410,8 @@ class TipoComidasControlador {
           accion: "D",
           datosOriginales: "",
           datosNuevos: "",
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id ${id}`,
         });
 
@@ -424,7 +433,8 @@ class TipoComidasControlador {
         accion: "D",
         datosOriginales: JSON.stringify(datos),
         datosNuevos: "",
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null,
       });
 

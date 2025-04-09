@@ -1,0 +1,49 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR GRUPO OCUPACIONAL
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
+</div>
+<div style="text-align: center">
+    <form [formGroup]="formulario">
+        <mat-card-content>
+            <div class="container">
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                        botón Guardar.
+                    </span>
+                </div>
+                <mat-form-field>
+                    <mat-label>Grupo Ocupacional</mat-label>
+                    <input matInput placeholder="Ej: Emergencia" [formControl]="grupo"
+                         required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingresar el grupo ocupacional.">
+                        help_outline</mat-icon>
+                </mat-form-field>
+                <br />
+                <mat-form-field>
+                    <mat-label>Número de partida</mat-label>
+                    <input matInput placeholder="Ej: 1253225632" [formControl]="numero_partida"
+                        required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingresar el número de partida.">
+                        help_outline</mat-icon>
+                    <mat-error *ngIf="numero_partida.invalid">{{ObtenerMensajeErrorNumero()}}</mat-error>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarGrupo(formulario.value)"
+            [disabled]="!formulario.valid">Guardar</button>
+    </div>
+</div>

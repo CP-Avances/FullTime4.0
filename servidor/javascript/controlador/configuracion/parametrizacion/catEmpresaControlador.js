@@ -17,10 +17,10 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const luxon_1 = require("luxon");
+const sharp_1 = __importDefault(require("sharp"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
 const fs_1 = __importDefault(require("fs"));
-const sharp = require('sharp');
 class EmpresaControlador {
     // BUSCAR DATOS DE EMPRESA PARA RECUPERAR CUENTA
     BuscarCadena(req, res) {
@@ -63,7 +63,7 @@ class EmpresaControlador {
     ActualizarLogoEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
-            sharp.cache(false);
+            sharp_1.default.cache(false);
             // FECHA DEL SISTEMA
             const fecha = luxon_1.DateTime.now();
             const anio = fecha.toFormat('yyyy');
@@ -78,7 +78,7 @@ class EmpresaControlador {
             let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
             let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
             if (comprimir != false) {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 // CONSULTAR SI EXISTE UNA IMAGEN
                 const logo_name = yield database_1.default.query(`
                 SELECT nombre, logo FROM e_empresa WHERE id = $1
@@ -90,7 +90,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar logo de empresa con id: ${id}`
                     });
                     res.status(404).jsonp({ message: 'error' });
@@ -120,7 +121,8 @@ class EmpresaControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(obj),
                             datosNuevos: `{"logo": "${logo}"}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -160,7 +162,7 @@ class EmpresaControlador {
     ActualizarEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento, dias_cambio, cambios, num_partida, id, user_name, ip } = req.body;
+                const { nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento, dias_cambio, cambios, num_partida, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -174,7 +176,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar datos de empresa con id: ${id}`
                     });
                     yield database_1.default.query('COMMIT');
@@ -193,7 +196,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -211,7 +215,7 @@ class EmpresaControlador {
     ActualizarColores(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { color_p, color_s, id, user_name, ip } = req.body;
+                const { color_p, color_s, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -225,7 +229,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar colores de empresa con id: ${id}`
                     });
                     yield database_1.default.query('COMMIT');
@@ -241,7 +246,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                     datosNuevos: `{"color_principal": "${color_p}", "color_secundario": "${color_s}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -259,7 +265,7 @@ class EmpresaControlador {
     ActualizarMarcaAgua(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { marca_agua, id, user_name, ip } = req.body;
+                const { marca_agua, id, user_name, ip, ip_local } = req.body;
                 // INICAIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -273,7 +279,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar marca de agua de empresa con id: ${id}. Registro no encontrado.`
                     });
                     yield database_1.default.query('COMMIT');
@@ -289,7 +296,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                     datosNuevos: `{"marca_agua": "${marca_agua}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -307,7 +315,7 @@ class EmpresaControlador {
     ActualizarSeguridad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { seg_contrasena, seg_frase, seg_ninguna, id, user_name, ip } = req.body;
+                const { seg_contrasena, seg_frase, seg_ninguna, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -321,7 +329,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar niveles de seguridad de empresa con id: ${id}. Registro no encontrado.`
                     });
                     yield database_1.default.query('COMMIT');
@@ -338,7 +347,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                     datosNuevos: `{"seguridad_contrasena": "${seg_contrasena}", "seguridad_frase": "${seg_frase}", "seguridad_ninguna": "${seg_ninguna}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -356,7 +366,7 @@ class EmpresaControlador {
     ActualizarCabeceraCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
-            sharp.cache(false);
+            sharp_1.default.cache(false);
             const fecha = luxon_1.DateTime.now();
             const anio = fecha.toFormat('yyyy');
             const mes = fecha.toFormat('MM');
@@ -370,7 +380,7 @@ class EmpresaControlador {
             let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
             let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
             if (comprimir != false) {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const logo_name = yield database_1.default.query(`
             SELECT cabecera_firma FROM e_empresa WHERE id = $1
             `, [id]);
@@ -381,7 +391,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar cabecera de correo de empresa con id: ${id}`
                     });
                     res.status(404).jsonp({ message: 'error' });
@@ -402,8 +413,8 @@ class EmpresaControlador {
                         yield database_1.default.query('BEGIN');
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         yield database_1.default.query(`
-                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
-                    `, [id, logo]);
+                        UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
+                        `, [id, logo]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'e_empresa',
@@ -411,7 +422,8 @@ class EmpresaControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(obj),
                             datosNuevos: `{"cabecera_firma": "${logo}"}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -456,7 +468,7 @@ class EmpresaControlador {
     ActualizarPieCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
-            sharp.cache(false);
+            sharp_1.default.cache(false);
             // FECHA DEL SISTEMA
             const fecha = luxon_1.DateTime.now();
             const anio = fecha.toFormat('yyyy');
@@ -471,7 +483,7 @@ class EmpresaControlador {
             let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
             let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
             if (comprimir != false) {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const logo_name = yield database_1.default.query(`
             SELECT pie_firma FROM e_empresa WHERE id = $1
             `, [id]);
@@ -482,7 +494,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
                     });
                     res.status(404).jsonp({ message: 'error' });
@@ -512,7 +525,8 @@ class EmpresaControlador {
                             accion: 'U',
                             datosOriginales: JSON.stringify(obj),
                             datosNuevos: `{"pie_firma": "${logo}"}`,
-                            ip,
+                            ip: ip,
+                            ip_local: ip_local,
                             observacion: null
                         });
                         // FINALIZAR TRANSACCION
@@ -558,7 +572,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id_empresa;
-                const { correo, password_correo, servidor, puerto, user_name, ip } = req.body;
+                const { correo, password_correo, servidor, puerto, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
@@ -572,7 +586,8 @@ class EmpresaControlador {
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip,
+                        ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al actualizar datos de correo de empresa con id: ${id}. Registro no encontrado.`
                     });
                     yield database_1.default.query('COMMIT');
@@ -589,7 +604,8 @@ class EmpresaControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales.rows[0]),
                     datosNuevos: `{"correo": "${correo}", "password_correo": "${password_correo}", "servidor": "${servidor}", "puerto": "${puerto}"}`,
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -600,57 +616,6 @@ class EmpresaControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // METODO PARA ACTUALIZAR USO DE ACCIONES
-    ActualizarAccionesTimbres(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id, bool_acciones, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ORIGINALES
-                const datosOriginales = yield database_1.default.query(`
-                SELECT acciones_timbres FROM e_empresa WHERE id = $1
-                `, [id]);
-                if (datosOriginales.rows.length === 0) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'e_empresa',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar acciones de empresa con id: ${id}. Registro no encontrado.`
-                    });
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'error' });
-                }
-                yield database_1.default.query(`
-                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
-                `, [bool_acciones, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                    datosNuevos: `{"acciones_timbres": "${bool_acciones}"}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({
-                    message: 'Empresa actualizada exitosamente.',
-                    title: 'Ingrese nuevamente al sistema.'
-                });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ error });
             }
         });
     }

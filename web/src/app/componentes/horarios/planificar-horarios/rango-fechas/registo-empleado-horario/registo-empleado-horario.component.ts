@@ -27,6 +27,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistoEmpleadoHorarioComponent implements OnInit {
+  ips_locales: any = '';
 
   @Input() data_horario: any;
 
@@ -89,7 +90,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     this.BuscarHorarios();
     this.ObtenerEmpleado(this.data_horario.idEmpleado);
@@ -453,7 +457,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     this.lista_descanso.forEach((obj: any) => {
@@ -497,7 +501,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
@@ -804,7 +808,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     // CONTABILIZAR CUANTOS HORARIOS TIENE EL USUARIO
@@ -951,7 +955,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     existe.forEach((h: any) => {
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {

@@ -26,7 +26,9 @@
               "ts-md5/dist/md5",
               "xml2js",
               "src/assets/build/pdfmake.js",
-              "src/assets/build/vfs_fonts.js"
+              "src/assets/build/vfs_fonts.js",
+              "exceljs",
+              "crypto-js"
             ],
             "outputPath": "dist/fulltimeweb",
             "index": "src/index.html",

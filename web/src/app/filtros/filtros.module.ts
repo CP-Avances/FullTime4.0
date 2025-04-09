@@ -24,9 +24,16 @@ import { ModulosPipe } from './modulos/modulos.pipe';
 import { RolesPipe } from './roles/roles.pipe';
 import { PadrePipe } from './filtroProcesoPadre/padre.pipe';
 import { TipoPipe } from './tipoServicio/tipo.pipe';
+import { FiltrosGrupoPipe } from './filtrosGrupo/filtros-grupo.pipe';
+import { FiltrosGradoPipe } from './fitroGrado/filtros-grado.pipe';
+
 // PIPE PAGINACION
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { FiltroGeneroPipe } from './filtroGenero/filtro-genero.pipe';
+import { FiltroEstadoCivilPipe } from './filtroEstadoCivil/filtro-estado-civil.pipe';
+import { FiltroNacionalidadPipe } from './filtroNacionalidad/filtro-nacionalidad.pipe';
+
 
 @NgModule({
   declarations: [
@@ -55,6 +62,11 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
     RolesPipe,
     PadrePipe,
     TipoPipe,
+    FiltroGeneroPipe,
+    FiltroEstadoCivilPipe,
+    FiltroNacionalidadPipe,
+    FiltrosGrupoPipe,
+    FiltrosGradoPipe
   ],
   exports: [
     OrdenarAsignacionesPipe,
@@ -83,6 +95,11 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
     RolesPipe,
     PadrePipe,
     TipoPipe,
+    FiltroGeneroPipe,
+    FiltroEstadoCivilPipe,
+    FiltroNacionalidadPipe,
+    FiltrosGrupoPipe,
+    FiltrosGradoPipe
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

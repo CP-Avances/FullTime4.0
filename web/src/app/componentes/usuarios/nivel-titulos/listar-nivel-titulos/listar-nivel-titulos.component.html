@@ -21,7 +21,7 @@
         <!--  ********************************  REGISTRO MULTIPLE DE NIVELES  *******************************  -->
         <div class="col-12 col-md-6">
             <div id="titulo">
-                <span>REGISTRO MULTIPLE</span>
+                <span>REGISTRO MÚLTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row" *ngIf="getPlantilla()">
@@ -59,7 +59,7 @@
                         <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                             <button *ngIf="DataNivelesProfesionales && messajeExcel != 'error'" id="descargar"
                                 class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
-                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
                                 Registrar
                             </button>
                         </div>
@@ -157,11 +157,11 @@
                     matTooltipPosition="right" matTooltip="Descargar Lista de Niveles de Títulos en formato PDF.">
                     <p>PDF</p>
                 </i>
-                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                <i (click)="generarExcelNivelesTitulos()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Niveles de Títulos en formato EXCEL.">
                     <p>XLSL</p>
                 </i>
-                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
                     <p>CSV</p>
                 </i>
@@ -190,7 +190,7 @@
     *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">
-            REGISTRO MULTIPLE
+            REGISTRO MÚLTIPLE
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm ">

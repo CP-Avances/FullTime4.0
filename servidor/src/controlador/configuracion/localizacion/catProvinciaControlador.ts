@@ -72,7 +72,7 @@ class ProvinciaControlador {
   // METODO PARA ELIMINAR REGISTROS  **USADO
   public async EliminarProvincia(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -91,6 +91,7 @@ class ProvinciaControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -113,6 +114,7 @@ class ProvinciaControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -131,7 +133,7 @@ class ProvinciaControlador {
   // METODO PARA REGISTRAR PROVINCIA   **USADO
   public async CrearProvincia(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, id_pais, user_name, ip } = req.body;
+      const { nombre, id_pais, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -150,6 +152,7 @@ class ProvinciaControlador {
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 

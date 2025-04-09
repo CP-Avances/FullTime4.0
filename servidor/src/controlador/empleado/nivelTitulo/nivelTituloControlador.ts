@@ -5,7 +5,7 @@ import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 
 import pool from '../../../database';
-import excel from 'xlsx';
+import Excel from 'exceljs'
 import path from 'path';
 import fs from 'fs';
 
@@ -29,7 +29,7 @@ class NivelTituloControlador {
   // METODO PARA ELIMINAR REGISTROS   **USADO
   public async EliminarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -46,7 +46,8 @@ class NivelTituloControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id ${id}. No existe el registro en la base de datos.`
         });
 
@@ -67,7 +68,8 @@ class NivelTituloControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -86,7 +88,7 @@ class NivelTituloControlador {
   // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
   public async CrearNivel(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, user_name, ip } = req.body;
+      const { nombre, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -107,6 +109,7 @@ class NivelTituloControlador {
         datosOriginales: '',
         datosNuevos: JSON.stringify(nivel),
         ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -130,7 +133,7 @@ class NivelTituloControlador {
   // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO    **USADO
   public async ActualizarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id, user_name, ip } = req.body;
+      const { nombre, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -146,7 +149,8 @@ class NivelTituloControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
         });
 
@@ -168,7 +172,8 @@ class NivelTituloControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -206,14 +211,15 @@ class NivelTituloControlador {
     const documento = req.file?.originalname;
     let separador = path.sep;
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-    const workbook = excel.readFile(ruta);
+    const workbook = new Excel.Workbook();
+    await workbook.xlsx.readFile(ruta);
     let verificador = ObtenerIndicePlantilla(workbook, 'NIVELES_TITULOS');
     if (verificador === false) {
       return res.jsonp({ message: 'no_existe', data: undefined });
     }
     else {
-      const sheet_name_list = workbook.SheetNames;
-      const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+      const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+      const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
       let data: any = {
         fila: '',
         nombre: '',
@@ -223,49 +229,78 @@ class NivelTituloControlador {
       var listNivelesProfesionales: any = [];
       var duplicados: any = [];
       var mensaje: string = 'correcto';
+      if (plantilla) {
+        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+        const headerRow = plantilla.getRow(1);
+        const headers: any = {};
+        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+        headerRow.eachCell((cell: any, colNumber) => {
+          headers[cell.value.toString().toUpperCase()] = colNumber;
+        });
+        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+        if (!headers['ITEM'] || !headers['NOMBRE']
+        ) {
+          return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+        }
+        plantilla.eachRow(async (row, rowNumber) => {
+          // SALTAR LA FILA DE LAS CABECERAS
+          if (rowNumber === 1) return;
+          // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+          const ITEM = row.getCell(headers['ITEM']).value;
+          const NOMBRE = row.getCell(headers['NOMBRE']).value;
 
-      // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any) => {
-        var { ITEM, NOMBRE } = dato;
-        data.fila = dato.ITEM
-        data.nombre = dato.NOMBRE;
+          data.fila = ITEM
+          data.nombre = NOMBRE;
 
-        if ((data.fila != undefined && data.fila != '') &&
-          (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
-          // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
-          const existe_nivelProfecional = await pool.query(
-            `
+          if ((data.fila != undefined && data.fila != '') &&
+            (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
+            // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
+            const existe_nivelProfecional = await pool.query(
+              `
             SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
             `
-            , [data.nombre]);
-          if (existe_nivelProfecional.rowCount == 0) {
-            data.fila = ITEM;
-            data.nombre = NOMBRE;
-            if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
-              data.observacion = 'ok';
-              duplicados.push(dato);
+              , [data.nombre]);
+            if (existe_nivelProfecional.rowCount == 0) {
+              data.fila = ITEM;
+              data.nombre = NOMBRE;
+
+              if (duplicados.find((p: any) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
+                data.observacion = 'ok';
+                duplicados.push(data);
+              }
+
+              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+              data.nombre = data.nombre.trim();
+
+              listNivelesProfesionales.push(data);
+            } else {
+              data.fila = ITEM
+              data.nombre = NOMBRE;
+              data.observacion = 'Ya existe en el sistema';
+
+              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+              data.nombre = data.nombre.trim();
+
+              listNivelesProfesionales.push(data);
             }
-            listNivelesProfesionales.push(data);
           } else {
             data.fila = ITEM
-            data.nombre = NOMBRE;
-            data.observacion = 'Ya existe en el sistema';
+            data.nombre = 'No registrado';
+            data.observacion = 'Nivel no registrado';
+
+            if (data.fila == '' || data.fila == undefined) {
+              data.fila = 'error';
+              mensaje = 'error'
+            }
+
+            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+            data.nombre = data.nombre.trim();
+
             listNivelesProfesionales.push(data);
           }
-        } else {
-          data.fila = ITEM
-          data.nombre = 'No registrado';
-          data.observacion = 'Nivel no registrado';
-
-          if (data.fila == '' || data.fila == undefined) {
-            data.fila = 'error';
-            mensaje = 'error'
-          }
-          listNivelesProfesionales.push(data);
-        }
-        data = {};
-      });
-
+          data = {};
+        });
+      }
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -316,7 +351,7 @@ class NivelTituloControlador {
 
   // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO    **USADO
   public async RegistrarNivelesPlantilla(req: Request, res: Response): Promise<any> {
-    const { niveles, user_name, ip } = req.body;
+    const { niveles, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const nivel of niveles) {
@@ -343,6 +378,7 @@ class NivelTituloControlador {
           datosOriginales: '',
           datosNuevos: JSON.stringify(nivel),
           ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

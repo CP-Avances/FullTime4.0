@@ -13,8 +13,8 @@ export class EmpleadoProcesosService {
   }
 
   // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
-  ObtenerProcesoUsuario(id_empl_cargo: number) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoProcesos/infoProceso/${id_empl_cargo}`);
+  ObtenerProcesoUsuario(id_empl: number) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoProcesos/infoProceso/${id_empl}`);
   }
 
   ActualizarUnProceso(datos: any) {

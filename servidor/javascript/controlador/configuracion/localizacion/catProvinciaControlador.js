@@ -80,7 +80,7 @@ class ProvinciaControlador {
     EliminarProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
+                const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -96,6 +96,7 @@ class ProvinciaControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip: ip,
+                        ip_local: ip_local,
                         observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
@@ -113,6 +114,7 @@ class ProvinciaControlador {
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -130,7 +132,7 @@ class ProvinciaControlador {
     CrearProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_pais, user_name, ip } = req.body;
+                const { nombre, id_pais, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
@@ -144,6 +146,7 @@ class ProvinciaControlador {
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION

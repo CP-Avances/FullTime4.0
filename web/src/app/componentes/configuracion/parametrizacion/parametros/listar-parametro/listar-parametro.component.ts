@@ -5,9 +5,9 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
-import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
@@ -21,6 +21,19 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 })
 
 export class ListarParametroComponent implements OnInit {
+  ips_locales: any = '';
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
@@ -56,12 +69,38 @@ export class ListarParametroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-    
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerParametros();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -146,7 +185,7 @@ export class ListarParametroComponent implements OnInit {
    ** ************************************************************************************************** **/
 
 
-   async GenerarPdf(action = 'open') {
+  async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -254,56 +293,157 @@ export class ListarParametroComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
+  async generarExcelParametros() {
 
-  ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'ParametrosGenerales');
-    xlsx.writeFile(wb, "ParametrosGeneralesEXCEL" + '.xlsx');
-  }
-
-  EstructurarDatosExcel() {
-    let datos: any = [];
+    const parametroslista: any[] = [];
     let n: number = 1;
+
     this.parametros.forEach((obj: any) => {
       obj.detalles.forEach((det: any) => {
-        datos.push({
-          'N°': n++,
-          'PARÁMETRO': obj.descripcion,
-          'DETALLE': det.descripcion,
-          'DESCRIPCIÓN': det.observacion
-        });
+        parametroslista.push([
+          n++,
+          obj.descripcion,
+          det.descripcion,
+          det.observacion
+        ]);
       });
     });
 
-    return datos;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Parametros");
+
+
+    console.log("ver logo. ", this.logo)
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:D1");
+    worksheet.mergeCells("B2:D2");
+    worksheet.mergeCells("B3:D3");
+    worksheet.mergeCells("B4:D4");
+    worksheet.mergeCells("B5:D5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Parámetros Generales".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "parametro", width: 20 },
+      { key: "detalle", width: 20 },
+      { key: "descripcion", width: 160 },
+    ];
+
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "PARÁMETRO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "DETALLE", totalsRowLabel: "", filterButton: true },
+      { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "ParametrosTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: parametroslista,
+    });
+
+
+    const numeroFilas = parametroslista.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 4; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "ParametrosGeneralesEXCEL.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
+
+  private obtenerAlineacionHorizontalEmpleados(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
+  }
+
 
   /** ************************************************************************************************* **
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
-
-  ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "ParametrosGeneralesCSV" + '.csv');
-  }
-
-  EstructurarDatosCSV() {
-    let datos: any = [];
+  ExportToCSV() {
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
     let n: number = 1;
+
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('ParametrosGeneralesCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'n', key: 'n', width: 10 },
+      { header: 'parametro', key: 'parametro', width: 30 },
+      { header: 'detalle', key: 'detalle', width: 15 },
+      { header: 'descripcion', key: 'descripcion', width: 15 }
+    ];
+    // 4. Llenar las filas con los datos
     this.parametros.forEach((obj: any) => {
       obj.detalles.forEach((det: any) => {
-        datos.push({
-          'n': n++,
-          'parametro': obj.descripcion,
-          'detalle': det.descripcion,
-          'descripcion': det.observacion
-        });
-      });
+        worksheet.addRow({
+          n: n++,
+          parametro: obj.descripcion,
+          detalle: det.descripcion,
+          descripcion: det.observacion
+        }).commit();
+      })
     });
-    return datos;
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "ParametrosGeneralesCSV.csv");
+    });
   }
 
   /** ************************************************************************************************* **

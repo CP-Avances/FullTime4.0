@@ -24,7 +24,7 @@
                 <mat-form-field>
                     <mat-label>Nombre de proceso</mat-label>
                     <input matInput placeholder="Ej: Emergencia" [formControl]="nombre"
-                        (keypress)="IngresarSoloLetras($event)" required>
+                        required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar nombre con el que se va a identificar el nuevo proceso.">
                         help_outline
@@ -40,19 +40,6 @@
                     <mat-select [formControl]="procesoPadre" required>
                         <mat-option *ngFor="let p of procesos" [value]="p.nombre">
                             {{p.nombre}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <br>
-                <mat-form-field>
-                    <mat-label>Nivel</mat-label>
-                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                        matTooltip="Seleccionar el nivel del nuevo proceso.">
-                        help_outline
-                    </mat-icon>
-                    <mat-select [formControl]="nivel" required>
-                        <mat-option *ngFor="let n of niveles" [value]="n.valor">
-                            {{n.valor}}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>

@@ -19,6 +19,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 })
 
 export class RegistrarVacacionesComponent implements OnInit {
+  ips_locales: any = '';
 
   empleados: any = [];
   calcular = false;
@@ -74,7 +75,10 @@ export class RegistrarVacacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
 
     var f = DateTime.now();
     this.FechaActual = f.toformat('yyyy-MM-dd');
@@ -299,7 +303,7 @@ export class RegistrarVacacionesComponent implements OnInit {
       id_empleado: this.empleados[0].id,
       estado: 1,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     };
     console.log(datosVacaciones);
     this.restV.RegistrarVacaciones(datosVacaciones).subscribe(vacacion => {
@@ -442,7 +446,7 @@ export class RegistrarVacacionesComponent implements OnInit {
       mensaje: 'Ha realizado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
 
@@ -492,7 +496,7 @@ export class RegistrarVacacionesComponent implements OnInit {
       id_documento: '',
       id_plan_hora_extra: null,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     }, error => { })

@@ -2,9 +2,12 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatRadioChange } from '@angular/material/radio';
+import { Observable, map, startWith } from 'rxjs';
 
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+
 
 @Component({
   selector: 'app-criterios-busqueda',
@@ -21,7 +24,11 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_cargo = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
+
   seleccion = new FormControl('');
+  filteredRoles!: Observable<any[]>;
+  listaRoles: any = [];
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_cargo: false,
@@ -40,13 +47,27 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
   constructor(
     private reporteService: ReportesService,
-    private validacionService: ValidacionesService
+    private validacionService: ValidacionesService,
+    private restRol: RolesService
   ) { }
 
   ngOnInit(): void {
     //console.log('atributo', this.num_option);
     this.check = this.reporteService.checkOptionsN(this.num_option);
     //console.log('CHECK ', this.check);
+    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+      this.listaRoles = respuesta
+      console.log('this.listaRoles: ', this.listaRoles)
+    });
+
+    this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 14);
+    });
   }
 
   ngOnDestroy() {
@@ -64,6 +85,13 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
       this.reporteService.DefaultFormCriterios();
       this.reporteService.DefaultValoresFiltros();
     }
+  }
+
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.listaRoles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
   }
 
   // METODO PARA BUSCAR TIPO DE OPCION
@@ -165,6 +193,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
       case 11: this.reporteService.setFiltroCodigo_inc(e); break;
       case 12: this.reporteService.setFiltroCedula_inc(e); break;
       case 13: this.reporteService.setFiltroNombreInc(e); break;
+      case 14: this.reporteService.setFiltroRolEmp(e); break;
       default:
         break;
     }

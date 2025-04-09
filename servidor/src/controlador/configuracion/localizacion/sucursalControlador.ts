@@ -2,7 +2,6 @@ import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-//import excel from 'xlsx';
 import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
@@ -31,7 +30,7 @@ class SucursalControlador {
   public async CrearSucursal(req: Request, res: Response): Promise<Response> {
 
     try {
-      const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
+      const { nombre, id_ciudad, id_empresa, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -51,7 +50,8 @@ class SucursalControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(sucursal),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -74,7 +74,7 @@ class SucursalControlador {
   // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO  **USADO
   public async ActualizarSucursal(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id_ciudad, id, user_name, ip } = req.body;
+      const { nombre, id_ciudad, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -90,7 +90,8 @@ class SucursalControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -112,7 +113,8 @@ class SucursalControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -164,7 +166,7 @@ class SucursalControlador {
   // METODO PARA ELIMINAR REGISTRO **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       const id = req.params.id;
 
@@ -182,7 +184,8 @@ class SucursalControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
         });
 
@@ -204,7 +207,8 @@ class SucursalControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -285,8 +289,8 @@ class SucursalControlador {
 
           // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
           const ITEM = row.getCell(headers['ITEM']).value;
-          const NOMBRE = row.getCell(headers['NOMBRE']).value;
-          const CIUDAD = row.getCell(headers['CIUDAD']).value;
+          const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
+          const CIUDAD = row.getCell(headers['CIUDAD']).value?.toString().trim();
 
           const dato = {
             ITEM: ITEM,
@@ -297,6 +301,8 @@ class SucursalControlador {
           data.fila = ITEM;
           data.nom_sucursal = NOMBRE;
           data.ciudad = CIUDAD;
+
+          console.log('dataaaaaaaaaaaaaa: ',data);
 
           if ((data.fila != undefined && data.fila != '') &&
             (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
@@ -324,28 +330,51 @@ class SucursalControlador {
                 data.fila = ITEM
                 data.nom_sucursal = NOMBRE;
                 data.ciudad = CIUDAD;
+
                 // DISCRIMINACION DE ELEMENTOS IGUALES
                 if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === data.nom_sucursal.toLowerCase() &&
                   p.CIUDAD.toLowerCase() === data.ciudad.toLowerCase()) == undefined) {
                   data.observacion = 'ok';
                   duplicados.push(dato);
                 }
+
+                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                data.nom_sucursal = data.nom_sucursal.trim();
+                data.ciudad = data.ciudad.trim();
+
+                console.log('dataaa 010101010101: ',data);
+
                 listSucursales.push(data);
               } else {
                 data.fila = ITEM
                 data.nom_sucursal = NOMBRE;
                 data.ciudad = CIUDAD;
                 data.observacion = 'Ya existe en el sistema';
+
+                //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                data.nom_sucursal = data.nom_sucursal.trim();
+                data.ciudad = data.ciudad.trim();
+
+                console.log('dataaa 000000000: ',data);
+
                 listSucursales.push(data);
               }
             } else {
               data.fila = ITEM
               data.nom_sucursal = NOMBRE;
               data.ciudad = CIUDAD;
+
               if (data.ciudad == '' || data.ciudad == undefined) {
                 data.ciudad = 'No registrado';
               }
               data.observacion = 'Ciudad no existe en el sistema';
+
+              //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+              data.nom_sucursal = data.nom_sucursal.trim();
+              data.ciudad = data.ciudad.trim();
+
+              console.log('dataaa 111111111: ',data);
+
               listSucursales.push(data);
             }
           } else {
@@ -371,6 +400,12 @@ class SucursalControlador {
             if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
               data.observacion = 'Sucursal y ciudad no registrada';
             }
+
+            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+            data.nom_sucursal = data.nom_sucursal.trim();
+            data.ciudad = data.ciudad.trim();
+
+            console.log('dataaa 222222: ',data);
 
             listSucursales.push(data);
           }
@@ -428,7 +463,7 @@ class SucursalControlador {
 
   // METODO PARA CARGAR PLANTILLA DE SUCURSALES  **USADO
   public async RegistrarSucursales(req: Request, res: Response): Promise<Response> {
-    const { sucursales, user_name, ip } = req.body;
+    const { sucursales, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const sucursal of sucursales) {
@@ -453,7 +488,8 @@ class SucursalControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: JSON.stringify(sucursal),
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

@@ -5,6 +5,7 @@ import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { Observable, map, startWith } from 'rxjs';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -15,6 +16,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 import { ConfiguracionNotificacionComponent } from '../configuracion/configuracionNotificacion.component';
 
@@ -34,7 +36,11 @@ export class ListaNotificacionComponent implements OnInit {
     nombre_suc = new FormControl('', [Validators.minLength(2)]);
     nombre_reg = new FormControl('', [Validators.minLength(2)]);
     nombre_carg = new FormControl('', [Validators.minLength(2)]);
+    nombre_rol = new FormControl('', [Validators.minLength(2)]);
     seleccion = new FormControl('');
+
+    filteredRoles!: Observable<any[]>;
+    listaRoles: any = [];
 
     public _booleanOptions: FormCriteriosBusqueda = {
         bool_suc: false,
@@ -45,6 +51,8 @@ export class ListaNotificacionComponent implements OnInit {
     };
 
     mostrarTablas: boolean = false;
+    verConfiguracion: boolean = true;
+    verSeleccion: boolean = false;
 
     public check: checkOptions[];
 
@@ -105,6 +113,7 @@ export class ListaNotificacionComponent implements OnInit {
     get filtroNombreEmp() { return this.restR.filtroNombreEmp };
     get filtroCodigo() { return this.restR.filtroCodigo };
     get filtroCedula() { return this.restR.filtroCedula };
+    get filtroRolEmp() { return this.restR.filtroRolEmp};
 
     // FILTRO CARGO
     get filtroNombreCarg() { return this.restR.filtroNombreCarg }
@@ -122,6 +131,7 @@ export class ListaNotificacionComponent implements OnInit {
         private ventana: MatDialog,
         private validar: ValidacionesService,
         private toastr: ToastrService,
+        private restRol: RolesService
     ) {
         this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     }
@@ -135,6 +145,21 @@ export class ListaNotificacionComponent implements OnInit {
         this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
         this.BuscarInformaciongeneral();
+
+        this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+            this.listaRoles = respuesta
+            console.log('this.listaRoles: ', this.listaRoles)
+          });
+      
+          this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+            startWith(''),
+            map(value => this.filtrarRoles(value || ''))
+          );
+      
+          this.nombre_rol.valueChanges.subscribe(valor => {
+            this.Filtrar(valor, 8);
+          });
+
     }
 
     ngOnDestroy() {
@@ -157,6 +182,13 @@ export class ListaNotificacionComponent implements OnInit {
             this.toastr.error(err.error.message)
         })
     }
+
+    filtrarRoles(valor: string): any[] {
+        const filtro = valor.toLowerCase();
+        return this.listaRoles.filter(rol =>
+          rol.nombre.toLowerCase().includes(filtro)
+        );
+      }
 
     // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
     ProcesarDatos(informacion: any) {
@@ -268,6 +300,7 @@ export class ListaNotificacionComponent implements OnInit {
             case 5: this.restR.setFiltroCedula(e); break;
             case 6: this.restR.setFiltroNombreEmp(e); break;
             case 7: this.restR.setFiltroNombreReg(e); break;
+            case 8: this.restR.setFiltroRolEmp(e); break;
             default:
                 break;
         }
@@ -431,7 +464,7 @@ export class ListaNotificacionComponent implements OnInit {
         }
     }
 
-    
+
     /** ************************************************************************************** **
      ** **                    METODOS DE REGISTRO DE CONFIGURACIONES                        ** **
      ** ************************************************************************************** **/
@@ -453,16 +486,11 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     // METODO PARA CONFIGURAR DATOS
+    datosEmpleados: any;
     Registrar(seleccionados: any) {
-        this.ventana.open(ConfiguracionNotificacionComponent,
-            { width: '350px', data: seleccionados }).afterClosed().subscribe(evento => {
-                if (evento) {
-                    if (evento != false) {
-                        this.individual = true;
-                        this.LimpiarFormulario();
-                    }
-                }
-            })
+        this.datosEmpleados = seleccionados;
+        this.verConfiguracion = false;
+        this.verSeleccion = true;
     }
 
     // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -573,6 +601,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.cedula.reset();
             this.nombre_emp.reset();
             this.nombre_suc.reset();
+            this.nombre_rol.reset();
             this.selectionDep.clear();
             this.selectionCarg.clear();
             this.selectionSuc.clear();
@@ -581,6 +610,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.Filtrar('', 4)
             this.Filtrar('', 5)
             this.Filtrar('', 6)
+            this.Filtrar('', 8);
         }
     }
 

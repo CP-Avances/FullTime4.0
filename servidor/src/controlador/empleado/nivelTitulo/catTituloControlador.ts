@@ -1,7 +1,7 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
@@ -38,11 +38,10 @@ class TituloControlador {
     }
   }
 
-
   // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
       // INICIAR TRANSACCION
@@ -60,7 +59,8 @@ class TituloControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar el título con id ${id}. Registro no encontrado.`
         });
 
@@ -82,7 +82,8 @@ class TituloControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -101,7 +102,7 @@ class TituloControlador {
   // METODO PARA ACTUALIZAR REGISTRO   **USADO
   public async ActualizarTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id_nivel, id, user_name, ip } = req.body;
+      const { nombre, id_nivel, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -118,7 +119,8 @@ class TituloControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar el título con id ${id}. Registro no encontrado.`
         });
 
@@ -140,14 +142,15 @@ class TituloControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
-      
+
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
@@ -158,7 +161,7 @@ class TituloControlador {
   // METODO PARA REGISTRAR TITULO   **USADO
   public async CrearTitulo(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, id_nivel, user_name, ip } = req.body;
+      const { nombre, id_nivel, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -176,7 +179,8 @@ class TituloControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -196,14 +200,15 @@ class TituloControlador {
     const documento = req.file?.originalname;
     let separador = path.sep;
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-    const workbook = excel.readFile(ruta);
+    const workbook = new Excel.Workbook();
+    await workbook.xlsx.readFile(ruta);
     let verificador = ObtenerIndicePlantilla(workbook, 'TITULOS');
     if (verificador === false) {
       return res.jsonp({ message: 'no_existe', data: undefined });
     }
     else {
-      const sheet_name_list = workbook.SheetNames;
-      const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+      const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+      const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
       let data: any = {
         fila: '',
         titulo: '',
@@ -214,90 +219,76 @@ class TituloControlador {
       var listTitulosProfesionales: any = [];
       var duplicados: any = [];
       var mensaje: string = 'correcto';
+      if (plantilla) {
+        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+        const headerRow = plantilla.getRow(1);
+        const headers: any = {};
+        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+        headerRow.eachCell((cell: any, colNumber) => {
+          headers[cell.value.toString().toUpperCase()] = colNumber;
+        });
+        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+        if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['NIVEL']
+        ) {
+          return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+        }
+        // LECTURA DE LOS DATOS DE LA PLANTILLA
+        plantilla.eachRow(async (row, rowNumber) => {
+          // SALTAR LA FILA DE LAS CABECERAS
+          if (rowNumber === 1) return;
+          // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+          const ITEM = row.getCell(headers['ITEM']).value;
+          const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
+          const NIVEL = row.getCell(headers['NIVEL']).value?.toString().trim();
+          const dato = {
+            ITEM: ITEM,
+            NOMBRE: NOMBRE,
+            NIVEL: NIVEL,
+          }
 
-      // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any) => {
-        var { NOMBRE, NIVEL } = dato;
-        data.fila = dato.ITEM
-        data.titulo = dato.NOMBRE;
-        data.nivel = dato.NIVEL;
+          data.fila = ITEM
+          data.titulo = NOMBRE;
+          data.nivel = NIVEL;
+          data.observacion = 'no registrado';
 
-        if ((data.fila != undefined && data.fila != '') &&
-          (data.titulo != undefined && data.titulo != '') &&
-          (data.nivel != undefined && data.nivel != '')) {
-          // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-          const existe_nivel = await pool.query(
-            `
-            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
-            `
-            , [NIVEL]);
-          var id_nivel = existe_nivel.rows[0];
-          if (id_nivel != undefined && id_nivel != '') {
-            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
-            const VERIFICAR_Titulos = await pool.query(
-              `
-              SELECT * FROM et_titulos
-              WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
-              `
-              , [NOMBRE, id_nivel.id]);
-            if (VERIFICAR_Titulos.rowCount == 0) {
-              data.fila = dato.ITEM
-              data.titulo = dato.NOMBRE;
-              data.nivel = dato.NIVEL
-              if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
-                p.NIVEL.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
-                data.observacion = 'ok';
-                duplicados.push(dato);
-              }
-              listTitulosProfesionales.push(data);
-            } else {
-              data.fila = dato.ITEM
-              data.titulo = NOMBRE;
-              data.nivel = NIVEL
-              data.observacion = 'Ya existe en el sistema';
-              listTitulosProfesionales.push(data);
-            }
+
+
+          if ((data.fila != undefined && data.fila != '') &&
+            (data.titulo != undefined && data.titulo != '') &&
+            (data.nivel != undefined && data.nivel != '')) {
+            
+            listTitulosProfesionales.push(data);
+
           } else {
-            data.fila = dato.ITEM
-            data.titulo = dato.NOMBRE;
-            data.nivel = dato.NIVEL;
+            data.fila = ITEM
+            data.titulo = NOMBRE;
+            data.nivel = NIVEL;
+            data.observacion = 'no registrado';
+
+            if (data.fila == '' || data.fila == undefined) {
+              data.fila = 'error';
+              mensaje = 'error'
+            }
+
+            if (data.titulo == '' || data.titulo == undefined) {
+              data.titulo = 'No registrado';
+              data.observacion = 'Título no registrado';
+            }
 
             if (data.nivel == '' || data.nivel == undefined) {
               data.nivel = 'No registrado';
               data.observacion = 'Nivel no registrado';
             }
-            data.observacion = 'Nivel no existe en el sistema'
+
+            if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
+              data.observacion = 'Título y Nivel no registrado';
+            }
+
             listTitulosProfesionales.push(data);
           }
-
-        } else {
-          data.fila = dato.ITEM
-          data.titulo = dato.NOMBRE;
-          data.nivel = dato.NIVEL;
-
-          if (data.fila == '' || data.fila == undefined) {
-            data.fila = 'error';
-            mensaje = 'error'
-          }
-
-          if (data.titulo == '' || data.titulo == undefined) {
-            data.titulo = 'No registrado';
-            data.observacion = 'Título no registrado';
-          }
-
-          if (data.nivel == '' || data.nivel == undefined) {
-            data.nivel = 'No registrado';
-            data.observacion = 'Nivel no registrado';
-          }
-
-          if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
-            data.observacion = 'Título y Nivel no registrado';
-          }
-          listTitulosProfesionales.push(data);
-        }
-        data = {};
-      });
-
+          data = {};
+        });
+      }
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -306,6 +297,51 @@ class TituloControlador {
           fs.unlinkSync(ruta);
         }
       });
+
+      listTitulosProfesionales.forEach(async (item: any, index: number) => {
+        if (item.observacion == 'no registrado') {
+          // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
+          const existe_nivel = await pool.query(
+            `
+            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+            `
+            , [item.nivel]);
+
+          var id_nivel = existe_nivel.rows[0];
+          if (id_nivel != undefined && id_nivel != '') {
+            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
+            const VERIFICAR_Titulos = await pool.query(
+              `
+              SELECT * FROM et_titulos
+              WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
+              `
+              , [item.titulo, id_nivel.id]);
+
+              
+            if (VERIFICAR_Titulos.rowCount == 0) {
+
+              if (duplicados.find((p: any) => p.titulo.toLowerCase() === item.titulo.toLowerCase() &&
+                p.nivel.toLowerCase() === item.nivel.toLowerCase()) == undefined) {
+                item.observacion = 'ok';
+                duplicados.push(item);
+              }else{
+                
+                  item.observacion = '1';
+              }
+
+            } else {
+              
+              item.observacion = 'Ya existe en el sistema'
+              
+            }
+
+          } else {
+            item.observacion = 'Nivel no existe en el sistema'
+          }
+        }
+
+      })
+
 
       setTimeout(() => {
         listTitulosProfesionales.sort((a: any, b: any) => {
@@ -322,7 +358,7 @@ class TituloControlador {
         var filaDuplicada: number = 0;
 
         listTitulosProfesionales.forEach((item: any) => {
-          if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
+          if (item.observacion == '1') {
             item.observacion = 'Registro duplicado'
           }
 
@@ -350,7 +386,7 @@ class TituloControlador {
 
   // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA   **USADO
   public async RegistrarTitulosPlantilla(req: Request, res: Response): Promise<any> {
-    const { titulos, user_name, ip } = req.body;
+    const { titulos, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
     for (const titulo of titulos) {
@@ -372,7 +408,8 @@ class TituloControlador {
           accion: 'I',
           datosOriginales: '',
           datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: null
         });
 

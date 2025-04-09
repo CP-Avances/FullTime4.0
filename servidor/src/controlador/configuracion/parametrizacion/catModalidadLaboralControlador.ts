@@ -5,7 +5,7 @@ import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../../database';
-import excel from 'xlsx';
+import Excel from 'exceljs';
 
 class ModalidaLaboralControlador {
 
@@ -30,7 +30,7 @@ class ModalidaLaboralControlador {
     // METODO PARA REGISTRAR MODALIDAD LABORAL   **USADO
     public async CrearModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { modalidad, user_name, ip } = req.body;
+            const { modalidad, user_name, ip, ip_local } = req.body;
             var VERIFICAR_MODALIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
@@ -59,7 +59,8 @@ class ModalidaLaboralControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(modalidadLaboral),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -86,7 +87,7 @@ class ModalidaLaboralControlador {
     // METODO PARA EDITAR MODALIDAD LABORAL    **USADO
     public async EditarModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, modalidad, user_name, ip } = req.body;
+            const { id, modalidad, user_name, ip, ip_local } = req.body;
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
 
             const modalExiste = await pool.query(
@@ -109,7 +110,8 @@ class ModalidaLaboralControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                 });
 
@@ -142,7 +144,8 @@ class ModalidaLaboralControlador {
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(modalidadLaboral),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 
@@ -167,7 +170,7 @@ class ModalidaLaboralControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            const { user_name, ip } = req.body;
+            const { user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -188,7 +191,8 @@ class ModalidaLaboralControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: `Error al eliminar el registro con id: ${id}, no se encuentra el registro.`
                 });
 
@@ -210,7 +214,8 @@ class ModalidaLaboralControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(modalidadLaboral),
                 datosNuevos: '',
-                ip,
+                ip: ip,
+                ip_local: ip_local,
                 observacion: null
             });
 
@@ -231,14 +236,15 @@ class ModalidaLaboralControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-            const workbook = excel.readFile(ruta);
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
             let verificador = ObtenerIndicePlantilla(workbook, 'MODALIDAD_LABORAL');
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
             else {
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla_modalidad_laboral = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla_modalidad_laboral = workbook.getWorksheet(sheet_name_list[verificador]);
                 let data: any = {
                     fila: '',
                     modalida_laboral: '',
@@ -247,36 +253,65 @@ class ModalidaLaboralControlador {
                 var listModalidad: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
-
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
-                    var { ITEM, MODALIDAD_LABORAL } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') &&
-                        (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
-                        data.fila = ITEM;
-                        data.modalida_laboral = MODALIDAD_LABORAL;
-                        data.observacion = 'no registrada';
-                        listModalidad.push(data);
-                    } else {
-                        data.fila = ITEM;
-                        data.modalida_laboral = MODALIDAD_LABORAL;
-                        data.observacion = 'no registrada';
-
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error'
-                        }
-
-                        if (MODALIDAD_LABORAL == undefined) {
-                            data.modalida_laboral = 'No registrado';
-                            data.observacion = 'Modalidad Laboral ' + data.observacion;
-                        }
-                        listModalidad.push(data);
+                if (plantilla_modalidad_laboral) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla_modalidad_laboral.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['MODALIDAD_LABORAL']) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
-                    data = {};
-                });
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla_modalidad_laboral.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
 
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        let ITEM = row.getCell(headers['ITEM']).value;
+                        let MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value;
+
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
+
+                            data.fila = ITEM;
+                            data.modalida_laboral = MODALIDAD_LABORAL;
+                            data.observacion = 'no registrada';
+                            
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.modalida_laboral = data.modalida_laboral.trim();
+                            data.observacion = data.observacion.trim();
+
+                            listModalidad.push(data);
+                        } else {
+                            data.fila = ITEM;
+                            data.modalida_laboral = MODALIDAD_LABORAL;
+                            data.observacion = 'no registrada';
+
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (MODALIDAD_LABORAL == undefined) {
+                                data.modalida_laboral = 'No registrado';
+                                data.observacion = 'Modalidad Laboral ' + data.observacion;
+                            }
+
+
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.modalida_laboral = data.modalida_laboral.trim();
+                            data.observacion = data.observacion.trim();
+
+                            listModalidad.push(data);
+                        }
+                        data = {};
+                    });
+                }
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -354,7 +389,7 @@ class ModalidaLaboralControlador {
 
     // REGISTRAR PLANTILLA MODALIDAD_LABORAL    **USADO
     public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
@@ -382,7 +417,8 @@ class ModalidaLaboralControlador {
                     accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(modalidad_la),
-                    ip,
+                    ip: ip,
+                    ip_local: ip_local,
                     observacion: null
                 });
 

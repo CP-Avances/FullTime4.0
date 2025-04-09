@@ -7,7 +7,6 @@ import { MatDialog } from "@angular/material/dialog";
 import { DateTime } from 'luxon';
 
 import * as FileSaver from "file-saver";
-import * as xlsx from "xlsx";
 
 // IMPORTACION DE SERVICIOS
 import { AutorizaDepartamentoService } from "src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service";
@@ -668,6 +667,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).map((obj: any) => {
       return {
         Permiso: obj.id,
@@ -690,6 +690,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA PERMISOS');
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
+    */
   }
 
   /** ************************************************************************************************** ** 
@@ -697,6 +698,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   ** ************************************************************************************************** **/
 
   exportToCVS(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).map((obj: any) => {
       return {
         Permiso: obj.id,
@@ -712,6 +714,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, `${opcion}CSV` + new Date().getTime() + '.csv');
+    */
   }
 
   /** ************************************************************************************************* **

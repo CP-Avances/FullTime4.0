@@ -58,7 +58,7 @@
                             <div *ngIf="dataHorarios" class="d-flex flex-wrap justify-content-center m-auto"
                                 style="text-align: center; justify-content: center;">
                                 <button id="registrar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                    matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
+                                    matTooltip="Guardar registro múltiple." (click)="ConfirmarRegistroMultiple()">
                                     Registrar
                                 </button>
                             </div>
@@ -190,11 +190,11 @@
                         matTooltipPosition="right" matTooltip="Descargar Lista de Horarios en formato PDF.">
                         <p>PDF</p>
                     </i>
-                    <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                    <i (click)="generarExcel()" id="excel" class="fas fa-file-excel" matSuffix
                         matTooltipPosition="right" matTooltip="Descargar Lista de Horarios en formato EXCEL.">
                         <p>XLSL</p>
                     </i>
-                    <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                         matTooltip="Descargar Lista de Horarios en formato CSV.">
                         <p>CSV</p>
                     </i>
@@ -221,7 +221,7 @@
 <!--  *****************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE HORARIOS  *********************************  -->
 <div class="container" style="padding-bottom: 10px; padding-top: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">REGISTRO MULTIPLE HORARIOS</div>
+        <div id="titulo">REGISTRO MÚLTIPLE HORARIOS</div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -239,7 +239,7 @@
                 <tbody>
                     <tr *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_paginaH:numero_paginaH ">
                         <td>{{h.ITEM}}</td>
-                        <td>
+                        <td style="font-size: 12px;" class="td_ob">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
                                     [style.background-color]="ObtenerColorValidacion(h.OBSERVACION)"></div>
@@ -277,7 +277,7 @@
 <!-- *************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE DETALLES  **********************************  -->
 <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">REGISTRO MULTIPLE DETALLES</div>
+        <div id="titulo">REGISTRO MÚLTIPLE DETALLES</div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">

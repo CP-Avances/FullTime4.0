@@ -22,6 +22,7 @@ interface Estado {
 })
 
 export class EditarHoraExtraEmpleadoComponent implements OnInit {
+  ips_locales: any = '';
 
   estados: Estado[] = [
     { id: 1, nombre: 'Pendiente' },
@@ -80,7 +81,10 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');;
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); ;
 
     this.estados.forEach((obj: any) => {
       if (this.datos.estado === obj.nombre) {
@@ -161,7 +165,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
       num_hora: form.horasForm + ":00",
       estado: form.estadoForm,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     data.fec_inicio = this.ValidarFechas(form.fechaInicioForm, form.horaInicioForm);
@@ -343,7 +347,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_final,
       user_name: this.user_name,
-      ip: this.ip,
+      ip: this.ip, ip_local: this.ips_locales,
     }
 
     //Listado para eliminar el usuario duplicado
@@ -451,6 +455,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
 
     formData.append('uder_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('ip_local', this.ips_locales);
 
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();
@@ -503,7 +508,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
         documento: this.datos.documento,
         id: parseInt(this.datos.id),
         user_name: this.user_name,
-        ip: this.ip,
+        ip: this.ip, ip_local: this.ips_locales,
       }
       this.GuardarDatos(datos);
       this.restHE.EliminarArchivoRespaldo(eliminar).subscribe(res => {

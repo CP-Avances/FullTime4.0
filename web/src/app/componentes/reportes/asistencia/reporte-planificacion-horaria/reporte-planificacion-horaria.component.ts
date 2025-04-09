@@ -7,8 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
 import { DateTime } from 'luxon';
-
-import * as xlsx from 'xlsx';
+import ExcelJS, { FillPattern } from "exceljs";
+import * as FileSaver from 'file-saver';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -26,6 +26,19 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 })
 
 export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
+
+  private imagen: any;
+
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+
+  private fillAzul!: FillPattern;
+
+  private fontTitulo!: Partial<ExcelJS.Font>;
+
+  private fontHipervinculo!: Partial<ExcelJS.Font>;
+
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
 
@@ -43,6 +56,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -154,6 +168,29 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
+
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   ngOnDestroy(): void {
@@ -478,7 +515,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
   EjecutarAccion() {
     switch (this.accion) {
-      case 'excel': this.ExportarExcel(); break;
+      case 'excel': this.generarExcel(); break;
       case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(this.accion); break;
     }
@@ -512,7 +549,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-   async GenerarPDF(action: any) {
+  async GenerarPDF(action: any) {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
@@ -827,47 +864,39 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ExportarExcel(): void {
-    const sheet1: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.ConstruirTablaHorarioEmpleados());
-    const sheet2: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.ConstruirTablaDetalleHorarios());
-    const sheet3: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.ConstruirTablaDefiniciones());
-    const workbook: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, sheet1, 'Planificacion horaria');
-    xlsx.utils.book_append_sheet(workbook, sheet2, 'Detalle Horarios');
-    xlsx.utils.book_append_sheet(workbook, sheet3, 'Definiciones');
-    xlsx.writeFile(workbook, `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+  async generarExcel() {
+    const workbook = new ExcelJS.Workbook();
+    await this.generarHojaHorarios(workbook);
+    await this.generarHojaDetalleHorarios(workbook);
+    await this.generarHojaDefiniciones(workbook);
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
   }
 
-  ConstruirTablaHorarioEmpleados() {
-    let n = 0;
-    const tableData = [
-      [
-        'N°', 'CÓDIGO', 'NOMBRE EMPLEADO', 'CÉDULA',
-        'SUCURSAL', 'CIUDAD', 'REGIMEN', 'DEPARTAMENTO',
-        'CARGO', 'AÑO', 'MES',
-        '01', '02', '03', '04', '05',
-        '06', '07', '08', '09', '10',
-        '11', '12', '13', '14', '15',
-        '16', '17', '18', '19', '20',
-        '21', '22', '23', '24', '25',
-        '26', '27', '28', '29', '30', '31'
-      ],
-    ];
 
+  async generarHojaHorarios(workbook: ExcelJS.Workbook) {
+    let n = 0;
+    const horarioslista: any[] = [];
     this.horariosEmpleado.forEach((empleado) => {
       empleado.horarios.forEach((h: any) => {
         n++;
-        tableData.push([
+        horarioslista.push([
           n,
           empleado.codigo,
-          empleado.apelido + ' ' + empleado.nombre,
+          empleado.apellido + ' ' + empleado.nombre,
           empleado.cedula,
           empleado.sucursal,
           empleado.ciudad,
           empleado.regimen,
           empleado.departamento,
           empleado.cargo,
-          h.anio, h.mes,
+          h.anio,
+          h.mes,
           h.dia1, h.dia2, h.dia3, h.dia4,
           h.dia5, h.dia6, h.dia7, h.dia8,
           h.dia9, h.dia10, h.dia11, h.dia12,
@@ -875,44 +904,368 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
           h.dia17, h.dia18, h.dia19, h.dia20,
           h.dia21, h.dia22, h.dia23, h.dia24,
           h.dia25, h.dia26, h.dia27, h.dia28,
-          h.dia29, h.dia30, h.dia31
+          h.dia29, h.dia30, h.dia31,
         ]);
-      });
-    });
-    return tableData;
-  }
+      })
+    })
 
-  ConstruirTablaDetalleHorarios() {
-    const tableData = [
-      [
-        'CÓDIGO', 'ENTRADA (E)',
-        'INICIO ALIMENTACIÓN (I/A)',
-        'FIN ALIMENTACIÓN (F/A)', 'SALIDA (S)'
-      ],
+    const worksheet = workbook.addWorksheet("Planificacion horaria");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:AP1");
+    worksheet.mergeCells("B2:AP2");
+    worksheet.mergeCells("B3:AP3");
+    worksheet.mergeCells("B4:AP4");
+    worksheet.mergeCells("B5:AP5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Planificacion horaria".toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `PERIODO DEL REPORTE: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} AL ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2", "B3"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "apenombre", width: 30 },
+      { key: "cedula", width: 20 },
+      { key: "sucursal", width: 20 },
+      { key: "ciudad", width: 20 },
+      { key: "regimen", width: 20 },
+      { key: "departamento", width: 20 },
+      { key: "cargo", width: 20 },
+      { key: "anio", width: 20 },
+      { key: "mes", width: 20 },
+      { key: "dia1", width: 20 },
+      { key: "dia2", width: 20 },
+      { key: "dia3", width: 20 },
+      { key: "dia4", width: 20 },
+      { key: "dia5", width: 20 },
+      { key: "dia6", width: 20 },
+      { key: "dia7", width: 20 },
+      { key: "dia8", width: 20 },
+      { key: "dia9", width: 20 },
+      { key: "dia10", width: 20 },
+      { key: "dia11", width: 20 },
+      { key: "dia12", width: 20 },
+      { key: "dia13", width: 20 },
+      { key: "dia14", width: 20 },
+      { key: "dia15", width: 20 },
+      { key: "dia16", width: 20 },
+      { key: "dia17", width: 20 },
+      { key: "dia18", width: 20 },
+      { key: "dia19", width: 20 },
+      { key: "dia20", width: 20 },
+      { key: "dia21", width: 20 },
+      { key: "dia22", width: 20 },
+      { key: "dia23", width: 20 },
+      { key: "dia24", width: 20 },
+      { key: "dia25", width: 20 },
+      { key: "dia26", width: 20 },
+      { key: "dia27", width: 20 },
+      { key: "dia28", width: 20 },
+      { key: "dia29", width: 20 },
+      { key: "dia30", width: 20 },
+      { key: "dia31", width: 20 },
     ];
 
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "NOMBRE EMPLEADO", totalsRowLabel: "", filterButton: true },
+      { name: "CÉDULA", totalsRowLabel: "", filterButton: true },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "REGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "AÑO", totalsRowLabel: "", filterButton: true },
+      { name: "MES", totalsRowLabel: "", filterButton: true },
+      { name: "01", totalsRowLabel: "", filterButton: true },
+      { name: "02", totalsRowLabel: "", filterButton: true },
+      { name: "03", totalsRowLabel: "", filterButton: true },
+      { name: "04", totalsRowLabel: "", filterButton: true },
+      { name: "05", totalsRowLabel: "", filterButton: true },
+      { name: "06", totalsRowLabel: "", filterButton: true },
+      { name: "07", totalsRowLabel: "", filterButton: true },
+      { name: "08", totalsRowLabel: "", filterButton: true },
+      { name: "09", totalsRowLabel: "", filterButton: true },
+      { name: "10", totalsRowLabel: "", filterButton: true },
+      { name: "11", totalsRowLabel: "", filterButton: true },
+      { name: "12", totalsRowLabel: "", filterButton: true },
+      { name: "13", totalsRowLabel: "", filterButton: true },
+      { name: "14", totalsRowLabel: "", filterButton: true },
+      { name: "15", totalsRowLabel: "", filterButton: true },
+      { name: "16", totalsRowLabel: "", filterButton: true },
+      { name: "17", totalsRowLabel: "", filterButton: true },
+      { name: "18", totalsRowLabel: "", filterButton: true },
+      { name: "19", totalsRowLabel: "", filterButton: true },
+      { name: "20", totalsRowLabel: "", filterButton: true },
+      { name: "21", totalsRowLabel: "", filterButton: true },
+      { name: "22", totalsRowLabel: "", filterButton: true },
+      { name: "23", totalsRowLabel: "", filterButton: true },
+      { name: "24", totalsRowLabel: "", filterButton: true },
+      { name: "25", totalsRowLabel: "", filterButton: true },
+      { name: "26", totalsRowLabel: "", filterButton: true },
+      { name: "27", totalsRowLabel: "", filterButton: true },
+      { name: "28", totalsRowLabel: "", filterButton: true },
+      { name: "29", totalsRowLabel: "", filterButton: true },
+      { name: "30", totalsRowLabel: "", filterButton: true },
+      { name: "31", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "ListaHorarios",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: horarioslista,
+    });
+
+    const numeroFilas = horarioslista.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 42; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+
+  async generarHojaDetalleHorarios(workbook: ExcelJS.Workbook) {
+    let n = 0;
+    const tableData: any[] = [];
     this.detalle_acciones.forEach((d) => {
+      n++;
       tableData.push([
-        d.horario, d.entrada_, d.inicio_comida,
-        d.fin_comida, d.salida_
+        n,
+        d.horario,
+        d.entrada_,
+        d.inicio_comida,
+        d.fin_comida,
+        d.salida_
       ]);
     });
-    return tableData;
-  }
 
-  ConstruirTablaDefiniciones() {
-    const tableData = [
-      [
-        'NOMENCLATURA', 'DESCRIPCIÓN'
-      ],
+    const worksheet = workbook.addWorksheet("Detalle Horarios");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:F1");
+    worksheet.mergeCells("B2:F2");
+    worksheet.mergeCells("B3:F3");
+    worksheet.mergeCells("B4:F4");
+    worksheet.mergeCells("B5:F5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Planificacion horaria".toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `Periodo del reporte: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} al ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2", "B3"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "entrada", width: 20 },
+      { key: "inicioA", width: 40 },
+      { key: "finA", width: 40 },
+      { key: "salida", width: 20 },
     ];
 
-    this.nomenclatura.forEach((n) => {
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
+      { name: "ENTRADA (E)", totalsRowLabel: "", filterButton: true },
+      { name: "INICIO ALIMENTACIÓN (I/A)", totalsRowLabel: "", filterButton: true },
+      { name: "FIN ALIMENTACIÓN (F/A)", totalsRowLabel: "", filterButton: true },
+      { name: "SALIDA (S)", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "ListaDetaHorarios",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: tableData,
+    });
+
+    const numeroFilas = tableData.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 6; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+
+  async generarHojaDefiniciones(workbook: ExcelJS.Workbook) {
+    let n = 0;
+    const tableData: any[] = [];
+    this.nomenclatura.forEach((item) => {
+      n++;
       tableData.push([
-        n.nombre, n.descripcion
+        n,
+        item.nombre,
+        item.descripcion
       ]);
     });
-    return tableData;
+
+    const worksheet = workbook.addWorksheet("Definiciones");
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:C1");
+    worksheet.mergeCells("B2:C2");
+    worksheet.mergeCells("B3:C3");
+    worksheet.mergeCells("B4:C4");
+    worksheet.mergeCells("B5:C5");
+
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Definiciones".toUpperCase();
+    worksheet.getCell(
+      "B3"
+    ).value = `Periodo del reporte: ${DateTime.fromISO(this.fechaInicialF.value).toFormat('yyyy-MM-dd')} al ${DateTime.fromISO(this.fechaFinalF.value).toFormat('yyyy-MM-dd')}`;
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2", "B3"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 20 },
+      { key: "nomenclatura", width: 30 },
+      { key: "descripcion", width: 40 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "NOMENCLATURA", totalsRowLabel: "", filterButton: true },
+      { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.addTable({
+      name: "ListaDefinicionesHorarios",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: tableData,
+    });
+
+    const numeroFilas = tableData.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 3; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontal(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+    worksheet.getRow(6).font = this.fontTitulo;
+  }
+
+
+  private obtenerAlineacionHorizontal(
+    j: number
+  ): "left" | "center" | "right" {
+    if (j >= 10 || j == 1) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ****************************************************************************************** **

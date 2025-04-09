@@ -258,7 +258,8 @@ class HorasExtrasPedidasControlador {
       const nombreArchivo = req.file?.originalname;
 
       var { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora,
-        descripcion, estado, observacion, tipo_funcion, depa_user_loggin, user_name, ip, subir_documento, codigo, documento } = req.body;
+        descripcion, estado, observacion, tipo_funcion, depa_user_loggin, user_name, ip, 
+        subir_documento, codigo, documento, ip_local } = req.body;
       console.log
 
       let codigoEmpleado = codigo || '';
@@ -337,7 +338,8 @@ class HorasExtrasPedidasControlador {
         accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(objetoHoraExtra),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -366,7 +368,8 @@ class HorasExtrasPedidasControlador {
     try {
       const id = req.params.id
 
-      const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin, user_name, ip } = req.body;
+      const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion,
+         depa_user_loggin, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -382,7 +385,8 @@ class HorasExtrasPedidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar hora extra con id ${id}`
         });
 
@@ -408,7 +412,8 @@ class HorasExtrasPedidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: JSON.stringify(objetoHoraExtra),
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -426,7 +431,7 @@ class HorasExtrasPedidasControlador {
   public async EliminarHoraExtra(req: Request, res: Response): Promise<Response> {
     try {
       const { id_hora_extra, documento } = req.params;
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -442,7 +447,8 @@ class HorasExtrasPedidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar registro de ecm_realtime_notificacion con id_hora_extra ${id_hora_extra}`
         });
 
@@ -464,7 +470,8 @@ class HorasExtrasPedidasControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(objetoRealTime),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -479,7 +486,8 @@ class HorasExtrasPedidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar registro de ecm_autorizaciones con id_hora_extra ${id_hora_extra}`
         });
 
@@ -501,7 +509,8 @@ class HorasExtrasPedidasControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(objetoAutorizaciones),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -516,7 +525,8 @@ class HorasExtrasPedidasControlador {
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al eliminar registro de mhe_solicitud_hora_extra con id ${id_hora_extra}`
         });
 
@@ -540,7 +550,8 @@ class HorasExtrasPedidasControlador {
         accion: 'D',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: '',
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -593,7 +604,7 @@ class HorasExtrasPedidasControlador {
   public async TiempoAutorizado(req: Request, res: Response): Promise<Response> {
     try {
       const id_hora = parseInt(req.params.id_hora);
-      const { hora, user_name, ip } = req.body;
+      const { hora, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -609,7 +620,8 @@ class HorasExtrasPedidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar hora extra con id ${id_hora}. Registro no encontrado.`
         });
 
@@ -633,7 +645,8 @@ class HorasExtrasPedidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: `{ tiempo_autorizado: ${hora} }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -662,7 +675,7 @@ class HorasExtrasPedidasControlador {
 
     try {
       const id = req.params.id;
-      const { estado, usser_name, ip } = req.body;
+      const { estado, usser_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -678,7 +691,8 @@ class HorasExtrasPedidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar hora extra con id ${id}. Registro no encontrado.`
         });
 
@@ -702,7 +716,8 @@ class HorasExtrasPedidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: `{ estado: ${estado} }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -729,7 +744,7 @@ class HorasExtrasPedidasControlador {
   public async ActualizarObservacion(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      const { observacion, user_name, ip } = req.body;
+      const { observacion, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -745,7 +760,8 @@ class HorasExtrasPedidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar hora extra con id ${id}. Registro no encontrado.`
         });
 
@@ -769,7 +785,8 @@ class HorasExtrasPedidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: `{ observacion: ${observacion} }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -820,7 +837,7 @@ class HorasExtrasPedidasControlador {
       let { nombre } = req.params;
       let id = req.params.id;
 
-      const { user_name, ip } = req.body;
+      const { user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -836,7 +853,8 @@ class HorasExtrasPedidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar hora extra con id ${id}. Registro no encontrado.`
         });
 
@@ -858,7 +876,8 @@ class HorasExtrasPedidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: `{ documento: ${doc}, docu_nombre: ${nombre} }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
@@ -875,7 +894,7 @@ class HorasExtrasPedidasControlador {
   // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS 
   public async EliminarDocumentoHoras(req: Request, res: Response): Promise<Response> {
     try {
-      let { documento, id, user_name, ip } = req.body;
+      let { documento, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -891,7 +910,8 @@ class HorasExtrasPedidasControlador {
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
-          ip,
+          ip: ip,
+          ip_local: ip_local,
           observacion: `Error al actualizar hora extra con id ${id}`
         });
 
@@ -913,7 +933,8 @@ class HorasExtrasPedidasControlador {
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
         datosNuevos: `{ documento: null, docu_nombre: null }`,
-        ip,
+        ip: ip,
+        ip_local: ip_local,
         observacion: null
       });
 
