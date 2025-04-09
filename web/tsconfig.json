@@ -23,7 +23,7 @@
       "ES2022",
       "dom"
     ],
-    "types": ["node"],
+    //"types": ["node"],
     "noImplicitAny": false,
     "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true
