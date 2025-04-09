@@ -16,6 +16,7 @@ import { EditarRegistroComponent } from '../../editar-registro/editar-registro.c
 
 @Component({
   selector: 'app-empleado-grupo',
+  standalone: false,
   templateUrl: './empleado-grupo.component.html',
   styleUrl: './empleado-grupo.component.css'
 })

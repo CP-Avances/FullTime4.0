@@ -8,7 +8,6 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
 @Component({
   selector: 'app-editar-estado-civil',
   standalone: false,
-
   templateUrl: './editar-estado-civil.component.html',
   styleUrl: './editar-estado-civil.component.css'
 })

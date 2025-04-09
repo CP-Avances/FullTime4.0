@@ -17,6 +17,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-grados',
+  standalone: false,
   templateUrl: './grados.component.html',
   styleUrl: './grados.component.css'
 })

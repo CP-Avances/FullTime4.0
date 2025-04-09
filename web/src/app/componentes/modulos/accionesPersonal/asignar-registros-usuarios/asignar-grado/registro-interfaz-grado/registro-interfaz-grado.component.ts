@@ -20,6 +20,7 @@ import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoC
 
 @Component({
   selector: 'app-registro-interfaz-grado',
+  standalone: false,
   templateUrl: './registro-interfaz-grado.component.html',
   styleUrl: './registro-interfaz-grado.component.css'
 })

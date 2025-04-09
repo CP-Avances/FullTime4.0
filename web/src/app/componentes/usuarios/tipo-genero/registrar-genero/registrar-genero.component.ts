@@ -8,7 +8,6 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 @Component({
   selector: 'app-registrar-genero',
   standalone: false,
-
   templateUrl: './registrar-genero.component.html',
   styleUrl: './registrar-genero.component.css'
 })

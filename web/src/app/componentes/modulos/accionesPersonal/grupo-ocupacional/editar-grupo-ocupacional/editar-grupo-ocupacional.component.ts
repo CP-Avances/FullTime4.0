@@ -7,6 +7,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-editar-grupo-ocupacional',
+  standalone: false,
   templateUrl: './editar-grupo-ocupacional.component.html',
   styleUrl: './editar-grupo-ocupacional.component.css'
 })

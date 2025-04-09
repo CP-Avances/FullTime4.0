@@ -24,7 +24,6 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
 @Component({
   selector: 'app-listar-estado-civil',
   standalone: false,
-  
   templateUrl: './listar-estado-civil.component.html',
   styleUrl: './listar-estado-civil.component.css'
 })

@@ -19,6 +19,7 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
 
 @Component({
   selector: 'app-grupo-ocupacional',
+  standalone: false,
   templateUrl: './grupo-ocupacional.component.html',
   styleUrl: './grupo-ocupacional.component.css'
 })

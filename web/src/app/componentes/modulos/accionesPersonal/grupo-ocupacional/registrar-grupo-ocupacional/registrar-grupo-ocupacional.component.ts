@@ -7,6 +7,7 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
 
 @Component({
   selector: 'app-registrar-grupo-ocupacional',
+  standalone: false,
   templateUrl: './registrar-grupo-ocupacional.component.html',
   styleUrl: './registrar-grupo-ocupacional.component.css'
 })

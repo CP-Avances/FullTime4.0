@@ -10,6 +10,7 @@ import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-registro-multiple-proceso',
+  standalone: false,
   templateUrl: './registro-multiple-proceso.component.html',
   styleUrl: './registro-multiple-proceso.component.css'
 })

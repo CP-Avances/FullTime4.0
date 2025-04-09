@@ -8,6 +8,7 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
 
 @Component({
   selector: 'app-editar-grado',
+  standalone: false,
   templateUrl: './editar-grado.component.html',
   styleUrl: './editar-grado.component.css'
 })

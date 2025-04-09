@@ -9,6 +9,7 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
 
 @Component({
   selector: 'app-registro-multiple-grupo',
+  standalone: false,
   templateUrl: './registro-multiple-grupo.component.html',
   styleUrl: './registro-multiple-grupo.component.css'
 })

@@ -7,6 +7,7 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
 
 @Component({
   selector: 'app-registrar-grado',
+  standalone: false,
   templateUrl: './registrar-grado.component.html',
   styleUrl: './registrar-grado.component.css'
 })

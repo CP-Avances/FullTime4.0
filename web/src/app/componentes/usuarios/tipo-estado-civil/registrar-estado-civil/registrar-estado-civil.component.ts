@@ -9,7 +9,6 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
 @Component({
   selector: 'app-registrar-estado-civil',
   standalone: false,
-
   templateUrl: './registrar-estado-civil.component.html',
   styleUrl: './registrar-estado-civil.component.css'
 })

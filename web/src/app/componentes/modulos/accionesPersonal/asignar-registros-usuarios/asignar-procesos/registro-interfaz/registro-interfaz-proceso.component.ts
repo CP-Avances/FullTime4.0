@@ -20,6 +20,7 @@ import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoC
 
 @Component({
   selector: 'app-registro-interfaz-proceso',
+  standalone: false,
   templateUrl: './registro-interfaz-proceso.component.html',
   styleUrl: './registro-interfaz-proceso.component.css'
 })

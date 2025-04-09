@@ -9,6 +9,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 
 @Component({
   selector: 'app-ingresar-registros',
+  standalone: false,
   templateUrl: './ingresar-registros.component.html',
   styleUrl: './ingresar-registros.component.css'
 })

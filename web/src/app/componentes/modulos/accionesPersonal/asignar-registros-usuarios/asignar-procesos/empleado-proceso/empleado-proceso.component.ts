@@ -19,6 +19,7 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
 
 @Component({
   selector: 'app-empleado-proceso',
+  standalone: false,
   templateUrl: './empleado-proceso.component.html',
   styleUrl: './empleado-proceso.component.css'
 })

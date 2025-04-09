@@ -22,7 +22,6 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-listar-genero',
   standalone: false,
-
   templateUrl: './listar-genero.component.html',
   styleUrl: './listar-genero.component.css'
 })
