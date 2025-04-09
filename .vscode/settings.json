@@ -1,7 +1,0 @@
-{
-    "todo-tree.tree.disableCompactFolders": true,
-    "todo-tree.tree.showBadges": false,
-    "java.project.sourcePaths": [
-        "web/src/app"
-    ]
-}
