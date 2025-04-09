@@ -1,0 +1,50 @@
+mat-form-field {
+    width: 200px;
+    margin: 10px;
+}
+
+#letraT {
+    font-size: 11px;
+}
+
+#icono_emple {
+    cursor: pointer;
+}
+
+#seccion_emple {
+    color: rgba(8, 10, 124, 0.828);
+}
+
+.container {
+    padding-top: 15px;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+.subtitulo {
+    position: relative;
+    float: left;
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.scrollbar {
+    float: left;
+    height: 500px;
+    width: 100%;
+    background: #fff;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin-bottom: 25px;
+}
+
+.scrollbar-primary::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}

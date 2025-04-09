@@ -1,0 +1,109 @@
+<div class="container" style="padding-top: 20px;">
+    <div id="titulo" class="row w-100 m-auto">
+        <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+        <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+            <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                MODIFICAR SOLICITUD DE VACACIÓN
+            </span>
+        </div>
+        <div class="col-2 col-md-2 mb-2 mb-md-0">
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">highlight_off</mat-icon>
+        </div>
+    </div>
+    <mat-card class="example-card mat-elevation-z9">
+        <!-- FORMULARIO COMPLETO -->
+        <form [formGroup]="formulario">
+            <mat-card-content>
+                <div class="container" style="text-align: center;">
+                    <div class="nota" style="text-align: justify;">
+                        <span>
+                            NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                            botón Guardar.
+                        </span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label id="fecVaca">Fecha desde</mat-label>
+                            <input (click)="LimpiarCalculo()" (dateInput)="LimpiarCalculo()" matInput
+                                [matDatepicker]="picker" placeholder="dd/mm/aaaa" [formControl]="fechaInicio"
+                                min="1950-01-31" max="2050-01-31" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker" matSuffix id="i-cursor"
+                                matTooltipPosition="right"
+                                matTooltip="Indicar la fecha en la que sale a tomar vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker> </mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label id="fecVaca">Fecha hasta</mat-label>
+                            <input (click)="LimpiarCalculo()" (dateInput)="LimpiarCalculo()" matInput
+                                [matDatepicker]="picker2" placeholder="dd/mm/aaaa" [formControl]="fechaFinal" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Indicar la fecha de finalización de vacaciones tomadas. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker2></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label id="fecVaca">Fecha ingreso al trabajo</mat-label>
+                            <input matInput [matDatepicker]="picker3" placeholder="dd/mm/aaaa"
+                                [formControl]="fechaIngreso" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker3" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Indicar la fecha en la que se incorpora nuevamente al trabajo. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker3></mat-datepicker>
+                        </mat-form-field>
+                        <div class="caja align-self-center">
+                            <input style="margin-right: 5px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Presionar para calcular número de dias libres y laborables" type="checkbox"
+                                (click)="ImprimirCalculos(formulario.value)" id="activo" unchecked="false">
+                            <label style="margin-right: 12px;" id="calculo">
+                                Calcular días hábiles, libres y totales
+                            </label>
+                        </div>
+                        <mat-form-field *ngIf="habilitarCalculados">
+                            <mat-label id="dias">Vacaciones: días laborables</mat-label>
+                            <input readonly="readonly" matInput placeholder="Días de incremento"
+                                [formControl]="dialaborableF" required (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Número de días laborables que se toman para vacaciones">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="habilitarCalculados">
+                            <mat-label>Vacaciones: días libres</mat-label>
+                            <input readonly="readonly" matInput placeholder="Días de incremento"
+                                [formControl]="dialibreF" required (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Número de días libres que estan dentro de las vacaciones">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="habilitarCalculados">
+                            <mat-label id="i-cursor">Vacaciones: días feriados</mat-label>
+                            <input readonly="readonly" matInput placeholder="Días de incremento" [formControl]="diasTF"
+                                required (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Número de días Feriados que estan dentro de las vacaciones">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="habilitarCalculados">
+                            <mat-label>Días totales</mat-label>
+                            <input readonly="readonly" matInput placeholder="Días de incremento" [formControl]="totalF"
+                                required (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Número de días totales que se toman de vacaciones">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-card-content>
+        </form>
+        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+            <button type="submit" class="btn btn-sm" (click)="ValidarDatosVacacion(formulario.value)"
+                [disabled]="!formulario.valid">
+                Guardar
+            </button>
+        </div>
+    </mat-card>
+</div>

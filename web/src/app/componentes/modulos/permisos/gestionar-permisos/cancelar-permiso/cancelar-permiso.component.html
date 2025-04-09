@@ -1,0 +1,23 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            ELIMINAR REGISTRO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+    </div>
+</div>
+<mat-card-content>
+    <div style="padding: 2%;">
+        <p>Se le recuerda que al eliminar este registro automáticamente se eliminarán <b>TODOS</b> los registro con los
+            que guarde
+            alguna relación. <b>Podría afectar al buen funcionamiento del sistema.</b> </p>
+        <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR ESTE REGISTRO?</p>
+    </div>
+</mat-card-content>
+<div style="text-align: center; margin-bottom: 3%;">
+    <button mat-raised-button id="aceptar" color="primary" (click)="AceptarAdvertencia()"
+        cdkFocusInitial>Aceptar</button>
+    <button mat-raised-button id="btn-raised" (click)="ventana.close(false)">Cancelar</button>
+</div>

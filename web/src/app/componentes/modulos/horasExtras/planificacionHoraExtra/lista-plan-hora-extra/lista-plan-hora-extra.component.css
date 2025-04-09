@@ -1,0 +1,35 @@
+.empresasL { 
+    font-size: 20px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+    padding-bottom: 6px; 
+}
+#resultadosEmpre { 
+    font-size: 17px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+    padding-bottom: 6px; 
+}
+
+.btn { margin-left: 20px; background-color: rgb(80,87,97); color: white; }
+
+p { font-size: x-small; }
+
+td { padding-top: 10px; text-align: center;  }
+
+table { width: 100%; font-size: 14px; }
+
+
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#plan { color: rgb(38, 0, 255); font-size: 20px; text-align: center; cursor: pointer; }
+
+mat-panel-description { color: white; }

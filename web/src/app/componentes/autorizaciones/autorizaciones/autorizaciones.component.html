@@ -1,0 +1,93 @@
+<div class="d-flex bd-highlight" id="titulo" *ngIf="data.datosPermiso.length != 0">
+    <span class="w-100 bd-highlight">
+        REGISTRAR AUTORIZACIÓN</span>
+    <mat-icon class="float-right" id="cerrar" (click) = "CerrarVentanaRegistroNoti()">highlight_off</mat-icon>
+</div>
+
+<form [formGroup]="nuevaAutorizacionesForm" *ngIf="data.datosPermiso.length != 0">
+    <div style="text-align: center;">
+        <br>
+        <div class="row">
+                <div class="col">
+                    <div [hidden] = "oculDepa" *ngIf="!filtroDepa">
+                        <p style="font-size: 10px; margin-bottom: 0px;">Seleccione el departamento a aprobar</p>
+                        <mat-form-field>
+                            <mat-label>Departamento</mat-label>
+                            <mat-icon id="notifica"  matSuffix  matTooltipPosition="right"
+                                matTooltip="Lista de departamentos">
+                                help_outline</mat-icon>
+                            <mat-select [formControl]="idDepartamento">
+                                <mat-option *ngFor="let d of nuevoAutorizacionTipos" [value]="d.id_departamento" (click)="ChangeDepa(d.id_departamento, estadoL)">
+                                    {{d.depa_autoriza}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div [hidden] = "ocultar" >
+                        <mat-form-field>
+                            <mat-label>Estados</mat-label>
+                            <mat-icon id="notifica" matSuffix  matTooltipPosition="right"
+                                matTooltip="Lista de estados">
+                                help_outline</mat-icon>
+                            <mat-select #estadoL [formControl]="estado" required>
+                                <mat-option *ngFor="let e of estados" [value]="e.id" >
+                                    {{e.nombre}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    
+                </div>
+        </div>
+        <div style="margin: 2% 4% 2% 4%; font-size: 14px; text-align: center;" *ngIf="listafiltrada.length === 0">
+            <p>{{mensaje}}</p>
+        </div>
+    </div>
+</form>
+
+
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 15px;" [hidden] = "ocultar" >
+    <div class="mat-elevation-z8">
+        <div  class="d-flex bd-highlight" id="titulo" style="align-items: center; padding: auto;">
+                <span class="w-100 bd-highlight" style="margin: auto;"> LISTA DE PERMISOS SOLICITADOS POR USUARIO </span>
+        </div>
+        <div class="table-responsive" style="background: white;">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;" style="font-size: 14px;">
+                        <th scope="col">Permiso #</th>
+                        <th scope="col">Departamento</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Aprobar</th>
+                        <th scope="col">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let dato of listafiltrada" style="font-size: 13px;">
+                        <td>{{dato.id}}</td>
+                        <td>{{dato.nombre_depa}}</td>
+                        <td>{{dato.empleado}}</td>
+                        <td>{{dato.estado}}</td>
+                        <td>
+                            <p *ngIf="dato.aprobar == 'NO'" style="color: rgb(189, 8, 8);">{{dato.aprobar}}</p>
+                            <p *ngIf="dato.aprobar == 'SI'" style="color: rgb(3, 146, 53);">{{dato.aprobar}}</p>
+                        </td>
+                        <td>{{dato.observacion}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listafiltrada.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+
+    <div [hidden] = "ocultar" style="padding-top: 1%; margin-top: 9px; align-items: center;">
+        <button id="btn-raised"  class="btn btn-sm" (click)="insertarAutorizacion(nuevaAutorizacionesForm.value)"
+        [disabled]="!nuevaAutorizacionesForm.valid">Guardar</button>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,25 @@
+<div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 5px 10px;">
+    <mat-label class="tipo" for="tipoUsuario"></mat-label>
+
+    <div class="tipo" *ngFor="let a of acciones">
+
+        <div class="checkbox-container">
+            <label class="checkbox-label">
+                <ng-container *ngIf="a.nombre">
+                    <ng-container [ngSwitch]="a.nombre">
+                        <ng-container *ngSwitchCase="'I'">Insertar</ng-container>
+                        <ng-container *ngSwitchCase="'U'">Actualizar</ng-container>
+                        <ng-container *ngSwitchCase="'D'">Eliminar</ng-container>
+                        <ng-container *ngSwitchDefault>{{ a.nombre }}</ng-container>
+                    </ng-container>
+                </ng-container>
+            </label>
+            <div class="checkbox">
+                <mat-checkbox class="rBoton" (click)="$event.stopPropagation()"
+                    (change)="$event ? selectionAcciones.toggle(a) : null" [checked]="selectionAcciones.isSelected(a)"
+                    [aria-label]="checkboxLabelPag(a)">
+                </mat-checkbox>
+            </div>
+        </div>
+    </div>
+</div>

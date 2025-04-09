@@ -1,0 +1,191 @@
+.btn {
+  background-color: rgb(80, 87, 97);
+  color: white;
+}
+
+#descargar, #registrar {
+  background-color: #93a3c7;
+  margin-top: 15px;
+  padding-bottom: 6px;
+  border-radius: 5px;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  padding-top: 10px;
+  font-size: 14px;
+  overflow: hidden;
+  height: 65px;
+  width: 220px;
+  cursor: pointer;
+}
+
+#descargar:hover {
+  background-color: rgb(0, 76, 255);
+  font-weight: bold;
+}
+
+#registrar:hover {
+  background-color: rgb(0, 76, 255);
+  font-weight: bold;
+}
+
+#cargar {
+  margin-top: 15px;
+  padding-bottom: 6px;
+  border-radius: 5px;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  padding-top: 10px;
+  font-size: 14px;
+  overflow: hidden;
+  height: 65px;
+  width: 220px;
+  cursor: pointer;
+}
+
+#cargar {
+  background-color: rgb(79, 145, 73);
+}
+
+#cargar:hover {
+  background-color: rgb(19, 111, 2);
+}
+
+
+
+
+p {
+  font-size: x-small;
+  text-align: center;
+}
+
+td {
+  padding-top: 10px;
+  text-align: center;
+}
+
+mat-form-field {
+  padding: 10px 15px 0px 15px;
+}
+
+table {
+  width: 100%;
+  font-size: 12px;
+}
+
+.progress {
+  margin: 250px auto auto auto;
+  opacity: 1
+}
+
+.pantalla-progress {
+  background: #ffff;
+  position: fixed;
+  opacity: 0.8;
+  height: 100%;
+  width: 100%;
+  left: 0px;
+  top: 0px;
+}
+
+mat-progress-spinner {
+  background: transparent;
+  z-index: 100;
+}
+
+#table_horario {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+}
+
+.td_horarios, .td_observaciones {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table{
+  border-spacing: 0;
+}
+
+.table th,
+.table td{
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  min-width: 100px;
+}
+
+.table th:last-child,
+.table td:last-child{
+  border-right: 0;
+}
+
+.table tbody tr{
+  background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) {
+  background-color: #e6f3ff;
+}
+
+.colum_1{
+  border-right: 0px solid #a1a1a1;
+  border-left: 0px solid #979797;
+  min-width: 100px !important;
+}
+
+.colum_2{
+  border-right: 0px solid #a1a1a1;
+  border-left: 0px solid #979797;
+  min-width: 70px !important;
+}
+
+.table .sticky{
+  position: sticky;
+  left: 0;
+}
+
+.table .sticky-2{
+  position: sticky;
+  left: 100px;
+}
+
+.table tbody tr .sticky,
+.table tbody tr .sticky-2
+{
+  background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) .sticky,
+.table tbody tr:nth-child(2n) .sticky-2
+{
+  background-color: #e6f3ff;
+}
+
+.td_horarios{
+  z-index: 1;
+}
+
+.td_observaciones{
+  position: relative
+}
+
+.icon-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+#ver{
+  color: indianred;
+  cursor: pointer;
+}
+
+.circulo {
+  margin-right: -50px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  float: left;
+}

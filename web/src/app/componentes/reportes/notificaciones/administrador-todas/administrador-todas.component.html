@@ -1,0 +1,83 @@
+<!-- TABLA CON LISTA DE TIPOS DE NOTIFICACIONES -->
+<div class="container" style="padding-bottom: 30px; text-align: center; padding-top: 15px;" *ngIf='fechas'>
+    <div id="titulo">
+        <span>REPORTE DE NOTIFICACIONES</span>
+    </div>
+    <br>
+    <div class="col-lg">
+        <div id="titulo">
+            <span>BÚSQUEDA RANGO FECHAS</span>
+        </div>
+        <mat-card class="example-card mat-elevation-z9">
+            <form [formGroup]="fechasForm">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Fecha Inicial</mat-label>
+                        <input matInput [matDatepicker]="picker1" [formControl]="fechaInicialF" required>
+                        <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" matTooltipPosition="right"
+                            matTooltip="Fecha de inicio de periodo.">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker1></mat-datepicker>
+                    </mat-form-field>
+                    <br>
+                    <mat-form-field>
+                        <mat-label>Fecha Final</mat-label>
+                        <input matInput [matDatepicker]="picker2" [formControl]="fechaFinalF" required>
+                        <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
+                            matTooltip="Fecha de fin de periodo.">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker2></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </form>
+            <div class="d-flex justify-content-around">
+                <button mat-button type="submit" class="btn btn-sm" (click)="LimpiarFechas()">Cancelar
+                </button>
+            </div>
+        </mat-card>
+    </div>
+    <div class="container" style="padding-bottom: 50px; text-align: center; padding-top: 25px;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="d-flex bd-highlight" id="titulo">
+                <span class="w-100 bd-highlight">
+                    LISTA DE TIPOS DE NOTIFICACIONES</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">N°</th>
+                            <th scope="col">Notificación</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let t of tipos | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{t.id}}</td>
+                            <td>{{t.nombre}}</td>
+                            <td class="d-flex justify-content-center">
+                                <i (click)="GenerarPDF('download', t.id, 'E')" class="fas fa-file-export" id="enviar"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Descargar reporte de notificaciones enviadas en formato PDF.">
+                                    <p>Enviados</p>
+                                </i>
+                                <i (click)="GenerarPDF('download', t.id, 'R')" class="fas fa-file-import" id="recibir"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Descargar reporte de notificaciones recibidas en formato PDF.">
+                                    <p>Recibidos</p>
+                                </i>
+                                <i (click)="GenerarPDF('download', t.id, 'D')" class="fas fa-file-excel" id="eliminar"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Descargar reporte de notificaciones de registros eliminados en formato PDF.">
+                                    <p>Eliminados</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="tipos.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </div>

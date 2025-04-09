@@ -1,0 +1,55 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            MODIFICAR PROCESOS
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="Salir()">highlight_off</mat-icon>
+    </div>
+</div>
+<div style="text-align: center">
+    <form [formGroup]="formulario">
+        <mat-card-content>
+            <div class="container">
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                        botón Guardar.
+                    </span>
+                </div>
+                <mat-form-field>
+                    <mat-label>Nombre de proceso</mat-label>
+                    <input matInput placeholder="Ej: Emergencia" [formControl]="nombre"
+                        required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingresar nombre con el que se va a identificar el nuevo proceso.">
+                        help_outline
+                    </mat-icon>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Proceso Padre</mat-label>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Seleccionar proceso superior.">
+                        help_outline
+                    </mat-icon>
+                    <mat-select [formControl]="procesoPadre" required>
+                        <mat-option *ngFor="let p of procesos" [value]="p.nombre">
+                            {{p.nombre}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="EditarProceso(formulario.value)"
+            [disabled]="!formulario.valid">
+            Guardar
+        </button>
+    </div>
+</div>

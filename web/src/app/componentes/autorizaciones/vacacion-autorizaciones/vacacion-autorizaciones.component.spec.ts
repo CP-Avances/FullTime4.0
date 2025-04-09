@@ -1,0 +1,23 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { VacacionAutorizacionesComponent } from './vacacion-autorizaciones.component';
+
+describe('VacacionAutorizacionesComponent', () => {
+  let component: VacacionAutorizacionesComponent;
+  let fixture: ComponentFixture<VacacionAutorizacionesComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ VacacionAutorizacionesComponent ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(VacacionAutorizacionesComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

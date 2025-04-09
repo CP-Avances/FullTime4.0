@@ -1,0 +1,124 @@
+<ng-container *ngIf="!mensaje">
+    <div id="resultados">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            ELIMINAR REGISTRO
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p>Se le recuerda que al eliminar este registro automáticamente se eliminarán <b>TODOS</b> los registro con los
+                que guarde alguna relación.
+                <b>Podría afectar al buen funcionamiento del sistema.</b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR ESTE REGISTRO?</p>
+        </div>
+    </mat-card-content>
+    <mat-card-content *ngIf="!eliminar">
+        <div style="padding: 2%;">
+            <p>
+                Para planificaciones horarios múltiples
+                <b>
+                    existe la posibilidad que todos los
+                    timbres realizados en la fecha indica se desconfiguren.
+                </b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE VERIFICAR TIMBRES DE ASISTENCIA?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
+
+
+
+<!-- Componentes del notificacion de registro multiple -->
+<ng-container *ngIf="mensaje == 'registro'">
+    <div id="resultados" >
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            IMPORTAR PLANTILLA
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como
+                <b>observación “ok”</b>.
+            </p>
+            <p id="mensaje">¿ESTA SEGURO DE IMPORTAR LA PLANTILLA?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
+<ng-container *ngIf="mensaje == 'registro-planificacion'">
+  <div id="resultados" >
+      <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+          IMPORTAR PLANTILLA
+      </span>
+  </div>
+  <mat-card-content *ngIf="eliminar">
+      <div style="padding: 2%;">
+          <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como
+              <b>observación “OK”</b>.
+              Los días que indiquen alguna observación diferente a “OK” se subirán como días libres,
+              o como días feriados si ya existe el registro en el sistema.
+          </p>
+          <p id="mensaje">¿ESTA SEGURO DE IMPORTAR LA PLANTILLA?</p>
+      </div>
+  </mat-card-content>
+</ng-container>
+
+
+
+<!-- Componentes del notificacion de registro multiple -->
+<ng-container *ngIf="mensaje == 'eliminar'">
+    <div id="resultados" >
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            ELIMINAR REGISTRO
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p>Se le recuerda que al eliminar este registro automáticamente se eliminarán <b>TODOS</b> los registro con los
+                que guarde alguna relación.
+                <b>Podría afectar al buen funcionamiento del sistema.</b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR ESTE REGISTRO?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
+<ng-container *ngIf="mensaje == 'deshabilitar'">
+    <div id="resultados" >
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            DESHABILITAR REGISTRO
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p>Se le recuerda que al deshabilitar este registro automáticamente se deshabilitaran <b>TODOS</b> los registro con los
+                que guarde alguna relación.
+                <b>Podría afectar al buen funcionamiento del sistema.</b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE DESHABILITAR ESTE REGISTRO?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
+<ng-container *ngIf="mensaje == 'asistencia'">
+  <div id="resultados" >
+      <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+          VERIFICAR ASISTENCIA
+      </span>
+  </div>
+  <mat-card-content *ngIf="!eliminar">
+      <div style="padding: 2%;">
+          <p> <b>La asistencia se colocará de acuerdo a los timbres encontrados en el sistema.</b></p>
+      </div>
+  </mat-card-content>
+</ng-container>
+
+<div style="text-align: center; margin-bottom: 3%;">
+    <button mat-raised-button id="aceptar" class="btn-sm" color="primary" (click)="Confirmar()">
+        Aceptar
+    </button>
+    &nbsp;&nbsp;
+    <button mat-button id="btn-raised" (click)="CerrarVentana()" cdkFocusInitial>Cancelar</button>
+</div>

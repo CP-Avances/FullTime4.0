@@ -1,0 +1,80 @@
+@media (max-width: 992px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+}
+
+mat-form-field {
+    width: 90%;
+}
+
+img {
+    width: 100%;
+}
+
+.pantalla {
+    margin: auto;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    border-radius: 5px;
+    margin-left: 15px;
+    color: white;
+}
+
+mat-card {
+    width: 320px;
+    margin: auto;
+    text-align: center;
+    padding-top: 10px;
+    border-style: groove;
+    border-radius: 25px;
+    padding-bottom: 25px;
+}
+
+@media (max-width: 550px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+
+    #home-section {
+        background: url('../../../../../assets/imagenes/contrasena_mobil.png') no-repeat !important;
+        min-height: 100vh;
+        background-size: cover !important;
+        background-attachment: scroll !important;
+    }
+}
+
+@media (min-width: 551px) {
+    #home-section {
+        background: url('../../../../../assets/imagenes/apple.jpg') no-repeat;
+        min-height: 100vh;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+}
+
+
+.dark-overlay {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    min-width: 100%;
+    background-color: rgba(0, 0, 0, .6);
+}
+
+.home-inner {
+    padding: 45px 100px 15px 100px;
+}
+
+.verde {
+    background-color: rgb(0, 176, 103);
+    color: rgb(255, 255, 255);
+}
+
+button{
+    width: 100%;
+}

@@ -1,0 +1,81 @@
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
+    margin-left: 16px;
+  }
+
+mat-radio-group {
+    width: 210px;
+    padding: 15px 20px 15px 20x;
+    margin-bottom: 10px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+.separar {
+    padding: 10px 10px 0px 10px
+}
+
+#respaldo {
+    font-size: 13px;
+    display: inline-block;
+}
+
+#letras {
+    font-size: 14px;
+}
+
+[type="file"] {
+    overflow: hidden;
+    height: 0;
+    width: 0;
+}
+
+[type="file"]+label {
+    -webkit-transition: all 0.3s;
+    vertical-align: middle;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    background: #f15d22;
+    transition: all 0.3s;
+    font-size: inherit;
+    position: relative;
+    display: inline-block;
+    padding: 1rem 50px;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+}
+
+[type="file"]+label.btn-2 {
+    background-color: rgb(150, 243, 141);
+    overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+    -webkit-transition: all 0.3s;
+    font-family: "Font Awesome 5 Pro";
+    line-height: 3.3;
+    margin-left: 5px;
+    transition: all 0.3s;
+    font-size: 100%;
+    position: absolute;
+    content: "\f382";
+    height: 100%;
+    color: #fff;
+    right: 130%;
+    top: 0px;
+}
+
+[type="file"]+label.btn-2:hover {
+    background-color: rgb(0, 76, 255)
+}
+
+[type="file"]+label.btn-2:hover::before {
+    right: 80%
+}

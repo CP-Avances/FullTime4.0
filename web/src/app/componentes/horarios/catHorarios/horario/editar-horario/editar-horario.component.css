@@ -1,0 +1,125 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+    margin: 5px 10px 5px 10px;
+}
+
+mat-form-field {
+    width: 100%;
+    padding: 10px 10px 0px 10px;
+}
+
+#hora {
+    font-size: x-small;
+}
+
+#check {
+    margin-bottom: 5px;
+}
+
+#check_ {
+    width: 210px;
+    margin-right: 85px;
+    margin-bottom: 5px;
+}
+
+#checks {
+    width: 215px;
+    margin-right: 65px;
+    margin-bottom: 5px;
+}
+
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem auto;
+    max-width: 200px;
+    align-items: flex-start;
+}
+
+#respaldo {
+    font-size: 13px;
+    display: inline-block;
+}
+
+.separar {
+    padding: 10px 10px 0px 10px
+}
+
+[type="file"] {
+    overflow: hidden;
+    height: 0;
+    width: 0;
+}
+
+[type="file"]+label {
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Poppins", sans-serif;
+    font-size: inherit;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    outline: none;
+    padding: 1rem 50px;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+[type="file"]+label.btn-2 {
+    background-color: rgb(150, 243, 141);
+    overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+    color: #fff;
+    content: "\f382";
+    font-family: "Font Awesome 5 Pro";
+    font-size: 100%;
+    height: 100%;
+    right: 130%;
+    line-height: 3.3;
+    position: absolute;
+    top: 0px;
+    margin-left: 5px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+[type="file"]+label.btn-2:hover {
+    background-color: rgb(21, 130, 1);
+}
+
+[type="file"]+label.btn-2:hover::before {
+    right: 80%
+}
+
+.progress {
+    margin: 250px auto auto auto;
+    opacity: 1
+}
+
+.pantalla-progress {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    position: fixed;
+    background: #ffff;
+}
+
+mat-progress-spinner {
+    background: transparent;
+    z-index: 100;
+}
+
+mat-label {
+    font-size: 13px;
+}
+

@@ -1,0 +1,19 @@
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#verticalLine {
+    border-left: 1px solid rgb(52, 65, 84);
+}
+
+#datosF {
+    padding-right: 5px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.espacio {
+    padding: 0px 10px 0px 10px;
+}

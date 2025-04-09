@@ -1,0 +1,25 @@
+p {
+    font-size: x-small;
+}
+
+#iconos {
+    text-align: center;
+    cursor: pointer;
+    color: white;
+    margin-right: 10px;
+}
+
+#datosF {
+    font-weight: bold;
+    font-size: 15px;
+    padding-right: 5px;
+}
+
+.caja1 {
+    padding: 0px 10px 0px 10px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}

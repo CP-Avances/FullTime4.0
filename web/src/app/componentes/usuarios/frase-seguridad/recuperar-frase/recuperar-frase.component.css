@@ -1,0 +1,79 @@
+@media (max-width: 992px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+}
+
+mat-form-field {
+    width: 90%;
+}
+
+img {
+    width: 100%;
+}
+
+.pantalla {
+    margin: auto;
+}
+
+.home-inner {
+    padding: 50px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    border-radius: 5px;
+    color: white;
+}
+
+mat-card {
+    width: 320px;
+    margin: auto;
+    text-align: center;
+    padding-top: 10px;
+    border-style: groove;
+    border-radius: 25px;
+    padding-bottom: 25px;
+}
+
+@media (max-width: 550px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+
+    #home-section {
+        background: url('../../../../../assets/imagenes/cambioContrasena_mobil.jpg') no-repeat !important;
+        min-height: 100vh;
+        background-size: cover !important;
+        background-attachment: scroll !important;
+    }
+}
+
+@media (min-width: 551px) {
+    #home-section {
+        background: url('../../../../../assets/imagenes/fingerprint.jpg') no-repeat;
+        min-height: 100vh;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+}
+
+.dark-overlay {
+    background-color: rgba(0, 0, 0, .6);
+    min-width: 100%;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+
+#fuente {
+    font-size: x-small;
+}
+
+button{
+    width: 80%;
+    margin: auto;
+}

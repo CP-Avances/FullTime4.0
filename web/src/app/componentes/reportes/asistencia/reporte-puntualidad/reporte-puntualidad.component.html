@@ -1,0 +1,233 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div id="titulo">
+        <span>REPORTE DE PUNTUALIDAD</span>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-5" style="padding-bottom: 10px;">
+            <div id="titulo">
+                <span>OPCIONES DE DESCARGA</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <button mat-icon-button (click)="validacionReporte('open')">
+                        <mat-icon class="i-pdf" matTooltipPosition="right"
+                            matTooltip="Previsualizar reporte en el navegador en fomato PDF.">picture_as_pdf
+                        </mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="validacionReporte('print')">
+                        <mat-icon class="i-print" matTooltipPosition="right"
+                            matTooltip="Imprimir reporte en formato PDF.">local_printshop</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="validacionReporte('download')">
+                        <mat-icon class="i-download" matTooltipPosition="right"
+                            matTooltip="Descargar reporte en formato PDF.">cloud_download</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="validacionReporte('excel')">
+                        <mat-icon class="fas fa-file-excel i-excel" matTooltipPosition="right"
+                            matTooltip="Descargar reporte en formato EXCEL."></mat-icon>
+                    </button>
+                </div>
+            </mat-card>
+            <br>
+            <app-rango-fechas></app-rango-fechas>
+        </div>
+        <div class="col-lg-7">
+            <app-criterios-busqueda [num_option]="3"></app-criterios-busqueda>
+            <br>
+            <div id="titulo">
+                <span>PARÁMETROS DE SEMAFORIZACIÓN</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" style="padding: 2%;">
+                <p style="text-align: justify; font-size:small;">
+                    <b>Mínimo Puntualidades: </b> n días que se considera al empleado poco puntual. Es decir que el
+                    empleado tienen <b>más atrasos</b> que asistencias puntuales. <br>
+                    <b>Máximo Puntualidades:</b> n días que se considera al empleado muy puntual, puede o no tener
+                    atrasos y en caso de tenerlos serán muy pocos.
+                </p>
+                <form [formGroup]="ParametrosForm" (ngSubmit)="onSubmitParametros()">
+                    <div class="d-flex flex-wrap justify-content-around">
+                        <mat-form-field class="parametros_styles">
+                            <mat-label style="font-size: 13px;">Mínimo Puntualidad</mat-label>
+                            <input matInput #menor maxlength="2" placeholder="Menor a: ... " formControlName="menor"
+                                value="3">
+                            <mat-hint align="end">{{menor.value.length}} / 2</mat-hint>
+                        </mat-form-field>
+                        <mat-form-field class="parametros_styles">
+                            <mat-label style="font-size: 13px;"> Máximo Puntualidad </mat-label>
+                            <input matInput #mayor maxlength="2" placeholder="Mayora a: ..." formControlName="mayor"
+                                value="11">
+                            <mat-hint align="end">{{menor.value.length}} / 2</mat-hint>
+                        </mat-form-field>
+                    </div>
+                    <div class="d-flex justify-content-around">
+                        <button mat-button type="submit" class="btn btn-sm" id="boton"
+                            [disabled]="!ParametrosForm.valid">Guardar Parametros</button>
+                    </div>
+                </form>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
+    <div *ngIf="bool.bool_suc" class="mat-elevation-z8" style="background: white;">
+               
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                     RESULTADO SUCURSALES
+                </span>
+            </div>
+           <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+              <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                 (click)="MostrarLista()">
+                 Mostrar lista
+             </button>
+            </div>
+        </div>
+                     
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleSuc() : null"
+                                [checked]="selectionSuc.hasValue() && isAllSelectedSuc()"
+                                [indeterminate]="selectionSuc.hasValue() && !isAllSelectedSuc()"
+                                [aria-label]="checkboxLabelSuc()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Sucursal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"
+                                [aria-label]="checkboxLabelSuc(s)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{s.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+     <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+    <div *ngIf="bool.bool_dep" class="mat-elevation-z8" style="background: white;">
+
+                <div id="titulo" class="row w-100 m-auto">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            RESULTADO DEPARTAMENTOS
+                        </span>
+                    </div>
+                   <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                      <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                         (click)="MostrarLista()">
+                         Mostrar lista
+                     </button>
+                    </div>
+                </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleDep() : null"
+                                [checked]="selectionDep.hasValue() && isAllSelectedDep()"
+                                [indeterminate]="selectionDep.hasValue() && !isAllSelectedDep()"
+                                [aria-label]="checkboxLabelDep()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Departamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let d of departamentos | filtrosNombres: filtroNombreDep | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionDep.toggle(d) : null" [checked]="selectionDep.isSelected(d)"
+                                [aria-label]="checkboxLabelDep(d)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{d.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+    <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
+    <div *ngIf="bool.bool_emp" class="mat-elevation-z8" style="background: white;">
+        
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    RESULTADO USUARIOS
+                </span>
+            </div>
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                    (click)="MostrarLista()">
+                    Mostrar lista
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleEmp() : null"
+                                [checked]="selectionEmp.hasValue() && isAllSelectedEmp()"
+                                [indeterminate]="selectionEmp.hasValue() && !isAllSelectedEmp()"
+                                [aria-label]="checkboxLabelEmp()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let e of empleados | filtroCodigo: filtroCodigo | emplCedula: filtroCedula | filtrosNombres: filtroNombreEmp | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"
+                                [aria-label]="checkboxLabelEmp(e)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{e.cedula}}</td>
+                        <td>{{e.codigo}}</td>
+                        <td>{{e.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+</div>

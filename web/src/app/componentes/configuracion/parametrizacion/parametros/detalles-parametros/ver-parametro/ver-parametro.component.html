@@ -1,0 +1,397 @@
+<div class="container" *ngFor="let tp of parametros" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo" class="row w-100 m-auto align-items-center">
+            <div class="col-12 col-md-3 mb-2 mb-md-0 order-2 order-md-1">
+                <button class="btn btn-outline-light btn-sm w-100 m-auto" style="float: left;"
+                    (click)="VerListaParametro()">
+                    Listar parámetros
+                </button>
+            </div>
+            <div class="col-12 col-md-5 mb-2 mb-md-0 order-1 order-md-2">
+                <span class="Tabla_titulo">{{tp.descripcion.toUpperCase()}}</span>
+            </div>
+        </div>
+        <mat-card-content>
+
+            <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="!ver_detalles">
+                <div class="nota" id="espacio" style="text-align: justify;">
+                    <span>
+                        {{nota_parametro}}
+                    </span>
+                </div>
+
+                <!-- CONTENIDO DE SELECCION DE FORMATO DE FECHAS (1)-->
+                <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;" *ngIf="formato_fecha">
+                    <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formatoA, 'color':'white'}"
+                            (click)="GuardarDatos(1, '')">
+                            Formato americano: DD/MM/YYYY
+                        </button>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formatoI, 'color':'white'}"
+                            (click)="GuardarDatos(2, '')">
+                            Formato inglés: MM/DD/YYYY
+                        </button>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formatoE, 'color':'white'}"
+                            (click)="GuardarDatos(3, '')">
+                            Formato estándar: YYYY-MM-DD
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO DE SELECCION DE FORMATO DE HORAS (2) -->
+                <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;" *ngIf="formato_hora">
+                    <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formato12, 'color':'white'}"
+                            (click)="GuardarDatos(4, '')">
+                            Formato de 12 horas
+                        </button>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formato24, 'color':'white'}"
+                            style="font-size: 12px;" (click)="GuardarDatos(5, '')">
+                            Formato de 24 horas
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO CONFIGURACION DE ATRASOS (3) -->
+                <div *ngIf="tolerancia_atrasos">
+                    <form [formGroup]="formularioT">
+                        <mat-radio-group aria-label="Select an option" [formControl]="toleranciaF">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-button value="1" (change)="SeleccionarOpcion($event)">
+                                    <label id="textoradiobtn" style="color: black;">
+                                        No considerar minutos de tolerancia
+                                    </label>
+                                </mat-radio-button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-button value="2" (change)="SeleccionarOpcion($event)">
+                                    <label id="textoradiobtn" style="color: black;">
+                                        Considerar minutos de tolerancia
+                                    </label>
+                                </mat-radio-button>
+                                <div class="nota" style="text-align: center; margin-left: 15px;"
+                                    *ngIf="ver_con_tolerancia">
+                                    <span>
+                                        Si el usuario llega después de los minutos de tolerancia, calcular el atraso
+                                        considerando:
+                                    </span>
+                                </div>
+                            </div>
+                        </mat-radio-group>
+
+                        <mat-radio-group aria-label="Select an option" [formControl]="tipoF" *ngIf="ver_con_tolerancia">
+                            <div class="d-flex flex-wrap justify-content-start" style="margin-left: 30px;">
+                                <mat-radio-button value="2-1" (change)="SeleccionarTipo($event)">
+                                    <label id="textoradiobtn" style="color: black;">
+                                        Horario de entrada
+                                    </label>
+                                </mat-radio-button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start" style="margin-left: 30px;">
+                                <mat-radio-button value="2-2" (change)="SeleccionarTipo($event)">
+                                    <label id="textoradiobtn" style="color: black;">
+                                        Minutos de tolerancia
+                                    </label>
+                                </mat-radio-button>
+                            </div>
+                        </mat-radio-group>
+                    </form>
+
+                    <div class="mat-elevation-z8" style="background: white; padding-top: 10px;">
+                        <div class="d-flex bd-highlight" id="resultados" style="font-size: 12px;">
+                            <span class="w-100 bd-highlight">
+                                EJEMPLO CASO DE USO
+                            </span>
+                        </div>
+                        <div class="table-responsive" style="text-align: center;">
+                            <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                <thead class="thead-light">
+                                    <tr style="text-align: center;">
+                                        <th scope="col" id="td_horarios">HORARIO ENTRADA</th>
+                                        <th scope="col" id="td_horarios">TOLERANCIA</th>
+                                        <th scope="col" id="td_horarios">MARCACION USUARIO</th>
+                                        <th scope="col" id="td_horarios" *ngIf="ver_atraso">ATRASO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="td_horarios">09:00</td>
+                                        <td id="td_horarios">00:10</td>
+                                        <td id="td_horarios">09:12</td>
+                                        <td id="td_horarios" *ngIf="ver_sin_tolerancia">00:12</td>
+                                        <td id="td_horarios" *ngIf="ver_con_tolerancia_2">00:02</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn btn-sm" *ngIf="ver_guardar_atraso && getVerParametroRegistrarDetalleParametro()" (click)="RegistrarAtraso()"
+                            [disabled]="ver_registrar_atraso">
+                            Registrar
+                        </button>
+                        <button class="btn btn-sm" *ngIf="ver_actualizar_atraso && getVerParametroEditarDetalleParametro()" (click)="ActualizarAtraso()"
+                            [disabled]="ver_registrar_atraso">
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO FORMULARIO SELECCIONAR ACTIVAR (Si) - DESACTIVAR (No) -->
+                <form [formGroup]="formulario" *ngIf="ver_formulario">
+                    <mat-radio-group aria-label="Select an option" [formControl]="descripcionF">
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <mat-radio-button value="Si" (change)="SelecionarEvento($event, '')">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Activar
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <mat-radio-button value="No" (change)="SelecionarEvento($event, '')">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Desactivar
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </form>
+
+                <!-- CONTENIDO DE SELECCION DE DIAS -->
+                <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px;" *ngIf="seleccionar_dia">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':lunes, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Lunes')">
+                                    LUNES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':martes, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Martes')">
+                                    MARTES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':miercoles, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Miércoles')">
+                                    MIÉRCOLES
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':jueves, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Jueves')">
+                                    JUEVES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':viernes, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Viernes')">
+                                    VIERNES
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':sabado, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Sábado')">
+                                    SÁBADO
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
+                                <button mat-button type="button" class="btn-sm"
+                                    [ngStyle]="{'font-size.px':12, 'width.px':150, 'background-color':domingo, 'color':'white'}"
+                                    (click)="GuardarDatos(6, 'Domingo')">
+                                    DOMINGO
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO HABILITAR OPCIONES FORMATO LABORAL - CALENDARIO -->
+                <div class="row" *ngIf="laboral_calendario">
+                    <div class="col-md"></div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_laboral">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="laboral" (change)="SelecionarLaboral($event, '')"
+                                        matSuffix>
+                                        Laboral
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_laboral">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="calendario" (change)="SelecionarLaboral($event, '')"
+                                        matSuffix>
+                                        Calendario
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md"></div>
+                </div>
+
+                <!-- CONTENIDO DE SELECCION DE TIPO DE CARGA DE VACACIONES -->
+                <div class="row" *ngIf="carga">
+                    <div class="col-md"></div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="horas" (change)="SelecionarCarga($event, '')">
+                                        Horas
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="diaria" (change)="SelecionarCarga($event, '')">
+                                        Diaria
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="mensual" (change)="SelecionarCarga($event, '')">
+                                        Mensual
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="anual" (change)="SelecionarCarga($event, '')">
+                                        Anual
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md"></div>
+                </div>
+
+                <!-- CONTENIDO DE SELECCION DE TIPO DE DESCARGA DE KARDEX DE VACACIONES -->
+                <div class="row" *ngIf="kardex">
+                    <div class="col-md"></div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_kardex">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="periodos" (change)="SelecionarDescarga($event, '')">
+                                        Periodos
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_kardex">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="global" (change)="SelecionarDescarga($event, '')">
+                                        Global
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md"></div>
+                </div>
+
+            </div>
+
+            <!-- CONTENIDO VISTA DE DETALLE DE PARAMETROS -->
+            <div class="container contenedor_tabla" style="padding-bottom: 25px; text-align: center; padding-top: 5px;"
+                *ngIf="ver_detalles">
+
+                <div class="nota" id="espacio" style="text-align: justify;">
+                    <span>
+                        {{nota_parametro}}
+                    </span>
+                </div>
+
+                <div class="mat-elevation-z8" style="background: white;">
+                    <div id="titulo" class="row w-100 m-auto align-items-center text-center">
+                        <div class="col-12 col-md-10 mb-2 mb-md-0 order-1 order-md-1">
+                            <span class="Tabla_titulo">DETALLES DE PARÁMETRO GENERAL</span>
+                        </div>
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2 ">
+                            <button class="btn btn-outline-light btn-sm w-100 m-auto" (click)="AbrirVentanaDetalles(tp)"
+                                *ngIf="boton_registrar && getVerParametroEditarDetalleParametro()">
+                                Registrar detalle
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let dp of datosDetalle | paginate:tamanio_pagina:numero_pagina">
+                                    <td>
+                                        {{dp.descripcion}}
+                                        <span *ngIf="ubicacion">m</span>
+                                        <span *ngIf="horas">horas</span>
+                                    </td>
+                                    <td>
+                                        <i *ngIf="ver_editar" id="editarI" (click)="AbrirVentanaEditarDetalle(dp)"
+                                            matSuffix matTooltipPosition="right"
+                                            matTooltip="Modificar datos de este registro." class="fas fa-edit">
+                                            <p>Editar</p>
+                                        </i>
+                                        <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
+                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dp)" id="t-eliminar" *ngIf="getVerParametroEliminarDetalleParametro()">
+                                            <p>Eliminar</p>
+                                        </i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator id="pagina" [length]="datosDetalle.length" [pageSize]="tamanio_pagina"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+            </div>
+
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,0 +1,81 @@
+[type="file"] {
+    height: 0;
+    overflow: hidden;
+    width: 0;
+}
+
+[type="file"]+label {
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Poppins", sans-serif;
+    font-size: inherit;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    outline: none;
+    padding: 1rem 50px;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+[type="file"]+label.btn-2 {
+    background-color: rgb(150, 243, 141);
+    overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+    color: #fff;
+    content: "\f382";
+    font-family: "Font Awesome 5 Pro";
+    font-size: 100%;
+    height: 100%;
+    right: 130%;
+    line-height: 3.3;
+    position: absolute;
+    top: 0px;
+    margin-left: 4px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+[type="file"]+label.btn-2:hover {
+    background-color: rgb(21, 130, 1);
+}
+
+[type="file"]+label.btn-2:hover::before {
+    right: 80%
+}
+
+figure {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.logo{
+    margin: auto;
+    max-width: 300px;
+    max-height: 300px;
+
+    figure{
+        margin: auto;
+    }
+
+    ng-template{
+        margin: auto;
+
+        img{
+            width: 90%;
+            height: 90%;
+        }
+    }
+}
+
+

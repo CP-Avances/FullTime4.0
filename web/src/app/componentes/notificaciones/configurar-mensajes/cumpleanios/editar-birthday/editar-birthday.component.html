@@ -1,0 +1,66 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR MENSAJE DE CUMPLEAÑOS
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<div class="container">
+    <form [formGroup]="formulario">
+        <div class="container">
+            <div class="nota" id="espacio">
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
+            </div>
+            <div class="d-flex flex-wrap justify-content-between">
+                <mat-form-field>
+                    <mat-label>Asunto</mat-label>
+                    <input matInput [formControl]="tituloF" required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar asunto de mensaje.">
+                        help_outline
+                    </mat-icon>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Link (opcional)</mat-label>
+                    <input matInput [formControl]="linkF">
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingresar un link de acceso a mensaje de cumpleaños.">
+                        help_outline
+                    </mat-icon>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Mensaje</mat-label>
+                    <textarea matInput #message maxlength="256" placeholder="Ingrese mensaje de felicitación de cumpleaños."
+                        [formControl]="mensajeF" required></textarea>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingrese mensaje personalizado de cumpleaños.">
+                        help_outline
+                    </mat-icon>
+                    <mat-hint align="start"><strong>Solo puede ingresar hasta 255 caracteres</strong></mat-hint>
+                    <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
+                </mat-form-field>
+                <div style="width: 100%; padding: 20px 0px 15px 0px;">
+                    <div class="d-flex flex-wrap justify-content-center" style="width: min-content; margin: auto;">
+                        <div class="separar">
+                            <form method="post" enctype="multipart/form-data">
+                                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
+                                <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">Subir imagen</label>
+                            </form>
+                        </div>
+                        <br>
+                        <div class="separar" style="width: 200px;">
+                            <input type="text" id="imagen" placeholder="Ningún archivo seleccionado." class="form-control"
+                                [formControl]="imagenF">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button id="btn-raised"  class="btn btn-sm" (click)="ModificarMensajeBirthday(formulario.value)"
+        [disabled]="!formulario.valid">Guardar</button>
+</div>

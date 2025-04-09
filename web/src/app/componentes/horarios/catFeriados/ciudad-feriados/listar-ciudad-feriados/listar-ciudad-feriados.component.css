@@ -1,0 +1,68 @@
+p {
+    font-size: x-small;
+}
+
+td {
+    padding-top: 10px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+hr {
+    background-color: black;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+#editarI {
+    margin-left: 25px;
+    color: green;
+    cursor: pointer;
+}
+
+#datosF {
+    padding-right: 5px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    mat-card-content{
+        margin: 0%;
+        padding: 0%;
+
+        .container{
+            margin: 0%;
+            padding: 0%;
+            width: 100%;
+        }
+    }
+
+    .opciones{
+        margin-left: 10px;
+    }
+
+    hr{
+        width: 95%;
+        margin: auto;
+        margin-bottom: 10px;
+    }
+}
+
+
+

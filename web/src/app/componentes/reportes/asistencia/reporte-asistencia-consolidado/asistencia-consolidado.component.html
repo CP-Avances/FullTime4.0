@@ -1,0 +1,132 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div id="titulo">
+        <span>REPORTE DE ASISTENCIA DETALLE CONSOLIDADO</span>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg">
+            <div id="titulo">
+                <span>BÚSQUEDA RANGO FECHAS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <form [formGroup]="fechasForm">
+                        <button mat-icon-button (click)="ConfiguracionReporteAsistencia()">
+                            <mat-icon style="color: black;" matSuffix matTooltipPosition="right"
+                                matTooltip="Se visualizaran opciones de descarga al validar fechas ingresadas y seleccionar campos que se visualizaran en el reporte.">
+                                settings</mat-icon>
+                        </button>Seleccionar tipo de reporte
+                        <br>
+                        <mat-form-field>
+                            <mat-label>Desde</mat-label>
+                            <input matInput [matDatepicker]="pickerInicial" placeholder="dd/mm/aaaa"
+                                [disabled]="habilitar" [formControl]="fec_inicio_mes" required>
+                            <mat-datepicker-toggle matSuffix [for]="pickerInicial" matTooltipPosition="right"
+                                id="ayuda_fec"
+                                matTooltip="Ingresar fecha inicio del mes que desee consultar el reporte. Ejm: 01/08/2020.">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #pickerInicial></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Hasta</mat-label>
+                            <input matInput [matDatepicker]="pickerFinal" placeholder="dd/mm/aaaa"
+                                [disabled]="habilitar" [formControl]="fec_final_mes" required>
+                            <mat-datepicker-toggle matSuffix [for]="pickerFinal" matTooltipPosition="right"
+                                id="ayuda_fec"
+                                matTooltip="Ingresar fecha fin del mes que desee consultar el reporte. Ejm: 31/08/2020.">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #pickerFinal></mat-datepicker>
+                        </mat-form-field>
+                    </form>
+                    <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                        <button mat-button type="submit" class="btn btn-sm" id="botones" [disabled]="fechasForm.invalid"
+                            (click)="ValidarRangofechas(fechasForm.value)">Aceptar</button>
+                        <button mat-button type="submit" class="btn btn-sm" id="botones"
+                            (click)="limpiarCamposRango()">Cancelar</button>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">LISTA DE USUARIOS</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-icon id="limpiar" (click)="limpiarCampos()" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                                format_clear
+                            </mat-icon>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de empleado de acuerdo a las columnas de la tabla. Se visualizaran opciones de descarga al validar fechas ingresadas y seleccionar campos que se visualizaran en el reporte.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let e of empleados | filtroCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{e.cedula}}</td>
+                        <th scope="row">{{e.codigo}}</th>
+                        <td>{{e.apellido}}</td>
+                        <td>{{e.nombre}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i matSuffix [ngStyle]="estilo" matTooltipPosition="right"
+                                matTooltip="Visualizar reporte asistencia consolidada en formato PDF desde el navegador."
+                                class="material-icons" id="pdf"
+                                (click)="AsistenciaEmpleado(e.id, 'open')">picture_as_pdf
+                                <p>PDF</p>
+                            </i>
+                            <i (click)="exportToExcelAsistencia(e.id)" [ngStyle]="estilo" id="excel"
+                                class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                                matTooltip="Descargar reporte asistencia consolidada en formato EXCEL.">
+                                <p>XLSL</p>
+                            </i>
+                            <i matSuffix [ngStyle]="estilo" matTooltipPosition="right"
+                                matTooltip="Descargar reporte asistencia consolidada en formato PDF."
+                                class="material-icons" id="descarga" (click)="AsistenciaEmpleado(e.id, 'download')">
+                                cloud_download<p>PDF</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+</div>

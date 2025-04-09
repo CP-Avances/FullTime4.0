@@ -1,0 +1,46 @@
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+  }
+  
+  td {
+    white-space: nowrap;
+    padding-top: 10px;
+    text-align: center;
+  }
+  
+  mat-form-field {
+    padding: 10px 15px 0px 15px;
+  }
+  
+  table {
+    width: 100%;
+    font-size: 12px;
+  }
+  
+  p {
+    font-size: xx-small;
+  }
+  
+  #SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  
+  #accion {
+    font-size: 12px;
+    color: rgb(38, 0, 255);
+    cursor: pointer;
+    text-align: center;
+    margin-right: 5px;
+    margin-left: 15px;
+  }
+  
+  .mat-mdc-radio-button ~ .mat-mdc-radio-button {
+    margin-left: 20px;
+  }
+  
+  #fuente {
+    font-weight: bolder;
+  }

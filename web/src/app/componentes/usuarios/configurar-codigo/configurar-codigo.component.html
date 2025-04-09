@@ -1,0 +1,73 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+    <div class="row">
+        <div class="col-sm" style="margin-bottom: 25px;">
+            <div id="titulo">
+                <span>CONFIGURACIÓN DE CÓDIGO</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <form [formGroup]="formulario">
+                    <mat-card-content>
+                        <div class="container" style="text-align: center">
+                            <div class="nota" style="text-align: justify ;">
+                                <span>NOTA: Por favor indicar como desea generar el código de empleado.</span>
+                            </div>
+                            <section class="example-section">
+                                <mat-radio-group aria-label="Select an option" formControlName="seleccionForm" required>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col">
+                                                <mat-radio-button ngDefaultControl [checked]="automaticoF"
+                                                    (click)="VerCampo()">
+                                                    <label>Registro automático</label>
+                                                </mat-radio-button>
+                                            </div>
+                                            <div class="col">
+                                                <mat-radio-button ngDefaultControl [checked]="manualF"
+                                                    (click)="QuitarCampo()">
+                                                    <label>Registro manual</label>
+                                                </mat-radio-button>
+                                            </div>
+                                            <div class="col">
+                                                <mat-radio-button ngDefaultControl [checked]="cedulaF"
+                                                    (click)="QuitarCampoCedula()">
+                                                    <label>Registrar cédula</label>
+                                                </mat-radio-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-radio-group>
+                            </section>
+                            <mat-form-field *ngIf="!HabilitarDescrip">
+                                <mat-label id="letras">Código Automático desde:</mat-label>
+                                <input matInput type="tel" placeholder="1000" [formControl]="inicioF" maxlength="10"
+                                    (keypress)="IngresarSoloNumeros($event)"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Indicar valor inicial para generar código del empleado.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </mat-card-content>
+                </form>
+
+                <div style="text-align: center; padding-top: 15px;">
+                    <button id="btn-raised" class="btn btn-sm float-left" (click)="VisualizarConfiguracion()" *ngIf="getVerConfiguracion()">
+                        Visualizar
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)" *ngIf="getConfigurar()"
+                        [disabled]="registrar">
+                        Guardar
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm float-right" [routerLink]="['/home']">Cancelar</button>
+                </div>
+
+                <div id="fuente" *ngIf="ver_informacion">
+                    <span>
+                        *{{informacion}}*
+                    </span>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>

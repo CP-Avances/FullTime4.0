@@ -1,0 +1,53 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR REGISTRO
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(0)">highlight_off</mat-icon>
+</div>
+<!-- FORMULARIO COMPLETO -->
+<form [formGroup]="formulario">
+    <mat-card-content>
+        <div class="container" style="text-align: center">
+            <div class="nota" style="text-align: justify;">
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
+            </div>
+            <div class="d-flex flex-wrap justify-content-around">
+                <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <input matInput placeholder="Navidad" [formControl]="descripcionF" required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Modificar nombre de este feriado.">help_outline</mat-icon>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Fecha</mat-label>
+                    <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa" [formControl]="fechaF" required>
+                    <mat-datepicker-toggle matSuffix [for]="picker" matSuffix id="i-cursor" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Modificar fecha de este feriado. Seleccione la fecha del Feriado dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993.">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker touchUi #picker></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Fecha Recuperación</mat-label>
+                    <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
+                        [formControl]="fechaRecuperacionF">
+                    <mat-datepicker-toggle matSuffix [for]="picker2" matSuffix id="i-cursor" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Modificar fecha de recuperación para este feriado. Seleccione la fecha del Feriado dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker touchUi #picker2></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+    </mat-card-content>
+</form>
+<mat-card-actions class="d-flex justify-content-around" style="margin-bottom: 2%;">
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
+        (click)="ActualizarFeriados(formulario.value)" value="Guardar">
+        Guardar
+    </button>
+</mat-card-actions>

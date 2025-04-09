@@ -1,0 +1,107 @@
+<mat-accordion>
+    <mat-expansion-panel (opened)="expansion = true" (closed)="expansion = false">
+        <mat-expansion-panel-header style="background: rgb(58, 132, 242); font-size: 14px;">
+            <mat-panel-title style="color: white;">
+                <span style="margin-left: 15px;">
+                    INDICACIONES
+                </span>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row" style="padding-bottom: 5px; padding-top: 5px;">
+            <div class="col-md">
+                <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight" style="font-size: small;">
+                        DEFINICIONES
+                    </span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm" style="margin: 0 auto;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(242, 21, 21);"></i>
+                                    &nbsp;&nbsp; Identificación del dato que no está registrado.
+
+                                </td>
+                                <td>
+                                    Ej.: Fecha no registrada.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(239, 203, 106);"></i>
+                                    &nbsp;&nbsp; Ya existe en el sistema.
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(255, 192, 203)"></i>
+                                    &nbsp;&nbsp; Datos con los que tiene relación, pero no existe en la base de
+                                    datos.
+                                </td>
+                                <td>
+                                    Ej.: Nacionalidad no existe en el sistema.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(222, 162, 73);"></i>
+                                    &nbsp;&nbsp; Formato incorrecto de un dato.
+                                </td>
+                                <td>
+                                    Ej.: Formato de fecha incorrecto (YYYY-MM-DD).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(156, 214, 255);"></i>
+                                    &nbsp;&nbsp; Registro duplicado dentro de la plantilla.
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(170, 129, 236);"></i>
+                                    &nbsp;&nbsp; Dato que ya existe en otras columnas.
+                                </td>
+                                <td>
+                                    Ej.: Fecha registrada consta en otras columnas (fecha o fecha de recuperación).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(238, 34, 207);"></i>
+                                    &nbsp;&nbsp; Requerimientos que debe cumplir.
+                                </td>
+                                <td>
+                                    Ej.: Requerido solo dos detalles.
+                                </td>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(232, 137, 207);"></i>
+                                    &nbsp;&nbsp; Procesos mal definidos.
+                                    <br><span style="margin-left: 42px;">
+                                        Un proceso no puede ser proceso superior de
+                                        otro si este último ya es su proceso superior.
+                                    </span>
+                                    <br><span style="margin-left: 42px;">
+                                        (No se puede registrar procesos en cruz).
+                                    </span>
+                                </td>
+                                <td> Ej.: A -> B / B -> A </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa fa-circle circulo" style="color: rgb(159, 221, 154);"></i>
+                                    &nbsp;&nbsp; Dato correcto que se va a cargar en el sistema (ok).
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+</mat-accordion>

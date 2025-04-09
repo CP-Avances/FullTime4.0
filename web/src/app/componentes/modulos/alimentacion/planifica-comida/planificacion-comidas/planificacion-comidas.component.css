@@ -1,0 +1,22 @@
+.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
+
+mat-form-field { padding: 10px 15px 0px 15px; width: 90%;}
+
+
+.scrollbar {
+    float: left;
+    height: 380px;
+    width: 100%;
+    background: #fff;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin-bottom: 25px;
+}
+
+.scrollbar-primary::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5; 
+}
+
+
+

@@ -1,0 +1,91 @@
+<div class="container" style="padding-top: 20px; padding-bottom: 25px;">
+    <div id="titulo">
+        <span>
+            HABILITAR NOTIFICACIONES
+        </span>
+    </div>
+    <mat-card class="example-card mat-elevation-z9">
+        <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
+            <br>
+            <div class="row">
+                <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-left: 4%;">
+                        <div class="caja">
+                            <p>COMUNICADOS</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="comunicadoMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="comunicadoNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                        <div class="caja">
+                            <p>ATRASOS</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="atrasosMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="atrasosNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                        <div class="caja">
+                            <p>FALTAS</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="faltasMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="faltasNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                        <div class="caja">
+                            <p>SALIDAS ANTICIPADAS</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="salidasAnticipadasMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle
+                                    formControlName="salidasAnticipadasNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 m-auto mt-4" *ngIf="ver_modulos">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-left: 4%;">
+                        <div class="caja" *ngIf="habilitarPermisos">
+                            <p>PERMISOS</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="permisoMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="permisoNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                        <div class="caja" *ngIf="habilitarVacaciones">
+                            <p>VACACIONES</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="vacaMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="vacaNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                        <div class="caja" *ngIf="habilitarHorasExtras">
+                            <p>HORAS EXTRAS</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="horaExtraMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="horaExtraNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                        <div class="caja" *ngIf="habilitarAlimentacion">
+                            <p>ALIMENTACIÓN</p>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-slide-toggle formControlName="comidaMail">Correo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="comidaNoti">Notificaciones</mat-slide-toggle>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center">
+                <button *ngIf="btnActualizar" id="btn-raised" class="btn btn-sm"
+                    (click)="ActualizarConfiguracion(formGroup.value)">
+                    Guardar
+                </button>
+                <button *ngIf="btnCrear" id="btn-raised" class="btn btn-sm"
+                    (click)="CrearConfiguracion(formGroup.value)">
+                    Guardar
+                </button>
+                <button id="btn-raised" class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
+            </div>
+        </form>
+        <br>
+    </mat-card>
+</div>

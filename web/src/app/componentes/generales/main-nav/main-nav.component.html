@@ -1,0 +1,188 @@
+<mat-sidenav-container class="sidenav-container">
+
+  <mat-sidenav #drawer class="sidenav mat-elevation-z15" fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false" (mouseenter)="mouseenter()" (mouseleave)="mouseleave()">
+
+    <div class="uno">
+      <img src="../../../assets/imagenes/logo/logoAdmin.png" id="logo">
+    </div>
+
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+        <li class="material-tree-node" *ngIf="!barraInicial; else showItemsMenu">
+          <ul>
+            <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}"
+              *ngIf="node.color === true && node.ver === true" (click)="manejarEstadoActivo(node.name);"
+              [routerLink]="[node.url]">
+              <mat-icon style="float: left;" id="icono-menu_">done</mat-icon>
+              <p style="float: left; margin-left: -5%; margin-top: 2%;">{{node.name}}</p>
+            </a>
+            <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}"
+              *ngIf="(node.color === false && node.activo === false)" (click)="manejarEstadoActivo(node.name);"
+              [routerLink]="[node.url]" style="color: rgb(99, 105, 107);">
+              <mat-icon style="float: left;" id="icono-menu_x">phonelink_off</mat-icon>
+              <p style="float: left; margin-left: -3%; margin-top: 2%; margin-bottom: 2%;"> {{node.name}}</p>
+            </a>
+          </ul>
+        </li>
+
+        <ng-template #showItemsMenu>
+          <li class="material-tree-node">
+            <ul>
+              <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}"
+                *ngIf="node.color === true" (click)="manejarEstadoActivo(node.name); drawer.toggle()"
+                [routerLink]="[node.url]">
+                <mat-icon id="icono-menu_" style="float: left;">done</mat-icon>
+                <p style="float: left; margin-left: -5%; margin-top: 2%;">{{node.name}}</p>
+              </a>
+              <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}"
+                *ngIf="(node.color === false && node.activo === false)"
+                (click)="manejarEstadoActivo(node.name); drawer.toggle()" [routerLink]="[node.url]"
+                style="color: rgb(99, 105, 107);">
+                <mat-icon id="icono-menu_x" style="float: left;">phonelink_off</mat-icon>
+                <p style="float: left; margin-left: -3%; margin-top: 2%; margin-bottom: 2%;">{{node.name}}</p>
+              </a>
+            </ul>
+          </li>
+        </ng-template>
+
+      </mat-tree-node>
+
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+        <li *ngIf="node.accion === true && node.estado === true">
+          <button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name"
+            style="width: 100%; background: rgb(255, 255, 255); display: block; border: none;">
+            <div class="tree-titulos d-flex bd-highlight">
+              <div class="bd-highlight" style="float: left;">
+                <mat-icon id="icono-subtitulo"
+                  *ngIf="node.subtitulo === true && node.color === true">{{node.icono}}</mat-icon>
+                <mat-icon id="icono-menu" *ngIf="node.subtitulo === false">{{node.icono}}</mat-icon>
+              </div>
+              <div class="bd-highlight" style="float: left;">
+                <h5 class="subtitulo" *ngIf="node.subtitulo === true && node.color === true">{{node.name}}</h5>
+                <h5 class="name-uno" *ngIf="node.subtitulo === false">{{node.name}}</h5>
+              </div>
+              <div class="ml-auto bd-highlight" style="float: right;">
+                <mat-icon class="mat-icon-rtl-mirror" id="icono-despliega">
+                  {{treeControl.isExpanded(node) ? 'remove' : 'add'}}
+                </mat-icon>
+              </div>
+            </div>
+          </button>
+          <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)"
+            [style.padding]="treeControl.isExpanded(node) ? '10px 0px 10px 0px' : '0px 0px 0px 0px'">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </ul>
+        </li>
+      </mat-nested-tree-node>
+
+    </mat-tree>
+
+    <mat-card *ngIf="showMessageLicencia"
+      style="background-color: rgba(240, 56, 56, 0.849); color: white; text-align: center;">
+      <div>
+        <mat-icon style="font-size: 25px; padding-top: 5px;">report_problem</mat-icon>
+      </div>
+      <mat-card-title style="font-size: 18px;">LICENCIA EXPIRARÁ</mat-card-title>
+      <mat-card-subtitle style="color: rgb(221, 221, 221); font-size: 14px;">
+        {{fec_caducidad_licencia | date: 'fullDate' }}
+      </mat-card-subtitle>
+
+      <mat-card-content style="font-size: 15px;">
+        <p>
+          Comunicate con &nbsp;
+          <a href="https://casapazmino.com.ec" target="_blank" style="text-decoration: none;">
+            Casa Pazmiño Import & Export S.A
+          </a>
+          &nbsp; para seguir utilizando tu sistema.
+        </p>
+      </mat-card-content>
+    </mat-card>
+  </mat-sidenav>
+
+
+  <mat-sidenav-content class="degradado">
+    <mat-toolbar>
+      <!-- NAV PARA PANTALLAS GRANDES -->
+      <mat-toolbar-row *ngIf="!barraInicial; else ShowNavbar" class="d-flex justify-content-between">
+        <div>
+          <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
+            *ngIf="isHandset$ | async">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+
+          <app-navbar></app-navbar>
+        </div>
+
+        <app-search></app-search>
+
+        <div>
+          <span class="example-spacer"></span>
+
+          <!-- BOTON HOME -->
+          <button mat-mini-fab style="margin-left: 10px; margin-right: 10px;" (click)="irHome()">
+            <mat-icon id="iconos-navegador" style="margin-left: 8px;" matSuffix matTooltipPosition="right"
+              matTooltip="Ir inicio">home</mat-icon>
+          </button>
+
+          <!-- BOTON AVISOS -->
+          <app-button-avisos></app-button-avisos>
+
+          <!-- BOTON NOTIFICACION -->
+          <app-button-notificacion></app-button-notificacion>
+
+          <!-- BOTON CONFIGURACIONES DE TODO -->
+          <app-button-opciones></app-button-opciones>
+        </div>
+
+      </mat-toolbar-row>
+
+      <!-- NAV PARA CELULARES O PANTALLA PEQUEÑA -->
+      <ng-template #ShowNavbar>
+
+        <mat-toolbar-row class="d-flex justify-content-between">
+          <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
+            *ngIf="isHandset$ | async">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+
+          <app-navbar id="nombreUsuario" ></app-navbar>
+           
+          <div>
+            <span class="example-spacer"></span>
+            <!-- BOTON HOME -->
+            <button mat-mini-fab style="margin: 0 10px" (click)="irHome()">
+              <mat-icon id="iconos-navegador" style="margin-left: 8px;" matSuffix matTooltipPosition="right"
+                matTooltip="Ir inicio">home</mat-icon>
+            </button>
+
+            <!-- BOTON AVISOS -->
+            <app-button-avisos></app-button-avisos>
+
+            <!-- BOTON NOTIFICACION -->
+            <app-button-notificacion></app-button-notificacion>
+
+            <!-- BOTON CONFIGURACIONES DE TODO -->
+            <app-button-opciones></app-button-opciones>
+
+          </div>
+
+
+        </mat-toolbar-row>
+
+        <mat-toolbar-row class="d-flex justify-content-center">
+          <app-search></app-search>
+        </mat-toolbar-row>
+
+      </ng-template>
+
+    </mat-toolbar>
+
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

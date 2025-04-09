@@ -1,0 +1,123 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            Calcular Horas Extras Realizadas
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+</div>
+<div class="container" style="padding-top: 5px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <form [formGroup]="PedirHoraExtraForm">
+            <div class="container">
+                <br>
+                <div class="nota">
+                    <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.</span>
+                </div>
+                <div class="d-flex flex-wrap justify-content-between">
+                    <mat-form-field>
+                        <mat-label>Empleado</mat-label>
+                        <input matInput [formControl]="nombreEmpleadoF" readonly>
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Nombre del empleado que solicita realizar horas extras">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Tipo de Hora Extra</mat-label>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" 
+                            matTooltip="Seleccionar el tipo de hora extra">help_outline</mat-icon>
+                        <mat-select [formControl]="seleccionarHoraF" required>
+                            <mat-option *ngFor="let hora of horasExtras" [value]="hora.id"> {{hora.descripcion}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="fechaR">Fecha Actividades Realizadas</mat-label>
+                        <input matInput [matDatepicker]="picker1" [formControl]="fechaRealizadasF" required>
+                        <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" 
+                            matTooltipPosition="right"
+                            matTooltip="Indicar la fecha de realización de actividades. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker1></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Estado</mat-label>
+                        <input matInput [formControl]="estadoF">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Indicar el estado de registro">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Hora de Inicio Planificada</mat-label>
+                        <input matInput [formControl]="horaInicioF" type="time"
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Hora en la que inicia actividades de horas extras">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Hora de Finalización Planificada</mat-label>
+                        <input matInput [formControl]="horaFinF" type="time" (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Hora en la que finaliza las actividades de horas extras">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Hora de Inicio Timbre</mat-label>
+                        <input matInput [formControl]="horaInicioTF" type="time"
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Hora de inicio registrada en el timbre">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Hora de Finalización Timbre</mat-label>
+                        <input matInput [formControl]="horaFinTF" type="time" (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Hora de finalización registrada en el timbre">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Límite número de horas</mat-label>
+                        <input matInput [formControl]="horasF" type="time" (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de horas límites para realizar horas extras">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Número de horas realizadas</mat-label>
+                        <input matInput [formControl]="horasRealesF" type="time"
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de horas y minutos de horas extras reales realizadas">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Tipo de día</mat-label>
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Seleccionar el tipo de día en el que realizo las actividades">
+                            help_outline</mat-icon>
+                        <mat-select [formControl]="tipoF" required>
+                            <mat-option *ngFor="let tipo of tipoD" [value]="tipo.value">
+                                {{tipo.viewValue}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Horas y minutos de Permisos</mat-label>
+                        <input matInput [formControl]="horasPermisoF" type="time"
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de horas y minutos solicitados de permiso">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+        <div>
+            <button mat-raised-button id="btn-raised">Calcular Horas Extras</button>
+        </div>
+    </mat-card>
+</div>

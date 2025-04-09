@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>FullTime</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="assets/imagenes/icono.png">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <!-- fonst de google -->
+  <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet" >
+  <!-- icons de google material -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <!-- Font Awesome 5-->
+  <script src="https://kit.fontawesome.com/e278d964e1.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+
+<body ng-app="myModule">
+  <app-root></app-root>
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script src="//code.angularjs.org/snapshot/angular.min.js"></script>
+
+  <script>
+    var app = angular.module('myModule', []);
+    app.run(function ($rootScope, $timeout, $document) {
+      // console.log('starting run');
+
+      // Timeout timer value
+      var TimeOutTimerValue = (30 * 60 * 1000);
+      // var TimeOutTimerValue = (60000);
+
+      // Start a timeout
+      var TimeOut_Thread = $timeout(function () { LogoutByTimer() }, TimeOutTimerValue);
+      var bodyElement = angular.element($document);
+
+      /// Keyboard Events
+      bodyElement.bind('keydown', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('keyup', function (e) { TimeOut_Resetter(e) });
+
+      /// Mouse Events
+      bodyElement.bind('click', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('mousemove', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('DOMMouseScroll', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('mousewheel', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('mousedown', function (e) { TimeOut_Resetter(e) });
+
+      /// Touch Events
+      bodyElement.bind('touchstart', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('touchmove', function (e) { TimeOut_Resetter(e) });
+
+      /// Common Events
+      bodyElement.bind('scroll', function (e) { TimeOut_Resetter(e) });
+      bodyElement.bind('focus', function (e) { TimeOut_Resetter(e) });
+
+      function LogoutByTimer() {
+        console.log('Logout');
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.reload()
+      }
+
+      function TimeOut_Resetter(e) {
+        // console.log('' + e);
+
+        /// Stop the pending timeout
+        $timeout.cancel(TimeOut_Thread);
+
+        /// Reset the timeout
+        TimeOut_Thread = $timeout(function () { LogoutByTimer() }, TimeOutTimerValue);
+      }
+
+    })
+  </script>
+
+</body>
+
+</html>

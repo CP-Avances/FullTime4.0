@@ -1,0 +1,270 @@
+<!-- ACTUALIZADO PERMISOS MULTIPLES -->
+<mat-card class="example-card mat-elevation-z8">
+    <div>
+        <div id="titulo">
+            <span>
+                SOLICITUD DE PERMISO
+            </span>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+        </div>
+        <mat-card class="example-card mat-elevation-z8">
+            <!-- FORMULARIO COMPLETO -->
+            <form [formGroup]="formulario">
+                <mat-card-content>
+                    <div class="container" style="text-align: center;">
+                        <div class="nota" style="text-align: justify;">
+                            <span>
+                                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                                botón Guardar.
+                            </span>
+                        </div>
+                        <br>
+                        <div class="info" *ngIf="ver_informacion">
+                            <span>
+                                <b>INFORMACIÓN DEL PERMISO:</b> &nbsp;&nbsp; <i>{{informacion1}}</i> &nbsp;&nbsp;
+                                <i>{{informacion2}}</i> <br>
+                                <i>{{informacion4}}</i> <br>
+                                <i>{{informacion3}}</i> <br>
+                            </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field>
+                                        <mat-label>Motivo</mat-label>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Seleccionar un tipo de permiso.">
+                                            help_outline
+                                        </mat-icon>
+                                        <mat-select [formControl]="idPermisoF" required>
+                                            <mat-option *ngFor="let per of tipoPermisos"
+                                                (click)="ImprimirDatos(formulario.value)" [value]="per.id">
+                                                {{per.descripcion}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field style="width: 200px;">
+                                        <mat-label>Solicitud por:</mat-label>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Indicar si va a realizar una solicitud de permiso por días o una solicitud de permiso por horas.">
+                                            help_outline
+                                        </mat-icon>
+                                        <mat-select [formControl]="solicitarF" required>
+                                            <mat-option *ngFor="let dh of diasHoras" [value]="dh.valor"
+                                                (click)="ActivarDiasHoras(formulario.value)">
+                                                {{dh.nombre}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 15px; padding-top: 35px;" *ngIf="activar_hora">
+                                        <mat-checkbox labelPosition="after" [formControl]="especialF" matSuffix
+                                            matTooltipPosition="right"
+                                            matTooltip="Solicitud de permiso por horas en un periodo de dos días."
+                                            (click)="LimpiarInformacion('')">
+                                            <span id="color_fuente">Especial</span>
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field id="formulario">
+                                        <mat-label>Fecha desde:</mat-label>
+                                        <input matInput [matDatepicker]="picker2"
+                                            (dateInput)="ValidarFechaSalida($event, formulario.value)" readonly
+                                            placeholder="dd/mm/aaaa" [formControl]="fechaInicioF" min="1950-01-31"
+                                            max="2050-01-31" required>
+                                        <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                            matTooltipPosition="right"
+                                            matTooltip="Indicar la fecha en la desea el permiso. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato día/mes/año. Ejemplo: 12/04/1993">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker touchUi #picker2></mat-datepicker>
+                                    </mat-form-field>
+                                    <mat-form-field style="width: 100px;" *ngIf="activar_hora">
+                                        <mat-label>Hora desde:</mat-label>
+                                        <input matInput type="time" (keypress)="IngresarSoloNumeros($event)"
+                                            [formControl]="horaSalidaF">
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field id="formulario">
+                                        <mat-label>Fecha hasta:</mat-label>
+                                        <input matInput [matDatepicker]="picker3" placeholder="dd/mm/aaaa"
+                                            [formControl]="fechaFinalF" required readonly
+                                            (dateInput)="ValidarFechaIngreso($event, formulario.value)">
+                                        <mat-datepicker-toggle matSuffix [for]="picker3" id="i-cursor"
+                                            matTooltipPosition="right"
+                                            matTooltip="Indicar la fecha de finalización del permiso. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato día/mes/año. Ejemplo: 12/04/1993">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker touchUi #picker3></mat-datepicker>
+                                    </mat-form-field>
+                                    <mat-form-field style="width: 100px;" *ngIf="activar_hora">
+                                        <mat-label>Hora hasta:</mat-label>
+                                        <input matInput type="time" (keypress)="IngresarSoloNumeros($event)"
+                                            [formControl]="horaIngresoF">
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field style="width: 350px;">
+                                        <mat-label>Observación</mat-label>
+                                        <textarea matInput #message maxlength="150"
+                                            [formControl]="descripcionF"></textarea>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Ingresar una descripción acerca de la solicitud del permiso.">
+                                            help_outline
+                                        </mat-icon>
+                                        <mat-hint align="end">{{message.value.length}} / 150</mat-hint>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start"
+                                    style="position: relative; left: 10px; padding-top: 20px;">
+                                    <mat-checkbox disabled labelPosition="before" [checked]="legalizar"
+                                        matTooltipPosition="right"
+                                        matTooltip="De acuerdo a la configuración del tipo de permiso se indicará si la solicitud deberá ser o no legalizada.">
+                                        <span id="color_fuente">Legalizado</span>
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field *ngIf="habilitarDias" id="calculos">
+                                        <mat-label>Días calendario</mat-label>
+                                        <input matInput [formControl]="diasF" readonly>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field *ngIf="activar_hora" id="calculos">
+                                        <mat-label>Horas y minutos solicitados</mat-label>
+                                        <input matInput type="time" [formControl]="horasF" readonly
+                                            [required]='activar_hora'>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Calcular" (click)="CalcularHoras(formulario.value)"
+                                            style="color:blue">
+                                            touch_app
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <section class="d-flex flex-column bd-highlight">
+                                        <div class="bd-highlight">
+                                            <form method="post" enctype="multipart/form-data">
+                                                <input (change)="fileChange($event)" type="file"
+                                                    [formControl]="archivoForm" id="file">
+                                                <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
+                                                    Subir Certificado
+                                                </label>
+                                            </form>
+                                        </div>
+                                        <div class="bd-highlight">
+                                            <input type="text" id="fuente-certificado"
+                                                placeholder="Ningún archivo seleccionado." class="form-control"
+                                                style="width: 200px;" [formControl]="nombreCertificadoF" readonly>
+                                            <i *ngIf="HabilitarBtn" class="far fa-trash-alt"
+                                                style="color:red; margin-left: 5px;" id="i-cursor"
+                                                (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
+                                                matTooltip="Eliminar archivo seleccionado.">
+                                            </i>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </form>
+            <div style="text-align: center; margin-right: 3%;">
+                <button id="btn-raised" class="btn btn-sm" (click)="ValidarRegistroPermiso(formulario.value)"
+                    [disabled]="!formulario.valid">
+                    Verificar
+                </button>
+            </div>
+        </mat-card>
+        <hr>
+    </div>
+
+    <div style="padding-top: 15px;" *ngIf="verificar">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="d-flex bd-highlight" id="resultados">
+                <div class="w-100 bd-highlight">
+                    VERIFICACIÓN DE REGISTRO DE PERMISO
+                </div>
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                        (click)="RegistrarPermisos(formulario.value)">
+                        Registrar
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Código</th>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Tiempo solicitado</th>
+                            <th scope="col">Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let u of usuarios | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{u.codigo}}</td>
+                            <td>{{u.nombre}}</td>
+                            <td>{{u.tiempo_solicitado}}</td>
+                            <td>{{u.observacion}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="usuarios.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </div>
+
+    <div style="padding-top: 15px;" *ngIf="verificar_">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="d-flex bd-highlight" id="resultados">
+                <div class="w-100 bd-highlight">
+                    VERIFICACIÓN DE REGISTRO DE PERMISO
+                </div>
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                        (click)="RegistrarPermisos(formulario.value)">
+                        Registrar
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col" id="centrar" rowspan="2">Código</th>
+                            <th scope="col" id="centrar" rowspan="2">Usuario</th>
+                            <th scope="col" id="centrar" colspan="2">Días solicitados</th>
+                            <th scope="col" id="centrar" rowspan="2">Observación</th>
+                        </tr>
+                        <tr style="text-align: center;">
+                            <th scope="col">Laborables</th>
+                            <th scope="col">Libres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let u of usuarios | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{u.codigo}}</td>
+                            <td>{{u.nombre}}</td>
+                            <td>{{u.dias_laborables}}</td>
+                            <td>{{u.dias_libres}}</td>
+                            <td>{{u.observacion}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="usuarios.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </div>
+</mat-card>

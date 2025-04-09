@@ -1,0 +1,160 @@
+<!--  ************************  PANTALLA LISTA DE REGIMEN LABORAL  *************************  -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 15px; padding-bottom: 15px; padding-top: 15px;">
+        <div class="row">
+            <div class="col-sm">
+                <div id="titulo">
+                    <span>Régimen Laboral</span>
+                </div>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirRegistrar()" *ngIf="getCrearRegimenLaboral()">
+                            Crear régimen laboral
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                            Mostrar lista
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="row w-100 m-auto" id="titulo">
+                <div class="col-12 col-md-10 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>
+                        RESULTADO DE BÚSQUEDA
+                    </span>
+                </div>
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-3">
+                    <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarRegimenLaboral()">Eliminar </button>
+                </div>
+
+            </div>
+            <div class="table-responsive">
+                <div class="table-wrapper">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center;">
+                                <th scope="col" rowspan="2">
+                                    <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                        matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                        id="SelectCheck" (click)="HabilitarSeleccion()">
+                                        library_add_check
+                                    </mat-icon>
+                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                        [checked]="selectionRegimen.hasValue() && isAllSelectedPag()"
+                                        [indeterminate]="selectionRegimen.hasValue() && !isAllSelectedPag()"
+                                        [aria-label]="checkboxLabelPag()">
+                                    </mat-checkbox>
+                                </th>
+                                <th scope="col" rowspan="2">Régimen Laboral</th>
+                                <th scope="col" rowspan="2">Periodo</th>
+                                <th scope="col" colspan="3">Vacaciones</th>
+                                <th scope="col" rowspan="2">Acciones</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">Días hábiles</th>
+                                <th scope="col">Días libres</th>
+                                <th scope="col">Días calendario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <mat-form-field id="t-inputs">
+                                        <input matInput placeholder="Buscar" [formControl]="descripcionF">
+                                    </mat-form-field>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de Régimen Laboral por su descripción.">
+                                        help_outline
+                                    </mat-icon>
+                                </td>
+                            </tr>
+                            <tr
+                                *ngFor="let regimenL of regimen | filtroDescripcion: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
+                                <td>
+                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                        (change)="$event ? selectionRegimen.toggle(regimenL) : null"
+                                        [checked]="selectionRegimen.isSelected(regimenL)"
+                                        [aria-label]="checkboxLabelPag(regimenL)">
+                                    </mat-checkbox>
+                                </td>
+                                <td>{{regimenL.descripcion}}</td>
+                                <td>{{regimenL.mes_periodo}} meses</td>
+                                <td>{{regimenL.vacacion_dias_laboral}}</td>
+                                <td>{{regimenL.vacacion_dias_libre}}</td>
+                                <td>{{regimenL.vacacion_dias_calendario}}</td>
+                                <td class="justify-content-center">
+                                    <i matSuffix matTooltipPosition="right"
+                                        matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                        (click)="VerDatosRegimen(regimenL.id)" *ngIf="getVerRegimenLaboral()">
+                                        <p>Ver</p>
+                                    </i>
+                                    <i class="fas fa-edit" id="t-editar" (click)="AbrirEditar(regimenL.id)" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Editar los datos generales de este registro." *ngIf="getEditarRegimenLaboral()">
+                                        <p>Editar</p>
+                                    </i>
+                                    <i class="far fa-trash-alt" id="t-eliminar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar este registro." (click)="ConfirmarDelete(regimenL)" *ngIf="getEliminarRegimenLaboral()">
+                                        <p>Eliminar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <mat-paginator id="pagina" [length]="regimen.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <!--  ************************* DESCARGA DE REPORTES **************************  -->
+            <div *ngIf="getDescargarReportes()">
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                    <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Regímenes Laborales en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="generarExcelRegimen()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Regímenes Laborales en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Regímenes Laborales en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Regímenes Laborales en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de régimen laboral. </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  ************************  PANTALLA REGISTRAR REGIMEN LABORAL  *************************  -->
+<app-regimen *ngIf="ver_registrar"></app-regimen>
+
+<!--  ************************  PANTALLA VER DATOS REGIMEN LABORAL  *************************  -->
+<app-ver-regimen *ngIf="ver_datos" [idRegimen]="regimen_id"></app-ver-regimen>
+
+<!--  ************************  PANTALLA EDITAR DATOS REGIMEN LABORAL  *************************  -->
+<app-editar-regimen *ngIf="ver_editar" [pagina]="pagina" [idRegimen]="regimen_id"></app-editar-regimen>

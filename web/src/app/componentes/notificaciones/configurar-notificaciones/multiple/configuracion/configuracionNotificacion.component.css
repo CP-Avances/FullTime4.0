@@ -1,0 +1,23 @@
+.example-form mat-slide-toggle {
+    margin: 4px 4px 20px 4px;
+    display: block;
+}
+
+p {
+    font-weight: bold;
+}
+
+.caja {
+    padding: 15px 5px 0px 5px;
+    font-size: 60%;
+}
+
+mat-slide-toggle {
+    padding: 0 10px 0 15px;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}

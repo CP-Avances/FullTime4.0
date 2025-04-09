@@ -1,0 +1,638 @@
+<!-- *** VENTANA DE REGISTRO INDIVDUAL DE PLANIFICACION *** -->
+<div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="ventana_horario_individual">
+    <app-registo-empleado-horario [data_horario]="data_horario">
+    </app-registo-empleado-horario>
+</div>
+
+<!-- *** VENTANA DE REGISTRO INDIVDUAL DE PLANIFICACION MULTIPLE *** -->
+<div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="registrar_rotativo">
+    <app-registro-plan-horario [datoEmpleado]="rotativo"></app-registro-plan-horario>
+</div>
+
+<!-- *** VENTANA DE BUSQUEDA DE PLANIFICACIONES *** -->
+<div style="padding-top: 20px;" *ngIf="seleccionar">
+    <div id="resultados">
+        LISTAR PLANIFICACIONES HORARIAS
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarBuscar()">highlight_off</mat-icon>
+    </div>
+    <mat-card class="example-card mat-elevation-z9">
+        <mat-card-content>
+            <div *ngIf="buscar_fechas">
+                <div class="row">
+                    <div class="nota" id="fuente_" style="margin-left: 15px;">
+                        <span>
+                            NOTA: Al Cargar Planificación se visualizará la planificación del mes actual. Para una
+                            búsqueda personalizada ingresar mes de inicio y fin de periodo.
+                        </span>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Mes inicio</mat-label>
+                                <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                    placeholder="MM/YYYY">
+                                <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                <mat-datepicker #fec1 startView="year" (monthSelected)="FormatearFecha($event, fec1, 1)"
+                                    touchUi>
+                                </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Mes final</mat-label>
+                                <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                    placeholder="MM/YYYY">
+                                <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                    [disabled]="fecHorario"></mat-datepicker-toggle>
+                                <mat-datepicker #fec2 startView="year" (monthSelected)="FormatearFecha($event, fec2, 2)"
+                                    touchUi>
+                                </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center">
+                    <button id="btn-raised" class="btn btn-sm" (click)="VerPlanificacion()" *ngIf="getBuscarPlanificaciones()">
+                        Cargar Planificacion
+                    </button>
+                    <button *ngIf="multiple && getPlanificacionFija()" id="btn-raised" class="btn btn-sm"
+                        style="float: right; margin-right: 10px;" (click)="PlanificarFija()">
+                        Planificación Fija
+                    </button>
+                    <button *ngIf="multiple && getPlanificacionMultiple()" id="btn-raised" class="btn btn-sm"
+                        style="float: right; margin-right: 10px;" (click)="PlanificarMultiple()">
+                        Planificación Múltiple
+                    </button>
+                </div>
+                <hr>
+            </div>
+
+
+            <!-- ************** PANTALLA DE EDICION DE HORARIOS ************************* -->
+            <app-editar-planificacion [datos_horarios]="datos_editar" *ngIf="editar_horario">
+            </app-editar-planificacion>
+
+
+            <!-- *********************** TABLA DE DETALLES DE HORARIOS Y DEFINICIONES ******************************* -->
+            <div class="container" style="padding-bottom: 25px;" *ngIf="ver_acciones">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="mat-elevation-z8" style="background: white;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DETALLE DE HORARIOS
+                                </span>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">HORARIO</th>
+                                            <th scope="col" id="td_horarios">ENTRADA (E)</th>
+                                            <th scope="col" id="td_horarios">INICIO ALIMENTACIÓN (I/A)</th>
+                                            <th scope="col" id="td_horarios">FIN ALIMENTACIÓN (F/A)</th>
+                                            <th scope="col" id="td_horarios">SALIDA (S)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="paginar">
+                                        <tr
+                                            *ngFor="let d of detalle_acciones | paginate:tamanio_paginaD:numero_paginaD">
+                                            <td id="td_horarios">{{d.horario}}</td>
+                                            <td id="td_horarios">{{d.entrada_}}</td>
+                                            <td id="td_horarios">{{d.inicio_comida}}</td>
+                                            <td id="td_horarios">{{d.fin_comida}}</td>
+                                            <td id="td_horarios">{{d.salida_}}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody *ngIf="!paginar">
+                                        <tr *ngFor="let d of detalle_acciones">
+                                            <td id="td_horarios">{{d.horario}}</td>
+                                            <td id="td_horarios">{{d.entrada_}}</td>
+                                            <td id="td_horarios">{{d.inicio_comida}}</td>
+                                            <td id="td_horarios">{{d.fin_comida}}</td>
+                                            <td id="td_horarios">{{d.salida_}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <mat-paginator *ngIf="paginar" id="pagina" [length]="detalle_acciones.length"
+                                [pageSize]="tamanio_paginaD" [pageSizeOptions]="pageSizeOptionsD"
+                                (page)="ManejarPaginaDetalles($event)" showFirstLastButtons>
+                            </mat-paginator>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="mat-elevation-z8" style="background: white; padding-top: 5px;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DEFINICIONES
+                                </span>
+                                <mat-icon class="float-right" id="cerrar_"
+                                    (click)="CerrarDetalles()">highlight_off</mat-icon>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">NOMENCLATURA</th>
+                                            <th scope="col" id="td_horarios">DESCRIPCIÓN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let n of nomenclatura">
+                                            <td id="td_horarios">{{n.nombre}}</td>
+                                            <td id="td_horarios">{{n.descripcion}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
+            <div class="mat-elevation-z8" style="background: white;">
+                <div class="d-flex bd-highlight" id="resultados">
+                    <i class="fa fa-pencil-square-o float-right"  id="activar_editar"
+                        *ngIf="ver_activar_editar" (click)="ActivarEditarHorario()">
+                    </i>
+                    <span class="w-100 bd-highlight">
+                        RESULTADO PLANIFICACIONES
+                    </span>
+                    <button *ngIf="multiple" class="btn btn-outline-light btn-sm"
+                        style="float: right; margin-right: 10px;" (click)="ObtenerDetallesPlanificacion()">
+                        Ver detalle
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table id="table_horario" class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center;">
+                                <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">Código</th>
+                                <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">Usuario</th>
+                                <th class="sticky-3 colum_2" scope="col" id="td_horarios" rowspan="2">Año</th>
+                                <th class="sticky-4 colum_2" scope="col" id="td_horarios" rowspan="2">Mes</th>
+
+                                <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
+                                <th *ngIf="columnAccion" class="sticky-5 colum_1" scope="col" id="td_horarios"
+                                    rowspan="2">Acciones</th>
+                            </tr>
+                            <tr style="text-align: center;">
+                                <th scope="col" id="td_horarios">01</th>
+                                <th scope="col" id="td_horarios">02</th>
+                                <th scope="col" id="td_horarios">03</th>
+                                <th scope="col" id="td_horarios">04</th>
+                                <th scope="col" id="td_horarios">05</th>
+                                <th scope="col" id="td_horarios">06</th>
+                                <th scope="col" id="td_horarios">07</th>
+                                <th scope="col" id="td_horarios">08</th>
+                                <th scope="col" id="td_horarios">09</th>
+                                <th scope="col" id="td_horarios">10</th>
+                                <th scope="col" id="td_horarios">11</th>
+                                <th scope="col" id="td_horarios">12</th>
+                                <th scope="col" id="td_horarios">13</th>
+                                <th scope="col" id="td_horarios">14</th>
+                                <th scope="col" id="td_horarios">15</th>
+                                <th scope="col" id="td_horarios">16</th>
+                                <th scope="col" id="td_horarios">17</th>
+                                <th scope="col" id="td_horarios">18</th>
+                                <th scope="col" id="td_horarios">19</th>
+                                <th scope="col" id="td_horarios">20</th>
+                                <th scope="col" id="td_horarios">21</th>
+                                <th scope="col" id="td_horarios">22</th>
+                                <th scope="col" id="td_horarios">23</th>
+                                <th scope="col" id="td_horarios">24</th>
+                                <th scope="col" id="td_horarios">25</th>
+                                <th scope="col" id="td_horarios">26</th>
+                                <th scope="col" id="td_horarios">27</th>
+                                <th scope="col" id="td_horarios">28</th>
+                                <th scope="col" id="td_horarios">29</th>
+                                <th scope="col" id="td_horarios">30</th>
+                                <th scope="col" id="td_horarios">31</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of horariosEmpleado | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                <td class="sticky colum_1" id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color)}">
+                                    {{e.codigo_e}}
+                                </td>
+                                <td class="sticky-2 colum_1" id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color)}">
+                                    {{e.nombre_e}}
+                                </td>
+                                <td class="sticky-3 colum_2" id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color)}">
+                                    {{e.anio}}
+                                </td>
+                                <td class="sticky-4 colum_2" id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color)}">
+                                    {{e.mes}}
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 1 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 1, e.dia1, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia1.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 2 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 2, e.dia2, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia2.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 3 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 3, e.dia3, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia3.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 4 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 4, e.dia4, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia4.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 5 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 5, e.dia5, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia5.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 6 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 6, e.dia6, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia6.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 7 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 7, e.dia7, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia7.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 8 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 8, e.dia8, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia8.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 9 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 9, e.dia9, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia9.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 10 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 10, e.dia10, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia10.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 11 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 11, e.dia11, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia11.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 12 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 12, e.dia12, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia12.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 13 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 13, e.dia13, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia13.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 14 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 14, e.dia14, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia14.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 15 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 15, e.dia15, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia15.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 16 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 16, e.dia16, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia16.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 17 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 17, e.dia17, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia17.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 18 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 18, e.dia18, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia18.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 19 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 19, e.dia19, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia19.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 20 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 20, e.dia21, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia20.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 21 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 21, e.dia21, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia21.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 22 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 22, e.dia22, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia22.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 23 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 23, e.dia23, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia23.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 24 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 24, e.dia24, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia24.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 25 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 25, e.dia25, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia25.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 26 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 26, e.dia26, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia26.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 27 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 27, e.dia27, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia27.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 28 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 28, e.dia28, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia28.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 29 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 29, e.dia29, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia29.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 30 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 30, e.dia30, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia30.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td id="td_horarios"
+                                    [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 31 ? '#9CF7B9' : '' }">
+                                    <i class="fa fa-pencil-square-o"  id="editar_horario"
+                                        *ngIf="editar_activar"
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 31, e.dia31, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
+                                    </i>
+                                    <br *ngIf="editar_activar">
+                                    <div *ngFor="let dia of e.dia31.split(','); let ultimo = last">
+                                        {{ dia }}
+                                        <br *ngIf="!ultimo">
+                                    </div>
+                                </td>
+                                <td *ngIf="columnAccion" class="sticky-5 colum_1" id="td_horarios">
+                                    <i (click)="PlanificarIndividual(e)" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
+                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de horarios.">
+                                        <p>Planificar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="horariosEmpleado.length" [pageSize]="tamanio_pagina_emp"
+                    [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPaginaResultados($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+                <br>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
+
+<!-- *** VENTANA DE REGISTRO DE MULTIPLES PLANIFICACIONES *** -->
+<div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="asignar_multiple">
+    <app-horarios-multiples [seleccionados]="seleccionados" pagina="buscar">
+    </app-horarios-multiples>
+</div>
+
+<!-- *** VENTANA DE REGISTRO DE MULTIPLES PLANIFICACIONES ROTATIVAS *** -->
+<div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="rotativo_multiple">
+    <app-planificacion-multiple [datosSeleccionados]="data_horario"></app-planificacion-multiple>
+</div>

@@ -1,0 +1,62 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            ADMINISTRAR MÓDULO DE ALIMENTACIÓN 
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
+</div>
+<div>
+    <!-- FORMULARIO COMPLETO -->
+    <form [formGroup]="formulario">
+        <mat-card-content>
+            <div class="container" style="text-align: center;">
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.
+                    </span>
+                </div>
+                <div style="text-align: center;">
+                    <mat-radio-group required aria-label="select an option" [formControl]="comidaF"
+                        [value]="comidaF.value">
+
+                        <div>
+                            <label style="font-size: 15px; padding-top: 10px; text-align: center;">
+                                <span>{{nombre}}</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 15px; padding-top: 5px; text-align: center; padding-bottom: 10px;">
+                                <span><b>Administra el módulo de alimentación *</b></span>
+                            </label>
+                        </div>
+
+                        <div class="d-flex justify-content-around">
+                            <mat-radio-button value="si" matSuffix matTooltipPosition="right"
+                                matTooltip="Usuario Administra el Módulo de Alimentación.">
+                                <label id="textlabel">Si</label>
+                            </mat-radio-button>
+                            <mat-radio-button value="no" matSuffix matTooltipPosition="right"
+                                matTooltip="Usuario NO Administra el Módulo de Alimentación.">
+                                <label id="textlabel">No</label>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarAutorizacion(formulario.value)"
+            [disabled]="!formulario.valid" value="Guardar">
+            Guardar
+        </button>
+    </div>
+</div>

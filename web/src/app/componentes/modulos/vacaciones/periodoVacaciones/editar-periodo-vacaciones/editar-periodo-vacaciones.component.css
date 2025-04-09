@@ -1,0 +1,36 @@
+
+#letras {
+    font-size: 12px;
+}
+
+.mat-radio-button~.mat-radio-button {
+    margin-left: 16px;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+mat-radio-group {
+    width: 210px;
+    padding: 15px 20px 15px 20x;
+    margin-bottom: 10px;
+}
+
+mat-form-field {
+    padding: 10px 10px 0px 10px;
+}
+
+label {
+    font-size: 14px;
+    margin: 12px 0px 0px 0px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+}
+
+#fechas {
+    width: 150px;
+}

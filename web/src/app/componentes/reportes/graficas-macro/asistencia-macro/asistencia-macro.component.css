@@ -1,0 +1,17 @@
+#ayuda_fec {color: black}
+
+mat-icon {
+  cursor: pointer;
+}
+
+mat-form-field { padding: 10px 15px 0px 15px; }
+
+#charts_asistencia_macro { width: 1050px; height: 450px;}
+
+.scroll-box {
+  overflow-y: scroll;
+  height: 100%;
+  overflow-x: scroll;
+  width: 100%;
+  padding: 1rem;
+}

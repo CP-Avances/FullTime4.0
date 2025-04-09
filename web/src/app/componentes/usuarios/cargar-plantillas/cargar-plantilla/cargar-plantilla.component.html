@@ -1,0 +1,414 @@
+<br>
+<mat-tab-group>
+
+    <!-- PANTALLA CARGAR NIVELES DE DEPARTAMENTOS -->
+    <mat-tab>
+        <ng-template mat-tab-label *ngIf="getCargarNivelDepartamentos()">
+            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <h6 id="items" (click)="LimpiarCampos()">&nbsp; Cargar Niveles Departamento</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px;" *ngIf="getCargarNivelDepartamentos()">
+            <div class="row m-auto">
+                <div class="col-md">
+                    <div id="titulo">
+                        <span>CARGAR PLANTILLAS</span>
+                    </div>
+                    <mat-card class="example-card mat-elevation-z9">
+                        <div class="row">
+                            <div class="col-12 col-md-auto m-auto w-auto"
+                                style="padding-top: 5px; padding-bottom: 5px;">
+                                <div class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <form method="post" class="btn-2" enctype="multipart/form-data">
+                                        <input (change)="FileChange($event, 'niveles')" type="file"
+                                            [formControl]="archivoForm" id="file"
+                                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                        <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                            style="height: 65px; padding-top: 25px;"
+                                            matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                            Subir plantilla
+                                        </label>
+                                        <label for="file" matSuffix matTooltipPosition="right"
+                                            *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                            style="height: 64px; padding-top: 25px;"
+                                            matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                            Subir nueva plantilla
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-auto m-auto w-auto"
+                                style="padding-top: 5px; padding-bottom: 5px;">
+                                <div *ngIf="DatosNivelesDep.length == 0"
+                                    class="d-flex flex-wrap justify-content-around">
+                                    <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                        style="margin: 2% 0% 3% 0%;"
+                                        matTooltip="Dar click para ver o descargar el documento."
+                                        href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                        <br>
+                                        Descargar plantilla usuarios
+                                    </a>
+                                </div>
+                                <div *ngIf="DatosNivelesDep.length > 0" class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                                        matSuffix matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
+                                        Registrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+
+        <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+        <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+            <app-definicion-plantilla>
+            </app-definicion-plantilla>
+        </div>
+
+        <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE NIVELES DE DEPARTAMENTO ------------------------------------------------->
+        <div *ngIf="DatosNivelesDep.length > 0 " class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="titulo">REGISTRO MÚLTIPLE</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center; font-size: 13px;">
+                                <th scope="col">Item</th>
+                                <th scope="col">Observación</th>
+                                <th scope="col">Sucursal</th>
+                                <th scope="col">Departamento</th>
+                                <th scope="col">Nivel</th>
+                                <th scope="col">Sucursal Departamento Superior</th>
+                                <th scope="col">Departamento Superior</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let nt of DatosNivelesDep | paginate:tamanio_paginaDepaNivel: numero_paginaDepaNivel; let i = index">
+                                <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                    {{nt.fila}}</td>
+                                <td style="font-size: 12px;" class="td_ob">
+                                    <div style="width: 270px; margin: auto;">
+                                        <div id="t-editar" class="circulo"
+                                            [style.background-color]="EstiloCeldaNivel(nt.observacion)"></div>
+                                        {{nt.observacion}}
+                                    </div>
+                                </td>
+                                <td [style.color]="EstiloTextoCelda(nt.sucursal)" style="font-size: 12px;"
+                                    style="font-size: 12px;">{{nt.sucursal}}</td>
+                                <td [style.color]="EstiloTextoCelda(nt.departamento)" style="font-size: 12px;">
+                                    {{nt.departamento}}</td>
+                                <td [style.color]="EstiloTextoCelda(nt.nivel)" style="font-size: 12px;">{{nt.nivel}}
+                                </td>
+                                <td [style.color]="EstiloTextoCelda(nt.sucursal_depa_superior)"
+                                    style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
+                                <td [style.color]="EstiloTextoCelda(nt.depa_superior)" style="font-size: 12px;">
+                                    {{nt.depa_superior}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 col-md-2">
+                        <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                            <div id="t-editar" class="circulo circuloTotal"></div>
+                            <div>{{nivelesDepartamentoCorrectos}}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-10">
+                        <mat-paginator [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
+                            [pageSizeOptions]="pageSizeOptions" id="pagina"
+                            (page)="ManejarPaginaMulti($event, 'depaNivel')" showFirstLastButtons>
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </mat-tab>
+
+    <!-- PANTALLA CARGAR CONTRATOS -->
+    <mat-tab>
+        <ng-template mat-tab-label *ngIf="getCargarCargos()">
+            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <h6 id="items" (click)="LimpiarCampos()">&nbsp; Cargar Contratos</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px;" *ngIf="getCargarCargos()">
+            <div class="row m-auto">
+                <div class="col-md">
+                    <div id="titulo">
+                        <span>CARGAR PLANTILLAS</span>
+                    </div>
+                    <mat-card class="example-card mat-elevation-z9">
+                        <div class="row">
+                            <div class="col-12 col-md-auto m-auto w-auto"
+                                style="padding-top: 5px; padding-bottom: 5px;">
+                                <div class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <form method="post" class="btn-2" enctype="multipart/form-data" *ngIf="getCargarContratos()">
+                                        <input (change)="FileChange($event, 'contratos')" type="file"
+                                            [formControl]="archivoForm" id="file"
+                                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                        <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                            style="height: 65px; padding-top: 25px;"
+                                            matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                            Subir plantilla
+                                        </label>
+                                        <label for="file" matSuffix matTooltipPosition="right"
+                                            *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                            style="height: 64px; padding-top: 25px;"
+                                            matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                            Subir nueva plantilla
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-auto m-auto w-auto"
+                                style="padding-top: 5px; padding-bottom: 5px;">
+                                <div *ngIf="DatosContrato.length == 0" class="d-flex flex-wrap justify-content-around">
+                                    <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                        style="margin: 2% 0% 3% 0%;"
+                                        matTooltip="Dar click para ver o descargar el documento."
+                                        href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                        <br>
+                                        Descargar plantilla usuarios
+                                    </a>
+                                </div>
+                                <div *ngIf="DatosContrato.length > 0" class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                                        matSuffix matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
+                                        Registrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+
+        <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+        <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+            <app-definicion-plantilla>
+            </app-definicion-plantilla>
+        </div>
+
+        <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE CONTRATOS ------------------------------------------------->
+        <div *ngIf="DatosContrato.length > 0 " class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="titulo">REGISTRO MÚLTIPLE</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center; font-size: 13px;">
+                                <th scope="col">Item</th>
+                                <th scope="col">Observación</th>
+                                <th scope="col">Cédula</th>
+                                <th scope="col">País</th>
+                                <th scope="col">Régimen Laboral</th>
+                                <th scope="col">Modalidad Laboral</th>
+                                <th scope="col">Fecha desde</th>
+                                <th scope="col">Fecha hasta</th>
+                                <th scope="col">Control asistencias</th>
+                                <th scope="col">Control vacaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let contrato of DatosContrato | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                                <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                    {{contrato.fila}}</td>
+                                <td style="font-size: 12px;" class="td_ob">
+                                    <div style="width: 270px; margin: auto;">
+                                        <div id="t-editar" class="circulo"
+                                            [style.background-color]="EstiloCelda(contrato.observacion)"></div>
+                                        {{contrato.observacion}}
+                                    </div>
+                                </td>
+                                <td [style.color]="EstiloTextoCelda(contrato.cedula)" style="font-size: 12px;">
+                                    {{contrato.cedula}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.pais)" style="font-size: 12px;">
+                                    {{contrato.pais}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">
+                                    {{contrato.regimen_la}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">
+                                    {{contrato.modalida_la}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.fecha_desde)" style="font-size: 12px;">
+                                    {{contrato.fecha_desde}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.fecha_hasta)" style="font-size: 12px;">
+                                    {{contrato.fecha_hasta}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.control_asis)" id="letras"
+                                    style="font-size: 12px;">{{contrato.control_asis}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.control_vaca)" id="letras"
+                                    style="font-size: 12px;">{{contrato.control_vaca}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 col-md-2">
+                        <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                            <div id="t-editar" class="circulo circuloTotal"></div>
+                            <div>{{contratosCorrectos}}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-10">
+                        <mat-paginator [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
+                            [pageSizeOptions]="pageSizeOptions" id="pagina"
+                            (page)="ManejarPaginaMulti($event, 'contrato')" showFirstLastButtons>
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-tab>
+
+    <!--  PANTALLA CARGAR CARGOS -->
+    <mat-tab>
+        <ng-template mat-tab-label *ngIf="getCargarCargos()">
+            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <h6 id="items" (click)="LimpiarCampos()">&nbsp; Cargar Cargos</h6>
+        </ng-template>
+        <div class="container" style="padding-top: 15px;" *ngIf="getCargarCargos()">
+            <div class="row m-auto">
+                <div class="col-md">
+                    <div id="titulo">
+                        <span>CARGAR PLANTILLAS</span>
+                    </div>
+                    <mat-card class="example-card mat-elevation-z9">
+                        <div class="row">
+                            <div class="col-12 col-md-auto m-auto w-auto"
+                                style="padding-top: 5px; padding-bottom: 5px;">
+
+                                <div class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <form method="post" class="btn-2" enctype="multipart/form-data">
+                                        <input (change)="FileChangeCargo($event)" type="file"
+                                            [formControl]="archivoForm" id="file"
+                                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                        <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir && getCargarCargos()"
+                                            style="height: 65px; padding-top: 25px;"
+                                            matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                            Subir plantilla
+                                        </label>
+                                        <label for="file" matSuffix matTooltipPosition="right"
+                                            *ngIf="mostrarbtnsubir && messajeExcelCargos != 'error'"
+                                            style="height: 65px; padding-top: 25px;"
+                                            matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                            Subir nueva plantilla
+                                        </label>
+                                    </form>
+                                </div>
+
+                            </div>
+                            <div class="col-12 col-md-auto m-auto w-auto"
+                                style="padding-top: 5px; padding-bottom: 5px;">
+                                <div *ngIf="DatosCargos?.length == 0" class="d-flex flex-wrap justify-content-around">
+                                    <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                        style="margin: 2% 0% 3% 0%;"
+                                        matTooltip="Dar click para ver o descargar el documento."
+                                        href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                        <br>
+                                        Descargar plantilla usuarios
+                                    </a>
+                                </div>
+                                <div *ngIf="DatosCargos?.length > 0" class="d-flex flex-wrap justify-content-around"
+                                    style="text-align: center; justify-content: center;">
+                                    <button id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                        (click)="ConfirmarRegistroMultipleCargos()"
+                                        matTooltip="Guardar registro múltiple.">
+                                        Registrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+
+        <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+        <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+            <app-definicion-plantilla>
+            </app-definicion-plantilla>
+        </div>
+
+        <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE CARGOS ------------------------------------------------->
+        <div *ngIf="DatosCargos?.length > 0" class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="titulo">REGISTRO MÚLTIPLE</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center; font-size: 13px;">
+                                <th scope="col">Item</th>
+                                <th scope="col">Observación</th>
+                                <th scope="col">Cédula</th>
+                                <th scope="col">Sucursal</th>
+                                <th scope="col">Departamento</th>
+                                <th scope="col">Cargo</th>
+                                <th scope="col">Fecha desde</th>
+                                <th scope="col">Fecha hasta</th>
+                                <th scope="col">Sueldo</th>
+                                <th scope="col">Hora de trabajo</th>
+                                <th scope="col">Jefe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let cargo of DatosCargos | paginate:tamanio_paginaMulCargo:numero_paginaMulCargo; let i = index">
+                                <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                    {{cargo.fila}}</td>
+                                <td style="font-size: 12px;" class="td_ob">
+                                    <div style="width: 270px; margin: auto;">
+                                        <div id="t-editar" class="circulo"
+                                            [style.background-color]="EstiloCelda(cargo.observacion)"></div>
+                                        {{cargo.observacion}}
+                                    </div>
+                                </td>
+                                <td [style.color]="EstiloTextoCelda(cargo.cedula)" style="font-size: 12px;">
+                                    {{cargo.cedula}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">
+                                    {{cargo.sucursal}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.departamento)" style="font-size: 12px;">
+                                    {{cargo.departamento}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">
+                                    {{cargo.cargo}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.fecha_desde)" style="font-size: 12px;">
+                                    {{cargo.fecha_desde}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.fecha_hasta)" style="font-size: 12px;">
+                                    {{cargo.fecha_hasta}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">
+                                    {{cargo.sueldo}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.hora_trabaja)" id="letras"
+                                    style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.admini_depa)" id="letras"
+                                    style="font-size: 12px;">{{cargo.admini_depa}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 col-md-2">
+                        <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                            <div id="t-editar" class="circulo circuloTotal"></div>
+                            <div>{{cargosCorrectos}}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-10">
+                        <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
+                            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
+                            showFirstLastButtons>
+                        </mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-tab>
+</mat-tab-group>

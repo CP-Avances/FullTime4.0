@@ -1,0 +1,56 @@
+<header id="home-section">
+    <div class="dark-overlay">
+        <div class="home-inner">
+            <div class="container">
+                <div class="row">
+                    <div class="col d-flex align-items-center justify-content-center">
+                        <mat-card class="mat-elevation-z8">
+                            <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br>
+                            <span>Cambiar frase seguridad</span>
+                            <form [formGroup]="formulario">
+                                <mat-form-field>
+                                    <mat-label>Ingresa correo electrónico</mat-label>
+                                    <input matInput placeholder="pat@example.com" [formControl]="correo" required>
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar correo electrónico asociado a su cuenta de usuario, recibirá un mail para cambiar su frase de seguridad.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="correo.invalid">{{ObtenerMensajeError()}}</mat-error>
+                                </mat-form-field>
+                                <br>
+                                <mat-form-field>
+                                    <mat-label>Ingresa cédula</mat-label>
+                                    <input matInput [formControl]="cedula" required autocomplete="off" maxlength="10">
+                                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar cédula.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="cedula.invalid">{{ObtenerMensajeError()}}</mat-error>
+                                </mat-form-field>
+                                <br>
+                                <mat-form-field>
+                                    <mat-label>Ingresa código empresarial</mat-label>
+                                    <input matInput [formControl]="empresa" required autocomplete="off">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar código empresarial.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="empresa.invalid">{{ObtenerMensajeError()}}</mat-error>
+                                </mat-form-field>
+                            </form>
+                            <div class="w-100" style="margin: auto;">
+                                <div class="row">
+                                    <div class="col-12 p-0">
+                                        <button type="submit" class="btn mb-3" (click)="EnviarCorreoConfirmacion(formulario.value)"
+                                            [disabled]="!formulario.valid">Enviar</button>
+                                        <button type="submit" class="btn" (click)="Cancelar();">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<app-footer></app-footer>

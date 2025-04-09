@@ -1,0 +1,22 @@
+.btn { margin-left: 20px; background-color: rgb(80,87,97); color: white; }
+
+#movilidad { 
+    cursor: grab;
+    color: blue;
+    margin-left: 10px;
+}
+
+.tituloNotifica { 
+    font-size: 20px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+}
+#selecDepa { font-size: 13px; }
+
+#notifica { cursor: pointer; }
+
+
+
+#opciones { font-size: 13px;}

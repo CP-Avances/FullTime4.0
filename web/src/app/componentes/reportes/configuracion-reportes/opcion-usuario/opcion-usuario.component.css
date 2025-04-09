@@ -1,0 +1,22 @@
+.tipo{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 50px;
+    font-size: 14px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.mat-radio-button ~ .mat-radio-button {
+    margin-left: 16px;
+}
+
+mat-icon { cursor: pointer; }
+
+.rBoton label{
+    font-size: 14px;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+}

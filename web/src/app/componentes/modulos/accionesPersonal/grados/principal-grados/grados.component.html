@@ -1,0 +1,228 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo" class="Tabla_titulo">
+                <span>GRADOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z8">
+                <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGrado()">
+                        Crear grado
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+        <div class="col-md">
+            <div id="titulo">
+                <span>CARGAR PLANTILLA DE GRADOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="row">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                                <input (change)="FileChange($event)" type="file"
+                                    [formControl]="archivoForm" id="file1"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file1" matSuffix matTooltipPosition="right" 
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px;  padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!Datos_grados" class="d-flex flex-wrap justify-content-center m-auto"
+                            style="text-align: center; justify-content: center;">
+                            <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                <br> Descargar plantilla
+                            </a>
+                        </div>
+                        <div  class="d-flex flex-wrap justify-content-center m-auto">
+                            <button *ngIf="Datos_grados && messajeExcel != 'error'" id="descargar" 
+                                class="btn m-auto" matSuffix matTooltipPosition="right"
+                                matTooltip="Guardar registro múltiple." (click)="ConfirmarRegistroMultiple()">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_grados">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="row w-100">
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                     matTooltipPosition="right" matTooltip="Selección múltiple para eliminar registros." id="SelectCheck">
+                        library_add_check
+                    </mat-icon>
+                </div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>
+                        LISTA DE GRADOS
+                    </span>
+                </div>
+                <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                        (click)="ConfirmarDeleteMultiple()">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Grado</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar"
+                                    [formControl]="buscarGrupo">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda del grado de acuerdo a las columnas de la tabla.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let grado of ListGrados | filtrosGrado:buscarGrupo.value | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(grado) : null" [checked]="selectionUno.isSelected(grado)"
+                                [aria-label]="checkboxLabel(grado)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{grado.descripcion}}</td>
+                        <td>
+                            <i class="fas fa-edit" (click)="AbrirVentanaEditar(grado)" id="accion" matSuffix
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro.">
+                                <p>Editar</p>
+                            </i>
+                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(grado)" id="t-eliminar" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="ListGrados.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Grados en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Grados en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Grados en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Grados en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de grados. </p>
+        </div>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="Datos_grados && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_grados && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MÚLTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Grado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let gra of Datos_grados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{gra.fila}}</td>
+                        <td style="font-size: 12px;" class="td_ob">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="EstiloCelda(gra.observacion)"></div>
+                                {{gra.observacion}}
+                            </div>
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(gra.descripcion)" style="font-size: 12px;">
+                            {{gra.descripcion}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{listaGradosCorrectasCont}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="Datos_grados.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

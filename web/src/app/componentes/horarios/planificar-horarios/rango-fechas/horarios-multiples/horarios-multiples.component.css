@@ -1,0 +1,33 @@
+.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
+
+#letra { font-size: 14px;}
+
+table {
+    width: 100%;
+    font-size: 12px;
+}
+
+.progress {
+    margin: 250px auto auto auto;
+    opacity: 1
+}
+
+.pantalla-progress {
+    background: #ffff;
+    position: fixed;
+    opacity: 0.8;
+    height: 100%;
+    width: 100%;
+    left: 0px;
+    top: 0px;
+}
+
+mat-progress-spinner {
+    background: transparent;
+    z-index: 100;
+}
+
+#campos {
+    width: 160px;
+    padding: 0px 10px 0px 10px;
+}

@@ -1,0 +1,330 @@
+<!--  ************************************* LISTA DE RELOJES ****************************************** -->
+<div *ngIf="listar_relojes">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <div id="titulo">
+                    <span>DISPOSITIVOS</span>
+                </div>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button *ngIf="!DataDispositivos && getCrearDispositivos()" id="btn-raised" class="btn btn-sm" id="btn-raised"
+                            [routerLink]="['/registrarRelojes']">
+                            Crear dispositivo
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            value="Mostrar lista">
+                            Mostrar lista
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+            <div class="col-12 col-md-6">
+                <div id="titulo">
+                    <span>REGISTRO MÚLTIPLE DE DISPOSITIVOS</span>
+                </div>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="row" *ngIf="getPlantilla()">
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <form method="post" class="btn-2" enctype="multipart/form-data" style="margin: auto;">
+                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
+                                        id="file"
+                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 65px;  padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre Dispositivos.">
+                                        Subir plantilla
+                                    </label>
+                                    <label for="file" matSuffix matTooltipPosition="right"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 65px;  padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                        Subir nueva plantilla
+                                    </label>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div *ngIf="!DataDispositivos" class="d-flex flex-wrap justify-content-center m-auto"
+                                style="text-align: center; justify-content: center; margin: auto;">
+                                <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                    matTooltip="Dar click para ver o descargar el documento."
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                    <br>
+                                    Descargar plantilla
+                                </a>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
+                                <button *ngIf="DataDispositivos && messajeExcel != 'error'" id="descargar"
+                                    class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                    matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
+                                    Registrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!DataDispositivos" class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="d-flex bd-highlight" id="titulo">
+                <div class="w-100 bd-highlight">
+                    <h5>
+                        LISTA DE DISPOSITIVOS
+                    </h5>
+                </div>
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                        (click)="ConfirmarDeleteMultiple()">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th>
+                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                    matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                    id="SelectCheck" (click)="HabilitarSeleccion()">
+                                    library_add_check
+                                </mat-icon>
+                                <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                    [checked]="selectionDispositivos.hasValue() && isAllSelectedPag()"
+                                    [indeterminate]="selectionDispositivos.hasValue() && !isAllSelectedPag()"
+                                    [aria-label]="checkboxLabelPag()">
+                                </mat-checkbox>
+                            </th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Ciudad</th>
+                            <th scope="col">Sucursal</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Dispositivo</th>
+                            <th scope="col">IP</th>
+                            <th scope="col">Tipo conexión</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="sucursalF">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="departamentoF">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="nombreF">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="ipF"
+                                        (keypress)="IngresarIp($event)">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda del dipositivo de acuerdo a las columnas de la tabla.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let reloj of relojes | filtrosNombres: nombreF.value  | sucNombre: sucursalF.value | filtroIp: ipF.value | departamento: departamentoF.value | paginate:tamanio_pagina:numero_pagina">
+                            <td>
+                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionDispositivos.toggle(reloj) : null"
+                                    [checked]="selectionDispositivos.isSelected(reloj)"
+                                    [aria-label]="checkboxLabelPag(reloj)">
+                                </mat-checkbox>
+                            </td>
+                            <th style="padding-top: 10px; text-align: center;" scope="row">{{reloj.codigo}}</th>
+                            <td>{{reloj.nomciudad}}</td>
+                            <td>{{reloj.nomsucursal}}</td>
+                            <td>{{reloj.nomdepar}}</td>
+                            <td>{{reloj.nombre}}</td>
+                            <td>{{reloj.ip}}</td>
+                            <td *ngIf="reloj.tipo_conexion === true">Interna</td>
+                            <td *ngIf="reloj.tipo_conexion === false">Externa</td>
+                            <td class="justify-content-center">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                    (click)="VerDatosReloj(reloj.id)" *ngIf="getVerDispositivos()">
+                                    <p>Ver</p>
+                                </i>
+                                <i class="fas fa-edit" id="t-editar" (click)="VerEditarReloj(reloj.id)" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDispositivos()">
+                                    <p>Editar</p>
+                                </i>
+                                <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
+                                    class="far fa-trash-alt" id="t-eliminar" (click)="ConfirmarDelete(reloj)" *ngIf="getEliminarDispositivos()">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="relojes.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <!--  **********************  DESCARGA DE REPORTES  ***************************  -->
+            <div *ngIf="getDescargarReportes()">
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin: 10px;">
+                    <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Dispositivos en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="generarExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Dispositivos en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Dispositivos en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Dispositivos en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de dispositivos. </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+    <div class="container" style="padding-bottom: 20px;" *ngIf="DataDispositivos && messajeExcel != 'error'">
+        <app-definicion-plantilla>
+        </app-definicion-plantilla>
+    </div>
+
+    <!--  ***************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS *****************************  --->
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+        *ngIf="DataDispositivos && messajeExcel != 'error'">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="titulo">REGISTRO MÚLTIPLE</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center; font-size: 13px;">
+                            <th scope="col">Item</th>
+                            <th scope="col">Observación</th>
+                            <th scope="col">Sucursal</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Nombre dispositivo</th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Dirección IP</th>
+                            <th scope="col">Puerto</th>
+                            <th scope="col">Tipo conexión</th>
+                            <th scope="col">Temperatura</th>
+                            <th scope="col">Marca</th>
+                            <th scope="col">Modelo</th>
+                            <th scope="col">ID fabricante</th>
+                            <th scope="col">Fabricante</th>
+                            <th scope="col">Número de serie</th>
+                            <th scope="col">Dirección MAC</th>
+                            <th scope="col">Contraseña</th>
+                            <th scope="col">Zona horaria</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let d of DataDispositivos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                {{d.fila}}</td>
+                            <td style="font-size: 12px;" class="td_ob">
+                                <div style="width: 270px; margin: auto;">
+                                    <div id="t-editar" class="circulo"
+                                        [style.background-color]="EstiloCelda(d.observacion)">
+                                    </div>
+                                    {{d.observacion}}
+                                </div>
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.establecimiento)" style="font-size: 12px;">
+                                {{d.establecimiento}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.departamento)" id="letras">
+                                {{d.departamento}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.nombre_dispo)" style="font-size: 12px;">
+                                {{d.nombre_dispo}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.codigo)" id="letras">{{d.codigo}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.direccion_ip)" style="font-size: 12px;">
+                                {{d.direccion_ip}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.puerto)" id="letras">{{d.puerto}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.tipo_conexion)" style="font-size: 12px;">
+                                {{d.tipo_conexion}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.temperatura)" id="letras">
+                                {{d.temperatura}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.marca)" style="font-size: 12px;">{{d.marca}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.modelo)" id="letras">{{d.modelo}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.id_fabricante)" style="font-size: 12px;">
+                                {{d.id_fabricante}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.fabricante)" id="letras">
+                                {{d.fabricante}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.numero_serie)" style="font-size: 12px;">
+                                {{d.numero_serie}}
+                            </td>
+                            <td [style.color]="EstiloTextoCelda(d.direccion_mac)" id="letras">
+                                {{d.direccion_mac}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.contrasena)" id="letras">
+                                {{d.contrasena}}</td>
+                            <td [style.color]="EstiloTextoCelda(d.zona_horaria)" id="letras">
+                                {{d.zona_horaria}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12 col-md-2">
+                    <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                        <div id="t-editar" class="circulo circuloTotal"></div>
+                        <div>{{dispositivosCorrectos}}</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-10">
+                    <mat-paginator [length]="DataDispositivos.length" [pageSize]="tamanio_paginaMul"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  ******************************** PANTALLA DATOS DE RELOJ *********************************** -->
+<app-ver-dipositivo *ngIf="ver_datos" [idReloj]="reloj_id" [pagina]="pagina"></app-ver-dipositivo>
+
+
+<!--  ******************************** PANTALLA EDICION DATOS DE RELOJ *********************************** -->
+<app-editar-reloj *ngIf="ver_editar" [idReloj]="reloj_id" [pagina]="pagina">
+</app-editar-reloj>

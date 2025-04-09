@@ -1,0 +1,195 @@
+<div class="container" style="text-align: center; padding-top: 20px; padding-bottom: 5px;">
+    <div id="titulo">
+        <span>
+            REGISTRAR TIMBRE
+        </span>
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()" matSuffix matTooltipPosition="right"
+            matTooltip="Cerrar ventana.">
+            highlight_off
+        </mat-icon>
+    </div>
+
+    <div *ngIf="!ver_informacion" class="m-auto">
+        <div class="container d-flex flex-wrap justify-content-center" style="padding-top: 8px;">
+            <span>{{f | date: 'fullDate' : undefined : 'es-EC'}}</span>
+        </div>
+        <div class="container d-flex flex-wrap justify-content-center">
+            <span><b>{{ currentTime }}</b></span>
+        </div>
+        <div class="nota" style="text-align: center;">
+            <span>Seleccione una opción para registrar</span>
+        </div>
+        <div class="row m-auto" style="padding-top: 20px;">
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreInicio" style="float: right; margin-right: 2px;" mat-raised-button
+                    (click)="AlmacenarDatos(1)">
+                    Inicio Jornada Laboral
+                </button>
+            </div>
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreFin" style="float: left; margin-left: 2px;" mat-raised-button
+                    (click)="AlmacenarDatos(2)">
+                    Fin Jornada Laboral
+                </button>
+            </div>
+        </div>
+        <div class="row m-auto" style="padding-top: 10px;">
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreInicio" style="float: right; margin-right: 2px;" mat-raised-button
+                    (click)="AlmacenarDatos(3)">
+                    Inicio Alimentación
+                </button>
+            </div>
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreFin" style="float: left; margin-left: 2px;" mat-raised-button
+                    (click)="AlmacenarDatos(4)">
+                    Fin Alimentación
+                </button>
+            </div>
+
+        </div>
+        <div class="row m-auto" style="padding-top: 10px;">
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreInicio" style="float: right; margin-right: 2px;" mat-raised-button
+                    (click)="AlmacenarDatos(5)">
+                    Inicio Permiso
+                </button>
+            </div>
+            <div class="col-6 col-md-6 m-0 p-0">
+                <button id="botonTimbreFin" style="float: left; margin-left: 2px;" mat-raised-button
+                    (click)="AlmacenarDatos(6)">
+                    Fin Permiso
+                </button>
+            </div>
+        </div>
+
+        <div class="container" *ngIf="especial">
+            <div class="row mt-2">
+                <div class="col-12 col-md-8 m-auto">
+                    <div>
+                        <button mat-raised-button id="botonTimbreAbierto" style="width: 200px;"
+                            (click)="AlmacenarDatos(7)">
+                            Timbre Especial
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  ******************  INFORMACION DEL TIMBRE  ********************  -->
+    <div class="row" *ngIf="ver_informacion">
+        <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
+
+            <div  *ngIf="opcional && existe_camara && foto" >
+                <mat-slide-toggle [(ngModel)]="ver_camara" color="primary">
+                    Mostrar cámara
+                </mat-slide-toggle>
+            </div>
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-calendar"></i>
+                    {{this.fecha_hora}}
+                </label>
+            </span>
+        
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-globe"></i>
+                    Zona Horaria:
+                </label>
+                {{timeZone}} ({{gmt_dispositivo}})
+            </span>
+        
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-hand-o-right"></i>
+                    Tipo timbre:
+                </label>
+                {{asistencia}}
+            </span>
+        
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-map-marker"></i>
+                    Ubicación:
+                </label>
+                {{ubicacion}}
+            </span>
+        
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-location-arrow"></i>
+                    Longitud:
+                </label>
+                {{longitud}}
+            </span>
+        
+            <span id="fuente" class="card-span">
+                <label><i id="ver" class="fa fa-location-arrow"></i>
+                    Latitud:
+                </label>
+                {{latitud}}
+            </span>
+        
+            <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
+                <label><i id="ver" class="fa fa-camera"></i>
+                    Cámara en uso:
+                </label>
+                {{camaraSeleccionada}}
+            </span>
+
+        </div>
+        
+
+        <div class="col-12 col-md-6 m-auto mt-4" *ngIf="ver_camara && existe_camara">
+            <div class="camara">
+                <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
+                    <webcam [height]="225" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
+                        (imageCapture)="handleImage($event)">
+                    </webcam>
+                </div>
+                <div class="button-container">
+                    <button mat-mini-fab *ngIf="!imagenCamara" (click)="triggerSnapshot()">
+                        <mat-icon>photo_camera</mat-icon>
+                    </button>
+                    <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 1"
+                        (click)="SeleccionarCamara()">
+                        <mat-icon>loop</mat-icon>
+                    </button>
+                </div>
+                <div *ngIf="imagenCamara" class="circular-image-container">
+                    <img [src]="imagenCamara" />
+                </div>
+                <div class="button-container">
+                    <button class="gray-button" *ngIf="imagenCamara" (click)="CerrarCamara()">
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="ver_informacion">
+        <div class="col-12">
+            <form [formGroup]="formulario">
+                <div style="text-align: center;">
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <mat-form-field>
+                            <mat-label>Observación</mat-label>
+                            <textarea matInput #message maxlength="150" placeholder="Ingresar una descripción."
+                                [formControl]="observacionF">
+                            </textarea>
+                            <mat-hint align="start" id="letras">
+                                <strong>Ingresar hasta 150 caracteres</strong>
+                            </mat-hint>
+                            <mat-hint align="end" id="letras">{{message.value.length}} / 150</mat-hint>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-6 d-flex justify-content-center m-auto">
+            <button *ngIf="imagenCamara" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">
+                ENVIAR TIMBRE
+            </button>
+            <button *ngIf="!ver_camara" mat-raised-button id="botonTimbre" (click)="GuardarImagen(formulario.value)">
+                ENVIAR TIMBRE
+            </button>
+            <br />
+        </div>
+    </div>
+</div>

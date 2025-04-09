@@ -1,0 +1,85 @@
+<div id="titulo">
+    <span style="margin: auto;">
+        {{texto}} DISCAPACIDAD</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarRegistro()" matSuffix matTooltipPosition="right"
+        matTooltip="Salir">
+        highlight_off
+    </mat-icon>
+</div>
+<!-- FORMULARIO COMPLETO -->
+<form [formGroup]="formulario">
+    <mat-card-content>
+        <div class="container" style="text-align: center;">
+            <div class="nota" style="text-align: justify;">
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field>
+                        <mat-label>N° de carnet Conadis</mat-label>
+                        <input matInput placeholder="Ej: " [formControl]="carnet" maxlength="7"
+                            oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                            (keypress)="IngresarSoloNumeros($event)" required>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Ingresar número del carnet del Conadis.">
+                            help_outline
+                        </mat-icon>
+                        <mat-error *ngIf="carnet.invalid">{{ObtenerMensajeErrorCarnet()}}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field>
+                        <mat-label id="tipoD">Seleccionar discapacidad</mat-label>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Seleccionar tipo de discapacidad.">
+                            help_outline
+                        </mat-icon>
+                        <mat-select [formControl]="tipo">
+                            <mat-option *ngFor="let td of tipoDiscapacidad" [value]="td.id"
+                                (click)="ActivarDesactivarNombre(formulario.value)">
+                                {{td.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field *ngIf="!HabilitarDescrip">
+                        <mat-label>Tipo discapacidad</mat-label>
+                        <input matInput placeholder="Ej:Visual" (keypress)="IngresarSoloLetras($event)"
+                            [formControl]="nombreF">
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Registrar tipo de discapacidad.">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" style="padding: 5% 15% 0% 15%;">
+                    <mat-label class="float-left" style="font-size: 13px;">Porcentaje de discapacidad *</mat-label>
+                    <mat-icon class="float-right" id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Indique el valor porcentual de discapacidad.">
+                        help_outline
+                    </mat-icon>
+                    <br>
+                    <mat-slider showTickMarks discrete min="0" max="100" step="1" [displayWith]="formatLabel" required>
+                        <input matSliderThumb [formControl]="porcentaje">
+                    </mat-slider>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+    <div style="text-align: center; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarCarnet(formulario.value)"
+            [disabled]="!formulario.valid" type="submit">
+            Guardar
+        </button>
+    </div>
+</form>

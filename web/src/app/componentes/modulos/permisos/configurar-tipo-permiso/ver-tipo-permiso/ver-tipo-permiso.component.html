@@ -1,0 +1,185 @@
+<div class="container" *ngFor="let p of datosPermiso" style="padding-top: 15px;">
+        <mat-card class="example-card mat-elevation-z8">
+                <div id="titulo" class="row w-100 m-auto align-items-center">
+                        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1">
+                                <button class="btn btn-outline-light btn-sm" style="float: left;"
+                                (click)="VerListaPermisos()">
+                                        Listar tipo permisos
+                                </button>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                                <span>TIPO DE PERMISO <br> {{p.descripcion.toUpperCase()}}</span>
+                        </div>
+                        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+                                <button class="btn btn-outline-light btn-sm" style="float: right;" *ngIf="getEditarCumpleanos()" 
+                                (click)="VerFormularioEditar(p.id)">
+                                        Editar
+                                </button>
+                        </div>
+                
+                    </div>
+
+                <mat-card-content>
+                        <div class="container" style="padding-top: 15px;">
+                                <div class="row">
+                                        <div class="col-md" id="verticalLine">
+                                                <label class="col-sm col-form-label" *ngIf="p.solicita_empleado == 1">
+                                                        <b>Usuario podrá solicitar permiso:</b> Sí
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.solicita_empleado == 2">
+                                                        <b>Usuario podrá solicitar permiso:</b> No
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label">
+                                                        <b>Horas máximas de permiso:</b> {{p.horas_maximo_permiso}}
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label">
+                                                        <b>Días máximos de permiso:</b> {{p.dias_maximo_permiso}} días
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label">
+                                                        <b>Días previos de solicitud:</b> {{p.dias_anticipar_permiso}} días
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label">
+                                                        <b>Días posteriores para solicitudes (años anteriores):</b>
+                                                        {{p.crear_dias_anteriores}} días
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label"
+                                                        *ngIf="p.justificar == true">
+                                                        <b>Requiere justificación:</b> Sí
+                                                </label>
+                                                <label class="col-sm col-form-label"
+                                                        *ngIf="p.justificar == false">
+                                                        <b>Requiere justificación:</b> No
+                                                </label>
+                                                <br *ngIf="p.dias_justificar == true">
+                                                <label class="col-sm col-form-label"
+                                                        *ngIf="p.justificar == true">
+                                                        <b>Días para justificar:</b> {{p.dias_justificar}}
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label" *ngIf="p.tipo_descuento == '1'">
+                                                        <b>Descuento:</b> Vacaciones
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.tipo_descuento == '2'">
+                                                        <b>Descuento:</b> Ninguno
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == true">
+                                                        <b>Restricción por fecha:</b> Sí
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == false">
+                                                        <b>Restricción por fecha:</b> No
+                                                </label>
+                                                <br *ngIf="p.fecha_restriccion == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == true">
+                                                        <b>Fecha desde no permitida:</b> {{p.fecha_inicio}}
+                                                </label>
+                                                <br *ngIf="p.fecha_restriccion == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == true">
+                                                        <b>Fecha hasta no permitida:</b> {{p.fecha_fin}}
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label" *ngIf="p.documento == false">
+                                                        <b>Cargar documento:</b> Opcional
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.documento == true">
+                                                        <b>Cargar documento:</b> Requerido
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label" *ngIf="p.incluir_minutos_comida == true">
+                                                        <b>Incluye alimentación:</b> Sí
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.incluir_minutos_comida == false">
+                                                        <b>Incluye alimentación:</b> No
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label" *ngIf="p.legalizar == true">
+                                                        <b>Legalizar permiso:</b> Sí
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.legalizar == false">
+                                                        <b>Legalizar permiso:</b> No
+                                                </label>
+                                                <br>
+                                                <label class="col-sm col-form-label" *ngIf="p.contar_feriados == true">
+                                                        <b>En la solicitud se incluira:</b> Feriados como días normales
+                                                </label>
+                                                <label class="col-sm col-form-label" *ngIf="p.contar_feriados == false">
+                                                        <b>En la solicitud se incluira:</b> Feriados como días libres
+                                                </label>
+                                        </div>
+                                        <div class="col-md custom-disabled-checkbox" id="verticalLine">
+                                                <label class="col-sm col-form-label">
+                                                        <b>Notificaciones de solicitudes de permisos:</b>
+                                                </label>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_crear">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Crear</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_editar">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Editar</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_eliminar">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Eliminar</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                                <label class="col-sm col-form-label">
+                                                        <b>
+                                                                Notificaciones de aprobaciones de solicitudes de
+                                                                permisos:
+                                                        </b>
+                                                </label>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_preautorizar">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Pre-autorizar</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_autorizar">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Autorizar</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_negar">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Negar</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                                <div class="espacio d-flex justify-content-start"
+                                                        style="position: relative; left: 40px; font-size: 12px;">
+                                                        <mat-checkbox disabled [checked]="p.correo_legalizar">
+                                                                <span id="color_fuente">
+                                                                        <label id="textoradiobtn">Legalizar</label>
+                                                                </span>
+                                                        </mat-checkbox>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                </mat-card-content>
+        </mat-card>
+</div>

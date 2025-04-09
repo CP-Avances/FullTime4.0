@@ -1,0 +1,166 @@
+<!--  *****************  LISTA DE PLANIFICACIONES  **********************  -->
+<div *ngIf="ver_listas">
+    <!--  ******************  TABLA CON LISTA DE EMPLEADOS CON PLANIFICACION SELECCIONADA  *******************************  -->
+    <div class="container" style="padding-bottom: 25px; padding-top: 20px; text-align: center;" *ngIf="lista_plan">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="d-flex bd-highlight" id="titulo">
+                <span class="w-100 bd-highlight">
+                    PLANIFICACIONES DE HORAS EXTRAS
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Fecha desde</th>
+                            <th scope="col">Fecha hasta</th>
+                            <th scope="col">Hora desde</th>
+                            <th scope="col">Hora hasta</th>
+                            <th scope="col">Horas totales</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let p of listaPlan | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{p.descripcion}}</td>
+                            <td>{{p.fecha_desde_}}</td>
+                            <td>{{p.fecha_hasta_}}</td>
+                            <td>{{p.hora_inicio_}}</td>
+                            <td>{{p.hora_fin_}}</td>
+                            <td>{{p.horas_totales}}</td>
+                            <td class="justify-content-center">
+                                <i *ngIf="ver_icono" class="fas fa-edit" (click)="HabilitarTablaEditar(p.id)" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i *ngIf="ver_icono" (click)="HabilitarTablaEliminar(p.id)" class="far fa-trash-alt"
+                                    id="t-eliminar" matSuffix matTooltipPosition="right"
+                                    matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <mat-paginator id="pagina" [length]="listaPlan.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Descargar Lista planificaciones de horas extras en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista planificaciones de horas extras en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista planificaciones de horas extras en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista planificaciones de horas extras en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de planificaciones de horas extras. </p>
+            </div>
+        </div>
+    </div>
+
+    <!--  *****************  TABLA CON LISTA DE EMPLEADOS CON PLANIFICACION SELECCIONADA  **********************  -->
+    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_empleados">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="d-flex bd-highlight" id="titulo">
+                <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                    matTooltipPosition="right" matTooltip="Editar o Eliminar datos la planificación de horas extras."
+                    id="SelectCheck">
+                    library_add_check
+                </mat-icon>
+                <button *ngIf="botonEditar" class="btn btn-primary" (click)="EditarRegistrosMultiple()"
+                    style="float: left; margin-left: 10px;">
+                    Editar
+                </button>
+                <button *ngIf="botonEliminar" class="btn btn-primary" (click)="EliminarRegistrosMultiple()"
+                    style="float: left; margin-left: 10px;">
+                    Eliminar
+                </button>
+                <span class="w-100 bd-highlight">
+                    LISTA DE COLABORADORES CON PLANIFICACIÓN
+                </span>
+                <mat-icon class="float-right" (click)="CerrarTabla()" matSuffix matTooltipPosition="right"
+                    matTooltip="Cerrar lista de colaboradores con planificación de horas extras." id="cerrar">
+                    highlight_off
+                </mat-icon>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th>
+                                <mat-checkbox *ngIf="botonSeleccion" (change)="$event ? masterToggle() : null"
+                                    [checked]="selectionUno.hasValue() && isAllSelected()"
+                                    [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
+                            <th scope="col">Empleado</th>
+                            <th scope="col">Motivo</th>
+                            <th scope="col">Fecha desde</th>
+                            <th scope="col">Fecha hasta</th>
+                            <th scope="col">Hora desde</th>
+                            <th scope="col">Hora hasta</th>
+                            <th scope="col">Horas totales</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let e of planEmpleados | paginate:tamanio_pagina_empleado:numero_pagina_empleado">
+                            <td>
+                                <mat-checkbox *ngIf="botonSeleccion" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionUno.toggle(e) : null"
+                                    [checked]="selectionUno.isSelected(e)" [aria-label]="checkboxLabel(e)">
+                                </mat-checkbox>
+                            </td>
+                            <td>{{e.nombre}}</td>
+                            <td>{{e.descripcion}}</td>
+                            <td>{{e.fecDesde}}</td>
+                            <td>{{e.fecHasta}}</td>
+                            <td>{{e.horaInicio}}</td>
+                            <td>{{e.horaFin}}</td>
+                            <td>{{e.horas_totales}}</td>
+                            <td class="justify-content-center">
+                                <i *ngIf="ver_editar" class="fas fa-edit" (click)="AbrirEditarPlan(e, 'individual')"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i *ngIf="ver_eliminar" (click)="ConfirmarDeletePlan(e)" class="far fa-trash-alt"
+                                    id="t-eliminar" matSuffix matTooltipPosition="right"
+                                    matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="planEmpleados.length" [pageSize]="tamanio_pagina_empleado"
+                [pageSizeOptions]="pageSizeOptions_empleado" id="pagina" (page)="ManejarPaginaEmpleados($event)"
+                showFirstLastButtons>
+            </mat-paginator>
+            <br>
+        </div>
+    </div>
+
+</div>
+
+<!--  *****************  FORMULARIO EDITAR **********************  -->
+<app-editar-plan-hora-extra *ngIf="ver_form_editar" [pagina]="pagina" [data]="datos_editar"></app-editar-plan-hora-extra>

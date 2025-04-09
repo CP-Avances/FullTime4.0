@@ -1,0 +1,37 @@
+.btn-sm {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+p {
+    font-size: x-small;
+}
+
+table {
+    width: 100%;
+    font-size: 12px;
+}
+
+tr {
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#pdf_ {
+    color: red;
+    margin-left: 15px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#excel_ {
+    color: green;
+    text-align: center;
+    margin-left: 15px;
+    cursor: pointer;
+}

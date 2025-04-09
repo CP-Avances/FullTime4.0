@@ -1,0 +1,120 @@
+<div class="row m-auto">
+    <div class="col-md">
+        <div id="titulo">
+            <span>ASIGNAR PROCESOS</span>
+        </div>
+        <mat-card class="example-card mat-elevation-z9">
+            <div class="row">
+                <div class="col-12 col-md-auto m-auto w-auto"
+                    style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="d-flex flex-wrap justify-content-around"
+                        style="text-align: center; justify-content: center;">
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event, 'niveles')" type="file"
+                                [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 64px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                Subir nueva plantilla
+                            </label>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-12 col-md-auto m-auto w-auto"
+                    style="padding-top: 5px; padding-bottom: 5px;">
+                    <div *ngIf="!Datos_procesos" class="d-flex flex-wrap justify-content-around">
+                        <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                            style="margin: 2% 0% 3% 0%;"
+                            matTooltip="Dar click para ver o descargar el documento."
+                            href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                            <br>
+                            Descargar plantilla usuarios
+                        </a>
+                    </div>
+                    <div *ngIf="Datos_procesos" class="d-flex flex-wrap justify-content-around"
+                        style="text-align: center; justify-content: center;">
+                        <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                            matSuffix matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
+                            Registrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+   <app-definicion-plantilla>
+   </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_procesos && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MÚLTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Proceso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let pro of Datos_procesos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{pro.fila}}</td>
+                        <td style="font-size: 12px;" class="td_ob">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="EstiloCelda(pro.observacion)"></div>
+                                {{pro.observacion}}
+                            </div>
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.nombre)" style="font-size: 12px;">
+                            {{pro.nombre}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.apellido)" style="font-size: 12px;">
+                            {{pro.apellido}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.cedula)" style="font-size: 12px;">
+                            {{pro.cedula}}
+                        </td>
+                        <td [style.color]="EstiloTextoCelda(pro.proceso)" style="font-size: 12px;">
+                            {{pro.proceso}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{listaProcesosCorrectasCont}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator [length]="Datos_procesos.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptionsMul" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 30px;">
+    <mat-card class="mat-elevation-z8">
+        <div *ngIf="HabilitarBtn" id="titulo" class="row w-100 m-auto">
+            <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>
+                    CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS
+                </span>
+            </div>
+            <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                    (click)="AbrirRegistrarMensaje()">
+                    Añadir
+                </button>
+            </div>
+        </div>
+        <div class="container" *ngFor="let c of cumple">
+            <div id="titulo" class="row w-100 m-auto">
+                <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                </div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>
+                        CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS
+                    </span>
+                </div>
+                <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px; margin-top: -3px;"
+                    (click)="EditarMensaje(c)" *ngIf="getEditarCumpleanos()">
+                        Editar
+                    </button>
+                </div>
+            </div>
+
+            <div style="padding-top: 15px;">
+                <div class="caja">
+                    <label>Asunto:</label>
+                    <span>{{c.asunto}}</span>
+                </div>
+                <div class="caja" *ngIf="c.link != null && c.link != ''">
+                    <label>Link:</label>
+                    <a href="{{c.link}}" target="_blank"> ! VER FELICITACIONES ! </a>
+                </div>
+                <div class="caja">
+                    <label>Mensaje:</label>
+                    <span>{{c.mensaje}} </span>
+                </div>
+                <div class="caja" style="padding-bottom: 30px;">
+                    <label>Imagen:</label><br>
+                    <img class="img-fluid rounded mx-auto d-block" src="{{API_URL}}/mensajes_notificaciones/img/{{c.imagen}}">
+                </div>
+            </div>
+        </div>
+    </mat-card>
+</div>

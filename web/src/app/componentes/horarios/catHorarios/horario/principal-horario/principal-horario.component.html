@@ -1,0 +1,337 @@
+<!--  ****************************************** LISTA DE HORARIOS ******************************************** -->
+<div *ngIf="ver_horarios">
+    <div class="container" style="padding-top: 20px; padding-bottom: 25px;">
+        <div class="row">
+            <div class="col-md">
+                <div id="titulo">
+                    <span>HORARIOS</span>
+                </div>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarHorario()" *ngIf="!dataHorarios && getCrearHorario()">
+                            Crear horario
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                            Mostrar lista
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+            <div class="col-md">
+                <div id="titulo">
+                    <span>CARGAR PLANTILLA DE HORARIOS</span>
+                </div>
+                <mat-card class="example-card mat-elevation-z9" *ngIf="getPlantilla()">
+                    <div class="row">
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <form method="post" class="btn-2" enctype="multipart/form-data">
+                                    <input (change)="CargarPlantillaGeneral($event)" type="file"
+                                        [formControl]="archivo1Form" id="file1"
+                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 65px; padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir plantilla
+                                    </label>
+                                    <label for="file1" matSuffix matTooltipPosition="right" *ngIf="mostrarbtnsubir"
+                                        style="height: 65px;  padding-top: 25px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                        Subir nueva plantilla
+                                    </label>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div *ngIf="!dataHorarios" class="d-flex flex-wrap justify-content-center m-auto"
+                                style="text-align: center; justify-content: center;">
+                                <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                    matTooltip="Dar click para ver o descargar el documento."
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                    <br> Descargar plantilla
+                                </a>
+                            </div>
+                            <div *ngIf="dataHorarios" class="d-flex flex-wrap justify-content-center m-auto"
+                                style="text-align: center; justify-content: center;">
+                                <button id="registrar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                    matTooltip="Guardar registro múltiple." (click)="ConfirmarRegistroMultiple()">
+                                    Registrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!dataHorarios">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="titulo" class="row w-100 m-auto">
+                <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+                    <mat-icon style="float: left; margin-left: 10px;" class="flex-shrink-1 bd-highlight"
+                        (click)="HabilitarSeleccion()" matSuffix matTooltipPosition="right"
+                        matTooltip="Elimar múltiples registros." id="SelectCheck">
+                        library_add_check
+                    </mat-icon>
+                </div>
+                <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                    <span>LISTA DE PLANIFICACIÓN HORARIA</span>
+                </div>
+                <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -2px;"
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarHorario()">Eliminar</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm ">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th *ngIf="btnCheckHabilitar">
+                                <mat-checkbox (change)="$event ? masterTogglePag() : null"
+                                    [checked]="selectionHorarios.hasValue() && isAllSelectedPag()"
+                                    [indeterminate]="selectionHorarios.hasValue() && !isAllSelectedPag()"
+                                    [aria-label]="checkboxLabelPag()">
+                                </mat-checkbox>
+                            </th>
+                            <th scope="col">Código</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Minutos alimentación</th>
+                            <th scope="col">Horas totales</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Horario nocturno</th>
+                            <th scope="col">Documento</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field class="input-tables codigo">
+                                    <input matInput placeholder="Buscar" [formControl]="nombreHorarioF">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de horario por el nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let horario of horarios | filtroCodigo: nombreHorarioF.value | paginate:tamanio_pagina:numero_pagina">
+                            <td *ngIf="btnCheckHabilitar">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionHorarios.toggle(horario) : null"
+                                    [checked]="selectionHorarios.isSelected(horario)"
+                                    [aria-label]="checkboxLabelPag(horario)">
+                                </mat-checkbox>
+                            </td>
+                            <td>{{horario.codigo}}</td>
+                            <td>{{horario.nombre}}</td>
+                            <td>{{horario.minutos_comida}}</td>
+                            <td>{{horario.hora_trabajo}}</td>
+                            <td>{{horario.default_tipo}}</td>
+                            <td *ngIf="horario.nocturno == true">Sí</td>
+                            <td *ngIf="horario.nocturno == false">No</td>
+                            <td *ngIf="horario.documento == null"></td>
+                            <td *ngIf="horario.documento != null"> <a class="fas fa-file-alt"
+                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center; text-decoration: none;"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Dar click para ver o descargar el documento."
+                                    href="{{hipervinculo}}/horario/documentos/{{horario.documento}}" target="_blank" *ngIf="getDescargarDocumento()">
+                                    <p>Documento</p>
+                                </a>
+                            </td>
+                            <td class="justify-content-center">
+                                <i *ngIf="auto_individual && getVerHorario()" matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                    (click)="VerDetallesHorario(horario.id)">
+                                    <p>Ver</p>
+                                </i>
+                                <i matSuffix matTooltipPosition="right" matTooltip="Agregar Detalles de Horario."
+                                    class="fas fa-list-alt" id="t-detalles" (click)="AbrirRegistraDetalle(horario)"
+                                    *ngIf="(horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA' && auto_individual) && getCrearDetalleHorario()">
+                                    <p>Detalle</p>
+                                </i>
+                                <i class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
+                                    (click)="AbrirVentanaEditarHorario(horario)"
+                                    matTooltip="Modificar los datos generales de este registro."
+                                    *ngIf="(horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA' && auto_individual) && getEditarHorario()">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(horario)" class="far fa-trash-alt" id="t-eliminar" matSuffix
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro."
+                                    *ngIf="(horario.default_ != 'DL' && horario.default_ != 'DFD' && horario.default_ != 'DHA' && auto_individual) && getEliminarHorario()">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator #paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <!--  **********************  DESCARGAR REPORTES  ************************  -->
+            <div *ngIf="getDescargarReportes()">
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                    <i (click)="GenerarPDF('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Horarios en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="generarExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Horarios en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Horarios en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Horarios en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de horarios. </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px;" *ngIf="dataHorarios">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!--  *****************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE HORARIOS  *********************************  -->
+<div class="container" style="padding-bottom: 10px; padding-top: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MÚLTIPLE HORARIOS</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Código horario</th>
+                        <th scope="col">Horas totales</th>
+                        <th scope="col">Minutos alimentación</th>
+                        <th scope="col">Tipo horario</th>
+                        <th scope="col">Horario nocturno</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_paginaH:numero_paginaH ">
+                        <td>{{h.ITEM}}</td>
+                        <td style="font-size: 12px;" class="td_ob">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="ObtenerColorValidacion(h.OBSERVACION)"></div>
+                                {{h.OBSERVACION}}.
+                                <span *ngIf="!h.DETALLE && h.OBSERVACION === 'Ok'">Registro sin detalles.</span>
+                            </div>
+                        </td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.DESCRIPCION)">{{h.DESCRIPCION}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.CODIGO_HORARIO)">{{h.CODIGO_HORARIO}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.HORAS_TOTALES)">{{h.HORAS_TOTALES}}</td>
+                        <td>{{h.MINUTOS_ALIMENTACION}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.TIPO_HORARIO)">{{h.TIPO_HORARIO}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.HORARIO_NOCTURNO)">{{h.HORARIO_NOCTURNO}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{horariosCorrectos}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length"
+                    [pageSize]="tamanio_paginaH" [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- *************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE DETALLES  **********************************  -->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MÚLTIPLE DETALLES</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">Código horario</th>
+                        <th scope="col">Tipo acción</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Tolerancia</th>
+                        <th scope="col">Orden</th>
+                        <th scope="col">Salida siguiente día</th>
+                        <th scope="col">Minutos antes</th>
+                        <th scope="col">Minutos después</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let d of dataHorarios.plantillaDetalles | paginate:tamanio_paginaD:numero_paginaD ">
+                        <td>{{d.ITEM}}</td>
+                        <td>
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="ObtenerColorValidacion(d.OBSERVACION)"></div>
+                                {{d.OBSERVACION}}.
+                            </div>
+                        </td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(d.CODIGO_HORARIO)">{{d.CODIGO_HORARIO}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(d.TIPO_ACCION)">{{d.TIPO_ACCION}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(d.HORA)">{{d.HORA}}</td>
+                        <td>{{d.TOLERANCIA}}</td>
+                        <td>{{d.ORDEN}}</td>
+                        <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
+                        <td>{{d.MINUTOS_ANTES}}</td>
+                        <td>{{d.MINUTOS_DESPUES}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-md-2">
+                <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                    <div id="t-editar" class="circulo circuloTotal"></div>
+                    <div>{{detallesCorrectos}}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-10">
+                <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length"
+                    [pageSize]="tamanio_paginaD" [pageSizeOptions]="pageSizeOptionsD" id="paginaD"
+                    (page)="ManejarPaginaD($event)" showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
+<app-ver-horario-detalle *ngIf="ver_detalles" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>

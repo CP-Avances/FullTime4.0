@@ -1,0 +1,40 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+       DEPARTAMENTO {{datos.departamento_nombre_nivel}}
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+
+<div class="container" style="padding: 10px; text-align: center; margin-top: 5px; margin-bottom: 10px;">
+    <div style="background: white; border: solid 1px #a9b3b7;">
+        <div id="resultados">LISTA DE USUARIOS QUE AUTORIZAN</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Usuarios</th>
+                        <th scope="col">Tipo de autorización</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let empleado of empleados">
+                        <td>{{empleado.nombre}} {{empleado.apellido}}</td>
+                        <td>
+                            <span *ngIf="empleado.estado === true && empleado.autorizar === true">
+                                Autoriza
+                            </span>
+                            <span *ngIf="empleado.estado === true && empleado.preautorizar === true">
+                                Pre-autoriza
+                            </span>
+                            <span *ngIf="empleado.estado === false">
+                                Se le ha quitado la autorizacion
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

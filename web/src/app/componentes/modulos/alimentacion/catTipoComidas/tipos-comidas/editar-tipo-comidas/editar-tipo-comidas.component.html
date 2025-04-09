@@ -1,0 +1,83 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR ALIMENTACIÓN
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="Salir(1)">highlight_off</mat-icon>
+</div>
+<!-- FORMULARIO COMPLETO -->
+<form [formGroup]="TipoComidaForm">
+    <div class="container" style="text-align: center">
+        <div class="nota" id="espacio" style="text-align: justify;">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
+        </div>
+        <div class="row">
+            <div class="col-md">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field *ngIf="habilitarSeleccion">
+                        <mat-label>Tipo de Servicio*</mat-label>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Seleccione el tipo de servicio que va a registrar.">
+                            help_outline
+                        </mat-icon>
+                        <mat-select [formControl]="tipoF">
+                            <mat-option *ngFor="let s of servicios" [value]="s.id"
+                                (click)="IngresarServicio(TipoComidaForm.value)">
+                                {{s.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="habilitarServicio">
+                        <mat-label>Ingresar Servicio*</mat-label>
+                        <input matInput placeholder="Ej: Merienda" [formControl]="servicioF">
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Regresar a la lista de tipo de servicios existentes."
+                            (click)="VerTiposServicios()">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Nombre del menú</mat-label>
+                        <input matInput placeholder="Nombre del plato" [formControl]="nombreF" required>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Modificar nombre del nuevo menú.">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Hora desde</mat-label>
+                            <input matInput type="time" [formControl]="horaInicioF" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar la hora en la que inicia el servicio.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Hora hasta</mat-label>
+                            <input matInput type="time" placeholder="Ejm: 1" [formControl]="horaFinF" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar la hora de finalización del servicio.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!TipoComidaForm.valid"
+        (click)="InsertarTipoComida(TipoComidaForm.value)" value="Guardar">
+        Guardar
+    </button>
+</div>

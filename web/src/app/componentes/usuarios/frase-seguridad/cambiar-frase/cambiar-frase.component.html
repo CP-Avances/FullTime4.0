@@ -1,0 +1,39 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        CAMBIAR SU FRASE
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarRegistro()">highlight_off</mat-icon>
+</div>
+<div style="text-align: center; padding: 3%;">
+    <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br><br>
+    <span>Modificar su frase de seguridad</span>
+    <form [formGroup]="formulario">
+        <div class="nota" style="padding-bottom: 5px;">
+            <span>NOTA: Ingresar una frase que pueda recordar. Esta frase la usará para realizar cambios importantes
+                dentro del sistema.
+            </span>
+        </div>
+        <mat-form-field>
+            <mat-label>Frase actual</mat-label>
+            <textarea matInput #message1 maxlength="100" placeholder="***************" formControlName="aFrase"
+                required></textarea>
+            <mat-hint id="fuente" align="start"><strong>Ingresar hasta 100 caracteres.</strong></mat-hint>
+            <mat-hint id="fuente" align="end">{{message1.value.length}} / 100</mat-hint>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Nueva frase</mat-label>
+            <textarea matInput #message2 maxlength="100" placeholder="***************" formControlName="nFrase"
+                required></textarea>
+            <mat-hint id="fuente" align="start"><strong>Ingresar hasta 100 caracteres.</strong></mat-hint>
+            <mat-hint id="fuente" align="end">{{message2.value.length}} / 100</mat-hint>
+        </mat-form-field>
+        <div style="text-align: center; padding-top: 5px;">
+            <button id="btn-raised" class="btn btn-sm" (click)="CompararFrase(formulario.value)"
+                [disabled]="!formulario.valid">Guardar Frase</button>
+        </div>
+        <div class="caja1">
+            <span (click)="RecuperarFrase()" class="verde">Olvido su frase de seguridad?</span>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,150 @@
+<div class="container" style="padding-bottom: 15px;">
+  <mat-card class="example-card mat-elevation-z8">
+      <div id="titulo">
+          <span>CARGAR PLANTILLA DE PLANIFICACIÓN HORARIA</span>
+          <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
+              highlight_off
+          </mat-icon>
+      </div>
+      <mat-card-content>
+          <div class="row">
+              <div class="nota" style="margin-left: 15px; padding-top: 15px;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
+                  <span>
+                      NOTA: Para generar la plantilla debe seleccionar el mes de inicio.
+                      No modificar el campo usuario y los dias del mes en la plantilla.
+                  </span>
+              </div>
+              <div class="col-md" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
+                  <div class="row">
+                      <div class="col-md">
+                          <div class="row" style="margin-top: 5px;">
+                              <div class="col-md">
+                                  <div class="d-flex flex-wrap justify-content-center">
+                                      <mat-form-field style="width: 160px;">
+                                          <mat-label>Mes inicio</mat-label>
+                                          <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                              placeholder="DD/MM/YYYY" readonly>
+                                          <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                          <mat-datepicker #fec1 startView="year"
+                                              (monthSelected)="FormatearFecha($event, fec1)" touchUi>
+                                          </mat-datepicker>
+                                      </mat-form-field>
+                                  </div>
+                              </div>
+                              <div class="col-md">
+                                  <div class="d-flex flex-wrap justify-content-center">
+                                      <mat-form-field style="width: 160px;">
+                                          <mat-label>Mes final</mat-label>
+                                          <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                              placeholder="DD/MM/YYYY" readonly>
+                                          <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                              [disabled]="true"></mat-datepicker-toggle>
+                                          <mat-datepicker #fec2 startView="year">
+                                          </mat-datepicker>
+                                      </mat-form-field>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+
+                  </div>
+              </div>
+              <div class="col-md">
+                <div class="row">
+                  <div class="d-flex flex-wrap justify-content-center">
+                    <div style="margin: 0 auto;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
+                      <button class="btn btn-sm" id="descargar" (click)="DescargarPlantilla()"
+                      matTooltip="Presiona para descargar plantilla con nombre plantillaPlanificacionMultiple">
+                        Descargar plantilla
+                      </button>
+                    </div>
+                    <div style="margin: 0 auto;">
+                      <input #fileInput (change)="CargarPlantilla($event)" type="file"
+                      [formControl]="archivo1Form" id="file1"
+                      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                      style="display: none;">
+                      <button class="btn btn-2" id="cargar" (click)="fileInput.click()"
+                      matTooltip="Presiona para seleccionar plantilla con nombre plantillaPlanificacionMultiple">
+                        {{ textoBoton }}
+                      </button>
+                    </div>
+                    <div style="margin: 0 auto;">
+                        <button class="btn btn-2" id="registrar" [disabled]="deshabilitarRegistro"
+                          (click)="ConfirmarRegistroPlanificaciones()"
+                          matTooltip="Presiona para registrar planificaciones verificadas">
+                            Registrar planificaciones
+                        </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+          <div class="mat-elevation-z8" style="background: white; margin-top: 15px;"  *ngIf="planificacionesHorarias">
+            <div class="d-flex bd-highlight" id="resultados">
+              <span class="w-100 bd-highlight">
+                  PLANIFICACIÓN MÚLTIPLE
+              </span>
+            </div>
+
+            <div class="container_ table-responsive">
+              <table id="table_horario" class="table table-hover table-sm">
+                <thead class="thead-light">
+                  <tr style="text-align: center;">
+                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">CÉDULA</th>
+                      <th class="sticky-2 colum_1 td_horarios" scope="col"  rowspan="2">EMPLEADO</th>
+
+                      <th scope="col" class="td_horarios" colspan="31">DÍAS DEL MES DE {{ mes }}</th>
+                  </tr>
+                  <tr style="text-align: center;">
+                      <th *ngFor="let dia of dias_mes" scope="col" class="td_horarios">{{dia.fecha_formato}}</th>
+                  </tr>
+              </thead>
+
+              <tbody>
+                  <tr *ngFor="let empleado of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
+                      <td class="sticky colum_1 td_horarios" *ngIf="empleado.cedula_empleado">{{empleado.cedula_empleado}}</td>
+                      <td class="sticky colum_1 td_horarios" *ngIf="!empleado.cedula_empleado" [style.color]="ObtenerColorEmpleado('Empleado no válido')">{{empleado.cedula}}</td>
+                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorEmpleado(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
+                      <td *ngFor="let dia of empleado.dias" class="td_observaciones">
+                        <div *ngFor="let horario of dia.horarios">
+                            {{horario.codigo}}
+                        </div>
+                        <div *ngIf="dia.observacion4" [style.color]="ObtenerColorObservacion(dia.observacion4)">
+                          Jornada superada
+                        </div>
+                        <div [style.color]="ObtenerColorObservacion(dia.observacion)">
+                          {{dia.observacion}}
+                        </div>
+                        <div *ngIf="dia.observacion5" [style.color]="ObtenerColorObservacion(dia.observacion5)">
+                          {{dia.observacion5}}
+                        </div>
+                        <div class="icon-container">
+                          <i id="ver" *ngIf="MostrarVisualizarObservacion(dia)"
+                            class="fa fa-eye" matSuffix matTooltipPosition="right"
+                            matTooltip="Visualizar observaciones completas"
+                            (click)="VisualizarObservacion(dia)">
+                          </i>
+                        </div>
+                      </td>
+                  </tr>
+              </tbody>
+
+              </table>
+            </div>
+            <div style="display: flex; align-items: center;">
+              <div class="contenedorTotal" matTooltip="Número de datos que se van a cargar en el sistema.">
+                <div id="t-editar" class="circulo circuloTotal"></div>
+                <div>{{numeroPlanificacionesCorrectas}}</div>
+              </div>
+              <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
+                [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
+                showFirstLastButtons>
+              </mat-paginator>
+            </div>
+          </div>
+
+      </mat-card-content>
+  </mat-card>
+</div>

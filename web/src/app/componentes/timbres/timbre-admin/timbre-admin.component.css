@@ -1,0 +1,49 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#accion {
+    color: rgb(53, 95, 209);
+    cursor: pointer;
+}
+
+#cerrar {
+    cursor: pointer;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+table {
+    width: 100%;
+    font-size: 11px;
+}
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 65px;
+}
+
+.codigo {
+    width: 70px;
+}
+
+.cedula {
+    width: 100px;
+}
+
+.fecha {
+    width: 100px;
+}
+
+p {
+    font-size: x-small;
+}

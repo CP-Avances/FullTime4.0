@@ -1,0 +1,66 @@
+p {
+    text-align: center;
+    font-size: x-small;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+#editarI {
+    cursor: pointer;
+    color: green;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin:1rem auto;
+    max-width: 500px;
+} 
+
+#table_acciones {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10px;
+}
+
+#td_horarios {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+    .Tabla_titulo{
+        font-size: smaller;
+    }
+
+    mat-card-content{
+        padding: 0px;
+
+        .container{
+            margin: 0%;
+            width: 100%;
+        }
+    }
+
+    .contenedor_tabla{
+        padding: 0px !important;
+    }
+}
+
+table{
+    width: 100%;
+    margin: 0% !important;
+}

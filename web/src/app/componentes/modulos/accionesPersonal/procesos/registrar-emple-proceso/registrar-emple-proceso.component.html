@@ -1,0 +1,77 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR DEPARTAMENTO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistroProceso()">highlight_off</mat-icon>
+    </div>
+</div>
+<div>
+    <!-- FORMULARIO COMPLETO -->
+    <form [formGroup]="EmpleProcesoForm">
+        <mat-card-content>
+            <div style="text-align: center;">
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.
+                    </span>
+                </div>
+                <div class="row w-100 m-auto">
+                    <div class="col-sm m-auto p-0">
+                        <mat-form-field>
+                            <mat-label>Empleado</mat-label>
+                            <input id="nomEmple" matInput placeholder="Empleado" [formControl]="nombreEmpleado"
+                                readonly="readonly" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Nombre de identifiacción del empleado.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <br>
+                        <mat-form-field>
+                            <mat-label>Seleccionar Proceso</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de Procesos">
+                                help_outline</mat-icon>
+                            <mat-select [formControl]="idProcesoF" required>
+                                <mat-option *ngFor="let pro of procesos" [value]="pro.id">
+                                    {{pro.nombre}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-sm m-auto p-0">
+                        <mat-form-field>
+                            <mat-label>Fecha de Inicio</mat-label>
+                            <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                [formControl]="fechaInicio" min="1950-01-31" max="2050-01-31" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Indicar la fecha de inicio de período del proceso. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker></mat-datepicker>
+                        </mat-form-field>
+                        <br>
+                        <mat-form-field>
+                            <mat-label>Fecha de Finalización</mat-label>
+                            <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
+                                [formControl]="fechaFinal" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Indicar la fecha de finalización de período del proceso. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker2></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!EmpleProcesoForm.valid"
+        (click)="ValidarDatosProeso(EmpleProcesoForm.value)" value="Guardar"> Guardar</button>
+    </div>
+</div>

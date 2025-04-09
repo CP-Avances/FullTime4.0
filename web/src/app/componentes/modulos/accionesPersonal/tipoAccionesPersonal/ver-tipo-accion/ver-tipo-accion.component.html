@@ -1,0 +1,47 @@
+<div class="container" *ngFor="let a of datosTipos" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-7 col-md-3 mb-2 mb-md-0 mb-2 mb-md-0 order-2 order-md-2"> 
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                (click)="VerListaAcciones()">
+                Listar tipo acción personal
+                </button>
+            </div>
+            <div class="col-12 col-md-6 mb-2 mb-md-0 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                    {{a.nombre.toUpperCase()}}
+                </span>
+            </div>
+            <div class="col-5 col-md-2 mb-2 mb-md-0 mb-2 mb-md-0 order-3 order-md-2">
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                (click)="AbrirEditar(a)">
+                Editar
+                </button>
+            </div>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col" id="verticalLine">
+                        <label class="col-sm col-form-label"><b>Descripcion:</b>
+                            {{a.descripcion}}
+                        </label>
+                        <br>
+                        <label class="col-sm col-form-label"><b>Base Legal:</b>
+                            {{a.base_legal}}</label>
+                        <br>
+                        <label *ngIf="a.tipo_permiso === true" class="col-sm col-form-label"><b>Tipo:</b>
+                            Permiso
+                        </label>
+                        <label *ngIf="a.tipo_vacacion === true" class="col-sm col-form-label"><b>Tipo:</b>
+                            Vacación
+                        </label>
+                        <label *ngIf="a.tipo_situacion_propuesta === true" class="col-sm col-form-label"><b>Tipo:</b>
+                            Situación Propuesta
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

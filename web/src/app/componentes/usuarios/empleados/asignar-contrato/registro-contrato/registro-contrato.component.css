@@ -1,0 +1,100 @@
+#letras {
+    font-size: 14px;
+}
+
+.separar {
+    padding: 5px 5px 0px 5px
+}
+
+#respaldo {
+    font-size: 13px;
+    display: inline-block;
+}
+
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+mat-radio-group {
+    width: 210px;
+    padding: 0px 10px 10px 10px;
+    margin-bottom: 0px;
+}
+
+#fechas {
+    width: 200px;
+}
+
+
+[type="file"] {
+    overflow: hidden;
+    height: 0;
+    width: 0;
+}
+
+[type="file"]+label {
+    -webkit-transition: all 0.3s;
+    vertical-align: middle;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    background: #f15d22;
+    transition: all 0.3s;
+    font-size: inherit;
+    position: relative;
+    display: inline-block;
+    outline: none;
+    padding: 1rem 50px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+}
+
+[type="file"]+label.btn-2 {
+    background-color: rgb(150, 243, 141);
+    overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+    -webkit-transition: all 0.3s;
+    font-family: "Font Awesome 5 Pro";
+    line-height: 3.3;
+    margin-left: 5px;
+    transition: all 0.3s;
+    font-size: 100%;
+    position: absolute;
+    content: "\f382";
+    height: 100%;
+    color: #fff;
+    right: 130%;
+    top: 0px;
+}
+
+[type="file"]+label.btn-2:hover {
+    background-color: rgb(0, 76, 255)
+}
+
+[type="file"]+label.btn-2:hover::before {
+    right: 80%
+}
+
+.scrollbar {
+    float: left;
+    width: 100%;
+    height: 550px;
+    background: #fff;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin-bottom: 25px;
+}
+
+.scrollbar-primary::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+

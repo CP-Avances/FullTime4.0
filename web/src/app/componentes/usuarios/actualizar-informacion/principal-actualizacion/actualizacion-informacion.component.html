@@ -1,0 +1,22 @@
+<br>
+<mat-tab-group>
+
+    <!-- PANTALLA ACTUALIZACION DE ROLES -->
+    <mat-tab  *ngIf="getActualizarRolUsuario()">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
+            <h6 id="items">Actualizar Roles</h6>
+        </ng-template>
+        <app-editar-rol-user></app-editar-rol-user>
+    </mat-tab>
+
+    <!-- PANTALLA ACTUALIZACION DE DEPARTAMENTOS-->
+    <mat-tab *ngIf="getActualizarDepartamentoUsuario()">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
+            <h6 id="items">Actualizar Departamentos</h6>
+        </ng-template>
+        <app-editar-depa-user></app-editar-depa-user>
+    </mat-tab>
+
+</mat-tab-group>

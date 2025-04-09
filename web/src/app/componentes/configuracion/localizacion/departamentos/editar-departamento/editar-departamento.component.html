@@ -1,0 +1,56 @@
+<div id="titulo" class="row w-100 m-auto">
+    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    </div>
+    <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            MODIFICAR DEPARTAMENTO
+        </span>
+    </div>
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
+</div>
+<div class="container" style="padding-top: 5px;">
+    <form [formGroup]="formulario">
+        <div style="text-align: center">
+            <div class="nota" id="espacio" style="text-align: justify;">
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field *ngIf="Habilitar">
+                            <mat-label id="letras">Seleccionar establecimiento</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Lista de establecimientos registrados.">help_outline
+                            </mat-icon>
+                            <mat-select [formControl]="idSucursal" required>
+                                <mat-option *ngFor="let suc of sucursales" [value]="suc.id"
+                                    (click)="ObtenerDepartamentos(formulario.value)">
+                                    {{suc.nombre}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>Departamento</mat-label>
+                            <input matInput placeholder="Ej: Contabilidad" [formControl]="nombre" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar nombre del nuevo departamento.">help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
+            <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+                (click)="ModificarDepartamento(formulario.value)">
+                Guardar
+            </button>
+        </div>
+    </form>
+</div>

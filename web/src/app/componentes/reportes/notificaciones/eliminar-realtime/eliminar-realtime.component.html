@@ -1,0 +1,31 @@
+<div id="resultados">
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+        ELIMINAR REGISTROS
+    </span>
+</div>
+<mat-card-content>
+    <div *ngIf="contenidoSolicitudes" style="padding: 2%;">
+        <p>
+            Se le indica que se eliminaran todas las notificaciones de permisos, horas extras y vacaciones
+            seleccionadas.
+        </p>
+        <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR LAS NOTIFICACIONES?</p>
+    </div>
+    <div *ngIf="contenidoAvisos">
+        <p>
+            Se le indica que se eliminaran todas los avisos de horas extras, servicios de alimentación, comunicados
+            y aletras de timbres seleccionados.
+        </p>
+        <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR LOS AVISOS?</p>
+    </div>
+</mat-card-content>
+
+<div style="text-align: center; margin-bottom: 3%;">
+    <button mat-raised-button id="aceptar" class="btn-sm" color="primary" (click)="ConfirmarListaNotificaciones()">
+        Aceptar
+    </button>&nbsp;&nbsp;
+    <button mat-button id="btn-raised" class="btn btn-sm" (click)="ventana.close(false)" cdkFocusInitial>
+        Cancelar
+    </button>
+</div>
+

@@ -1,0 +1,134 @@
+<div style="padding-top: 20px;">
+    <div id="titulo" class="row w-100 m-auto align-items-center">
+        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1">
+            <button class="btn btn-outline-light btn-sm" style="float: left;" (click)="VerDepartamentos()">
+                Atras
+            </button>
+        </div>
+        <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+            <span>NIVELES DE AUTORIZACIÓN</span>
+        </div>
+        <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+            <button class="btn btn-outline-light btn-sm" style="float: right; " (click)=" AbrirRegistrarNiveles()" *ngIf="getVerDepartamentoVerNiveles()">
+                Añadir
+            </button>
+        </div>
+
+    </div>
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 10px;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div class="container">
+                <div id="titulo" class="row align-items-center">
+                    <div class="col-6 col-md-3 mb-2 mb-md-0 order-2 order-md-1">
+                        <mat-icon class="float-left" id="cerrar" (click)="CargarDatos(info)" matTooltipPosition="right"
+                            matTooltip="Actualización de niveles de aprobación.">autorenew
+                        </mat-icon>
+                    </div>
+                    <div class="col-12 col-md-6 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            DEPARTAMENTO {{info.nombre}} - ESTABLECIMIENTO {{nombre_sucursal}}
+                        </span>
+                    </div>
+                    <div class="col-6 col-md-3 mb-2 mb-md-0 order-2 order-md-3 ">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right; "
+                            (click)="ConfirmarDeleteMultiple()" *ngIf="getVerDepartamentoEliminarNiveles()">Eliminar </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="table-responsive table_horario">
+                <div class="table-wrapper">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center;">
+                                <th>
+                                    <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                        (click)="HabilitarSeleccion()">
+                                        library_add_check
+                                    </mat-icon>
+                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                        [checked]="selectionNivel.hasValue() && isAllSelectedPag()"
+                                        [indeterminate]="selectionNivel.hasValue() && !isAllSelectedPag()"
+                                        [aria-label]="checkboxLabelPag()">
+                                    </mat-checkbox>
+                                </th>
+                                <th scope="col">Nivel Jerárquico</th>
+                                <th scope="col">Sucursal</th>
+                                <th scope="col">Departamento</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let departamento of departamentos">
+                                <td>
+                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                        (change)="$event ? selectionNivel.toggle(departamento) : null"
+                                        [checked]="selectionNivel.isSelected(departamento)"
+                                        [aria-label]="checkboxLabelPag(departamento)">
+                                    </mat-checkbox>
+                                </td>
+                                <td>{{departamento.nivel}}</td>
+                                <td>{{departamento.suc_nivel}}</td>
+                                <td>{{departamento.departamento_nombre_nivel}}</td>
+                                <td class="d-flex justify-content-center">
+                                    <i (click)="AbrirVentanaVerListadoEmpleados(departamento)" id="t-detalles"
+                                        class="fa fa-user-circle" matSuffix matTooltipPosition="right"
+                                        matTooltip="Visualizar personal con permisos de autorización." *ngIf="getVerDepartamentoVerAutoridades()">
+                                        <p>Autorización</p>
+                                    </i>
+                                    <i (click)="ConfirmarDelete(departamento)" class="far fa-trash-alt" id="t-eliminar"
+                                        matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getVerDepartamentoEliminarNiveles()">
+                                        <p>Eliminar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div [hidden]="mostrar" style="text-align: center; margin-top: 5px; margin-bottom: 10px;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">
+                LISTA DE USUARIOS QUE AUTORIZAN EN {{depa}}
+                <mat-icon class="float-right" id="cerrar" style="color: rgb(255, 52, 52);" (click)="CerrarTabla()">
+                    highlight_off
+                </mat-icon>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Cargo</th>
+                            <th scope="col">Tipo de aprobación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let empleado of empleados">
+                            <td>{{empleado.nombre}} {{empleado.apellido}}</td>
+                            <td>{{empleado.depa_registro}}</td>
+                            <td>{{empleado.cargo}}</td>
+                            <td>
+                                <span *ngIf="empleado.estado === true && empleado.autorizar === true">
+                                    Autoriza
+                                </span>
+                                <span *ngIf="empleado.estado === true && empleado.preautorizar === true">
+                                    Pre-autoriza
+                                </span>
+                                <span *ngIf="empleado.estado === false">
+                                    Se le ha quitado la autorización
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

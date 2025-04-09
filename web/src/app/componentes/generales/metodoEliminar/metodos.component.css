@@ -1,0 +1,39 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+    margin: 5px 10px 5px 10px;
+}
+
+p {
+    font-size: 13px;
+}
+
+#cancelar {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#mensaje {
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    color: red;
+}
+
+#aceptar {
+    margin: 5px 10px 5px 10px;
+    font-size: 14px;
+    color: white;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    word-wrap: break-word;
+}
+
+.circulo {
+    width: 12px;
+    height: 12px;
+    border-radius: 50px;
+    z-index: 0;
+    background-color: rgb(36, 169, 118);
+}
