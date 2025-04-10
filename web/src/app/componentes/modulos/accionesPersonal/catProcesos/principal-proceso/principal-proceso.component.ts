@@ -277,7 +277,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
     this.rest.EliminarProcesoMult(data).subscribe({
       next: () => {
-        this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+        this.toastr.error('Registros eliminados exitosamente.', 'Operación exitosa.', {
           timeOut: 5000,
         });
       }, error: (err) => {

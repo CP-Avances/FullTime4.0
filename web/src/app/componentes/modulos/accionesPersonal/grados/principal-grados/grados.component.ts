@@ -236,7 +236,7 @@ export class GradosComponent implements OnInit {
     };
     this._grados.ElminarGrado(dataGrado).subscribe((res: any) => {
       if (res.codigo != 200) {
-        this.toastr.error('No se completo el proceso.', 'No fue posible eliminar.', {
+        this.toastr.warning('No se completo el proceso.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -282,7 +282,7 @@ export class GradosComponent implements OnInit {
 
     this._grados.EliminarGradoMult(data).subscribe({
        next: () => {
-         this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+         this.toastr.error('Registros eliminados exitosamente.', 'Operación exitosa.', {
            timeOut: 5000,
          });
        },error: (err) => {

@@ -229,7 +229,7 @@ export class ListarTipoComidasComponent implements OnInit {
     this.rest.EliminarRegistro(id_tipo, datos).subscribe((res: any) => {
 
       if (res.message === 'error') {
-        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+        this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
 

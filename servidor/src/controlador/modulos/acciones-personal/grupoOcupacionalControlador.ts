@@ -1,12 +1,11 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
-import { Query, QueryResult } from 'pg';
+import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
 import Excel from 'exceljs';
-import { count } from 'console';
 
 class GrupoOcupacionalControlador {
 
@@ -25,7 +24,7 @@ class GrupoOcupacionalControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al optener los grupos ocupacionales' });
+      res.status(500).jsonp({ message: 'Error al obtener los grupos ocupacionales' });
     }
 
   }
@@ -60,7 +59,7 @@ class GrupoOcupacionalControlador {
       const GRUPO = await pool.query(
         `
           SELECT gp.id, gp.descripcion, gp.numero_partida FROM map_cat_grupo_ocupacional AS gp
-          WHERE UPPER(gp.descripcion) = UPPER($1) OR numero_partida = $2
+          WHERE UPPER(gp.descripcion) = UPPER($1) OR ($2 <> '' AND gp.numero_partida = $2)
           `
         , [grupo, numero_partida]);
 
@@ -105,7 +104,7 @@ class GrupoOcupacionalControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al guardar el grupo ocupacional' });
+      res.status(500).jsonp({ message: 'Error al guardar el grupo ocupacional.' });
     }
 
   }
@@ -121,17 +120,17 @@ class GrupoOcupacionalControlador {
       await pool.query('BEGIN');
       const DataGrupoOcu = await pool.query(
         `
-              SELECT * FROM map_cat_grupo_ocupacional WHERE (UPPER(descripcion) = UPPER($1) OR numero_partida = $2) AND id != $3
-            `
+        SELECT * FROM map_cat_grupo_ocupacional WHERE (UPPER(descripcion) = UPPER($1) OR ($2 <> '' AND numero_partida = $2)) AND id != $3
+        `
         , [grupo, numero_partida, id_grupo]);
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
       if (DataGrupoOcu.rows[0] != undefined && DataGrupoOcu.rows[0] != null && DataGrupoOcu.rows[0] != "") {
         if (DataGrupoOcu.rows[0].descripcion.toLowerCase() == grupo.toLowerCase()) {
-          res.status(300).jsonp({ message: 'Ya existe un grupo ocupacional registrado', codigo: 300 });
+          res.status(300).jsonp({ message: 'Ya existe un grupo ocupacional registrado.', codigo: 300 });
         } else {
-          res.status(300).jsonp({ message: 'Ya existe el número de partida', codigo: 300 });
+          res.status(300).jsonp({ message: 'Ya existe el número de partida.', codigo: 300 });
         }
 
       } else {
@@ -159,14 +158,14 @@ class GrupoOcupacionalControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        res.status(200).jsonp({ message: 'El grupo ocupacional se ha actualizado con éxito', codigo: 200 });
+        res.status(200).jsonp({ message: 'El grupo ocupacional se ha actualizado con éxito.', codigo: 200 });
 
       }
 
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al actualizar el grupo ocupacional' });
+      res.status(500).jsonp({ message: 'Error al actualizar el grupo ocupacional.' + error });
     }
 
   }
@@ -526,17 +525,18 @@ class GrupoOcupacionalControlador {
     try {
       for (const item of listaUsuarios) {
 
-        const { id_empleado } = item;
+        const { id } = item;
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
         const response: QueryResult = await pool.query(
           `
-            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
-           `
-          , [id_grupo, id_empleado]);
+          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
+          `
+          , [id_grupo, id]);
 
         const [grupo] = response.rows;
+
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'map_empleado_grupo_ocupacional',
@@ -559,9 +559,10 @@ class GrupoOcupacionalControlador {
             `
             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
            `
-            , [id_empleado]);
+            , [id]);
 
           const [grupo_activo] = response.rows;
+
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'map_empleado_grupo_ocupacional',
@@ -576,17 +577,16 @@ class GrupoOcupacionalControlador {
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
 
-          console.log('grado_activo: ', grupo_activo)
-
           if (grupo_activo == undefined || grupo_activo == '' || grupo_activo == null) {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
+
             const responsee: QueryResult = await pool.query(
               `
               INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_empleado, id_grupo, true]);
+              , [id, id_grupo, true]);
 
             const [grupo_insert] = responsee.rows;
 
@@ -603,8 +603,6 @@ class GrupoOcupacionalControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
-
 
           } else {
 
@@ -637,7 +635,7 @@ class GrupoOcupacionalControlador {
               `
                INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_empleado, id_grupo, true]);
+              , [id, id_grupo, true]);
 
             const [nuevo_grupo] = response.rows;
             // AUDITORIA
@@ -666,7 +664,7 @@ class GrupoOcupacionalControlador {
               `
                 SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
               `
-              , [id_empleado]);
+              , [id]);
 
             const [grupo_activo1] = response.rows;
             // AUDITORIA
@@ -688,8 +686,8 @@ class GrupoOcupacionalControlador {
               await pool.query('BEGIN');
               const grupo_update: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
-              `
+                UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+                `
                 , [grupo.id]);
 
               const [grup_UPD] = grupo_update.rows;
@@ -711,8 +709,8 @@ class GrupoOcupacionalControlador {
               await pool.query('BEGIN');
               const grupo_update_false: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
-              `
+                UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+                `
                 , [grupo_activo1.id]);
 
               const [grupo_UPD] = grupo_update_false.rows;
@@ -752,15 +750,10 @@ class GrupoOcupacionalControlador {
               });
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
-
             }
-
-
-
           }
         }
       }
-
       return res.status(200).jsonp({ message: 'Registro de grupo ocupacional' });
 
     } catch {
@@ -1387,13 +1380,13 @@ class GrupoOcupacionalControlador {
 
       if (error) {
         if (err.table == 'map_empleado_grupo_ocupacional') {
-          if(count == 1){
-            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registro.', ms2:'Existen datos relacionados con el grupo '+datoEliminar });
-          }else{
-            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registros.', ms2:'Existen datos relacionados con el grupo '+datoEliminar });
+          if (count == 1) {
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo ocupacional ' + datoEliminar });
+          } else {
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo ocupacional ' + datoEliminar });
           }
         } else {
-          return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+          return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
         }
       }
     }

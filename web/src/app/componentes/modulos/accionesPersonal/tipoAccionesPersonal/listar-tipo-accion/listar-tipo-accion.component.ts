@@ -170,7 +170,7 @@ export class ListarTipoAccionComponent implements OnInit {
     };
     this.rest.EliminarRegistro(id_accion, datos).subscribe((res: any) => {
       if (res.message === 'error') {
-        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+        this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {

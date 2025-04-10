@@ -121,6 +121,7 @@ class AuditoriaControlador {
                 `, [plataforma, tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion, ip_local]);
             }
             catch (error) {
+                console.log('ver error ', error);
                 throw error;
             }
         });

@@ -63,7 +63,7 @@ export class RegistrarGradoComponent  implements OnInit{
     this._grados.IngresarGrado(dataGrado).subscribe({
       next: (respuesta: any) => {
         if(respuesta.codigo != 200){
-          this.toastr.warning(respuesta.message, 'Error registro.', {
+          this.toastr.warning(respuesta.message, 'Advertencia.', {
             timeOut: 6000,
           });
         }else{

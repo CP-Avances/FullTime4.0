@@ -319,6 +319,13 @@ export class ListaWebComponent implements OnInit {
   // METODO DE BUSQUEDA DE DATOS GENERALES TIMBRE WEB
   BuscarInformacionGeneral(estado: any) {
     this.informacion.UsuariosTimbreWebGeneral(1, estado).subscribe((res: any[]) => {
+      console.log('ver infor ', estado, '   ', res)
+
+      this.inactivar = true;
+      this.ver_imagen = true;
+      this.activar = true;
+
+      /*
       if (estado === false) {
         this.inactivar = true;
         this.ver_imagen = true;
@@ -327,15 +334,20 @@ export class ListaWebComponent implements OnInit {
         this.activar = true;
         this.ver_imagen = true;
       }
-
+*/
       this.ProcesarDatos(res, estado);
     }, err => {
+      /*
       if (estado === false) {
         this.inactivar = false;
       }
       else {
         this.activar = false;
       }
+        */
+      this.inactivar = true;
+      this.ver_imagen = true;
+      this.activar = true;
     })
   }
 
