@@ -229,7 +229,7 @@ export class EmpleadoProcesoComponent {
     console.log('data: ',data)
     this.rest.EliminarRegistro(data.id, data).subscribe({
       next: (respuesta: any) => {
-        this.toastr.success(respuesta.message, 'Correcto.', {
+        this.toastr.error(respuesta.message, 'Correcto.', {
           timeOut: 4500,
         });
         this.ngOnInit();

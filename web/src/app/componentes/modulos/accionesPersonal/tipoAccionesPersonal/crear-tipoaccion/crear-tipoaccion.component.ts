@@ -173,6 +173,7 @@ export class CrearTipoaccionComponent implements OnInit {
       this.formulario.patchValue({
         otroTipoForm: '',
       });
+      
       this.ingresoTipo = true;
       this.toastr.info('Ingresar nombre de un nuevo tipo de acción personal.', '', {
         timeOut: 6000,

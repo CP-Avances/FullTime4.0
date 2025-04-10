@@ -670,7 +670,7 @@ export class RegistroInterfazGrupoComponent {
       
         }
       
-        // METODO PARA EDITAR EL DEPARTAMENTO DEL USUARIO SELECCIONADO
+
         AbrirEditarDepaUser(datos: any) {
           console.log('datos: ', datos)
           if (datos.length > 0) {
@@ -685,7 +685,7 @@ export class RegistroInterfazGrupoComponent {
             } else {
               
               this.resGrupo.RegistroGrupo(data).subscribe((res: any) => {
-                this.toastr.success(res.message, '', {
+                this.toastr.success(res.message, 'Correcto.', {
                   timeOut: 4000,
                 });
                 this.LimpiarFormularioDep();

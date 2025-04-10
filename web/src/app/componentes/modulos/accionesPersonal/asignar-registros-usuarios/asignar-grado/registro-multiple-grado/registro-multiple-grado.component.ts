@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -15,6 +15,8 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
 })
 
 export class RegistroMultipleGradoComponent {
+
+  @Output() cerrarComponente = new EventEmitter<boolean>();
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -212,7 +214,7 @@ export class RegistroMultipleGradoComponent {
            });
            if (this.listaGradoCorrectas?.length > 0) {
              setTimeout(() => {
-               //this.ngOnInit();
+                this.cerrarComponente.emit(false);
              }, 500);
            }
            
