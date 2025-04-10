@@ -850,52 +850,78 @@ class ProcesoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const proceso_update: QueryResult = await pool.query(
-              `
+            if (proceso_activo1 != undefined && proceso_activo1 != null && proceso_activo1 != '') {
+              // INICIAR TRANSACCION
+              await pool.query('BEGIN');
+              const proceso_update: QueryResult = await pool.query(
+                `
               UPDATE map_empleado_procesos SET estado = true WHERE id = $1
               `
-              , [procesos.id]);
+                , [procesos.id]);
 
-            const [proceso_UPD] = proceso_update.rows;
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'map_empleado_procesos',
-              usuario: user_name,
-              accion: 'I',
-              datosOriginales: '',
-              datosNuevos: JSON.stringify(proceso_UPD),
-              ip: ip,
-              ip_local: ip_local,
-              observacion: null
-            });
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+              const [proceso_UPD] = proceso_update.rows;
+              // AUDITORIA
+              await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_empleado_procesos',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(proceso_UPD),
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+              });
+              // FINALIZAR TRANSACCION
+              await pool.query('COMMIT');
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const proceso_update1: QueryResult = await pool.query(
-              `
+
+              // INICIAR TRANSACCION
+              await pool.query('BEGIN');
+              const proceso_update1: QueryResult = await pool.query(
+                `
               UPDATE map_empleado_procesos SET estado = false WHERE id = $1
               `
-              , [proceso_activo1.id]);
+                , [proceso_activo1.id]);
 
-            const [proceso_UPD1] = proceso_update.rows;
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'map_empleado_procesos',
-              usuario: user_name,
-              accion: 'I',
-              datosOriginales: '',
-              datosNuevos: JSON.stringify(proceso_UPD1),
-              ip: ip,
-              ip_local: ip_local,
-              observacion: null
-            });
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+              const [proceso_UPD1] = proceso_update.rows;
+              // AUDITORIA
+              await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_empleado_procesos',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(proceso_UPD1),
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+              });
+              // FINALIZAR TRANSACCION
+              await pool.query('COMMIT');
+            }else{
+              // INICIAR TRANSACCION
+              await pool.query('BEGIN');
+              const proceso_update: QueryResult = await pool.query(
+                `
+              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+              `
+                , [procesos.id]);
 
+              const [proceso_UPD] = proceso_update.rows;
+              // AUDITORIA
+              await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_empleado_procesos',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(proceso_UPD),
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+              });
+              // FINALIZAR TRANSACCION
+              await pool.query('COMMIT');
+            }
+            
           }
         }
       }

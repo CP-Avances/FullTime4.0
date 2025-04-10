@@ -678,8 +678,6 @@ export class RegistroInterfazProcesoComponent {
               listaUsuarios: datos
             }
 
-            console.log('Datos a enviar: ',data)
-
             if (data.id_proceso == '') {
               this.toastr.warning('Seleccione el proceso.', '', {
                 timeOut: 4000,
@@ -688,7 +686,7 @@ export class RegistroInterfazProcesoComponent {
 
               
               this.restPro.RegistroProcesos(data).subscribe((res: any) => {
-                this.toastr.success(res.message, '', {
+                this.toastr.success(res.message, 'Correcto.', {
                   timeOut: 4000,
                 });
                 this.LimpiarFormularioDep();

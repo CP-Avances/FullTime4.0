@@ -225,7 +225,7 @@ export class EmpleadoGradoComponent {
     }
     this.rest.EliminarGradoEmple(grado.id, data).subscribe({
       next: (respuesta: any) => {
-        this.toastr.success(respuesta.message, 'Correcto.', {
+        this.toastr.error(respuesta.message, 'Correcto.', {
           timeOut: 4500,
         });
         this.ngOnInit();

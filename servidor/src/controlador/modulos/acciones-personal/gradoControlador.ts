@@ -624,7 +624,7 @@ class GradoControlador {
           }
 
         } else {
-          console.log('proceso: ', grados.estado)
+          
           if (grados.estado == false) {
 
             // INICIAR TRANSACCION
@@ -650,52 +650,82 @@ class GradoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const proceso_update: QueryResult = await pool.query(
-              `
+
+            if (grado_activo1 != undefined && grado_activo1 != null && grado_activo1 != '') {
+              // INICIAR TRANSACCION
+              await pool.query('BEGIN');
+              const proceso_update: QueryResult = await pool.query(
+                `
               UPDATE map_empleado_grado SET estado = true WHERE id = $1
               `
-              , [grados.id]);
+                , [grados.id]);
 
-            const [grado_UPD] = proceso_update.rows;
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'map_empleado_grado',
-              usuario: user_name,
-              accion: 'I',
-              datosOriginales: '',
-              datosNuevos: JSON.stringify(grado_UPD),
-              ip: ip,
-              ip_local: ip_local,
-              observacion: null
-            });
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+              const [grado_UPD] = proceso_update.rows;
+              // AUDITORIA
+              await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_empleado_grado',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(grado_UPD),
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+              });
+              // FINALIZAR TRANSACCION
+              await pool.query('COMMIT');
 
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const proceso_update1: QueryResult = await pool.query(
-              `
+              // INICIAR TRANSACCION
+              await pool.query('BEGIN');
+              const proceso_update1: QueryResult = await pool.query(
+                `
               UPDATE map_empleado_grado SET estado = false WHERE id = $1
               `
-              , [grado_activo1.id]);
+                , [grado_activo1.id]);
 
-            const [grado_UPD1] = proceso_update1.rows;
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'map_empleado_grado',
-              usuario: user_name,
-              accion: 'I',
-              datosOriginales: '',
-              datosNuevos: JSON.stringify(grado_UPD1),
-              ip: ip,
-              ip_local: ip_local,
-              observacion: null
-            });
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+              const [grado_UPD1] = proceso_update1.rows;
+              // AUDITORIA
+              await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_empleado_grado',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(grado_UPD1),
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+              });
+              // FINALIZAR TRANSACCION
+              await pool.query('COMMIT');
+
+            } else {
+
+              // INICIAR TRANSACCION
+              await pool.query('BEGIN');
+              const grado_update: QueryResult = await pool.query(
+                `
+              UPDATE map_empleado_grado SET estado = true WHERE id = $1
+              `
+                , [grados.id]);
+
+              const [grado_UPD] = grado_update.rows;
+              // AUDITORIA
+              await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_empleado_grupo_ocupacional',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(grado_UPD),
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+              });
+              // FINALIZAR TRANSACCION
+              await pool.query('COMMIT');
+              
+
+            }
+
 
           }
         }

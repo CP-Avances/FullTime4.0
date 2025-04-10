@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -14,6 +14,8 @@ import { environment } from 'src/environments/environment';
   styleUrl: './registro-multiple-grupo.component.css'
 })
 export class RegistroMultipleGrupoComponent {
+
+  @Output() cerrarComponente = new EventEmitter<boolean>();
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -203,6 +205,7 @@ export class RegistroMultipleGrupoComponent {
  
    // METODO PARA REGISTRAR DATOS
    RegistrarProcesos() {
+
     console.log('listaGrupoOcupacionalCorrectas: ',this.listaGrupoOcupacionalCorrectas.length)
      if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
        const data = {
@@ -210,6 +213,7 @@ export class RegistroMultipleGrupoComponent {
          user_name: this.user_name,
          ip: this.ip, ip_local: this.ips_locales
        }
+
        this.rest.RegistrarPlantillaEmpleGrupoOcu(data).subscribe({
          next: (response: any) => {
            this.toastr.success('Plantilla de Grupo Ocupacional importada.', 'Operación exitosa.', {
@@ -217,7 +221,7 @@ export class RegistroMultipleGrupoComponent {
            });
            if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
              setTimeout(() => {
-               //this.ngOnInit();
+              this.cerrarComponente.emit(false);
              }, 500);
            }
            
@@ -229,6 +233,7 @@ export class RegistroMultipleGrupoComponent {
            this.archivoForm.reset();
          }
        });
+
      } else {
        this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
          timeOut: 4000,
@@ -238,6 +243,8 @@ export class RegistroMultipleGrupoComponent {
  
      this.archivoSubido = [];
      this.nameFile = '';
+
+
    }
 
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
@@ -15,6 +15,8 @@ import { PageEvent } from '@angular/material/paginator';
   styleUrl: './registro-multiple-proceso.component.css'
 })
 export class RegistroMultipleProcesoComponent {
+
+  @Output() cerrarComponente = new EventEmitter<boolean>();
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -223,7 +225,7 @@ export class RegistroMultipleProcesoComponent {
            });
            if (this.listaProcesosCorrectas?.length > 0) {
              setTimeout(() => {
-               //this.ngOnInit();
+              this.cerrarComponente.emit(false);
              }, 500);
            }
            

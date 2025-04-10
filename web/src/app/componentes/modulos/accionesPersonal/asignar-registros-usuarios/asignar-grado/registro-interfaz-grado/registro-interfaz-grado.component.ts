@@ -688,7 +688,7 @@ export class RegistroInterfazGradoComponent {
             } else {
 
               this.resGrados.RegistroGrado(data).subscribe((res: any) => {
-                this.toastr.success(res.message, '', {
+                this.toastr.success(res.message, 'Correcto.', {
                   timeOut: 4000,
                 });
                 this.LimpiarFormularioDep();
