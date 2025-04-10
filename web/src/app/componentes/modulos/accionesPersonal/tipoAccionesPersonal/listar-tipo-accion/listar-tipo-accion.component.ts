@@ -570,7 +570,7 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Tipo Acción Personal');
+      return datos.some(item => item.accion === 'Crear Detalle Tipo Acción Personal');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -580,7 +580,7 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Tipo Acción Personal');
+      return datos.some(item => item.accion === 'Ver Detalle Tipo Acción Personal');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -590,7 +590,7 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Tipo Acción Personal');
+      return datos.some(item => item.accion === 'Editar Detalle Tipo Acción Personal');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -600,7 +600,7 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Tipo Acción Personal');
+      return datos.some(item => item.accion === 'Eliminar Detalle Tipo Acción Personal');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -610,7 +610,7 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Tipo Acción Personal');
+      return datos.some(item => item.accion === 'Descargar Reportes Detalle Tipo Acción Personal');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
