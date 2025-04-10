@@ -9,11 +9,11 @@ import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/
 
 @Component({
   selector: 'app-registrar-nacionalidad',
-  standalone: false,
-  
+  standalone: false, 
   templateUrl: './registrar-nacionalidad.component.html',
   styleUrl: './registrar-nacionalidad.component.css'
 })
+
 export class RegistrarNacionalidadComponent {
 
   nacionalidades: any = [];

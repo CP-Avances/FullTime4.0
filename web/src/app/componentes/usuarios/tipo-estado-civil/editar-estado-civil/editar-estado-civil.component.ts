@@ -11,6 +11,7 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
   templateUrl: './editar-estado-civil.component.html',
   styleUrl: './editar-estado-civil.component.css'
 })
+
 export class EditarEstadoCivilComponent {
 
   ips_locales: any = '';

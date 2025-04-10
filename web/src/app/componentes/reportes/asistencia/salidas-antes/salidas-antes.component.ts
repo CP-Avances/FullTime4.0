@@ -20,6 +20,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-salidas-antes',
+  standalone: false,
   templateUrl: './salidas-antes.component.html',
   styleUrls: ['./salidas-antes.component.css']
 })

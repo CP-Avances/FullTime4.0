@@ -12,8 +12,10 @@ interface Estados {
   valor: number;
   nombre: string
 }
+
 @Component({
   selector: 'app-estado-hora-extra',
+  standalone: false,
   templateUrl: './estado-hora-extra.component.html',
   styleUrls: ['./estado-hora-extra.component.css']
 })

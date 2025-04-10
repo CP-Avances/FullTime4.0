@@ -22,6 +22,7 @@ import { IReporteAsistenciaConsolidada, IRestAsisteConsoli, IRestTotalAsisteCons
 
 @Component({
   selector: 'app-asistencia-consolidado',
+  standalone: false,
   templateUrl: './asistencia-consolidado.component.html',
   styleUrls: ['./asistencia-consolidado.component.css']
 })

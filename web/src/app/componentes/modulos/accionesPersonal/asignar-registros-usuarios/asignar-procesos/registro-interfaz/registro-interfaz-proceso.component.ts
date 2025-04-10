@@ -24,6 +24,7 @@ import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoC
   templateUrl: './registro-interfaz-proceso.component.html',
   styleUrl: './registro-interfaz-proceso.component.css'
 })
+
 export class RegistroInterfazProcesoComponent {
 
   listaUsuariosRol: any = []

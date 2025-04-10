@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-feriados',
+  standalone: false,
   templateUrl: './editar-feriados.component.html',
   styleUrls: ['./editar-feriados.component.css'],
 })

@@ -10,6 +10,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 
 @Component({
   selector: 'app-principal-sucursal-usuario',
+  standalone: false,
   templateUrl: './principal-sucursal-usuario.component.html',
   styleUrls: ['./principal-sucursal-usuario.component.css']
 })

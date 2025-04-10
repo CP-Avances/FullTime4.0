@@ -21,6 +21,7 @@ import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/
 
 @Component({
   selector: 'app-vacuna-multiple',
+  standalone: false,
   templateUrl: './vacuna-multiple.component.html',
   styleUrls: ['./vacuna-multiple.component.css'],
 })

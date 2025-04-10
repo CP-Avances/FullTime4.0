@@ -8,6 +8,7 @@ import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacio
 
 @Component({
   selector: 'app-editar-detalle-menu',
+  standalone: false,
   templateUrl: './editar-detalle-menu.component.html',
   styleUrls: ['./editar-detalle-menu.component.css']
 })

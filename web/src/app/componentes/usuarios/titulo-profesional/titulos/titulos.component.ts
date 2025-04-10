@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-titulos',
+  standalone: false,
   templateUrl: './titulos.component.html',
   styleUrls: ['./titulos.component.css'],
 })

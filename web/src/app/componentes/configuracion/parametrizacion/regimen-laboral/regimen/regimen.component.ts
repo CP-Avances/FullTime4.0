@@ -13,6 +13,7 @@ import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.compone
 
 @Component({
   selector: 'app-regimen',
+  standalone: false,
   templateUrl: './regimen.component.html',
   styleUrls: ['./regimen.component.css'],
 })

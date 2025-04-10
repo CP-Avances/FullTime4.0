@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-timbre-mrl',
+  standalone: false,
   templateUrl: './timbre-mrl.component.html',
   styleUrls: ['./timbre-mrl.component.css']
 })

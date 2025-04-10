@@ -7,6 +7,7 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 
 @Component({
   selector: 'app-ver-tipo-accion',
+  standalone: false,
   templateUrl: './ver-tipo-accion.component.html',
   styleUrls: ['./ver-tipo-accion.component.css']
 })

@@ -16,6 +16,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-editar-plan-comidas',
+  standalone: false,
   templateUrl: './editar-plan-comidas.component.html',
   styleUrls: ['./editar-plan-comidas.component.css'],
 })

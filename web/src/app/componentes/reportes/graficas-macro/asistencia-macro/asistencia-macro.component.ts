@@ -15,10 +15,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-asistencia-macro',
+  standalone: false,
   templateUrl: './asistencia-macro.component.html',
   styleUrls: ['./asistencia-macro.component.css'],
-
 })
+
 export class AsistenciaMacroComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

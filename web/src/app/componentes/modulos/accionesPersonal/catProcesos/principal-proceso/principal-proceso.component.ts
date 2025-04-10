@@ -23,6 +23,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-principal-proceso',
+  standalone: false,
   templateUrl: './principal-proceso.component.html',
   styleUrls: ['./principal-proceso.component.css']
 })
@@ -676,43 +677,38 @@ export class PrincipalProcesoComponent implements OnInit {
   }
 
   //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
   getCrearProceso(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Proceso');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Crear Proceso');
   }
 
-  getEditar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Proceso');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getEditarProceso(){
+    return this.tienePermiso('Editar Proceso');
   }
 
-  getEliminar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Proceso');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getEliminarProceso(){
+    return this.tienePermiso('Eliminar Proceso');
   }
 
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Proceso');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getCargarPlantillaProceso(){
+    return this.tienePermiso('Cargar Plantilla Proceso');
+  }
+
+  getDescargarReportesProceso(){
+    return this.tienePermiso('Descargar Reportes Proceso');
   }
 }

@@ -23,6 +23,7 @@ import { MetodosComponent } from '../../../generales/metodoEliminar/metodos.comp
 
 @Component({
   selector: 'app-cat-discapacidad',
+  standalone: false,
   templateUrl: './cat-vacunas.component.html',
   styleUrls: ['./cat-vacunas.component.css']
 })

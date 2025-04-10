@@ -18,9 +18,11 @@ interface Estado {
 
 @Component({
   selector: 'app-plan-hora-extra-autoriza',
+  standalone: false,
   templateUrl: './plan-hora-extra-autoriza.component.html',
   styleUrls: ['./plan-hora-extra-autoriza.component.css']
 })
+
 export class PlanHoraExtraAutorizaComponent implements OnInit {
   ips_locales: any = '';
 

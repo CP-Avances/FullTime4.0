@@ -12,6 +12,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 
 @Component({
   selector: 'app-cancelar-permiso',
+  standalone: false,
   templateUrl: './cancelar-permiso.component.html',
   styleUrls: ['./cancelar-permiso.component.css']
 })

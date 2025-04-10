@@ -22,6 +22,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-timbre-sistema',
+  standalone: false,
   templateUrl: './timbre-sistema.component.html',
   styleUrls: ['./timbre-sistema.component.css']
 })

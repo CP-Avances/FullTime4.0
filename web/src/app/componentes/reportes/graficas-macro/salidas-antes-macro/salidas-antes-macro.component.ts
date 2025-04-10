@@ -14,9 +14,9 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-salidas-antes-macro',
+  standalone: false,
   templateUrl: './salidas-antes-macro.component.html',
   styleUrls: ['./salidas-antes-macro.component.css'],
-
 })
 
 export class SalidasAntesMacroComponent implements OnInit {

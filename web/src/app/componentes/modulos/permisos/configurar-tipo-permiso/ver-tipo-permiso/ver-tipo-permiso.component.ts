@@ -9,6 +9,7 @@ import { VistaElementosComponent } from '../listarTipoPermisos/vista-elementos.c
 
 @Component({
   selector: 'app-ver-tipo-permiso',
+  standalone: false,
   templateUrl: './ver-tipo-permiso.component.html',
   styleUrls: ['./ver-tipo-permiso.component.css']
 })

@@ -339,7 +339,6 @@ import { RegistroInterfazProcesoComponent } from './componentes/modulos/acciones
 import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-multiple/registro-multiple-proceso.component';
 import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-interfaz-grado/registro-interfaz-grado.component';
 import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-multiple-grado/registro-multiple-grado.component';
-import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
 import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
 import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/empleado-proceso/empleado-proceso.component';
 import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/empleado-grado/empleado-grado.component';
@@ -348,6 +347,7 @@ import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/
 import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
 import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
 import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
+import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
 
 @NgModule({
   declarations: [
@@ -653,7 +653,6 @@ import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-naci
     EditarNacionalidadComponent,
     ListarNacionalidadComponent,
     RegistrarNacionalidadComponent,
-
   ],
 
   imports: [

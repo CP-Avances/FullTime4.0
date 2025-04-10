@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-definicion-plantilla',
+  standalone: false,
   templateUrl: './definicion-plantilla.component.html',
   styleUrls: ['./definicion-plantilla.component.css']
 })

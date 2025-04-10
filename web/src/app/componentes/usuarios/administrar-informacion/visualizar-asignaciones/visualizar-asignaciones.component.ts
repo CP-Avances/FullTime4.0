@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-visualizar-asignaciones',
+  standalone: false,
   templateUrl: './visualizar-asignaciones.component.html',
   styleUrls: ['./visualizar-asignaciones.component.css']
 })

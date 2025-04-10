@@ -9,6 +9,7 @@ import { SucursalService } from 'src/app/servicios/configuracion/localizacion/su
 
 @Component({
   selector: 'app-registro-departamento',
+  standalone: false,
   templateUrl: './registro-departamento.component.html',
   styleUrls: ['./registro-departamento.component.css'],
 })

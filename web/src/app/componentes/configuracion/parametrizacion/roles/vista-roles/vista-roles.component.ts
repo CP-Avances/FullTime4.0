@@ -31,6 +31,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-vista-roles',
+  standalone: false,
   templateUrl: './vista-roles.component.html',
   styleUrls: ['./vista-roles.component.css'],
 })

@@ -13,6 +13,7 @@ import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.s
 
 @Component({
   selector: 'app-registro-horario',
+  standalone: false,
   templateUrl: './registro-horario.component.html',
   styleUrls: ['./registro-horario.component.css'],
 })

@@ -27,6 +27,7 @@ import { ITableDepartamentos } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-principal-departamento',
+  standalone: false,
   templateUrl: './principal-departamento.component.html',
   styleUrls: ['./principal-departamento.component.css']
 })

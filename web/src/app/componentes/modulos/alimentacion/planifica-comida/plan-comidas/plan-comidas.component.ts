@@ -18,6 +18,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-plan-comidas',
+  standalone: false,
   templateUrl: './plan-comidas.component.html',
   styleUrls: ['./plan-comidas.component.css']
 })

@@ -6,6 +6,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 
 @Component({
   selector: 'app-confirmar-desactivados',
+  standalone: false,
   templateUrl: './confirmar-crearCarpeta.component.html',
   styleUrls: ['./confirmar-crearCarpeta.component.css']
 })

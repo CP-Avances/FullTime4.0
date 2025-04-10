@@ -14,6 +14,7 @@ import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.s
 
 @Component({
   selector: 'app-editar-horario',
+  standalone: false,
   templateUrl: './editar-horario.component.html',
   styleUrls: ['./editar-horario.component.css']
 })

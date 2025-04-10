@@ -4,13 +4,12 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
-import { use } from 'echarts';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-frase-seguridad',
+  standalone: false,
   templateUrl: './frase-seguridad.component.html',
   styleUrls: ['./frase-seguridad.component.css']
 })

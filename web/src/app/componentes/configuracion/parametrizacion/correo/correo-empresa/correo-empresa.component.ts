@@ -10,6 +10,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-correo-empresa',
+  standalone: false,
   templateUrl: './correo-empresa.component.html',
   styleUrls: ['./correo-empresa.component.css']
 })

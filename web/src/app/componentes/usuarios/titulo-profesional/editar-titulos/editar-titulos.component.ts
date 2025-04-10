@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-titulos',
+  standalone: false,
   templateUrl: './editar-titulos.component.html',
   styleUrls: ['./editar-titulos.component.css']
 })

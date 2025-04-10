@@ -16,6 +16,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-listar-parametro',
+  standalone: false,
   templateUrl: './listar-parametro.component.html',
   styleUrls: ['./listar-parametro.component.css']
 })

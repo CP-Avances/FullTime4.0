@@ -23,6 +23,7 @@ import { EditarEstadoHoraExtraAutorizacionComponent } from 'src/app/componentes/
 
 @Component({
   selector: 'app-ver-pedido-hora-extra',
+  standalone: false,
   templateUrl: './ver-pedido-hora-extra.component.html',
   styleUrls: ['./ver-pedido-hora-extra.component.css']
 })

@@ -16,6 +16,7 @@ import { VerImagenComponent } from '../acciones-timbres/ver-imagen/ver-imagen.co
 
 @Component({
   selector: 'app-timbre-admin',
+  standalone: false,
   templateUrl: './timbre-admin.component.html',
   styleUrls: ['./timbre-admin.component.css']
 })

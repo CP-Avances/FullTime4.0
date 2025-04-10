@@ -15,10 +15,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-metrica-permisos',
+  standalone: false,
   templateUrl: './metrica-permisos.component.html',
   styleUrls: ['./metrica-permisos.component.css'],
-
 })
+
 export class MetricaPermisosComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

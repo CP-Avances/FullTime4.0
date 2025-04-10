@@ -25,6 +25,7 @@ interface Estado {
 
 @Component({
   selector: 'app-autorizaciones',
+  standalone: false,
   templateUrl: './autorizaciones.component.html',
   styleUrls: ['./autorizaciones.component.css'],
 })

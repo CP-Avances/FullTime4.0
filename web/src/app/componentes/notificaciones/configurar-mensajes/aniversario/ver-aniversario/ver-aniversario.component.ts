@@ -8,6 +8,7 @@ import { EditarAniversarioComponent } from '../editar-aniversario/editar-anivers
 
 @Component({
   selector: 'app-ver-aniversario',
+  standalone: false,
   templateUrl: './ver-aniversario.component.html',
   styleUrl: './ver-aniversario.component.css'
 })

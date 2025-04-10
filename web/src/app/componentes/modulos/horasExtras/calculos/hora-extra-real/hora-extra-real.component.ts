@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-hora-extra-real',
+  standalone: false,
   templateUrl: './hora-extra-real.component.html',
   styleUrls: ['./hora-extra-real.component.css'],
 })

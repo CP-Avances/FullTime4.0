@@ -8,6 +8,7 @@ import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/
 
 @Component({
   selector: 'app-editar-aniversario',
+  standalone: false,
   templateUrl: './editar-aniversario.component.html',
   styleUrl: './editar-aniversario.component.css'
 })

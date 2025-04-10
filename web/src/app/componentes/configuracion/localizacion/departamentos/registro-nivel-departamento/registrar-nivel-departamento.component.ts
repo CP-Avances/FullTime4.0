@@ -13,6 +13,7 @@ interface Nivel {
 
 @Component({
   selector: 'app-registrar-nivel-departamento',
+  standalone: false,
   templateUrl: './registrar-nivel-departamento.component.html',
   styleUrls: ['./registrar-nivel-departamento.component.css']
 })

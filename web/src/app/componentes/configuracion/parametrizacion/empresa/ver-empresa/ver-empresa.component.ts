@@ -24,6 +24,7 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-ver-empresa',
+  standalone: false,
   templateUrl: './ver-empresa.component.html',
   styleUrls: ['./ver-empresa.component.css'],
 })

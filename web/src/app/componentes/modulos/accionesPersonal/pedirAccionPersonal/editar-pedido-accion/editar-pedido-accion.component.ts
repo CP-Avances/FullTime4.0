@@ -18,9 +18,11 @@ import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedi
 
 @Component({
   selector: "app-editar-pedido-accion",
+  standalone: false,
   templateUrl: "./editar-pedido-accion.component.html",
   styleUrls: ["./editar-pedido-accion.component.css"],
 })
+
 export class EditarPedidoAccionComponent implements OnInit {
   ips_locales: any = '';
 

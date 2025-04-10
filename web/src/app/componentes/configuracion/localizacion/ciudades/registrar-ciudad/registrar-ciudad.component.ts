@@ -11,6 +11,7 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 
 @Component({
   selector: 'app-registrar-ciudad',
+  standalone: false,
   templateUrl: './registrar-ciudad.component.html',
   styleUrls: ['./registrar-ciudad.component.css']
 })

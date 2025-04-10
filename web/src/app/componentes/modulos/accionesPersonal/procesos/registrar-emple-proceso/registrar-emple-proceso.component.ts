@@ -11,6 +11,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-registrar-emple-proceso',
+  standalone: false,
   templateUrl: './registrar-emple-proceso.component.html',
   styleUrls: ['./registrar-emple-proceso.component.css'],
 })

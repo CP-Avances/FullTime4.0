@@ -17,6 +17,7 @@ const OPTIONS_HORARIOS = [
 
 @Component({
   selector: 'app-editar-detalle-cat-horario',
+  standalone: false,
   templateUrl: './editar-detalle-cat-horario.component.html',
   styleUrls: ['./editar-detalle-cat-horario.component.css']
 })

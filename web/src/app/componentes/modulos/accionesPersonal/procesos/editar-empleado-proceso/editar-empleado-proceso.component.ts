@@ -10,6 +10,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-empleado-proceso',
+  standalone: false,
   templateUrl: './editar-empleado-proceso.component.html',
   styleUrls: ['./editar-empleado-proceso.component.css'],
 })

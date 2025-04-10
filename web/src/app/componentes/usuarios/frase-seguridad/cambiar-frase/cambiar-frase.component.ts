@@ -8,12 +8,12 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Router } from '@angular/router';
-import { use } from 'echarts';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 
 @Component({
   selector: 'app-cambiar-frase',
+  standalone: false,
   templateUrl: './cambiar-frase.component.html',
   styleUrls: ['./cambiar-frase.component.css']
 })

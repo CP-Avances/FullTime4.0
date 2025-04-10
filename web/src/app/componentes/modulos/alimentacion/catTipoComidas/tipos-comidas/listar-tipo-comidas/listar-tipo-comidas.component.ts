@@ -26,6 +26,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 
 @Component({
   selector: 'app-listar-tipo-comidas',
+  standalone: false,
   templateUrl: './listar-tipo-comidas.component.html',
   styleUrls: ['./listar-tipo-comidas.component.css']
 })

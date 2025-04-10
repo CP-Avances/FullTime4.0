@@ -23,6 +23,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-seleccionar-rol-permiso',
+  standalone: false,
   templateUrl: './seleccionar-rol-permiso.component.html',
   styleUrls: ['./seleccionar-rol-permiso.component.css'],
 })

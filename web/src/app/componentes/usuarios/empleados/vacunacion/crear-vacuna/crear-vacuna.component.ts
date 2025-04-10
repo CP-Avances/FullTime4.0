@@ -12,6 +12,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-crear-vacuna',
+  standalone: false,
   templateUrl: './crear-vacuna.component.html',
   styleUrls: ['./crear-vacuna.component.css'],
 })

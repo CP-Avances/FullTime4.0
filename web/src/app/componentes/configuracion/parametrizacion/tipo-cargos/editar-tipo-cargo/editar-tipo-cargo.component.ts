@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-tipo-cargo',
+  standalone: false,
   templateUrl: './editar-tipo-cargo.component.html',
   styleUrls: ['./editar-tipo-cargo.component.css']
 })

@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-discapacidad',
+  standalone: false,
   templateUrl: './editar-discapacidad.component.html',
   styleUrls: ['./editar-discapacidad.component.css']
 })

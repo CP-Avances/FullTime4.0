@@ -12,6 +12,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-crear-timbre',
+  standalone: false,
   templateUrl: './crear-timbre.component.html',
   styleUrls: ['./crear-timbre.component.css'],
 })

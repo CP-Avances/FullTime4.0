@@ -20,6 +20,7 @@ import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizacio
 
 @Component({
   selector: 'app-ver-vacacion',
+  standalone: false,
   templateUrl: './ver-vacacion.component.html',
   styleUrls: ['./ver-vacacion.component.css']
 })

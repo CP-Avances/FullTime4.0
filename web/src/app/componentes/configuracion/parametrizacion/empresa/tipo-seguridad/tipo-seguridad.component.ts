@@ -7,6 +7,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-tipo-seguridad',
+  standalone: false,
   templateUrl: './tipo-seguridad.component.html',
   styleUrls: ['./tipo-seguridad.component.css']
 })

@@ -11,6 +11,7 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
   templateUrl: './registrar-grado.component.html',
   styleUrl: './registrar-grado.component.css'
 })
+
 export class RegistrarGradoComponent  implements OnInit{
 
   ips_locales: any = '';

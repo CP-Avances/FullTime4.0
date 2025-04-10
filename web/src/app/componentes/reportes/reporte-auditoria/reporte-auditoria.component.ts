@@ -30,6 +30,7 @@ interface TablasD {
 
 @Component({
     selector: 'app-reporte-auditoria',
+    standalone: false,
     templateUrl: './reporte-auditoria.component.html',
     styleUrls: ['./reporte-auditoria.component.css']
 })

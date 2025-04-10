@@ -10,6 +10,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-registro-rol',
+  standalone: false,
   templateUrl: './registro-rol.component.html',
   styleUrls: ['./registro-rol.component.css'],
 })

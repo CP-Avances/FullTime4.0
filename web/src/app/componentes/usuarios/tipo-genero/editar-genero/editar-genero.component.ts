@@ -11,6 +11,7 @@ import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.se
   templateUrl: './editar-genero.component.html',
   styleUrl: './editar-genero.component.css'
 })
+
 export class EditarGeneroComponent {
   ips_locales: any = '';
 

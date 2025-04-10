@@ -12,6 +12,7 @@ import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.ser
 
 @Component({
   selector: 'app-relojes',
+  standalone: false,
   templateUrl: './relojes.component.html',
   styleUrls: ['./relojes.component.css'],
 })

@@ -10,6 +10,7 @@ import { ValidacionesService } from "src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: "app-registro-provincia",
+  standalone: false,
   templateUrl: "./registro-provincia.component.html",
   styleUrls: ["./registro-provincia.component.css"],
 })

@@ -9,10 +9,9 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
-import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar-notificaciones/settings/settings.component';
-
 @Component({
   selector: 'app-button-notificacion',
+  standalone: false,
   templateUrl: './button-notificacion.component.html',
   styleUrls: ['../main-nav.component.css']
 })
@@ -238,7 +237,7 @@ export class ButtonNotificacionComponent implements OnInit {
 
   // METODO PARA CONFIGURAR NOTIFICACIONES
   ConfigurarNotificaciones() {
-    const id_empleado = parseInt(localStorage.getItem('empleado') as string);
-    this.ventana.open(SettingsComponent, { width: '900px', data: { id_empleado } });
+    let dato = this.validar.EncriptarDato(localStorage.getItem('empleado') as string);
+    return this.router.navigate(['/configuraciones-alertas/', dato]);
   }
 }

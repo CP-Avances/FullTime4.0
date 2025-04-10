@@ -24,6 +24,7 @@ import { log } from 'console';
 
 @Component({
   selector: 'app-reporte-empleados',
+  standalone: false,
   templateUrl: './reporte-empleados.component.html',
   styleUrls: ['./reporte-empleados.component.css'],
 

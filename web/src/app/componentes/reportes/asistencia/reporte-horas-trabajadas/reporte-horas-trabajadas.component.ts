@@ -20,9 +20,11 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-reporte-horas-trabajadas',
+  standalone: false,
   templateUrl: './reporte-horas-trabajadas.component.html',
   styleUrls: ['./reporte-horas-trabajadas.component.css']
 })
+
 export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   private imagen: any;
 

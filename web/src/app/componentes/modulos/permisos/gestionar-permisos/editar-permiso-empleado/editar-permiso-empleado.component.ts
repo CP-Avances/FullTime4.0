@@ -29,6 +29,7 @@ interface opcionesDiasHoras {
 
 @Component({
   selector: 'app-editar-permiso-empleado',
+  standalone: false,
   templateUrl: './editar-permiso-empleado.component.html',
   styleUrls: ['./editar-permiso-empleado.component.css'],
 })

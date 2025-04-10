@@ -8,6 +8,7 @@ import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.compone
 
 @Component({
   selector: 'app-ver-regimen',
+  standalone: false,
   templateUrl: './ver-regimen.component.html',
   styleUrls: ['./ver-regimen.component.css']
 })

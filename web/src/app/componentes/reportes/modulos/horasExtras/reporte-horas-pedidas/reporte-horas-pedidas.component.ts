@@ -18,6 +18,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-reporte-horas-pedidas',
+  standalone: false,
   templateUrl: './reporte-horas-pedidas.component.html',
   styleUrls: ['./reporte-horas-pedidas.component.css']
 })

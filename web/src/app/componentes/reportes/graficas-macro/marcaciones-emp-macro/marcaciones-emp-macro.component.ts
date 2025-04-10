@@ -15,10 +15,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-marcaciones-emp-macro',
+  standalone: false,
   templateUrl: './marcaciones-emp-macro.component.html',
   styleUrls: ['./marcaciones-emp-macro.component.css'],
-
 })
+
 export class MarcacionesEmpMacroComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

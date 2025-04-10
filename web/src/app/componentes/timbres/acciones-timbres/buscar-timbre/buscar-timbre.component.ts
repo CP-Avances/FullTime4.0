@@ -15,6 +15,7 @@ import { VerTimbreComponent } from '../ver-timbre/ver-timbre.component';
 
 @Component({
   selector: 'app-buscar-timbre',
+  standalone: false,
   templateUrl: './buscar-timbre.component.html',
   styleUrls: ['./buscar-timbre.component.css']
 })

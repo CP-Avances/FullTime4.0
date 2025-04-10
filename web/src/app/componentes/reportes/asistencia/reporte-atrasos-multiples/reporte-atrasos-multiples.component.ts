@@ -19,6 +19,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-reporte-atrasos-multiples',
+  standalone: false,
   templateUrl: './reporte-atrasos-multiples.component.html',
   styleUrls: ['./reporte-atrasos-multiples.component.css']
 })

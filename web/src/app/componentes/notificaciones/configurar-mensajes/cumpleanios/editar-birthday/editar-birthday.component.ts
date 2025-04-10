@@ -8,6 +8,7 @@ import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/
 
 @Component({
   selector: 'app-editar-birthday',
+  standalone: false,
   templateUrl: './editar-birthday.component.html',
   styleUrls: ['./editar-birthday.component.css']
 })

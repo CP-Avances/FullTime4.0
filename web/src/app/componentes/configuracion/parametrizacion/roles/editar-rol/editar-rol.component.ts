@@ -10,6 +10,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-editar-rol',
+  standalone: false,
   templateUrl: './editar-rol.component.html',
   styleUrls: ['./editar-rol.component.css']
 })

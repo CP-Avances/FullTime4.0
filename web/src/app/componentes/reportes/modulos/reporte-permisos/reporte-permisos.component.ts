@@ -17,6 +17,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-reporte-permisos',
+  standalone: false,
   templateUrl: './reporte-permisos.component.html',
   styleUrls: ['./reporte-permisos.component.css'],
 })

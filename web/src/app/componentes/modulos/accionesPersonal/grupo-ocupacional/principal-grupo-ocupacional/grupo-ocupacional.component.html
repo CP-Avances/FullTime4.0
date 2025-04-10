@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGrupo()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGrupo()" *ngIf="getCrearGrupoOcupacional()">
                         Crear grupo ocupacional
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -22,7 +22,7 @@
                 <span>CARGAR PLANTILLA DE GRUPO OCUPACIONAL</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
+                <div class="row" *ngIf="getCargarPlantillaGrupoOcupacional()">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
@@ -83,7 +83,7 @@
                     </span>
                 </div>
                 <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;" *ngIf="getEliminarGrupoOcupacional()"
                         (click)="ConfirmarDeleteMultiple()">
                         Eliminar
                     </button>
@@ -135,10 +135,10 @@
                         <td>{{grupo.numero_partida}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(grupo)" id="accion" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro.">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro." *ngIf="getEditarGrupoOcupacional()">
                                 <p>Editar</p>
                             </i>
-                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(grupo)" id="t-eliminar" matSuffix
+                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(grupo)" id="t-eliminar" matSuffix *ngIf="getEliminarGrupoOcupacional()"
                                 matTooltipPosition="right" matTooltip="Eliminar registro.">
                                 <p>Eliminar</p>
                             </i>
@@ -150,7 +150,7 @@
         <mat-paginator id="pagina" [length]="ListGrupoOcupacional.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportesGrupoOcupacional()">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Grupo Ocupacional en formato PDF.">
                 <p>PDF</p>

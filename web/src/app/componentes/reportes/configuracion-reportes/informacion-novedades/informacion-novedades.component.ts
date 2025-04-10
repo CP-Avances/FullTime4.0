@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-informacion-novedades',
+  standalone: false,
   templateUrl: './informacion-novedades.component.html',
   styleUrl: './informacion-novedades.component.css'
 })

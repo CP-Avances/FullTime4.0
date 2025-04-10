@@ -15,6 +15,7 @@ interface Nivel {
 
 @Component({
   selector: 'app-editar-cat-procesos',
+  standalone: false,
   templateUrl: './editar-cat-procesos.component.html',
   styleUrls: ['./editar-cat-procesos.component.css']
 })

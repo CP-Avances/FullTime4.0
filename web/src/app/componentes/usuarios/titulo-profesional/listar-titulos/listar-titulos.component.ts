@@ -29,6 +29,7 @@ import { ITableProvincias } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-listar-titulos',
+  standalone: false,
   templateUrl: './listar-titulos.component.html',
   styleUrls: ['./listar-titulos.component.css']
 })

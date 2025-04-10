@@ -13,6 +13,7 @@ import { TipoVacunaComponent } from '../../../tipo-vacunas/tipo-vacuna/tipo-vacu
 
 @Component({
   selector: 'app-editar-vacuna',
+  standalone: false,
   templateUrl: './editar-vacuna.component.html',
   styleUrls: ['./editar-vacuna.component.css'],
 })

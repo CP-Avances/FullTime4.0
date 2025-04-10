@@ -19,6 +19,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 @Component({
   selector: 'app-ver-horario-detalle',
+  standalone: false,
   templateUrl: './ver-horario-detalle.component.html',
   styleUrls: ['./ver-horario-detalle.component.css']
 })

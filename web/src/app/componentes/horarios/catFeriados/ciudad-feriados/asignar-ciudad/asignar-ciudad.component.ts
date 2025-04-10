@@ -11,8 +11,10 @@ import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados
 import { ListarCiudadFeriadosComponent } from '../listar-ciudad-feriados/listar-ciudad-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 @Component({
   selector: 'app-asignar-ciudad',
+  standalone: false,
   templateUrl: './asignar-ciudad.component.html',
   styleUrls: ['./asignar-ciudad.component.css']
 })

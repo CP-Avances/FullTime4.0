@@ -14,6 +14,7 @@ import { ListarVacacionesComponent } from 'src/app/componentes/modulos/vacacione
 
 @Component({
   selector: 'app-editar-vacaciones-empleado',
+  standalone: false,
   templateUrl: './editar-vacaciones-empleado.component.html',
   styleUrls: ['./editar-vacaciones-empleado.component.css'],
 })

@@ -10,6 +10,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-autoriza-solicitud',
+  standalone: false,
   templateUrl: './autoriza-solicitud.component.html',
   styleUrls: ['./autoriza-solicitud.component.css']
 })

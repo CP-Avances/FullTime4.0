@@ -21,6 +21,7 @@ import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/
 
 @Component({
   selector: 'app-reporte-faltas',
+  standalone: false,
   templateUrl: './reporte-faltas.component.html',
   styleUrls: ['./reporte-faltas.component.css']
 })

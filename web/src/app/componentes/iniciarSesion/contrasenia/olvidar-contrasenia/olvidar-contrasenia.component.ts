@@ -8,6 +8,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-olvidar-contrasenia',
+  standalone: false,
   templateUrl: './olvidar-contrasenia.component.html',
   styleUrls: ['./olvidar-contrasenia.component.css']
 })

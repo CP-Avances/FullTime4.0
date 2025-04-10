@@ -16,6 +16,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-lista-archivos',
+  standalone: false,
   templateUrl: './lista-archivos.component.html',
   styleUrls: ['./lista-archivos.component.css']
 })

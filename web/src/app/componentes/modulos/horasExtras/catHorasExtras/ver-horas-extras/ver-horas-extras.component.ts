@@ -10,6 +10,7 @@ import { ListaHorasExtrasComponent } from '../lista-horas-extras/lista-horas-ext
 
 @Component({
   selector: 'app-ver-horas-extras',
+  standalone: false,
   templateUrl: './ver-horas-extras.component.html',
   styleUrls: ['./ver-horas-extras.component.css']
 })

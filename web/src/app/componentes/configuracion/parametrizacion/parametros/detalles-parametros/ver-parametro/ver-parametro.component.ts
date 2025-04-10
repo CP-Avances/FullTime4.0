@@ -16,6 +16,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-ver-parametro',
+  standalone: false,
   templateUrl: './ver-parametro.component.html',
   styleUrls: ['./ver-parametro.component.css']
 })

@@ -27,6 +27,7 @@ import { RegistroModalidadComponent } from '../registro-modalidad/registro-modal
 
 @Component({
   selector: 'app-cat-modalida-laboral',
+  standalone: false,
   templateUrl: './cat-modalida-laboral.component.html',
   styleUrls: ['./cat-modalida-laboral.component.css']
 })

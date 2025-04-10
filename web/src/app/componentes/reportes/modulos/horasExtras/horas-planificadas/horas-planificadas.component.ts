@@ -16,6 +16,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-horas-planificadas',
+  standalone: false,
   templateUrl: './horas-planificadas.component.html',
   styleUrls: ['./horas-planificadas.component.css']
 })

@@ -24,6 +24,7 @@ import { ITableProvincias } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-principal-provincia',
+  standalone: false,
   templateUrl: './principal-provincia.component.html',
   styleUrls: ['./principal-provincia.component.css'],
 })

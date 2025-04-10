@@ -8,6 +8,7 @@ import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/
 
 @Component({
   selector: 'app-registrar-aniversario',
+  standalone: false,
   templateUrl: './registrar-aniversario.component.html',
   styleUrl: './registrar-aniversario.component.css'
 })

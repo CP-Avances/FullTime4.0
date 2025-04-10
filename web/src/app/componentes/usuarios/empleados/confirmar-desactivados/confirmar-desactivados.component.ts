@@ -7,6 +7,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-confirmar-desactivados',
+  standalone: false,
   templateUrl: './confirmar-desactivados.component.html',
   styleUrls: ['./confirmar-desactivados.component.css']
 })

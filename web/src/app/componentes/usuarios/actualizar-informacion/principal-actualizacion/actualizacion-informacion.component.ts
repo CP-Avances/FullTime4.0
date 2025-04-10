@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-actualizacion-informacion',
+  standalone: false,
   templateUrl: './actualizacion-informacion.component.html',
   styleUrls: ['./actualizacion-informacion.component.css']
 })

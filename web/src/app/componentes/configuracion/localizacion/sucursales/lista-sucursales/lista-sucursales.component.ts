@@ -27,6 +27,7 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-lista-sucursales',
+  standalone: false,
   templateUrl: './lista-sucursales.component.html',
   styleUrls: ['./lista-sucursales.component.css']
 })

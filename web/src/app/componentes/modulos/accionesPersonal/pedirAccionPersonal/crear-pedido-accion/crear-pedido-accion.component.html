@@ -524,7 +524,7 @@
             <button id="btn-raised" class="btn btn-sm"
                 (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value)"
                 [disabled]="!firstFormGroup.valid || !secondFormGroup.valid || !thirdFormGroup.valid || !fourthFormGroup.valid"
-                value="Guardar" *ngIf="getRegistrarPedido()">
+                value="Guardar" *ngIf="getRegistrarPedidoAccionPersonal()">
                 Guardar
             </button>
         </div>

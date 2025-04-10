@@ -9,8 +9,10 @@ import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 @Component({
   selector: 'app-registrar-sucursales',
+  standalone: false,
   templateUrl: './registrar-sucursales.component.html',
   styleUrls: ['./registrar-sucursales.component.css']
 })

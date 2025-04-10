@@ -10,6 +10,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-recuperar-frase',
+  standalone: false,
   templateUrl: './recuperar-frase.component.html',
   styleUrls: ['./recuperar-frase.component.css']
 })

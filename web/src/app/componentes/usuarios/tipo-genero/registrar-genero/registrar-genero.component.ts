@@ -11,6 +11,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
   templateUrl: './registrar-genero.component.html',
   styleUrl: './registrar-genero.component.css'
 })
+
 export class RegistrarGeneroComponent {
 
   ips_locales: any = '';

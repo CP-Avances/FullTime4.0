@@ -27,6 +27,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-registro-dispositivos',
+  standalone: false,
   templateUrl: './registro-dispositivos.component.html',
   styleUrls: ['./registro-dispositivos.component.css']
 })

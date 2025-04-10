@@ -15,10 +15,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-metrica-vacaciones',
+  standalone: false,
   templateUrl: './metrica-vacaciones.component.html',
   styleUrls: ['./metrica-vacaciones.component.css'],
-
 })
+
 export class MetricaVacacionesComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

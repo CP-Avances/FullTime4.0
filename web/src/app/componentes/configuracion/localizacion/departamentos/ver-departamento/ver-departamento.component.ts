@@ -23,6 +23,7 @@ interface Nivel {
 
 @Component({
   selector: 'app-ver-departamento',
+  standalone: false,
   templateUrl: './ver-departamento.component.html',
   styleUrls: ['./ver-departamento.component.css']
 })

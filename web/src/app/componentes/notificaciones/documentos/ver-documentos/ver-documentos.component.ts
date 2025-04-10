@@ -5,6 +5,7 @@ import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/d
 
 @Component({
   selector: 'app-ver-documentos',
+  standalone: false,
   templateUrl: './ver-documentos.component.html',
   styleUrls: ['./ver-documentos.component.css']
 })

@@ -16,6 +16,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-alimentos-invitados',
+  standalone: false,
   templateUrl: './alimentos-invitados.component.html',
   styleUrls: ['./alimentos-invitados.component.css'],
 })

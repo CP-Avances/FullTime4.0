@@ -20,6 +20,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 
 @Component({
   selector: 'app-planificacion-multiple',
+  standalone: false,
   templateUrl: './planificacion-multiple.component.html',
   styleUrls: ['./planificacion-multiple.component.css']
 })

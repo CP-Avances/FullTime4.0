@@ -29,6 +29,7 @@ export interface EmpleadoElemento {
 
 @Component({
   selector: 'app-comunicados',
+  standalone: false,
   templateUrl: './comunicados.component.html',
   styleUrls: ['./comunicados.component.css']
 })

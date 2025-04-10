@@ -11,6 +11,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
   templateUrl: './editar-grupo-ocupacional.component.html',
   styleUrl: './editar-grupo-ocupacional.component.css'
 })
+
 export class EditarGrupoOcupacionalComponent implements OnInit{
 
   ips_locales: any = '';

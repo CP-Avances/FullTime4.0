@@ -22,6 +22,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-timbre-abiertos',
+  standalone: false,
   templateUrl: './timbre-abiertos.component.html',
   styleUrls: ['./timbre-abiertos.component.css']
 })

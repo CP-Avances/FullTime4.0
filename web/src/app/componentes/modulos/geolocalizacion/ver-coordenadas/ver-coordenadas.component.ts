@@ -37,6 +37,7 @@ export interface EmpleadoElemento {
 
 @Component({
   selector: 'app-ver-coordenadas',
+  standalone: false,
   templateUrl: './ver-coordenadas.component.html',
   styleUrls: ['./ver-coordenadas.component.css']
 })

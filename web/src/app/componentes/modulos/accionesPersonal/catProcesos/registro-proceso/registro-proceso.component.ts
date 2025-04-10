@@ -14,6 +14,7 @@ interface Nivel {
 
 @Component({
   selector: 'app-registro-proceso',
+  standalone: false,
   templateUrl: './registro-proceso.component.html',
   styleUrls: ['./registro-proceso.component.css']
 })

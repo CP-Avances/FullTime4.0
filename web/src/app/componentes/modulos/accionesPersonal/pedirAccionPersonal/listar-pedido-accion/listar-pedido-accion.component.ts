@@ -22,6 +22,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: "app-listar-pedido-accion",
+  standalone: false,
   templateUrl: "./listar-pedido-accion.component.html",
   styleUrls: ["./listar-pedido-accion.component.css"],
 })
@@ -4185,63 +4186,43 @@ export class ListarPedidoAccionComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getVer(){
+  private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Pedido Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
-  getEditar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Pedido Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getVerPedidoAccionPersonal(){
+    return this.tienePermiso('Ver Pedido Acción Personal');
   }
 
-  getVerPedidoPdf(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Acción Personal en formato PDF');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getEditarPedidoAccionPersonal(){
+    return this.tienePermiso('Editar Pedido Acción Personal');
   }
 
-  getVerPedidoExcel(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Acción Personal en formato EXCEL');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getVerAccionPersonalPDF(){
+    return this.tienePermiso('Ver Acción Personal en formato PDF');
   }
 
-  getDescargaReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reporte Lista Pedidos Acciones Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getVerAccionPersonalEXCEL(){
+    return this.tienePermiso('Ver Acción Personal en formato EXCEL');
   }
 
-  getRegistrarAccionPersonal(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Registrar Pedido Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getDescargarReporteListaPedidosAccionesPersonal(){
+    return this.tienePermiso('Descargar Reporte Lista Pedidos Acciones Personal');
   }
+
+  getRegistrarPedidoAccionPersonal(){
+    return this.tienePermiso('Registrar Pedido Acción Personal');
+  }
+
 }

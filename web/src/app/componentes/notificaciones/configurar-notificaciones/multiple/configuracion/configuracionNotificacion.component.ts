@@ -10,6 +10,7 @@ import { ListaNotificacionComponent } from '../lista-empleados/listaNotificacion
 
 @Component({
     selector: 'app-configuracionNotificacion',
+    standalone: false,
     templateUrl: './configuracionNotificacion.component.html',
     styleUrls: ['./configuracionNotificacion.component.css']
 })

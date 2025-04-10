@@ -14,9 +14,11 @@ import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-r
 
 @Component({
   selector: 'app-reporte-horas-extras',
+  standalone: false,
   templateUrl: './reporte-horas-extras.component.html',
   styleUrls: ['./reporte-horas-extras.component.css']
 })
+
 export class ReporteHorasExtrasComponent implements OnInit {
 
   fec_inicia: string = '2021-12-01';

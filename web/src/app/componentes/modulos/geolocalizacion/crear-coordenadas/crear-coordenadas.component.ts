@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-crear-coordenadas',
+  standalone: false,
   templateUrl: './crear-coordenadas.component.html',
   styleUrls: ['./crear-coordenadas.component.css']
 })

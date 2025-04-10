@@ -3,6 +3,7 @@ import { Component, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-visualizar-observacion',
+  standalone: false,
   templateUrl: './visualizar-observacion.component.html',
   styleUrls: ['./visualizar-observacion.component.css']
 })

@@ -20,6 +20,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-reporte-resumen-asistencia',
+  standalone: false,
   templateUrl: './reporte-resumen-asistencia.component.html',
   styleUrls: ['./reporte-resumen-asistencia.component.css']
 })

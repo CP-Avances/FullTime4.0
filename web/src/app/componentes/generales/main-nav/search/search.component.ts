@@ -8,6 +8,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 
 @Component({
   selector: 'app-search',
+  standalone: false,
   templateUrl: './search.component.html',
   styleUrls: ['../main-nav.component.css']
 })

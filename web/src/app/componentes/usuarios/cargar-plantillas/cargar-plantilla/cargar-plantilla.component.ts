@@ -13,6 +13,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 @Component({
   selector: 'app-cargar-plantilla',
+  standalone: false,
   templateUrl: './cargar-plantilla.component.html',
   styleUrls: ['./cargar-plantilla.component.css']
 })

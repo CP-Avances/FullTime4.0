@@ -20,6 +20,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-asignar-usuario',
+  standalone: false,
   templateUrl: './asignar-usuario.component.html',
   styleUrls: ['./asignar-usuario.component.css']
 })

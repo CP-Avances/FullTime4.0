@@ -29,6 +29,7 @@ interface opcionesDiasHoras {
 
 @Component({
   selector: 'app-permisos-multiples',
+  standalone: false,
   templateUrl: './permisos-multiples.component.html',
   styleUrls: ['./permisos-multiples.component.css'],
 })

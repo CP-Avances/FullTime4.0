@@ -16,14 +16,14 @@
                     </div>
                     <mat-card class="example-card mat-elevation-z9">
                         <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                            <button id="btn-raised" class="btn btn-sm"
+                            <button id="btn-raised" class="btn btn-sm" *ngIf="getVerAsignacionGrado()"
                                 (click)="PantallaRegistros('grado', 'registros')">
                                 Mostrar registros
                             </button>
-                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grado', 'interfaz')">
+                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grado', 'interfaz')" *ngIf="getAsignarGradoInterfaz()">
                                 Registrar grados
                             </button>
-                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grado', 'multiple')">
+                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grado', 'multiple')" *ngIf="getAsignarGradoPlantilla()">
                                 Registro múltiple de grados
                             </button>
                         </div>
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 20px" *ngIf="MostrarListaGrado">
+        <div class="container" style="padding-top: 15px; padding-bottom: 20px" *ngIf="MostrarListaGrado && getVerAsignacionGrado()">
             <div class="mat-elevation-z8" style="background: white;" *ngIf="!listadoUsuariosGrado">
                 <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
                 <div class="table-responsive">
@@ -114,15 +114,15 @@
                     <mat-card class="example-card mat-elevation-z9">
                         <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
                             <button id="btn-raised" class="btn btn-sm"
-                                (click)="PantallaRegistros('proceso', 'registros')">
+                                (click)="PantallaRegistros('proceso', 'registros')" *ngIf="getVerAsignacionProceso()">
                                 Mostrar registros
                             </button>
                             <button id="btn-raised" class="btn btn-sm"
-                                (click)="PantallaRegistros('proceso', 'interfaz')">
+                                (click)="PantallaRegistros('proceso', 'interfaz')" *ngIf="getAsignarProcesoInterfaz()">
                                 Registrar procesos
                             </button>
                             <button id="btn-raised" class="btn btn-sm"
-                                (click)="PantallaRegistros('proceso', 'multiple')">
+                                (click)="PantallaRegistros('proceso', 'multiple')" *ngIf="getAsignarProcesoPlantilla()">
                                 Registro múltiple de proceso
                             </button>
                         </div>
@@ -131,7 +131,7 @@
             </div>
         </div>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 20px" *ngIf="MostrarListaProcesos">
+        <div class="container" style="padding-top: 15px; padding-bottom: 20px" *ngIf="MostrarListaProcesos && getVerAsignacionProceso()">
             <div class="mat-elevation-z8" style="background: white;" *ngIf="!listadoUsuariosProceso">
                 <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
                 <div class="table-responsive">
@@ -213,13 +213,13 @@
                     <mat-card class="example-card mat-elevation-z9">
                         <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
                             <button id="btn-raised" class="btn btn-sm"
-                                (click)="PantallaRegistros('grupo', 'registros')">
+                                (click)="PantallaRegistros('grupo', 'registros')" *ngIf="getVerAsignacionGrupoOcupacional()">
                                 Mostrar registros
                             </button>
-                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grupo', 'interfaz')">
+                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grupo', 'interfaz')" *ngIf="getAsignarGrupoOcupacionalInterfaz()">
                                 Registrar grupo ocupacional
                             </button>
-                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grupo', 'multiple')">
+                            <button id="btn-raised" class="btn btn-sm" (click)="PantallaRegistros('grupo', 'multiple')" *ngIf="getAsignarGrupoOcupacionalPlantilla()">
                                 Registro múltiple de grupo ocupacional
                             </button>
                         </div>
@@ -228,7 +228,7 @@
             </div>
         </div>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 20px;" *ngIf="MostrarListaGrupoOcupacional">
+        <div class="container" style="padding-top: 15px; padding-bottom: 20px;" *ngIf="MostrarListaGrupoOcupacional && getVerAsignacionGrupoOcupacional()">
             <div class="mat-elevation-z8" style="background: white;" *ngIf="!listadoUsuariosGrupoOcupa">
                 <div id="resultados">LISTA DE SUCURSALES O ESTABLECIMIENTOS</div>
                 <div class="table-responsive">

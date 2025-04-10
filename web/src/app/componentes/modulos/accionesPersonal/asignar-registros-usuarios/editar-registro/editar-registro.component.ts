@@ -10,9 +10,11 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
 
 @Component({
   selector: 'app-editar-registro',
+  standalone: false,
   templateUrl: './editar-registro.component.html',
   styleUrl: './editar-registro.component.css'
 })
+
 export class EditarRegistroComponent {
 
   // VARIABLES PARA AUDITORIA

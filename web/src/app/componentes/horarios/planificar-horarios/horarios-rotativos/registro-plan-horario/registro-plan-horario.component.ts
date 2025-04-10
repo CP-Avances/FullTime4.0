@@ -21,6 +21,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 
 @Component({
   selector: 'app-registro-plan-horario',
+  standalone: false,
   templateUrl: './registro-plan-horario.component.html',
   styleUrls: ['./registro-plan-horario.component.css'],
 })

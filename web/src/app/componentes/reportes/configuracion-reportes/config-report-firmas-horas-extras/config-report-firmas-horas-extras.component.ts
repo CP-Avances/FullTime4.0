@@ -4,9 +4,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-config-report-firmas-horas-extras',
+  standalone: false,
   templateUrl: './config-report-firmas-horas-extras.component.html',
   styleUrls: ['./config-report-firmas-horas-extras.component.css']
 })
+
 export class ConfigReportFirmasHorasExtrasComponent implements OnInit {
 
   FirmasformGroup: FormGroup;

@@ -16,6 +16,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-hora-extra-macro',
+  standalone: false,
   templateUrl: './hora-extra-macro.component.html',
   styleUrls: ['./hora-extra-macro.component.css'],
 

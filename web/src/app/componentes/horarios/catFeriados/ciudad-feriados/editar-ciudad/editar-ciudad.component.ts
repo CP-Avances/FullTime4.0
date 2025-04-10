@@ -7,8 +7,10 @@ import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service'
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 @Component({
   selector: 'app-editar-ciudad',
+  standalone: false,
   templateUrl: './editar-ciudad.component.html',
   styleUrls: ['./editar-ciudad.component.css']
 })

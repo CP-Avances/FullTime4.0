@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-eliminar-realtime',
+  standalone: false,
   templateUrl: './eliminar-realtime.component.html',
   styleUrls: ['./eliminar-realtime.component.css']
 })

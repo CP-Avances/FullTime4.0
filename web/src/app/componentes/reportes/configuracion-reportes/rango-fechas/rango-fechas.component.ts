@@ -5,9 +5,11 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 @Component({
   selector: 'app-rango-fechas',
+  standalone: false,
   templateUrl: './rango-fechas.component.html',
   styleUrls: ['./rango-fechas.component.css'],
 })
+
 export class RangoFechasComponent implements OnInit, OnDestroy {
 
   @Input() limitarFecha: boolean = false;

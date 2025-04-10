@@ -23,6 +23,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 @Component({
   selector: 'app-listar-coordenadas',
+  standalone: false,
   templateUrl: './listar-coordenadas.component.html',
   styleUrls: ['./listar-coordenadas.component.css']
 })

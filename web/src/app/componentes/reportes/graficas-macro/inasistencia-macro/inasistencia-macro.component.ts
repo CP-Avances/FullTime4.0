@@ -15,10 +15,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-inasistencia-macro',
+  standalone: false,
   templateUrl: './inasistencia-macro.component.html',
   styleUrls: ['./inasistencia-macro.component.css'],
-
 })
+
 export class InasistenciaMacroComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

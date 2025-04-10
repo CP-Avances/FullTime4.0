@@ -22,6 +22,7 @@ import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.se
 
 @Component({
   selector: 'app-ver-configuracion-timbre',
+  standalone: false,
   templateUrl: './ver-configuracion-timbre.component.html',
   styleUrl: './ver-configuracion-timbre.component.css'
 })

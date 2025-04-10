@@ -35,6 +35,7 @@ interface opcionesDiasHoras {
 
 @Component({
   selector: 'app-tipo-permisos',
+  standalone: false,
   templateUrl: './tipo-permisos.component.html',
   styleUrls: ['./tipo-permisos.component.css'],
 })

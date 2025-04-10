@@ -20,6 +20,7 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 
 @Component({
   selector: 'app-listar-ciudad',
+  standalone: false,
   templateUrl: './listar-ciudad.component.html',
   styleUrls: ['./listar-ciudad.component.css'],
 })

@@ -16,6 +16,7 @@ import { PieChart } from 'echarts/charts';
 
 @Component({
   selector: 'app-jornada-vs-hora-extra-macro',
+  standalone: false,
   templateUrl: './jornada-vs-hora-extra-macro.component.html',
   styleUrls: ['./jornada-vs-hora-extra-macro.component.css'],
 

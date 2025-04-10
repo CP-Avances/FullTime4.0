@@ -17,8 +17,10 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 @Component({
   selector: 'app-ver-sucursal',
+  standalone: false,
   templateUrl: './ver-sucursal.component.html',
   styleUrls: ['./ver-sucursal.component.css']
 })

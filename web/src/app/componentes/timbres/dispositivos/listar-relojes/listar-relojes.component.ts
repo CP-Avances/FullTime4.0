@@ -24,6 +24,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-listar-relojes',
+  standalone: false,
   templateUrl: './listar-relojes.component.html',
   styleUrls: ['./listar-relojes.component.css']
 })

@@ -36,6 +36,7 @@ export interface HoraExtraElemento {
 
 @Component({
   selector: 'app-lista-pedido-hora-extra',
+  standalone: false,
   templateUrl: './lista-pedido-hora-extra.component.html',
   styleUrls: ['./lista-pedido-hora-extra.component.css']
 })

@@ -11,6 +11,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({
   selector: 'app-olvidar-frase',
+  standalone: false,
   templateUrl: './olvidar-frase.component.html',
   styleUrls: ['./olvidar-frase.component.css']
 })

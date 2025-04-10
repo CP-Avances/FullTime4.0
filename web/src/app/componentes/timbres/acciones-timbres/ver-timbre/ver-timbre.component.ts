@@ -6,6 +6,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-ver-timbre',
+  standalone: false,
   templateUrl: './ver-timbre.component.html',
   styleUrls: ['./ver-timbre.component.css']
 })

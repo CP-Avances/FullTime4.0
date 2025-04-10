@@ -19,6 +19,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 
 @Component({
   selector: 'app-vista-elementos',
+  standalone: false,
   templateUrl: './vista-elementos.component.html',
   styleUrls: ['./vista-elementos.component.css']
 })

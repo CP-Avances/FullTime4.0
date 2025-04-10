@@ -14,6 +14,7 @@ interface Estados {
 
 @Component({
   selector: 'app-estado-vacaciones',
+  standalone: false,
   templateUrl: './estado-vacaciones.component.html',
   styleUrls: ['./estado-vacaciones.component.css']
 })

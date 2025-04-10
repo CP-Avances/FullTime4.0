@@ -3,6 +3,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-metodos',
+  standalone: false,
   templateUrl: './metodos.component.html',
   styleUrls: ['./metodos.component.css']
 })

@@ -9,6 +9,7 @@ import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.serv
 
 @Component({
   selector: 'app-titulo-empleado',
+  standalone: false,
   templateUrl: './titulo-empleado.component.html',
   styleUrls: ['./titulo-empleado.component.css'],
 })

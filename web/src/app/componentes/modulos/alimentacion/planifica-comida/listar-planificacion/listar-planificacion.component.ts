@@ -7,8 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as FileSaver from "file-saver";
-
 // LLAMADO A COMPONENTES
 import { EditarPlanComidasComponent } from '../editar-plan-comidas/editar-plan-comidas.component';
 
@@ -50,6 +48,7 @@ export interface SolicitudElemento {
 
 @Component({
   selector: 'app-listar-planificacion',
+  standalone: false,
   templateUrl: './listar-planificacion.component.html',
   styleUrls: ['./listar-planificacion.component.css']
 })
@@ -112,7 +111,6 @@ export class ListarPlanificacionComponent implements OnInit {
     private ventana: MatDialog, // VARIABLE PARA LLAMADO A COMPONENTES
     private parametro: ParametrosService,
     private funciones: MainNavService,
-
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }

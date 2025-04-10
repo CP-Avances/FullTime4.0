@@ -15,6 +15,7 @@ import { ListaPlanificacionesComponent } from '../lista-planificaciones/lista-pl
 
 @Component({
   selector: 'app-editar-plan-hora-extra',
+  standalone: false,
   templateUrl: './editar-plan-hora-extra.component.html',
   styleUrls: ['./editar-plan-hora-extra.component.css'],
 })

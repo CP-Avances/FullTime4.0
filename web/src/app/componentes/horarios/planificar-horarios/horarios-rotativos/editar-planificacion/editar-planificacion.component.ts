@@ -21,6 +21,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 @Component({
   selector: 'app-editar-planificacion',
+  standalone: false,
   templateUrl: './editar-planificacion.component.html',
   styleUrls: ['./editar-planificacion.component.css'],
 })

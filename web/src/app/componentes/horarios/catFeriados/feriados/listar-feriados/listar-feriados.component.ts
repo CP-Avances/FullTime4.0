@@ -27,6 +27,7 @@ import { ITableFeriados } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-listar-feriados',
+  standalone: false,
   templateUrl: './listar-feriados.component.html',
   styleUrls: ['./listar-feriados.component.css'],
 })

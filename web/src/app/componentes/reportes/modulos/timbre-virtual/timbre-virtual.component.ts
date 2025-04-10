@@ -21,6 +21,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-timbre-virtual',
+  standalone: false,
   templateUrl: './timbre-virtual.component.html',
   styleUrls: ['./timbre-virtual.component.css']
 })

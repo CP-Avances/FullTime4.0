@@ -39,6 +39,7 @@ export interface SolicitudElemento {
 
 @Component({
   selector: 'app-listar-solicitud',
+  standalone: false,
   templateUrl: './listar-solicitud.component.html',
   styleUrls: ['./listar-solicitud.component.css']
 })

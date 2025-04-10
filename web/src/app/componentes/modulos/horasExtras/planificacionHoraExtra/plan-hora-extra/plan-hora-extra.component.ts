@@ -18,6 +18,7 @@ interface Estado {
 
 @Component({
   selector: 'app-plan-hora-extra',
+  standalone: false,
   templateUrl: './plan-hora-extra.component.html',
   styleUrls: ['./plan-hora-extra.component.css'],
 })

@@ -4,7 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import * as XLSX from 'xlsx';
+//import * as XLSX from 'xlsx';
 import { DateTime } from 'luxon';
 
 
@@ -21,6 +21,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
+  standalone: false,
   templateUrl: './cargar-plantilla-planificacion.component.html',
   styleUrls: ['./cargar-plantilla-planificacion.component.css']
 })
@@ -328,9 +329,9 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   }
 
 
-  // METODO PARA GENERAR EXCEL
+  // METODO PARA GENERAR EXCEL  ** CORREGI
   GenerarExcel(fechaInicial: DateTime, fechaFinal: DateTime, usuarios: any[]) {
-
+/*
     console.log("ver fechaInicial: ", fechaInicial)
     if (fechaInicial === null || fechaFinal === null) {
       this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
@@ -382,7 +383,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     XLSX.utils.book_append_sheet(wb, ws, 'Planificacion');
 
     // ESCRIBIR EL LIBRO DE TRABAJO EN UN ARCHIVO EXCEL
-    XLSX.writeFile(wb, 'plantillaPlanificacionMultiple.xlsx');
+    XLSX.writeFile(wb, 'plantillaPlanificacionMultiple.xlsx');*/
   }
 
   /** ************************************************************************************************* **

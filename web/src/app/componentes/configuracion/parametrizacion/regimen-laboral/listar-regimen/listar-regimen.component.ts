@@ -27,6 +27,7 @@ import { ValidacionesService } from "src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: "app-listar-regimen",
+  standalone: false,
   templateUrl: "./listar-regimen.component.html",
   styleUrls: ["./listar-regimen.component.css"],
 })

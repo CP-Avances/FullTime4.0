@@ -16,6 +16,7 @@ interface Estado {
 
 @Component({
   selector: 'app-editar-estado-hora-extra-autorizacion',
+  standalone: false,
   templateUrl: './editar-estado-hora-extra-autorizacion.component.html',
   styleUrls: ['./editar-estado-hora-extra-autorizacion.component.css']
 })

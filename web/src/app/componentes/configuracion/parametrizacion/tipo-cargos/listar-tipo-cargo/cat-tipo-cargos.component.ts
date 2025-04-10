@@ -26,6 +26,7 @@ import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo
 
 @Component({
   selector: 'app-cat-tipo-cargos',
+  standalone: false,
   templateUrl: './cat-tipo-cargos.component.html',
   styleUrls: ['./cat-tipo-cargos.component.css']
 })

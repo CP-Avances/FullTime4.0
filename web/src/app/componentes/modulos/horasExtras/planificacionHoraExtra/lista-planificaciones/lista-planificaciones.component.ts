@@ -38,6 +38,7 @@ export interface PlanificacionHE {
 
 @Component({
   selector: 'app-lista-planificaciones',
+  standalone: false,
   templateUrl: './lista-planificaciones.component.html',
   styleUrls: ['./lista-planificaciones.component.css']
 })

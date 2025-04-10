@@ -6,6 +6,7 @@ import { MensajesNotificacionesService } from 'src/app/servicios/notificaciones/
 
 @Component({
   selector: 'app-ver-birthday',
+  standalone: false,
   templateUrl: './ver-birthday.component.html',
   styleUrls: ['./ver-birthday.component.css']
 })

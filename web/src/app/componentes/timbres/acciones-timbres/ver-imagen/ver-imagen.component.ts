@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-ver-imagen',
+  standalone: false,
   templateUrl: './ver-imagen.component.html',
   styleUrl: './ver-imagen.component.css'
 })

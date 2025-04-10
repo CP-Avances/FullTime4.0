@@ -29,6 +29,7 @@ interface Dia {
 
 @Component({
   selector: 'app-editar-horas-extras',
+  standalone: false,
   templateUrl: './editar-horas-extras.component.html',
   styleUrls: ['./editar-horas-extras.component.css']
 })

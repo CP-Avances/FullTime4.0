@@ -12,6 +12,7 @@ interface tipoDia {
 
 @Component({
   selector: 'app-calculo-hora-extra',
+  standalone: false,
   templateUrl: './calculo-hora-extra.component.html',
   styleUrls: ['./calculo-hora-extra.component.css'],
 })

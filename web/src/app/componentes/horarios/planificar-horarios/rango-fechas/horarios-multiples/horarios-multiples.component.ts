@@ -22,6 +22,7 @@ import { BuscarPlanificacionComponent } from '../buscar-planificacion/buscar-pla
 
 @Component({
   selector: 'app-horarios-multiples',
+  standalone: false,
   templateUrl: './horarios-multiples.component.html',
   styleUrls: ['./horarios-multiples.component.css'],
 })

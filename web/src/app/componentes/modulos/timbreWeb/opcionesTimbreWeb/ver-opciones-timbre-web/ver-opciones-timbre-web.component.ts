@@ -21,6 +21,7 @@ import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.se
 
 @Component({
   selector: 'app-ver-opciones-timbre-web',
+  standalone: false,
   templateUrl: './ver-opciones-timbre-web.component.html',
   styleUrl: './ver-opciones-timbre-web.component.css'
 })

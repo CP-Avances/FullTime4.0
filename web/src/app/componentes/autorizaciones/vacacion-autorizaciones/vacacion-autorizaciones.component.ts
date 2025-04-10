@@ -21,6 +21,7 @@ interface Estado {
 
 @Component({
   selector: 'app-vacacion-autorizaciones',
+  standalone: false,
   templateUrl: './vacacion-autorizaciones.component.html',
   styleUrls: ['./vacacion-autorizaciones.component.css']
 })

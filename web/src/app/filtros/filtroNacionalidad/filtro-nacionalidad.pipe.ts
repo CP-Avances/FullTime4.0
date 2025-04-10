@@ -1,8 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'filtroNacionalidad'
+  name: 'filtroNacionalidad',
+  standalone: false,
 })
+
 export class FiltroNacionalidadPipe implements PipeTransform {
 
   transform(value: any, filtroNacionalidad: any): any {

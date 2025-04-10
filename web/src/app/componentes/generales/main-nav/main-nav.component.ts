@@ -24,6 +24,7 @@ import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizac
 
 @Component({
   selector: 'app-main-nav',
+  standalone: false,
   templateUrl: './main-nav.component.html',
   styleUrls: ['./main-nav.component.css']
 })

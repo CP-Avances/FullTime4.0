@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-cambiar-contrasena',
+  standalone: false,
   templateUrl: './cambiar-contrasena.component.html',
   styleUrls: ['./cambiar-contrasena.component.css']
 })

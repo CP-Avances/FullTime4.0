@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'fecTimbre'
+  name: 'fecTimbre',
+  standalone: false,
 })
 
 export class FecTimbrePipe implements PipeTransform {

@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-confirmar-contrasenia',
+  standalone: false,
   templateUrl: './confirmar-contrasenia.component.html',
   styleUrls: ['./confirmar-contrasenia.component.css']
 })

@@ -2,7 +2,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'modulos',
+  standalone: false,
 })
+
 export class ModulosPipe implements PipeTransform {
 
   transform(value: any[], arg: any): any[] {

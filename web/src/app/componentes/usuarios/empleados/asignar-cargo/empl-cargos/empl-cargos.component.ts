@@ -17,6 +17,7 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 
 @Component({
   selector: 'app-empl-cargos',
+  standalone: false,
   templateUrl: './empl-cargos.component.html',
   styleUrls: ['./empl-cargos.component.css'],
 })

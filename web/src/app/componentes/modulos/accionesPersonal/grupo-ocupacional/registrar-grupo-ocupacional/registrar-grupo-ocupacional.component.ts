@@ -11,6 +11,7 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
   templateUrl: './registrar-grupo-ocupacional.component.html',
   styleUrl: './registrar-grupo-ocupacional.component.css'
 })
+
 export class RegistrarGrupoOcupacionalComponent implements OnInit {
 
   ips_locales: any = '';

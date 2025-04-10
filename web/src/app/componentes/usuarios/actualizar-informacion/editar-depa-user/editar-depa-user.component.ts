@@ -20,6 +20,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 
 @Component({
   selector: 'app-editar-depa-user',
+  standalone: false,
   templateUrl: './editar-depa-user.component.html',
   styleUrl: './editar-depa-user.component.css'
 })

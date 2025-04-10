@@ -12,6 +12,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({
   selector: 'app-seguridad',
+  standalone: false,
   templateUrl: './seguridad.component.html',
   styleUrls: ['./seguridad.component.css']
 })

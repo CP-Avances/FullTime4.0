@@ -18,6 +18,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-alimentos-general',
+  standalone: false,
   templateUrl: './alimentos-general.component.html',
   styleUrls: ['./alimentos-general.component.css'],
 })

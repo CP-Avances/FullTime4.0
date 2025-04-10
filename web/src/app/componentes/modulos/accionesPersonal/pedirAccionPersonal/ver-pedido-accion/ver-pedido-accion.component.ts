@@ -13,6 +13,7 @@ import { ListarPedidoAccionComponent } from '../listar-pedido-accion/listar-pedi
 
 @Component({
   selector: 'app-ver-pedido-accion',
+  standalone: false,
   templateUrl: './ver-pedido-accion.component.html',
   styleUrls: ['./ver-pedido-accion.component.css']
 })

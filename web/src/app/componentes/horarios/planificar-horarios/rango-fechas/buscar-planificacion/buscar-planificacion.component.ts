@@ -19,6 +19,7 @@ import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/h
 
 @Component({
   selector: 'app-buscar-planificacion',
+  standalone: false,
   templateUrl: './buscar-planificacion.component.html',
   styleUrls: ['./buscar-planificacion.component.css']
 })

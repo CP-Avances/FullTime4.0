@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-registro-modalidad',
+  standalone: false,
   templateUrl: './registro-modalidad.component.html',
   styleUrls: ['./registro-modalidad.component.css']
 })

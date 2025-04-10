@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-crear-detalle-parametro',
+  standalone: false,
   templateUrl: './crear-detalle-parametro.component.html',
   styleUrls: ['./crear-detalle-parametro.component.css']
 })

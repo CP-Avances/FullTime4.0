@@ -14,6 +14,7 @@ import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.compone
 
 @Component({
   selector: 'app-editar-regimen',
+  standalone: false,
   templateUrl: './editar-regimen.component.html',
   styleUrls: ['./editar-regimen.component.css']
 })

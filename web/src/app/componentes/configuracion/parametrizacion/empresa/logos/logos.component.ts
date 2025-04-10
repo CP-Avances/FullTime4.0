@@ -9,6 +9,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-logos',
+  standalone: false,
   templateUrl: './logos.component.html',
   styleUrls: ['./logos.component.css']
 })

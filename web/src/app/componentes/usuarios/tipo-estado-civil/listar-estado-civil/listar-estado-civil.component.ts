@@ -27,6 +27,7 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
   templateUrl: './listar-estado-civil.component.html',
   styleUrl: './listar-estado-civil.component.css'
 })
+
 export class ListarEstadoCivilComponent {
 
    // ALMACENAMIENTO DE DATOS

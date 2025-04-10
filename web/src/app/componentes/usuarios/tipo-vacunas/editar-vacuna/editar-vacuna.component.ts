@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-vacuna',
+  standalone: false,
   templateUrl: './editar-vacuna.component.html',
   styleUrls: ['./editar-vacuna.component.css']
 })

@@ -11,6 +11,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-por-usuario',
+  standalone: false,
   templateUrl: './por-usuario.component.html',
   styleUrls: ['./por-usuario.component.css'],
 })

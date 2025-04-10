@@ -9,6 +9,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-editar-detalle-parametro',
+  standalone: false,
   templateUrl: './editar-detalle-parametro.component.html',
   styleUrls: ['./editar-detalle-parametro.component.css']
 })

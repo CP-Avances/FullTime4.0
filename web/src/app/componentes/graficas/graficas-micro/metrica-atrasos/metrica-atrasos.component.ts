@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-metrica-atrasos',
+  standalone: false,
   templateUrl: './metrica-atrasos.component.html',
   styleUrls: ['./metrica-atrasos.component.css'],
 

@@ -16,6 +16,7 @@ import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-editar-reloj',
+  standalone: false,
   templateUrl: './editar-reloj.component.html',
   styleUrls: ['./editar-reloj.component.css']
 })

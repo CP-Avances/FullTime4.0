@@ -16,6 +16,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 
 @Component({
   selector: 'app-permisos-multiples-empleados',
+  standalone: false,
   templateUrl: './permisos-multiples-empleados.component.html',
   styleUrls: ['./permisos-multiples-empleados.component.css']
 })

@@ -21,6 +21,7 @@ interface Estado {
 
 @Component({
   selector: 'app-pedido-hora-extra',
+  standalone: false,
   templateUrl: './pedido-hora-extra.component.html',
   styleUrls: ['./pedido-hora-extra.component.css'],
 })

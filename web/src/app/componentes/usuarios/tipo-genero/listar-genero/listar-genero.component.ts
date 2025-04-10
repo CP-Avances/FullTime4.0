@@ -25,6 +25,7 @@ import { Router } from '@angular/router';
   templateUrl: './listar-genero.component.html',
   styleUrl: './listar-genero.component.css'
 })
+
 export class ListarGeneroComponent {
 
   // ALMACENAMIENTO DE DATOS

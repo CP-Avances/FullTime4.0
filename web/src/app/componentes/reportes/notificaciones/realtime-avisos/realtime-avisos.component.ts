@@ -20,6 +20,7 @@ export interface TimbresAvisos {
 
 @Component({
   selector: 'app-realtime-avisos',
+  standalone: false,
   templateUrl: './realtime-avisos.component.html',
   styleUrls: ['./realtime-avisos.component.css']
 })

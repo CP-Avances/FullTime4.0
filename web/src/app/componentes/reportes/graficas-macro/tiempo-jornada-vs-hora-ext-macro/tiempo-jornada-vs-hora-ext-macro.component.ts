@@ -16,10 +16,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-tiempo-jornada-vs-hora-ext-macro',
+  standalone: false,
   templateUrl: './tiempo-jornada-vs-hora-ext-macro.component.html',
   styleUrls: ['./tiempo-jornada-vs-hora-ext-macro.component.css'],
-
 })
+
 export class TiempoJornadaVsHoraExtMacroComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

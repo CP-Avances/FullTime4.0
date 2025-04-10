@@ -19,6 +19,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-reporte-entrada-salida',
+  standalone: false,
   templateUrl: './reporte-entrada-salida.component.html',
   styleUrls: ['./reporte-entrada-salida.component.css'],
 })

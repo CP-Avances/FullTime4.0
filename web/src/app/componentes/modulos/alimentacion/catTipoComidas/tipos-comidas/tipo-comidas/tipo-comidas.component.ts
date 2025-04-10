@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-tipo-comidas',
+  standalone: false,
   templateUrl: './tipo-comidas.component.html',
   styleUrls: ['./tipo-comidas.component.css'],
 })

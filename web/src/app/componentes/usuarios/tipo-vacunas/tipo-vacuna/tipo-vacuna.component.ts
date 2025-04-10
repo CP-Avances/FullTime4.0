@@ -11,6 +11,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-tipo-vacuna',
+  standalone: false,
   templateUrl: './tipo-vacuna.component.html',
   styleUrls: ['./tipo-vacuna.component.css']
 })

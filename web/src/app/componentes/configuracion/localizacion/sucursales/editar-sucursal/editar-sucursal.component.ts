@@ -12,6 +12,7 @@ import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciud
 
 @Component({
   selector: 'app-editar-sucursal',
+  standalone: false,
   templateUrl: './editar-sucursal.component.html',
   styleUrls: ['./editar-sucursal.component.css']
 })

@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-contrato',
+  standalone: false,
   templateUrl: './editar-contrato.component.html',
   styleUrls: ['./editar-contrato.component.css']
 })

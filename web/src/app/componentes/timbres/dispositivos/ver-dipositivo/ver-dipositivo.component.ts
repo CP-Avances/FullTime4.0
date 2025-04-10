@@ -7,6 +7,7 @@ import { ListarRelojesComponent } from '../../../timbres/dispositivos/listar-rel
 
 @Component({
   selector: 'app-ver-dipositivo',
+  standalone: false,
   templateUrl: './ver-dipositivo.component.html',
   styleUrls: ['./ver-dipositivo.component.css']
 })

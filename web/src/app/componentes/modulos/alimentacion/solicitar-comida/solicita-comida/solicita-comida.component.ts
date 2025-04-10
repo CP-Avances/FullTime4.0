@@ -15,6 +15,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-solicita-comida',
+  standalone: false,
   templateUrl: './solicita-comida.component.html',
   styleUrls: ['./solicita-comida.component.css'],
 })

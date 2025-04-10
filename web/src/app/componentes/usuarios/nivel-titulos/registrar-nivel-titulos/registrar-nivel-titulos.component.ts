@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-registrar-nivel-titulos',
+  standalone: false,
   templateUrl: './registrar-nivel-titulos.component.html',
   styleUrls: ['./registrar-nivel-titulos.component.css']
 })

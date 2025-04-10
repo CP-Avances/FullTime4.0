@@ -13,6 +13,7 @@ interface Nivel {
 
 @Component({
   selector: 'app-ver-listado-nivel',
+  standalone: false,
   templateUrl: './ver-listado-nivel.component.html',
   styleUrls: ['./ver-listado-nivel.component.css']
 })

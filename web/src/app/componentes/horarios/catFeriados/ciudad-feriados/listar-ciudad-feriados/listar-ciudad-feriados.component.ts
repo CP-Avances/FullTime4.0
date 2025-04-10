@@ -21,6 +21,7 @@ export interface Feriado {
 
 @Component({
   selector: 'app-listar-ciudad-feriados',
+  standalone: false,
   templateUrl: './listar-ciudad-feriados.component.html',
   styleUrls: ['./listar-ciudad-feriados.component.css']
 })

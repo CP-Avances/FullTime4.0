@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
+  standalone: false,
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })

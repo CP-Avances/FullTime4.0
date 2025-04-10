@@ -19,6 +19,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-registrar-timbre',
+  standalone: false,
   templateUrl: './registrar-timbre.component.html',
   styleUrls: ['./registrar-timbre.component.css']
 })

@@ -34,6 +34,7 @@ import { EmpleadoElemento } from 'src/app/model/empleado.model';
 
 @Component({
   selector: 'app-lista-empleados',
+  standalone: false,
   templateUrl: './lista-empleados.component.html',
   styleUrls: ['./lista-empleados.component.css']
 })

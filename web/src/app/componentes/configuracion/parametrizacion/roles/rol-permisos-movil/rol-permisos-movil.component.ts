@@ -23,6 +23,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-rol-permisos-movil',
+  standalone: false,
   templateUrl: './rol-permisos-movil.component.html',
   styleUrl: './rol-permisos-movil.component.css'
 })

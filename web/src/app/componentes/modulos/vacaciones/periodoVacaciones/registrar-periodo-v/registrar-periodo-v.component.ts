@@ -12,6 +12,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 
 @Component({
   selector: 'app-registrar-periodo-v',
+  standalone: false,
   templateUrl: './registrar-periodo-v.component.html',
   styleUrls: ['./registrar-periodo-v.component.css'],
 

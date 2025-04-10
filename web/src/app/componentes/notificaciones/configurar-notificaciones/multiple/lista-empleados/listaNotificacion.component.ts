@@ -22,6 +22,7 @@ import { ConfiguracionNotificacionComponent } from '../configuracion/configuraci
 
 @Component({
     selector: 'app-listaNotificacion',
+    standalone: false,
     templateUrl: './listaNotificacion.component.html',
     styleUrls: ['./listaNotificacion.component.css']
 })

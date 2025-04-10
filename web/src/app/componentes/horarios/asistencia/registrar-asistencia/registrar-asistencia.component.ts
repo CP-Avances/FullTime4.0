@@ -14,6 +14,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 
 @Component({
   selector: 'app-registrar-asistencia',
+  standalone: false,
   templateUrl: './registrar-asistencia.component.html',
   styleUrls: ['./registrar-asistencia.component.css']
 })

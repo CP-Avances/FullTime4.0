@@ -23,6 +23,7 @@ import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-person
   templateUrl: './empleado-proceso.component.html',
   styleUrl: './empleado-proceso.component.css'
 })
+
 export class EmpleadoProcesoComponent {
 
   @Input() data: any;
@@ -242,6 +243,30 @@ export class EmpleadoProcesoComponent {
 
   regresar(){
     this.ngOnInit();
+  }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getEditarAsignacionProceso(): boolean {
+    return this.tienePermiso('Editar Asignación Proceso');
+  }
+
+  getEliminarAsignacionProceso(): boolean {
+    return this.tienePermiso('Eliminar Asignación Proceso');
   }
 
 }

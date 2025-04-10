@@ -12,6 +12,7 @@ import { LogosComponent } from 'src/app/componentes/configuracion/parametrizacio
 
 @Component({
   selector: 'app-configuracion',
+  standalone: false,
   templateUrl: './configuracion.component.html',
   styleUrls: ['./configuracion.component.css']
 })

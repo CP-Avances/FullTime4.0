@@ -12,6 +12,7 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
   templateUrl: './editar-grado.component.html',
   styleUrl: './editar-grado.component.css'
 })
+
 export class EditarGradoComponent {
 
   ips_locales: any = '';

@@ -11,6 +11,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-criterios-busqueda',
+  standalone: false,
   templateUrl: './criterios-busqueda.component.html',
   styleUrls: ['./criterios-busqueda.component.css']
 })

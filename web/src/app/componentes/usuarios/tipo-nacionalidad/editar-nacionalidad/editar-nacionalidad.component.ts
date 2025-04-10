@@ -11,6 +11,7 @@ import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/
   templateUrl: './editar-nacionalidad.component.html',
   styleUrl: './editar-nacionalidad.component.css'
 })
+
 export class EditarNacionalidadComponent {
   ips_locales: any = '';
 

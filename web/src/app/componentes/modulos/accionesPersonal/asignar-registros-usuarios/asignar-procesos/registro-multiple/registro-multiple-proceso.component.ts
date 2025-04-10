@@ -14,6 +14,7 @@ import { PageEvent } from '@angular/material/paginator';
   templateUrl: './registro-multiple-proceso.component.html',
   styleUrl: './registro-multiple-proceso.component.css'
 })
+
 export class RegistroMultipleProcesoComponent {
 
   // VARIABLES PARA AUDITORIA

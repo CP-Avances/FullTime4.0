@@ -10,6 +10,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 
 @Component({
   selector: 'app-registro-autorizacion-depa',
+  standalone: false,
   templateUrl: './registro-autorizacion-depa.component.html',
   styleUrls: ['./registro-autorizacion-depa.component.css']
 })

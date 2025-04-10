@@ -17,6 +17,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-detalle-planificados',
+  standalone: false,
   templateUrl: './detalle-planificados.component.html',
   styleUrls: ['./detalle-planificados.component.css'],
 })

@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-administra-comida',
+  standalone: false,
   templateUrl: './administra-comida.component.html',
   styleUrls: ['./administra-comida.component.css']
 })

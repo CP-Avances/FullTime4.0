@@ -17,6 +17,7 @@ import { Console } from 'console';
 
 @Component({
   selector: 'app-editar-empleado',
+  standalone: false,
   templateUrl: './editar-empleado.component.html',
   styleUrls: ['./editar-empleado.component.css']
 })

@@ -22,6 +22,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-lista-app',
+  standalone: false,
   templateUrl: './lista-app.component.html',
   styleUrls: ['./lista-app.component.css']
 })

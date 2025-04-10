@@ -17,6 +17,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-reporte-tiempo-alimentacion',
+  standalone: false,
   templateUrl: './reporte-tiempo-alimentacion.component.html',
   styleUrls: ['./reporte-tiempo-alimentacion.component.css']
 })

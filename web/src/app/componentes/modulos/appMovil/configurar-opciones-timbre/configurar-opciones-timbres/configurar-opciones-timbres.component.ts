@@ -21,6 +21,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-configurar-opciones-timbres',
+  standalone: false,
   templateUrl: './configurar-opciones-timbres.component.html',
   styleUrl: './configurar-opciones-timbres.component.css',
 })

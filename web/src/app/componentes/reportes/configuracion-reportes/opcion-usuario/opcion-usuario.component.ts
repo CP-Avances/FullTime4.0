@@ -2,9 +2,11 @@ import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-opcion-usuario',
+  standalone: false,
   templateUrl: './opcion-usuario.component.html',
   styleUrls: ['./opcion-usuario.component.css']
 })
+
 export class OpcionUsuarioComponent {
   @Output() tipoUsuarioCambio = new EventEmitter<string>();
 

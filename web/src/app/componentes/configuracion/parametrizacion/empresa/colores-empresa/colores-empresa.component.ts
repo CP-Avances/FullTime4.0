@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-colores-empresa',
+  standalone: false,
   templateUrl: './colores-empresa.component.html',
   styleUrls: ['./colores-empresa.component.css']
 })

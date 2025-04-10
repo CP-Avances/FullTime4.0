@@ -14,6 +14,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-registrar-vacaciones',
+  standalone: false,
   templateUrl: './registrar-vacaciones.component.html',
   styleUrls: ['./registrar-vacaciones.component.css'],
 })

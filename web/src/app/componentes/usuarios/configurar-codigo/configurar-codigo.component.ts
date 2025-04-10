@@ -10,6 +10,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-configurar-codigo',
+  standalone: false,
   templateUrl: './configurar-codigo.component.html',
   styleUrls: ['./configurar-codigo.component.css']
 })

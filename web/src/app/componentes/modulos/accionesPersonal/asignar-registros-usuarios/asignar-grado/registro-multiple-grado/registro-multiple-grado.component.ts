@@ -13,6 +13,7 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
   templateUrl: './registro-multiple-grado.component.html',
   styleUrl: './registro-multiple-grado.component.css'
 })
+
 export class RegistroMultipleGradoComponent {
 
   // VARIABLES PARA AUDITORIA

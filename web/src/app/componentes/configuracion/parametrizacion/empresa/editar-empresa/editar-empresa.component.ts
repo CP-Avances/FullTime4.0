@@ -12,6 +12,7 @@ import { VerEmpresaComponent } from '../ver-empresa/ver-empresa.component';
 
 @Component({
   selector: 'app-editar-empresa',
+  standalone: false,
   templateUrl: './editar-empresa.component.html',
   styleUrls: ['./editar-empresa.component.css']
 })

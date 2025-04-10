@@ -38,6 +38,7 @@ export interface HoraExtraPlanElemento {
 
 @Component({
   selector: 'app-lista-plan-hora-extra',
+  standalone: false,
   templateUrl: './lista-plan-hora-extra.component.html',
   styleUrls: ['./lista-plan-hora-extra.component.css']
 })

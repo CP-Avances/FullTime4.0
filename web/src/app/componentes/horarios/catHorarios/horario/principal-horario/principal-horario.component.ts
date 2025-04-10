@@ -31,6 +31,7 @@ import { ITableHorarios } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-principal-horario',
+  standalone: false,
   templateUrl: './principal-horario.component.html',
   styleUrls: ['./principal-horario.component.css']
 })

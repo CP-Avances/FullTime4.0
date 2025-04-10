@@ -20,8 +20,10 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { Observable, map, startWith  } from 'rxjs';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+
 @Component({
   selector: 'app-horario-multiple-empleado',
+  standalone: false,
   templateUrl: './horario-multiple-empleado.component.html',
   styleUrls: ['./horario-multiple-empleado.component.css']
 })

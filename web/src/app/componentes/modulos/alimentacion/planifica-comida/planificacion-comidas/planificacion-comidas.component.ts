@@ -15,6 +15,7 @@ import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
 
 @Component({
   selector: 'app-planificacion-comidas',
+  standalone: false,
   templateUrl: './planificacion-comidas.component.html',
   styleUrls: ['./planificacion-comidas.component.css'],
 })

@@ -7,6 +7,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-empl-leaflet',
+  standalone: false,
   templateUrl: './empl-leaflet.component.html',
   styleUrls: ['./empl-leaflet.component.css']
 })

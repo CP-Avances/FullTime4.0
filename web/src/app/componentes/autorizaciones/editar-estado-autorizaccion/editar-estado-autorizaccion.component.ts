@@ -19,6 +19,7 @@ interface Estado {
 
 @Component({
   selector: 'app-editar-estado-autorizaccion',
+  standalone: false,
   templateUrl: './editar-estado-autorizaccion.component.html',
   styleUrls: ['./editar-estado-autorizaccion.component.css']
 })

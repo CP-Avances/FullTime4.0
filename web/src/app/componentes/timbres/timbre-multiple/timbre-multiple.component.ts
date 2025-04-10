@@ -31,6 +31,7 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 
 @Component({
   selector: 'app-timbre-multiple',
+  standalone: false,
   templateUrl: './timbre-multiple.component.html',
   styleUrls: ['./timbre-multiple.component.css'],
 

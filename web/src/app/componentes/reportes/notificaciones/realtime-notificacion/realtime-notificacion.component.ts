@@ -26,6 +26,7 @@ export interface NotiRealtime {
 
 @Component({
   selector: 'app-realtime-notificacion',
+  standalone: false,
   templateUrl: './realtime-notificacion.component.html',
   styleUrls: ['./realtime-notificacion.component.css']
 })

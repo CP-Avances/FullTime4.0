@@ -15,6 +15,7 @@ import { ListarFeriadosComponent } from '../listar-feriados/listar-feriados.comp
 
 @Component({
   selector: 'app-registrar-feriados',
+  standalone: false,
   templateUrl: './registrar-feriados.component.html',
   styleUrls: ['./registrar-feriados.component.css'],
 })

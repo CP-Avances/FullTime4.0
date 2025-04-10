@@ -5,9 +5,11 @@ import { Task } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-config-asistencia',
+  standalone: false,
   templateUrl: './config-asistencia.component.html',
   styleUrls: ['./config-asistencia.component.css']
 })
+
 export class ConfigAsistenciaComponent implements OnInit {
 
   task: Task = {

@@ -16,6 +16,7 @@ import { VerImagenComponent } from 'src/app/componentes/timbres/acciones-timbres
 
 @Component({
   selector: 'app-timbre-web',
+  standalone: false,
   templateUrl: './timbre-web.component.html',
   styleUrls: ['./timbre-web.component.css']
 })

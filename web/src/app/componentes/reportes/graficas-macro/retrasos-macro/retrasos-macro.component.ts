@@ -14,10 +14,11 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-retrasos-macro',
+  standalone: false,
   templateUrl: './retrasos-macro.component.html',
   styleUrls: ['./retrasos-macro.component.css'],
-
 })
+
 export class RetrasosMacroComponent implements OnInit {
 
   anio_inicio = new FormControl('', Validators.required);

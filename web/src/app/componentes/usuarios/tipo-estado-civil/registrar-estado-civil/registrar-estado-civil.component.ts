@@ -12,6 +12,7 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
   templateUrl: './registrar-estado-civil.component.html',
   styleUrl: './registrar-estado-civil.component.css'
 })
+
 export class RegistrarEstadoCivilComponent {
   ips_locales: any = '';
 

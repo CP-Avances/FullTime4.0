@@ -27,6 +27,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-listar-nivel-titulos',
+  standalone: false,
   templateUrl: './listar-nivel-titulos.component.html',
   styleUrls: ['./listar-nivel-titulos.component.css']
 })

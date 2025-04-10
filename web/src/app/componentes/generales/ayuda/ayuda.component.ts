@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-ayuda',
+  standalone: false,
   templateUrl: './ayuda.component.html',
   styleUrls: ['./ayuda.component.css']
 })

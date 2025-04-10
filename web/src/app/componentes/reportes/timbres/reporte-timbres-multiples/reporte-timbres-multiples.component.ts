@@ -25,6 +25,7 @@ import { InformacionNovedadesComponent } from '../../configuracion-reportes/info
 
 @Component({
   selector: 'app-reporte-timbres-multiples',
+  standalone: false,
   templateUrl: './reporte-timbres-multiples.component.html',
   styleUrls: ['./reporte-timbres-multiples.component.css'],
 })

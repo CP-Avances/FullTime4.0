@@ -10,6 +10,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-administrador-todas',
+  standalone: false,
   templateUrl: './administrador-todas.component.html',
   styleUrls: ['./administrador-todas.component.css']
 })

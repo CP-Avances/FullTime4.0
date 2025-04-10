@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 
 import * as FileSaver from "file-saver";
-import * as xlsx from "xlsx";
+//import * as xlsx from "xlsx";
 
 // IMPORTACION DE COMPONENTES
 import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
@@ -47,6 +47,7 @@ export interface VacacionesElemento {
 
 @Component({
   selector: 'app-listar-vacaciones',
+  standalone: false,
   templateUrl: './listar-vacaciones.component.html',
   styleUrls: ['./listar-vacaciones.component.css']
 })
@@ -619,6 +620,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   exportToExcel(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).map((obj: any) => {
       return {
         Nombre: obj.nombre + ' ' + obj.apellido,
@@ -637,7 +639,7 @@ export class ListarVacacionesComponent implements OnInit {
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA VACACIONES');
-    xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');*/
   }
 
   /** ************************************************************************************************** ** 
@@ -645,6 +647,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS(opcion: string) {
+    /*
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).map((obj: any) => {
       return {
         Nombre: obj.nombre + ' ' + obj.apellido,
@@ -656,7 +659,7 @@ export class ListarVacacionesComponent implements OnInit {
     }));
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, `${opcion}CSV` + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, `${opcion}CSV` + new Date().getTime() + '.csv');*/
   }
 
   /** ************************************************************************************************* **

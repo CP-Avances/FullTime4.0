@@ -90,6 +90,7 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
 
 @Component({
   selector: 'app-ver-empleado',
+  standalone: false,
   templateUrl: './ver-empleado.component.html',
   styleUrls: ['./ver-empleado.component.css']
 })

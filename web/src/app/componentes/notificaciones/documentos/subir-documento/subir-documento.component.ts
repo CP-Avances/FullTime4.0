@@ -7,6 +7,7 @@ import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/d
 
 @Component({
   selector: 'app-subir-documento',
+  standalone: false,
   templateUrl: './subir-documento.component.html',
   styleUrls: ['./subir-documento.component.css']
 })

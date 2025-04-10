@@ -15,6 +15,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 @Component({
   selector: 'app-metrica-horas-extras',
+  standalone: false,
   templateUrl: './metrica-horas-extras.component.html',
   styleUrls: ['./metrica-horas-extras.component.css'],
 

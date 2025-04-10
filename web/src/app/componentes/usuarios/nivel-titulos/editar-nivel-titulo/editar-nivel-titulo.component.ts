@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-nivel-titulo',
+  standalone: false,
   templateUrl: './editar-nivel-titulo.component.html',
   styleUrls: ['./editar-nivel-titulo.component.css']
 })

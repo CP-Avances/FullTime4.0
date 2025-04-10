@@ -21,6 +21,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 
 @Component({
   selector: 'app-editar-rol-user',
+  standalone: false,
   templateUrl: './editar-rol-user.component.html',
   styleUrl: './editar-rol-user.component.css'
 })

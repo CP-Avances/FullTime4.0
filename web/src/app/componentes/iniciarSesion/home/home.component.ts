@@ -9,6 +9,7 @@ import { MainNavService } from '../../generales/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-home',
+  standalone: false,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })

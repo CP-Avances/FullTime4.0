@@ -22,6 +22,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-timbre-incompleto',
+  standalone: false,
   templateUrl: './timbre-incompleto.component.html',
   styleUrls: ['./timbre-incompleto.component.css']
 })

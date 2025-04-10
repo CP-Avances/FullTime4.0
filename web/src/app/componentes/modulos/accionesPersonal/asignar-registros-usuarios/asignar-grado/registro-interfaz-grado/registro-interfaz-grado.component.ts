@@ -24,6 +24,7 @@ import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoC
   templateUrl: './registro-interfaz-grado.component.html',
   styleUrl: './registro-interfaz-grado.component.css'
 })
+
 export class RegistroInterfazGradoComponent {
 
   listaUsuariosRol: any = []

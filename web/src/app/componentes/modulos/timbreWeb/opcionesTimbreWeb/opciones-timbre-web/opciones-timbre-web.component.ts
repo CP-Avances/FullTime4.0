@@ -21,6 +21,7 @@ import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/ca
 
 @Component({
   selector: 'app-opciones-timbre-web',
+  standalone: false,
   templateUrl: './opciones-timbre-web.component.html',
   styleUrl: './opciones-timbre-web.component.css'
 })

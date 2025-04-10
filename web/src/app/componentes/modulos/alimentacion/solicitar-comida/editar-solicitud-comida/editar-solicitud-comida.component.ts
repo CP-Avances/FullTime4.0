@@ -18,6 +18,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-editar-solicitud-comida',
+  standalone: false,
   templateUrl: './editar-solicitud-comida.component.html',
   styleUrls: ['./editar-solicitud-comida.component.css'],
 })

@@ -12,6 +12,7 @@ import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
 @Component({
   selector: 'app-reporte-kardex',
+  standalone: false,
   templateUrl: './reporte-kardex.component.html',
   styleUrls: ['./reporte-kardex.component.css'],
 

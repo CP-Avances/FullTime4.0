@@ -20,6 +20,7 @@ import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.
 
 @Component({
   selector: 'app-lista-horas-extras',
+  standalone: false,
   templateUrl: './lista-horas-extras.component.html',
   styleUrls: ['./lista-horas-extras.component.css']
 })

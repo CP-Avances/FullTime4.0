@@ -17,6 +17,7 @@ interface Estado {
 
 @Component({
   selector: 'app-editar-hora-extra-empleado',
+  standalone: false,
   templateUrl: './editar-hora-extra-empleado.component.html',
   styleUrls: ['./editar-hora-extra-empleado.component.css'],
 })

@@ -10,6 +10,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-cancelar-comida',
+  standalone: false,
   templateUrl: './cancelar-comida.component.html',
   styleUrls: ['./cancelar-comida.component.css']
 })

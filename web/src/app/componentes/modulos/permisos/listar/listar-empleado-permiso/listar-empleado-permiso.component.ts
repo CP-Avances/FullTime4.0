@@ -49,6 +49,7 @@ export interface PermisosElemento {
 
 @Component({
   selector: "app-listar-empleado-permiso",
+  standalone: false,
   templateUrl: "./listar-empleado-permiso.component.html",
   styleUrls: ["./listar-empleado-permiso.component.css"],
 })

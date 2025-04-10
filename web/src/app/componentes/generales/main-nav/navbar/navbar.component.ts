@@ -4,6 +4,7 @@ import { PerfilEmpleadoService } from 'src/app/servicios/usuarios/empleado/perfi
 
 @Component({
   selector: 'app-navbar',
+  standalone: false,
   templateUrl: './navbar.component.html',
   styleUrls: ['../main-nav.component.css']
 })

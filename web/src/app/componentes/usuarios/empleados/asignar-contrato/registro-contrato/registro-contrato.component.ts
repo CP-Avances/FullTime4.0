@@ -15,6 +15,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-registro-contrato',
+  standalone: false,
   templateUrl: './registro-contrato.component.html',
   styleUrls: ['./registro-contrato.component.css'],
 })

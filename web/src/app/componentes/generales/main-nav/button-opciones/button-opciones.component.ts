@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
-
-import { SettingsComponent } from 'src/app/componentes/notificaciones/configurar-notificaciones/settings/settings.component';
-import { AyudaComponent } from '../../ayuda/ayuda.component';
-import { Router } from '@angular/router';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
+import { AyudaComponent } from '../../ayuda/ayuda.component';
 
 @Component({
   selector: 'app-button-opciones',
+  standalone: false,
   templateUrl: './button-opciones.component.html',
   styleUrls: ['../main-nav.component.css']
 })
@@ -27,10 +27,8 @@ export class ButtonOpcionesComponent implements OnInit {
   }
 
   AbrirSettings() {
-
     let dato = this.validar.EncriptarDato(localStorage.getItem('empleado') as string);
     return this.router.navigate(['/configuraciones-alertas/', dato]);
-    //this.ventana.open(SettingsComponent, { width: '650px', data: { id_empleado } });
   }
 
   AbrirVentanaAyuda() {

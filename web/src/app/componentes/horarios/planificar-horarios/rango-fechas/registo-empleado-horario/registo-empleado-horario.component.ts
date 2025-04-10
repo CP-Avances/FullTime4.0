@@ -22,6 +22,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 
 @Component({
   selector: 'app-registo-empleado-horario',
+  standalone: false,
   templateUrl: './registo-empleado-horario.component.html',
   styleUrls: ['./registo-empleado-horario.component.css'],
 })

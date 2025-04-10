@@ -7,6 +7,7 @@ import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-spinner',
+  standalone: false,
   templateUrl: './spinner.component.html',
   styleUrls: ['./spinner.component.css']
 })

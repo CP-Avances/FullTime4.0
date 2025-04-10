@@ -14,6 +14,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-tiempo-autorizado',
+  standalone: false,
   templateUrl: './tiempo-autorizado.component.html',
   styleUrls: ['./tiempo-autorizado.component.css']
 })

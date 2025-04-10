@@ -11,6 +11,7 @@ const { DateTime } = require("luxon");
 
 @Component({
   selector: 'app-button-avisos',
+  standalone: false,
   templateUrl: './button-avisos.component.html',
   styleUrls: ['../main-nav.component.css']
 })

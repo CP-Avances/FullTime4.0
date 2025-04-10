@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-registrar-cargo',
+  standalone: false,
   templateUrl: './registrar-cargo.component.html',
   styleUrls: ['./registrar-cargo.component.css']
 })

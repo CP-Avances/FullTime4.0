@@ -19,6 +19,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-lista-emple-plan-hora-e',
+  standalone: false,
   templateUrl: './lista-emple-plan-hora-e.component.html',
   styleUrls: ['./lista-emple-plan-hora-e.component.css'],
 })

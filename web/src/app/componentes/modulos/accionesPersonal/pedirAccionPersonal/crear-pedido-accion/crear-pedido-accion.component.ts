@@ -19,6 +19,7 @@ import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciud
 
 @Component({
   selector: "app-crear-pedido-accion",
+  standalone: false,
   templateUrl: "./crear-pedido-accion.component.html",
   styleUrls: ["./crear-pedido-accion.component.css"],
 })
@@ -569,13 +570,23 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getRegistrarPedido(){
+  private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Registrar Pedido Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
+
+  getRegistrarPedidoAccionPersonal(){
+    return this.tienePermiso('Registrar Pedido Acción Personal');
+  }
+
 }

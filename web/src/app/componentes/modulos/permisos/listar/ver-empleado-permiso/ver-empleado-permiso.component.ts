@@ -20,6 +20,7 @@ import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autoriza
 
 @Component({
   selector: 'app-ver-empleado-permiso',
+  standalone: false,
   templateUrl: './ver-empleado-permiso.component.html',
   styleUrls: ['./ver-empleado-permiso.component.css']
 })

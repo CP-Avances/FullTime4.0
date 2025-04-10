@@ -21,6 +21,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 
 @Component({
   selector: 'app-reporte-planificacion-horaria',
+  standalone: false,
   templateUrl: './reporte-planificacion-horaria.component.html',
   styleUrls: ['./reporte-planificacion-horaria.component.css']
 })

@@ -15,6 +15,7 @@ import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empl
 
 @Component({
   selector: 'app-editar-cargo',
+  standalone: false,
   templateUrl: './editar-cargo.component.html',
   styleUrls: ['./editar-cargo.component.css']
 })

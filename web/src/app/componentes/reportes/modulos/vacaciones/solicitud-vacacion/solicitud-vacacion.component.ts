@@ -16,6 +16,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 
 @Component({
   selector: 'app-solicitud-vacacion',
+  standalone: false,
   templateUrl: './solicitud-vacacion.component.html',
   styleUrls: ['./solicitud-vacacion.component.css']
 })

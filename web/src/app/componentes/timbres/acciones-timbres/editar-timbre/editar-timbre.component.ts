@@ -9,6 +9,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-editar-timbre',
+  standalone: false,
   templateUrl: './editar-timbre.component.html',
   styleUrls: ['./editar-timbre.component.css']
 })

@@ -8,7 +8,7 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirRegistrar()" *ngIf="getCrearTipoAccion()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirRegistrar()" *ngIf="getCrearDetalleTipoAccionPersonal()">
                             Crear tipo de acción
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -24,7 +24,7 @@
                     <span>CARGAR PLANTILLA DETALLE TIPO ACCIÓN DE PERSONAL</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row">
+                    <div class="row" *ngIf="getCargarPlantillaDetalleTipoAccionPersonal()">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                             <div class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
@@ -101,16 +101,16 @@
                             <td id="centrar" class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="AbrirDatosAccion(ta.id)" *ngIf="getVer()">
+                                    (click)="AbrirDatosAccion(ta.id)" *ngIf="getVerDetalleTipoAccionPersonal()">
                                     <p>Ver</p>
                                 </i>
                                 <i id="i-cursor" class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
                                     (click)="AbrirEditar(ta)"
-                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditar()">
+                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDetalleTipoAccionPersonal()">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(ta)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminar()">
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarDetalleTipoAccionPersonal()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -121,7 +121,7 @@
             <mat-paginator id="pagina" [length]="tipo_acciones.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportes()">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportesDetalleTipoAccionPersonal()">
                 <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right"
                     matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato PDF.">

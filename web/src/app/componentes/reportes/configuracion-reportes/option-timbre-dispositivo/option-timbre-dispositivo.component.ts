@@ -4,9 +4,11 @@ import { ReportesService } from '../../../../servicios/reportes/reportes.service
 
 @Component({
   selector: 'app-option-timbre-dispositivo',
+  standalone: false,
   templateUrl: './option-timbre-dispositivo.component.html',
   styleUrls: ['./option-timbre-dispositivo.component.css']
 })
+
 export class OptionTimbreDispositivoComponent implements OnDestroy {
 
   showTimbre = this.reporteService.mostrarTimbreDispositivo;

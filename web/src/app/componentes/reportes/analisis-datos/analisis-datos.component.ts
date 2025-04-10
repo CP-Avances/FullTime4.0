@@ -5,6 +5,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-analisis-datos',
+  standalone: false,
   templateUrl: './analisis-datos.component.html',
   styleUrls: ['./analisis-datos.component.css']
 })

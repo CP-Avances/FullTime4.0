@@ -10,6 +10,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-cancelar-vacaciones',
+  standalone: false,
   templateUrl: './cancelar-vacaciones.component.html',
   styleUrls: ['./cancelar-vacaciones.component.css']
 })

@@ -11,6 +11,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-ti
 
 @Component({
   selector: 'app-cancelar-hora-extra',
+  standalone: false,
   templateUrl: './cancelar-hora-extra.component.html',
   styleUrls: ['./cancelar-hora-extra.component.css']
 })

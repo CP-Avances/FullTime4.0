@@ -29,6 +29,7 @@ interface Dia {
 
 @Component({
   selector: 'app-horas-extras',
+  standalone: false,
   templateUrl: './horas-extras.component.html',
   styleUrls: ['./horas-extras.component.css']
 })

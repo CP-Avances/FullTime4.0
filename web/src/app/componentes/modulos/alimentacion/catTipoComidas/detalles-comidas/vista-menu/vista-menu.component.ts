@@ -16,6 +16,7 @@ import { TipoComidasService } from 'src/app/servicios/modulos/modulo-alimentacio
 
 @Component({
   selector: 'app-vista-menu',
+  standalone: false,
   templateUrl: './vista-menu.component.html',
   styleUrls: ['./vista-menu.component.css']
 })

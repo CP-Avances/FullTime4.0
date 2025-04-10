@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'fitroNivel'
+  name: 'fitroNivel',
+  standalone: false,
 })
 
 export class FitroNivelPipe implements PipeTransform {

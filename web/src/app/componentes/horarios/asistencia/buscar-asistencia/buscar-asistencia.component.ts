@@ -10,6 +10,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 
 @Component({
   selector: 'app-buscar-asistencia',
+  standalone: false,
   templateUrl: './buscar-asistencia.component.html',
   styleUrls: ['./buscar-asistencia.component.css']
 })

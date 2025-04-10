@@ -8,6 +8,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 
 @Component({
   selector: 'app-editar-modalidad',
+  standalone: false,
   templateUrl: './editar-modalidad.component.html',
   styleUrls: ['./editar-modalidad.component.css']
 })

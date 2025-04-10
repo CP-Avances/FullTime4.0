@@ -5,9 +5,11 @@ import { Task } from '../../../../model/reportes.model'
 
 @Component({
   selector: 'app-config-empleados',
+  standalone: false,
   templateUrl: './config-empleados.component.html',
   styleUrls: ['./config-empleados.component.css']
 })
+
 export class ConfigEmpleadosComponent implements OnInit {
 
   task: Task = {

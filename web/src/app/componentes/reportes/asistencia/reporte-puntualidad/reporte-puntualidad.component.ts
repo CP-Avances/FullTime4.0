@@ -14,9 +14,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-reporte-puntualidad',
+  standalone: false,
   templateUrl: './reporte-puntualidad.component.html',
   styleUrls: ['./reporte-puntualidad.component.css']
 })
+
 export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
   get rangoFechas() { return this.reporteService.rangoFechas; }

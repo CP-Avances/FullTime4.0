@@ -11,6 +11,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 
 @Component({
   selector: 'app-editar-periodo-vacaciones',
+  standalone: false,
   templateUrl: './editar-periodo-vacaciones.component.html',
   styleUrls: ['./editar-periodo-vacaciones.component.css'],
 })

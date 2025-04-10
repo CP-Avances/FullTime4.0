@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-registro-multiple-grupo',
@@ -13,6 +14,7 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
   templateUrl: './registro-multiple-grupo.component.html',
   styleUrl: './registro-multiple-grupo.component.css'
 })
+
 export class RegistroMultipleGrupoComponent {
 
   // VARIABLES PARA AUDITORIA
@@ -23,7 +25,7 @@ export class RegistroMultipleGrupoComponent {
 
   archivoForm = new FormControl('', Validators.required);
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string =  (localStorage.getItem('empresaURL') as string);
+  hipervinculo: string = environment.url
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;

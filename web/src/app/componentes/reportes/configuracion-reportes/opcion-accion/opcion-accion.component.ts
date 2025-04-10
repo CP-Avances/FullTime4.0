@@ -4,9 +4,11 @@ import { ITableAccionesPaginas } from 'src/app/model/reportes.model';
 
 @Component({
     selector: 'app-opcion-accion',
+    standalone: false,
     templateUrl: './opcion-accion.component.html',
     styleUrls: ['./opcion-accion.component.css']
 })
+
 export class OpcionAccionComponent {
 
     accionesSeleccionadas: any = [];

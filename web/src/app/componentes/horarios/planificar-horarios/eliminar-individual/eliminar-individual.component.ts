@@ -18,6 +18,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 @Component({
   selector: 'app-eliminar-individual',
+  standalone: false,
   templateUrl: './eliminar-individual.component.html',
   styleUrls: ['./eliminar-individual.component.css']
 })

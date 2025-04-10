@@ -19,6 +19,7 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
 
 @Component({
   selector: 'app-registro',
+  standalone: false,
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css'],
 })
