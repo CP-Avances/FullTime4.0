@@ -93,7 +93,7 @@
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="RegistroMultipleGrado">
-            <app-registro-multiple-grado></app-registro-multiple-grado>
+            <app-registro-multiple-grado (cerrarComponente)="ocultarRegistroGrado($event)"></app-registro-multiple-grado>
         </div>
 
     </mat-tab>
@@ -193,7 +193,7 @@
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="RegistroMultipleProcesos">
-            <app-registro-multiple-proceso></app-registro-multiple-proceso>
+            <app-registro-multiple-proceso (cerrarComponente)="ocultarRegistroProceso($event)"></app-registro-multiple-proceso>
         </div>
     </mat-tab>
 
@@ -289,7 +289,7 @@
         </div>
 
         <div class="container" style="padding-top: 15px;" *ngIf="RegistroMultipleGrupoOcupacional">
-            <app-registro-multiple-grupo></app-registro-multiple-grupo>
+            <app-registro-multiple-grupo (cerrarComponente)="ocultarRegistroGrupo($event)"></app-registro-multiple-grupo>
         </div>
 
     </mat-tab>

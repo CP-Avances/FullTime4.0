@@ -26,8 +26,6 @@ import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acc
 
 export class GrupoOcupacionalComponent implements OnInit {
 
-  ips_locales: any = '';
-
   buscarGrupo = new FormControl('', [Validators.minLength(2)]);
   archivoForm = new FormControl('', Validators.required);
 
@@ -36,6 +34,7 @@ export class GrupoOcupacionalComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+  ips_locales: any = '';
 
   // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
   nameFile: string;
@@ -249,7 +248,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         this.OptenerListaGrupoOcupacional();
       }
     }, (error: any) => {
-      this.toastr.error(error.error.message, 'No fue posible eliminar.', {
+      this.toastr.warning(error.error.message, 'No fue posible eliminar.', {
         timeOut: 6000,
       });
     });
@@ -262,10 +261,9 @@ export class GrupoOcupacionalComponent implements OnInit {
         if (confirmado) {
           if (this.grupoOcupacionalEliminar.length != 0) {
             this.EliminarMultiple();
-            this.btnCheckHabilitar = true;
+            this.btnCheckHabilitar = false;
             this.grupoOcupacionalEliminar = [];
             this.selectionUno.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -283,9 +281,11 @@ export class GrupoOcupacionalComponent implements OnInit {
 
     this._GrupoOp.EliminarGrupoMult(data).subscribe({
       next: (response: any) => {
-        this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+        console.log('response: ',response)
+        this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
         });
+        this.ngOnInit();
       },error: (err) => {
         if(err.status == 300){
           this.toastr.error(err.error.message,'', {
@@ -298,8 +298,7 @@ export class GrupoOcupacionalComponent implements OnInit {
           this.toastr.error(err.error.message, 'Ups !!! algo salio mal.', {
             timeOut: 4000,
           });
-        }
-        
+        }     
       },
     })
     

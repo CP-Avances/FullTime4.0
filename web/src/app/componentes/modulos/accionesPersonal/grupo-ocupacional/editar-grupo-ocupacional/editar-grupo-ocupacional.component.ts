@@ -12,7 +12,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
   styleUrl: './editar-grupo-ocupacional.component.css'
 })
 
-export class EditarGrupoOcupacionalComponent implements OnInit{
+export class EditarGrupoOcupacionalComponent implements OnInit {
 
   ips_locales: any = '';
 
@@ -22,7 +22,7 @@ export class EditarGrupoOcupacionalComponent implements OnInit{
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   grupo = new FormControl('', Validators.required);
-  numero_partida = new FormControl('', Validators.required);
+  numero_partida = new FormControl('');
 
   procesos: any = [];
 
@@ -38,9 +38,9 @@ export class EditarGrupoOcupacionalComponent implements OnInit{
     public validar: ValidacionesService,
     public ventana: MatDialogRef<EditarGrupoOcupacionalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ){}
+  ) { }
 
-  
+
   ngOnInit(): void {
     this.ImprimirDatos();
     this.user_name = localStorage.getItem('usuario');
@@ -57,25 +57,6 @@ export class EditarGrupoOcupacionalComponent implements OnInit{
     })
   }
 
-  // METODO PARA VALIDAR INGRESO DE NUMEROS
-  IngresarSoloNumeros(evt: any) {
-    return this.validar.IngresarSoloNumeros(evt);
-  }
-  // METODO PARA VALIDAR INGRESO DE LETRA
-  IngresarSoloLetras(e: any) {
-    return this.validar.IngresarSoloLetras(e);
-  }
-
-  // METODO DE VALIDACION DE CAMPOS
-  ObtenerMensajeErrorNombre() {
-    return this.grupo.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
-  }
-  
-  // METODO DE VALIDACION DE CAMPOS
-  ObtenerMensajeErrorNumero() {
-    return this.numero_partida.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
-  }
-
   // METODO PARA SALIR DEL REGISTRO
   Salir() {
     this.formulario.reset();
@@ -83,7 +64,7 @@ export class EditarGrupoOcupacionalComponent implements OnInit{
   }
 
   // METODO PARA EDITAR DEL REGISTRO
-  EditarGrupo(form: any){
+  EditarGrupo(form: any) {
     let dataGrado = {
       id_grupo: this.data.id,
       grupo: form.grupoForm,
@@ -94,17 +75,17 @@ export class EditarGrupoOcupacionalComponent implements OnInit{
 
     this._grupoOp.EditarGrupoOcupacion(dataGrado).subscribe({
       next: (res: any) => {
-          this.toastr.success(res.message, 'Registro actualizado.', {
-            timeOut: 6000,
-          });
-          this.Salir();
-      },error: (err) => {
-        if(err.status == 300){
+        this.toastr.success(res.message, 'Registro actualizado.', {
+          timeOut: 6000,
+        });
+        this.Salir();
+      }, error: (err) => {
+        if (err.status == 300) {
           this.toastr.warning(err.error.message, 'Advertencia.', {
             timeOut: 6000,
           });
-        }else{
-          this.toastr.error(err.error.message, 'Erro server', {
+        } else {
+          this.toastr.error(err.error.message, 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }

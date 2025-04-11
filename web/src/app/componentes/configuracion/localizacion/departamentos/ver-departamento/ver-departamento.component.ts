@@ -376,121 +376,81 @@ export class VerDepartamentoComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getVerDepartamentoVerNiveles() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-
-      const currentUrl: string = window.location.href;
-      const ultimaBarraIndex: number = currentUrl.lastIndexOf("/");
-      let contenidoDerecha: string = ''; 
-      if (ultimaBarraIndex !== -1) {
-        contenidoDerecha = currentUrl.substring(ultimaBarraIndex + 1);
-      }
-
-      if(contenidoDerecha === 'vistaEmpresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Añadir Nivel' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (contenidoDerecha === 'sucursales'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Añadir Nivel' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (contenidoDerecha === 'departamento'){
-        const index = datos.findIndex(item => item.accion === 'Ver Niveles - Añadir Nivel');
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+  getVerDepartamentoVerNiveles(): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+  
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
-  }
+  
+    try {
+      const datos = JSON.parse(datosRecuperados);
+      const currentUrl = window.location.href;
+      const contenidoDerecha = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
+  
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['vistaEmpresa', item => item.accion === 'Ver Departamento - Ver Niveles - Añadir Nivel' && item.id_funcion === 1],
+        ['sucursales', item => item.accion === 'Ver Departamento - Ver Niveles - Añadir Nivel' && item.id_funcion === 10],
+        ['departamento', item => item.accion === 'Ver Niveles - Añadir Nivel']
+      ]);
+  
+      const condicion = condiciones.get(contenidoDerecha);
+      return condicion ? datos.some(condicion) : false;
+  
+    } catch {
+      return false;
+    }
+  }  
 
   getVerDepartamentoEliminarNiveles() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      
-      const currentUrl: string = window.location.href;
-      const ultimaBarraIndex: number = currentUrl.lastIndexOf("/");
-      let contenidoDerecha: string = ''; 
-      if (ultimaBarraIndex !== -1) {
-        contenidoDerecha = currentUrl.substring(ultimaBarraIndex + 1);
-      }
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
 
-      if(contenidoDerecha === 'vistaEmpresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Eliminar Nivel' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (contenidoDerecha === 'sucursales'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Eliminar Nivel' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (contenidoDerecha === 'departamento'){
-        const index = datos.findIndex(item => item.accion === 'Ver Niveles - Eliminar Nivel');
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
 
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+    try {
+      const datos = JSON.parse(datosRecuperados);
+      const currentUrl = window.location.href;
+      const contenidoDerecha = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
+  
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['vistaEmpresa', item => item.accion === 'Ver Departamento - Ver Niveles - Eliminar Nivel' && item.id_funcion === 1],
+        ['sucursales', item => item.accion === 'Ver Departamento - Ver Niveles - Eliminar Nivel' && item.id_funcion === 10],
+        ['departamento', item => item.accion === 'Ver Niveles - Eliminar Nivel']
+      ]);
+  
+      const condicion = condiciones.get(contenidoDerecha);
+      return condicion ? datos.some(condicion) : false;
+  
+    } catch {
+      return false;
     }
   }
 
   getVerDepartamentoVerAutoridades() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      
-      const currentUrl: string = window.location.href;
-      const ultimaBarraIndex: number = currentUrl.lastIndexOf("/");
-      let contenidoDerecha: string = ''; 
-      if (ultimaBarraIndex !== -1) {
-        contenidoDerecha = currentUrl.substring(ultimaBarraIndex + 1);
-      }
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
 
-      if(contenidoDerecha === 'vistaEmpresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (contenidoDerecha === 'sucursales'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (contenidoDerecha === 'departamento'){
-        const index = datos.findIndex(item => item.accion === 'Ver Niveles - Ver Autoridades');
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+
+    try {
+      const datos = JSON.parse(datosRecuperados);
+      const currentUrl = window.location.href;
+      const contenidoDerecha = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
+
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['vistaEmpresa', item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades' && item.id_funcion === 1],
+        ['sucursales', item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades' && item.id_funcion === 10],
+        ['departamento', item => item.accion === 'Ver Niveles - Ver Autoridades']
+      ]);
+
+      const condicion = condiciones.get(contenidoDerecha);
+      return condicion ? datos.some(condicion) : false;
+
+    } catch {
+      return false;
     }
   }
 

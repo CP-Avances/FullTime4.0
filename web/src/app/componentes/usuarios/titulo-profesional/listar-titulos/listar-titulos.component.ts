@@ -683,57 +683,6 @@ export class ListarTitulosComponent implements OnInit {
 
   }
 
-  //CONTROL BOTONES
-  getCrearTituloProfesional(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Título Profesional');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getPlantilla(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Títulos Profesionales');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEditarTituloProfesional(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Título Profesional');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEliminarTituloProfesional(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Título Profesional');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Títulos Profesionales');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
   /** ************************************************************************************************** **
    ** **                           METODO DE SELECCION MULTIPLE DE DATOS                              ** **
    ** ************************************************************************************************** **/
@@ -884,6 +833,43 @@ export class ListarTitulosComponent implements OnInit {
           this.router.navigate(['/titulos']);
         }
       });
+  }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearTituloProfesional(){
+    return this.tienePermiso('Crear Título Profesional');
+  }
+
+  getPlantilla(){
+    return this.tienePermiso('Cargar Plantilla Títulos Profesionales');
+  }
+
+  getEditarTituloProfesional(){
+    return this.tienePermiso('Editar Título Profesional');
+  }
+
+  getEliminarTituloProfesional(){
+    return this.tienePermiso('Eliminar Título Profesional');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Títulos Profesionales');
   }
 
 }

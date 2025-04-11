@@ -1,6 +1,7 @@
+import { MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+
 import { ToastrService } from 'ngx-toastr';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
@@ -22,7 +23,7 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   grupo = new FormControl('', Validators.required);
-  numero_partida = new FormControl('', Validators.required);
+  numero_partida = new FormControl('');
 
   procesos: any = [];
 
@@ -39,15 +40,6 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
     public ventana: MatDialogRef<RegistrarGrupoOcupacionalComponent>,
   ) { }
 
-  // METODO PARA VALIDAR INGRESO DE NUMEROS
-  IngresarSoloNumeros(evt: any) {
-    return this.validar.IngresarSoloNumeros(evt);
-  }
-  // METODO PARA VALIDAR INGRESO DE LETRA
-  IngresarSoloLetras(e: any) {
-    return this.validar.IngresarSoloLetras(e);
-  }
-
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
@@ -56,35 +48,27 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
     });
   }
 
-  // METODO DE VALIDACION DE CAMPOS
-  ObtenerMensajeErrorNombre() {
-    return this.grupo.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
-  }
-  // METODO DE VALIDACION DE CAMPOS
-  ObtenerMensajeErrorNumero() {
-    return this.numero_partida.hasError('pattern') ? 'No se admite el ingreso de letras.' : '';
-  }
-
   InsertarGrupo(form: any) {
     let dataGrupo = {
       grupo: form.grupoForm,
       numero_partida: form.numero_partidaForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
     this._grupoOp.IngresarGrupoOcupacion(dataGrupo).subscribe({
       next: (respuesta: any) => {
-          this.toastr.success(respuesta.message, 'Registro guardado.', {
-            timeOut: 6000,
-          });
-          this.CerrarVentana();
+        this.toastr.success(respuesta.message, 'Registro guardado.', {
+          timeOut: 6000,
+        });
+        this.CerrarVentana();
       }, error: (err) => {
-       if(err.status == 300){
+        if (err.status == 300) {
           this.toastr.warning(err.error.message, 'Advertencia.', {
             timeOut: 6000,
           });
-        }else{
-          this.toastr.error(err.error.message, 'Erro server', {
+        } else {
+          this.toastr.error(err.error.message, 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }

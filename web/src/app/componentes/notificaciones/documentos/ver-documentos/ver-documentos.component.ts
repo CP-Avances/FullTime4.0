@@ -38,57 +38,49 @@ export class VerDocumentosComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getContratos(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Documentos Contratos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
+  }
+
+  getContratos(){
+    return this.tienePermiso('Ver Documentos Contratos');
   }
   
   getRespaldosHorarios(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Documentos Respaldos horarios');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Ver Documentos Respaldos horarios');
   }
 
   getRespaldoPermisos(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Documentos Respaldos Permisos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Ver Documentos Respaldos Permisos');
   }
 
   getDocumentacion(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Gestionar Documentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Gestionar Documentación');
   }
 
   verificarValorBoton(nombre: string): boolean {
-    switch(nombre){
+    switch (nombre) {
       case 'Contratos':
         return this.getContratos();
       case 'Respaldos Horarios':
         return this.getRespaldosHorarios();
       case 'Respaldos Permisos':
-          return this.getRespaldoPermisos();
+        return this.getRespaldoPermisos();
       case 'Documentacion':
         return this.getDocumentacion();
-      default: 
+      default:
         return false;
     }
   }

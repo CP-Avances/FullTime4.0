@@ -525,7 +525,6 @@ class GradoControlador {
                         }
                     }
                     else {
-                        console.log('proceso: ', grados.estado);
                         if (grados.estado == false) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
@@ -546,44 +545,67 @@ class GradoControlador {
                             });
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            const proceso_update = yield database_1.default.query(`
+                            if (grado_activo1 != undefined && grado_activo1 != null && grado_activo1 != '') {
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const proceso_update = yield database_1.default.query(`
               UPDATE map_empleado_grado SET estado = true WHERE id = $1
               `, [grados.id]);
-                            const [grado_UPD] = proceso_update.rows;
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_empleado_grado',
-                                usuario: user_name,
-                                accion: 'I',
-                                datosOriginales: '',
-                                datosNuevos: JSON.stringify(grado_UPD),
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            const proceso_update1 = yield database_1.default.query(`
+                                const [grado_UPD] = proceso_update.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grado',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grado_UPD),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const proceso_update1 = yield database_1.default.query(`
               UPDATE map_empleado_grado SET estado = false WHERE id = $1
               `, [grado_activo1.id]);
-                            const [grado_UPD1] = proceso_update1.rows;
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_empleado_grado',
-                                usuario: user_name,
-                                accion: 'I',
-                                datosOriginales: '',
-                                datosNuevos: JSON.stringify(grado_UPD1),
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
+                                const [grado_UPD1] = proceso_update1.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grado',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grado_UPD1),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                            }
+                            else {
+                                // INICIAR TRANSACCION
+                                yield database_1.default.query('BEGIN');
+                                const grado_update = yield database_1.default.query(`
+              UPDATE map_empleado_grado SET estado = true WHERE id = $1
+              `, [grados.id]);
+                                const [grado_UPD] = grado_update.rows;
+                                // AUDITORIA
+                                yield auditoriaControlador_1.default.InsertarAuditoria({
+                                    tabla: 'map_empleado_grupo_ocupacional',
+                                    usuario: user_name,
+                                    accion: 'I',
+                                    datosOriginales: '',
+                                    datosNuevos: JSON.stringify(grado_UPD),
+                                    ip: ip,
+                                    ip_local: ip_local,
+                                    observacion: null
+                                });
+                                // FINALIZAR TRANSACCION
+                                yield database_1.default.query('COMMIT');
+                            }
                         }
                     }
                 }

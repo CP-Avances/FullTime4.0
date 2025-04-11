@@ -16,12 +16,4 @@ export class FuncionesService {
     return this.http.post<any>(`${environment.url}/administracion/funcionalidad`, data)
   }
 
-  CrearFunciones(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/administracion`, data);
-  }
-
-  EditarFunciones(id: number, data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcion/${id}`, data);
-  }
-
 }

@@ -170,7 +170,7 @@ export class ListarTipoAccionComponent implements OnInit {
     };
     this.rest.EliminarRegistro(id_accion, datos).subscribe((res: any) => {
       if (res.message === 'error') {
-        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+        this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -484,14 +484,14 @@ export class ListarTipoAccionComponent implements OnInit {
           width: 'auto',
           style: 'tableMarginCabecera',
           table: {
-            widths: ['auto', '*', '*', '*', '*'],
+            widths: ['auto', '*', '*', '*'],
             body: [
               [
                 { text: 'CÓDIGO', style: 'tableHeader' },
                 { text: 'TIPO DE ACCIÓN DE PERSONAL', style: 'tableHeader' },
                 { text: 'DESCRIPCIÓN', style: 'tableHeader' },
                 { text: 'BASE LEGAL', style: 'tableHeader' },
-                { text: 'TIPO', style: 'tableHeader' },
+                //{ text: 'TIPO', style: 'tableHeader' },
               ],
               ...this.tipo_acciones.map((obj: any) => {
                 return [
@@ -499,7 +499,7 @@ export class ListarTipoAccionComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
                   { text: obj.base_legal, style: 'itemsTable' },
-                  { text: (obj.tipo_permiso == true ? 'Permiso' : obj.tipo_vacacion == true ? 'Vacación' : 'Situación propuesta'), style: 'itemsTable' },
+                  //{ text: (obj.tipo_permiso == true ? 'Permiso' : obj.tipo_vacacion == true ? 'Vacación' : 'Situación propuesta'), style: 'itemsTable' },
                 ];
               })
             ]

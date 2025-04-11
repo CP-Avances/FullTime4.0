@@ -30,7 +30,7 @@
                         </mat-icon>
                         <mat-select [formControl]="tipoAccionF">
                             <mat-option *ngFor="let t of tipos" [value]="t.id"
-                                (click)="IngresarTipoAccion(formulario.value, t.descripcion)">
+                                >
                                 {{t.descripcion}}
                             </mat-option>
                         </mat-select>

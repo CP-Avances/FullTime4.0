@@ -236,7 +236,7 @@ export class GradosComponent implements OnInit {
     };
     this._grados.ElminarGrado(dataGrado).subscribe((res: any) => {
       if (res.codigo != 200) {
-        this.toastr.error('No se completo el proceso.', 'No fue posible eliminar.', {
+        this.toastr.warning('No se completo el proceso.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -259,12 +259,9 @@ export class GradosComponent implements OnInit {
         if (confirmado) {
           if (this.gradoEliminar.length != 0) {
             this.EliminarMultiple();
-            this.btnCheckHabilitar = true;
-            // this.plan_multiple = false;
-            // this.plan_multiple_ = false;
+            this.btnCheckHabilitar = false;
             this.gradoEliminar = [];
             this.selectionUno.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -282,9 +279,10 @@ export class GradosComponent implements OnInit {
 
     this._grados.EliminarGradoMult(data).subscribe({
        next: () => {
-         this.toastr.success('Registro eliminados exitosamete.', 'Operación exitosa.', {
+         this.toastr.error('Registros eliminados exitosamente.', 'Operación exitosa.', {
            timeOut: 5000,
          });
+         this.ngOnInit();
        },error: (err) => {
         if(err.status == 300){
           this.toastr.error(err.error.message,'', {

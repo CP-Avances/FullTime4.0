@@ -48,7 +48,6 @@ import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
-import FUNCIONES_RUTAS from './rutas/funciones/funcionRutas';
 import GENERO_RUTAS  from './rutas/empleado/generos/catGeneroRutas'
 import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
@@ -246,8 +245,6 @@ class Servidor {
         this.app.use(`/${ruta}/reportes-auditoria`, AUDITORIA_RUTAS);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, VACUNAS_REPORTE_RUTAS);
         this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, VACACIONES_REPORTES_RUTAS);
-        // FUNCIONES
-        this.app.use(`/${ruta}/administracion`, FUNCIONES_RUTAS);
         // LICENCIAS
         this.app.use(`/${ruta}/licencias`, LICENCIAS_RUTAS);
     }

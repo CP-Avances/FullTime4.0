@@ -60,7 +60,6 @@ const plantillaRutas_1 = __importDefault(require("./rutas/documentos/plantillaRu
 const datosGeneralesRutas_1 = __importDefault(require("./rutas/datosGenerales/datosGeneralesRutas"));
 const graficasRutas_1 = __importDefault(require("./rutas/graficas/graficasRutas"));
 const licencias_1 = __importDefault(require("./utils/licencias"));
-const funcionRutas_1 = __importDefault(require("./rutas/funciones/funcionRutas"));
 const catGeneroRutas_1 = __importDefault(require("./rutas/empleado/generos/catGeneroRutas"));
 const catEstadoCivilRutas_1 = __importDefault(require("./rutas/empleado/estadoCivil/catEstadoCivilRutas"));
 // CON MODULOS
@@ -241,8 +240,6 @@ class Servidor {
         this.app.use(`/${ruta}/reportes-auditoria`, auditoriaRutas_1.default);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, reporteVacunasRutas_1.default);
         this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, solicitudVacacionesRutas_1.default);
-        // FUNCIONES
-        this.app.use(`/${ruta}/administracion`, funcionRutas_1.default);
         // LICENCIAS
         this.app.use(`/${ruta}/licencias`, licencias_1.default);
     }
