@@ -85,7 +85,7 @@ export const atrasosSemanal = async function () {
 export const atrasosDiarios = async function () {
     const date = new Date();
     const fecha = date.toJSON().split("T")[0];
-    console.log("ver la fecha de hoy: ", fecha);
+    
     const hora = date.getHours();
     const minutos = date.getMinutes();
 
@@ -94,20 +94,29 @@ export const atrasosDiarios = async function () {
         SELECT * FROM ep_detalle_parametro WHERE id_parametro = 10
         `);
 
-    if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
+    if (PARAMETRO_DIARIO.rowCount != 0) {   
+        if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
         const PARAMETRO_HORA_DIARIO = await pool.query(
             `
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
             `);
+            if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
+                if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                atrasos(fecha, fecha, false);
+                atrasosDepartamentos(fecha, fecha, false);
+                atrasosIndividual(fecha, fecha);
+                } 
+            }
+        }
+    }
 
-        console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion)
-
-        if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-            atrasos(fecha, fecha, false);
-            atrasosDepartamentos(fecha, fecha, false);
-            atrasosIndividual(fecha, fecha);
-        } else {
-            console.log("hora incorrecta")
+    const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
+        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 41`
+    );
+    
+    if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
+        if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
+            atrasosIndividual(fecha, fecha); 
         }
     }
 

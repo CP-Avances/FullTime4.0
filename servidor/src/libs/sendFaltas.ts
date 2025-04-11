@@ -111,6 +111,17 @@ export const faltasDiarios = async function () {
             }
         }
     }
+    console.log("formato de hora:", hora);
+
+    const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
+        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 40`
+    );
+    
+    if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
+        if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
+            faltasIndividual(fecha, fecha); 
+        }
+    }
 }
 
 export const faltas = async function (desde: any, hasta: any, semanal: any) {
