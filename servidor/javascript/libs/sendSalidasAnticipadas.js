@@ -126,18 +126,25 @@ const salidasAnticipadasDiarios = function () {
         const PARAMETRO_DIARIO = yield database_1.default.query(`
         SELECT * FROM ep_detalle_parametro WHERE id_parametro = 26
         `);
-        if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
-            const PARAMETRO_HORA_DIARIO = yield database_1.default.query(`
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 27
-            `);
-            console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion);
-            if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-                (0, exports.salidasAnticipadas)(fecha, fecha, false);
-                (0, exports.salidasAnticipadasDepartamentos)(fecha, fecha, false);
-                (0, exports.salidasAnticipadasIndividual)(fecha, fecha);
+        if (PARAMETRO_DIARIO.rowCount != 0) {
+            if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
+                const PARAMETRO_HORA_DIARIO = yield database_1.default.query(`
+                SELECT * FROM ep_detalle_parametro WHERE id_parametro = 27
+                `);
+                console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion);
+                if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
+                    if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                        (0, exports.salidasAnticipadas)(fecha, fecha, false);
+                        (0, exports.salidasAnticipadasDepartamentos)(fecha, fecha, false);
+                        (0, exports.salidasAnticipadasIndividual)(fecha, fecha);
+                    }
+                }
             }
-            else {
-                console.log("hora incorrecta");
+        }
+        const PARAMETRO_HORA_INDIVIDUAL = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id_parametro = 42`);
+        if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
+            if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
+                (0, exports.salidasAnticipadasIndividual)(fecha, fecha);
             }
         }
     });

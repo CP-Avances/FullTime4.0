@@ -118,24 +118,29 @@ const atrasosDiarios = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date();
         const fecha = date.toJSON().split("T")[0];
-        console.log("ver la fecha de hoy: ", fecha);
         const hora = date.getHours();
         const minutos = date.getMinutes();
         const PARAMETRO_DIARIO = yield database_1.default.query(`
         SELECT * FROM ep_detalle_parametro WHERE id_parametro = 10
         `);
-        if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
-            const PARAMETRO_HORA_DIARIO = yield database_1.default.query(`
+        if (PARAMETRO_DIARIO.rowCount != 0) {
+            if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
+                const PARAMETRO_HORA_DIARIO = yield database_1.default.query(`
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
             `);
-            console.log("ver Parametro hora: ", PARAMETRO_HORA_DIARIO.rows[0].descripcion);
-            if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-                (0, exports.atrasos)(fecha, fecha, false);
-                (0, exports.atrasosDepartamentos)(fecha, fecha, false);
-                (0, exports.atrasosIndividual)(fecha, fecha);
+                if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
+                    if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                        (0, exports.atrasos)(fecha, fecha, false);
+                        (0, exports.atrasosDepartamentos)(fecha, fecha, false);
+                        (0, exports.atrasosIndividual)(fecha, fecha);
+                    }
+                }
             }
-            else {
-                console.log("hora incorrecta");
+        }
+        const PARAMETRO_HORA_INDIVIDUAL = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id_parametro = 41`);
+        if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
+            if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
+                (0, exports.atrasosIndividual)(fecha, fecha);
             }
         }
     });
