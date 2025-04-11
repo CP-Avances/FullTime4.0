@@ -256,10 +256,9 @@ export class PrincipalProcesoComponent implements OnInit {
         if (confirmado) {
           if (this.procesoEliminar.length != 0) {
             this.EliminarMultiple();
-            this.btnCheckHabilitar = true;
+            this.btnCheckHabilitar = false;
             this.procesoEliminar = [];
             this.selectionUno.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -280,6 +279,7 @@ export class PrincipalProcesoComponent implements OnInit {
         this.toastr.error('Registros eliminados exitosamente.', 'Operación exitosa.', {
           timeOut: 5000,
         });
+        this.ngOnInit();
       }, error: (err) => {
         if(err.status == 300){
           this.toastr.error(err.error.message,'', {

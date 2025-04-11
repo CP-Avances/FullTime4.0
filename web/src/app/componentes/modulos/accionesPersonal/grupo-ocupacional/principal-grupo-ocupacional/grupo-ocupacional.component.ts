@@ -261,10 +261,9 @@ export class GrupoOcupacionalComponent implements OnInit {
         if (confirmado) {
           if (this.grupoOcupacionalEliminar.length != 0) {
             this.EliminarMultiple();
-            this.btnCheckHabilitar = true;
+            this.btnCheckHabilitar = false;
             this.grupoOcupacionalEliminar = [];
             this.selectionUno.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -282,9 +281,11 @@ export class GrupoOcupacionalComponent implements OnInit {
 
     this._GrupoOp.EliminarGrupoMult(data).subscribe({
       next: (response: any) => {
-        this.toastr.error('Registros eliminados exitosamente.', 'Operación exitosa.', {
+        console.log('response: ',response)
+        this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
         });
+        this.ngOnInit();
       },error: (err) => {
         if(err.status == 300){
           this.toastr.error(err.error.message,'', {

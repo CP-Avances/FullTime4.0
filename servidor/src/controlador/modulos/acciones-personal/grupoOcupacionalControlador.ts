@@ -1341,37 +1341,88 @@ class GrupoOcupacionalControlador {
     const { listaEliminar, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
     var count = 0;
-    var datoEliminar = ''
+    var count_no = 0;
+   
     try {
 
       for (const item of listaEliminar) {
+
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-        datoEliminar = item.descripcion
-        const res = await pool.query(
+      
+        const resultado = await pool.query(
           `
-             DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+             SELECT * FROM map_cat_grupo_ocupacional WHERE id = $1
            `
           , [item.id]);
+        const [existe_grupo] = resultado.rows;
 
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_grupo_ocupacional',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: `{"id": "${item.id}"}`,
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
-
+        if (!existe_grupo) {
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_cat_grupo_ocupacional',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            ip_local: ip_local,
+            observacion: `Error al eliminar el Grupo ocupacional con id: ${item.id}. Registro no encontrado.`
+          });
+        }
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        count += 1;
+
+        if (existe_grupo) {
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          
+          const resultado = await pool.query(
+            `
+             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1
+           `
+            , [item.id]);
+
+          const [existe_grupo_emple] = resultado.rows;
+
+          if (!existe_grupo_emple) {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            
+            const res = await pool.query(
+              `
+             DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+           `
+              , [item.id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_grupo_ocupacional',
+              usuario: user_name,
+              accion: 'D',
+              datosOriginales: JSON.stringify(existe_grupo),
+              datosNuevos: '',
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            //CONTADOR ELIMINADOS
+            count += 1;
+
+          } else {
+            count_no += 1;
+          }
+
+        }
+
       }
 
-      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+      res.status(200).jsonp({ message: count.toString()+' registros eliminados con éxito', ms2: 'Existen'+ count_no +' datos relacionados con el grupo ocupacional', codigo: 200 });
 
     } catch (err) {
       // REVERTIR TRANSACCION
@@ -1381,9 +1432,9 @@ class GrupoOcupacionalControlador {
       if (error) {
         if (err.table == 'map_empleado_grupo_ocupacional') {
           if (count == 1) {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo ocupacional ' + datoEliminar });
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo ocupacional' });
           } else {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo ocupacional ' + datoEliminar });
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo ocupacional ' });
           }
         } else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
