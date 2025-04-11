@@ -109,42 +109,27 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getConfigurarImagenes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar Imágenes Correo');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
         return false;
-      }else{
-        return true;
       }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
+  getConfigurarImagenes(){
+    return this.tienePermiso('Configurar Imágenes Correo');
+  }
+
   getConfigurarServidor(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar Servidor Correo');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
+    return this.tienePermiso('Configurar Servidor Correo');
   }
 
 }

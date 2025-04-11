@@ -633,5 +633,40 @@ export class GrupoOcupacionalComponent implements OnInit {
 
   }
 
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+  
+  getCrearGrupoOcupacional(): boolean {
+    return this.tienePermiso('Crear Grupo Ocupacional');
+  }
+
+  getEditarGrupoOcupacional(): boolean {
+    return this.tienePermiso('Editar Grupo Ocupacional');
+  }
+
+  getEliminarGrupoOcupacional(): boolean {
+    return this.tienePermiso('Eliminar Grupo Ocupacional');
+  }
+
+  getCargarPlantillaGrupoOcupacional(): boolean {
+    return this.tienePermiso('Cargar Plantilla Grupo Ocupacional');
+  }
+
+  getDescargarReportesGrupoOcupacional(): boolean {
+    return this.tienePermiso('Descargar Reportes Grupo Ocupacional');
+  }
 
 }

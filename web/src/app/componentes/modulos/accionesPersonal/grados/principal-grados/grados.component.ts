@@ -624,4 +624,40 @@ export class GradosComponent implements OnInit {
 
   }
 
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+  
+  getCrearGrado(): boolean {
+    return this.tienePermiso('Crear Grado');
+  }
+
+  getEditarGrado(): boolean {
+    return this.tienePermiso('Editar Grado');
+  }
+
+  getEliminarGrado(): boolean {
+    return this.tienePermiso('Eliminar Grado');
+  }
+
+  getCargarPlantillaGrado(): boolean {
+    return this.tienePermiso('Cargar Plantilla Grado');
+  }
+
+  getDescargarReportesGrado(): boolean {
+    return this.tienePermiso('Descargar Reportes Grado');
+  }
+
 }

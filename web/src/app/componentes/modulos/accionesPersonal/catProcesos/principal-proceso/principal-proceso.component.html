@@ -22,7 +22,7 @@
                 <span>CARGAR PLANTILLA DE PROCESOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
+                <div class="row" *ngIf="getCargarPlantillaProceso()">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
@@ -83,7 +83,7 @@
                     </span>
                 </div>
                 <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;" *ngIf="getEliminarProceso()"
                         (click)="ConfirmarDeleteMultiple()">
                         Eliminar
                     </button>
@@ -141,11 +141,11 @@
                         <td>{{proceso.proc_padre}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(proceso)" id="accion" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro." *ngIf="getEditar()">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro." *ngIf="getEditarProceso()">
                                 <p>Editar</p>
                             </i>
                             <i class="far fa-trash-alt" (click)="ConfirmarDelete(proceso)" id="t-eliminar" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminar()">
+                                matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarProceso()">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -156,7 +156,7 @@
         <mat-paginator id="pagina" [length]="procesos.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportes()">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportesProceso()">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Procesos en formato PDF.">
                 <p>PDF</p>

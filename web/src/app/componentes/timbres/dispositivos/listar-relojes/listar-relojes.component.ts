@@ -847,68 +847,6 @@ export class ListarRelojesComponent implements OnInit {
     a.click();
   }
 
-  //CONTROL BOTONES
-  getCrearDispositivos(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Dispositivos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getPlantilla(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Dispositivos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getVerDispositivos(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Información Dipositivo');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEditarDispositivos(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Dispositivos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEliminarDispositivos(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Dispositivos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Dispositivos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-
   /** ********************************************************************************************** **
    ** **                          METODO DE SELECCION MULTIPLE DE DATOS                           ** **
    ** ********************************************************************************************** **/
@@ -1055,6 +993,45 @@ export class ListarRelojesComponent implements OnInit {
       });
   }
 
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearDispositivos(){
+    return this.tienePermiso('Crear Dispositivos');
+  }
+
+  getPlantilla(){
+    return this.tienePermiso('Cargar Plantilla Dispositivos');
+  }
+
+  getVerDispositivos(){
+    return this.tienePermiso('Ver Información Dipositivo');
+  }
+
+  getEditarDispositivos(){
+    return this.tienePermiso('Editar Dispositivos');
+  }
+
+  getEliminarDispositivos(){
+    return this.tienePermiso('Eliminar Dispositivos');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Dispositivos');
+  }
+
 }
-
-

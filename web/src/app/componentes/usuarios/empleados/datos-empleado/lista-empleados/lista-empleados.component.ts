@@ -1284,57 +1284,6 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
-  //CONTROL BOTONES
-  getCrearUsuarios(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Usuarios');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getActivarDesactivarUsuarios(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Activar o Desactivar Usuarios');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getPlantilla(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Usuarios');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getVerUsuario(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Datos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Usuarios');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   // 1 = ACTIVOS | 2 = INACTIVOS
   ConfirmarDeleteMultiple(opcion: number) {
@@ -1406,6 +1355,43 @@ export class ListaEmpleadosComponent implements OnInit {
         console.log("Cédula Inválida")
       }
     }
+  }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearUsuarios(){
+    return this.tienePermiso('Crear Usuarios');
+  }
+
+  getActivarDesactivarUsuarios(){
+    return this.tienePermiso('Activar o Desactivar Usuarios');
+  }
+
+  getPlantilla(){
+    return this.tienePermiso('Cargar Plantilla Usuarios');
+  }
+
+  getVerUsuario(){
+    return this.tienePermiso('Ver Datos');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Usuarios');
   }
 
 }

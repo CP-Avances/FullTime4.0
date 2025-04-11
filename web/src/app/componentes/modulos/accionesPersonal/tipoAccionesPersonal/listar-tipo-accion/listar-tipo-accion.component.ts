@@ -566,53 +566,42 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getCrearTipoAccion(){
+  private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
-  getVer(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getCrearDetalleTipoAccionPersonal(){
+    return this.tienePermiso('Crear Detalle Tipo Acción Personal');
   }
 
-  getEditar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getEditarDetalleTipoAccionPersonal(){
+    return this.tienePermiso('Editar Detalle Tipo Acción Personal');
   }
 
-  getEliminar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getEliminarDetalleTipoAccionPersonal(){
+    return this.tienePermiso('Eliminar Detalle Tipo Acción Personal');
   }
 
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  getVerDetalleTipoAccionPersonal(){
+    return this.tienePermiso('Eliminar Detalle Tipo Acción Personal');
+  }
+
+  getCargarPlantillaDetalleTipoAccionPersonal(){
+    return this.tienePermiso('Cargar Plantilla Detalle Tipo Acción Personal');
+  }
+
+  getDescargarReportesDetalleTipoAccionPersonal(){
+    return this.tienePermiso('Descargar Reportes Detalle Tipo Acción Personal');
   }
 }

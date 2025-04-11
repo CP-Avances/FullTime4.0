@@ -620,102 +620,6 @@ export class ListarRegimenComponent implements OnInit {
     this.ObtenerRegimen();
   }
 
-  // CONTROL BOTONES
-  getCrearRegimenLaboral(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Régimen Laboral');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getVerRegimenLaboral(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Régimen Laboral');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getEditarRegimenLaboral(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Régimen Laboral');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getEliminarRegimenLaboral(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Régimen Laboral');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getDescargarReportes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Régimen Laboral' && item.id_funcion === 5));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
   //HABILITAR LOS CHECKS
 
   /** ************************************************************************************************** **
@@ -866,9 +770,42 @@ export class ListarRegimenComponent implements OnInit {
         }
       });
   }
+
+  // CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearRegimenLaboral(){
+    return this.tienePermiso('Crear Régimen Laboral');
+  }
+
+  getVerRegimenLaboral(){
+    return this.tienePermiso('Ver Régimen Laboral');
+  }
+
+  getEditarRegimenLaboral(){
+    return this.tienePermiso('Editar Régimen Laboral');
+  }
+
+  getEliminarRegimenLaboral(){
+    return this.tienePermiso('Eliminar Régimen Laboral');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Régimen Laboral', 5);
+  }
+
 }
-
-
-
-
-

@@ -179,44 +179,36 @@ export class VistaMenuComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getEditarMenu(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Horario Alimentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
+  }
+
+  getEditarMenu(){
+    return this.tienePermiso('Editar Horario Alimentación');
   }
 
   getRegistrarDetalle(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Detalle Alimentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Crear Detalle Alimentación');
   }
 
   getEditarDetalleMenu(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver - Editar Detalle Alimentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Ver - Editar Detalle Alimentación');
   }
 
   getEliminarDetalleMenu(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver - Eliminar Detalle Alimentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Ver - Eliminar Detalle Alimentación');
   }
 
 }

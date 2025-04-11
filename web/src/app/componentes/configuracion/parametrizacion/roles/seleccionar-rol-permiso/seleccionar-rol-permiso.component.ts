@@ -1361,59 +1361,32 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getVerFuncionesGuardar() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    var rolEmpl = parseInt(localStorage.getItem('rol') as string);
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Funciones Rol - Guardar');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (rolEmpl != 1) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
         return false;
-      } else {
-        return true;
       }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
+  }
+
+  getVerFuncionesGuardar() {
+    return this.tienePermiso('Ver Funciones Rol - Guardar');
   }
 
   getVerFuncionesEliminar() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    var rolEmpl = parseInt(localStorage.getItem('rol') as string);
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Funciones Rol - Eliminar');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (rolEmpl != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
+    return this.tienePermiso('Ver Funciones Rol - Eliminar');
   }
 
   getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => (item.accion === 'Descargar Reportes Roles' && item.id_funcion === 4));
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Descargar Reportes Roles', 4);
   }
-
-
-
-
-
 
 }

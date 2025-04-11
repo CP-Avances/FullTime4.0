@@ -182,23 +182,56 @@ export class IngresarRegistrosComponent {
     this.RegistroMultipleGrupoOcupacional = false;
   }
 
-  ocultarRegistroGrado(valor: boolean) {
-    this.MostrarListaProcesos = !valor;
-    this.RegistroMultipleProcesos = valor;
-    this.RegistroInterfazProcesos = false;
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
   }
 
-  ocultarRegistroProceso(valor: boolean) {
-    this.MostrarListaProcesos = !valor;
-    this.RegistroMultipleProcesos = valor;
-    this.RegistroInterfazProcesos = false;
+  getVerAsignacionGrado(): boolean {
+    return this.tienePermiso('Ver Asignación Grado');
   }
 
-  ocultarRegistroGrupo(valor: boolean) {
-    this.MostrarListaGrupoOcupacional = !valor;
-    this.RegistroMultipleGrupoOcupacional = valor;
-    this.RegistroInterfazGrupoOcupacional = false;
+  getAsignarGradoInterfaz(): boolean {
+    return this.tienePermiso('Asignar Grado Interfaz');
   }
- 
+
+  getAsignarGradoPlantilla(): boolean {
+    return this.tienePermiso('Asignar Grado Plantilla');
+  }
+
+  getVerAsignacionProceso(): boolean {
+    return this.tienePermiso('Ver Asignación Proceso');
+  }
+
+  getAsignarProcesoInterfaz(): boolean {
+    return this.tienePermiso('Asignar Proceso Interfaz');
+  }
+
+  getAsignarProcesoPlantilla(): boolean {
+    return this.tienePermiso('Asignar Proceso Plantilla');
+  }
+
+  getVerAsignacionGrupoOcupacional(): boolean {
+    return this.tienePermiso('Ver Asignación Grupo Ocupacional');
+  }
+
+  getAsignarGrupoOcupacionalInterfaz(): boolean {
+    return this.tienePermiso('Asignar Grupo Ocupacional Interfaz');
+  }
+
+  getAsignarGrupoOcupacionalPlantilla(): boolean {
+    return this.tienePermiso('Asignar Grupo Ocupacional Plantilla');
+  }
 
 }

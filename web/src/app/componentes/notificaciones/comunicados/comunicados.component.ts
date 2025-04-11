@@ -748,14 +748,24 @@ export class ComunicadosComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getEnviarComunicado(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Enviar Comunicado');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
+  }
+
+  getEnviarComunicado(){
+    return this.tienePermiso('Enviar Comunicado');
   }
 
 }

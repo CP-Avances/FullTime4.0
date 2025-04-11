@@ -7,8 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as FileSaver from "file-saver";
-
 // LLAMADO A COMPONENTES
 import { EditarPlanComidasComponent } from '../editar-plan-comidas/editar-plan-comidas.component';
 
@@ -113,7 +111,6 @@ export class ListarPlanificacionComponent implements OnInit {
     private ventana: MatDialog, // VARIABLE PARA LLAMADO A COMPONENTES
     private parametro: ParametrosService,
     private funciones: MainNavService,
-
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -940,24 +937,28 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getEditarPlanificacion(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Planificación Alimentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
+  getEditarPlanificacion(){
+    return this.tienePermiso('Editar Planificación Alimentación');
+  }
+
   getEliminarPlanificacion(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Planificación Alimentación');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Eliminar Planificación Alimentación');
   }
 
 }

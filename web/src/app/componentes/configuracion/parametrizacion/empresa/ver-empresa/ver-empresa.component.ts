@@ -409,161 +409,6 @@ export class VerEmpresaComponent implements OnInit {
     };
   }
 
-  //CONTROL BOTONES
-  getEditarInformacionGeneral() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Información General');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getConfigurarNivelSeguridad() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar Nivel Seguridad');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getConfigurarReportes() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar Reportes');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getCrearSucursales() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Sucursal');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getEditarSucursales() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Sucursal');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getEliminarSucursales() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Sucursal');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getSucursalesDepartamento() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Departamento' && item.id_funcion === 1);
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getVerDepartamento() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Información General' && item.id_funcion === 1);
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  
-
   // CHECK SUCURSALES
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -697,4 +542,54 @@ export class VerEmpresaComponent implements OnInit {
         }
       });
   }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getEditarInformacionGeneral() {
+    return this.tienePermiso('Editar Información General');
+  }
+
+  getConfigurarNivelSeguridad() {
+    return this.tienePermiso('Configurar Nivel Seguridad');
+  }
+
+  getConfigurarReportes() {
+    return this.tienePermiso('Configurar Reportes');
+  }
+
+  getCrearSucursales() {
+    return this.tienePermiso('Crear Sucursal');
+  }
+
+  getEditarSucursales() {
+    return this.tienePermiso('Editar Sucursal');
+  }
+
+  getEliminarSucursales() {
+    return this.tienePermiso('Eliminar Sucursal');
+  }
+
+  getSucursalesDepartamento() {
+    return this.tienePermiso('Ver Departamento', 1);
+  }
+
+  getVerDepartamento() {
+    return this.tienePermiso('Editar Información General', 1);
+  }
+  
 }

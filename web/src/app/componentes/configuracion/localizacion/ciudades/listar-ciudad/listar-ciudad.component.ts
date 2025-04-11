@@ -507,64 +507,6 @@ export class ListarCiudadComponent implements OnInit {
 
   }
 
-  //CONTROL BOTONES
-  getCrearCiudad(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Ciudad');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getEliminarCiudad(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Ciudad');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getDescargarReportes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Ciudades'));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
   /** ************************************************************************************************* **
    ** **                               METODO DE SELECCION MULTIPLE DE DATOS                         ** **
    ** ************************************************************************************************* **/
@@ -714,6 +656,34 @@ export class ListarCiudadComponent implements OnInit {
           this.router.navigate(['/listarCiudades']);
         }
       });
+  }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearCiudad(){
+    return this.tienePermiso('Crear Ciudad');
+  }
+
+  getEliminarCiudad(){
+    return this.tienePermiso('Eliminar Ciudad');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Ciudades');
   }
 
 }

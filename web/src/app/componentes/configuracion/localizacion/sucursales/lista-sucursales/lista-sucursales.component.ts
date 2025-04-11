@@ -761,86 +761,6 @@ export class ListaSucursalesComponent implements OnInit {
     }
   }
 
-  //CONTROL BOTONES
-  getCrearEstablecimiento(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Establecimiento');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getEditarEstablecimiento(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Establecimiento');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getEliminarEstablecimiento(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Establecimiento');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 1){
-        return false;
-      }else{
-        return true;
-      }
-    }
-  }
-
-  getPlantillaEstablecimiento(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Establecimientos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getVerDepartamento(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Departamento' && item.id_funcion === 10);
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-
-
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -985,6 +905,43 @@ export class ListaSucursalesComponent implements OnInit {
           this.router.navigate(['/sucursales']);
         }
       });
+  }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearEstablecimiento(){
+    return this.tienePermiso('Crear Establecimiento');
+  }
+
+  getEditarEstablecimiento(){
+    return this.tienePermiso('Editar Establecimiento');
+  }
+
+  getEliminarEstablecimiento(){
+    return this.tienePermiso('Eliminar Establecimiento');
+  }
+
+  getPlantillaEstablecimiento(){
+    return this.tienePermiso('Cargar Plantilla Establecimientos');
+  }
+
+  getVerDepartamento(){
+    return this.tienePermiso('Ver Departamento', 10);
   }
 
 }

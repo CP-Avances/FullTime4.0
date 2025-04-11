@@ -737,58 +737,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     a.click();
   }
 
-  //CONTROL BOTONES
-  getCrearDepartamento(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Departamento');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEditarDepartamento(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Departamento');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEliminarDepartamento(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Departamento');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getNiveles(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Niveles');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getReportesDepartamento(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Departamentos');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -985,6 +933,43 @@ export class PrincipalDepartamentoComponent implements OnInit {
         }
       });
   }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) => item.accion === accion);
+      } catch {
+        return false;
+      }
+    } else {
+      // Si no hay datos, se permite si el rol es 1 (Admin)
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearDepartamento(){
+    return this.tienePermiso('Crear Departamento');
+  }
+
+  getEditarDepartamento(){
+    return this.tienePermiso('Editar Departamento');
+  }
+
+  getEliminarDepartamento(){
+    return this.tienePermiso('Eliminar Departamento');
+  }
+
+  getNiveles(){
+    return this.tienePermiso('Ver Niveles');
+  }
+
+  getReportesDepartamento(){
+    return this.tienePermiso('Descargar Reportes Departamentos');
+  }
+
 }
 
 

@@ -628,54 +628,40 @@ export class VerHorarioDetalleComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getEditarHorario(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Horario');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
+  }
+
+  getEditarHorario(){
+    return this.tienePermiso('Editar Horario');
   }
 
   getCrearDetalleHorario(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Detalle Horario');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Crear Detalle Horario');
   }
 
   getDescargarDocumentoHorario(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Documento Horario');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Descargar Documento Horario');
   }
 
   getVerEditarDetalleHorario(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Horario - Editar Detalle Horario');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Ver Horario - Editar Detalle Horario');
   }
 
   getVerEliminarDetalleHorario(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Horario - Eliminar Detalle Horario');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Ver Horario - Eliminar Detalle Horario');
   }
 
 }

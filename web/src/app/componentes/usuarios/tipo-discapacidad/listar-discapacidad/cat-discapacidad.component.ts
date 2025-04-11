@@ -803,54 +803,40 @@ export class CatDiscapacidadComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getCrearTipoDiscapacidad(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Tipo Discapacidad');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
+  }
+
+  getCrearTipoDiscapacidad(){
+    return this.tienePermiso('Crear Tipo Discapacidad');
   }
 
   getEditarTipoDiscapacidad(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Tipo Discapacidad');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Editar Tipo Discapacidad');
   }
 
   getEliminarTipoDiscapacidad(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Tipo Discapacidad');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Eliminar Tipo Discapacidad');
   }
 
   getCargarPlantillaTipoDiscapacidad(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Tipo Discapacidad');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Cargar Plantilla Tipo Discapacidad');
   }
 
   getDescargarReportesTipoDiscapacidad(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Tipo Discapacidad');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Descargar Reportes Tipo Discapacidad');
   }
 
 }

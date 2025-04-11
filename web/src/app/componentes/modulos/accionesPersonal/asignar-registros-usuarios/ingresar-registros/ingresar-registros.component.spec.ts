@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IngresarProcesosComponent } from './ingresar-registros.component';
+import { IngresarRegistrosComponent } from './ingresar-registros.component';
 
-describe('IngresarProcesosComponent', () => {
-  let component: IngresarProcesosComponent;
-  let fixture: ComponentFixture<IngresarProcesosComponent>;
+describe('IngresarRegistrosComponent', () => {
+  let component: IngresarRegistrosComponent;
+  let fixture: ComponentFixture<IngresarRegistrosComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [IngresarProcesosComponent]
+      declarations: [IngresarRegistrosComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(IngresarProcesosComponent);
+    fixture = TestBed.createComponent(IngresarRegistrosComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

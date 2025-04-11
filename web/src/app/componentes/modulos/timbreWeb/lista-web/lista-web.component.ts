@@ -1289,24 +1289,28 @@ export class ListaWebComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getActivarUsuarios(){
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 42);
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
+  getActivarUsuarios(){
+    return this.tienePermiso('Activar Usuarios', 42);
+  }
+
   getDesactivarUsuarios(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 42);
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+    return this.tienePermiso('Inactivar Usuarios', 42);
   }
 
 }
