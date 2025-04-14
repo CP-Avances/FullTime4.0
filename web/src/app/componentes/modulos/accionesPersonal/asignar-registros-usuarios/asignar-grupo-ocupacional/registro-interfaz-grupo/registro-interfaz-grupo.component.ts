@@ -185,7 +185,7 @@ export class RegistroInterfazGrupoComponent {
       console.log('this.listaRoles: ', this.listaRoles)
     })
 
-    this.BuscarInformacionGeneralDepa();
+    this.BuscarInformacionGeneral();
     this.ObtenerGrupoOcupacional();
     this.ObtenerSucursalesPorEmpresa();
   }
@@ -236,7 +236,7 @@ export class RegistroInterfazGrupoComponent {
     this.QuitarTodos();
   }
 
-  BuscarInformacionGeneralDepa() {
+  BuscarInformacionGeneral() {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentosDep = [];
     this.sucursalesDep = [];
@@ -702,7 +702,7 @@ export class RegistroInterfazGrupoComponent {
             timeOut: 4000,
           });
           this.LimpiarFormularioDep();
-          this.BuscarInformacionGeneralDepa();
+          this.BuscarInformacionGeneral();
           this.formularioDep.reset();
         }, (error: any) => {
           this.toastr.error(error, '', {

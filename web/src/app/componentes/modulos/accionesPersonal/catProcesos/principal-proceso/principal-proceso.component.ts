@@ -275,10 +275,15 @@ export class PrincipalProcesoComponent implements OnInit {
     }
 
     this.rest.EliminarProcesoMult(data).subscribe({
-      next: () => {
-        this.toastr.error('Registros eliminados exitosamente.', 'Operación exitosa.', {
+      next: (response) => {
+        this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
         });
+        if(response.relacionados > 0){
+          this.toastr.warning(response.ms2, 'Advertencia.', {
+            timeOut: 5000,
+          });
+        }
         this.ngOnInit();
       }, error: (err) => {
         if(err.status == 300){

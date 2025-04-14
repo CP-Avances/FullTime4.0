@@ -460,17 +460,6 @@ class GrupoOcupacionalControlador {
           SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
           `, [id_grupo, id]);
                     const [grupo] = response.rows;
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_empleado_grupo_ocupacional',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(grupo),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     if (grupo == undefined || grupo == '' || grupo == null) {
@@ -480,17 +469,6 @@ class GrupoOcupacionalControlador {
             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
            `, [id]);
                         const [grupo_activo] = response.rows;
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'map_empleado_grupo_ocupacional',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(grupo_activo),
-                            ip: ip,
-                            ip_local: ip_local,
-                            observacion: null
-                        });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
                         if (grupo_activo == undefined || grupo_activo == '' || grupo_activo == null) {
@@ -564,17 +542,6 @@ class GrupoOcupacionalControlador {
                 SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
               `, [id]);
                             const [grupo_activo1] = response.rows;
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_empleado_grupo_ocupacional',
-                                usuario: user_name,
-                                accion: 'I',
-                                datosOriginales: '',
-                                datosNuevos: JSON.stringify(grupo_activo1),
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
                             if (grupo_activo1 != undefined && grupo_activo1 != null && grupo_activo1 != '') {
@@ -588,7 +555,7 @@ class GrupoOcupacionalControlador {
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
                                     tabla: 'map_empleado_grupo_ocupacional',
                                     usuario: user_name,
-                                    accion: 'I',
+                                    accion: 'U',
                                     datosOriginales: '',
                                     datosNuevos: JSON.stringify(grup_UPD),
                                     ip: ip,
@@ -1171,7 +1138,15 @@ class GrupoOcupacionalControlador {
                         }
                     }
                 }
-                res.status(200).jsonp({ message: count.toString() + ' registros eliminados con éxito', ms2: 'Existen' + count_no + ' datos relacionados con el grupo ocupacional', codigo: 200 });
+                var meCount = "registro";
+                if (count > 1) {
+                    meCount = "registros";
+                }
+                var meCount_no = "registro relacionado";
+                if (count_no > 1) {
+                    meCount_no = "registros relacionados";
+                }
+                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' eliminados con éxito', ms2: count_no + ' ' + meCount_no + ' con el grupo ocupacional', codigo: 200, eliminados: count, relacionados: count_no });
             }
             catch (err) {
                 // REVERTIR TRANSACCION

@@ -281,10 +281,15 @@ export class GrupoOcupacionalComponent implements OnInit {
 
     this._GrupoOp.EliminarGrupoMult(data).subscribe({
       next: (response: any) => {
-        console.log('response: ',response)
         this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
         });
+        if(response.relacionados > 0){
+          this.toastr.warning(response.ms2, 'Advertencia.', {
+            timeOut: 5000,
+          });
+        }
+        
         this.ngOnInit();
       },error: (err) => {
         if(err.status == 300){
