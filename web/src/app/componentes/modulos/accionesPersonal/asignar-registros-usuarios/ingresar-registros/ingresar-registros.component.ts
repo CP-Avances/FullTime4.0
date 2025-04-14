@@ -35,9 +35,6 @@ export class IngresarRegistrosComponent {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-
-
-
   DatosProcesos: any
   DatosGrado: any
 
@@ -143,7 +140,6 @@ export class IngresarRegistrosComponent {
     return this.validar.IngresarSoloLetras(e);
   }
 
-
   listadoUsuariosProceso: boolean = false;
   listadoUsuariosGrado: boolean = false;
   listadoUsuariosGrupoOcupa: boolean = false;
@@ -165,6 +161,24 @@ export class IngresarRegistrosComponent {
       this.listadoUsuariosGrupoOcupa = true;
     }
     
+  }
+
+  ocultarRegistroGrado(valor: boolean) {
+    this.MostrarListaProcesos = !valor;
+    this.RegistroMultipleProcesos = valor;
+    this.RegistroInterfazProcesos = false;
+  }
+
+  ocultarRegistroProceso(valor: boolean) {
+    this.MostrarListaProcesos = !valor;
+    this.RegistroMultipleProcesos = valor;
+    this.RegistroInterfazProcesos = false;
+  }
+
+  ocultarRegistroGrupo(valor: boolean) {
+    this.MostrarListaGrupoOcupacional = !valor;
+    this.RegistroMultipleGrupoOcupacional = valor;
+    this.RegistroInterfazGrupoOcupacional = false;
   }
 
   // METODO PARA LIMPIAR FORMULARIO
