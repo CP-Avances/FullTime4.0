@@ -139,7 +139,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
-    this.ValidarCedula('1727193848');
+    this.ValidarCedula('1727193847');
 
     this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);

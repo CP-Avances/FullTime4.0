@@ -2194,8 +2194,12 @@ class EmpleadoControlador {
                                 data.longitud = parseFloat(data.longitud);
                                 data.latitud = parseFloat(data.latitud);
                                 if (regex.test(data.cedula)) {
-                                    if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10 && ValidarCedula(data.cedula)) {
+                                    const cedulaValida = ValidarCedula(data.cedula);
+                                    console.log("Valor ded cedula", cedulaValida);
+                                    if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10 || !cedulaValida) {
                                         data.observacion = 'La cédula ingresada no es válida';
+                                        console.log("Entro a validar cedula linea 2464");
+                                        console.log("Observacion:", data.observacion);
                                     }
                                     else {
                                         if (regex.test(data.codigo)) {
@@ -2426,6 +2430,7 @@ class EmpleadoControlador {
                                     const rege = /^[0-9]+$/;
                                     if (rege.test(data.cedula)) {
                                         if (data.cedula.toString().length != 10) {
+                                            console.log("Entro a validar cedula linea 2702");
                                             data.observacion = 'La cédula ingresada no es válida';
                                         }
                                     }
@@ -2975,31 +2980,31 @@ exports.EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 exports.default = exports.EMPLEADO_CONTROLADOR;
 function ValidarCedula(cedula) {
     console.log("entra a validar Cedula");
-    const cad = cedula;
-    let total = 0;
-    const longitud = cad.length;
-    const longcheck = longitud - 1;
-    if (cad !== "" && longitud === 10) {
-        for (let i = 0; i < longcheck; i++) {
-            let num = parseInt(cad.charAt(i), 10);
-            if (isNaN(num))
-                return false;
-            if (i % 2 === 0) {
-                num *= 2;
-                if (num > 9)
-                    num -= 9;
-            }
-            total += num;
-        }
-        total = total % 10 ? 10 - (total % 10) : 0;
-        if (parseInt(cad.charAt(longitud - 1), 10) === total) {
-            console.log("Cédula Válida");
-            return true;
-        }
-        else {
-            console.log("Cédula Inválida");
-            return false;
-        }
+    const cad = cedula.toString().trim();
+    if (cad === "" || cad.length !== 10 || isNaN(Number(cad))) {
+        console.log("Cédula vacía, no numérica o con longitud distinta de 10");
+        return false;
     }
-    return false;
+    let total = 0;
+    for (let i = 0; i < 9; i++) {
+        let num = parseInt(cad.charAt(i), 10);
+        if (isNaN(num))
+            return false;
+        if (i % 2 === 0) {
+            num *= 2;
+            if (num > 9)
+                num -= 9;
+        }
+        total += num;
+    }
+    const verificador = parseInt(cad.charAt(9), 10);
+    const resultado = total % 10 ? 10 - (total % 10) : 0;
+    if (verificador === resultado) {
+        console.log("Cédula Válida");
+        return true;
+    }
+    else {
+        console.log("Cédula Inválida");
+        return false;
+    }
 }
