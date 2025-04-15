@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GradosComponent } from '../grados.component';
+import { GradosComponent } from './grados.component';
 
 describe('GradosComponent', () => {
   let component: GradosComponent;

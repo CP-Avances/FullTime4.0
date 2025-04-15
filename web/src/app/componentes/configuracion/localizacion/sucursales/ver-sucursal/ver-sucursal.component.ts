@@ -395,129 +395,116 @@ export class VerSucursalComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getVerDepartamentoCrearDepartamento() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      if(this.pagina_ === 'datos-empresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Crear Departamento' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      else if (this.pagina_ === 'lista-sucursal'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Crear Departamento' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
         return false;
-      } else {
-        return true;
       }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getVerDepartamentoCrearDepartamento() {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+
+    try {
+      const datos = JSON.parse(datosRecuperados);
+
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['datos-empresa', item => item.accion === 'Ver Departamento - Crear Departamento' && item.id_funcion === 1],
+        ['lista-sucursal', item => item.accion === 'Ver Departamento - Crear Departamento' && item.id_funcion === 10]
+      ]);
+
+      const condicion = condiciones.get(this.pagina_);
+      return condicion ? datos.some(condicion) : false;
+
+    } catch {
+      return false;
     }
   }
 
   getEditarSucursal() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Sucursal' && item.id_funcion === 1);
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
+    return this.tienePermiso('Editar Sucursal', 1);
   }
 
   getVerDepartamentoEliminarDepartamento() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      if(this.pagina_ === 'datos-empresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Eliminar Departamento' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (this.pagina_ === 'lista-sucursal'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Eliminar Departamento' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+
+    try {
+      const datos = JSON.parse(datosRecuperados);
+
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['datos-empresa', item => item.accion === 'Ver Departamento - Eliminar Departamento' && item.id_funcion === 1],
+        ['lista-sucursal', item => item.accion === 'Ver Departamento - Eliminar Departamento' && item.id_funcion === 10]
+      ]);
+
+      const condicion = condiciones.get(this.pagina_);
+      return condicion ? datos.some(condicion) : false;
+
+    } catch {
+      return false;
     }
   }
 
   getVerDepartamentoEditarDepartamento() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      if(this.pagina_ === 'datos-empresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Editar Departamento' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (this.pagina_ === 'lista-sucursal'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Editar Departamento' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+
+    try {
+      const datos = JSON.parse(datosRecuperados);
+
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['datos-empresa', item => item.accion === 'Ver Departamento - Editar Departamento' && item.id_funcion === 1],
+        ['lista-sucursal', item => item.accion === 'Ver Departamento - Editar Departamento' && item.id_funcion === 10]
+      ]);
+
+      const condicion = condiciones.get(this.pagina_);
+      return condicion ? datos.some(condicion) : false;
+
+    } catch {
+      return false;
     }
   }
 
   getVerDepartamentoVerNiveles() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      if(this.pagina_ === 'datos-empresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }else if (this.pagina_ === 'lista-sucursal'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles' && item.id_funcion === 10);
-        if (index !== -1) {
-          encontrado = true;
-        }
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+
+    if (!datosRecuperados) {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+
+    try {
+      const datos = JSON.parse(datosRecuperados);
+
+      const condiciones = new Map<string, (item: any) => boolean>([
+        ['datos-empresa', item => item.accion === 'Ver Departamento - Ver Niveles' && item.id_funcion === 1],
+        ['lista-sucursal', item => item.accion === 'Ver Departamento - Ver Niveles' && item.id_funcion === 10]
+      ]);
+
+      const condicion = condiciones.get(this.pagina_);
+      return condicion ? datos.some(condicion) : false;
+
+    } catch {
+      return false;
     }
   }
-
 
 }

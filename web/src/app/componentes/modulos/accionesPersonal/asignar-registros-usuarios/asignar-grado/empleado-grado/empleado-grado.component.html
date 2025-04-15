@@ -103,12 +103,12 @@
                         <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
-                                class="fas fa-pen" id="t-editar" (click)="AbrirVentanaEditar(gra)">
+                                class="fas fa-pen" id="t-editar" (click)="AbrirVentanaEditar(gra)" *ngIf="getEditarAsignacionGrado()">
                                 <p>Editar</p>
                             </i>
                             <i matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
-                                class="fas fa-trash" id="t-ver" (click)="ConfirmarDelete(gra)">
+                                class="fas fa-trash" id="t-ver" (click)="ConfirmarDelete(gra)" *ngIf="getEliminarAsignacionGrado()">
                                 <p>Eliminar</p>
                             </i>
                         </td>

@@ -825,77 +825,6 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  //CONTROL BOTONES
-  getCrearFeriado(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Feriado');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getVerFeriado(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Feriados');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getPlantilla(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Feriados');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEditarFeriado(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Feriado');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEliminarFeriado(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Feriado');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getAsignarCiudadFeriado(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Asignar Ciudad Feriado');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Feriados');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
   /** ************************************************************************************************** **
    ** **                          METODO DE SELECCION MULTIPLE DE DATOS                               ** **
    ** ************************************************************************************************** **/
@@ -1036,6 +965,49 @@ export class ListarFeriadosComponent implements OnInit {
       });
   }
 
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
 
+  getCrearFeriado(){
+    return this.tienePermiso('Crear Feriado');
+  }
+
+  getVerFeriado(){
+    return this.tienePermiso('Ver Feriados');
+  }
+
+  getPlantilla(){
+    return this.tienePermiso('Cargar Plantilla Feriados');
+  }
+
+  getEditarFeriado(){
+    return this.tienePermiso('Editar Feriado');
+  }
+
+  getEliminarFeriado(){
+    return this.tienePermiso('Eliminar Feriado');
+  }
+
+  getAsignarCiudadFeriado(){
+    return this.tienePermiso('Asignar Ciudad Feriado');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Feriados');
+  }
 
 }

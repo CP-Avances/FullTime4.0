@@ -665,85 +665,6 @@ export class VistaRolesComponent implements OnInit {
     });
   }
 
-  //CONTROL BOTONES
-  getCrearRol(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Rol');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => (item.accion === 'Descargar Reportes Roles' && item.id_funcion === 4));
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getVerFuncionesRol() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    var rolEmpl = parseInt(localStorage.getItem('rol') as string);
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Funciones Rol');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (rolEmpl != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getEditarRol() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Rol');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getEliminarRol() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Rol');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 1) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -886,4 +807,42 @@ export class VistaRolesComponent implements OnInit {
         }
       });
   }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearRol(){
+    return this.tienePermiso('Crear Rol');
+  }
+
+  getDescargarReportes(){
+    return this.tienePermiso('Descargar Reportes Roles', 4);
+  }
+
+  getVerFuncionesRol() {
+    return this.tienePermiso('Ver Funciones Rol');
+  }
+
+  getEditarRol() {
+    return this.tienePermiso('Editar Rol');
+  }
+
+  getEliminarRol() {
+    return this.tienePermiso('Eliminar Rol');
+  }
+  
 }

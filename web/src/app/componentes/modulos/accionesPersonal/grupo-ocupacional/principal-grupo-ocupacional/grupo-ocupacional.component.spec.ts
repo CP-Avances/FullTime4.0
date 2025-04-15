@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GrupoOcupacionalComponent } from '../grupo-ocupacional.component';
+import { GrupoOcupacionalComponent } from './grupo-ocupacional.component';
 
 describe('GrupoOcupacionalComponent', () => {
   let component: GrupoOcupacionalComponent;

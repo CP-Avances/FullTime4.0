@@ -417,57 +417,6 @@ export class CatTipoCargosComponent {
     }
   }
 
-  //CONTROL BOTONES
-  getCrearTipoCargo(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Tipo Cargo');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEditarTipoCargo(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Tipo Cargo');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getEliminarTipoCargo(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Tipo Cargo');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getCargarPlantillaTipoCargo(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Cargar Plantilla Tipo Cargo');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
-  getDescargarReportesTipoCargo(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Tipo Cargo');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
-
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -879,6 +828,43 @@ export class CatTipoCargosComponent {
           }
         }
       });
+  }
+
+  //CONTROL BOTONES
+  private tienePermiso(accion: string, idFuncion?: number): boolean {
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      try {
+        const datos = JSON.parse(datosRecuperados);
+        return datos.some((item: any) =>
+          item.accion === accion && (idFuncion === undefined || item.id_funcion === idFuncion)
+        );
+      } catch {
+        return false;
+      }
+    } else {
+      return parseInt(localStorage.getItem('rol') || '0') === 1;
+    }
+  }
+
+  getCrearTipoCargo(){
+    return this.tienePermiso('Crear Tipo Cargo');
+  }
+
+  getEditarTipoCargo(){
+    return this.tienePermiso('Editar Tipo Cargo');
+  }
+
+  getEliminarTipoCargo(){
+    return this.tienePermiso('Eliminar Tipo Cargo');
+  }
+
+  getCargarPlantillaTipoCargo(){
+    return this.tienePermiso('Cargar Plantilla Tipo Cargo');
+  }
+
+  getDescargarReportesTipoCargo(){
+    return this.tienePermiso('Descargar Reportes Tipo Cargo');
   }
 
 }
