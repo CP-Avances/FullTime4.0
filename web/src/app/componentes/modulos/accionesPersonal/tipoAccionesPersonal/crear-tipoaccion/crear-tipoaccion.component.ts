@@ -76,10 +76,10 @@ export class CrearTipoaccionComponent implements OnInit {
     };
 
     if (form.tipoAccionForm != undefined && form.tipoAccionForm != 20) {
-      this.GuardarInformacion(datosAccion);
+    //   this.GuardarInformacion(datosAccion);
     }
     else {
-      this.IngresarNuevoTipo(form, datosAccion);
+       this.IngresarNuevoTipo(form, datosAccion);
     }
 
   }
@@ -193,19 +193,17 @@ export class CrearTipoaccionComponent implements OnInit {
 
   // METODO PARA INGRESAR NUEVO TIPO_ACCION
   IngresarNuevoTipo(form: any, datos: any) {
-    if (form.otroTipoForm != '') {
-      let tipo = {
-        descripcion: form.otroTipoForm,
-        user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales,
-      }
-      this.VerificarDuplicidad(form, tipo, datos);
+
+    let tipo = {
+      descripcion: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales,
     }
-    else {
-      this.toastr.info('Ingresar una nueva opción o seleccionar una de la lista.', 'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      });
-    }
+
+    console.log('form: ',form);
+    console.log('datosAccion: ',datos);
+    this.VerificarDuplicidad(form, tipo, datos);
+
   }
 
   // METODO PARA VERIFICAR DUPLICIDAD
@@ -213,7 +211,7 @@ export class CrearTipoaccionComponent implements OnInit {
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
     this.contar = 0;
     this.tipos.map((obj: any) => {
-      if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
+      if (obj.descripcion.toUpperCase() === form.descripcionForm.toUpperCase()) {
         this.contar = this.contar + 1;
       }
     });
@@ -223,11 +221,14 @@ export class CrearTipoaccionComponent implements OnInit {
         timeOut: 6000,
       })
     } else {
+      console.log('tipo data: ',tipo)
+
       this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
         datos.id_tipo = resol.id;
         // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
         this.GuardarInformacion(datos);
       });
+
     }
   }
 

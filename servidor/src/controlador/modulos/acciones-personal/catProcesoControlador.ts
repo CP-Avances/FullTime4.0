@@ -696,7 +696,7 @@ class ProcesoControlador {
     try {
       for (const item of listaUsuarios) {
 
-        const { id_empleado } = item;
+        const { id } = item;
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -704,7 +704,7 @@ class ProcesoControlador {
           `
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
            `
-          , [id_proceso, id_empleado]);
+          , [id_proceso, id]);
 
         const [procesos] = response.rows;
         // AUDITORIA
@@ -729,7 +729,7 @@ class ProcesoControlador {
             `
             SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
            `
-            , [id_empleado]);
+            , [id]);
 
           const [proceso_activo] = response.rows;
           // AUDITORIA
@@ -754,7 +754,7 @@ class ProcesoControlador {
               `
               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_proceso, id_empleado, true]);
+              , [id_proceso, id, true]);
 
             const [proceso_insert] = responsee.rows;
 
@@ -805,7 +805,7 @@ class ProcesoControlador {
               `
                INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_proceso, id_empleado, true]);
+              , [id_proceso, id, true]);
 
             const [nuevo_proceso] = response.rows;
             // AUDITORIA
@@ -833,7 +833,7 @@ class ProcesoControlador {
               `
                 SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
               `
-              , [id_empleado]);
+              , [id]);
 
             const [proceso_activo1] = response.rows;
             // AUDITORIA
@@ -897,7 +897,7 @@ class ProcesoControlador {
               });
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
-            }else{
+            } else {
               // INICIAR TRANSACCION
               await pool.query('BEGIN');
               const proceso_update: QueryResult = await pool.query(
@@ -921,7 +921,7 @@ class ProcesoControlador {
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
             }
-            
+
           }
         }
       }
@@ -1468,35 +1468,97 @@ class ProcesoControlador {
     const { listaEliminar, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
     var count = 0;
-    var datoEliminar = ''
+    var count_no = 0;
+    var list_Procesos: any = [];
     try {
 
       for (const item of listaEliminar) {
+
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-        datoEliminar = item.nombre
-        const res = await pool.query(
+        const resultado = await pool.query(
           `
-               DELETE FROM map_cat_procesos WHERE id = $1
-             `
+             SELECT * FROM map_cat_procesos WHERE id = $1
+           `
           , [item.id]);
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_procesos',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: `{"id": "${item.id}"}`,
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
+        const [existe_proceso] = resultado.rows;
+
+        if (!existe_proceso) {
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_cat_procesos',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            ip_local: ip_local,
+            observacion: `Error al eliminar el proceso con id: ${item.id}. Registro no encontrado.`
+          });
+        }
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        count += 1;
+
+        if (existe_proceso) {
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          const resultado = await pool.query(
+            `
+             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1
+           `
+            , [item.id]);
+
+          const [existe_proceso_emple] = resultado.rows
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
+          if (!existe_proceso_emple) {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const res = await pool.query(
+              `
+                DELETE FROM map_cat_procesos WHERE id = $1
+                `
+              , [item.id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_procesos',
+              usuario: user_name,
+              accion: 'D',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(existe_proceso),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            count += 1;
+
+          } else {
+            list_Procesos.push(item.nombre)
+            count_no += 1;
+          }
+
+        }
+
       }
 
-      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+      var meCount = "registro"
+      if(count > 1){
+        meCount = "registros"
+      }
+
+      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' eliminados con éxito', 
+                              ms2: 'Existen datos relacionados con el proceso - ', 
+                              codigo: 200, 
+                              eliminados: count, 
+                              relacionados: count_no,
+                              listaNoEliminados: list_Procesos
+                            });
+
 
     } catch (err) {
       // REVERTIR TRANSACCION
@@ -1504,10 +1566,12 @@ class ProcesoControlador {
       error = true;
       if (error) {
         if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
-          if(count <= 1){
-            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registro.', ms2:'Existen datos relacionados con el proceso '+datoEliminar });
-          }else if(count > 1){
-            return res.status(300).jsonp({ message: 'Se han eliminado '+count+ ' registros.', ms2:'Existen datos relacionados con el proceso '+datoEliminar });
+          if (count <= 1) {
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el proceso ',eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Procesos });
+          } else if (count > 1) {
+            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el proceso ', eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Procesos });
           }
         } else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });

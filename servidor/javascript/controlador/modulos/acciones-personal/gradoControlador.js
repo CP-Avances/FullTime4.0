@@ -418,14 +418,15 @@ class GradoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grado, listaUsuarios, user_name, ip, ip_local } = req.body;
             let error = false;
+            console.log('datos: ', id_grado, listaUsuarios, user_name, ip, ip_local);
             try {
                 for (const item of listaUsuarios) {
-                    const { id_empleado } = item;
+                    const { id } = item;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
-           `, [id_grado, id_empleado]);
+           `, [id_grado, id]);
                     const [grados] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -446,7 +447,7 @@ class GradoControlador {
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
-           `, [id_empleado]);
+           `, [id]);
                         const [grado_activo] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -467,7 +468,7 @@ class GradoControlador {
                             yield database_1.default.query('BEGIN');
                             const responsee = yield database_1.default.query(`
               INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
-              `, [id_empleado, id_grado, true]);
+              `, [id, id_grado, true]);
                             const [grado_insert] = responsee.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -507,7 +508,7 @@ class GradoControlador {
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
                INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
-              `, [id_empleado, id_grado, true]);
+              `, [id, id_grado, true]);
                             const [nuevo_grado] = response.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -530,7 +531,7 @@ class GradoControlador {
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
-           `, [id_empleado]);
+           `, [id]);
                             const [grado_activo1] = response.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1049,32 +1050,76 @@ class GradoControlador {
             const { listaEliminar, user_name, ip, ip_local } = req.body;
             let error = false;
             var count = 0;
-            var datoEliminar = '';
+            var count_no = 0;
+            var list_Grados = [];
             try {
                 for (const item of listaEliminar) {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    datoEliminar = item.descripcion;
-                    const res = yield database_1.default.query(`
-               DELETE FROM map_cat_grado WHERE id = $1
-             `, [item.id]);
-                    console.log('res: ', res);
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_cat_grado',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: `{"id": "${item.id}"}`,
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
+                    const resultado = yield database_1.default.query(`
+             SELECT * FROM map_cat_grado WHERE id = $1
+           `, [item.id]);
+                    const [existe_grado] = resultado.rows;
+                    if (!existe_grado) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_cat_grado',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al eliminar el Grado con id: ${item.id}. Registro no encontrado.`
+                        });
+                    }
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    count += 1;
+                    if (existe_grado) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const resultado = yield database_1.default.query(`
+             SELECT * FROM map_empleado_grado WHERE id_grado = $1
+           `, [item.id]);
+                        const [existe_grado_emple] = resultado.rows;
+                        if (!existe_grado_emple) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const res = yield database_1.default.query(`
+               DELETE FROM map_cat_grado WHERE id = $1
+             `, [item.id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_cat_grado',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(existe_grado),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            count += 1;
+                        }
+                        else {
+                            list_Grados.push(item.descripcion);
+                            count_no += 1;
+                        }
+                    }
                 }
-                res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+                var meCount = "registro";
+                if (count > 1) {
+                    meCount = "registros";
+                }
+                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' eliminados con éxito',
+                    ms2: 'Existen datos relacionados con el grado - ',
+                    codigo: 200,
+                    eliminados: count,
+                    relacionados: count_no,
+                    listaNoEliminados: list_Grados
+                });
             }
             catch (err) {
                 // REVERTIR TRANSACCION
@@ -1083,10 +1128,12 @@ class GradoControlador {
                 if (error) {
                     if (err.table == 'map_empleado_grado') {
                         if (count <= 1) {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grado ' + datoEliminar });
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grado ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Grados });
                         }
                         else if (count > 1) {
-                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grado ' + datoEliminar });
+                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grado ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Grados });
                         }
                     }
                     else {

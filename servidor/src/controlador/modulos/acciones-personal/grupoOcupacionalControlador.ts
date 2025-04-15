@@ -536,18 +536,6 @@ class GrupoOcupacionalControlador {
           , [id_grupo, id]);
 
         const [grupo] = response.rows;
-
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_empleado_grupo_ocupacional',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: JSON.stringify(grupo),
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
@@ -562,18 +550,6 @@ class GrupoOcupacionalControlador {
             , [id]);
 
           const [grupo_activo] = response.rows;
-
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'map_empleado_grupo_ocupacional',
-            usuario: user_name,
-            accion: 'I',
-            datosOriginales: '',
-            datosNuevos: JSON.stringify(grupo_activo),
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
 
@@ -667,17 +643,6 @@ class GrupoOcupacionalControlador {
               , [id]);
 
             const [grupo_activo1] = response.rows;
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'map_empleado_grupo_ocupacional',
-              usuario: user_name,
-              accion: 'I',
-              datosOriginales: '',
-              datosNuevos: JSON.stringify(grupo_activo1),
-              ip: ip,
-              ip_local: ip_local,
-              observacion: null
-            });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
@@ -695,7 +660,7 @@ class GrupoOcupacionalControlador {
               await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'map_empleado_grupo_ocupacional',
                 usuario: user_name,
-                accion: 'I',
+                accion: 'U',
                 datosOriginales: '',
                 datosNuevos: JSON.stringify(grup_UPD),
                 ip: ip,
@@ -1342,7 +1307,8 @@ class GrupoOcupacionalControlador {
     let error: boolean = false;
     var count = 0;
     var count_no = 0;
-   
+    var list_Grupos: any = [];
+
     try {
 
       for (const item of listaEliminar) {
@@ -1415,6 +1381,7 @@ class GrupoOcupacionalControlador {
             count += 1;
 
           } else {
+            list_Grupos.push(item.descripcion)
             count_no += 1;
           }
 
@@ -1422,7 +1389,18 @@ class GrupoOcupacionalControlador {
 
       }
 
-      res.status(200).jsonp({ message: count.toString()+' registros eliminados con éxito', ms2: 'Existen'+ count_no +' datos relacionados con el grupo ocupacional', codigo: 200 });
+      var meCount = "registro"
+      if(count > 1){
+        meCount = "registros"
+      }
+
+      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' eliminados con éxito', 
+                              ms2: 'Existen datos relacionados con el grupo - ', 
+                              codigo: 200, 
+                              eliminados: count, 
+                              relacionados: count_no, 
+                              listaNoEliminados: list_Grupos
+                            });
 
     } catch (err) {
       // REVERTIR TRANSACCION
@@ -1432,9 +1410,11 @@ class GrupoOcupacionalControlador {
       if (error) {
         if (err.table == 'map_empleado_grupo_ocupacional') {
           if (count == 1) {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo ocupacional' });
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo - ', eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Grupos });
           } else {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo ocupacional ' });
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo - ',eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Grupos });
           }
         } else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });

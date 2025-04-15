@@ -43,7 +43,7 @@ class AccionPersonalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                INSERT INTO map_tipo_accion_personal (descripcion) VALUES($1) RETURNING *
+                INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
                 `, [descripcion]);
                 const [datos] = response.rows;
                 if (datos) {
@@ -64,12 +64,12 @@ class AccionPersonalControlador {
                 }
                 else {
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'error' });
+                    return res.status(300).jsonp({ message: 'error, no se insertaron los datos' });
                 }
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }

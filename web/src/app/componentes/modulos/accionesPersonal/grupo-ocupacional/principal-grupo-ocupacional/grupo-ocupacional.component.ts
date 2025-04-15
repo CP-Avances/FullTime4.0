@@ -283,8 +283,17 @@ export class GrupoOcupacionalComponent implements OnInit {
       next: (response: any) => {
         console.log('response: ',response)
         this.toastr.error(response.message, 'Operación exitosa.', {
-          timeOut: 5000,
+          timeOut: 4500,
         });
+        if(response.relacionados > 0){
+          response.listaNoEliminados.forEach(item => {
+            this.toastr.warning(response.ms2+' '+item.trim(), 'Advertencia.', {
+              timeOut: 5000,
+            });
+          });
+          
+        }
+        
         this.ngOnInit();
       },error: (err) => {
         if(err.status == 300){
