@@ -182,6 +182,24 @@ export class IngresarRegistrosComponent {
     this.RegistroMultipleGrupoOcupacional = false;
   }
 
+  ocultarRegistroGrado(valor: boolean) {
+    this.MostrarListaProcesos = !valor;
+    this.RegistroMultipleProcesos = valor;
+    this.RegistroInterfazProcesos = false;
+  }
+
+  ocultarRegistroProceso(valor: boolean) {
+    this.MostrarListaProcesos = !valor;
+    this.RegistroMultipleProcesos = valor;
+    this.RegistroInterfazProcesos = false;
+  }
+
+  ocultarRegistroGrupo(valor: boolean) {
+    this.MostrarListaGrupoOcupacional = !valor;
+    this.RegistroMultipleGrupoOcupacional = valor;
+    this.RegistroInterfazGrupoOcupacional = false;
+  }
+
   //CONTROL BOTONES
   private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
