@@ -76,10 +76,10 @@ export class CrearTipoaccionComponent implements OnInit {
     };
 
     if (form.tipoAccionForm != undefined && form.tipoAccionForm != 20) {
-      this.GuardarInformacion(datosAccion);
+    //   this.GuardarInformacion(datosAccion);
     }
     else {
-      this.IngresarNuevoTipo(form, datosAccion);
+       this.IngresarNuevoTipo(form, datosAccion);
     }
 
   }
@@ -195,10 +195,13 @@ export class CrearTipoaccionComponent implements OnInit {
   IngresarNuevoTipo(form: any, datos: any) {
 
     let tipo = {
-      descripcion: form.otroTipoForm,
+      descripcion: form.descripcionForm,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     }
+
+    console.log('form: ',form);
+    console.log('datosAccion: ',datos);
     this.VerificarDuplicidad(form, tipo, datos);
 
   }
@@ -208,7 +211,7 @@ export class CrearTipoaccionComponent implements OnInit {
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
     this.contar = 0;
     this.tipos.map((obj: any) => {
-      if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
+      if (obj.descripcion.toUpperCase() === form.descripcionForm.toUpperCase()) {
         this.contar = this.contar + 1;
       }
     });
@@ -219,11 +222,13 @@ export class CrearTipoaccionComponent implements OnInit {
       })
     } else {
       console.log('tipo data: ',tipo)
+
       this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
         datos.id_tipo = resol.id;
         // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
         this.GuardarInformacion(datos);
       });
+
     }
   }
 

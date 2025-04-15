@@ -283,9 +283,13 @@ export class GradosComponent implements OnInit {
           timeOut: 5000,
         });
         if(response.relacionados > 0){
-          this.toastr.warning(response.ms2, 'Advertencia.', {
-            timeOut: 5000,
-          });
+          if(response.relacionados > 0){
+            response.listaNoEliminados.forEach(item => {
+              this.toastr.warning(response.ms2+' '+item.trim(), 'Advertencia.', {
+                timeOut: 5000,
+              });
+            });
+          }
         }
          this.ngOnInit();
        },error: (err) => {

@@ -1081,6 +1081,7 @@ class GrupoOcupacionalControlador {
             let error = false;
             var count = 0;
             var count_no = 0;
+            var list_Grupos = [];
             try {
                 for (const item of listaEliminar) {
                     // INICIAR TRANSACCION
@@ -1134,6 +1135,7 @@ class GrupoOcupacionalControlador {
                             count += 1;
                         }
                         else {
+                            list_Grupos.push(item.descripcion);
                             count_no += 1;
                         }
                     }
@@ -1142,11 +1144,13 @@ class GrupoOcupacionalControlador {
                 if (count > 1) {
                     meCount = "registros";
                 }
-                var meCount_no = "registro relacionado";
-                if (count_no > 1) {
-                    meCount_no = "registros relacionados";
-                }
-                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' eliminados con éxito', ms2: count_no + ' ' + meCount_no + ' con el grupo ocupacional', codigo: 200, eliminados: count, relacionados: count_no });
+                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' eliminados con éxito',
+                    ms2: 'Existen datos relacionados con el grupo - ',
+                    codigo: 200,
+                    eliminados: count,
+                    relacionados: count_no,
+                    listaNoEliminados: list_Grupos
+                });
             }
             catch (err) {
                 // REVERTIR TRANSACCION
@@ -1155,10 +1159,12 @@ class GrupoOcupacionalControlador {
                 if (error) {
                     if (err.table == 'map_empleado_grupo_ocupacional') {
                         if (count == 1) {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo ocupacional' });
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grupo - ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Grupos });
                         }
                         else {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo ocupacional ' });
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grupo - ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Grupos });
                         }
                     }
                     else {

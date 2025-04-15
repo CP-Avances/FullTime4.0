@@ -1469,6 +1469,7 @@ class ProcesoControlador {
     let error: boolean = false;
     var count = 0;
     var count_no = 0;
+    var list_Procesos: any = [];
     try {
 
       for (const item of listaEliminar) {
@@ -1537,6 +1538,7 @@ class ProcesoControlador {
             count += 1;
 
           } else {
+            list_Procesos.push(item.nombre)
             count_no += 1;
           }
 
@@ -1549,12 +1551,13 @@ class ProcesoControlador {
         meCount = "registros"
       }
 
-      var meCount_no = "registro relacionado"
-      if(count_no > 1){
-        meCount_no = "registros relacionados"
-      }
-
-      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' eliminados con éxito', ms2: count_no+' '+ meCount_no +'con el proceso', codigo: 200, eliminados: count, relacionados: count_no });
+      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' eliminados con éxito', 
+                              ms2: 'Existen datos relacionados con el proceso - ', 
+                              codigo: 200, 
+                              eliminados: count, 
+                              relacionados: count_no,
+                              listaNoEliminados: list_Procesos
+                            });
 
 
     } catch (err) {
@@ -1564,9 +1567,11 @@ class ProcesoControlador {
       if (error) {
         if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
           if (count <= 1) {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el proceso ' });
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el proceso ',eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Procesos });
           } else if (count > 1) {
-            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el proceso ' });
+            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el proceso ', eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Procesos });
           }
         } else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });

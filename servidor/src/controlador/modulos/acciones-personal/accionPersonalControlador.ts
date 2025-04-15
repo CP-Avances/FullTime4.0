@@ -32,10 +32,9 @@ class AccionPersonalControlador {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO map_tipo_accion_personal (descripcion) VALUES($1) RETURNING *
+                INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
                 `
                 , [descripcion]);
 
@@ -60,11 +59,11 @@ class AccionPersonalControlador {
             }
             else {
                 await pool.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' })
+                return res.status(300).jsonp({ message: 'error, no se insertaron los datos' })
             }
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' })
+            return res.status(500).jsonp({ message: error })
         }
     }
 
