@@ -5,9 +5,9 @@ import Pool from 'pg-pool';
 const pool = new Pool({
   user: 'postgres', // postgres
   host: 'localhost',
-  port: 5432,
-  database: 'fulltime4_redireccion',
-  password: '12345'
+  port: 5433,
+  database: 'fulltimeDireccionar',
+  password: 'KAte1234'
 })
 
 pool.query('SELECT NOW()', (err, res) => {
