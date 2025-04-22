@@ -765,6 +765,106 @@ class AccionPersonalControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
+    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    EliminarTipoAccionMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            var count = 0;
+            var count_no = 0;
+            var list_TipoAccion = [];
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const resultado = yield database_1.default.query(`
+             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `, [item.id]);
+                    const [existe_tipo] = resultado.rows;
+                    if (!existe_tipo) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_detalle_tipo_accion_personal',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al eliminar el tipo accion personal con id: ${item.id}. Registro no encontrado.`
+                        });
+                    }
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (existe_tipo) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const resultado = yield database_1.default.query(`
+             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `, [item.id]);
+                        const [existe_tipo_emple] = resultado.rows;
+                        if (!existe_tipo_emple) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const res = yield database_1.default.query(`
+             DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `, [item.id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_detalle_tipo_accion_personal',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: JSON.stringify(existe_tipo),
+                                datosNuevos: '',
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            //CONTADOR ELIMINADOS
+                            count += 1;
+                        }
+                        else {
+                            list_TipoAccion.push(item.descripcion);
+                            count_no += 1;
+                        }
+                    }
+                }
+                var meCount = "registro";
+                if (count > 1) {
+                    meCount = "registros";
+                }
+                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' eliminados con éxito',
+                    ms2: 'Existen datos relacionados con el tipo acción - ',
+                    codigo: 200,
+                    eliminados: count,
+                    relacionados: count_no,
+                    listaNoEliminados: list_TipoAccion
+                });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    if (err.table == 'map_empleado_grupo_ocupacional') {
+                        if (count == 1) {
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el tipo acción - ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_TipoAccion });
+                        }
+                        else {
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el tipo acción - ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_TipoAccion });
+                        }
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
+                    }
+                }
+            }
+        });
+    }
 }
 exports.ACCION_PERSONAL_CONTROLADOR = new AccionPersonalControlador();
 exports.default = exports.ACCION_PERSONAL_CONTROLADOR;

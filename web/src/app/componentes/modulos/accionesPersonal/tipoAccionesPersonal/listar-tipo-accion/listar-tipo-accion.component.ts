@@ -21,6 +21,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { auto } from '@popperjs/core';
 import { ExcelService } from 'src/app/servicios/generarDocumentos/excel.service';
+import { SelectionModel } from '@angular/cdk/collections';
 
 (ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
 
@@ -48,17 +49,17 @@ export class ListarTipoAccionComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-   // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
-   nameFile: string;
-   archivoSubido: Array<File>;
- 
-   tamanio_paginaMul: number = 5;
-   numero_paginaMul: number = 1;
+  // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
+  nameFile: string;
+  archivoSubido: Array<File>;
 
-   @ViewChild(MatPaginator) paginator: MatPaginator;
-   
-   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-    hipervinculo: string = (localStorage.getItem('empresaURL') as string);
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
@@ -76,6 +77,10 @@ export class ListarTipoAccionComponent implements OnInit {
   private fontTitulo!: Partial<ExcelJS.Font>;
   private imagen: any;
 
+  // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
+  selectionUno = new SelectionModel<any>(true, []);
+  tipoAccionEliminar: any = [];
+
   constructor(
     public restEmpre: EmpresaService,
     public ventana: MatDialog,
@@ -92,10 +97,10 @@ export class ListarTipoAccionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     if (this.habilitarAccion === false) {
       let mensaje = {
@@ -194,6 +199,62 @@ export class ListarTipoAccionComponent implements OnInit {
       });
   }
 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelected() {
+    const numSelected = this.selectionUno.selected.length;
+    const numRows = this.tipo_acciones.length;
+    return numSelected === numRows;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selectionUno.clear() :
+      this.tipo_acciones.forEach((row: any) => this.selectionUno.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabel(row?: any): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+    this.tipoAccionEliminar = this.selectionUno.selected;
+    return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // METODO PARA HACTIBAR LA SELECCION
+  btnCheckHabilitar: boolean = false;
+  HabilitarSeleccion() {
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+    } else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.selectionUno.clear();
+    }
+  }
+
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.tipoAccionEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.btnCheckHabilitar = false;
+            this.tipoAccionEliminar = [];
+            this.selectionUno.clear();
+          } else {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        }
+      });
+  }
+  EliminarMultiple() {
+
+  }
+
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.archivoSubido = [];
@@ -236,7 +297,6 @@ export class ListarTipoAccionComponent implements OnInit {
     this.ver_datos = true;
     this.accion_id = id;
   }
-
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   mostrarbtnsubir: boolean = false;
@@ -284,7 +344,7 @@ export class ListarTipoAccionComponent implements OnInit {
   VerificarPlantilla() {
     this.listaTipoAccionesCorrectas = [];
     let formData = new FormData();
-    
+
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
@@ -292,7 +352,7 @@ export class ListarTipoAccionComponent implements OnInit {
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipoAccion_personal = res.data;
-        this.messajeExcel = res.message;
+      this.messajeExcel = res.message;
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -330,21 +390,21 @@ export class ListarTipoAccionComponent implements OnInit {
         timeOut: 4000,
       });
     });
-    
-  }
-    // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
-    ConfirmarRegistroMultiple() {
-      const mensaje = 'registro';
-      this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
-        .subscribe((confirmado: Boolean) => {
-          if (confirmado) {
-            this.RegistrarAcciones();
-          }
-        });
-        
-    }
 
-    // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  }
+  // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.RegistrarAcciones();
+        }
+      });
+
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -354,7 +414,7 @@ export class ListarTipoAccionComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion  == 'Registro cruzado' ||
+    } else if (observacion == 'Registro cruzado' ||
       observacion == 'No existe el tipo de acción de personal en el sistema'
     ) {
       return 'rgb(238, 21, 242)';
@@ -374,9 +434,9 @@ export class ListarTipoAccionComponent implements OnInit {
     }
   }
 
-   // METODO PARA REGISTRAR DATOS
-   RegistrarAcciones() {
-    console.log('listaProcesosCorrectas: ',this.listaTipoAccionesCorrectas.length)
+  // METODO PARA REGISTRAR DATOS
+  RegistrarAcciones() {
+    console.log('listaProcesosCorrectas: ', this.listaTipoAccionesCorrectas.length)
     if (this.listaTipoAccionesCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaTipoAccionesCorrectas,
@@ -520,7 +580,123 @@ export class ListarTipoAccionComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   async exportToExcel() {
-    this.generarExcel.generarExcel()
+
+    var f = DateTime.now();
+    let fecha = f.toFormat('yyyy-MM-dd');
+    let hora = f.toFormat('HH:mm:ss');
+    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
+    const tipoAccion: any[] = [];
+
+    console.log('tipo_acciones: ', this.tipo_acciones);
+    this.tipo_acciones.forEach((accion: any, index: number) => {
+
+      tipoAccion.push([
+        index + 1,
+        accion.id_tipo_accion_personal,
+        accion.nombre,
+        accion.descripcion,
+        accion.base_legal
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Tipo Acción Personal");
+
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:M1");
+    worksheet.mergeCells("B2:M2");
+    worksheet.mergeCells("B3:M3");
+    worksheet.mergeCells("B4:M4");
+    worksheet.mergeCells("B5:M5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Tipo de Acción Personal".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "id_tipo_accion_personal", width: 20 },
+      { key: "nombre", width: 20 },
+      { key: "descripcion", width: 20 },
+      { key: "base_legal", width: 20 },
+    ]
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "TIPO ACCIÓN PERSONAL", totalsRowLabel: "", filterButton: true },
+      { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "BASE LEGAL", totalsRowLabel: "", filterButton: true },
+    ];
+    console.log("ver Tipo Accion Personal", tipoAccion);
+    console.log("Columnas:", columnas);
+
+    worksheet.addTable({
+      name: "TipoAccionPersonal",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: tipoAccion,
+    });
+
+
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    const numeroFilas = tipoAccion.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 5; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Lista_tipoAccionPersonal.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+
+  }
+  private obtenerAlineacionHorizontalEmpleados(j: number): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
 
@@ -529,90 +705,136 @@ export class ListarTipoAccionComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
-    /*
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipo_acciones);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "TipoAccionesPersonalCSV" + new Date().getTime() + '.csv');
-    */
+    var arreglo = this.tipo_acciones;
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('TipoAccionPersonalCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 30 },
+      { header: 'TIPO_ACCION_PERSONAL', key: 'tipo_accion_personal', width: 30 },
+      { header: 'NOMBRE', key: 'nombre', width: 15 },
+      { header: 'DESCRIPCION', key: 'descripcion', width: 15 },
+      { header: 'BASE_LEGAL', key: 'base_legal', width: 15 },
+    ];
+
+    // 4. Llenar las filas con los datos
+    arreglo.map((obj: any) => {
+      worksheet.addRow({
+        id: obj.id,
+        tipo_accion_personal: obj.id_tipo_accion_personal,
+        nombre: obj.nombre,
+        descripcion: obj.descripcion,
+        base_legal: obj.base_legal,
+      }).commit();
+    });
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "TipoAccionPersonalCSV.csv");
+    });
   }
 
-  /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
-   ** ************************************************************************************************* **/
+/** ************************************************************************************************* **
+ ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
+ ** ************************************************************************************************* **/
 
-  urlxml: string;
-  data: any = [];
-  exportToXML() {
-    var objeto;
-    var arregloTipoAcciones: any = [];
-    this.tipo_acciones.forEach((obj: any) => {
-      objeto = {
-        "tipo_accion_personal": {
-          '@id': obj.id,
-          "nombre": obj.nombre,
-          "descripcion": obj.descripcion,
-          "base_legal": obj.base_legal,
-          "tipo_permiso": obj.tipo_permiso == true ? 'Permiso' : obj.tipo_vacacion == true ? 'Vacación' : 'Situación propuesta'
-        }
+urlxml: string;
+data: any = [];
+exportToXML() {
+
+  var objeto: any;
+  var arregloTipoAcciones: any = [];
+  console.log('this.tipo_acciones: ', this.tipo_acciones)
+  this.tipo_acciones.forEach((obj: any) => {
+    objeto = {
+      "tipo_accion_personal": {
+        "$": { "id": obj.id },
+        "id_tipo_accion_personal": obj.id_tipo_accion_personal,
+        "nombre": obj.nombre,
+        "descripcion": obj.descripcion,
+        "base_legal": obj.base_legal,
       }
-      arregloTipoAcciones.push(objeto)
-    });
-    this.rest.CrearXML(arregloTipoAcciones).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/departamento/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    }
+    arregloTipoAcciones.push(objeto)
+  });
+  const xmlBuilder = new xml2js.Builder({ rootName: 'TipoAcciones' });
+  const xml = xmlBuilder.buildObject(arregloTipoAcciones);
+
+  if (xml === undefined) {
+    return;
   }
 
-  //CONTROL BOTONES
-  getCrearTipoAccion(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
+  const blob = new Blob([xml], { type: 'application/xml' });
+  const xmlUrl = URL.createObjectURL(blob);
 
-  getVer(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+  // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+  const newTab = window.open(xmlUrl, '_blank');
+  if (newTab) {
+    newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+    newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+  } else {
+    alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
   }
+  const a = document.createElement('a');
+  a.href = xmlUrl;
+  a.download = 'Tipo_Accion_Personal.xml';
+  // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+  a.click();
+}
 
-  getEditar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
-  }
 
-  getEliminar(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+//CONTROL BOTONES
+getCrearTipoAccion() {
+  const datosRecuperados = sessionStorage.getItem('paginaRol');
+  if (datosRecuperados) {
+    var datos = JSON.parse(datosRecuperados);
+    return datos.some(item => item.accion === 'Crear Detalle Tipo Acción Personal');
+  } else {
+    return !(parseInt(localStorage.getItem('rol') as string) !== 1);
   }
+}
 
-  getDescargarReportes(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes Detalle Tipo Acción Personal');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
-    }
+getVer() {
+  const datosRecuperados = sessionStorage.getItem('paginaRol');
+  if (datosRecuperados) {
+    var datos = JSON.parse(datosRecuperados);
+    return datos.some(item => item.accion === 'Ver Detalle Tipo Acción Personal');
+  } else {
+    return !(parseInt(localStorage.getItem('rol') as string) !== 1);
   }
+}
+
+getEditar() {
+  const datosRecuperados = sessionStorage.getItem('paginaRol');
+  if (datosRecuperados) {
+    var datos = JSON.parse(datosRecuperados);
+    return datos.some(item => item.accion === 'Editar Detalle Tipo Acción Personal');
+  } else {
+    return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+  }
+}
+
+getEliminar() {
+  const datosRecuperados = sessionStorage.getItem('paginaRol');
+  if (datosRecuperados) {
+    var datos = JSON.parse(datosRecuperados);
+    return datos.some(item => item.accion === 'Eliminar Detalle Tipo Acción Personal');
+  } else {
+    return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+  }
+}
+
+getDescargarReportes() {
+  const datosRecuperados = sessionStorage.getItem('paginaRol');
+  if (datosRecuperados) {
+    var datos = JSON.parse(datosRecuperados);
+    return datos.some(item => item.accion === 'Descargar Reportes Detalle Tipo Acción Personal');
+  } else {
+    return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+  }
+}
 }

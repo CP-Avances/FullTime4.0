@@ -865,6 +865,129 @@ class AccionPersonalControlador {
     return res.status(200).jsonp({ message: 'ok' });
   }
 
+   // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+   public async EliminarTipoAccionMultiple(req: Request, res: Response): Promise<any> {
+    const { listaEliminar, user_name, ip, ip_local } = req.body;
+    let error: boolean = false;
+    var count = 0;
+    var count_no = 0;
+    var list_TipoAccion: any = [];
+
+    try {
+
+      for (const item of listaEliminar) {
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+      
+        const resultado = await pool.query(
+          `
+             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `
+          , [item.id]);
+        const [existe_tipo] = resultado.rows;
+
+        if (!existe_tipo) {
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_detalle_tipo_accion_personal',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            ip_local: ip_local,
+            observacion: `Error al eliminar el tipo accion personal con id: ${item.id}. Registro no encontrado.`
+          });
+        }
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
+        if (existe_tipo) {
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          
+          const resultado = await pool.query(
+            `
+             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `
+            , [item.id]);
+
+          const [existe_tipo_emple] = resultado.rows;
+
+          if (!existe_tipo_emple) {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            
+            const res = await pool.query(
+              `
+             DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `
+              , [item.id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_detalle_tipo_accion_personal',
+              usuario: user_name,
+              accion: 'D',
+              datosOriginales: JSON.stringify(existe_tipo),
+              datosNuevos: '',
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            //CONTADOR ELIMINADOS
+            count += 1;
+
+          } else {
+            list_TipoAccion.push(item.descripcion)
+            count_no += 1;
+          }
+
+        }
+
+      }
+
+      var meCount = "registro"
+      if(count > 1){
+        meCount = "registros"
+      }
+
+      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' eliminados con éxito', 
+                              ms2: 'Existen datos relacionados con el tipo acción - ', 
+                              codigo: 200, 
+                              eliminados: count, 
+                              relacionados: count_no, 
+                              listaNoEliminados: list_TipoAccion
+                            });
+
+    } catch (err) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      error = true;
+
+      if (error) {
+        if (err.table == 'map_empleado_grupo_ocupacional') {
+          if (count == 1) {
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el tipo acción - ', eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_TipoAccion });
+          } else {
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el tipo acción - ',eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_TipoAccion });
+          }
+        } else {
+          return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
+        }
+      }
+    }
+
+  }
+
 }
 
 export const ACCION_PERSONAL_CONTROLADOR = new AccionPersonalControlador();

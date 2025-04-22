@@ -183,9 +183,9 @@ export class IngresarRegistrosComponent {
   }
 
   ocultarRegistroGrado(valor: boolean) {
-    this.MostrarListaProcesos = !valor;
-    this.RegistroMultipleProcesos = valor;
-    this.RegistroInterfazProcesos = false;
+    this.MostrarListaGrado = !valor;
+    this.RegistroMultipleGrado = valor;
+    this.RegistroInterfazGrado = false;
   }
 
   ocultarRegistroProceso(valor: boolean) {

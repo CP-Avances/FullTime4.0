@@ -71,11 +71,40 @@
     </div>
     <div *ngIf="!Datos_tipoAccion_personal" class="container" style="padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="resultados">LISTA DETALLES TIPOS DE ACCIONES DE PERSONAL</div>
+            <div class="d-flex bd-highlight" id="titulo">
+                <div class="row w-100">
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+                        <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                            matTooltipPosition="right" matTooltip="Selección múltiple para eliminar registros."
+                            id="SelectCheck">
+                            library_add_check
+                        </mat-icon>
+                    </div>
+                    <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                        <span>
+                            LISTA DETALLES TIPOS DE ACCIONES DE PERSONAL
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                            (click)="ConfirmarDeleteMultiple()">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
+                            <th>
+                                <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                    [checked]="selectionUno.hasValue() && isAllSelected()"
+                                    [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
                             <th scope="col">Tipo de acción personal</th>
                             <th scope="col">Descripción</th>
                             <th scope="col">Acción</th>
@@ -83,6 +112,7 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput name="filtroNombre" placeholder="Buscar" minlength="2"
@@ -99,6 +129,12 @@
                         </tr>
                         <tr
                             *ngFor="let ta of tipo_acciones | filtrosNombres:nombreF.value | paginate:tamanio_pagina:numero_pagina">
+                            <td>
+                                <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionUno.toggle(ta) : null"
+                                    [checked]="selectionUno.isSelected(ta)" [aria-label]="checkboxLabel(ta)">
+                                </mat-checkbox>
+                            </td>
                             <td id="centrar">{{ta.nombre}}</td>
                             <td id="centrar">{{ta.descripcion}}</td>
                             <td id="centrar" class="justify-content-center">

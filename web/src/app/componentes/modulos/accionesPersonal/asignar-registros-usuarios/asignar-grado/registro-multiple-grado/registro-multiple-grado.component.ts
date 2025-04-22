@@ -53,6 +53,20 @@ export class RegistroMultipleGradoComponent {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   /** ************************************************************************************************************* **
 ** **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
 ** ************************************************************************************************************* **/
@@ -92,12 +106,6 @@ export class RegistroMultipleGradoComponent {
     }
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
-  }
-
-  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-  ManejarPaginaMulti(e: PageEvent) {
-    this.tamanio_paginaMul = e.pageSize;
-    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLAS

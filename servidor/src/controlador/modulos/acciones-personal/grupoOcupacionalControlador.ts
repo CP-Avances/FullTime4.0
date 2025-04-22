@@ -965,6 +965,8 @@ class GrupoOcupacionalControlador {
   public async RegistrarEmpleadoGrupoOcu(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
+    
+    console.log('datos: ',plantilla, user_name, ip, ip_local )
 
     try {
       for (const item of plantilla) {
@@ -1005,17 +1007,6 @@ class GrupoOcupacionalControlador {
           , [id_grupo_ocupacional, id_empleado]);
 
         const [Gupo_Ocupacionales] = response.rows;
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_empleado_grupo_ocupacional',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: JSON.stringify(Gupo_Ocupacionales),
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
@@ -1030,17 +1021,6 @@ class GrupoOcupacionalControlador {
             , [id_empleado]);
 
           const [grupo_activo] = response.rows;
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'map_empleado_grupo_ocupacional',
-            usuario: user_name,
-            accion: 'I',
-            datosOriginales: '',
-            datosNuevos: JSON.stringify(grupo_activo),
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
 
