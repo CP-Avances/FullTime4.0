@@ -196,7 +196,7 @@
                             *ngIf="activar">
                             <div class="separar">
                                 <form method="post" enctype="multipart/form-data">
-                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
+                                    <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" [formControl]="archivoForm"
                                         id="file">
                                     <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor" matSuffix
                                         matTooltipPosition="right"

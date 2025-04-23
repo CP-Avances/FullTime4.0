@@ -614,7 +614,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { name: "ID", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "NIVEL", totalsRowLabel: "", filterButton: true },
-      { name: "DEPARTAMENTO PADRE", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO SUPERIOR", totalsRowLabel: "", filterButton: true },
 
     ];
 
@@ -675,9 +675,14 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ExportToCSV() {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('DepartamentosCSV');
-    //  Agregar encabezados dinámicos basados en las claves del primer objeto
-    const keys = Object.keys(this.departamentos[0] || {}); // Obtener las claves
-    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
+    worksheet.columns = [
+      { header: 'id_sucursal', key: 'id_sucursal', width: 20 },
+      { header: 'nomsucursal', key: 'nomsucursal', width: 30 },
+      { header: 'id', key: 'id', width: 20 },
+      { header: 'nombre', key: 'nombre', width: 30 },
+      { header: 'nivel', key: 'nivel', width: 10 },
+      { header: 'departamento_superior', key: 'departamento_padre', width: 30 },
+    ];
     // Llenar las filas con los datos
     this.departamentos.forEach((obj: any) => {
       worksheet.addRow(obj);
