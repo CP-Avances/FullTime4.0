@@ -92,7 +92,7 @@
               <table id="table_horario" class="table table-hover table-sm">
                 <thead class="thead-light">
                   <tr style="text-align: center;">
-                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">CÉDULA</th>
+                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">IDENTIFICACIÓN</th>
                       <th class="sticky-2 colum_1 td_horarios" scope="col"  rowspan="2">EMPLEADO</th>
 
                       <th scope="col" class="td_horarios" colspan="31">DÍAS DEL MES DE {{ mes }}</th>
@@ -105,7 +105,7 @@
               <tbody>
                   <tr *ngFor="let empleado of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
                       <td class="sticky colum_1 td_horarios" *ngIf="empleado.cedula_empleado">{{empleado.cedula_empleado}}</td>
-                      <td class="sticky colum_1 td_horarios" *ngIf="!empleado.cedula_empleado" [style.color]="ObtenerColorEmpleado('Empleado no válido')">{{empleado.cedula}}</td>
+                      <td class="sticky colum_1 td_horarios" *ngIf="!empleado.cedula_empleado" [style.color]="ObtenerColorEmpleado('Empleado no válido')">{{empleado.identificacion}}</td>
                       <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorEmpleado(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
                       <td *ngFor="let dia of empleado.dias" class="td_observaciones">
                         <div *ngFor="let horario of dia.horarios">

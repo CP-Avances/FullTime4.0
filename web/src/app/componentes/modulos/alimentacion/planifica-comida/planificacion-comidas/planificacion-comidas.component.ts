@@ -298,7 +298,7 @@ export class PlanificacionComidasComponent implements OnInit {
 
         // LECTURA DE DATOS DE USUARIO
         let usuario = '<tr><th>' + this.data.nombre +
-          '</th><th>' + this.data.cedula + '</th></tr>';
+          '</th><th>' + this.data.identificacion + '</th></tr>';
         let cuenta_correo = this.data.correo;
 
         // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -522,7 +522,7 @@ export class PlanificacionComidasComponent implements OnInit {
             planEmpleado.id_empleado = obj.id;
 
             // LECTURA DE NOMBRES DE USUARIOS
-            usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
+            usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.identificacion + '</th></tr>';
 
             this.contadorFechas = 0;
 

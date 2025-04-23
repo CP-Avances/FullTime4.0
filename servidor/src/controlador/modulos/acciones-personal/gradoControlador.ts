@@ -770,7 +770,7 @@ class GradoControlador {
           fila: '',
           nombre: '',
           apellido: '',
-          cedula: '',
+          identificacion: '',
           grado: '',
           observacion: ''
         };
@@ -790,7 +790,7 @@ class GradoControlador {
 
           // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
           if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] ||
-            !headers['CEDULA'] || !headers['GRADO']
+            !headers['IDENTIFICACION'] || !headers['GRADO']
           ) {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
@@ -804,21 +804,21 @@ class GradoControlador {
             const ITEM = row.getCell(headers['ITEM']).value;
             const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
             const APELLIDO = row.getCell(headers['APELLIDO']).value?.toString().trim();
-            const CEDULA = row.getCell(headers['CEDULA']).value?.toString().trim();
+            const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString().trim();
             const GRADO = row.getCell(headers['GRADO']).value?.toString().trim();
 
             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
             if ((ITEM != undefined && ITEM != '') &&
               (NOMBRE != undefined && NOMBRE != '') &&
               (APELLIDO != undefined && APELLIDO != '') &&
-              (CEDULA != undefined && CEDULA != '') &&
+              (IDENTIFICACION != undefined && IDENTIFICACION != '') &&
               (GRADO != undefined && GRADO != '')
             ) {
 
               data.fila = ITEM;
               data.nombre = NOMBRE;
               data.apellido = APELLIDO;
-              data.cedula = CEDULA;
+              data.identificacion = IDENTIFICACION;
               data.grado = GRADO;
               data.observacion = 'no registrado';
 
@@ -828,7 +828,7 @@ class GradoControlador {
               data.fila = ITEM;
               data.nombre = NOMBRE;
               data.apellido = APELLIDO;
-              data.cedula = CEDULA;
+              data.identificacion = IDENTIFICACION;
               data.grado = GRADO;
               data.observacion = 'no registrado';
 
@@ -845,9 +845,9 @@ class GradoControlador {
                 data.apellido = '-';
               }
 
-              if (CEDULA == undefined) {
-                data.cedula = 'No registrado';
-                data.observacion = 'Cédula ' + data.observacion;
+              if (IDENTIFICACION == undefined) {
+                data.identificacion = 'No registrado';
+                data.observacion = 'Identificación ' + data.observacion;
               }
 
               if (GRADO == undefined) {
@@ -877,9 +877,9 @@ class GradoControlador {
           if (item.observacion == 'no registrado') {
             const VERIFICAR_IDEMPLEADO = await pool.query(
               `
-              SELECT id FROM eu_empleados WHERE cedula = $1
+              SELECT id FROM eu_empleados WHERE identificacion = $1
               `
-              , [item.cedula.trim()]);
+              , [item.identificacion.trim()]);
 
             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
 
@@ -909,7 +909,7 @@ class GradoControlador {
                 } else {
                   if (item.observacion == 'no registrado') {
                     // DISCRIMINACION DE ELEMENTOS IGUALES
-                    if (duplicados.find((p: any) => (p.cedula.trim() === item.cedula.trim())
+                    if (duplicados.find((p: any) => (p.identificacion.trim() === item.identificacion.trim())
                     ) == undefined) {
                       duplicados.push(item);
                     } else {
@@ -923,7 +923,7 @@ class GradoControlador {
               }
 
             } else {
-              item.observacion = 'La cédula ingresada no esta registrada en el sistema'
+              item.observacion = 'La identificación ingresada no esta registrada en el sistema'
             }
 
           }
@@ -988,7 +988,7 @@ class GradoControlador {
     try {
       for (const item of plantilla) {
 
-        const { cedula, grado } = item;
+        const { identificacion, grado } = item;
 
         await pool.query('BEGIN');
         const VERIFICAR_IDGRADO = await pool.query(
@@ -1005,9 +1005,9 @@ class GradoControlador {
         await pool.query('BEGIN');
         const VERIFICAR_IDEMPLEADO = await pool.query(
           `
-          SELECT id FROM eu_empleados WHERE cedula = $1
+          SELECT id FROM eu_empleados WHERE identificacion = $1
           `
-          , [cedula.trim()]);
+          , [identificacion.trim()]);
 
         const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
         // FINALIZAR TRANSACCION

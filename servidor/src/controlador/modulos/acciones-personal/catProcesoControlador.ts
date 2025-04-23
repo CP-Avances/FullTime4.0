@@ -960,7 +960,7 @@ class ProcesoControlador {
           fila: '',
           nombre: '',
           apellido: '',
-          cedula: '',
+          identificacion: '',
           proceso: '',
           observacion: ''
         };
@@ -978,7 +978,7 @@ class ProcesoControlador {
           });
 
           // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-          if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || !headers['CEDULA'] || !headers['PROCESOS']
+          if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || !headers['IDENTIFICACION'] || !headers['PROCESOS']
           ) {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
@@ -992,20 +992,20 @@ class ProcesoControlador {
             const ITEM = row.getCell(headers['ITEM']).value;
             const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
             const APELLIDO = row.getCell(headers['APELLIDO']).value?.toString().trim();
-            const CEDULA = row.getCell(headers['CEDULA']).value?.toString().trim();
+            const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString().trim();
             const PROCESOS = row.getCell(headers['PROCESOS']).value?.toString().trim();
 
             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
             if ((ITEM != undefined && ITEM != '') &&
               (NOMBRE != undefined && NOMBRE != '') &&
               (APELLIDO != undefined && APELLIDO != '') &&
-              (CEDULA != undefined && CEDULA != '') &&
+              (IDENTIFICACION != undefined && IDENTIFICACION != '') &&
               (PROCESOS != undefined && PROCESOS != '')) {
 
               data.fila = ITEM;
               data.nombre = NOMBRE,
                 data.apellido = APELLIDO,
-                data.cedula = CEDULA,
+                data.identificacion = IDENTIFICACION,
                 data.proceso = PROCESOS,
                 data.observacion = 'no registrado';
 
@@ -1016,7 +1016,7 @@ class ProcesoControlador {
               data.fila = ITEM;
               data.nombre = NOMBRE,
                 data.apellido = APELLIDO,
-                data.cedula = CEDULA,
+                data.identificacion = IDENTIFICACION,
                 data.proceso = PROCESOS,
                 data.observacion = 'no registrado';
 
@@ -1033,9 +1033,9 @@ class ProcesoControlador {
                 data.apellido = '-';
               }
 
-              if (CEDULA == undefined) {
-                data.cedula = 'No registrado';
-                data.observacion = 'Cédula ' + data.observacion;
+              if (IDENTIFICACION == undefined) {
+                data.identificacion = 'No registrado';
+                data.observacion = 'Identificación ' + data.observacion;
               }
 
               if (PROCESOS == undefined) {
@@ -1065,9 +1065,9 @@ class ProcesoControlador {
           if (item.observacion == 'no registrado') {
             const VERIFICAR_IDEMPLEADO = await pool.query(
               `
-              SELECT id FROM eu_empleados WHERE cedula = $1
+              SELECT id FROM eu_empleados WHERE identificacion = $1
               `
-              , [item.cedula.trim()]);
+              , [item.identificacion.trim()]);
 
             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
 
@@ -1097,7 +1097,7 @@ class ProcesoControlador {
                 } else {
                   if (item.observacion == 'no registrado') {
                     // DISCRIMINACION DE ELEMENTOS IGUALES
-                    if (duplicados.find((p: any) => (p.cedula.trim() === item.cedula.trim())
+                    if (duplicados.find((p: any) => (p.identificacion.trim() === item.identificacion.trim())
                     ) == undefined) {
                       duplicados.push(item);
                     } else {
@@ -1111,7 +1111,7 @@ class ProcesoControlador {
               }
 
             } else {
-              item.observacion = 'La cédula ingresada no esta registrada en el sistema'
+              item.observacion = 'La identificación ingresada no esta registrada en el sistema'
             }
 
           }
@@ -1178,7 +1178,7 @@ class ProcesoControlador {
     try {
       for (const item of plantilla) {
 
-        const { cedula, proceso } = item;
+        const { identificacion, proceso } = item;
 
         await pool.query('BEGIN');
         const VERIFICAR_IDPROCESO = await pool.query(
@@ -1195,9 +1195,9 @@ class ProcesoControlador {
         await pool.query('BEGIN');
         const VERIFICAR_IDEMPLEADO = await pool.query(
           `
-          SELECT id FROM eu_empleados WHERE cedula = $1
+          SELECT id FROM eu_empleados WHERE identificacion = $1
           `
-          , [cedula.trim()]);
+          , [identificacion.trim()]);
 
         const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
         // FINALIZAR TRANSACCION

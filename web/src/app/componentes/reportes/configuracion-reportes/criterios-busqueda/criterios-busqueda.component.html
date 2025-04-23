@@ -171,13 +171,13 @@
         <div class="col-md">
             <div class="d-flex flex-wrap justify-content-center">
             <mat-form-field>
-                <mat-label>Cédula</mat-label>
+                <mat-label>Identificación</mat-label>
                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 6)"
                 oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                 [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
                 <mat-icon matSuffix matTooltipPosition="right"
-                matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                matTooltip="Búsqueda de datos de empleado por número de identificación.">help_outline</mat-icon>
             </mat-form-field>
             </div>
         </div>
@@ -218,14 +218,14 @@
                 </mat-icon>
             </mat-form-field>
             <mat-form-field>
-                <mat-label>Cédula</mat-label>
+                <mat-label>Identificación</mat-label>
                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 9)"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                     [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
                 </mat-error>
                 <mat-icon matSuffix matTooltipPosition="right"
-                    matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
+                    matTooltip="Búsqueda de datos de empleado por número de identificación.">
                     help_outline
                 </mat-icon>
             </mat-form-field>
@@ -253,14 +253,14 @@
                 </mat-icon>
             </mat-form-field>
             <mat-form-field>
-                <mat-label>Cédula</mat-label>
+                <mat-label>Identificación</mat-label>
                 <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 12)"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                     [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
                 </mat-error>
                 <mat-icon matSuffix matTooltipPosition="right"
-                    matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
+                    matTooltip="Búsqueda de datos de empleado por número de identificación.">
                     help_outline
                 </mat-icon>
             </mat-form-field>

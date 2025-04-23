@@ -32,7 +32,7 @@ export interface SolicitudElemento {
   apellido: string;
   hora_fin: string;
   nombre: string;
-  cedula: string;
+  identificacion: string;
   codigo: number;
   id: number;
 }

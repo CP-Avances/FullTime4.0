@@ -560,7 +560,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -871,7 +871,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           if(obj3.control){
             datos.push([
               n++,
-              empl.cedula,
+              empl.identificacion,
               empl.codigo,
               empl.apellido + ' ' + empl.nombre,
               empl.ciudad,
@@ -896,7 +896,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           }else{
             datos.push([
               n++,
-              empl.cedula,
+              empl.identificacion,
               empl.codigo,
               empl.apellido + ' ' + empl.nombre,
               empl.ciudad,
@@ -961,7 +961,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
       { key: "ciudad", width: 20 },
@@ -986,7 +986,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -1103,7 +1103,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           n = n + 1;
           const ele = {
             n,
-            cedula: empl.cedula,
+            identificacion: empl.identificacion,
             codigo: empl.codigo,
             empleado: empl.apellido + ' ' + empl.nombre,
             ciudad: empl.ciudad,

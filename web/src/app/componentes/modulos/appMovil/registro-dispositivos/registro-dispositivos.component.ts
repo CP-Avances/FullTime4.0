@@ -402,8 +402,8 @@ export class RegistroDispositivosComponent implements OnInit {
               [
                 { text: 'N#', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Codigo', style: 'tableHeader' },
-                { text: 'Cedula', style: 'tableHeader' },
+                { text: 'Código', style: 'tableHeader' },
+                { text: 'Identificación', style: 'tableHeader' },
                 { text: 'Id dispositivo', style: 'tableHeader' },
                 { text: 'Modelo dispositivo', style: 'tableHeader' },
               ],
@@ -412,7 +412,7 @@ export class RegistroDispositivosComponent implements OnInit {
                   { text: count++, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.codigo, style: 'itemsTableC' },
-                  { text: obj.cedula, style: 'itemsTableC' },
+                  { text: obj.identificacion, style: 'itemsTableC' },
                   { text: obj.id_dispositivo, style: 'itemsTable' },
                   { text: obj.modelo_dispositivo, style: 'itemsTable' },
                 ];
@@ -445,7 +445,7 @@ export class RegistroDispositivosComponent implements OnInit {
         n++,
         obj.codigo,
         obj.nombre,
-        obj.cedula,
+        obj.identificacion,
         obj.id_dispositivo,
         obj.modelo_dispositivo,
       ]);
@@ -486,7 +486,7 @@ export class RegistroDispositivosComponent implements OnInit {
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
       { key: "nombre", width: 20 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "id_dispositivo", width: 50 },
       { key: "modelo_dispositivo", width: 30 },
     ];
@@ -495,7 +495,7 @@ export class RegistroDispositivosComponent implements OnInit {
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
-      { name: "CEDULA", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "ID_DIPOSITIVO", totalsRowLabel: "", filterButton: true },
       { name: "MODELO DISPOSITIVO", totalsRowLabel: "", filterButton: true },
     ]
@@ -562,7 +562,7 @@ export class RegistroDispositivosComponent implements OnInit {
       { header: 'N#', key: 'n', width: 10 },
       { header: 'CODIGO', key: 'codigo', width: 30 },
       { header: 'NOMBRE', key: 'nombre', width: 15 },
-      { header: 'CEDULA', key: 'cedula', width: 15 },
+      { header: 'IDENTIFICACION', key: 'identificacion', width: 15 },
       { header: 'ID DISPOSITIVOS', key: 'id_dispositivo', width: 15 },
       { header: 'MODELO', key: 'modelo_dispositivo', width: 15 },
 
@@ -575,7 +575,7 @@ export class RegistroDispositivosComponent implements OnInit {
         'n': cont++,
         "codigo": obj.codigo,
         "nombre": obj.nombre,
-        "cedula": obj.cedula,
+        "identificacion": obj.identificacion,
         "id_dispositivo": obj.id_dispositivo,
         "modelo_dispositivo": obj.modelo_dispositivo,
       })
@@ -605,7 +605,7 @@ export class RegistroDispositivosComponent implements OnInit {
       objeto = {
         "dispositivo": {
           "$": { "codigo": obj.codigo },
-          "cedula": obj.cedula,
+          "identificacion": obj.identificacion,
           "id_dispositivo": obj.id_dispositivo,
           "modelo_dispositivo": obj.modelo_dispositivo,
         }

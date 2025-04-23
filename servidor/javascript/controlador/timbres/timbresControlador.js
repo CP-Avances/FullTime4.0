@@ -182,25 +182,25 @@ class TimbresControlador {
     ObtenertimbreFechaEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { codigo, cedula, fecha } = req.query;
+                let { codigo, identificacion, fecha } = req.query;
                 fecha = fecha + '%';
                 if (codigo === '') {
                     let usuario = yield database_1.default.query(`
                     SELECT * FROM informacion_general    
-                    WHERE cedula = $1
-                    `, [cedula]).then((result) => {
+                    WHERE identificacion = $1
+                    `, [identificacion]).then((result) => {
                         return result.rows.map((obj) => {
                             codigo = obj.codigo;
                         });
                     });
                 }
-                else if (cedula === '') {
+                else if (identificacion === '') {
                     let usuario = yield database_1.default.query(`
                     SELECT * FROM informacion_general 
                     WHERE codigo = $1
                     `, [codigo]).then((result) => {
                         return result.rows.map((obj) => {
-                            cedula = obj.cedula;
+                            identificacion = obj.identificacion;
                         });
                     });
                 }
@@ -215,8 +215,8 @@ class TimbresControlador {
                 WHERE t.codigo = $1 
                     AND CAST(t.fecha_hora_timbre_validado AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
-                    AND da.cedula = $3
-                `, [codigo, fecha, cedula]).then((result) => {
+                    AND da.identificacion = $3
+                `, [codigo, fecha, identificacion]).then((result) => {
                     timbresRows = result.rowCount;
                     if (result.rowCount != 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
@@ -907,7 +907,7 @@ class TimbresControlador {
     BuscarMultipleOpcionesTimbre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
-            const OPCIONES = yield database_1.default.query("SELECT e.nombre, e.apellido, e.cedula, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
+            const OPCIONES = yield database_1.default.query("SELECT e.nombre, e.apellido, e.identificacion, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
                 "   om.timbre_foto, om.timbre_especial, om.timbre_ubicacion_desconocida, om.opcional_obligatorio " +
                 "FROM mrv_opciones_marcacion AS om, eu_empleados AS e " +
                 "WHERE e.id = om.id_empleado AND om.id_empleado IN (" + id_empleado + ") ");

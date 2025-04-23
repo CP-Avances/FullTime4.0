@@ -335,7 +335,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
             default: accionT = '9'; break;
           }
           let ele = {
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             accion: accionT,
             fecha_hora: `${servidor_fecha} ${servidor_hora}`,
           }
@@ -355,7 +355,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   ExportarDatos() {
     const txt = this.timbres.map((timbre: TimbreMrl) => {
       return [
-        timbre.cedula,
+        timbre.identificacion,
         timbre.accion,
         timbre.fecha_hora,
       ].join(";");

@@ -51,7 +51,7 @@ export interface dep {
 
 export interface emp {
     id: number,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     cargo?: string,
     genero?: string | number,
@@ -97,7 +97,7 @@ export interface emp_puntualidad {
     id: number,
     color: string
     cargo?: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     contrato?: string,
@@ -123,7 +123,7 @@ interface dep_tim {
 interface emp_tim {
     id: number,
     cargo?: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     timbres?: Array<timbre> | Array <tim_tabulado>,
@@ -168,7 +168,7 @@ interface dep_tim_inc {
 interface emp_tim_inc {
     id: number,
     cargo?: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     timbres?: Array<tim_Imcompleto>,

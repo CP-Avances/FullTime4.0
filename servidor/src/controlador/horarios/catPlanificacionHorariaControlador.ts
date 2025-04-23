@@ -78,11 +78,11 @@ class PlanificacionHorariaControlador {
 
             // ESTRUCTURAR PLANTILLA PLANIFICACION HORARIA
             let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data: any) => {
-                let nuevoObjeto: { cedula: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { cedula: data.CEDULA, dias: {} };
+                let nuevoObjeto: { identificacion: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { identificacion: data.IDENTIFICACION, dias: {} };
 
                 // AGREGAR COLUMNAS DE LA PLANTILLA COMO DIAS AL HORARIO
                 for (let propiedad in data) {
-                    if (propiedad !== 'EMPLEADO' && propiedad !== 'CEDULA') {
+                    if (propiedad !== 'EMPLEADO' && propiedad !== 'IDENTIFICACION') {
                         let [diaSemana, fecha] = propiedad.split(', ');
                         let [dia, mes, ano] = fecha.split('/');
                         let fechaFormateada = `${ano}-${mes}-${dia}`;
@@ -95,24 +95,24 @@ class PlanificacionHorariaControlador {
 
             // VERIFICAR EMPLEADO, HORARIOS Y SOBREPOSICION DE HORARIOS
             for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
-                let { cedula: cedula } = data;
+                let { identificacion: identificacion } = data;
 
-                cedula = cedula.toString();
+                identificacion = identificacion.toString();
 
                 // VERIFICAR DATO REQUERIDO EMPLEADO
-                if (!cedula) {
-                    data.observacion = 'Datos no registrados: CEDULA';
+                if (!identificacion) {
+                    data.observacion = 'Datos no registrados: IDENTIFICACION';
                     continue;
                 }
 
                 // VERIFICAR EMPLEADO DUPLICADO
-                if (plantillaPlanificacionHorariaEstructurada.filter((d: any) => d.usuario === cedula).length > 1) {
+                if (plantillaPlanificacionHorariaEstructurada.filter((d: any) => d.usuario === identificacion).length > 1) {
                     data.observacion = 'Empleado duplicado';
                     continue;
                 }
 
                 // VERIFICAR EXISTENCIA DE EMPLEADO
-                const empleadoVerificado = await VerificarEmpleado(cedula);
+                const empleadoVerificado = await VerificarEmpleado(identificacion);
 
                 if (!empleadoVerificado[0]) {
                     data.observacion = empleadoVerificado[2];
@@ -124,7 +124,7 @@ class PlanificacionHorariaControlador {
                     data.id_empl_cargo = empleadoVerificado[1].id_cargo;
                     data.nombre_usuario = `${empleadoVerificado[1].nombre} ${empleadoVerificado[1].apellido}`;
                     data.hora_trabaja = ConvertirHorasAMinutos(empleadoVerificado[1].hora_trabaja);
-                    data.cedula_empleado = empleadoVerificado[1].cedula;
+                    data.cedula_empleado = empleadoVerificado[1].identificacion;
 
                     const feriados = await ConsultarFeriados(fechaInicial, fechaFinal, empleadoVerificado[1].id);
                     // consultar fechas del mes desde inicil hasta final si en data.dias falta alguna fecha agregarla con el codigo DEFAULT-FERIADO si es feriado si no omitir y no agregar a data.dias
@@ -437,7 +437,7 @@ class PlanificacionHorariaControlador {
 }
 
 // FUNCION PARA VERIFICAR EXISTENCIA DE EMPLEADO EN LA BASE DE DATOS
-async function VerificarEmpleado(cedula: string): Promise<[boolean, any, string]> {
+async function VerificarEmpleado(identificacion: string): Promise<[boolean, any, string]> {
     try {
         let observacion = '';
         let empleadoValido = false;
@@ -445,9 +445,9 @@ async function VerificarEmpleado(cedula: string): Promise<[boolean, any, string]
         const empleado = await pool.query(`
             SELECT e.*, dae.id_cargo, dae.hora_trabaja 
             FROM eu_empleados e 
-            LEFT JOIN informacion_general dae ON e.cedula = dae.cedula 
-            WHERE LOWER(e.cedula) = $1
-        `, [cedula.toLowerCase()]);
+            LEFT JOIN informacion_general dae ON e.identificacion = dae.identificacion 
+            WHERE LOWER(e.identificacion) = $1
+        `, [identificacion.toLowerCase()]);
 
         if (empleado.rowCount === 0) {
             observacion = 'Empleado no válido';

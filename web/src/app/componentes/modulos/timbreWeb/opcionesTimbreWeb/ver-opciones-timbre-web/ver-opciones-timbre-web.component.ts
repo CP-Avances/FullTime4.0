@@ -408,7 +408,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
             body: [
               [
                 { rowSpan: 2, text: 'N°', style: 'cabeceras' },
-                { rowSpan: 2, text: 'CÉDULA', style: 'cabeceras' },
+                { rowSpan: 2, text: 'IDENTIFICACIÓN', style: 'cabeceras' },
                 { rowSpan: 2, text: 'CÓDIGO', style: 'cabeceras' },
                 { rowSpan: 2, text: 'EMPLEADO', style: 'cabeceras' },
                 { rowSpan: 2, text: 'GÉNERO', style: 'cabeceras' },
@@ -446,7 +446,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
                 console.log(genero)
                 return [
                   { style: 'itemsTableCentrado', text: obj.n },
-                  { style: 'itemsTable', text: obj.cedula },
+                  { style: 'itemsTable', text: obj.identificacion },
                   { style: 'itemsTableCentrado', text: obj.codigo },
                   { style: 'itemsTable', text: obj.apellido + ' ' + obj.nombre },
                   { style: 'itemsTableCentrado', text: genero },
@@ -501,7 +501,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
 
       datos.push([
         n++,
-        usu.cedula,
+        usu.identificacion,
         usu.codigo,
         usu.apellido,
         usu.nombre,
@@ -551,7 +551,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apellido", width: 20 },
       { key: "nombre", width: 20 },
@@ -568,7 +568,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },

@@ -2,11 +2,11 @@ import pool from '../database';
 import path from 'path';
 
 // METODO PARA OBTENER RUTAS ORIGINALES
-export const ObtenerRuta = async function (codigo: string, cedula: string, directorio: string) {
+export const ObtenerRuta = async function (codigo: string, identificacion: string, directorio: string) {
     let ruta = '';
     let separador = path.sep;
     ruta = path.join(__dirname, `..${separador}..`);
-    return `${ruta}${separador}${directorio}${separador}${codigo}_${cedula}`;
+    return `${ruta}${separador}${directorio}${separador}${codigo}_${identificacion}`;
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
@@ -15,11 +15,11 @@ export const ObtenerRutaUsuario = async function (id: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `
         , [id]);
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+    return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CARNET VACUNAS
@@ -28,11 +28,11 @@ export const ObtenerRutaVacuna = async function (id: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `
         , [id]);
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+    return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE PERMISOS
@@ -41,11 +41,11 @@ export const ObtenerRutaPermisos = async function (codigo: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT cedula FROM eu_empleados WHERE codigo = $1
+        SELECT identificacion FROM eu_empleados WHERE codigo = $1
         `
         , [codigo]);
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
+    return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].identificacion;
 }
 
 export const ObtenerRutaPermisosIdEmpleado = async function (id_empleado: any) {
@@ -53,12 +53,12 @@ export const ObtenerRutaPermisosIdEmpleado = async function (id_empleado: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `
         , [id_empleado]);
     ruta = path.join(__dirname, `..${separador}..`);
     const codigo = usuario.rows[0].codigo;
-    const carpetaPermisos = `${ruta}${separador}permisos${separador}${codigo}_${usuario.rows[0].cedula}`;
+    const carpetaPermisos = `${ruta}${separador}permisos${separador}${codigo}_${usuario.rows[0].identificacion}`;
     return { carpetaPermisos, codigo };
 }
 // METODO PARA OBTENER RUTA CARPETA DE PERMISOS GENERAL
@@ -75,12 +75,12 @@ export const ObtenerRutaHorasExtraIdEmpleado = async function (id_empleado: any)
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `
         , [id_empleado]);
     ruta = path.join(__dirname, `..${separador}..`);
     const codigo = usuario.rows[0].codigo;
-    const carpetaHorasExtra = `${ruta}${separador}horasExtra${separador}${codigo}_${usuario.rows[0].cedula}`;
+    const carpetaHorasExtra = `${ruta}${separador}horasExtra${separador}${codigo}_${usuario.rows[0].identificacion}`;
     return { carpetaHorasExtra, codigo };
 }
 
@@ -97,11 +97,11 @@ export const ObtenerRutaHorasExtra = async function (codigo: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT cedula FROM eu_empleados WHERE codigo = $1
+        SELECT identificacion FROM eu_empleados WHERE codigo = $1
         `
         , [codigo]);
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'horasExtras' + separador + codigo + '_' + usuario.rows[0].cedula;
+    return ruta + separador + 'horasExtras' + separador + codigo + '_' + usuario.rows[0].identificacion;
 }
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
@@ -110,11 +110,11 @@ export const ObtenerRutaContrato = async function (id: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `
         , [id]);
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+    return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
 }
 
 export const ObtenerRutaHorarios = function () {

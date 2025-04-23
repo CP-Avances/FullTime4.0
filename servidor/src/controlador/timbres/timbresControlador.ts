@@ -168,21 +168,21 @@ class TimbresControlador {
     // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA     **USADO
     public async ObtenertimbreFechaEmple(req: Request, res: Response): Promise<any> {
         try {
-            let { codigo, cedula, fecha } = req.query;
+            let { codigo, identificacion, fecha } = req.query;
             fecha = fecha + '%';
             if (codigo === '') {
                 let usuario = await pool.query(
                     `
                     SELECT * FROM informacion_general    
-                    WHERE cedula = $1
+                    WHERE identificacion = $1
                     `
-                    , [cedula]).then((result: any) => {
+                    , [identificacion]).then((result: any) => {
                         return result.rows.map((obj: any) => {
                             codigo = obj.codigo;
                         });
                     }
                     );
-            } else if (cedula === '') {
+            } else if (identificacion === '') {
                 let usuario = await pool.query(
                     `
                     SELECT * FROM informacion_general 
@@ -190,7 +190,7 @@ class TimbresControlador {
                     `
                     , [codigo]).then((result: any) => {
                         return result.rows.map((obj: any) => {
-                            cedula = obj.cedula;
+                            identificacion = obj.identificacion;
                         });
                     }
                     );
@@ -209,9 +209,9 @@ class TimbresControlador {
                 WHERE t.codigo = $1 
                     AND CAST(t.fecha_hora_timbre_validado AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
-                    AND da.cedula = $3
+                    AND da.identificacion = $3
                 `
-                , [codigo, fecha, cedula]).then((result: any) => {
+                , [codigo, fecha, identificacion]).then((result: any) => {
                     timbresRows = result.rowCount;
                     if (result.rowCount != 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
@@ -1007,7 +1007,7 @@ class TimbresControlador {
 
         const { id_empleado } = req.body;
         const OPCIONES = await pool.query(
-            "SELECT e.nombre, e.apellido, e.cedula, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
+            "SELECT e.nombre, e.apellido, e.identificacion, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
             "   om.timbre_foto, om.timbre_especial, om.timbre_ubicacion_desconocida, om.opcional_obligatorio " +
             "FROM mrv_opciones_marcacion AS om, eu_empleados AS e " +
             "WHERE e.id = om.id_empleado AND om.id_empleado IN (" + id_empleado + ") "

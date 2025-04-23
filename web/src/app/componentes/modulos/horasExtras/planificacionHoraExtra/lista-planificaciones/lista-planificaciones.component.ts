@@ -33,7 +33,7 @@ export interface PlanificacionHE {
   codigo: number;
   id: number;
   correo: string;
-  cedula: string;
+  identificacion: string;
 }
 
 @Component({
@@ -323,7 +323,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -394,7 +394,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       console.log('ver datos seleccionados', obj)
 
       // LECTURA DE NOMBRES DE USUARIOS
-      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
+      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.identificacion + '</th></tr>';
 
       // LECTURA DE DATOS DE LA PLANIFICACION
       const desde_ = DateTime.fromISO(obj.fecha_desde).setLocale('es').toFormat('cccc');

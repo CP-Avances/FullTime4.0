@@ -1,6 +1,6 @@
 export interface IReporteEmpleados {
     cargo: boolean;
-    cedula: boolean;
+    identificacion: boolean;
     codigo: boolean;
     depart: boolean;
     detall: boolean;
@@ -9,7 +9,7 @@ export interface IReporteEmpleados {
 }
 
 export interface IRestListEmpl {
-    cedula: string;
+    identificacion: string;
     nom_completo: string;
     codigo?: string;
     departamento?: string;
@@ -80,7 +80,7 @@ export interface ITableEmpleados {
     nombre: string,
     codigo?: string,
     apellido?: string,
-    cedula?: string,
+    identificacion?: string,
     id_usucursal?: number,
     id_suc?: number,
     id_regimen?: number,
@@ -119,7 +119,7 @@ export interface dep {
 export interface emp {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     correo?: string,
     timbres?: Array<tim>,
@@ -166,7 +166,7 @@ interface departamento {
 interface empleado {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number
     timbres?: Array<hora_trab>,
     genero?: string | number,
@@ -210,7 +210,7 @@ export interface dep_puntualidad {
 export interface emp_puntualidad {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     cargo?: string,
@@ -221,7 +221,7 @@ export interface emp_puntualidad {
 
 export interface model_pdf_puntualidad {
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     ciudad: string,
     name_dep: string,
@@ -251,7 +251,7 @@ interface dep_tim {
 interface emp_tim {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     cargo?: string,
@@ -278,7 +278,7 @@ export interface tim_tabulado {
 }
 
 export interface TimbreMrl {
-    cedula: string,
+    identificacion: string,
     fecha_hora: string,
     accion: string
 }
@@ -303,7 +303,7 @@ interface dep_tim_inc {
 interface emp_tim_inc {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     cargo?: string,
@@ -365,7 +365,7 @@ interface dep_vac {
 interface emp_vac {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     cargo?: string,
@@ -398,7 +398,7 @@ interface depa_vac {
 interface emp_vac {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     cargo?: string,
@@ -431,7 +431,7 @@ interface depa_he {
 interface emp_he {
     id: number,
     name_empleado: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     cargo?: string,

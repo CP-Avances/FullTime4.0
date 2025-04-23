@@ -246,7 +246,7 @@ function CargoContratoByFecha(id_empleado, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const cargo_contrato = yield database_1.default.query(`
-            SELECT (e.nombre || \' \' || e.apellido) as nombre, e.codigo, e.cedula, ca.id AS id_cargo, ca.fecha_inicio, 
+            SELECT (e.nombre || \' \' || e.apellido) as nombre, e.codigo, e.identificacion, ca.id AS id_cargo, ca.fecha_inicio, 
                 ca.fecha_final, co.id AS id_contrato, ca.sueldo, ca.hora_trabaja 
             FROM eu_empleados AS e, eu_empleado_contratos AS co, eu_empleado_cargos AS ca 
             WHERE e.id = co.id_empleado AND co.id_empleado = $1 

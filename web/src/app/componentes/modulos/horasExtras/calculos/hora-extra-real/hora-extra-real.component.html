@@ -27,7 +27,7 @@
                                     help_outline</mat-icon>
                             </mat-form-field>
                             <mat-form-field>
-                                <mat-label>Ingresar Cédula</mat-label>
+                                <mat-label>Ingresar Identificación</mat-label>
                                 <input matInput placeholder="Ej: "  maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
@@ -35,7 +35,7 @@
                                 </mat-error>
                                 <mat-icon id="iemple" matSuffix matTooltipPosition="right"
                                     
-                                    matTooltip="Búsqueda de empleado por la cédula de identificación o pasaporte">
+                                    matTooltip="Búsqueda de empleado por número de identificación.">
                                     help_outline</mat-icon>
                             </mat-form-field>
                             <mat-form-field>
@@ -125,7 +125,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
@@ -138,7 +138,7 @@
                 <tbody>
                     <tr
                         *ngFor="let d of datosTotales | filtroCodigo: codigo.value | emplCedula: cedula.value | filtrosNombres: nombre.value | nombreCompleto: apellido.value  | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{d.cedula}}</td>
+                        <td>{{d.identificacion}}</td>
                         <th scope="row">{{d.codigo}}</th>
                         <td>{{d.apellido}}</td>
                         <td>{{d.nombre}}</td>

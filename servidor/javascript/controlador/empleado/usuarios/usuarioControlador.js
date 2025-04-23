@@ -459,7 +459,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const DISPOSITIVOS = yield database_1.default.query(`
-        SELECT e.codigo, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
+        SELECT e.codigo, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nombre, e.identificacion, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
         INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
@@ -543,7 +543,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const correo = req.body.correo;
             const url_page = req.body.url_page;
-            const cedula = req.body.cedula;
+            const identificacion = req.body.identificacion;
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
@@ -553,10 +553,10 @@ class UsuarioControlador {
             const correoValido = yield database_1.default.query(`
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2  AND u.frase IS NOT NULL 
-      `, [correo, cedula]);
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2  AND u.frase IS NOT NULL 
+      `, [correo, identificacion]);
             if (correoValido.rows[0] == undefined)
-                return res.status(401).send('Correo o cédula o frase de usuario no válido.');
+                return res.status(401).send('Correo o identificación o frase de usuario no válido.');
             var datos = yield (0, settingsMail_1.Credenciales)(1);
             if (datos === 'ok') {
                 const token = jsonwebtoken_1.default.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail', { expiresIn: 60 * 5, algorithm: 'HS512' });
@@ -1000,7 +1000,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const query = `
-        SELECT e.cedula, e.codigo, e.nombre, e.apellido,
+        SELECT e.identificacion, e.codigo, e.nombre, e.apellido,
                (e.apellido || ' ' || e.nombre) AS fullname,
                e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol,
                e.domicilio, e.ciudad, e.name_suc, e.name_dep, e.name_regimen,

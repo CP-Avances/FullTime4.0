@@ -749,7 +749,7 @@ class NotificacionTiempoRealControlador {
 
       const USUARIO_ENVIA = await pool.query(
         `
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1
@@ -998,7 +998,7 @@ class NotificacionTiempoRealControlador {
 
       const USUARIO_ENVIA = await pool.query(
         `
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1 
@@ -1082,7 +1082,7 @@ class NotificacionTiempoRealControlador {
 
       const query =
         `
-            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.identificacion,
             da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
             (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
             (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal

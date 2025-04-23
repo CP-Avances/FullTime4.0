@@ -339,7 +339,7 @@ export class AlimentosInvitadosComponent implements OnInit {
           [
             { text: 'TICKET', style: 'centrado' },
             { text: 'INVITADO', style: 'centrado' },
-            { text: 'CÉDULA', style: 'centrado' },
+            { text: 'IDENTIFICACIÓN', style: 'centrado' },
             { text: 'TIPO COMIDA', style: 'centrado' },
             { text: 'MENÚ', style: 'centrado' },
             { text: 'PLATO', style: 'centrado' },

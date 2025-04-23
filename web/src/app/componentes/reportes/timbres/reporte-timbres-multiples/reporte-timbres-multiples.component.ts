@@ -501,7 +501,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -673,7 +673,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           if (this.timbreDispositivo) {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.ciudad,
@@ -695,7 +695,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           } else {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.ciudad,
@@ -753,7 +753,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "ciudad", width: 20 },
@@ -775,7 +775,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -847,7 +847,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "ciudad", width: 20 },
@@ -866,7 +866,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -967,7 +967,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           }
           let ele = {
             n: n,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             codigo: usu.codigo,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,

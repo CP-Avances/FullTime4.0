@@ -333,12 +333,12 @@ DesactivarFinContratoEmpleado();
 export const io = SERVIDOR.io;
 
 setInterval(async () => {
-    atrasosDiarios();
-    atrasosSemanal();
-    faltasDiarios();
-    faltasSemanal();
-    salidasAnticipadasSemanal();
-    salidasAnticipadasDiarios();
+    //atrasosDiarios();
+    //atrasosSemanal();
+    //faltasDiarios();
+    //faltasSemanal();
+    //salidasAnticipadasSemanal();
+    //salidasAnticipadasDiarios();
 }, 2700000);
 
 // LLAMA AL MEODO DE CUMPLEAÑOS

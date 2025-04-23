@@ -23,7 +23,7 @@ class PlanComidasControlador {
     EncontrarSolicitaComidaNull(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PLAN_COMIDAS = yield database_1.default.query(`
-      SELECT e.apellido, e.nombre, e.cedula, e.codigo, sc.aprobada, sc.id, sc.id_empleado, sc.fecha, sc.observacion, 
+      SELECT e.apellido, e.nombre, e.identificacion, e.codigo, sc.aprobada, sc.id, sc.id_empleado, sc.fecha, sc.observacion, 
         sc.fecha_comida, sc.hora_inicio, sc.hora_fin, sc.aprobada, sc.verificar, ctc.id AS id_menu, 
         ctc.nombre AS nombre_menu, tc.id AS id_servicio, tc.nombre AS nombre_servicio, dm.id AS id_detalle, dm.valor, 
         dm.nombre AS nombre_plato, dm.observacion AS observa_menu, sc.extra 
@@ -43,7 +43,7 @@ class PlanComidasControlador {
     EncontrarSolicitaComidaAprobada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PLAN_COMIDAS = yield database_1.default.query(`
-      SELECT e.apellido, e.nombre, e.cedula, e.codigo, sc.aprobada, sc.id, sc.id_empleado, sc.fecha, sc.observacion, 
+      SELECT e.apellido, e.nombre, e.identificacion, e.codigo, sc.aprobada, sc.id, sc.id_empleado, sc.fecha, sc.observacion, 
         sc.fecha_comida, sc.hora_inicio, sc.hora_fin, sc.aprobada, sc.verificar, ctc.id AS id_menu, 
         ctc.nombre AS nombre_menu, tc.id AS id_servicio, tc.nombre AS nombre_servicio, dm.id AS id_detalle, dm.valor, 
         dm.nombre AS nombre_plato, dm.observacion AS observa_menu, sc.extra 
@@ -63,7 +63,7 @@ class PlanComidasControlador {
     EncontrarSolicitaComidaExpirada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PLAN_COMIDAS = yield database_1.default.query(`
-      SELECT e.apellido, e.nombre, e.cedula, e.codigo, sc.aprobada, sc.id, sc.id_empleado, sc.fecha, sc.observacion, 
+      SELECT e.apellido, e.nombre, e.identificacion, e.codigo, sc.aprobada, sc.id, sc.id_empleado, sc.fecha, sc.observacion, 
         sc.fecha_comida, sc.hora_inicio, sc.hora_fin, sc.aprobada, sc.verificar, ctc.id AS id_menu, 
         ctc.nombre AS nombre_menu, tc.id AS id_servicio, tc.nombre AS nombre_servicio, dm.id AS id_detalle, dm.valor, 
         dm.nombre AS nombre_plato, dm.observacion AS observa_menu, sc.extra 
@@ -741,7 +741,7 @@ class PlanComidasControlador {
             const { id } = req.params;
             const PLAN_COMIDAS = yield database_1.default.query(`
       SELECT DISTINCT pc.id, pce.id_empleado, pc.fecha, pc.observacion, pc.fecha_inicio, pc.fecha_final, pc.hora_inicio, 
-        pc.hora_fin, (e.nombre || ' ' || e.apellido) AS nombre, e.codigo, e.cedula, e.correo, ctc.id AS id_menu, 
+        pc.hora_fin, (e.nombre || ' ' || e.apellido) AS nombre, e.codigo, e.identificacion, e.correo, ctc.id AS id_menu, 
         ctc.nombre AS nombre_menu, tc.id AS id_servicio, tc.nombre AS nombre_servicio, dm.id AS id_detalle, dm.valor, 
         dm.nombre AS nombre_plato, dm.observacion AS observa_menu, pc.extra 
       FROM ma_detalle_plan_comida AS pc, ma_empleado_plan_comida_general AS pce, ma_horario_comidas AS ctc, 
@@ -802,7 +802,7 @@ class PlanComidasControlador {
       SELECT DISTINCT pc.id, pce.id_empleado, pc.fecha, pc.observacion, pc.fecha_inicio, pc.fecha_final, pc.hora_inicio, 
         pc.hora_fin, ctc.id AS id_menu, ctc.nombre AS nombre_menu, tc.id AS id_servicio, tc.nombre AS nombre_servicio, 
         dm.id AS id_detalle, dm.valor, dm.nombre AS nombre_plato, dm.observacion AS observa_menu, pc.extra, e.codigo, 
-        e.cedula, e.correo, (e.nombre || ' ' || e.apellido) AS nombre
+        e.identificacion, e.correo, (e.nombre || ' ' || e.apellido) AS nombre
       FROM ma_detalle_plan_comida AS pc, ma_empleado_plan_comida_general AS pce, ma_horario_comidas AS ctc, 
         ma_cat_comidas AS tc, ma_detalle_comida AS dm, eu_empleados AS e 
 	    WHERE pce.id_empleado = $1 AND ctc.id_comida = tc.id AND ctc.id = dm.id_horario_comida AND pc.id_detalle_comida = dm.id 
@@ -892,7 +892,7 @@ class PlanComidasControlador {
                     tipo_servicio = 'Normal';
                 }
                 const EMPLEADO_SOLICITA = yield database_1.default.query(`
-        SELECT e.correo, e.nombre, e.apellido, e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, 
+        SELECT e.correo, e.nombre, e.apellido, e.identificacion, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, 
           tc.cargo AS tipo_cargo, d.nombre AS departamento 
         FROM eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, ed_departamentos AS d 
         WHERE (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
@@ -925,7 +925,7 @@ class PlanComidasControlador {
               <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${EMPLEADO_SOLICITA.rows[0].nombre} ${EMPLEADO_SOLICITA.rows[0].apellido} <br>
-              <b>Número de Cédula:</b> ${EMPLEADO_SOLICITA.rows[0].cedula} <br>
+              <b>Número de identificación:</b> ${EMPLEADO_SOLICITA.rows[0].identificacion} <br>
               <b>Cargo:</b> ${EMPLEADO_SOLICITA.rows[0].tipo_cargo} <br>
               <b>Departamento:</b> ${EMPLEADO_SOLICITA.rows[0].departamento} <br>
               <b>Generado mediante:</b> Aplicación Web <br>
@@ -1002,7 +1002,7 @@ class PlanComidasControlador {
                     tipo_servicio = 'Normal';
                 }
                 const EMPLEADO_SOLICITA = yield database_1.default.query(`
-          SELECT e.correo, e.nombre, e.apellido, e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, 
+          SELECT e.correo, e.nombre, e.apellido, e.identificacion, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, 
             tc.cargo AS tipo_cargo, d.nombre AS departamento 
           FROM eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, ed_departamentos AS d
           WHERE (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
@@ -1034,7 +1034,7 @@ class PlanComidasControlador {
               <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${EMPLEADO_SOLICITA.rows[0].nombre} ${EMPLEADO_SOLICITA.rows[0].apellido} <br>
-              <b>Número de Cédula:</b> ${EMPLEADO_SOLICITA.rows[0].cedula} <br>
+              <b>Número de identificación:</b> ${EMPLEADO_SOLICITA.rows[0].identificacion} <br>
               <b>Cargo:</b> ${EMPLEADO_SOLICITA.rows[0].tipo_cargo} <br>
               <b>Departamento:</b> ${EMPLEADO_SOLICITA.rows[0].departamento} <br>
               <b>Generado mediante:</b> Aplicación Móvil <br>
@@ -1113,7 +1113,7 @@ class PlanComidasControlador {
                     tipo_servicio = 'Normal';
                 }
                 const Envia = yield database_1.default.query(`
-        SELECT da.nombre, da.apellido, da.cedula, da.correo, da.name_cargo AS tipo_cargo, 
+        SELECT da.nombre, da.apellido, da.identificacion, da.correo, da.name_cargo AS tipo_cargo, 
           da.name_dep AS departamento
         FROM informacion_general AS da
         WHERE da.id = $1
@@ -1142,7 +1142,7 @@ class PlanComidasControlador {
               <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${Envia.nombre} ${Envia.apellido} <br>
-              <b>Número de Cédula:</b> ${Envia.cedula} <br>
+              <b>Número de identificación:</b> ${Envia.identificacion} <br>
               <b>Cargo:</b> ${Envia.tipo_cargo} <br>
               <b>Departamento:</b> ${Envia.departamento} <br>
               <b>Generado mediante:</b> Aplicación Web <br>
@@ -1168,7 +1168,7 @@ class PlanComidasControlador {
             <table border=2 cellpadding=10 cellspacing=0 style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px;">
               <tr>
                 <th><h5>COLABORADOR</h5></th> 
-                <th><h5>CÉDULA</h5></th> 
+                <th><h5>IDENTIFICACIÓN</h5></th> 
               </tr>            
               ${nombres} 
             </table>

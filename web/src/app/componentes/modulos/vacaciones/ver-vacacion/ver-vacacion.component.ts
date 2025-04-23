@@ -426,7 +426,7 @@ export class VerVacacionComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + this.datoSolicitud[0].apellido_emple, style: 'itemsTableD' }] },
               { text: [{ text: 'NOMBRES: ' + this.datoSolicitud[0].nombre_emple, style: 'itemsTableD' }] },
-              { text: [{ text: 'CÉDULA: ' + this.datoSolicitud[0].cedula, style: 'itemsTableD' }] }
+              { text: [{ text: 'IDENTIFICACIÓN: ' + this.datoSolicitud[0].identificacion, style: 'itemsTableD' }] }
             ]
           }],
           [{

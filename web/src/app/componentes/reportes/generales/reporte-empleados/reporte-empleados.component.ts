@@ -529,7 +529,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         body: [
           [
             { text: 'N°', style: 'tableHeader' },
-            { text: 'CÉDULA', style: 'tableHeader' },
+            { text: 'IDENTIFICACIÓN', style: 'tableHeader' },
             { text: 'CÓDIGO', style: 'tableHeader' },
             { text: 'EMPLEADO', style: 'tableHeader' },
             { text: 'USUARIO', style: 'tableHeader' },
@@ -546,7 +546,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
           ...arr_emp.map((usu: any) => {
             return [
               { style: 'itemsTableCentrado', text: arr_emp.indexOf(usu) + 1 },
-              { style: 'itemsTableCentrado', text: usu.cedula },
+              { style: 'itemsTableCentrado', text: usu.identificacion },
               { style: 'itemsTableCentrado', text: usu.codigo },
               { style: 'itemsTable', text: `${usu.apellido} ${usu.nombre}` },
               { style: 'itemsTableCentrado', text: usu.usuario },
@@ -614,7 +614,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
         datos.push([
           n++,
-          usu.cedula,
+          usu.identificacion,
           usu.codigo,
           usu.apellido,
           usu.nombre,
@@ -665,7 +665,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 30 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
@@ -683,7 +683,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },

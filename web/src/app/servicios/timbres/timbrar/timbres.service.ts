@@ -30,7 +30,7 @@ export class TimbresService {
   ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
-      .set('cedula', datos.cedula)
+      .set('identificacion', datos.identificacion)
       .set('fecha', datos.fecha)
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/timbresfechaemple`, { params });
   }

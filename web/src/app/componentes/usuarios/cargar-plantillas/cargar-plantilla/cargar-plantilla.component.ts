@@ -391,14 +391,14 @@ export class CargarPlantillaComponent implements OnInit {
     else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
     }
-    else if (observacion == 'Cédula no existe en el sistema' ||
+    else if (observacion == 'Identificación no existe en el sistema' ||
       observacion == 'Cargo no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema' ||
       observacion == 'Sucursal no existe en el sistema' ||
-      observacion == 'Cédula no tiene registrado un contrato') {
+      observacion == 'Identificación no tiene registrado un contrato') {
       return 'rgb(255, 192, 203)';
     }
-    else if (observacion == 'Registro duplicado (cédula)') {
+    else if (observacion == 'Registro duplicado (identificación)') {
       return 'rgb(156, 214, 255)';
     }
     else if (arrayObservacion[0] == 'Formato') {

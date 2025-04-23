@@ -1989,7 +1989,7 @@ export class PermisosMultiplesComponent implements OnInit {
               usuarios = {
                 estado: 'Pendiente',
                 codigo: empleadoValido.codigo,
-                cedula: empleadoValido.cedula,
+                identificacion: empleadoValido.identificacion,
                 empleado: empleadoValido.nombre,
                 dias_libres: empleadoValido.dias_libres,
                 departamento: empleadoValido.name_departamento,

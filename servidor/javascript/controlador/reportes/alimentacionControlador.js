@@ -107,7 +107,7 @@ class AlimentacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
             const DATOS = yield database_1.default.query(`
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo, 
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo, 
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -117,7 +117,7 @@ class AlimentacionControlador {
                 AND pc.extra = false AND pce.consumido = true AND e.id = pce.id_empleado AND 
                 pc.id = pce.id_detalle_plan AND pc.fecha BETWEEN $1 AND $2 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC
+                e.apellido, e.identificacion, e.codigo ORDER BY e.apellido ASC
             `, [fec_inicio, fec_final]);
             if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
@@ -131,7 +131,7 @@ class AlimentacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
             const DATOS = yield database_1.default.query(`
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo,
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo,
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -141,7 +141,7 @@ class AlimentacionControlador {
                 AND sc.extra = false AND pce.consumido = true AND e.id = sc.id_empleado AND 
                 sc.fecha_comida BETWEEN $1 AND $2  AND pce.id_solicitud_comida = sc.id 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo 
+                e.apellido, e.identificacion, e.codigo 
             ORDER BY e.apellido ASC
             `, [fec_inicio, fec_final]);
             if (DATOS.rowCount != 0) {
@@ -156,7 +156,7 @@ class AlimentacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
             const DATOS = yield database_1.default.query(`
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo, 
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo, 
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -166,7 +166,7 @@ class AlimentacionControlador {
                 AND pc.extra = true AND pce.consumido = true AND e.id = pce.id_empleado AND 
                 pc.id = pce.id_detalle_plan AND pc.fecha BETWEEN $1 AND $2 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo 
+                e.apellido, e.identificacion, e.codigo 
             ORDER BY e.apellido ASC
             `, [fec_inicio, fec_final]);
             if (DATOS.rowCount != 0) {
@@ -181,7 +181,7 @@ class AlimentacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
             const DATOS = yield database_1.default.query(`
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo,
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo,
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -191,7 +191,7 @@ class AlimentacionControlador {
                 AND sc.extra = true AND pce.consumido = true AND e.id = sc.id_empleado AND 
                 sc.fecha_comida BETWEEN $1 AND $2  AND pce.id_solicitud_comida = sc.id 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo 
+                e.apellido, e.identificacion, e.codigo 
             ORDER BY e.apellido ASC
             `, [fec_inicio, fec_final]);
             if (DATOS.rowCount != 0) {

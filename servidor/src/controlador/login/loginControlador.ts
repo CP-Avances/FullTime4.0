@@ -70,7 +70,7 @@ class LoginControlador {
 
           //FIXME
           `
-          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
+          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.identificacion, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `
           , [USUARIO.rows[0].id])
@@ -78,7 +78,7 @@ class LoginControlador {
             return result.rows
           });
 
-        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
+        const { empleado, usuario, codigo, web_access, nombre, apellido, identificacion, imagen, app_habilita } = ACTIVO[0];
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         console.log('verificar activo ', empleado, ' usu ', usuario)
         if (empleado === 2 && usuario === false) {
@@ -92,13 +92,6 @@ class LoginControlador {
 
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
         if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil" })
-
-        // BUSQUEDA DE MODULOS DEL SISTEMA
-        const [modulos] = await pool.query(
-          `
-          SELECT * FROM e_funciones LIMIT 1
-          `
-        ).then((result: any) => { return result.rows; })
 
         // BUSQUEDA DE CLAVE DE LICENCIA
         //FIXME
@@ -163,7 +156,6 @@ class LoginControlador {
             _empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            modulos: modulos,
             id_contrato: id_contrato
           }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
 
@@ -179,11 +171,10 @@ class LoginControlador {
             empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            modulos: modulos,
             id_contrato: id_contrato,
             nombre: nombre,
             apellido: apellido,
-            cedula: cedula,
+            identificacion: identificacion,
             imagen: imagen,
             codigo: codigo,
             ruc: ruc,
@@ -195,13 +186,12 @@ class LoginControlador {
           if (id_rol === 1) {
             const token = jwt.sign({
               _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente,
-              modulos: modulos
+              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente
             },
               process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
             return res.status(200).jsonp({
               caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-              empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos//, modulos: modulos
+              empresa: id_empresa, ip_adress: ip_cliente
             });
           }
           else {
@@ -222,7 +212,7 @@ class LoginControlador {
   public async EnviarCorreoContrasena(req: Request, res: Response) {
     const correo = req.body.correo;
     const url_page = req.body.url_page;
-    const cedula = req.body.cedula;
+    const identificacion = req.body.identificacion;
 
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
@@ -236,11 +226,11 @@ class LoginControlador {
       `
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2 
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2 
       `
-      , [correo, cedula]);
+      , [correo, identificacion]);
 
-    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o cédula de usuario no válido.');
+    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o identificación de usuario no válido.');
 
     var datos = await Credenciales(1);
 

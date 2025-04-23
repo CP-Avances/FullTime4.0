@@ -576,7 +576,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -700,7 +700,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         empl.vacunas.map((vac: any) => {
           datos.push([
             n++,
-            empl.cedula,
+            empl.identificacion,
             empl.codigo,
             empl.apellido + ' ' + empl.nombre,
             nombreGenero,
@@ -753,7 +753,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
       { key: "genero", width: 20 },
@@ -772,7 +772,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
@@ -862,7 +862,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           let ele = {
             n: n,
             id_empleado: vac.id,
-            cedula: vac.cedula,
+            identificacion: vac.identificacion,
             codigo: vac.codigo,
             empleado: vac.apellido + ' ' + vac.nombre,
             genero: nombreGenero,

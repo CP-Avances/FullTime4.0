@@ -296,11 +296,8 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
-const sendAtraso_1 = require("./libs/sendAtraso");
 const sendAniversario_1 = require("./libs/sendAniversario");
 const sendBirthday_1 = require("./libs/sendBirthday");
-const sendFaltas_1 = require("./libs/sendFaltas");
-const sendSalidasAnticipadas_1 = require("./libs/sendSalidasAnticipadas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
@@ -308,12 +305,12 @@ const sendSalidasAnticipadas_1 = require("./libs/sendSalidasAnticipadas");
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 exports.io = SERVIDOR.io;
 setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    (0, sendAtraso_1.atrasosDiarios)();
-    (0, sendAtraso_1.atrasosSemanal)();
-    (0, sendFaltas_1.faltasDiarios)();
-    (0, sendFaltas_1.faltasSemanal)();
-    (0, sendSalidasAnticipadas_1.salidasAnticipadasSemanal)();
-    (0, sendSalidasAnticipadas_1.salidasAnticipadasDiarios)();
+    //atrasosDiarios();
+    //atrasosSemanal();
+    //faltasDiarios();
+    //faltasSemanal();
+    //salidasAnticipadasSemanal();
+    //salidasAnticipadasDiarios();
 }), 2700000);
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendAniversario_1.aniversario)();

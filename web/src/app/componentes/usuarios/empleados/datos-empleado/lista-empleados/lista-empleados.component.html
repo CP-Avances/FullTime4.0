@@ -125,7 +125,7 @@
                                 [aria-label]="checkboxLabelDos()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
@@ -165,7 +165,7 @@
                                 [aria-label]="checkboxLabelDos(e)">
                             </mat-checkbox>
                         </td>
-                        <td>{{e.cedula}}</td>
+                        <td>{{e.identificacion}}</td>
                         <td scope="row">{{e.codigo}}</td>
                         <td>{{e.apellido}}</td>
                         <td>{{e.nombre}}</td>
@@ -254,7 +254,7 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
@@ -303,7 +303,7 @@
                                 [aria-label]="checkboxLabel(e)">
                             </mat-checkbox>
                         </td>
-                        <td>{{e.cedula}}</td>
+                        <td>{{e.identificacion}}</td>
                         <td scope="row">{{e.codigo}}</td>
                         <td>{{e.apellido}}</td>
                         <td>{{e.nombre}}</td>
@@ -373,7 +373,7 @@
                     <tr style="text-align: center;">
                         <th id="td_usuario" scope="col">Item</th>
                         <th id="td_usuario" scope="col">Observación</th>
-                        <th id="td_usuario" scope="col">Cédula</th>
+                        <th id="td_usuario" scope="col">Identificación</th>
                         <th id="td_usuario" scope="col" *ngIf="datosManuales">Código</th>
                         <th id="td_usuario" scope="col">Apellido</th>
                         <th id="td_usuario" scope="col">Nombre</th>
@@ -399,7 +399,7 @@
                             </div>
                             {{e.observacion}}
                         </td>
-                        <td [style.color]="EstiloTextoCelda(e.cedula)">{{e.cedula}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.identificacion)">{{e.identificacion}}</td>
                         <td [style.color]="EstiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
                         <td [style.color]="EstiloTextoCelda(e.apellido)">{{e.apellido}}</td>
                         <td [style.color]="EstiloTextoCelda(e.nombre)">{{e.nombre}}</td>

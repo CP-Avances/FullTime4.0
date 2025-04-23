@@ -445,12 +445,12 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
   // Estructura de los datos generales del empleado
   presentarDatosGenerales(id_seleccionado, form, fechasTotales) {
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -477,7 +477,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -861,13 +861,13 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   // Datos generales del PDF y sumatoria total de calculos realizados
   presentarDatosEmpleado(id_seleccionado, form) {
     // Inicialización de varibles
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA de los datos del empleado del cual se obtiene el reporte
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -892,7 +892,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -938,7 +938,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           CODIGO: this.datosEmpleado[i].codigo,
           NOMBRE: this.datosEmpleado[i].nombre,
           APELLIDO: this.datosEmpleado[i].apellido,
-          CEDULA: this.datosEmpleado[i].cedula,
+          IDENTIFICACION: this.datosEmpleado[i].cedula,
           SUCURSAL: this.datosEmpleado[i].sucursal,
           DEPARTAMENTO: this.datosEmpleado[i].departamento,
           CIUDAD: this.datosEmpleado[i].ciudad,

@@ -515,7 +515,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -691,7 +691,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
             'N°': n,
-            'Cédula': usu.cedula,
+            'Identificación': usu.identificacion,
             'Código': usu.codigo,
             'Nombre Empleado': usu.apellido + ' ' + usu.nombre,
             'Ciudad': usu.ciudad,
@@ -737,7 +737,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           n = n + 1;
           const ele = {
             n: n,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             codigo: usu.codigo,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,

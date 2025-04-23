@@ -400,7 +400,7 @@ class PermisosControlador {
                 `
                 SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
                     da.estado, dae.id_contrato, da.id_empleado_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                    dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion 
+                    dae.identificacion, dae.correo, c.permiso_mail, c.permiso_notificacion 
                 FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae,
                     eu_configurar_alertas AS c, ed_departamentos AS cg 
                 WHERE n.id_departamento = $1
@@ -576,7 +576,7 @@ class PermisosControlador {
         const PERMISOS = await pool.query(
             `
             SELECT p.*, tp.descripcion AS tipo_permiso, da.name_regimen AS regimen, da.nombre, da.apellido,
-                da.cedula, da.name_suc AS sucursal, da.ciudad, e.nombre AS empresa, da.name_cargo AS cargo
+                da.identificacion, da.name_suc AS sucursal, da.ciudad, e.nombre AS empresa, da.name_cargo AS cargo
             FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS tp, informacion_general AS da, 
                 e_empresa AS e, e_sucursales AS s
             WHERE p.id_tipo_permiso = tp.id 
@@ -895,7 +895,7 @@ class PermisosControlador {
             const correoInfoPidePermiso = await pool.query(
                 `
                 SELECT e.id, e.correo, e.nombre, e.apellido, 
-                    e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+                    e.identificacion, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
                     d.nombre AS departamento 
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
@@ -927,7 +927,7 @@ class PermisosControlador {
                             <b>Empresa:</b> ${nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
-                            <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                            <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
                             <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
                             <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
                             <b>Generado mediante:</b> Aplicación Web <br>
@@ -1009,7 +1009,7 @@ class PermisosControlador {
             const correoInfoPidePermiso = await pool.query(
                 `
                 SELECT e.id, e.correo, e.nombre, e.apellido, 
-                    e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+                    e.identificacion, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
                     d.nombre AS departamento 
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
@@ -1041,7 +1041,7 @@ class PermisosControlador {
                             <b>Empresa:</b> ${nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
-                            <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                            <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
                             <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
                             <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
                             <b>Generado mediante:</b> Aplicación Web <br>
@@ -1207,7 +1207,7 @@ class PermisosControlador {
 
             const solicita = await pool.query(
                 `
-                SELECT de.id, (de.nombre ||' '|| de.apellido) AS empleado, de.cedula, de.name_cargo AS tipo_cargo, 
+                SELECT de.id, (de.nombre ||' '|| de.apellido) AS empleado, de.identificacion, de.name_cargo AS tipo_cargo, 
                     de.name_dep AS departamento     
                 FROM informacion_general AS de
                 WHERE de.id = $1
@@ -1233,7 +1233,7 @@ class PermisosControlador {
                             <b>Empresa:</b> ${nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>${tipo_solicitud}:</b> ${solicita.rows[0].empleado} <br>
-                            <b>Número de cédula:</b> ${solicita.rows[0].cedula} <br>
+                            <b>Número de identificación:</b> ${solicita.rows[0].identificacion} <br>
                             <b>Cargo:</b> ${solicita.rows[0].tipo_cargo} <br>
                             <b>Departamento:</b> ${solicita.rows[0].departamento} <br>
                             <b>Generado mediante:</b> Aplicación Web <br>
@@ -1299,7 +1299,7 @@ class PermisosControlador {
             `
             SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.documento, p.fecha_final, p.estado, 
                 p.id_empleado_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, 
-                (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, e.correo, cp.descripcion AS nom_permiso, 
+                (e.nombre || \' \' || e.apellido) AS fullname, e.identificacion, e.correo, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, e.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
                 contrato_cargo_vigente AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
@@ -1324,7 +1324,7 @@ class PermisosControlador {
             `
             SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.documento,  p.fecha_final, p.estado, 
                 p.id_empleado_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, 
-                (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, cp.descripcion AS nom_permiso, 
+                (e.nombre || \' \' || e.apellido) AS fullname, e.identificacion, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, e.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
                 contrato_cargo_vigente AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
@@ -1490,7 +1490,7 @@ class PermisosControlador {
             `
             SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.dias_permiso, p.hora_salida, p.hora_ingreso, 
                 p.horas_permiso, p.documento, p.fecha_final, p.estado, p.id_empleado_cargo, e.nombre, 
-                e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
+                e.apellido, e.identificacion, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
                 cp.descripcion AS nom_permiso, ec.id AS id_contrato 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp,
                 eu_empleado_cargos AS ce
@@ -1528,7 +1528,7 @@ class PermisosControlador {
 
             const correoInfoPidePermiso = await pool.query(
                 `
-                SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula, ecr.id_departamento, ecr.id_sucursal, 
+                SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion, ecr.id_departamento, ecr.id_sucursal, 
                     ecr.id AS cargo, tc.cargo AS tipo_cargo, d.nombre AS departamento 
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
@@ -1558,7 +1558,7 @@ class PermisosControlador {
                             <b>Empresa:</b> ${nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
-                            <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                            <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
                             <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
                             <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
                             <b>Generado mediante:</b> Aplicación Móvil <br>
@@ -1641,7 +1641,7 @@ class PermisosControlador {
 
             const correoInfoPidePermiso = await pool.query(
                 `
-                SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula, ecr.id_departamento, ecr.id_sucursal, 
+                SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion, ecr.id_departamento, ecr.id_sucursal, 
                     ecr.id AS cargo, tc.cargo AS tipo_cargo, d.nombre AS departamento 
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
@@ -1671,7 +1671,7 @@ class PermisosControlador {
                             <b>Empresa:</b> ${nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
-                            <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                            <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
                             <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
                             <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
                             <b>Generado mediante:</b> Aplicación Móvil <br>
@@ -1878,7 +1878,7 @@ const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<st
         tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
         tablaHtml += "<th scope='col'>Código</th>";
         tablaHtml += "<th scope='col'>Usuario</th>";
-        tablaHtml += "<th scope='col'>Cédula</th>";
+        tablaHtml += "<th scope='col'>Identificación</th>";
         tablaHtml += "<th scope='col'>Departamento</th>";
         tablaHtml += "<th scope='col'>Permiso</th>";
         tablaHtml += `<th scope='col'>Días permiso</th>`;
@@ -1889,7 +1889,7 @@ const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<st
             tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.codigo}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
-            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.identificacion}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.departamento}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id_permiso}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.dias_laborables}</td>`;
@@ -1901,7 +1901,7 @@ const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<st
         tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
         tablaHtml += "<th scope='col'>Código</th>";
         tablaHtml += "<th scope='col'>Usuario</th>";
-        tablaHtml += "<th scope='col'>Cédula</th>";
+        tablaHtml += "<th scope='col'>Identificación</th>";
         tablaHtml += "<th scope='col'>Departamento</th>";
         tablaHtml += "<th scope='col'>Permiso</th>";
         tablaHtml += `<th scope='col'>Horas permiso</th>`
@@ -1912,7 +1912,7 @@ const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<st
             tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.codigo}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
-            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.identificacion}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.departamento}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id_permiso}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.tiempo_solicitado}</td>`;
@@ -2006,7 +2006,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             `
             SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
                 da.estado, dae.id_contrato, da.id_empleado_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, dae.id AS id_aprueba 
+                dae.identificacion, dae.correo, c.permiso_mail, c.permiso_notificacion, dae.id AS id_aprueba 
             FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae,
                 eu_configurar_alertas AS c, ed_departamentos AS cg
             WHERE n.id_departamento = $1

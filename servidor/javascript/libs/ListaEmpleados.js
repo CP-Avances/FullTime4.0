@@ -17,7 +17,7 @@ const database_1 = __importDefault(require("../database"));
 function EmpleadoDepartamentos(id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT CONCAT(e.nombre, \' \', e.apellido) name_empleado, e.cedula, e.codigo, co.id_regimen, ca.id_tipo_cargo,
+        SELECT CONCAT(e.nombre, \' \', e.apellido) name_empleado, e.identificacion, e.codigo, co.id_regimen, ca.id_tipo_cargo,
             d.nombre AS nom_depa 
         FROM eu_empleados AS e, eu_empleado_contratos AS co, eu_empleado_cargos AS ca, ed_departamentos AS d 
         WHERE e.id = $1 AND e.estado = 1 AND e.id = co.id_empleado AND ca.id_contrato = co.id 
@@ -28,7 +28,7 @@ function EmpleadoDepartamentos(id_empleado) {
             return result.rows[0];
         }).then((obj) => __awaiter(this, void 0, void 0, function* () {
             let data = {
-                cedula: obj.cedula,
+                identificacion: obj.identificacion,
                 codigo: obj.codigo,
                 nom_completo: obj.name_empleado,
                 departamento: obj.nom_depa,

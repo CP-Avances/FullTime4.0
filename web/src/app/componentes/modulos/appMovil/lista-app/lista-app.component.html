@@ -178,12 +178,12 @@
                       <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                           <mat-form-field>
-                            <mat-label>Cédula</mat-label>
+                            <mat-label>Identificación</mat-label>
                             <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 10)"
                               oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                               [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)" >
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por número de identificación.">help_outline</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -528,7 +528,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -545,7 +545,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>
@@ -766,12 +766,12 @@
                       <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                           <mat-form-field>
-                            <mat-label>Cédula</mat-label>
+                            <mat-label>Identificación</mat-label>
                             <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar_DH(cedula_dh.value, 5)"
                               oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                               [formControl]="cedula_dh" type="tel" (keypress)="IngresarSoloNumeros($event)" >
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por número de identificación.">help_outline</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -1139,7 +1139,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -1157,7 +1157,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>

@@ -43,7 +43,7 @@ export interface SolicitudElemento {
   observacion: string;
   valor: string;
   correo: string;
-  cedula: string;
+  identificacion: string;
 }
 
 @Component({
@@ -279,7 +279,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -439,7 +439,7 @@ export class ListarPlanificacionComponent implements OnInit {
     EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         nombre: obj.nombre,
-        cedula: obj.cedula,
+        identificacion: obj.identificacion,
         correo: obj.correo,
         id_empleado: obj.id_empleado,
         hora_inicio: obj.hora_inicio,
@@ -516,7 +516,7 @@ export class ListarPlanificacionComponent implements OnInit {
       let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
       // LECTURA DE NOMBRES DE USUARIOS
-      usuario = usuario + '<tr><th>' + plan.nombre + '</th><th>' + plan.cedula + '</th></tr>';
+      usuario = usuario + '<tr><th>' + plan.nombre + '</th><th>' + plan.identificacion + '</th></tr>';
 
       this.restC.EliminarPlanComida(plan.id, plan.id_empleado, data).subscribe(res => {
         this.contar_eliminados = this.contar_eliminados + 1;

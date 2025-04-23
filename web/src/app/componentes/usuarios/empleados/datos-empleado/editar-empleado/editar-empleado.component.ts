@@ -160,7 +160,7 @@ export class EditarEmpleadoComponent implements OnInit {
 
   // CARGAR DATOS DE EMPLEADO Y USUARIO
   ObtenerEmpleado() {
-    const { apellido, cedula, codigo, correo, domicilio, estado_civil, estado, fecha_nacimiento, genero,
+    const { apellido, identificacion, codigo, correo, domicilio, estado_civil, estado, fecha_nacimiento, genero,
       id, id_nacionalidad, nombre, telefono } = this.empleado;
 
 
@@ -168,7 +168,7 @@ export class EditarEmpleadoComponent implements OnInit {
       apellidoForm: apellido,
       codigoForm: codigo,
       nombreForm: nombre,
-      cedulaForm: cedula,
+      cedulaForm: identificacion,
       emailForm: correo,
       fechaForm: fecha_nacimiento,
     });
@@ -204,11 +204,11 @@ export class EditarEmpleadoComponent implements OnInit {
       if (this.datosCodigo.automatico === true) {
         this.escritura = true;
       }
-      else if (this.datosCodigo.cedula === true) {
+      else if (this.datosCodigo.identificacion === true) {
         this.cedula = true;
         this.escritura = true;
         this.primeroFormGroup.patchValue({
-          codigoForm: this.empleado.cedula
+          codigoForm: this.empleado.identificacion
         })
       }
       else {
@@ -267,7 +267,7 @@ export class EditarEmpleadoComponent implements OnInit {
       domicilio: form2.domicilioForm,
       apellido: ApellidoCapitalizado,
       telefono: form2.telefonoForm,
-      cedula: form1.cedulaForm,
+      identificacion: form1.cedulaForm,
       nombre: NombreCapitalizado,
       genero: form2.generoForm,
       correo: form1.emailForm,

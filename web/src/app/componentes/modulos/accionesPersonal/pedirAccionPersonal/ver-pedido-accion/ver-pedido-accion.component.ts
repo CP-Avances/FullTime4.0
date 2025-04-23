@@ -80,7 +80,7 @@ export class VerPedidoAccionComponent implements OnInit {
   decreto: string = '';
   departamentoE: string = '';
   proceso: string = '';
-  cedula: string = '';
+  identificacion: string = '';
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
@@ -96,7 +96,7 @@ export class VerPedidoAccionComponent implements OnInit {
         this.sueldo = data1[0].sueldo;
         this.cargo = data1[0].cargo;
         this.departamentoE = data1[0].departamento;
-        this.cedula = data1[0].cedula;
+        this.identificacion = data1[0].identificacion;
         this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_uno).subscribe(data2 => {
           this.datoEmpleadoH = data2[0].apellido + ' ' + data2[0].nombre;
           this.cargoH = data2[0].cargo;

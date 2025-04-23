@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // CONEXION CON LA BASE DE DATOS POSTGRESQL
 const pg_pool_1 = __importDefault(require("pg-pool"));
 const pool = new pg_pool_1.default({
-    user: 'postgres', // postgres
+    user: 'postgres',
     host: '192.168.0.148',
     port: 5432,
-    database: 'empresa_local',
+    database: 'empresa_jenny',
     password: 'fu11tim3'
 });
 pool.query('SELECT NOW()', (err, res) => {

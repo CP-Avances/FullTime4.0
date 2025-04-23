@@ -167,7 +167,7 @@ const faltas = function (desde, hasta, semanal) {
                 nombre: obj.nombre,
                 apellido: obj.apellido,
                 codigo: obj.codigo,
-                cedula: obj.cedula,
+                identificacion: obj.identificacion,
                 correo: obj.correo,
                 genero: obj.genero,
                 id_cargo: obj.id_cargo,
@@ -442,7 +442,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                     nombre: obj.nombre,
                     apellido: obj.apellido,
                     codigo: obj.codigo,
-                    cedula: obj.cedula,
+                    identificacion: obj.identificacion,
                     correo: obj.correo,
                     genero: obj.genero,
                     id_cargo: obj.id_cargo,
@@ -694,7 +694,7 @@ const faltasIndividual = function (desde, hasta) {
                 nombre: obj.nombre,
                 apellido: obj.apellido,
                 codigo: obj.codigo,
-                cedula: obj.cedula,
+                identificacion: obj.identificacion,
                 correo: obj.correo,
                 genero: obj.genero,
                 id_cargo: obj.id_cargo,
@@ -985,7 +985,7 @@ const EstructurarDatosPDF = function (data) {
                             [
                                 {
                                     border: [true, true, false, false],
-                                    text: 'C.C.: ' + empl.cedula,
+                                    text: 'C.C.: ' + empl.identificacion,
                                     style: 'itemsTableInfoEmpleado',
                                 },
                                 {

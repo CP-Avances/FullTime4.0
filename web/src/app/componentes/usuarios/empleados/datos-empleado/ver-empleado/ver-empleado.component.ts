@@ -2100,7 +2100,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + this.unPermiso.nombre, style: 'itemsTableD' }] },
               { text: [{ text: 'NOMBRES: ' + this.unPermiso.apellido, style: 'itemsTableD' }] },
-              { text: [{ text: 'CÉDULA: ' + this.unPermiso.cedula, style: 'itemsTableD' }] }
+              { text: [{ text: 'IDENTIFICACIÓN: ' + this.unPermiso.identificacion, style: 'itemsTableD' }] }
             ]
           }],
           [{
@@ -2228,7 +2228,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + this.unPermiso.nombre, style: 'itemsTableD' }] },
               { text: [{ text: 'NOMBRES: ' + this.unPermiso.apellido, style: 'itemsTableD' }] },
-              { text: [{ text: 'CÉDULA: ' + this.unPermiso.cedula, style: 'itemsTableD' }] }
+              { text: [{ text: 'IDENTIFICACIÓN: ' + this.unPermiso.identificacion, style: 'itemsTableD' }] }
             ]
           }],
           [{
@@ -2549,7 +2549,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         id_contrato: this.datoActual.id_contrato,
         id_cargo: this.datoActual.id_cargo,
         nombre: this.datoActual.nombre + ' ' + this.datoActual.apellido,
-        cedula: this.datoActual.cedula,
+        identificacion: this.datoActual.identificacion,
         codigo: this.datoActual.codigo,
         correo: this.datoActual.correo,
         id: this.datoActual.id,
@@ -2599,7 +2599,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -2731,7 +2731,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       id_contrato: this.datoActual.id_contrato,
       id_cargo: this.datoActual.id_cargo,
       nombre: this.datoActual.nombre + ' ' + this.datoActual.apellido,
-      cedula: this.datoActual.cedula,
+      identificacion: this.datoActual.identificacion,
       correo: this.datoActual.correo,
       codigo: this.datoActual.codigo,
       id: this.datoActual.id,
@@ -2806,7 +2806,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -3251,7 +3251,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                           [
                             {
                               text: [
-                                'CI: ' + this.empleadoUno[0].cedula + '\n',
+                                'CI: ' + this.empleadoUno[0].identificacion + '\n',
                                 'Nacionalidad: ' + nacionalidad + '\n',
                                 'Fecha Nacimiento: ' + '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                                 'Estado civil: ' + estadoCivil + '\n',
@@ -3620,7 +3620,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
               [
                 {
                   text: [
-                    'CI: ' + this.empleadoUno[0].cedula + '\n',
+                    'CI: ' + this.empleadoUno[0].identificacion + '\n',
                     'Nacionalidad: ' + nacionalidad + '\n',
                     'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                     'Estado civil: ' + estadoCivil + '\n',
@@ -3836,7 +3836,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         'Codigo': obj.codigo,
         "Apellido": obj.apellido,
         "Nombre": obj.nombre,
-        "Cedula": obj.cedula,
+        "Identificacion": obj.identificacion,
         "Estado Civil": estadoCivil,
         "Genero": genero,
         "Correo": obj.correo,
@@ -3988,7 +3988,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { key: "codigo", width: 20 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "estadoCivil", width: 20 },
       { key: "genero", width: 20 },
       { key: "correo", width: 20 },
@@ -4004,7 +4004,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
-      { name: "CÉDULA", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "ESTADO CIVIL", totalsRowLabel: "", filterButton: true },
       { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
       { name: "CORREO", totalsRowLabel: "", filterButton: true },
@@ -4518,7 +4518,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           "$": { "codigo": obj.codigo },
           "apellido": obj.apellido,
           "nombre": obj.nombre,
-          "cedula": obj.cedula,
+          "identificacion": obj.identificacion,
           "estadoCivil": estadoCivil,
           "genero": genero,
           "correo": obj.correo,

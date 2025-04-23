@@ -94,7 +94,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Departamento</th>
@@ -139,7 +139,7 @@
                     </tr>
                     <tr
                         *ngFor="let d of datosEmpleado | filtroCodigo: codigo.value | emplCedula: cedula.value | nombreCompleto: nombre.value | paginate:tamanio_pagina_e:numero_pagina_e">
-                        <td>{{d.cedula}}</td>
+                        <td>{{d.identificacion}}</td>
                         <td>{{d.codigo}}</td>
                         <td>{{d.apellido}} {{d.nombre}}</td>
                         <td>{{d.name_dep | titlecase}}</td>

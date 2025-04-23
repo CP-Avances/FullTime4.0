@@ -27,7 +27,7 @@ import { DepartamentoPipe } from "src/app/filtros/catDepartamentos/departamento/
 
 export interface PermisosElemento {
   apellido: string;
-  cedula: string;
+  identificacion: string;
   descripcion: string;
   docu_nombre: string;
   documento: string;

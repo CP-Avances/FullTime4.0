@@ -231,7 +231,7 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Sucursal</th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Rol</th>
@@ -247,7 +247,7 @@
                             </mat-checkbox>
                         </td>
                         <td>{{e.sucursal}}</td>
-                        <td>{{e.cedula}}</td>
+                        <td>{{e.identificacion}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
                         <td>{{e.rol}}</td>
@@ -278,7 +278,7 @@
                         <thead class="thead-light">
                             <tr style="text-align: center">
                                 <th class="t_horarios" scope="col" rowspan="2">N°</th>
-                                <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">IDENTIFICACIÓN</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">GÉNERO</th>
@@ -295,7 +295,7 @@
                         <tbody>
                             <tr *ngFor="let v of arr_vac | paginate : tamanio_pagina : numero_pagina">
                                 <td class="t_horarios">{{ v.n }}</td>
-                                <td class="t_horarios">{{ v.cedula }}</td>
+                                <td class="t_horarios">{{ v.identificacion }}</td>
                                 <td class="t_horarios">{{ v.codigo }}</td>
                                 <td class="t_horarios">{{ v.empleado.toUpperCase() }}</td>
                                 <td class="t_horarios">{{ v.genero }}</td>

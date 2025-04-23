@@ -153,7 +153,7 @@ export const salidasAnticipadas = async function (desde: any, hasta: any, semana
             nombre: obj.nombre,
             apellido: obj.apellido,
             codigo: obj.codigo,
-            cedula: obj.cedula,
+            identificacion: obj.identificacion,
             correo: obj.correo,
             genero: obj.genero,
             id_cargo: obj.id_cargo,
@@ -491,7 +491,7 @@ export const salidasAnticipadasDepartamentos = async function (desde: any, hasta
                 nombre: obj.nombre,
                 apellido: obj.apellido,
                 codigo: obj.codigo,
-                cedula: obj.cedula,
+                identificacion: obj.identificacion,
                 correo: obj.correo,
                 genero: obj.genero,
                 id_cargo: obj.id_cargo,
@@ -799,7 +799,7 @@ export const salidasAnticipadasIndividual = async function (desde: any, hasta: a
             nombre: obj.nombre,
             apellido: obj.apellido,
             codigo: obj.codigo,
-            cedula: obj.cedula,
+            identificacion: obj.identificacion,
             correo: obj.correo,
             genero: obj.genero,
             id_cargo: obj.id_cargo,
@@ -1151,7 +1151,7 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
                         [
                             {
                                 border: [true, true, false, false],
-                                text: 'C.C.: ' + empl.cedula,
+                                text: 'C.C.: ' + empl.identificacion,
                                 style: 'itemsTableInfoEmpleado',
                             },
                             {

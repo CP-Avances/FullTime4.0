@@ -16,7 +16,7 @@ interface emp_he {
     horaE?: Array<hora>,
     cargo?: string,
     codigo: string | number,
-    cedula: string,
+    identificacion: string,
     genero?: string | number,
     contrato?: string,
     name_empleado: string,

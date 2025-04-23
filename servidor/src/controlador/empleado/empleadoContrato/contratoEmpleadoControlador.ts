@@ -625,7 +625,7 @@ class ContratoEmpleadoControlador {
             const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
             let data: any = {
                 fila: '',
-                cedula: '',
+                identificacion: '',
                 pais: '',
                 regimen_la: '',
                 modalida_la: '',
@@ -648,7 +648,7 @@ class ContratoEmpleadoControlador {
                     headers[cell.value.toString().toUpperCase()] = colNumber;
                 });
                 // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                if (!headers['ITEM'] || !headers['CEDULA'] || !headers['PAIS'] ||
+                if (!headers['ITEM'] || !headers['IDENTIFICACION'] || !headers['PAIS'] ||
                     !headers['REGIMEN_LABORAL'] || !headers['MODALIDAD_LABORAL'] || !headers['FECHA_DESDE'] ||
                     !headers['FECHA_HASTA'] || !headers['CONTROLAR_ASISTENCIA'] || !headers['CONTROLAR_VACACIONES']
                 ) {
@@ -661,7 +661,7 @@ class ContratoEmpleadoControlador {
                     if (rowNumber === 1) return;
                     // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                     const ITEM = row.getCell(headers['ITEM']).value;
-                    const CEDULA = row.getCell(headers['CEDULA']).value?.toString();
+                    const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString();
                     const PAIS = row.getCell(headers['PAIS']).value?.toString();
                     const REGIMEN_LABORAL = row.getCell(headers['REGIMEN_LABORAL']).value?.toString();
                     const MODALIDAD_LABORAL = row.getCell(headers['MODALIDAD_LABORAL']).value?.toString();
@@ -671,12 +671,12 @@ class ContratoEmpleadoControlador {
                     const CONTROLAR_VACACIONES = row.getCell(headers['CONTROLAR_VACACIONES']).value?.toString();
 
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (PAIS != undefined) &&
+                    if ((ITEM != undefined && ITEM != '') && (IDENTIFICACION != undefined) && (PAIS != undefined) &&
                         (REGIMEN_LABORAL != undefined) && (MODALIDAD_LABORAL != undefined) && (FECHA_DESDE != undefined) &&
                         (FECHA_HASTA != undefined) && (CONTROLAR_ASISTENCIA != undefined) && (CONTROLAR_VACACIONES != undefined)) {
                         data.fila = ITEM;
                         data.pais = PAIS?.trim();
-                        data.cedula = CEDULA?.trim();
+                        data.identificacion = IDENTIFICACION?.trim();
                         data.regimen_la = REGIMEN_LABORAL?.trim();
                         data.fecha_desde = FECHA_DESDE?.trim();
                         data.fecha_hasta = FECHA_HASTA?.trim();
@@ -688,9 +688,9 @@ class ContratoEmpleadoControlador {
 
                         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
-                        if (rege.test(data.cedula)) {
-                            if (data.cedula.length != 10) {
-                                data.observacion = 'La cédula ingresada no es válida';
+                        if (rege.test(data.identificacion)) {
+                            if (data.identificacion.length != 10) {
+                                data.observacion = 'La identificación ingresada no es válida';
                             } else {
                                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                 if (DateTime.fromFormat(data.fecha_desde, 'yyyy-MM-dd').isValid) {
@@ -703,14 +703,14 @@ class ContratoEmpleadoControlador {
                                 }
                             }
                         } else {
-                            data.observacion = 'La cédula ingresada no es válida';
+                            data.observacion = 'La identificación ingresada no es válida';
                         }
 
                         listContratos.push(data);
                     } else {
                         data.fila = ITEM;
                         data.pais = PAIS?.trim();
-                        data.cedula = CEDULA?.trim();
+                        data.identificacion = IDENTIFICACION?.trim();
                         data.regimen_la = REGIMEN_LABORAL?.trim();
                         data.modalida_la = MODALIDAD_LABORAL?.trim();
                         data.fecha_desde = FECHA_DESDE?.trim();
@@ -752,17 +752,17 @@ class ContratoEmpleadoControlador {
                             data.observacion = 'Control vacaciones no registrado';
                         }
 
-                        if (CEDULA == undefined) {
-                            data.cedula = 'No registrado'
-                            data.observacion = 'Cédula no registrado';
+                        if (IDENTIFICACION == undefined) {
+                            data.identificacion = 'No registrado'
+                            data.observacion = 'Identificación no registrado';
                         }
                         else {
 
                             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                             const rege = /^[0-9]+$/;
-                            if (rege.test(data.cedula)) {
-                                if (data.cedula.length != 10) {
-                                    data.observacion = 'La cédula ingresada no es válida';
+                            if (rege.test(data.identificacion)) {
+                                if (data.identificacion.length != 10) {
+                                    data.observacion = 'La identificación ingresada no es válida';
                                 } else {
                                     // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                     if (data.fecha_desde != 'No registrado') {
@@ -797,7 +797,7 @@ class ContratoEmpleadoControlador {
                                 }
                             }
                             else {
-                                data.observacion = 'La cédula ingresada no es válida';
+                                data.observacion = 'La identificación ingresada no es válida';
                             }
                         }
                         listContratos.push(data);
@@ -819,12 +819,12 @@ class ContratoEmpleadoControlador {
                 if (valor.observacion == 'no registrado') {
                     var VERIFICAR_CEDULA = await pool.query(
                         `
-                        SELECT * FROM eu_empleados WHERE cedula = $1
+                        SELECT * FROM eu_empleados WHERE identificacion = $1
                         `
-                        , [valor.cedula]);
+                        , [valor.identificacion]);
                     if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
 
-                        if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
+                        if (valor.identificacion != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                             const fechaRango: any = await pool.query(
                                 `
                                 SELECT * FROM eu_empleado_contratos 
@@ -887,7 +887,7 @@ class ContratoEmpleadoControlador {
                         }
 
                         // DISCRIMINACIÓN DE ELEMENTOS IGUALES
-                        if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                        if (duplicados.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
                             duplicados.push(valor);
                         }
                         else {
@@ -896,7 +896,7 @@ class ContratoEmpleadoControlador {
 
                     }
                     else {
-                        valor.observacion = 'Cédula no existe en el sistema'
+                        valor.observacion = 'Identificación no existe en el sistema'
                     }
                 }
             });
@@ -925,7 +925,7 @@ class ContratoEmpleadoControlador {
 
                 listContratos.forEach((item: any) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado (cédula)'
+                        item.observacion = 'Registro duplicado (identificación)'
                     }
 
                     if (item.observacion != undefined) {
@@ -966,7 +966,7 @@ class ContratoEmpleadoControlador {
         for (const data of plantilla) {
             try {
 
-                const { cedula, regimen_la, modalida_la, fecha_desde, fecha_hasta,
+                const { identificacion, regimen_la, modalida_la, fecha_desde, fecha_hasta,
                     control_asis, control_vaca } = data;
 
                 // INICIAR TRANSACCION
@@ -974,9 +974,9 @@ class ContratoEmpleadoControlador {
 
                 const ID_EMPLEADO: any = await pool.query(
                     `
-                    SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
+                    SELECT id FROM eu_empleados WHERE UPPER(identificacion) = $1
                     `
-                    , [cedula]);
+                    , [identificacion]);
                 const ID_REGIMEN: any = await pool.query(
                     `
                     SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1

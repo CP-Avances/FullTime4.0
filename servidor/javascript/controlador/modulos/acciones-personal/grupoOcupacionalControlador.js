@@ -641,7 +641,7 @@ class GrupoOcupacionalControlador {
                         fila: '',
                         nombre: '',
                         apellido: '',
-                        cedula: '',
+                        identificacion: '',
                         grupo_ocupacional: '',
                         observacion: ''
                     };
@@ -657,7 +657,7 @@ class GrupoOcupacionalControlador {
                             headers[cell.value.toString().toUpperCase()] = colNumber;
                         });
                         // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                        if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || !headers['CEDULA'] || !headers['GRUPO_OCUPACIONAL']) {
+                        if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] || !headers['IDENTIFICACION'] || !headers['GRUPO_OCUPACIONAL']) {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
                         // LECTURA DE LOS DATOS DE LA PLANTILLA
@@ -670,18 +670,18 @@ class GrupoOcupacionalControlador {
                             const ITEM = row.getCell(headers['ITEM']).value;
                             const NOMBRE = (_a = row.getCell(headers['NOMBRE']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
                             const APELLIDO = (_b = row.getCell(headers['APELLIDO']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
-                            const CEDULA = (_c = row.getCell(headers['CEDULA']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
+                            const IDENTIFICACION = (_c = row.getCell(headers['IDENTIFICACION']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
                             const GRUPO_OCUPACIONAL = (_d = row.getCell(headers['GRUPO_OCUPACIONAL']).value) === null || _d === void 0 ? void 0 : _d.toString().trim();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (NOMBRE != undefined && NOMBRE != '') &&
                                 (APELLIDO != undefined && APELLIDO != '') &&
-                                (CEDULA != undefined && CEDULA != '') &&
+                                (IDENTIFICACION != undefined && IDENTIFICACION != '') &&
                                 (GRUPO_OCUPACIONAL != undefined && GRUPO_OCUPACIONAL != '')) {
                                 data.fila = ITEM;
                                 data.nombre = NOMBRE,
                                     data.apellido = APELLIDO,
-                                    data.cedula = CEDULA,
+                                    data.identificacion = IDENTIFICACION,
                                     data.grupo_ocupacional = GRUPO_OCUPACIONAL,
                                     data.observacion = 'no registrado';
                                 listaGrupoOcupacional.push(data);
@@ -690,7 +690,7 @@ class GrupoOcupacionalControlador {
                                 data.fila = ITEM;
                                 data.nombre = NOMBRE,
                                     data.apellido = APELLIDO,
-                                    data.cedula = CEDULA,
+                                    data.identificacion = IDENTIFICACION,
                                     data.grupo_ocupacional = GRUPO_OCUPACIONAL,
                                     data.observacion = 'no registrado';
                                 if (data.fila == '' || data.fila == undefined) {
@@ -703,9 +703,9 @@ class GrupoOcupacionalControlador {
                                 if (APELLIDO == undefined) {
                                     data.apellido = '-';
                                 }
-                                if (CEDULA == undefined) {
-                                    data.cedula = 'No registrado';
-                                    data.observacion = 'Cédula ' + data.observacion;
+                                if (IDENTIFICACION == undefined) {
+                                    data.identificacion = 'No registrado';
+                                    data.observacion = 'Identificación ' + data.observacion;
                                 }
                                 if (GRUPO_OCUPACIONAL == undefined) {
                                     data.grupo_ocupacional = 'No registrado';
@@ -729,8 +729,8 @@ class GrupoOcupacionalControlador {
                     listaGrupoOcupacional.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrado') {
                             const VERIFICAR_IDEMPLEADO = yield database_1.default.query(`
-              SELECT id FROM eu_empleados WHERE cedula = $1
-              `, [item.cedula.trim()]);
+              SELECT id FROM eu_empleados WHERE identificacion = $1
+              `, [item.identificacion.trim()]);
                             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
                                 let id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
                                 const VERIFICAR_IDGRUPOOCU = yield database_1.default.query(`
@@ -748,7 +748,7 @@ class GrupoOcupacionalControlador {
                                     else {
                                         if (item.observacion == 'no registrado') {
                                             // DISCRIMINACION DE ELEMENTOS IGUALES
-                                            if (duplicados.find((p) => (p.cedula.trim() === item.cedula.trim())) == undefined) {
+                                            if (duplicados.find((p) => (p.identificacion.trim() === item.identificacion.trim())) == undefined) {
                                                 duplicados.push(item);
                                             }
                                             else {
@@ -762,7 +762,7 @@ class GrupoOcupacionalControlador {
                                 }
                             }
                             else {
-                                item.observacion = 'La cédula ingresada no esta registrada en el sistema';
+                                item.observacion = 'La identificación ingresada no esta registrada en el sistema';
                             }
                         }
                     }));
@@ -816,7 +816,7 @@ class GrupoOcupacionalControlador {
             let error = false;
             try {
                 for (const item of plantilla) {
-                    const { cedula, grupo_ocupacional } = item;
+                    const { identificacion, grupo_ocupacional } = item;
                     yield database_1.default.query('BEGIN');
                     const VERIFICAR_IDGRUPO = yield database_1.default.query(`
           SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
@@ -826,8 +826,8 @@ class GrupoOcupacionalControlador {
                     yield database_1.default.query('COMMIT');
                     yield database_1.default.query('BEGIN');
                     const VERIFICAR_IDEMPLEADO = yield database_1.default.query(`
-          SELECT id FROM eu_empleados WHERE cedula = $1
-          `, [cedula.trim()]);
+          SELECT id FROM eu_empleados WHERE identificacion = $1
+          `, [identificacion.trim()]);
                     const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');

@@ -424,7 +424,7 @@ class VacacionesControlador {
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
         v.legalizado, v.id, v.id_periodo_vacacion, e.id AS id_empleado,
-        (e.nombre || ' ' || e.apellido) AS fullname, e.cedula
+        (e.nombre || ' ' || e.apellido) AS fullname, e.identificacion
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e 
       WHERE v.id = $1 AND e.id = v.id_empleado
       `, [id]);
@@ -452,7 +452,7 @@ class VacacionesControlador {
             if (datos === 'ok') {
                 const { idContrato, desde, hasta, id_dep, id_suc, estado_v, correo, solicitado_por, id, asunto, tipo_solicitud, proceso } = req.body;
                 const correoInfoPideVacacion = yield database_1.default.query(`
-        SELECT e.correo, e.nombre, e.apellido, e.cedula, 
+        SELECT e.correo, e.nombre, e.apellido, e.identificacion, 
           ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
           d.nombre AS departamento 
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
@@ -482,7 +482,7 @@ class VacacionesControlador {
               <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${correoInfoPideVacacion.rows[0].nombre} ${correoInfoPideVacacion.rows[0].apellido} <br>
-              <b>Número de Cédula:</b> ${correoInfoPideVacacion.rows[0].cedula} <br>
+              <b>Número de identificación:</b> ${correoInfoPideVacacion.rows[0].identificacion} <br>
               <b>Cargo:</b> ${correoInfoPideVacacion.rows[0].tipo_cargo} <br>
               <b>Departamento:</b> ${correoInfoPideVacacion.rows[0].departamento} <br>
               <b>Generado mediante:</b> Aplicación Web <br>
@@ -551,7 +551,7 @@ class VacacionesControlador {
             if (datos === 'ok') {
                 const { idContrato, desde, hasta, id_dep, id_suc, estado_v, correo, solicitado_por, asunto, tipo_solicitud, proceso } = req.body;
                 const correoInfoPideVacacion = yield database_1.default.query(`
-        SELECT e.correo, e.nombre, e.apellido, e.cedula, 
+        SELECT e.correo, e.nombre, e.apellido, e.identificacion, 
           ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
           d.nombre AS departamento 
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
@@ -580,7 +580,7 @@ class VacacionesControlador {
               <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${correoInfoPideVacacion.rows[0].nombre} ${correoInfoPideVacacion.rows[0].apellido} <br>
-              <b>Número de Cédula:</b> ${correoInfoPideVacacion.rows[0].cedula} <br>
+              <b>Número de identificación:</b> ${correoInfoPideVacacion.rows[0].identificacion} <br>
               <b>Cargo:</b> ${correoInfoPideVacacion.rows[0].tipo_cargo} <br>
               <b>Departamento:</b> ${correoInfoPideVacacion.rows[0].departamento} <br>
               <b>Generado mediante:</b> Aplicación Móvil <br>

@@ -96,7 +96,7 @@ class EmpleadoControlador {
   public async ActualizarCodigoTotal(req: Request, res: Response): Promise<Response> {
     try {
 
-      const { valor, automatico, manual, cedula, id, user_name, ip, ip_local } = req.body;
+      const { valor, automatico, manual, identificacion, id, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -128,9 +128,9 @@ class EmpleadoControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5 RETURNING *
+        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , identificacion = $4 WHERE id = $5 RETURNING *
         `
-        , [valor, automatico, manual, cedula, id]);
+        , [valor, automatico, manual, identificacion, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -225,7 +225,7 @@ class EmpleadoControlador {
   // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS    **USADO
   public async InsertarEmpleado(req: Request, res: Response) {
     try {
-      const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
+      const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
         domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
@@ -233,11 +233,11 @@ class EmpleadoControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo, 
+        INSERT INTO eu_empleados (identificacion, apellido, nombre, estado_civil, genero, correo, 
           fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *
         `
-        , [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
+        , [identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
           telefono, id_nacionalidad, codigo]);
 
       const [empleado] = response.rows;
@@ -280,7 +280,7 @@ class EmpleadoControlador {
   public async EditarEmpleado(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
+      const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
         domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
 
       // INICIAR TRANSACCION
@@ -295,7 +295,7 @@ class EmpleadoControlador {
 
       const [datosOriginales] = empleado.rows;
       const codigoAnterior = datosOriginales.codigo;
-      const cedulaAnterior = datosOriginales.cedula;
+      const cedulaAnterior = datosOriginales.identificacion;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -316,12 +316,12 @@ class EmpleadoControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE eu_empleados SET cedula = $2, apellido = $3, nombre = $4, estado_civil = $5, 
+        UPDATE eu_empleados SET identificacion = $2, apellido = $3, nombre = $4, estado_civil = $5, 
           genero = $6, correo = $7, fecha_nacimiento = $8, estado = $9, domicilio = $10, 
           telefono = $11, id_nacionalidad = $12, codigo = $13 
         WHERE id = $1 RETURNING *
         `
-        , [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
+        , [id, identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
           domicilio, telefono, id_nacionalidad, codigo]);
 
       const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd');
@@ -349,7 +349,7 @@ class EmpleadoControlador {
       let verificar_vacunas = 0;
       let verificar_contrato = 0;
 
-      if (codigoAnterior !== codigo || cedulaAnterior !== cedula) {
+      if (codigoAnterior !== codigo || cedulaAnterior !== identificacion) {
         // RUTA DE LA CARPETA PERMISOS DEL USUARIO
         const carpetaPermisosAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'permisos');
         const carpetaPermisos = await ObtenerRutaPermisos(codigo);
@@ -580,8 +580,8 @@ class EmpleadoControlador {
             tabla: 'eu_empleados',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-            datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 2, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosOriginales: `{id: ${datosOriginales.id}, identificacion: ${datosOriginales.identificacion}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosNuevos: `{id: ${datosOriginales.id}, identificacion: ${datosOriginales.identificacion}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 2, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             ip: ip,
             ip_local: ip_local,
             observacion: null
@@ -689,8 +689,8 @@ class EmpleadoControlador {
             tabla: 'eu_empleados',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-            datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 1, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosOriginales: `{id: ${datosOriginales.id}, identificacion: ${datosOriginales.identificacion}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosNuevos: `{id: ${datosOriginales.id}, identificacion: ${datosOriginales.identificacion}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 1, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             ip: ip,
             ip_local: ip_local,
             observacion: null
@@ -956,8 +956,8 @@ class EmpleadoControlador {
             tabla: 'eu_empleados',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-            datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosOriginales: `{id: ${datosOriginales.id}, identificacion: ${datosOriginales.identificacion}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosNuevos: `{id: ${datosOriginales.id}, identificacion: ${datosOriginales.identificacion}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             ip: ip,
             ip_local: ip_local,
             observacion: null
@@ -1476,7 +1476,7 @@ class EmpleadoControlador {
         const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
         let data: any = {
           fila: '',
-          cedula: '',
+          identificacion: '',
           apellido: '',
           nombre: '',
           estado_civil: '',
@@ -1492,7 +1492,7 @@ class EmpleadoControlador {
           contrasena: '',
           rol: '',
           observacion: '',
-          identificacion: ''
+         // identificacion: ''
         };
 
         var ARREGLO_ESTADO_CIVIL = await pool.query(
@@ -1533,7 +1533,7 @@ class EmpleadoControlador {
             headers[cell.value.toString().toUpperCase()] = colNumber;
           });
           // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-          if (!headers['ITEM'] || !headers['CEDULA'] || !headers['APELLIDO'] ||
+          if (!headers['ITEM'] || !headers['IDENTIFICACION'] || !headers['APELLIDO'] ||
             !headers['NOMBRE'] || !headers['USUARIO'] || !headers['CONTRASENA'] ||
             !headers['ROL'] || !headers['ESTADO_CIVIL'] || !headers['GENERO'] ||
             !headers['CORREO'] || !headers['FECHA_NACIMIENTO'] || !headers['LATITUD'] ||
@@ -1548,7 +1548,7 @@ class EmpleadoControlador {
             if (rowNumber === 1) return;
             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
             const ITEM = row.getCell(headers['ITEM']).value;
-            const CEDULA = row.getCell(headers['CEDULA']).value?.toString();
+            const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString();
             const APELLIDO = row.getCell(headers['APELLIDO']).value?.toString();
             const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString();
             const USUARIO = row.getCell(headers['USUARIO']).value?.toString();
@@ -1567,7 +1567,7 @@ class EmpleadoControlador {
 
             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
             if ((ITEM != undefined && ITEM != '') &&
-              (CEDULA != undefined) && (APELLIDO != undefined) &&
+              (IDENTIFICACION != undefined) && (APELLIDO != undefined) &&
               (NOMBRE != undefined) && (ESTADO_CIVIL != undefined) &&
               (GENERO != undefined) && (CORREO != undefined) &&
               (FECHA_NACIMIENTO != undefined) &&
@@ -1578,7 +1578,7 @@ class EmpleadoControlador {
             ) {
               console.log("entra a todo los datos llenos")
               data.fila = ITEM;
-              data.cedula = CEDULA;
+              data.identificacion = IDENTIFICACION;
               data.nombre = NOMBRE;
               data.apellido = APELLIDO;
               data.usuario = USUARIO;
@@ -1596,11 +1596,11 @@ class EmpleadoControlador {
               data.observacion = 'no registrado';
 
 
-              if (regex.test(data.cedula)) {
+              if (regex.test(data.identificacion)) {
 
                 if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                  if (data.cedula.toString().length == 0 ) {
-                    data.observacion = 'La cédula ingresada no es válida';
+                  if (data.identificacion.toString().length == 0 ) {
+                    data.observacion = 'La identificación ingresada no es válida';
                   }
                   else {
                     if (!valiContra.test(data.contrasena.toString())) {
@@ -1651,8 +1651,8 @@ class EmpleadoControlador {
                   }
                 } else {
                   console.log("cEdula seleccionado")
-                  if (data.cedula.toString().length != 10 || !ValidarCedula(data.cedula.toString())) {
-                    data.observacion = 'La cédula ingresada no es válida';
+                  if (data.identificacion.toString().length != 10 || !ValidarCedula(data.identificacion.toString())) {
+                    data.observacion = 'La identificación ingresada no es válida';
                   }
                   else {
                     if (!valiContra.test(data.contrasena.toString())) {
@@ -1706,9 +1706,9 @@ class EmpleadoControlador {
               }
               else {
 
-                data.observacion = 'La cédula ingresada no es válida';
+                data.observacion = 'La identificación ingresada no es válida';
               }
-              data.cedula = data.cedula.trim();
+              data.identificacion = data.identificacion.trim();
               data.apellido = data.apellido.trim();
               data.nombre = data.nombre.trim();
               data.estado_civil = data.estado_civil.trim();
@@ -1728,7 +1728,7 @@ class EmpleadoControlador {
             }
             else {
               data.fila = ITEM;
-              data.cedula = CEDULA;
+              data.identificacion = IDENTIFICACION;
               data.nombre = NOMBRE;
               data.apellido = APELLIDO;
               data.usuario = USUARIO;
@@ -1806,18 +1806,18 @@ class EmpleadoControlador {
                 data.observacion = 'Rol no registrado';
               }
 
-              if (CEDULA == undefined) {
-                data.cedula = 'No registrado'
-                data.observacion = 'Cédula no registrado';
+              if (IDENTIFICACION == undefined) {
+                data.identificacion = 'No registrado'
+                data.observacion = 'Identificación no registrado';
               }
               
               if (TIPO_IDENTIFICACION == undefined) {
-                //data.cedula = 'No registrado'
+                //data.identificacion = 'No registrado'
                 data.observacion = 'Tipo identificación no registrado';
               }
               else {
 
-                data.cedula = data.cedula.trim();
+                data.identificacion = data.identificacion.trim();
                 data.apellido = data.apellido.trim();
                 data.nombre = data.nombre.trim();
                 data.estado_civil = data.estado_civil.trim();
@@ -1833,10 +1833,10 @@ class EmpleadoControlador {
                 data.contrasena = data.contrasena.trim();
                 data.rol = data.rol.trim();
 
-                if (regex.test(data.cedula)) {
+                if (regex.test(data.identificacion)) {
                   if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                    if (data.cedula.toString().length ==0) {
-                      data.observacion = 'La cédula ingresada no es válida';
+                    if (data.identificacion.toString().length ==0) {
+                      data.observacion = 'La identificación ingresada no es válida';
                     }
                     else {
                       if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
@@ -1897,8 +1897,8 @@ class EmpleadoControlador {
                       }
                     }
                   }else{
-                    if (data.cedula.toString().length != 10 && !ValidarCedula(data.cedula)) {
-                      data.observacion = 'La cédula ingresada no es válida';
+                    if (data.identificacion.toString().length != 10 && !ValidarCedula(data.identificacion)) {
+                      data.observacion = 'La identificación ingresada no es válida';
                     }
                     else {
                       if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
@@ -1963,7 +1963,7 @@ class EmpleadoControlador {
                   
                 }
                 else {
-                  data.observacion = 'La cédula ingresada no es válida';
+                  data.observacion = 'La identificación ingresada no es válida';
                 }
               }
               listEmpleados.push(data);
@@ -1983,11 +1983,11 @@ class EmpleadoControlador {
         listEmpleados.forEach(async (valor: any) => {
           var VERIFICAR_CEDULA = await pool.query(
             `
-            SELECT * FROM eu_empleados WHERE cedula = $1
+            SELECT * FROM eu_empleados WHERE identificacion = $1
             `
-            , [valor.cedula]);
+            , [valor.identificacion]);
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-            valor.observacion = 'Cédula ya existe en el sistema';
+            valor.observacion = 'Identificación ya existe en el sistema';
           }
           else {
             var VERIFICAR_USUARIO = await pool.query(
@@ -2014,7 +2014,7 @@ class EmpleadoControlador {
                       , [valor.nacionalidad.toUpperCase()]);
                     if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                       // DISCRIMINACION DE ELEMENTOS IGUALES
-                      if (duplicados1.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                      if (duplicados1.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
                         // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                         if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
                           duplicados2.push(valor);
@@ -2061,7 +2061,7 @@ class EmpleadoControlador {
           var filaDuplicada: number = 0;
           listEmpleados.forEach((item: any) => {
             if (item.observacion == '1') {
-              item.observacion = 'Registro duplicado (cédula)';
+              item.observacion = 'Registro duplicado (identificación)';
             }
             else if (item.observacion == '2') {
               item.observacion = 'Registro duplicado (usuario)';
@@ -2157,7 +2157,7 @@ class EmpleadoControlador {
         console.log('contraseña plantilla automatico: ', contrasena);
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
-        const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
+        const { identificacion, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
           nacionalidad, usuario, rol } = data;
 
         //OBTENER ID DEL ESTADO_CIVIL
@@ -2231,7 +2231,7 @@ class EmpleadoControlador {
           // INCREMENTAR EL VALOR DEL CODIGO
           codigo = codigo + 1;
         } else {
-          codigo = cedula;
+          codigo = identificacion;
         }
 
         console.log('Estado civil: ', id_estado_civil);
@@ -2239,11 +2239,11 @@ class EmpleadoControlador {
         // REGISTRO DE NUEVO EMPLEADO
         const response: QueryResult = await pool.query(
           `
-          INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo,
+          INSERT INTO eu_empleados (identificacion, apellido, nombre, estado_civil, genero, correo,
             fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `
-          , [cedula, apellidoE, nombreE,
+          , [identificacion, apellidoE, nombreE,
             id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
             _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
 
@@ -2255,7 +2255,7 @@ class EmpleadoControlador {
           usuario: user_name,
           accion: 'I',
           datosOriginales: '',
-          datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
+          datosNuevos: `{identificacion: ${identificacion}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
           ip: ip,
           ip_local: ip_local,
           observacion: null
@@ -2345,7 +2345,7 @@ class EmpleadoControlador {
         const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
         let data: any = {
           fila: '',
-          cedula: '',
+          identificacion: '',
           apellido: '',
           nombre: '',
           codigo: '',
@@ -2388,7 +2388,7 @@ class EmpleadoControlador {
             headers[cell.value.toString().toUpperCase()] = colNumber;
           });
           // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-          if (!headers['ITEM'] || !headers['CODIGO'] || !headers['CEDULA'] ||
+          if (!headers['ITEM'] || !headers['CODIGO'] || !headers['IDENTIFICACION'] ||
             !headers['APELLIDO'] || !headers['NOMBRE'] || !headers['USUARIO'] ||
             !headers['CONTRASENA'] || !headers['ROL'] || !headers['ESTADO_CIVIL'] ||
             !headers['GENERO'] || !headers['CORREO'] || !headers['FECHA_NACIMIENTO'] ||
@@ -2403,7 +2403,7 @@ class EmpleadoControlador {
             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
             const ITEM = row.getCell(headers['ITEM']).value;
             const CODIGO = row.getCell(headers['CODIGO']).value?.toString();
-            const CEDULA = row.getCell(headers['CEDULA']).value?.toString();
+            const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString();
             const APELLIDO = row.getCell(headers['APELLIDO']).value?.toString();
             const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString();
             const USUARIO = row.getCell(headers['USUARIO']).value?.toString();
@@ -2422,7 +2422,7 @@ class EmpleadoControlador {
 
             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
             if ((ITEM != undefined && ITEM != '') &&
-              (CEDULA != undefined) && (APELLIDO != undefined) &&
+              (IDENTIFICACION != undefined) && (APELLIDO != undefined) &&
               (NOMBRE != undefined) && (CODIGO != undefined) && (ESTADO_CIVIL != undefined) &&
               (GENERO != undefined) && (CORREO != undefined) &&
               (FECHA_NACIMIENTO != undefined) &&
@@ -2432,7 +2432,7 @@ class EmpleadoControlador {
               (CONTRASENA != undefined) && (ROL != undefined) && (TIPO_IDENTIFICACION != undefined)
             ) {
               data.fila = ITEM;
-              data.cedula = CEDULA?.trim();
+              data.identificacion = IDENTIFICACION?.trim();
               data.apellido = APELLIDO?.trim();
               data.nombre = NOMBRE?.trim();
               data.codigo = CODIGO?.trim();
@@ -2450,7 +2450,7 @@ class EmpleadoControlador {
               data.nacionalidad = NACIONALIDAD?.trim();
               data.observacion = 'no registrado';
 
-              data.cedula = parseInt(data.cedula);
+              data.identificacion = parseInt(data.identificacion);
               data.codigo = parseInt(data.codigo);
               data.longitud = parseFloat(data.longitud);
               data.latitud = parseFloat(data.latitud);
@@ -2458,9 +2458,9 @@ class EmpleadoControlador {
               
               
 
-              if (regex.test(data.cedula)) {
-                if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10 && ValidarCedula(data.cedula)) {
-                  data.observacion = 'La cédula ingresada no es válida';
+              if (regex.test(data.identificacion)) {
+                if (data.identificacion.toString().length > 10 || data.identificacion.toString().length < 10 && ValidarCedula(data.identificacion)) {
+                  data.observacion = 'La identificación ingresada no es válida';
                 }
                 else {
                   if (regex.test(data.codigo)) {
@@ -2524,14 +2524,14 @@ class EmpleadoControlador {
                 }
               }
               else {
-                data.observacion = 'La cédula ingresada no es válida';
+                data.observacion = 'La identificación ingresada no es válida';
               }
 
               listEmpleadosManual.push(data);
             }
             else {
               data.fila = ITEM;
-              data.cedula = CEDULA?.trim();
+              data.identificacion = IDENTIFICACION?.trim();
               data.apellido = APELLIDO?.trim();
               data.nombre = NOMBRE?.trim();
               data.codigo = CODIGO?.trim();
@@ -2549,7 +2549,7 @@ class EmpleadoControlador {
               data.nacionalidad = NACIONALIDAD?.trim();
               data.observacion = 'no registrado';
 
-              data.cedula = parseInt(data.cedula);
+              data.identificacion = parseInt(data.identificacion);
               data.codigo = parseInt(data.codigo);
               data.longitud = parseFloat(data.longitud);
               data.latitud = parseFloat(data.latitud);
@@ -2690,20 +2690,20 @@ class EmpleadoControlador {
                 }
               }
 
-              if (CEDULA == undefined) {
-                data.cedula = 'No registrado'
-                data.observacion = 'Cédula no registrada';
+              if (IDENTIFICACION == undefined) {
+                data.identificacion = 'No registrado'
+                data.observacion = 'Identificación no registrada';
               }
               else {
                 // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                 const rege = /^[0-9]+$/;
-                if (rege.test(data.cedula)) {
-                  if (data.cedula.toString().length != 10) {
-                    data.observacion = 'La cédula ingresada no es válida';
+                if (rege.test(data.identificacion)) {
+                  if (data.identificacion.toString().length != 10) {
+                    data.observacion = 'La identificación ingresada no es válida';
                   }
                 }
                 else {
-                  data.observacion = 'La cédula ingresada no es válida';
+                  data.observacion = 'La identificación ingresada no es válida';
                 }
               }
               listEmpleadosManual.push(data);
@@ -2725,11 +2725,11 @@ class EmpleadoControlador {
           if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
             var VERIFICAR_CEDULA = await pool.query(
               `
-              SELECT * FROM eu_empleados WHERE cedula = $1
+              SELECT * FROM eu_empleados WHERE identificacion = $1
               `
-              , [valor.cedula]);
+              , [valor.identificacion]);
             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-              valor.observacion = 'Cédula ya existe en el sistema'
+              valor.observacion = 'Identificación ya existe en el sistema'
             }
             else {
 
@@ -2766,7 +2766,7 @@ class EmpleadoControlador {
                           , [valor.nacionalidad.toUpperCase()]);
                         if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                           // DISCRIMINACION DE ELEMENTOS IGUALES
-                          if (duplicados1.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                          if (duplicados1.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
                             // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                             if (duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined) {
                               // DISCRIMINACION DE ELEMENTOS IGUALES
@@ -2824,7 +2824,7 @@ class EmpleadoControlador {
           var filaDuplicada: number = 0;
           listEmpleadosManual.forEach((item: any) => {
             if (item.observacion == '1') {
-              item.observacion = 'Registro duplicado (cédula)';
+              item.observacion = 'Registro duplicado (identificación)';
             }
             else if (item.observacion == '2') {
               item.observacion = 'Registro duplicado (usuario)';
@@ -2910,7 +2910,7 @@ class EmpleadoControlador {
         console.log('contraseña plantilla manual: ', contrasena);
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
-        const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,
+        const { identificacion, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,
           telefono, nacionalidad, usuario, rol } = data;
 
         // OBTENER ID DEL ESTADO_CIVIL
@@ -2984,7 +2984,7 @@ class EmpleadoControlador {
         //console.log('Estado civil manual: ', id_estado_civil);
 
         /*console.log('codigo: ', codigo)
-        console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
+        console.log('identificacion: ', identificacion, ' usuario: ', usuario, ' contrasena: ', contrasena);
         console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimiento, ' estado civil: ', id_estado_civil);
         console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol.rows);
         console.log('longitud: ', _longitud, ' latitud: ', _latitud)*/
@@ -2992,11 +2992,11 @@ class EmpleadoControlador {
         // REGISTRO DE NUEVO EMPLEADO
         const response: QueryResult = await pool.query(
           `
-          INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
+          INSERT INTO eu_empleados ( identificacion, apellido, nombre, estado_civil, genero, correo,
             fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `
-          , [cedula, apellidoE, nombreE,
+          , [identificacion, apellidoE, nombreE,
             id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
             _domicilio, _telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
 
@@ -3008,7 +3008,7 @@ class EmpleadoControlador {
           usuario: user_name,
           accion: 'I',
           datosOriginales: '',
-          datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
+          datosNuevos: `{identificacion: ${identificacion}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
           ip: ip,
           ip_local: ip_local,
           observacion: null
@@ -3091,10 +3091,10 @@ class EmpleadoControlador {
     let errorOccurred = false;
 
     for (const e of empleados) {
-      const { codigo, cedula } = e;
+      const { codigo, identificacion } = e;
 
       if (permisos) {
-        const carpetaPermisos = await ObtenerRuta(codigo, cedula, 'permisos');
+        const carpetaPermisos = await ObtenerRuta(codigo, identificacion, 'permisos');
         try {
           await fs.promises.access(carpetaPermisos, fs.constants.F_OK);
         } catch (error) {
@@ -3107,7 +3107,7 @@ class EmpleadoControlador {
       }
 
       if (vacaciones) {
-        const carpetaVacaciones = await ObtenerRuta(codigo, cedula, 'vacaciones');
+        const carpetaVacaciones = await ObtenerRuta(codigo, identificacion, 'vacaciones');
         try {
           await fs.promises.access(carpetaVacaciones, fs.constants.F_OK);
         } catch (error) {
@@ -3120,7 +3120,7 @@ class EmpleadoControlador {
       }
 
       if (horasExtras) {
-        const carpetaHorasExtras = await ObtenerRuta(codigo, cedula, 'horasExtras');
+        const carpetaHorasExtras = await ObtenerRuta(codigo, identificacion, 'horasExtras');
         try {
           await fs.promises.access(carpetaHorasExtras, fs.constants.F_OK);
         } catch (error) {
@@ -3168,7 +3168,7 @@ class EmpleadoControlador {
 
   public async getListaEmpleados(req: Request, res: Response): Promise<Response> {
     try {
-      const response: QueryResult = await pool.query('SELECT id, cedula, codigo,  (nombre || \' \' || apellido) as fullname, name_cargo as cargo, name_suc as sucursal, name_dep as departamento, name_regimen as regimen  FROM informacion_general ORDER BY fullname ASC');
+      const response: QueryResult = await pool.query('SELECT id, identificacion, codigo,  (nombre || \' \' || apellido) as fullname, name_cargo as cargo, name_suc as sucursal, name_dep as departamento, name_regimen as regimen  FROM informacion_general ORDER BY fullname ASC');
       const empleados: any[] = response.rows;
       console.log(empleados);
 
@@ -3308,9 +3308,9 @@ export const EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 export default EMPLEADO_CONTROLADOR;
 
 
-export function  ValidarCedula(cedula: string): boolean {
-  console.log("entra a validar Cedula");
-  const cad: string = cedula;
+export function  ValidarCedula(identificacion: string): boolean {
+  console.log("entra a validar cedula");
+  const cad: string = identificacion;
   let total: number = 0;
   const longitud: number = cad.length;
   const longcheck: number = longitud - 1;

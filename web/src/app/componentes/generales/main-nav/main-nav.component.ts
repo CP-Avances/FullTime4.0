@@ -570,7 +570,7 @@ export class MainNavComponent implements OnInit {
           complete: () => {
             //Control de vistas activas
             this.paginasMG.forEach((row: any) => {
-              console.log('id: ' , row.id, ' funcion ', row.funcion, ' link: ' , row.link, ' id_rol: ' , row.id_rol, ' accion: ' , row.id_accion);
+              console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
               switch (row.link) {
                 case 'vistaEmpresa':
                   this.itemConfiguracion = true;
@@ -792,17 +792,6 @@ export class MainNavComponent implements OnInit {
                     this.childrenUsuarios.push({ name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true });
                   }
                   break;
-                case 'actualizarInformacion':
-                  this.itemUsuarios = true;
-                  for (const parametrizacion of this.childrenUsuarios) {
-                    if (parametrizacion.url === '/actualizarInformacion') {
-                      this.vistaActualizarInformacion = true;
-                    }
-                  }
-                  if (!this.vistaActualizarInformacion) {
-                    this.childrenUsuarios.push({ name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true });
-                  }
-                  break;
                 case 'empleado':
                   this.itemUsuarios = true;
                   for (const parametrizacion of this.childrenUsuarios) {
@@ -812,6 +801,17 @@ export class MainNavComponent implements OnInit {
                   }
                   if (!this.vistaEmpleados) {
                     this.childrenUsuarios.push({ name: 'Empleados', url: '/empleado', color: true, ver: true });
+                  }
+                  break;
+                case 'actualizarInformacion':
+                  this.itemUsuarios = true;
+                  for (const parametrizacion of this.childrenUsuarios) {
+                    if (parametrizacion.url === '/actualizarInformacion') {
+                      this.vistaActualizarInformacion = true;
+                    }
+                  }
+                  if (!this.vistaActualizarInformacion) {
+                    this.childrenUsuarios.push({ name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true });
                   }
                   break;
                 case 'administrarInformacion':

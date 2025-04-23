@@ -347,7 +347,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     // CREAR UN ARRAY PARA LAS FILAS DEL ARCHIVO EXCEL
     const filas: any[] = [];
     // CREAR LA FILA DE ENCABEZADOS
-    const encabezados = ['CEDULA', 'EMPLEADO'];
+    const encabezados = ['IDENTIFICACION', 'EMPLEADO'];
     for (let fecha = new Date(fechaInicio); fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
       // CONVERTIR FECHA A ESTE FORMATO VIERNES 26/01/2024
       const opciones: Intl.DateTimeFormatOptions = {
@@ -364,7 +364,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
     // CREAR LAS FILAS DE DATOS
     for (const usuario of usuarios) {
-      const fila = [usuario.cedula, usuario.nombre];
+      const fila = [usuario.identificacion, usuario.nombre];
       filas.push(fila);
     }
 

@@ -213,7 +213,7 @@ export class RegistroComponent implements OnInit {
       domicilio: form2.domicilioForm,
       apellido: ApellidoCapitalizado,
       telefono: form2.telefonoForm,
-      cedula: form1.cedulaForm,
+      identificacion: form1.cedulaForm,
       nombre: NombreCapitalizado,
       genero: form2.generoForm,
       correo: form1.emailForm,
@@ -227,7 +227,7 @@ export class RegistroComponent implements OnInit {
     if (this.contador === 0) {
       this.rest.RegistrarEmpleados(empleado).subscribe(response => {
         if (response.message === 'error') {
-          this.toastr.error('Cédula o código de usuario ya se encuentran registrados.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Identificación o código de usuario ya se encuentran registrados.', 'Ups!!! algo salio mal.', {
             timeOut: 6000,
           });
         }

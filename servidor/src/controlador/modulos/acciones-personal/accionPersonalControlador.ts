@@ -490,7 +490,7 @@ class AccionPersonalControlador {
         const { id } = req.params;
         const EMPLEADO = await pool.query(
             `
-            SELECT d.id, d.nombre, d.apellido, d.cedula, d.codigo, d.id_cargo, 
+            SELECT d.id, d.nombre, d.apellido, d.identificacion, d.codigo, d.id_cargo, 
                 ec.sueldo, d.name_cargo AS cargo, d.name_dep AS departamento 
             FROM informacion_general AS d, eu_empleado_cargos AS ec
             WHERE d.id_cargo = ec.id AND d.id = $1
@@ -554,7 +554,7 @@ class AccionPersonalControlador {
                 ap.numero_partida_individual, ap.acta_final_concurso, ap.fecha_acta_final_concurso, ap.nombre_reemplazo, 
                 ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 
                 ap.posesion_notificacion, ap.descripcion_posesion_notificacion, tap.base_legal, tap.id_tipo_accion_personal,
-                e.codigo, e.cedula, e.nombre, e.apellido 
+                e.codigo, e.identificacion, e.nombre, e.apellido 
             FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, eu_empleados AS e 
             WHERE ap.id_detalle_tipo_accion_personal = tap.id AND e.id = ap.id_empleado
             `

@@ -668,7 +668,7 @@ class PlanGeneralControlador {
     // METODO PARA BUSCAR ASISTENCIAS   **USADO
     public async BuscarAsistencia(req: Request, res: Response) {
         try {
-            const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
+            const { identificacion, codigo, inicio, fin, nombre, apellido } = req.body;
             let ids = [];
             if (codigo !== '' && codigo !== null) {
                 const empleado = await BuscarEmpleadoPorParametro('codigo', codigo);
@@ -677,8 +677,8 @@ class PlanGeneralControlador {
                 }
             } else {
                 let empleado;
-                if (cedula !== '' && cedula !== null) {
-                    empleado = await BuscarEmpleadoPorParametro('cedula', cedula);
+                if (identificacion !== '' && identificacion !== null) {
+                    empleado = await BuscarEmpleadoPorParametro('identificacion', identificacion);
                 }
                 else if (nombre !== '' && apellido !== '' && nombre !== null && apellido !== null) {
                     empleado = await BuscarEmpleadoPorParametro('nombre_apellido', { nombre, apellido });
@@ -698,7 +698,7 @@ class PlanGeneralControlador {
                     `
                     SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
                         p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
-                        empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
+                        empleado.identificacion, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
                     FROM eu_asistencia_general p_g
                     INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
                     WHERE p_g.fecha_horario BETWEEN $1 AND $2
@@ -841,8 +841,8 @@ async function BuscarEmpleadoPorParametro(parametro: string, valor: string | { n
     let queryParams: any[] | undefined = [];
 
     switch (parametro) {
-        case 'cedula':
-            query = 'SELECT id FROM eu_empleados WHERE cedula = $1';
+        case 'identificacion':
+            query = 'SELECT id FROM eu_empleados WHERE identificacion = $1';
             queryParams = [valor];
             break;
         case 'nombre':

@@ -726,7 +726,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
               },
               {
                 border: [false, true, false, false],
-                text: 'C.C.: ' + e.cedula,
+                text: 'C.C.: ' + e.identificacion,
                 style: 'itemsTableInfoEmpleado'
               },
               {
@@ -890,7 +890,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
           n,
           empleado.codigo,
           empleado.apellido + ' ' + empleado.nombre,
-          empleado.cedula,
+          empleado.identificacion,
           empleado.sucursal,
           empleado.ciudad,
           empleado.regimen,
@@ -949,7 +949,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 30 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "sucursal", width: 20 },
       { key: "ciudad", width: 20 },
       { key: "regimen", width: 20 },
@@ -994,7 +994,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE EMPLEADO", totalsRowLabel: "", filterButton: true },
-      { name: "CÉDULA", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
       { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
       { name: "REGIMEN", totalsRowLabel: "", filterButton: true },
@@ -1280,7 +1280,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         n++;
         const horario = {
           n,
-          cedula: empleado.cedula,
+          identificacion: empleado.identificacion,
           codigo: empleado.codigo,
           empleado: empleado.apellido + ' ' + empleado.nombre,
           ciudad: empleado.ciudad,

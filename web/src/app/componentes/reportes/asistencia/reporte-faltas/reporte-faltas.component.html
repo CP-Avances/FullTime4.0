@@ -232,7 +232,7 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Sucursal</th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Rol</th>
@@ -248,7 +248,7 @@
                             </mat-checkbox>
                         </td>
                         <td>{{e.sucursal}}</td>
-                        <td>{{e.cedula}}</td>
+                        <td>{{e.identificacion}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
                         <td>{{e.rol}}</td>
@@ -279,7 +279,7 @@
                         <thead class="thead-light">
                             <tr style="text-align: center">
                                 <th class="t_horarios" scope="col" rowspan="2">N°</th>
-                                <th class="t_horarios" scope="col" rowspan="2">Cédula</th>
+                                <th class="t_horarios" scope="col" rowspan="2">Identificación</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Código</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Empleado</th>
                                 <th class="t_horarios" scope="col" rowspan="2">Género</th>
@@ -292,7 +292,7 @@
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
                                 <td class="t_horarios">{{ t.n }}</td>
-                                <td class="t_horarios">{{ t.cedula }}</td>
+                                <td class="t_horarios">{{ t.identificacion }}</td>
                                 <td class="t_horarios">{{ t.codigo }}</td>
                                 <td class="t_horarios">{{ t.empleado }}</td>
                                 <td class="t_horarios">{{ t.genero }}</td>

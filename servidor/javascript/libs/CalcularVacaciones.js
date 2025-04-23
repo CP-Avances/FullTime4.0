@@ -447,7 +447,7 @@ function ObtenerInformacionEmpleado(IAcumulado, id_empl) {
         let ObjetoEmpleado = {
             nombre: '',
             ciudad: '',
-            cedula: '',
+            identificacion: '',
             codigo: '',
             fec_ingreso: IAcumulado.fecha_ingreso,
             fec_carga: IAcumulado.inicio_Ultimo_Periodo,
@@ -455,7 +455,7 @@ function ObtenerInformacionEmpleado(IAcumulado, id_empl) {
             estado: 'Inactivo'
         };
         let data = yield database_1.default.query(`
-        SELECT e.nombre, e.apellido, e.cedula, e.codigo, e.estado, c.descripcion 
+        SELECT e.nombre, e.apellido, e.identificacion, e.codigo, e.estado, c.descripcion 
         FROM eu_empleados AS e, eu_empleado_contratos AS co, eu_empleado_cargos AS ca, e_sucursales AS s, e_ciudades AS c 
         WHERE e.id = $1 AND e.id = co.id_empleado AND ca.id_contrato = co.id AND s.id = ca.id_sucursal 
             AND s.id_ciudad = c.id 
@@ -466,7 +466,7 @@ function ObtenerInformacionEmpleado(IAcumulado, id_empl) {
         });
         ObjetoEmpleado.nombre = data.nombre + ' ' + data.apellido;
         ObjetoEmpleado.ciudad = data.descripcion;
-        ObjetoEmpleado.cedula = data.cedula;
+        ObjetoEmpleado.identificacion = data.identificacion;
         ObjetoEmpleado.codigo = data.codigo;
         if (data.estado === 1) {
             ObjetoEmpleado.estado = 'Activo';

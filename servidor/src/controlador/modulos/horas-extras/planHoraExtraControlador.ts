@@ -17,7 +17,7 @@ class PlanHoraExtraControlador {
   public async ListarPlanHoraExtra(req: Request, res: Response) {
     const PLAN = await pool.query(
       `
-      SELECT e.id AS empl_id, e.codigo, e.cedula, e.nombre, e.apellido, 
+      SELECT e.id AS empl_id, e.codigo, e.identificacion, e.nombre, e.apellido, 
         t.id_empl_cargo, t.id_empl_contrato, t.id_plan_extra, t.tiempo_autorizado, t.fecha_desde, t.fecha_hasta, 
         t.hora_inicio, t.hora_fin, (t.h_fin::interval - t.h_inicio::interval)::time AS hora_total_plan, 
         t.fecha_timbre, t.timbre_entrada, t.timbre_salida, 
@@ -40,7 +40,7 @@ class PlanHoraExtraControlador {
   public async ListarPlanHoraExtraObserva(req: Request, res: Response) {
     const PLAN = await pool.query(
       `
-      SELECT e.id AS empl_id, e.codigo, e.cedula, e.nombre, e.apellido, 
+      SELECT e.id AS empl_id, e.codigo, e.identificacion, e.nombre, e.apellido, 
         t.id_empl_cargo, t.id_empl_contrato, t.id_plan_extra, t.tiempo_autorizado, t.fecha_desde, t.fecha_hasta, 
         t.hora_inicio, t.hora_fin, (t.h_fin::interval - t.h_inicio::interval)::time AS hora_total_plan,
         t.fecha_timbre, t.timbre_entrada, t.timbre_salida, 
@@ -63,7 +63,7 @@ class PlanHoraExtraControlador {
   public async ListarPlanHoraExtraAutorizada(req: Request, res: Response) {
     const PLAN = await pool.query(
       `
-      SELECT e.id AS empl_id, e.codigo, e.cedula, e.nombre, e.apellido,
+      SELECT e.id AS empl_id, e.codigo, e.identificacion, e.nombre, e.apellido,
         t.id_empl_cargo, t.id_empl_contrato, t.id_plan_extra, t.tiempo_autorizado, t.fecha_desde, t.fecha_hasta,
         t.hora_inicio, t.hora_fin, (t.h_fin::interval - t.h_inicio::interval)::time AS hora_total_plan,
         t.fecha_timbre, t.timbre_entrada, t.timbre_salida, 
@@ -360,7 +360,7 @@ class PlanHoraExtraControlador {
       `
       SELECT p.id AS id_plan, pe.id, p.descripcion, p.fecha_desde, p.fecha_hasta, p.hora_inicio, p.hora_fin,
         p.horas_totales, e.id AS id_empleado, (e.nombre || ' ' || e.apellido) AS nombre,
-        e.codigo, e.cedula, e.correo, pe.id_empleado_cargo AS id_cargo
+        e.codigo, e.identificacion, e.correo, pe.id_empleado_cargo AS id_cargo
       FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, eu_empleados AS e
       WHERE pe.id_detalle_plan = $1 AND pe.id_detalle_plan = p.id AND e.id = pe.id_empleado_realiza
       `
@@ -505,7 +505,7 @@ class PlanHoraExtraControlador {
       `
       SELECT pe.id, p.id AS id_plan, p.descripcion, p.fecha_desde, p.fecha_hasta, p.hora_inicio, 
 	      p.hora_fin, p.horas_totales, pe.observacion, pe.tiempo_autorizado, pe.estado,
-        da.id AS id_empleado, (da.nombre || ' ' || da.apellido) AS nombre, da.correo, da.cedula,
+        da.id AS id_empleado, (da.nombre || ' ' || da.apellido) AS nombre, da.correo, da.identificacion,
         da.codigo, da.id_cargo, da.id_contrato
       FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, informacion_general AS da
       WHERE pe.id_empleado_realiza = $1 AND pe.id_detalle_plan = p.id AND da.id = pe.id_empleado_realiza
@@ -543,7 +543,7 @@ class PlanHoraExtraControlador {
 
       const Envia = await pool.query(
         `
-        SELECT da.nombre, da.apellido, da.cedula, da.correo, da.name_cargo AS tipo_cargo, 
+        SELECT da.nombre, da.apellido, da.identificacion, da.correo, da.name_cargo AS tipo_cargo, 
           da.name_dep AS departamento
         FROM informacion_general AS da
         WHERE da.id = $1
@@ -569,7 +569,7 @@ class PlanHoraExtraControlador {
               <b>Empresa:</b> ${nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${Envia.nombre} ${Envia.apellido} <br>
-              <b>Número de Cédula:</b> ${Envia.cedula} <br>
+              <b>Número de identificación:</b> ${Envia.identificacion} <br>
               <b>Cargo:</b> ${Envia.tipo_cargo} <br>
               <b>Departamento:</b> ${Envia.departamento} <br>
               <b>Generado mediante:</b> Aplicación Web <br>
@@ -590,7 +590,7 @@ class PlanHoraExtraControlador {
               <table border=2 cellpadding=10 cellspacing=0 style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px;">
                 <tr>
                   <th><h5>COLABORADOR</h5></th> 
-                  <th><h5>CÉDULA</h5></th> 
+                  <th><h5>IDENTIFICACIÓN</h5></th> 
                 </tr>            
                 ${nombres} 
               </table>

@@ -948,7 +948,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: "No. de Cédula de Ciudadanía",
+                      text: "No. de identificación",
                       style: "itemsTable_c",
                       alignment: 'center',
                     },
@@ -1015,7 +1015,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                     {
                       text: [
                         {
-                          text: this.empleado_1[0].cedula,
+                          text: this.empleado_1[0].identificacion,
                           style: "itemsTable_c",
                           alignment: 'center',
                         },
@@ -3309,7 +3309,7 @@ export class ListarPedidoAccionComponent implements OnInit {
               border: [false, false, false, false],
               margin: [0, 30, 0, 0],
               text: [
-                { text: "CON CÉDULA DE CIUDADANÍA No.", style: "itemsTable" },
+                { text: "CON IDENTIFICACIÓN DE CIUDADANÍA No.", style: "itemsTable" },
               ],
             },
             {
@@ -3319,7 +3319,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: this.empleado_1[0].cedula.toUpperCase(),
+                      text: this.empleado_1[0].identificacion.toUpperCase(),
                       color: "black",
                       style: "itemsTable",
                     },
@@ -3758,8 +3758,8 @@ export class ListarPedidoAccionComponent implements OnInit {
     xlsx.utils.sheet_add_aoa(worksheet, [['APELLIDO']], { origin: 'C10' });
     xlsx.utils.sheet_add_aoa(worksheet, [[nombreEmpleado]], { origin: 'I9' });
     xlsx.utils.sheet_add_aoa(worksheet, [['NOMBRE']], { origin: 'I10' });
-    xlsx.utils.sheet_add_aoa(worksheet, [['N°. de cédula de ciudadanía']], { origin: 'C11' });
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.empleado_1[0].cedula]], { origin: 'C12' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['N°. de identificación']], { origin: 'C11' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.empleado_1[0].identificacion]], { origin: 'C12' });
     xlsx.utils.sheet_add_aoa(worksheet, [['N°. de afiliación IESS']], { origin: 'G11' });
     xlsx.utils.sheet_add_aoa(worksheet, [['Rige a partir de:']], { origin: 'L11' });
     xlsx.utils.sheet_add_aoa(worksheet, [[fecha2]], { origin: 'L12' });
@@ -3897,8 +3897,8 @@ export class ListarPedidoAccionComponent implements OnInit {
     xlsx.utils.sheet_add_aoa(worksheet,
       [[
         `POSESIÓN DEL CARGO\n\n
-        YO ${this.empleado_1[0].apellido.toUpperCase()} ${this.empleado_1[0].nombre.toUpperCase()}     CON CÉDULA DE CIUDADANÍA No.
-        ${this.empleado_1[0].cedula.toUpperCase()}\n
+        YO ${this.empleado_1[0].apellido.toUpperCase()} ${this.empleado_1[0].nombre.toUpperCase()}     CON IDENTIFICACIÓN DE CIUDADANÍA No.
+        ${this.empleado_1[0].identificacion.toUpperCase()}\n
         JURO LEALTAD AL ESTADO ECUATORIANO.\n\n\n
         LUGAR:  ___________________________________\n\n
         FECHA:  ___________________________________\n\n\n\n\n\n
@@ -4052,7 +4052,7 @@ export class ListarPedidoAccionComponent implements OnInit {
             body: [
               [
                 { text: "Código", style: "tableHeader" },
-                { text: "Cédula", style: "tableHeader" },
+                { text: "Identificación", style: "tableHeader" },
                 { text: "Empleado", style: "tableHeader" },
                 { text: "Fecha de creación", style: "tableHeader" },
                 { text: "Rige desde", style: "tableHeader" },
@@ -4062,7 +4062,7 @@ export class ListarPedidoAccionComponent implements OnInit {
               ...this.listaPedidos.map((obj) => {
                 return [
                   { text: obj.id, style: "itemsTable" },
-                  { text: obj.cedula, style: "itemsTable" },
+                  { text: obj.identificacion, style: "itemsTable" },
                   {
                     text: obj.apellido + " " + obj.nombre,
                     style: "itemsTable",
@@ -4097,7 +4097,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       this.listaPedidos.map((obj) => {
         return {
           Codigo: obj.id,
-          Cedula: obj.cedula,
+          identificacion: obj.identificacion,
           Empleado: obj.apellido + " " + obj.nombre,
           Fecha_creacion: obj.fecCreacion_,
           Rige_desde: obj.fecDesde_,
@@ -4136,7 +4136,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       objeto = {
         Pedidos: {
           "@id": obj.id,
-          cedula: obj.cedula,
+          identificacion: obj.identificacion,
           empleado: obj.apellido + " " + obj.nombre,
           fecha_creacion: obj.fecCreacion_,
           rige_desde: obj.fecDesde_,
@@ -4165,7 +4165,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       this.listaPedidos.map((obj: any) => {
         return {
           Codigo: obj.id,
-          Cedula: obj.cedula,
+          identificacion: obj.identificacion,
           Empleado: obj.apellido + " " + obj.nombre,
           Fecha_creacion: obj.fecCreacion_,
           Rige_desde: obj.fecDesde_,
