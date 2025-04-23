@@ -768,14 +768,34 @@ export class PrincipalProcesoComponent implements OnInit {
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 
-  exportToCVS() {
-    /*
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.procesos);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "ProcesosCSV" + new Date().getTime() + '.csv');
-    */
-  }
+    exportToCVS() {
+      var arreglo = this.procesos;
+      // 1. Crear un nuevo workbook
+      const workbook = new ExcelJS.Workbook();
+      // 2. Crear una hoja en el workbook
+      const worksheet = workbook.addWorksheet('ProcesosCSV');
+      // 3. Agregar encabezados de las columnas
+      worksheet.columns = [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'PROCESO', key: 'nombre', width: 15 },
+        { header: 'PROCESO_PADRE', key: 'proc_padre', width: 15 }
+      ];
+  
+      // 4. Llenar las filas con los datos
+      arreglo.map((obj: any) => {
+        worksheet.addRow({
+          id: obj.id,
+          descripcion: obj.descripcion,
+        }).commit();
+      });
+  
+      // 5. Escribir el CSV en un buffer
+      workbook.csv.writeBuffer().then((buffer) => {
+        // 6. Crear un blob y descargar el archivo
+        const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+        FileSaver.saveAs(data, "ProcesosCSV.csv");
+      });
+    }
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **

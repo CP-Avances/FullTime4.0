@@ -720,12 +720,31 @@ export class GradosComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
-    /*
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.procesos);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "ProcesosCSV" + new Date().getTime() + '.csv');
-    */
+    var arreglo = this.ListGrados;
+    // 1. Crear un nuevo workbook
+    const workbook = new ExcelJS.Workbook();
+    // 2. Crear una hoja en el workbook
+    const worksheet = workbook.addWorksheet('GradoCSV');
+    // 3. Agregar encabezados de las columnas
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 30 },
+      { header: 'DESCRIPCION', key: 'descripcion', width: 15 },
+    ];
+
+    // 4. Llenar las filas con los datos
+    arreglo.map((obj: any) => {
+      worksheet.addRow({
+        id: obj.id,
+        descripcion: obj.descripcion,
+      }).commit();
+    });
+
+    // 5. Escribir el CSV en un buffer
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. Crear un blob y descargar el archivo
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "GradoCSV.csv");
+    });
   }
 
   /** ************************************************************************************************* **
