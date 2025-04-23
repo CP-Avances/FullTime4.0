@@ -782,6 +782,7 @@ class GrupoOcupacionalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
+            console.log('datos: ', plantilla, user_name, ip, ip_local);
             try {
                 for (const item of plantilla) {
                     const { identificacion, grupo_ocupacional } = item;
@@ -807,17 +808,6 @@ class GrupoOcupacionalControlador {
             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
            `, [id_grupo_ocupacional, id_empleado]);
                     const [Gupo_Ocupacionales] = response.rows;
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_empleado_grupo_ocupacional',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(Gupo_Ocupacionales),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     if (Gupo_Ocupacionales == undefined || Gupo_Ocupacionales == '' || Gupo_Ocupacionales == null) {
@@ -827,17 +817,6 @@ class GrupoOcupacionalControlador {
             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
            `, [id_empleado]);
                         const [grupo_activo] = response.rows;
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'map_empleado_grupo_ocupacional',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(grupo_activo),
-                            ip: ip,
-                            ip_local: ip_local,
-                            observacion: null
-                        });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
                         if (grupo_activo == undefined || grupo_activo == '' || grupo_activo == null) {

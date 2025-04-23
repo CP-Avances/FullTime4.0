@@ -7,8 +7,11 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
+import * as xml2js from 'xml2js';
+import * as FileSaver from 'file-saver';
+import { FillPatterns } from 'exceljs';
+
 
 import { RegistroProcesoComponent } from '../registro-proceso/registro-proceso.component';
 import { EditarCatProcesosComponent } from 'src/app/componentes/modulos/accionesPersonal/catProcesos/editar-cat-procesos/editar-cat-procesos.component';
@@ -40,6 +43,13 @@ export class PrincipalProcesoComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+  private bordeGrueso!: Partial<ExcelJS.Borders>;
+  private fillAzul!: FillPatterns;
+  private fontTitulo!: Partial<ExcelJS.Font>;
+  private imagen: any;
+
+
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
@@ -54,7 +64,7 @@ export class PrincipalProcesoComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string =  (localStorage.getItem('empresaURL') as string);
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
 
@@ -82,10 +92,10 @@ export class PrincipalProcesoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     if (this.habilitarAccion === false) {
       let mensaje = {
@@ -267,7 +277,7 @@ export class PrincipalProcesoComponent implements OnInit {
         }
       });
   }
-  EliminarMultiple(){    
+  EliminarMultiple() {
     const data = {
       listaEliminar: this.procesoEliminar,
       user_name: this.user_name,
@@ -279,26 +289,26 @@ export class PrincipalProcesoComponent implements OnInit {
         this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
         });
-        if(response.relacionados > 0){
-          if(response.relacionados > 0){
+        if (response.relacionados > 0) {
+          if (response.relacionados > 0) {
             response.listaNoEliminados.forEach(item => {
-              this.toastr.warning(response.ms2+' '+item.trim(), 'Advertencia.', {
+              this.toastr.warning(response.ms2 + ' ' + item.trim(), 'Advertencia.', {
                 timeOut: 5000,
               });
             });
-            
+
           }
         }
         this.ngOnInit();
       }, error: (err) => {
-        if(err.status == 300){
-          this.toastr.error(err.error.message,'', {
+        if (err.status == 300) {
+          this.toastr.error(err.error.message, '', {
             timeOut: 4500,
           });
           this.toastr.warning(err.error.ms2, 'Advertencia.', {
             timeOut: 5000,
           });
-        }else{
+        } else {
           this.toastr.error(err.error.message, 'Ups !!! algo salio mal.', {
             timeOut: 4000,
           });
@@ -317,8 +327,8 @@ export class PrincipalProcesoComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-   ManejarPaginaMulti(e: PageEvent) {
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
     this.tamanio_paginaMul = e.pageSize;
     this.numero_paginaMul = e.pageIndex + 1
   }
@@ -362,7 +372,7 @@ export class PrincipalProcesoComponent implements OnInit {
   }
 
 
-  
+
   // METODO PARA LEER DATOS DE PLANTILLA
   CargarPlantillaGeneral(element: any) {
     if (element.target.files && element.target.files[0]) {
@@ -371,9 +381,9 @@ export class PrincipalProcesoComponent implements OnInit {
       let arrayItems = this.nameFile.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
-      
+
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      
+
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.VerificarPlantilla();
         } else {
@@ -402,15 +412,15 @@ export class PrincipalProcesoComponent implements OnInit {
   VerificarPlantilla() {
     this.listaProcesosCorrectas = [];
     let formData = new FormData();
-    
+
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
-        this.Datos_procesos = res.data;
-        this.messajeExcel = res.message;
+      this.Datos_procesos = res.data;
+      this.messajeExcel = res.message;
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -448,9 +458,9 @@ export class PrincipalProcesoComponent implements OnInit {
         timeOut: 4000,
       });
     });
-    
+
   }
-  
+
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
@@ -460,7 +470,7 @@ export class PrincipalProcesoComponent implements OnInit {
           this.RegistrarProcesos();
         }
       });
-      
+
   }
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
@@ -473,14 +483,14 @@ export class PrincipalProcesoComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion  == 'Registro cruzado' || observacion == 'Proceso superior no existe en el sistema como un proceso..' ||
+    } else if (observacion == 'Registro cruzado' || observacion == 'Proceso superior no existe en el sistema como un proceso..' ||
       observacion == 'No se puede registrar este proceso con su proceso padre porque no se pueden cruzar los mismo procesos' ||
-      observacion == 'No es posible registrar un proceso como su propio proceso superior.' || 
+      observacion == 'No es posible registrar un proceso como su propio proceso superior.' ||
       observacion == 'Proceso superior no existe en el sistema como un proceso.'
     ) {
       return 'rgb(238, 21, 242)';
-    }else if(arrayObservacion[0] == 'Un' || 
-        observacion == 'Procesos mal definidos'){
+    } else if (arrayObservacion[0] == 'Un' ||
+      observacion == 'Procesos mal definidos') {
       return 'rgb(232, 137, 207)';
     } else {
       return 'rgb(242, 21, 21)';
@@ -500,7 +510,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS
   RegistrarProcesos() {
-    console.log('listaProcesosCorrectas: ',this.listaProcesosCorrectas.length)
+    console.log('listaProcesosCorrectas: ', this.listaProcesosCorrectas.length)
     if (this.listaProcesosCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaProcesosCorrectas,
@@ -637,54 +647,201 @@ export class PrincipalProcesoComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-  exportToExcel() {
-    /*
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.procesos);
-    const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Procesos');
-    xlsx.writeFile(wb, "Procesos" + new Date().getTime() + '.xlsx');
-    */
+  async exportToExcel() {
+
+    var f = DateTime.now();
+    let fecha = f.toFormat('yyyy-MM-dd');
+    let hora = f.toFormat('HH:mm:ss');
+    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
+    const listProcesos: any[] = [];
+
+    console.log('this.procesos: ', this.procesos);
+    this.procesos.forEach((accion: any, index: number) => {
+
+      listProcesos.push([
+        index + 1,
+        accion.id,
+        accion.nombre,
+        accion.proc_padre
+      ]);
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Procesos");
+
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COMBINAR CELDAS
+    worksheet.mergeCells("B1:M1");
+    worksheet.mergeCells("B2:M2");
+    worksheet.mergeCells("B3:M3");
+    worksheet.mergeCells("B4:M4");
+    worksheet.mergeCells("B5:M5");
+
+    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
+    worksheet.getCell("B2").value = "Lista de Procesos".toUpperCase();
+
+    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
+    ["B1", "B2"].forEach((cell) => {
+      worksheet.getCell(cell).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cell).font = { bold: true, size: 14 };
+    });
+
+    worksheet.columns = [
+      { key: "n", width: 10 },
+      { key: "codigo", width: 20 },
+      { key: "proceso", width: 20 },
+      { key: "proceso_padre", width: 20 },
+    ];
+
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
+      { name: "PROCESO", totalsRowLabel: "", filterButton: true },
+      { name: "PROCESO PADRE", totalsRowLabel: "", filterButton: true },
+    ];
+    console.log("ver list Procesos", listProcesos);
+    console.log("Columnas:", columnas);
+
+    worksheet.addTable({
+      name: "Procesos",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: listProcesos,
+    });
+
+
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    const numeroFilas = listProcesos.length;
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= 4; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
+          };
+        }
+        cell.border = this.bordeCompleto;
+      }
+    }
+
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Lista_procesos.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+
+  }
+  private obtenerAlineacionHorizontalEmpleados(j: number): "left" | "center" | "right" {
+    if (j === 1 || j === 9 || j === 10 || j === 11) {
+      return "center";
+    } else {
+      return "left";
+    }
   }
 
   /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 
-  exportToCVS() {
-    /*
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.procesos);
-    const csvDataH = xlsx.utils.sheet_to_csv(wse);
-    const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "ProcesosCSV" + new Date().getTime() + '.csv');
-    */
-  }
+    exportToCVS() {
+      var arreglo = this.procesos;
+      // 1. Crear un nuevo workbook
+      const workbook = new ExcelJS.Workbook();
+      // 2. Crear una hoja en el workbook
+      const worksheet = workbook.addWorksheet('ProcesosCSV');
+      // 3. Agregar encabezados de las columnas
+      worksheet.columns = [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'PROCESO', key: 'nombre', width: 15 },
+        { header: 'PROCESO_PADRE', key: 'proc_padre', width: 15 }
+      ];
+  
+      // 4. Llenar las filas con los datos
+      arreglo.map((obj: any) => {
+        worksheet.addRow({
+          id: obj.id,
+          descripcion: obj.descripcion,
+        }).commit();
+      });
+  
+      // 5. Escribir el CSV en un buffer
+      workbook.csv.writeBuffer().then((buffer) => {
+        // 6. Crear un blob y descargar el archivo
+        const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+        FileSaver.saveAs(data, "ProcesosCSV.csv");
+      });
+    }
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
    ** ************************************************************************************************* **/
 
-  urlxml: string;
-  data: any = [];
-  exportToXML() {
-    var objeto;
+   urlxml: string;
+   data: any = [];
+   exportToXML() {
+     
+    var objeto: any;
     var arregloProcesos: any = [];
+    console.log('this.procesos: ', this.procesos);
     this.procesos.forEach((obj: any) => {
       objeto = {
-        "proceso": {
-          '@id': obj.id,
-          "nombre": obj.nombre,
-          "proceso_superior": obj.proc_padre,
+        "tipo_accion_personal": {
+          "$": { "id": obj.id },
+          "proceso": obj.nombre,
+          "proceso_padre": obj.proc_padre,
         }
       }
       arregloProcesos.push(objeto)
-    });
-
-    this.rest.CrearXML(arregloProcesos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/proceso/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
-  }
+     });
+     const xmlBuilder = new xml2js.Builder({ rootName: 'Procesos' });
+     const xml = xmlBuilder.buildObject(arregloProcesos);
+ 
+     if (xml === undefined) {
+       return;
+     }
+ 
+     const blob = new Blob([xml], { type: 'application/xml' });
+     const xmlUrl = URL.createObjectURL(blob);
+ 
+     // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+     const newTab = window.open(xmlUrl, '_blank');
+     if (newTab) {
+       newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+       newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+     } else {
+       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+     }
+     const a = document.createElement('a');
+     a.href = xmlUrl;
+     a.download = 'Procesos.xml';
+     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+     a.click();
+   }
 
   //CONTROL BOTONES
   private tienePermiso(accion: string): boolean {

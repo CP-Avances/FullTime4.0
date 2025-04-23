@@ -103,12 +103,9 @@ export class EditarTipoAccionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     };
-    if (form.tipoAccionForm != undefined && form.tipoAccionForm != 20) {
-      this.GuardarInformacion(datosAccion);
-    }
-    else {
-      this.IngresarNuevoTipo(form, datosAccion);
-    }
+    
+    this.GuardarInformacion(datosAccion);
+    
   }
 
   // METODO PARA GUARDAR DATOS
