@@ -428,8 +428,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Grupo Ocupacional ya existe en el sistema' ||
-      observacion == 'Número de partida ya existe en el sistema'
+    } else if (observacion == 'Grupo Ocupacional ya existe en el sistema'
     ) {
       return 'rgb(239, 203, 106)';
     } else {
