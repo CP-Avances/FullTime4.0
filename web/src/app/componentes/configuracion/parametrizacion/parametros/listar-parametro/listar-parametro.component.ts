@@ -300,14 +300,23 @@ export class ListarParametroComponent implements OnInit {
     let n: number = 1;
 
     this.parametros.forEach((obj: any) => {
-      obj.detalles.forEach((det: any) => {
+      if (obj.detalles && obj.detalles.length > 0) {
+        obj.detalles.forEach((det: any) => {
+          parametroslista.push([
+            n++,
+            obj.descripcion,
+            det.descripcion,
+            det.observacion
+          ]);
+        });
+      } else {
         parametroslista.push([
           n++,
           obj.descripcion,
-          det.descripcion,
-          det.observacion
+          "", 
+          ""  
         ]);
-      });
+      }
     });
 
     const workbook = new ExcelJS.Workbook();
@@ -430,14 +439,23 @@ export class ListarParametroComponent implements OnInit {
     ];
     // 4. Llenar las filas con los datos
     this.parametros.forEach((obj: any) => {
-      obj.detalles.forEach((det: any) => {
+      if (obj.detalles && obj.detalles.length > 0) {
+        obj.detalles.forEach((det: any) => {
+          worksheet.addRow({
+            n: n++,
+            parametro: obj.descripcion,
+            detalle: det.descripcion,
+            descripcion: det.observacion
+          }).commit();
+        });
+      } else {
         worksheet.addRow({
           n: n++,
           parametro: obj.descripcion,
-          detalle: det.descripcion,
-          descripcion: det.observacion
+          detalle: "",       
+          descripcion: ""     
         }).commit();
-      })
+      }
     });
     // 5. Escribir el CSV en un buffer
     workbook.csv.writeBuffer().then((buffer) => {

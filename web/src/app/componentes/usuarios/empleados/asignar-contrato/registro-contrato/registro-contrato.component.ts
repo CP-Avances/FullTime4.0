@@ -188,7 +188,7 @@ export class RegistroContratoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     }
-    if (form.tipoForm === undefined) {
+    if (!form.tipoForm || form.tipoForm === 'OTRO') {
       this.InsertarModalidad(form, datosContrato);
     }
     else {
@@ -207,6 +207,11 @@ export class RegistroContratoComponent implements OnInit {
         timeOut: 6000,
       })
       this.habilitarSeleccion = false;
+      this.contratoF.setValidators([Validators.required, Validators.minLength(3)]);
+      this.contratoF.updateValueAndValidity();
+      this.tipoF.clearValidators();
+      this.tipoF.setValue(null);
+      this.tipoF.updateValueAndValidity();
     }
   }
 
@@ -406,6 +411,11 @@ export class RegistroContratoComponent implements OnInit {
     this.formulario.reset();
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }
+  
   // CERRAR VENTANA DE REGISTRO DE CONTRATO
   CerrarVentana(opcion: any) {
     this.LimpiarCampos();

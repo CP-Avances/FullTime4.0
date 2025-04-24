@@ -89,7 +89,7 @@ export class TitulosComponent implements OnInit {
 
   // METODO PARA REGISTRAR TITULO
   InsertarTitulo(form: any) {
-    if (form.tituloNivelForm === undefined || form.tituloNivelForm === 'OTRO') {
+    if (!form.tituloNivelForm || form.tituloNivelForm === 'OTRO') {
       if (form.nombreNivelForm != '') {
         this.GuardarNivel(form);
       }
