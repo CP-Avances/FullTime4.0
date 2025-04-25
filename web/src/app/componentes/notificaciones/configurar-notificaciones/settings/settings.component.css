@@ -5,6 +5,7 @@
 
 p {
     font-weight: bold;
+    font-size: x-small;
 }
 
 .caja {
@@ -20,4 +21,38 @@ mat-slide-toggle {
     margin-left: 15px;
     background-color: rgb(80, 87, 97);
     color: white;
+}
+
+.estado-card {
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+    height: 70%;
+    width: 80%;
+
+    &.activo {
+        background-color: #1391df;
+        color: #125982;
+    }
+
+    &.inactivo {
+        background-color: #b8b8b8; 
+        color: #6d6d6d;
+    }
+}
+
+.estado-card:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+
+    &.activo {
+        background-color: #0875b8;
+        color: #125982;
+    }
+
+    &.inactivo {
+        background-color: #959595; 
+        color: #787878;
+    }
 }

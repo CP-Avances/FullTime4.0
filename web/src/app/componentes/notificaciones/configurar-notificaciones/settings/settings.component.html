@@ -8,10 +8,47 @@
         <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
             <br>
             <div class="row">
-                <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
+                <div class="col-12 col-md-8 m-auto p-0" style="align-content: center;">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-left: 4%;">
                         <div class="caja">
                             <p>COMUNICADOS</p>
+
+                            <div class="row" style="text-align:justify;">
+                                <div class="col-md-6" (click)="toggleEstado('comunicado', 'correo')">
+                                    <mat-card [ngClass]="cominicadoCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ cominicadoCorreo ? 'email' : 'unsubscribe' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ cominicadoCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-md-6" (click)="toggleEstado('comunicado', 'notificacion')">
+                                    <mat-card [ngClass]="cominicadoNotificacion ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ cominicadoNotificacion ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ cominicadoNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+
+
+
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-slide-toggle formControlName="comunicadoMail">Correo</mat-slide-toggle>
                                 <mat-slide-toggle formControlName="comunicadoNoti">Notificaciones</mat-slide-toggle>
@@ -19,6 +56,41 @@
                         </div>
                         <div class="caja">
                             <p>ATRASOS</p>
+                            <div class="row" style="text-align:justify;">
+                                <div class="col-md-6" (click)="toggleEstado('atrasos', 'correo')">
+                                    <mat-card [ngClass]="atrasosCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ atrasosCorreo ? 'email' : 'unsubscribe' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ atrasosCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <div class="col-md-6" (click)="toggleEstado('atrasos', 'notificacion')">
+                                    <mat-card [ngClass]="atrasosNotificacion ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ atrasosNotificacion ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ atrasosNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                            
+
+
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-slide-toggle formControlName="atrasosMail">Correo</mat-slide-toggle>
                                 <mat-slide-toggle formControlName="atrasosNoti">Notificaciones</mat-slide-toggle>
@@ -26,6 +98,39 @@
                         </div>
                         <div class="caja">
                             <p>FALTAS</p>
+                            <div class="row" style="text-align:justify;">
+                                <div class="col-md-6" (click)="toggleEstado('faltas', 'correo')">
+                                    <mat-card [ngClass]="faltasCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ faltasCorreo ? 'email' : 'unsubscribe' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ faltasCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <div class="col-md-6" (click)="toggleEstado('faltas', 'notificacion')">
+                                    <mat-card [ngClass]="faltasNotificacion ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ faltasNotificacion ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ faltasNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-slide-toggle formControlName="faltasMail">Correo</mat-slide-toggle>
                                 <mat-slide-toggle formControlName="faltasNoti">Notificaciones</mat-slide-toggle>
@@ -33,6 +138,40 @@
                         </div>
                         <div class="caja">
                             <p>SALIDAS ANTICIPADAS</p>
+
+                            <div class="row" style="text-align:justify;">
+                                <div class="col-md-6" (click)="toggleEstado('salida', 'correo')">
+                                    <mat-card [ngClass]="salidaCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ salidaCorreo ? 'email' : 'unsubscribe' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ salidaCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <div class="col-md-6" (click)="toggleEstado('salida', 'notificacion')">
+                                    <mat-card [ngClass]="salidaNotificacion ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                        class="estado-card">
+                                        <mat-card-title style="text-align: center; padding: 1px;">
+                                            <mat-icon class="icon-menu-correo mt-2">{{ salidaNotificacion ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+                                        </mat-card-title>
+                                        <mat-card-content>
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <p>{{ salidaNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</p>
+                                                </div>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-slide-toggle formControlName="salidasAnticipadasMail">Correo</mat-slide-toggle>
                                 <mat-slide-toggle

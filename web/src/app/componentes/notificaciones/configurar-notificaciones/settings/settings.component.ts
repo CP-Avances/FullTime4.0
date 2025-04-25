@@ -29,6 +29,23 @@ export class SettingsComponent implements OnInit {
 
   formGroup: FormGroup;
 
+  permisosCorreo = false;
+  permisosNotificacion = false;
+  vacaCorreo = false;
+  vacaNotificacion = false;
+  horaExtraCorreo = false;
+  horaExtraNotificacion = false;
+  comidaCorreo = false;
+  comidaNotificacion = false;
+  cominicadoCorreo = false;
+  cominicadoNotificacion = false;
+  atrasosCorreo = false;
+  atrasosNotificacion = false;
+  faltasCorreo = false;
+  faltasNotificacion = false;
+  salidaCorreo = false;
+  salidaNotificacion = false;
+
   // BUSQUEDA DE MODULOS ACTIVOS
   get habilitarPermisos(): boolean { return this.funciones.permisos; }
   get habilitarVacaciones(): boolean { return this.funciones.vacaciones; }
@@ -96,6 +113,16 @@ export class SettingsComponent implements OnInit {
         salidasAnticipadasMail: res[0].salidas_anticipadas_mail,
         salidasAnticipadasNoti: res[0].salidas_anticipadas_notificacion
       });
+
+      this.cominicadoCorreo = res[0].comunicado_mail
+      this.cominicadoNotificacion = res[0].comunicado_notificacion
+      this.atrasosCorreo = res[0].atrasos_mail
+      this.atrasosNotificacion = res[0].atrasos_notificacion
+      this.faltasCorreo = res[0].faltas_mail
+      this.faltasNotificacion = res[0].faltas_notificacion
+      this.salidaCorreo = res[0].salidas_anticipadas_mail
+      this.salidaNotificacion = res[0].salidas_anticipadas_notificacion
+
     }, error => {
       this.btnCrear = true;
     });
@@ -172,6 +199,69 @@ export class SettingsComponent implements OnInit {
       });
       return this.router.navigate(['/home']);
     });
+  }
+
+  toggleEstado(item: string, tipo: string) {
+    this.reproducirSonido()
+    if(item == 'comunicado'){
+      if(tipo == 'correo'){
+        this.cominicadoCorreo = !this.cominicadoCorreo;
+      }else{
+        this.cominicadoNotificacion = !this.cominicadoNotificacion
+      }
+    }else if(item == 'atrasos'){
+      if(tipo == 'correo'){
+        this.atrasosCorreo = !this.atrasosCorreo;
+      }else{
+        this.atrasosNotificacion = !this.atrasosNotificacion
+      }
+    }else if(item == 'faltas'){
+      if(tipo == 'correo'){
+        this.faltasCorreo = !this.faltasCorreo;
+      }else{
+        this.faltasNotificacion = !this.faltasNotificacion
+      }
+    }else if(item == 'permisos'){
+      if(tipo == 'correo'){
+        this.permisosCorreo = !this.permisosCorreo;
+      }else{
+        this.permisosNotificacion = !this.permisosNotificacion
+      }
+    }else if(item == 'vacaciones'){
+      if(tipo == 'correo'){
+        this.vacaCorreo = !this.vacaCorreo;
+      }else{
+        this.vacaNotificacion = !this.vacaNotificacion
+      }
+    }else if(item == 'horaExtra'){
+      if(tipo == 'correo'){
+        this.horaExtraCorreo = !this.horaExtraCorreo;
+      }else{
+        this.horaExtraNotificacion = !this.horaExtraNotificacion
+      }
+    }else if(item == 'comida'){
+      if(tipo == 'correo'){
+        this.comidaCorreo = !this.comidaCorreo;
+      }else{
+        this.comidaNotificacion = !this.comidaNotificacion
+      }
+    }else if(item == 'salida'){
+      if(tipo == 'correo'){
+        this.salidaCorreo = !this.salidaCorreo;
+      }else{
+        this.salidaNotificacion = !this.salidaNotificacion
+      }
+    }
+
+
+    
+  }
+
+  reproducirSonido() {
+    const audio = new Audio();
+    audio.src = 'assets/sounds/click.mp3'; // Ruta del sonido
+    audio.load();
+    audio.play();
   }
 
 }
