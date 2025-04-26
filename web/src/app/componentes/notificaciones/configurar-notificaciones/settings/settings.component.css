@@ -1,20 +1,20 @@
-.example-form mat-slide-toggle {
-    margin: 0px 0px 25px 0px;
-    display: block;
+p {
+    font-weight: bold;
+    font-size: small;
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-bottom: -1px !important;
 }
 
-p {
+label{
     font-weight: bold;
     font-size: x-small;
 }
 
 .caja {
-    padding: 0 5px 0 5px;
+    margin: auto;
+    align-items: center;
     font-size: 60%;
-}
-
-mat-slide-toggle {
-    padding: 0 10px 0 20px;
 }
 
 .btn {
@@ -28,8 +28,9 @@ mat-slide-toggle {
     text-align: center;
     transition: background-color 0.3s ease;
     border-radius: 10px;
-    height: 70%;
+    height: 100%;
     width: 80%;
+    margin: auto;
 
     &.activo {
         background-color: #1391df;
@@ -54,5 +55,16 @@ mat-slide-toggle {
     &.inactivo {
         background-color: #959595; 
         color: #787878;
+    }
+}
+
+@media (max-width: 530px) {
+    .estado-card {
+        height: 100%;
+        width: 100%;
+    }
+
+    p {
+        margin-left: 10px;
     }
 }

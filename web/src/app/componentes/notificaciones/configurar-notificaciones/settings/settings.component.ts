@@ -27,8 +27,6 @@ export class SettingsComponent implements OnInit {
   ip: string | null;
   ips_locales: any = '';
 
-  formGroup: FormGroup;
-
   permisosCorreo = false;
   permisosNotificacion = false;
   vacaCorreo = false;
@@ -59,26 +57,7 @@ export class SettingsComponent implements OnInit {
     private funciones: MainNavService,
     public validar: ValidacionesService,
     public router: Router,
-  ) {
-    this.formGroup = formBuilder.group({
-      vacaMail: false,
-      vacaNoti: false,
-      permisoMail: false,
-      permisoNoti: false,
-      horaExtraMail: false,
-      horaExtraNoti: false,
-      comidaMail: false,
-      comidaNoti: false,
-      comunicadoMail: false,
-      comunicadoNoti: false,
-      atrasosMail: false,
-      atrasosNoti: false,
-      faltasMail: false,
-      faltasNoti: false,
-      salidasAnticipadasMail: false,
-      salidasAnticipadasNoti: false,
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -95,24 +74,15 @@ export class SettingsComponent implements OnInit {
     this.VerModulos();
     this.avisos.ObtenerConfiguracionEmpleado(this.id_empleado).subscribe(res => {
       this.btnActualizar = true;
-      this.formGroup.patchValue({
-        vacaMail: res[0].vacacion_mail,
-        vacaNoti: res[0].vacacion_notificacion,
-        permisoMail: res[0].permiso_mail,
-        permisoNoti: res[0].permiso_notificacion,
-        horaExtraMail: res[0].hora_extra_mail,
-        horaExtraNoti: res[0].hora_extra_notificacion,
-        comidaMail: res[0].comida_mail,
-        comidaNoti: res[0].comida_notificacion,
-        comunicadoMail: res[0].comunicado_mail,
-        comunicadoNoti: res[0].comunicado_notificacion,
-        atrasosMail: res[0].atrasos_mail,
-        atrasosNoti: res[0].atrasos_notificacion,
-        faltasMail: res[0].faltas_mail,
-        faltasNoti: res[0].faltas_notificacion,
-        salidasAnticipadasMail: res[0].salidas_anticipadas_mail,
-        salidasAnticipadasNoti: res[0].salidas_anticipadas_notificacion
-      });
+
+      this.permisosCorreo = res[0].permiso_mail
+      this.permisosNotificacion = res[0].permiso_notificacion
+      this.vacaCorreo = res[0].vacacion_mail
+      this.vacaNotificacion = res[0].vacacion_notificacion
+      this.horaExtraCorreo = res[0].hora_extra_mail
+      this.horaExtraNotificacion = res[0].hora_extra_notificacion;
+      this.comidaCorreo = res[0].comida_mail;
+      this.comidaNotificacion = res[0].comida_notificacion;
 
       this.cominicadoCorreo = res[0].comunicado_mail
       this.cominicadoNotificacion = res[0].comunicado_notificacion
@@ -139,25 +109,25 @@ export class SettingsComponent implements OnInit {
   }
 
   // METODO PARA REGISTRAR CONFIGURACION DE NOTIFICACIONES
-  CrearConfiguracion(form: any) {
+  CrearConfiguracion() {
     let data = {
       id_empleado: this.id_empleado,
-      vaca_mail: form.vacaMail,
-      vaca_notificacion: form.vacaNoti,
-      permiso_mail: form.permisoMail,
-      permiso_notificacion: form.permisoNoti,
-      hora_extra_mail: form.horaExtraMail,
-      hora_extra_notificacion: form.horaExtraNoti,
-      comida_mail: form.comidaMail,
-      comida_notificacion: form.comidaNoti,
-      comunicado_mail: form.comunicadoMail,
-      comunicado_notificacion: form.comunicadoNoti,
-      atrasos_mail: form.atrasosMail,
-      atrasos_notificacion: form.atrasosNoti,
-      faltas_mail: form.faltasMail,
-      faltas_notificacion: form.faltasNoti,
-      salidas_anticipadas_mail: form.salidasAnticipadasMail,
-      salidas_anticipadas_notificacion: form.salidasAnticipadasNoti,
+      vaca_mail: this.vacaCorreo,
+      vaca_notificacion: this.vacaNotificacion,
+      permiso_mail: this.permisosCorreo,
+      permiso_notificacion: this.permisosNotificacion,
+      hora_extra_mail: this.horaExtraCorreo,
+      hora_extra_notificacion: this.horaExtraNotificacion,
+      comida_mail: this.comidaCorreo,
+      comida_notificacion: this.comidaNotificacion,
+      comunicado_mail: this.cominicadoCorreo,
+      comunicado_notificacion: this.cominicadoNotificacion,
+      atrasos_mail: this.atrasosCorreo,
+      atrasos_notificacion: this.atrasosNotificacion,
+      faltas_mail: this.faltasCorreo,
+      faltas_notificacion: this.faltasNotificacion,
+      salidas_anticipadas_mail: this.salidaCorreo,
+      salidas_anticipadas_notificacion: this.salidaNotificacion,
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales
@@ -171,24 +141,24 @@ export class SettingsComponent implements OnInit {
   }
 
   // METODO PARA ACTUALIZAR REGISTRO DE NOTIFICACIONES
-  ActualizarConfiguracion(form: any) {
+  ActualizarConfiguracion() {
     let data = {
-      vaca_mail: form.vacaMail,
-      vaca_notificacion: form.vacaNoti,
-      permiso_mail: form.permisoMail,
-      permiso_notificacion: form.permisoNoti,
-      hora_extra_mail: form.horaExtraMail,
-      hora_extra_notificacion: form.horaExtraNoti,
-      comida_mail: form.comidaMail,
-      comida_notificacion: form.comidaNoti,
-      comunicado_mail: form.comunicadoMail,
-      comunicado_notificacion: form.comunicadoNoti,
-      atrasos_mail: form.atrasosMail,
-      atrasos_notificacion: form.atrasosNoti,
-      faltas_mail: form.faltasMail,
-      faltas_notificacion: form.faltasNoti,
-      salidas_anticipadas_mail: form.salidasAnticipadasMail,
-      salidas_anticipadas_notificacion: form.salidasAnticipadasNoti,
+      vaca_mail: this.vacaCorreo,
+      vaca_notificacion: this.vacaNotificacion,
+      permiso_mail: this.permisosCorreo,
+      permiso_notificacion: this.permisosNotificacion,
+      hora_extra_mail: this.horaExtraCorreo,
+      hora_extra_notificacion: this.horaExtraNotificacion,
+      comida_mail: this.comidaCorreo,
+      comida_notificacion: this.comidaNotificacion,
+      comunicado_mail: this.cominicadoCorreo,
+      comunicado_notificacion: this.cominicadoNotificacion,
+      atrasos_mail: this.atrasosCorreo,
+      atrasos_notificacion: this.atrasosNotificacion,
+      faltas_mail: this.faltasCorreo,
+      faltas_notificacion: this.faltasNotificacion,
+      salidas_anticipadas_mail: this.salidaCorreo,
+      salidas_anticipadas_notificacion: this.salidaNotificacion,
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales
@@ -201,65 +171,85 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  // METODO PARA ACTUALIZAR EL ESTADO DE LOS BOTONES
   toggleEstado(item: string, tipo: string) {
-    this.reproducirSonido()
     if(item == 'comunicado'){
       if(tipo == 'correo'){
         this.cominicadoCorreo = !this.cominicadoCorreo;
       }else{
         this.cominicadoNotificacion = !this.cominicadoNotificacion
+        if(this.cominicadoNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'atrasos'){
       if(tipo == 'correo'){
         this.atrasosCorreo = !this.atrasosCorreo;
       }else{
         this.atrasosNotificacion = !this.atrasosNotificacion
+        if(this.atrasosNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'faltas'){
       if(tipo == 'correo'){
         this.faltasCorreo = !this.faltasCorreo;
       }else{
         this.faltasNotificacion = !this.faltasNotificacion
+        if( this.faltasNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'permisos'){
       if(tipo == 'correo'){
         this.permisosCorreo = !this.permisosCorreo;
       }else{
         this.permisosNotificacion = !this.permisosNotificacion
+        if( this.permisosNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'vacaciones'){
       if(tipo == 'correo'){
         this.vacaCorreo = !this.vacaCorreo;
       }else{
         this.vacaNotificacion = !this.vacaNotificacion
+        if( this.vacaNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'horaExtra'){
       if(tipo == 'correo'){
         this.horaExtraCorreo = !this.horaExtraCorreo;
       }else{
         this.horaExtraNotificacion = !this.horaExtraNotificacion
+        if( this.horaExtraNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'comida'){
       if(tipo == 'correo'){
         this.comidaCorreo = !this.comidaCorreo;
       }else{
         this.comidaNotificacion = !this.comidaNotificacion
+        if( this.comidaNotificacion){
+          this.reproducirSonido()
+        }
       }
     }else if(item == 'salida'){
       if(tipo == 'correo'){
         this.salidaCorreo = !this.salidaCorreo;
       }else{
         this.salidaNotificacion = !this.salidaNotificacion
+        if( this.salidaNotificacion){
+          this.reproducirSonido()
+        }
       }
     }
-
-
-    
   }
-
   reproducirSonido() {
     const audio = new Audio();
-    audio.src = 'assets/sounds/click.mp3'; // Ruta del sonido
+    audio.src = 'assets/sounds/click_confirmed.mp3'; // Ruta del sonido
     audio.load();
     audio.play();
   }
