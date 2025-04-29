@@ -1,23 +1,70 @@
-.example-form mat-slide-toggle {
-    margin: 0px 0px 25px 0px;
-    display: block;
-}
-
 p {
     font-weight: bold;
+    font-size: small;
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-bottom: -1px !important;
+}
+
+label{
+    font-weight: bold;
+    font-size: x-small;
 }
 
 .caja {
-    padding: 0 5px 0 5px;
+    margin: auto;
+    align-items: center;
     font-size: 60%;
-}
-
-mat-slide-toggle {
-    padding: 0 10px 0 20px;
 }
 
 .btn {
     margin-left: 15px;
     background-color: rgb(80, 87, 97);
     color: white;
+}
+
+.estado-card {
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+    height: 100%;
+    width: 80%;
+    margin: auto;
+
+    &.activo {
+        background-color: #1391df;
+        color: #125982;
+    }
+
+    &.inactivo {
+        background-color: #b8b8b8; 
+        color: #6d6d6d;
+    }
+}
+
+.estado-card:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+
+    &.activo {
+        background-color: #0875b8;
+        color: #125982;
+    }
+
+    &.inactivo {
+        background-color: #959595; 
+        color: #787878;
+    }
+}
+
+@media (max-width: 530px) {
+    .estado-card {
+        height: 100%;
+        width: 100%;
+    }
+
+    p {
+        margin-left: 10px;
+    }
 }

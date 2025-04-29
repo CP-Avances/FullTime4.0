@@ -760,7 +760,7 @@ export class GradosComponent implements OnInit {
     console.log('this.tipo_acciones: ',this.ListGrados)
     this.ListGrados.forEach((obj: any) => {
       objeto = {
-        "tipo_accion_personal": {
+        "grado": {
           "$": { "id": obj.id },
           "descripcion": obj.descripcion,
         }
