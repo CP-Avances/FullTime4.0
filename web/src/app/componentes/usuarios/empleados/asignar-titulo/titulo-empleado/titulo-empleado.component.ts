@@ -69,7 +69,7 @@ export class TituloEmpleadoComponent implements OnInit {
     }
     // VERIFICAR DUPLICADO DE REGISTRO
     this.restEmpleado.BuscarTituloEspecifico(titulo).subscribe(data => {
-      this.toastr.warning('Registro ya se encuentra en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Registro ya se encuentra en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 3000,
       });
     }, vacio => {

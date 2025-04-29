@@ -307,7 +307,7 @@ export class VerOpcionesTimbreWebComponent implements OnInit {
           }
         });
     } else {
-      this.toastr.warning('No ha seleccionado Usuarios.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado Usuarios.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.HabilitarSeleccion();

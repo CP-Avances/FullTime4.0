@@ -189,6 +189,11 @@ export class EditarContratoComponent implements OnInit {
         timeOut: 6000,
       })
       this.habilitarSeleccion = false;
+      this.contratoF.setValidators([Validators.required, Validators.minLength(3)]);
+      this.contratoF.updateValueAndValidity();
+      this.tipoF.clearValidators();
+      this.tipoF.setValue(null);
+      this.tipoF.updateValueAndValidity();
     }
   }
 
@@ -277,7 +282,7 @@ export class EditarContratoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     };
-    if (form.tipoForm === undefined) {
+    if (!form.tipoForm || form.tipoForm === 'OTRO') {
       this.InsertarModalidad(form, datosContrato);
     }
     else {
@@ -308,7 +313,7 @@ export class EditarContratoComponent implements OnInit {
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.duplicado === 1) {
-        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
         this.duplicado = 0;
@@ -325,7 +330,7 @@ export class EditarContratoComponent implements OnInit {
   GuardarDatos(datos: any) {
     this.rest.ActualizarContratoEmpleado(this.idSelectContrato, datos).subscribe(response => {
       if (response.message === 'error') {
-        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -340,7 +345,7 @@ export class EditarContratoComponent implements OnInit {
       }
 
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups! algo salio mal.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     });
@@ -449,6 +454,11 @@ export class EditarContratoComponent implements OnInit {
     });
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }  
+
   // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
   opcion: number = 0;
@@ -483,7 +493,9 @@ export class EditarContratoComponent implements OnInit {
     if (this.pagina === 'ver-empleado') {
       this.componentev.editar_contrato = false;
       if (opcion === 2) {
-        this.componentev.VerDatosActuales(this.componentev.formato_fecha);
+        setTimeout(() => {
+          this.componentev.VerDatosActuales(this.componentev.formato_fecha);
+        }, 300); 
       }
     }
   }

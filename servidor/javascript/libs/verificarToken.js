@@ -64,7 +64,7 @@ const TokenValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
             next();
         }
         else {
-            return res.status(401).send('Ups!!! La licencia a expirado.');
+            return res.status(401).send('Ups! La licencia a expirado.');
         }
     }
     catch (error) {

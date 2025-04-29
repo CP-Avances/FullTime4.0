@@ -149,7 +149,7 @@ export class CatVacunasComponent implements OnInit {
           timeOut: 1500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al cargar los datos.', 'Ups! algo salio mal.', {
           timeOut: 3500,
         });
       }
@@ -789,7 +789,7 @@ export class CatVacunasComponent implements OnInit {
             this.selectionVacuna.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado TIPO VACUNAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TIPO VACUNAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

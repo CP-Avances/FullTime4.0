@@ -785,7 +785,7 @@ class PlanComidasControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito' });
+                res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -981,7 +981,7 @@ class PlanComidasControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -1089,7 +1089,7 @@ class PlanComidasControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -1208,7 +1208,7 @@ class PlanComidasControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }

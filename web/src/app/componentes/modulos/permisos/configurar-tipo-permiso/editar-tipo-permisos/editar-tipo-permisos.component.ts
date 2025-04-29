@@ -362,7 +362,7 @@ export class EditarTipoPermisosComponent implements OnInit {
         this.VerificarIngresoFecha(permiso);
       }
       else {
-        this.toastr.warning('Tipo de permiso ya se encuentra registrado.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Tipo de permiso ya se encuentra registrado.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

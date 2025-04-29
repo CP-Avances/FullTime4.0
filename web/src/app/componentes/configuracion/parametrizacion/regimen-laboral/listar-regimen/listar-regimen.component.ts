@@ -60,6 +60,8 @@ export class ListarRegimenComponent implements OnInit {
   // ALMACENAMIENTO DE DATOS CONSULTADOS
   empleado: any = [];
   regimen: any = [];
+  rangos_antiguedad: any = [];
+  periodos_vacacionales: any =[];
 
   idEmpleado: number; // VARIABLE QUE ALMACENA EL ID DEL EMPELADO QUE INICIA SESIÓN
 
@@ -152,8 +154,70 @@ export class ListarRegimenComponent implements OnInit {
     this.numero_pagina = 1;
     this.rest.ConsultarRegimen().subscribe((datos) => {
       this.regimen = datos;
+
+      this.ObtenerTodasLasAntiguedades();
+      this.ObtenerTodosLosPeriodosVacacionales();
     });
   }
+
+  // LECTURA DE ANTIGUEDAD
+  ObtenerTodasLasAntiguedades() {
+    this.rangos_antiguedad = [];
+
+    this.regimen.forEach((reg) => {
+      if (reg.antiguedad_variable) {
+        this.rest.ConsultarAntiguedad(reg.id).subscribe(
+          (data) => {
+            this.rangos_antiguedad.push({
+              id_regimen: reg.id,
+              rangos: data
+            });
+          },
+          () => {
+            this.rangos_antiguedad.push({
+              id_regimen: reg.id,
+              rangos: []
+            });
+          }
+        );
+      } else {
+        this.rangos_antiguedad.push({
+          id_regimen: reg.id,
+          rangos: []
+        });
+      }
+    });
+  }
+
+  // LECTURA DE VACASIONES POR PERIODO
+  ObtenerTodosLosPeriodosVacacionales() {
+    this.periodos_vacacionales = [];
+
+    this.regimen.forEach((reg) => {
+      if (reg.vacacion_divisible) {
+        this.rest.ConsultarUnPeriodo(reg.id).subscribe(
+          (data) => {
+            this.periodos_vacacionales.push({
+              id_regimen: reg.id,
+              periodos: data
+            });
+          },
+          () => {
+            this.periodos_vacacionales.push({
+              id_regimen: reg.id,
+              periodos: []
+            });
+          }
+        );
+      } else {
+        this.periodos_vacacionales.push({
+          id_regimen: reg.id,
+          periodos: []
+        });
+      }
+    });
+  }
+
 
   // ORDENAR LOS DATOS SEGÚN EL ID
   OrdenarDatos(array: any) {
@@ -295,83 +359,182 @@ export class ListarRegimenComponent implements OnInit {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: 'RÉGIMEN LABORAL', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
-        this.PresentarDataPDF(),
+        ...this.PresentarDataPDF(),
       ],
       styles: {
-        tableHeader: {
-          fontSize: 9,
-          bold: true,
-          alignment: "center",
-          fillColor: this.p_color,
-        },
-        itemsTable: { fontSize: 8, alignment: "center" },
-        tableMargin: { margin: [0, 5, 0, 0] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color, margin: [0, 7, 0, 0] },
+        itemsTable: { fontSize: 8 },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoHorario: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraHorario: { margin: [0, 7, 0, 0] },
       },
     };
   }
 
-  PresentarDataPDF() {
-    return {
-      columns: [
-        { width: "*", text: "" },
-        {
-          width: "auto",
-          style: 'tableMargin',
-          table: {
-            widths: [
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
+  PresentarDataPDF(): Array<any> {
+    const bloques: any[] = [];
+    this.regimen.forEach((obj: any) => {
+      const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
+      const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
+      
+      // BLOQUE 1 – INFORMACION GENERAL
+      bloques.push({
+        style: 'tableMarginCabeceraHorario',
+        table: {
+          widths: ['*', '*', '*', '*'],
+          body: [
+            [
+              { text: `PAÍS: ${obj.pais}`, style: 'itemsTableInfoHorario', border: [true, true, false, false] },
+              { text: `RÉGIMEN: ${obj.descripcion}`, style: 'itemsTableInfoHorario', border: [false, true, false, false] },
+              { text: `CONTINUIDAD LABORAL: ${obj.continuidad_laboral ? 'SI' : 'NO'}`, style: 'itemsTableInfoHorario', border: [false, true, false, false] },
+              { text: `CÓDIGO: ${obj.id}`, style: 'itemsTableInfoHorario', border: [false, true, true, false] }
             ],
-            body: [
-              [
-                { text: "CÓDIGO", style: "tableHeader" },
-                { text: "DESCRIPCIÓN", style: "tableHeader" },
-                { text: "PAÍS", style: "tableHeader" },
-                { text: "MESES PERIODO", style: "tableHeader" },
-                { text: "DÍAS POR MES", style: "tableHeader" },
-                { text: "VACACIONES POR AÑO", style: "tableHeader" },
-                { text: "DÍAS LIBRES", style: "tableHeader" },
-                { text: "DÍAS CALENDARIO", style: "tableHeader" },
-                { text: "DÍAS MÁXIMOS ACUMULABLES", style: "tableHeader" },
-                { text: "AÑOS PARA ANTIGUEDAD", style: "tableHeader" },
-                { text: "DÍAS DE INCREMENTO", style: "tableHeader" },
-              ],
-              ...this.regimen.map((obj: any) => {
-                return [
-                  { text: obj.id, style: "itemsTable" },
-                  { text: obj.descripcion, style: "itemsTable" },
-                  { text: obj.pais, style: "itemsTable" },
-                  { text: obj.mes_periodo, style: "itemsTable" },
-                  { text: obj.dias_mes, style: "itemsTable" },
-                  { text: obj.vacacion_dias_laboral, style: "itemsTable" },
-                  { text: obj.vacacion_dias_libre, style: "itemsTable" },
-                  { text: obj.vacacion_dias_calendario, style: "itemsTable" },
-                  { text: obj.dias_maximo_acumulacion, style: "itemsTable" },
-                  { text: obj.anio_antiguedad, style: "itemsTable" },
-                  { text: obj.dias_antiguedad, style: "itemsTable" },
-                ];
-              }),
-            ],
+            [
+              { text: `PERIODO LABORAL: ${obj.mes_periodo}`+' Meses', style: 'itemsTableInfoHorario', border: [true, false, false, true] },
+              { text: `DÍAS POR MES: ${obj.dias_mes}`, style: 'itemsTableInfoHorario', border: [false, false, false, true] },
+              {
+                text: `TIEMPO MÍNIMO: ${obj.trabajo_minimo_mes > 0 ? obj.trabajo_minimo_mes + ' Meses' : obj.trabajo_minimo_horas + ' Horas'}`,
+                style: 'itemsTableInfoHorario',
+                border: [false, false, false, true]
+              },
+              { text: `ANTIGÜEDAD LABORAL: ${obj.antiguedad ? 'SI' : 'NO'}`, style: 'itemsTableInfoHorario', border: [false, false, true, true] }
+            ]
+          ]
+        }
+      });
+  
+      // BLOQUES 
+      bloques.push({
+        columns: [
+          // BLOQUE 2 – CONFIGURACION DE VACACIONES
+          {
+            width: '33%',
+            stack: [
+              {
+                table: {
+                  widths: ['*'],
+                  body: [
+                    [{ text: 'CONFIGURACIÓN DE VACACIONES', style: 'itemsTableInfoHorario', alignment: 'center', border: [true, true, true, true] }]
+                  ]
+                },
+                style: 'tableMarginCabeceraHorario'
+              },
+              {
+                style: 'tableMargin',
+                table: {
+                  widths: ['60%', '40%'],
+                  body: [
+                    [{ text: 'DÍAS HÁBILES', style: 'tableHeader' }, { text: obj.vacacion_dias_laboral, style: 'itemsTableCentrado' }],
+                    [{ text: 'DÍAS LIBRES', style: 'tableHeader' }, { text: obj.vacacion_dias_libre, style: 'itemsTableCentrado' }],
+                    [{ text: 'DÍAS CALENDARIO', style: 'tableHeader' }, { text: obj.vacacion_dias_calendario, style: 'itemsTableCentrado' }],
+                    [{ text: 'ACUMULA VACACIONES', style: 'tableHeader' }, { text: obj.acumular ? 'SI' : 'NO', style: 'itemsTableCentrado' }],
+                    ...(obj.acumular
+                      ? [[{ text: 'MÁXIMO DÍAS ACUMULABLES', style: 'tableHeader' }, { text: obj.dias_maximo_acumulacion, style: 'itemsTableCentrado' }]]
+                      : []),
+                    [{ text: 'VACACIONES POR PERÍODOS', style: 'tableHeader' }, { text: obj.vacacion_divisible ? 'SI' : 'NO', style: 'itemsTableCentrado' }],
+                    ...(obj.vacacion_divisible
+                      ? (
+                          periodos.length > 0
+                          ? periodos.map((p: any) => [
+                              { text: p.descripcion, style: 'tableHeader' },
+                              { text: `${p.dias_vacacion} días`, style: 'itemsTableCentrado' }
+                            ])
+                          : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]]
+                        )
+                      : [])
+                    
+                  ]
+                },
+                layout: {
+                  fillColor: (i) => (i % 2 === 0 ? '#E8F6F3' : null)
+                }
+              }
+            ]
           },
-          // ESTILO DE COLORES FORMATO ZEBRA
-          layout: {
-            fillColor: function (i: any) {
-              return i % 2 === 0 ? "#CCD1D1" : null;
-            },
+  
+          // BLOQUE 3 – VACACIONES GANADAS
+          {
+            width: '34%',
+            stack: [
+              {
+                table: {
+                  widths: ['*'],
+                  body: [
+                    [{ text: 'VACACIONES GANADAS', style: 'itemsTableInfoHorario', alignment: 'center', border: [true, true, true, true] }]
+                  ]
+                },
+                style: 'tableMarginCabeceraHorario'
+              },
+              {
+                style: 'tableMargin',
+                table: {
+                  widths: ['70%', '30%'],
+                  body: [
+                    [{ text: 'POR MES (HÁBILES)', style: 'tableHeader' }, { text: obj.vacacion_dias_laboral_mes, style: 'itemsTableCentrado' }],
+                    [{ text: 'POR MES (CALEND.)', style: 'tableHeader' }, { text: obj.vacacion_dias_calendario_mes, style: 'itemsTableCentrado' }],
+                    [{ text: 'POR DÍA (HÁBILES)', style: 'tableHeader' }, { text: obj.laboral_dias, style: 'itemsTableCentrado' }],
+                    [{ text: 'POR DÍA (CALEND.)', style: 'tableHeader' }, { text: obj.calendario_dias, style: 'itemsTableCentrado' }]
+                  ]
+                },
+                layout: {
+                  fillColor: (i) => (i % 2 === 0 ? '#EBF5FB' : null)
+                }
+              }
+            ]
           },
-        },
-        { width: "*", text: "" },
-      ],
-    };
+
+          // BLOQUE 4 – CONDIGURACION DE ANTIGUEDAD
+          {
+            width: '33%',
+            stack: [
+              {
+                table: {
+                  widths: ['*'],
+                  body: [
+                    [{ text: 'CONFIGURACIÓN DE ANTIGÜEDAD', style: 'itemsTableInfoHorario', alignment: 'center', border: [true, true, true, true] }]
+                  ]
+                },
+                style: 'tableMarginCabeceraHorario'
+              },
+              {
+                style: 'tableMargin',
+                table: {
+                  widths: ['60%', '40%'],
+                  body:
+                  obj.antiguedad_fija
+                    ? [
+                        [{ text: 'TIPO', style: 'tableHeader' }, { text: 'FIJA', style: 'itemsTableCentrado' }],
+                        [{ text: 'AÑOS ANTIGÜEDAD', style: 'tableHeader' }, { text: obj.anio_antiguedad, style: 'itemsTableCentrado' }],
+                        [{ text: 'DÍAS ADICIONALES', style: 'tableHeader' }, { text: obj.dias_antiguedad, style: 'itemsTableCentrado' }]
+                      ]
+                    : obj.antiguedad_variable
+                      ? [
+                          [{ text: 'TIPO', style: 'tableHeader' }, { text: 'VARIABLE', style: 'itemsTableCentrado' }],
+                          ...(rangos.length > 0
+                            ? rangos.map((r: any) => [
+                                { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta}`, style: 'tableHeader' },
+                                { text: `${r.dias_antiguedad} días`, style: 'itemsTableCentrado' }
+                              ])
+                            : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]])
+                        ]
+                      : [[{ colSpan: 2, text: 'NO APLICA', style: 'itemsTableCentrado' }, {}]]
+
+                },
+                layout: {
+                  fillColor: (i) => (i % 2 === 0 ? '#FDEDEC' : null)
+                }
+              }
+            ]
+          }
+        ]
+      });
+    });
+  
+    return bloques;
   }
 
   /** ************************************************************************************************* **
@@ -721,7 +884,7 @@ export class ListarRegimenComponent implements OnInit {
             this.selectionRegimen.clear();
             this.ObtenerRegimen();
           } else {
-            this.toastr.warning('No ha seleccionado RÉGIMENES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado RÉGIMENES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

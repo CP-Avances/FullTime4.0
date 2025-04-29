@@ -303,7 +303,7 @@ export class ListaArchivosComponent implements OnInit {
             this.selectionArchivos.clear();
             this.MostrarArchivos();
           } else {
-            this.toastr.warning('No ha seleccionado ARCHIVOS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ARCHIVOS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

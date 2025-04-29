@@ -142,7 +142,7 @@ class ModalidaLaboralControlador {
                         return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
                     }
                     else {
-                        return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' });
+                        return res.status(404).jsonp({ message: 'Ups! algo slaio mal.', status: '400' });
                     }
                 }
             }

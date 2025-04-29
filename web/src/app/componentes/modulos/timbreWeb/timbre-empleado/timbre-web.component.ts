@@ -61,7 +61,7 @@ export class TimbreWebComponent implements OnInit {
     if (this.habilitarTimbre === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Teletrabajo. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Teletrabajo. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -207,7 +207,7 @@ export class TimbreWebComponent implements OnInit {
   VerMensaje() {
     this.toastr.info(
       '¿Te gustaría activarlo? Comunícate con el administrador del sistema.',
-      `Ups!!! al parecer no tienes permisos para timbrar desde la aplicación web. \n`,
+      `Ups! al parecer no tienes permisos para timbrar desde la aplicación web. \n`,
       {
         timeOut: 6000,
       });

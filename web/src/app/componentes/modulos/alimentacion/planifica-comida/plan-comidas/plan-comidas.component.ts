@@ -129,7 +129,7 @@ export class PlanComidasComponent implements OnInit {
     if (this.habilitarComida === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Alimentación. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }

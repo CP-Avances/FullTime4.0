@@ -119,7 +119,7 @@ export class EditarTipoAccionComponent implements OnInit {
     });
     if (this.contador != 0) {
       this.toastr.error('El tipo de acción personal seleccionado ya se encuentra registrado.',
-        'Ups!!! algo salio mal.', {
+        'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     } else {
@@ -131,7 +131,7 @@ export class EditarTipoAccionComponent implements OnInit {
         this.CerrarVentana(2, this.data.id);
       }, error => {
         this.toastr.error('Revisar los datos',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       });
@@ -263,7 +263,7 @@ export class EditarTipoAccionComponent implements OnInit {
     // });
     // if (this.contar != 0) {
     //   this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-    //     'Ups!!! algo salio mal.', {
+    //     'Ups! algo salio mal.', {
     //     timeOut: 6000,
     //   })
     // } else {

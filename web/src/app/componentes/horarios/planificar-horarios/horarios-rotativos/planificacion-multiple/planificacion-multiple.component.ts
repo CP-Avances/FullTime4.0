@@ -466,17 +466,17 @@ export class PlanificacionMultipleComponent implements OnInit {
       this.VerificarExistencias(dia, id_empleado, data, index);
     }
     else if (verificador === 1) {
-      this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Horario ya se encuentra registrado.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
     else if (verificador === 2) {
-      this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
     else if (verificador === 3) {
-      this.toastr.warning('Dia configurado como FERIADO dentro del sistema.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Dia configurado como FERIADO dentro del sistema.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -580,12 +580,12 @@ export class PlanificacionMultipleComponent implements OnInit {
         this.SumarJornada(index, dia);
       }
       else if (verificar === 1) {
-        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else if (verificar === 2) {
-        this.toastr.warning('Ya existe registro de horarios y no es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Ya existe registro de horarios y no es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
@@ -672,7 +672,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           this.datosSeleccionados.usuarios[index].asignado.splice(0, 1);
         }
         else if (this.datosSeleccionados.usuarios[index].asignado[0].tipo_dia === 'DFD') {
-          this.toastr.warning('Dia configurado como FERIADO dentro del sistema.', 'Ups!!! VERIFICAR.', {
+          this.toastr.warning('Dia configurado como FERIADO dentro del sistema.', 'Ups! VERIFICAR.', {
             timeOut: 6000,
           });
         }
@@ -695,7 +695,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           }
           else if (this.datosSeleccionados.usuarios[index].asignado[i].tipo_dia === 'DFD') {
             similar = 1;
-            this.toastr.warning('Dia configurado como FERIADO dentro del sistema.', 'Ups!!! VERIFICAR.', {
+            this.toastr.warning('Dia configurado como FERIADO dentro del sistema.', 'Ups! VERIFICAR.', {
               timeOut: 6000,
             });
             break;
@@ -753,7 +753,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           this.datosSeleccionados.usuarios[index].asignado = this.datosSeleccionados.usuarios[index].asignado.concat(data);
 
         } else {
-          this.toastr.warning('Ya existe registro de horarios, no es factible colocar como día libre.', 'Ups!!! VERIFICAR.', {
+          this.toastr.warning('Ya existe registro de horarios, no es factible colocar como día libre.', 'Ups! VERIFICAR.', {
             timeOut: 6000,
           });
           this.ActualizarTotalizador(index, dia);
@@ -808,7 +808,7 @@ export class PlanificacionMultipleComponent implements OnInit {
         this.ActualizarTotalizador(index, dia);
         this.datosSeleccionados.usuarios[index].asignado = this.datosSeleccionados.usuarios[index].asignado.concat(data);
       } else {
-        this.toastr.warning('Ya existe registro de horarios, no es factible colocar como día libre.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Ya existe registro de horarios, no es factible colocar como día libre.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
         this.ActualizarTotalizador(index, dia);
@@ -924,7 +924,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       }
     })
     if (usuarios.length === 0) {
-      this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('No ha registrado horarios.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     } else {
@@ -1298,7 +1298,7 @@ CargarTimbres() {
     }
     else if (datos.message === 'error') {
       this.toastr.info(
-        'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+        'Ups! algo salio mal', 'No se cargaron todos los registros.', {
         timeOut: 6000,
       })
     }

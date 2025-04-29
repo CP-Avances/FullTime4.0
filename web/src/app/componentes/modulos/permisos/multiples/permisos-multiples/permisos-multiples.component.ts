@@ -340,7 +340,7 @@ export class PermisosMultiplesComponent implements OnInit {
       }
     }
     else {
-      this.toastr.warning('Ups!!! no ha seleccionado ningún tipo de permiso.', '', {
+      this.toastr.warning('Ups! no ha seleccionado ningún tipo de permiso.', '', {
         timeOut: 6000,
       });
       this.fechaInicioF.setValue('');
@@ -371,7 +371,7 @@ export class PermisosMultiplesComponent implements OnInit {
         this.ImprimirFecha(form);
       }
       else {
-        this.toastr.warning('Ups!!! ha superado el limite de días permitido para cargar solicitudes.', '', {
+        this.toastr.warning('Ups! ha superado el limite de días permitido para cargar solicitudes.', '', {
           timeOut: 4000,
         });
         this.fechaInicioF.setValue('');
@@ -395,7 +395,7 @@ export class PermisosMultiplesComponent implements OnInit {
         this.ImprimirFecha(form);
       }
       else {
-        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.dias_anticipar_permiso + ' días previos.',
+        this.toastr.warning('Ups! el permiso debio ser solicitado con ' + this.datosPermiso.dias_anticipar_permiso + ' días previos.',
           '', {
           timeOut: 4000,
         });
@@ -612,7 +612,7 @@ export class PermisosMultiplesComponent implements OnInit {
     else {
       this.toastr.warning(
         `El tiempo solicitado es mayor a 24:00 horas.`,
-        `Ups!!! algo salio mal.`, {
+        `Ups! algo salio mal.`, {
         timeOut: 6000,
       });
     }
@@ -623,7 +623,7 @@ export class PermisosMultiplesComponent implements OnInit {
     if (valor === '00:00') {
       this.toastr.warning(
         `Ha solicitado ${valor} horas de permiso.`,
-        `Ups!!! algo salio mal.`, {
+        `Ups! algo salio mal.`, {
         timeOut: 6000,
       });
       this.LimpiarInformacion('');
@@ -2014,7 +2014,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
       },
       error: (error: any) => {
-        this.toastr.error('No se pudo registrar las solicitudes de permiso.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('No se pudo registrar las solicitudes de permiso.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -2128,7 +2128,7 @@ export class PermisosMultiplesComponent implements OnInit {
       else {
         //console.log('ver verificador ', this.verificador)
         if (this.verificador === true) {
-          this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
+          this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
             timeOut: 6000,
           });
           this.verificar = false;

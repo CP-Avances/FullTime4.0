@@ -202,7 +202,7 @@ export class ListarEstadoCivilComponent {
               this.selectionEstadosCivil.clear();
               this.ListarEstadoCivil();
             } else {
-              this.toastr.warning('No ha seleccionado estados civiles.', 'Ups!!! algo salio mal.', {
+              this.toastr.warning('No ha seleccionado estados civiles.', 'Ups! algo salio mal.', {
                 timeOut: 6000,
               })
             }

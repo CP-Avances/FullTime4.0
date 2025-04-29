@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
 import CryptoJS from 'crypto-js';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,8 @@ export class ValidacionesService {
 
   constructor(
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) { }
 
 
@@ -611,6 +613,13 @@ export class ValidacionesService {
     const pdfFonts = await import('src/assets/build/vfs_fonts.js');
     pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
     return pdfMake.default;
+  }
+
+  //MICROSERVICIO
+  generarReporteGeneros(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/generos/pdf', data, {
+      responseType: 'blob'
+    });
   }
 
 

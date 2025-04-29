@@ -7,7 +7,7 @@ export const ModuloPermisosValidation = (req: Request, res: Response, next: Next
 
     if (!permisos) return res.status(401).jsonp({
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
     })

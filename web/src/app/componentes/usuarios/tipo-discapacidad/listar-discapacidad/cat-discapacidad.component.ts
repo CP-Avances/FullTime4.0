@@ -794,7 +794,7 @@ export class CatDiscapacidadComponent implements OnInit {
             this.selectionDiscapacidad.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado DISCAPACIDADES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado DISCAPACIDADES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

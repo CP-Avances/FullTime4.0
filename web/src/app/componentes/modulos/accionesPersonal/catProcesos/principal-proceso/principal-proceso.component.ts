@@ -100,7 +100,7 @@ export class PrincipalProcesoComponent implements OnInit {
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -270,7 +270,7 @@ export class PrincipalProcesoComponent implements OnInit {
             this.procesoEliminar = [];
             this.selectionUno.clear();
           } else {
-            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -291,8 +291,8 @@ export class PrincipalProcesoComponent implements OnInit {
         });
         if (response.relacionados > 0) {
           if (response.relacionados > 0) {
-            response.listaNoEliminados.forEach(item => {
-              this.toastr.warning(response.ms2 + ' ' + item.trim(), 'Advertencia.', {
+            response.listaNoEliminados.forEach((item: any) => {
+              this.toastr.warning(response.ms2 + ' ' + item.trim() + '.', 'No fue posible eliminar.', {
                 timeOut: 5000,
               });
             });
@@ -305,7 +305,7 @@ export class PrincipalProcesoComponent implements OnInit {
           this.toastr.error(err.error.message, '', {
             timeOut: 4500,
           });
-          this.toastr.warning(err.error.ms2, 'Advertencia.', {
+          this.toastr.warning(err.error.ms2, 'No fue posible eliminar.', {
             timeOut: 5000,
           });
         } else {
@@ -397,7 +397,7 @@ export class PrincipalProcesoComponent implements OnInit {
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }

@@ -49,10 +49,10 @@ export class EditarCoordenadasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.MostrarDatos();
     this.ConsultarCoordenadas();
@@ -105,16 +105,24 @@ export class EditarCoordenadasComponent implements OnInit {
         ip: this.ip, ip_local: this.ips_locales
       }
       this.rest.ActualizarCoordenadas(datos).subscribe(response => {
-        this.toastr.success('Ubicación registrada exitosamente.',
-          '', {
-          timeOut: 2000,
-        })
-        this.ventanap.close(this.data.ubicacion.id);
+        if (response.message === 'error_duplicidad') {
+          this.toastr.warning('Ubicación registrada exitosamente.',
+            'Ups! algo salio mal.', {
+            timeOut: 2000,
+          })
+        }
+        else {
+          this.toastr.success('Ubicación registrada exitosamente.',
+            '', {
+            timeOut: 2000,
+          })
+          this.ventanap.close(this.data.ubicacion.id);
+        }
       });
     }
     else {
       this.toastr.error('Por favor ingresar coordenadas de ubicación.',
-        'Ups!!! algo salio mal.', {
+        'Ups! algo salio mal.', {
         timeOut: 2000,
       })
     }
@@ -152,7 +160,7 @@ export class EditarCoordenadasComponent implements OnInit {
           this.contDuplicado = this.contDuplicado + 1;
           if (this.contDuplicado === 1) {
             this.toastr.warning('El perímetro ingresado ya se encuentra registrado.',
-              'Ups!!! algo salio mal.', {
+              'Ups! algo salio mal.', {
               timeOut: 4000,
             })
           }

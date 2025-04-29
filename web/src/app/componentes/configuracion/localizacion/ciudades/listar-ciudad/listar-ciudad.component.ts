@@ -648,7 +648,7 @@ export class ListarCiudadComponent implements OnInit {
             this.selectiondatosCiudades.clear();
             this.ListarCiudades();
           } else {
-            this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

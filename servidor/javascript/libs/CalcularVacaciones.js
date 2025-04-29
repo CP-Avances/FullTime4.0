@@ -551,7 +551,7 @@ const ReportePeriVacaciones = function (id_empleado) {
         if (periodos.length === 0)
             return { message: 'No tiene ningun periodo asignado' };
         console.log(periodos);
-        return { message: 'Ups!!! algo salio mal en el proceso.' };
+        return { message: 'Ups! algo salio mal en el proceso.' };
     });
 };
 exports.ReportePeriVacaciones = ReportePeriVacaciones;

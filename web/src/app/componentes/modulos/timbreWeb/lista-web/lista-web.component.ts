@@ -240,7 +240,7 @@ export class ListaWebComponent implements OnInit {
     if (this.habilitarTimbreWeb === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Teletrabajo. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Teletrabajo. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }

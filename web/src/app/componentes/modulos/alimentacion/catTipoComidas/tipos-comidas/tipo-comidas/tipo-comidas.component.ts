@@ -74,7 +74,7 @@ export class TipoComidasComponent implements OnInit {
       })
       this.CerrarVentana(response.info.id);
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'No se guardo el registro.', {
+      this.toastr.error('Ups! algo salio mal.', 'No se guardo el registro.', {
         timeOut: 6000,
       })
     });
@@ -161,7 +161,7 @@ export class TipoComidasComponent implements OnInit {
       });
     }
     else {
-      this.toastr.warning('Ingresar el tipo de servicio.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Ingresar el tipo de servicio.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }

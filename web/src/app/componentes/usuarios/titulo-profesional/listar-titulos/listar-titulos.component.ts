@@ -825,7 +825,7 @@ export class ListarTitulosComponent implements OnInit {
             this.selectionTitulos.clear();
             this.ObtenerTitulos();
           } else {
-            this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

@@ -369,7 +369,7 @@ export class TipoPermisosComponent implements OnInit {
     this.validarGuardar = true;
     this.rest.RegistrarTipoPermiso(datos).subscribe(res => {
       if (res.message === 'error') {
-        this.toastr.warning('Tipo de permiso ya se encuentra registrado.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Tipo de permiso ya se encuentra registrado.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

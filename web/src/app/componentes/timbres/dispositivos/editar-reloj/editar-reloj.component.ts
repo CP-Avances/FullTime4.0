@@ -251,7 +251,7 @@ export class EditarRelojComponent implements OnInit {
         this.GuardarSistema(datosReloj);
       } else {
         this.toastr.warning('MAC ingresada no es válida.',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -273,13 +273,13 @@ export class EditarRelojComponent implements OnInit {
       }
       else if (response.message === 'existe') {
         this.toastr.warning('Código o serie del equipo ya existe en el sistema.',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }
       else if (response.message === 'error') {
         this.toastr.warning('IP ingresada ya existe en el sistema.',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }

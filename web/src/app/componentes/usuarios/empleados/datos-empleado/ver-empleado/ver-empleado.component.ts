@@ -61,8 +61,6 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
-import { RegistrarEmpleProcesoComponent } from 'src/app/componentes/modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
-import { EditarEmpleadoProcesoComponent } from 'src/app/componentes/modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { EditarSolicitudComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
 import { PlanificacionComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
 import { EditarPlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
@@ -297,8 +295,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.planComidas = [];
     this.solicitaComida = [];
     this.administra_comida = [];
-    // ACCIONES PERSONAL
-    this.empleadoProcesos = [];
     // AUTORIZACIONES SOLICITUDES
     this.autorizacionesTotales = [];
   }
@@ -358,12 +354,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
         this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
         this.alimentacion = 1;
-      }
-    }
-    else if (event.tab.textLabel === 'accion_personal') {
-      if (this.HabilitarAccion === true && this.accion_personal === 0) {
-        this.ObtenerEmpleadoProcesos(this.formato_fecha);
-        this.accion_personal = 1;
       }
     }
     else if (event.tab.textLabel === 'autorizar') {
@@ -904,18 +894,21 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       data: { idEmpleado: this.idEmpleado, vacuna: datos }, width: '600px'
     })
       .afterClosed().subscribe(result => {
+        setTimeout(() => {
         this.ObtenerDatosVacunas(this.formato_fecha);
-      })
+      }, 200); 
+      });
   }
 
   // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION
   MostrarVentanaVacuna() {
     this.ventana.open(CrearVacunaComponent, {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
-    })
-      .afterClosed().subscribe(result => {
-        this.ObtenerDatosVacunas(this.formato_fecha);
-      })
+    }).afterClosed().subscribe(result => {
+      setTimeout(() => {
+        this.ObtenerDatosVacunas(this.formato_fecha); 
+      }, 200); 
+    });
   }
 
   // ELIMINAR REGISTRO DE VACUNA
@@ -1636,7 +1629,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         }
       }
       else {
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -1815,7 +1808,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.ver_activar_editar = false;
     }
     else {
-      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+      this.toastr.warning('Ups! Fecha no es válida.', '', {
         timeOut: 6000,
       });
     }
@@ -2907,81 +2900,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         });
       }
       else {
-        this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de planificación.', {
+        this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de planificación.', {
           timeOut: 6000,
         });
       }
     })
   }
 
-  /** ******************************************************************************************* **
-   ** **                   METODO DE PRSENTACION DE DATOS DE PROCESOS                          ** **
-   ** ******************************************************************************************* **/
-
-  // METODO PARA MOSTRAR DATOS DE LOS PROCESOS DEL EMPLEADO
-  empleadoProcesos: any = [];
-  ObtenerEmpleadoProcesos(formato_fecha: string) {
-    this.empleadoProcesos = [];
-    this.restEmpleadoProcesos.ObtenerProcesoUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
-      this.empleadoProcesos = datos;
-      this.empleadoProcesos.forEach((data: any) => {
-        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-        data.fecha_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-      })
-    })
-  }
-
-  // VENTANA PARA INGRESAR PROCESOS DEL EMPLEADO
-  AbrirVentanaProcesos(): void {
-    if (this.datoActual.id_cargo != undefined) {
-      this.ventana.open(RegistrarEmpleProcesoComponent,
-        { width: '600px', data: { idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo } })
-        .afterClosed().subscribe(item => {
-          this.ObtenerEmpleadoProcesos(this.formato_fecha);
-        });
-    }
-    else {
-      this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
-        timeOut: 6000,
-      })
-    }
-  }
-
-  // VENTANA PARA EDITAR PROCESOS DEL EMPLEADO
-  AbrirVentanaEditarProceso(datoSeleccionado: any): void {
-    this.ventana.open(EditarEmpleadoProcesoComponent,
-      { width: '500px', data: { idEmpleado: this.idEmpleado, datosProcesos: datoSeleccionado } })
-      .afterClosed().subscribe(item => {
-        this.ObtenerEmpleadoProcesos(this.formato_fecha);
-      });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PROCESOS
-  EliminarProceso(id_plan: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
-    };
-    this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerEmpleadoProcesos(this.formato_fecha);
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDeleteProceso(datos: any) {
-    console.log(datos);
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarProceso(datos.id);
-        } else {
-          this.router.navigate(['/verEmpleado/', this.idEmpleado]);
-        }
-      });
-  }
 
 
   /** ******************************************************************************************* **
@@ -3443,31 +3368,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   PresentarDataPDFvacunasEmpleado() {
-    if (this.datosVacuna.length > 0) {
-      return {
-        table: {
-          widths: ['*'],
-          body: [
-            ...this.datosVacuna.map((obj: any) => {
-              return [
-                {
-                  text: [
-                    { text: 'Vacuna: ' + obj.nombre + ' ' },
-                    { text: 'descripcion: ' + obj.Descripción + ' ' },
-                    { text: 'fecha: ' + obj.fecha_ + ' ' },
-                    { text: 'carnet: ' + obj.carnet }
-                  ],
-                }
-              ];
-            })
-          ]
-        },
-        layout: 'noBorders',
-        alignment: 'left',
-        margin: [0, 0, 0, 5]
-      };
-    }
+  if (this.datosVacuna.length > 0) {
+    return {
+      table: {
+        widths: ['*', '*'],
+        body: [
+          ...this.datosVacuna.flatMap((obj: any) => {
+            console.log("Datos para vacuna:", obj);
+            return [
+              [
+                { text: 'Vacuna: ' + obj.nombre, bold: true },
+                { text: 'Descripción: ' + obj.descripcion }
+              ],
+              [
+                { text: 'Fecha: ' + obj.fecha_ },
+                { text: 'Carnet: ' + obj.carnet }
+              ],
+              [{ text: '', colSpan: 2 }, {}] 
+            ];
+          })
+        ]
+      },
+      layout: 'noBorders',
+    };
   }
+}
 
   PresentarDataPDFcontratoEmpleado() {
     if (this.contratoEmpleado.length > 0) {

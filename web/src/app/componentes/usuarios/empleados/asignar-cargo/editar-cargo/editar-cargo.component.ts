@@ -310,11 +310,11 @@ export class EditarCargoComponent implements OnInit {
       fecha_fin: datos.fec_final
     }
     this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
-      if (form.tipoForm === undefined) {
+      if (!form.tipoForm || form.tipoForm === 'OTRO') {
         this.VerificarTipoCargo(form, datos);
       }
       else {
@@ -345,15 +345,32 @@ export class EditarCargoComponent implements OnInit {
   habilitarCargo: boolean = false;
   habilitarSeleccion: boolean = true;
   IngresarOtro(form: any) {
-    if (form.tipoForm === undefined) {
-      this.formulario.patchValue({
-        cargoForm: '',
-      });
+    if (form.tipoForm === undefined || form.tipoForm === 'OTRO') {
+      // Activar campo para ingresar nuevo cargo
+      this.formulario.patchValue({ cargoForm: '' });
       this.habilitarCargo = true;
+      this.habilitarSeleccion = false;
+      this.cargoF.setValidators([Validators.required, Validators.minLength(3)]);
+      this.cargoF.updateValueAndValidity();
+      this.tipoF.clearValidators();
+      this.tipoF.setValue(null);
+      this.tipoF.updateValueAndValidity();
+
       this.toastr.info('Ingresar nombre del nuevo cargo.', 'Etiqueta Cargo a desempeñar activa.', {
         timeOut: 6000,
-      })
-      this.habilitarSeleccion = false;
+      });
+
+    } else {
+      // 👉 Usuario seleccionó un cargo existente, ocultar campo manual
+      this.habilitarCargo = false;
+      this.habilitarSeleccion = true;
+
+      this.cargoF.clearValidators();
+      this.cargoF.setValue('');
+      this.cargoF.updateValueAndValidity();
+
+      this.tipoF.setValidators(Validators.required);
+      this.tipoF.updateValueAndValidity();
     }
   }
 
@@ -392,7 +409,7 @@ export class EditarCargoComponent implements OnInit {
       nombre: (form.cargoForm).toUpperCase()
     }
     this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
-      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

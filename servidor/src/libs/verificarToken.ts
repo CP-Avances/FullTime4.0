@@ -82,7 +82,7 @@ export const TokenValidation = async (req: Request, res: Response, next: NextFun
             //req.modulos = payload.modulos;
             next();
         } else {
-            return res.status(401).send('Ups!!! La licencia a expirado.');
+            return res.status(401).send('Ups! La licencia a expirado.');
         }
         
     } catch (error) {

@@ -953,13 +953,13 @@ class AccionPersonalControlador {
 
       }
 
-      var meCount = "registro"
+      var meCount = "registro eliminado"
       if(count > 1){
-        meCount = "registros"
+        meCount = "registros eliminados"
       }
 
-      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' eliminados con éxito', 
-                              ms2: 'Existen datos relacionados con el tipo acción - ', 
+      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' con éxito.', 
+                              ms2: 'Existen datos relacionados con ', 
                               codigo: 200, 
                               eliminados: count, 
                               relacionados: count_no, 
@@ -974,10 +974,10 @@ class AccionPersonalControlador {
       if (error) {
         if (err.table == 'map_empleado_grupo_ocupacional') {
           if (count == 1) {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el tipo acción - ', eliminados: count, 
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count, 
               relacionados: count_no, listaNoEliminados: list_TipoAccion });
           } else {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el tipo acción - ',eliminados: count, 
+            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ',eliminados: count, 
               relacionados: count_no, listaNoEliminados: list_TipoAccion });
           }
         } else {

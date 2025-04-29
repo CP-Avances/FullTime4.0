@@ -333,7 +333,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -397,7 +397,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         this.ObtenerDetallesPlanificacion();
       }
       else {
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe planificación.', {
           timeOut: 6000,
         });
       }
@@ -491,7 +491,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       }
       else {
         this.EjecutarAccion();
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -1529,7 +1529,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         formulario.setValue(fecf.toISODate());
       }
     } else {
-      this.toastr.warning('La fecha no se registró. Ups!!!, la fecha no es correcta.', 'VERIFICAR', {
+      this.toastr.warning('La fecha no se registró. Ups!, la fecha no es correcta.', 'VERIFICAR', {
         timeOut: 6000,
       });
     }

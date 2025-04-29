@@ -1307,7 +1307,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.rest.EliminarEmpleados(datos).subscribe((res: any) => {
             if (res.error) {
               const metodo = res.status === 500 ? 'error' : 'warning';
-              const titulo = res.status === 500 ? 'Ups!!! algo salio mal.' : '';
+              const titulo = res.status === 500 ? 'Ups! algo salio mal.' : '';
               this.toastr[metodo](res.message, titulo, { timeOut: 6000 });
             } else {
               this.toastr.success(res.message, '', { timeOut: 6000 });

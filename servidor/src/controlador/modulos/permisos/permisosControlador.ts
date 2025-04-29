@@ -982,7 +982,7 @@ class PermisosControlador {
             });
         }
         else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+            res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
         }
     }
 
@@ -1166,7 +1166,7 @@ class PermisosControlador {
             });
         }
         else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+            res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
         }
     }
 
@@ -1289,7 +1289,7 @@ class PermisosControlador {
             });
         }
         else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+            res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
         }
     }
 
@@ -1612,7 +1612,7 @@ class PermisosControlador {
             });
         }
         else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' + datos });
+            res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' + datos });
         }
 
     }
@@ -1795,7 +1795,7 @@ class PermisosControlador {
             });
         }
         else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' + datos });
+            res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' + datos });
         }
     }
     //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 

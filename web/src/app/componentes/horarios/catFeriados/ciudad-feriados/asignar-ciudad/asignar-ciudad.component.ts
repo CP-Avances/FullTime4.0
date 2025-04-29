@@ -272,7 +272,7 @@ export class AsignarCiudadComponent implements OnInit {
           }, error => {
             this.contador = this.contador + 1;
             this.VerMensaje();
-            this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+            this.toastr.error('Ups! algo salio mal..', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           });
@@ -280,7 +280,7 @@ export class AsignarCiudadComponent implements OnInit {
       });
     }
     else {
-      this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }

@@ -248,7 +248,7 @@ export class EditarCiudadComponent implements OnInit {
         });
         this.CerrarVentana();
       }, error => {
-        this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Ups! algo salio mal..', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       });

@@ -197,7 +197,7 @@ export class ListarGeneroComponent {
             this.selectionGeneros.clear();
             this.ListarGeneros();
           } else {
-            this.toastr.warning('No ha seleccionado ningun genero.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ningun genero.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -348,22 +348,40 @@ export class ListarGeneroComponent {
 
 
   async GenerarPdf(action = "open") {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      case "download":
-        pdfMake.createPdf(documentDefinition).download('Géneros' + '.pdf');
-        break;
-
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+    if (action === "download") {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        generos: this.generos
+      };
+  
+      console.log("Enviando al microservicio:", data);
+  
+      this.validar.generarReporteGeneros(data).subscribe((pdfBlob: Blob) => {
+        const nombreArchivo = 'Géneros.pdf';
+        FileSaver.saveAs(pdfBlob, nombreArchivo);
+        console.log("Recibido del microservicio:");
+      }, error => {
+        console.error('Error al generar PDF desde el microservicio:', error);
+      });
+  
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      
+      switch (action) {
+        case "open":
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+        case "print":
+          pdfMake.createPdf(documentDefinition).print();
+          break;
+        default:
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+      }
     }
   }
 
