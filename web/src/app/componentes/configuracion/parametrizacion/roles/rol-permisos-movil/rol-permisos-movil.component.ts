@@ -551,7 +551,7 @@ export class RolPermisosMovilComponent implements OnInit {
                     })
                   }, error => {
                     this.contador = this.contador + 1;
-                    this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
+                    this.toastr.error('Ups! algo salio mal.', 'VERIFICAR.', {
                       timeOut: 6000,
                     })
                   });
@@ -559,7 +559,7 @@ export class RolPermisosMovilComponent implements OnInit {
               );
             })
           } else {
-            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -599,7 +599,7 @@ export class RolPermisosMovilComponent implements OnInit {
                 this.paginas = datos;
               })
             }, error => {
-              this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+              this.toastr.error('Ups! algo salio mal..', 'Ups! algo salio mal.', {
                 timeOut: 6000,
               })
             });
@@ -621,7 +621,7 @@ export class RolPermisosMovilComponent implements OnInit {
       };
     }
     else {
-      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }
@@ -680,7 +680,7 @@ export class RolPermisosMovilComponent implements OnInit {
                     })
                   }, error => {
                     this.contador = this.contador + 1;
-                    this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR', {
+                    this.toastr.error('Ups! algo salio mal.', 'VERIFICAR', {
                       timeOut: 6000,
                     })
                   });
@@ -688,7 +688,7 @@ export class RolPermisosMovilComponent implements OnInit {
               );
             });
           } else {
-            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -731,7 +731,7 @@ export class RolPermisosMovilComponent implements OnInit {
               this.ObtenerMenuModulos();
             }, error => {
               this.contador = this.contador + 1;
-              this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+              this.toastr.error('Ups! algo salio mal..', 'Ups! algo salio mal.', {
                 timeOut: 6000,
               })
             });
@@ -750,7 +750,7 @@ export class RolPermisosMovilComponent implements OnInit {
         tipo: this.plataforma,
       }
     } else {
-      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }
@@ -850,7 +850,7 @@ export class RolPermisosMovilComponent implements OnInit {
             this.plan_multiple_ = false;
             this.selectionPaginas.clear();
           } else {
-            this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

@@ -227,7 +227,7 @@ export class RegistroComponent implements OnInit {
     if (this.contador === 0) {
       this.rest.RegistrarEmpleados(empleado).subscribe(response => {
         if (response.message === 'error') {
-          this.toastr.error('Identificación o código de usuario ya se encuentran registrados.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Identificación o código de usuario ya se encuentran registrados.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }
@@ -259,7 +259,7 @@ export class RegistroComponent implements OnInit {
     }
     this.user.RegistrarUsuario(dataUser).subscribe(data => {
       if (data.message === 'error') {
-        this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
         this.contador = 1;

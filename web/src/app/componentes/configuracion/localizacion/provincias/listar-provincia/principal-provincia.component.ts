@@ -647,7 +647,7 @@ export class PrincipalProvinciaComponent implements OnInit {
             this.selectionProvincias.clear();
             this.ListarProvincias();
           } else {
-            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

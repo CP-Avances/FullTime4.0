@@ -162,7 +162,7 @@ export class RegistroHorarioComponent implements OnInit {
         this.ventana.close(response.id);
       },
       error: (error) => {
-        this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Limite de horas superado.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }

@@ -543,7 +543,7 @@ export class BuscarPlanificacionComponent {
       this.columnAccion = false;
     }
     else {
-      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+      this.toastr.warning('Ups! Fecha no es válida.', '', {
         timeOut: 6000,
       });
     }

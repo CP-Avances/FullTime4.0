@@ -82,7 +82,7 @@ export class EditarEstadoCivilComponent {
         
       
       this.estadoS.BuscarEstadoCivil((estado.estado).toUpperCase()).subscribe(response => {
-        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups! algo salio mal.', {
           timeOut: 3000,
         });
       }, vacio => {

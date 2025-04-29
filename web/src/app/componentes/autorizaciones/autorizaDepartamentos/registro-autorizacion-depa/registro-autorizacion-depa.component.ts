@@ -142,7 +142,7 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
     if (verificador === 0) {
       this.GuardarDatos(autoriza);
     } else {
-      this.toastr.error('Ups!!! algo salio mal.', 'Departamento ya se encuentra configurado.', {
+      this.toastr.error('Ups! algo salio mal.', 'Departamento ya se encuentra configurado.', {
         timeOut: 6000,
       });
     }

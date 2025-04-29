@@ -55,7 +55,7 @@ export class RegistrarNivelTitulosComponent implements OnInit {
     };
     // VERIFICAR DUPLICIDAD
     this.nivel.BuscarNivelNombre(nombre_nivel).subscribe(response => {
-      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
+      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups! algo salió mal.', {
         timeOut: 3000,
       });
     }, vacio => {

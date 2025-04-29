@@ -184,7 +184,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal.', {
             timeOut: 4000,
           });
         }
@@ -330,7 +330,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal.', {
             timeOut: 4000,
           });
         }
@@ -574,7 +574,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal', {
             timeOut: 4000,
           });
         }

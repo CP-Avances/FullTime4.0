@@ -80,7 +80,7 @@ export class RegistroRolComponent implements OnInit {
       }
       else {
         this.toastr.error('Rol ya se encuentra registrado.',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

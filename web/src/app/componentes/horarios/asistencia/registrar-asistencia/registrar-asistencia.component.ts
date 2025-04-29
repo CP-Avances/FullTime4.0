@@ -156,12 +156,12 @@ export class RegistrarAsistenciaComponent implements OnInit {
         this.CerrarVentana(2);
       }
       else {
-        this.toastr.warning('Ups!!! algo salio mal.', '', {
+        this.toastr.warning('Ups! algo salio mal.', '', {
           timeOut: 6000,
         });
       }
     }, vacio => {
-      this.toastr.warning('Ups!!! algo salio mal.', '', {
+      this.toastr.warning('Ups! algo salio mal.', '', {
         timeOut: 6000,
       });
     })

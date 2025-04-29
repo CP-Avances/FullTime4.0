@@ -310,7 +310,7 @@ export class EditarCargoComponent implements OnInit {
       fecha_fin: datos.fec_final
     }
     this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
@@ -409,7 +409,7 @@ export class EditarCargoComponent implements OnInit {
       nombre: (form.cargoForm).toUpperCase()
     }
     this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
-      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

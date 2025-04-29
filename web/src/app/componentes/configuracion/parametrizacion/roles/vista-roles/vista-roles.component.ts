@@ -798,7 +798,7 @@ export class VistaRolesComponent implements OnInit {
             this.selectionRoles.clear();
             this.ObtenerRoles();
           } else {
-            this.toastr.warning('No ha seleccionado ROLES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ROLES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

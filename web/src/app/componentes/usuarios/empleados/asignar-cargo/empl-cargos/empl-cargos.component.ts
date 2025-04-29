@@ -286,7 +286,7 @@ export class EmplCargosComponent implements OnInit {
       fecha_verificar: datos.fec_inicio
     }
     this.cargos.BuscarCargoFecha(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
@@ -337,7 +337,7 @@ export class EmplCargosComponent implements OnInit {
       nombre: (form.cargoForm).toUpperCase()
     }
     this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
-      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

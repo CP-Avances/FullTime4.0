@@ -51,7 +51,7 @@ export class EmplLeafletComponent implements OnInit {
           }
           else {
             this.toastr.warning(
-              'Es necesario el uso de CERTIFICADO DE SEGURIDAD (SSL) para ver el mapa.', 'Ups!!! algo salio mal.', {
+              'Es necesario el uso de CERTIFICADO DE SEGURIDAD (SSL) para ver el mapa.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
             //this.Salir();
@@ -95,7 +95,7 @@ export class EmplLeafletComponent implements OnInit {
               break;
             default:
               this.toastr.warning(
-                'Ups!!! algo salio mal.', 'Volver a intentar.', {
+                'Ups! algo salio mal.', 'Volver a intentar.', {
                 timeOut: 6000,
               })
               this.Salir();
@@ -104,7 +104,7 @@ export class EmplLeafletComponent implements OnInit {
     }
     else {
       this.toastr.warning(
-        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
+        'Ups! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
         timeOut: 6000,
       })
       this.Salir();

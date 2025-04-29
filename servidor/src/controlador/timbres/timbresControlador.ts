@@ -107,7 +107,7 @@ class TimbresControlador {
                         })
                 });
 
-            if (timbres.length === 0) return res.status(400).jsonp({ message: 'Ups!!! no existen registros.' });
+            if (timbres.length === 0) return res.status(400).jsonp({ message: 'Ups! no existen registros.' });
 
             let estado_cuenta = [{
                 timbres_PES: await pool.query(
@@ -223,7 +223,7 @@ class TimbresControlador {
             }
 
         } catch (err) {
-            const message = 'Ups!!! problemas con la petición al servidor.'
+            const message = 'Ups! problemas con la petición al servidor.'
             return res.status(500).jsonp({ error: err, message: message })
         }
     }
@@ -311,7 +311,7 @@ class TimbresControlador {
 
         } catch (err) {
             console.log('timbre error ', err)
-            const message = 'Ups!!! algo salio mal con la peticion al servidor.'
+            const message = 'Ups! algo salio mal con la peticion al servidor.'
             return res.status(500).jsonp({ error: err, message: message })
         }
     }
@@ -439,7 +439,7 @@ class TimbresControlador {
                         }
                     }
                     else {
-                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
+                        res.status(200).jsonp({ message: 'Ups! algo salio mal.' });
                     }
                 }
             )
@@ -1569,7 +1569,7 @@ class TimbresControlador {
             await pool.query('COMMIT');
 
             res.jsonp({
-                message: 'Timbre creado con éxito',
+                message: 'Timbre creado con éxito.',
                 respuestaBDD: response
             });
         } catch (error) {
@@ -1627,7 +1627,7 @@ class TimbresControlador {
             await pool.query('COMMIT');
 
             res.jsonp({
-                message: 'Timbre creado con éxito',
+                message: 'Timbre creado con éxito.',
                 respuestaBDD: response
             })
         } catch (error) {

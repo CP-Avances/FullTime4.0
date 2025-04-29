@@ -1629,7 +1629,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         }
       }
       else {
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -1808,7 +1808,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.ver_activar_editar = false;
     }
     else {
-      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+      this.toastr.warning('Ups! Fecha no es válida.', '', {
         timeOut: 6000,
       });
     }
@@ -2900,7 +2900,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         });
       }
       else {
-        this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de planificación.', {
+        this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de planificación.', {
           timeOut: 6000,
         });
       }

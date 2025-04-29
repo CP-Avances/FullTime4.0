@@ -87,7 +87,7 @@ export class CrearTipoaccionComponent implements OnInit {
       this.CerrarVentana(2, response.id);
     }, error => {
       this.toastr.error('Revisar los datos',
-        'Ups!!! algo salio mal.', {
+        'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     });
@@ -183,7 +183,7 @@ export class CrearTipoaccionComponent implements OnInit {
     });
     if (this.contar != 0) {
       this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-        'Ups!!! algo salio mal.', {
+        'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     } else {

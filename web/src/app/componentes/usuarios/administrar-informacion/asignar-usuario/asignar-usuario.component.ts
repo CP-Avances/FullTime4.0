@@ -303,7 +303,7 @@ export class AsignarUsuarioComponent implements OnInit {
         await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
       },
       error: () => {
-        this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al guardar registros.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

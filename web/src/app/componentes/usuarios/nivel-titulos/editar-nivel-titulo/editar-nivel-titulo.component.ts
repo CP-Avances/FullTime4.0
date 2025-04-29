@@ -60,7 +60,7 @@ export class EditarNivelTituloComponent implements OnInit {
       // VERIIFCAR DUPLICIDAD
       let nombre_nivel = (nivel.nombre).toUpperCase();
       this.nivel.BuscarNivelNombre(nombre_nivel).subscribe(response => {
-        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups! algo salio mal.', {
           timeOut: 3000,
         });
       }, vacio => {

@@ -95,7 +95,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                   },
                 error: (e) => 
                   {
-                    this.toastr.error('No se ha definido ruta de instalación.', 'Ups!!! algo salio mal.', {
+                    this.toastr.error('No se ha definido ruta de instalación.', 'Ups! algo salio mal.', {
                       timeOut: 6000,
                     });
                   },
@@ -117,7 +117,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                         this.router.navigate(['/login']);
                       }
                       else {
-                        this.toastr.error('Revisar la configuración de correo electrónico.', 'Ups!!! algo salio mal.', {
+                        this.toastr.error('Revisar la configuración de correo electrónico.', 'Ups! algo salio mal.', {
                           timeOut: 6000,
                         });
                         this.correo.reset();
@@ -126,7 +126,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                         this.router.navigate(['/login']);
                       }
                     }, error => {
-                      this.toastr.error('El correo electrónico o identificación ingresada no consta en los registros.', 'Ups!!! algo salio mal.', {
+                      this.toastr.error('El correo electrónico o identificación ingresada no consta en los registros.', 'Ups! algo salio mal.', {
                         timeOut: 6000,
                       });
                       this.correo.reset();

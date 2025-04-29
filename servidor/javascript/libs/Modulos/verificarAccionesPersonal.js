@@ -7,7 +7,7 @@ const ModuloAccionesPersonalValidation = (req, res, next) => {
     if (!accion_personal)
         return res.status(401).jsonp({
             access: false,
-            title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
+            title: `Ups! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
             message: '¿Te gustaría activarlo? Comunícate con nosotros.',
             url: 'www.casapazmino.com.ec'
         });

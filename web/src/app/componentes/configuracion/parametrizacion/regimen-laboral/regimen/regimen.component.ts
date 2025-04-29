@@ -1320,7 +1320,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         this.CerrarVentana(2, registro.id);
       }
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', '', {
+      this.toastr.error('Ups! algo salio mal.', '', {
         timeOut: 6000,
       })
     });
@@ -1364,7 +1364,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   GuardarPeriodo(periodo: any) {
     this.rest.CrearNuevoPeriodo(periodo).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en periodo de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en periodo de vacaciones.', '', {
         timeOut: 6000,
       })
     });
@@ -1415,7 +1415,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   GuardarAntiguedad(antiguedad: any) {
     this.rest.CrearNuevaAntiguedad(antiguedad).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en antiguedad de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en antiguedad de vacaciones.', '', {
         timeOut: 6000,
       })
     });

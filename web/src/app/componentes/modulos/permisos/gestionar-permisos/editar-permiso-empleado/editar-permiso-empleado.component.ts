@@ -470,7 +470,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
     }
     else {
-      this.toastr.warning('Ups!!! no ha seleccionado ningún tipo de permiso.', '', {
+      this.toastr.warning('Ups! no ha seleccionado ningún tipo de permiso.', '', {
         timeOut: 4000,
       });
       this.fechaInicioF.setValue('');
@@ -495,7 +495,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       if (DateTime.fromISO(inicio) >= restar) {
       }
       else {
-        this.toastr.warning('Ups!!! ha superado el limite de días permitidos para actualizar solicitudes.', '', {
+        this.toastr.warning('Ups! ha superado el limite de días permitidos para actualizar solicitudes.', '', {
           timeOut: 4000,
         });
         this.fechaInicioF.setValue('');
@@ -568,7 +568,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     }
     // MENSAJE NO HA SELECCIONADO TIPO DE PERMISO O NO HA INGRESADO FECHA
     else {
-      this.toastr.warning('Seleccione un tipo de permiso e ingrese fecha de inicio de permiso.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Seleccione un tipo de permiso e ingrese fecha de inicio de permiso.', 'Ups! algo salio mal.', {
         timeOut: 4000,
       });
       this.LimpiarInformacion('');
@@ -675,7 +675,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       if (hora_inicio_ === '00:00:00' && hora_final_ === '00:00:00') {
         this.toastr.warning(
           `No es posible registrar un permiso de 0 horas.`,
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -1169,7 +1169,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         }
       }
       else {
-        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -1218,7 +1218,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   // MENSAJE PARA MOSTRAR QUE NO SE ENCUENTRA PLANIFICACION
   EmitirMensajeError() {
-    this.toastr.warning('No tiene asignada una planificación horaria en las fechas y horas ingresadas.', 'Ups!!! algo salio mal.', {
+    this.toastr.warning('No tiene asignada una planificación horaria en las fechas y horas ingresadas.', 'Ups! algo salio mal.', {
       timeOut: 6000,
     });
     this.fechaInicioF.setValue('');
@@ -1227,7 +1227,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   // MENSAJE PARA MOSTRAR QUE EL DIA SELECCIONADO ES LIBRE
   EmitirMensajeErrorLibre() {
-    this.toastr.warning('El día registrado esta configurado como día libre.', 'Ups!!! algo salio mal.', {
+    this.toastr.warning('El día registrado esta configurado como día libre.', 'Ups! algo salio mal.', {
       timeOut: 6000,
     });
     this.fechaInicioF.setValue('');
@@ -1239,7 +1239,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     if (valor === '00:00:00') {
       this.toastr.warning(
         `Ha solicitado ${valor} horas de permiso.`,
-        `Ups!!! algo salio mal.`, {
+        `Ups! algo salio mal.`, {
         timeOut: 6000,
       });
       this.LimpiarInformacion('');
@@ -1329,7 +1329,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         if (form.especialForm === false) {
           this.toastr.warning(
             `No es posible registrar una solicitud de permiso en un día configurado como feriado.`,
-            `Ups!!!`, {
+            `Ups!`, {
             timeOut: 6000,
           });
           this.LimpiarInformacion('');
@@ -1408,14 +1408,14 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         })
       }
       else {
-        this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
         this.fechaInicioF.setValue('');
         this.LimpiarInformacion('00:00');
       }
     }, error => {
-      this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
       this.fechaInicioF.setValue('');
@@ -1590,7 +1590,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
       else {
         let justifica = this.validar.FormatearFecha(sumar, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        this.toastr.warning('Ups!!! el permiso debio ser justificado hasta el ' + justifica + '.',
+        this.toastr.warning('Ups! el permiso debio ser justificado hasta el ' + justifica + '.',
           '', {
           timeOut: 4000,
         });
@@ -1650,7 +1650,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         this.EliminarDocumentoBDD();
         this.CerrarVentana();
       } else {
-        this.toastr.warning('Documento de respaldo es requerido, no es posible eliminarlo.', 'Ups!!! no fue posible actualizar el registro.', {
+        this.toastr.warning('Documento de respaldo es requerido, no es posible eliminarlo.', 'Ups! no fue posible actualizar el registro.', {
           timeOut: 6000,
         });
       }
@@ -1676,7 +1676,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       if (this.archivoSubido != undefined && this.archivoSubido.length != 0) {
         this.ValidarDiasJustificacion(datosPermiso.fec_final, datosPermiso, form);
       } else {
-        this.toastr.warning('Por favor cargar el documento de permiso.', 'Ups!!! no ha seleccionado un archivo.', {
+        this.toastr.warning('Por favor cargar el documento de permiso.', 'Ups! no ha seleccionado un archivo.', {
           timeOut: 6000,
         });
       }
@@ -1689,7 +1689,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         this.CerrarVentana();
       }
       else {
-        this.toastr.warning('Documento de respaldo es requerido, no es posible eliminarlo.', 'Ups!!! no fue posible actualizar el registro.', {
+        this.toastr.warning('Documento de respaldo es requerido, no es posible eliminarlo.', 'Ups! no fue posible actualizar el registro.', {
           timeOut: 6000,
         });
       }
@@ -1742,7 +1742,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         }
       },
       error: error => {
-        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -2015,7 +2015,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                 });
               }
               else {
-                this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
+                this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
                   timeOut: 6000,
                 });
               }

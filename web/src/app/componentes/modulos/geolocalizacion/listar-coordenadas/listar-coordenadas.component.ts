@@ -84,7 +84,7 @@ export class ListarCoordenadasComponent implements OnInit {
     if (this.habilitarGeolocalizacion === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Geolocalización. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Geolocalización. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }

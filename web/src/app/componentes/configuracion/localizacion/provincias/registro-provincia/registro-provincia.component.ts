@@ -119,7 +119,7 @@ export class RegistroProvinciaComponent implements OnInit {
     if (idPais === 0) {
       this.toastr.error(
         "Verificar selección de país",
-        "Ups!!! algo salio mal.",
+        "Ups! algo salio mal.",
         {
           timeOut: 6000,
         }
@@ -146,7 +146,7 @@ export class RegistroProvinciaComponent implements OnInit {
         } else {
           this.toastr.error(
             "Provincia ya se encuentra registrada.",
-            "Ups!!! algo salio mal.",
+            "Ups! algo salio mal.",
             {
               timeOut: 6000,
             }
@@ -168,7 +168,7 @@ export class RegistroProvinciaComponent implements OnInit {
         this.CerrarVentana();
       },
       (error) => {
-        this.toastr.error("Ups!!! algo salio mal.", "Ups!!! algo salio mal.", {
+        this.toastr.error("Ups! algo salio mal.", "Ups! algo salio mal.", {
           timeOut: 6000,
         });
       }

@@ -801,7 +801,7 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.selectionNiveles.clear();
             this.ObtenerNiveles();
           } else {
-            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

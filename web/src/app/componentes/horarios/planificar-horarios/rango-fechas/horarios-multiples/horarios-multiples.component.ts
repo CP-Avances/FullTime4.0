@@ -267,7 +267,7 @@ export class HorariosMultiplesComponent implements OnInit {
     else {
       this.toastr.warning(
         'Seleccionar un horario.',
-        'Ups!!! se ha producido un error.', {
+        'Ups! se ha producido un error.', {
         timeOut: 6000,
       });
     }
@@ -1144,12 +1144,12 @@ export class HorariosMultiplesComponent implements OnInit {
         this.GuardarInformacion();
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error. Verificar registro de planificación.', '', {
+        this.toastr.error('Ups! se ha producido un error. Verificar registro de planificación.', '', {
           timeOut: 6000,
         });
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error. Verificar registro de planificación.', '', {
+      this.toastr.error('Ups! se ha producido un error. Verificar registro de planificación.', '', {
         timeOut: 6000,
       });
     })
@@ -1193,7 +1193,7 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       } else {
         // Si hay un error, lo mostramos en consola
-        this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+        this.toastr.error('Ups! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
@@ -1248,7 +1248,7 @@ export class HorariosMultiplesComponent implements OnInit {
       }
       else if (datos.message === 'error') {
         this.toastr.info(
-          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          'Ups! algo salio mal', 'No se cargaron todos los registros.', {
           timeOut: 6000,
         })
       }
@@ -1434,12 +1434,12 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+        this.toastr.error('Ups! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
           timeOut: 6000,
         });
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+      this.toastr.error('Ups! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
         timeOut: 6000,
       });
     })
@@ -1463,7 +1463,7 @@ export class HorariosMultiplesComponent implements OnInit {
     else {
       this.toastr.warning(
         'Seleccionar un horario.',
-        'Ups!!! se ha producido un error.', {
+        'Ups! se ha producido un error.', {
         timeOut: 6000,
       });
     }

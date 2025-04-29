@@ -148,7 +148,7 @@ export class CrearVacunaComponent implements OnInit {
       fecha: dataCarnet.fecha,
     }
     this.restVacuna.BuscarVacunaFechaTipo(vacuna).subscribe(response => {
-      this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
@@ -205,7 +205,7 @@ export class CrearVacunaComponent implements OnInit {
         this.archivoF.reset();
         this.nameFile = '';
         if (res.message === 'error') {
-          this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+          this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }
@@ -220,7 +220,7 @@ export class CrearVacunaComponent implements OnInit {
           });
         }
       }, error => {
-        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

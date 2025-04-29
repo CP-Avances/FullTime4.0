@@ -126,7 +126,7 @@ export class EditarVacunaComponent implements OnInit {
         id_vacuna: vacuna.id_tipo_vacuna
       }
       this.restVacuna.BuscarVacunaFechaTipo(verificar).subscribe(response => {
-        this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }, vacio => {
@@ -139,7 +139,7 @@ export class EditarVacunaComponent implements OnInit {
   GuardarDatos(datos: any) {
     this.restVacuna.ActualizarVacunacion(this.dvacuna.id, datos).subscribe(response => {
       if (response.message === 'error') {
-        this.toastr.info('Intente otra vez.', 'Ups!!! algo salio mal.', {
+        this.toastr.info('Intente otra vez.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -253,7 +253,7 @@ export class EditarVacunaComponent implements OnInit {
       this.archivoF.reset();
       this.nameFile = '';
     }, error => {
-      this.toastr.warning('Intente cargar nuevamente el archivo.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Intente cargar nuevamente el archivo.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }

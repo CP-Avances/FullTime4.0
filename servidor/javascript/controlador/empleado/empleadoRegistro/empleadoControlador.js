@@ -397,7 +397,7 @@ class EmpleadoControlador {
                 const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
                 if (mensajesError.length > 0) {
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
+                    return res.status(500).jsonp({ message: `Ups! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
                 }
                 else {
                     // FINALIZAR TRANSACCION
@@ -2816,7 +2816,7 @@ class EmpleadoControlador {
                 }
             }
             if (errorOccurred) {
-                res.status(500).jsonp({ message: 'Ups!!! se produjo un error al crear las carpetas.' });
+                res.status(500).jsonp({ message: 'Ups! se produjo un error al crear las carpetas.' });
             }
             else {
                 res.jsonp({ message: 'Carpetas creadas con éxito.' });

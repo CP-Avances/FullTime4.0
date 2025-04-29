@@ -285,7 +285,7 @@ class RelojesControlador {
             }
             catch (error) {
                 console.log('error ', error);
-                return res.status(500).jsonp({ message: 'Ups!!! algo salio mal. No se han encontrado registros.' });
+                return res.status(500).jsonp({ message: 'Ups! algo salio mal. No se han encontrado registros.' });
             }
         });
     }

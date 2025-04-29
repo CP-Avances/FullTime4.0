@@ -166,7 +166,7 @@ export class CatTipoCargosComponent {
           timeOut: 3500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al cargar los datos.', 'Ups! algo salio mal.', {
           timeOut: 3500,
         });
       }
@@ -822,7 +822,7 @@ export class CatTipoCargosComponent {
             this.selectionTipoCargo.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado TIPO CARGO.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TIPO CARGO.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

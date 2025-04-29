@@ -613,7 +613,7 @@ export const ReportePeriVacaciones = async function (id_empleado: number) {
     if (periodos.length === 0) return { message: 'No tiene ningun periodo asignado' }
     console.log(periodos);
 
-    return { message: 'Ups!!! algo salio mal en el proceso.' }
+    return { message: 'Ups! algo salio mal en el proceso.' }
 }
 
 async function PeriodosVacacionesEmpleado(id_empleado: number) {

@@ -190,7 +190,7 @@ export class LoginComponent implements OnInit {
           });
 
         } else {
-          this.toastr.error('Usuario o contraseña no son correctos.', 'Ups!!! algo ha salido mal.', {
+          this.toastr.error('Usuario o contraseña no son correctos.', 'Ups! algo ha salido mal.', {
             timeOut: 6000,
           });
         }

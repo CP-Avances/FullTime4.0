@@ -168,7 +168,7 @@ export class CatModalidaLaboralComponent implements OnInit {
           timeOut: 1500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al cargar los datos.', 'Ups! algo salio mal.', {
           timeOut: 3500,
         });
       }
@@ -369,7 +369,7 @@ export class CatModalidaLaboralComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error: any) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal.', {
             timeOut: 4000,
           });
           this.archivoForm.reset();
@@ -810,7 +810,7 @@ export class CatModalidaLaboralComponent implements OnInit {
             this.selectionModalidad.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado MODALIDAD LABORAL.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado MODALIDAD LABORAL.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

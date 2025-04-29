@@ -84,7 +84,7 @@ class GradoControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    res.jsonp({ message: 'El grado ha sido guardado con éxito', codigo: 200 });
+                    res.jsonp({ message: 'El grado ha sido guardado con éxito.', codigo: 200 });
                 }
             }
             catch (error) {
@@ -128,7 +128,7 @@ class GradoControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    res.status(200).jsonp({ message: 'Grado actualizado con éxito', codigo: 200 });
+                    res.status(200).jsonp({ message: 'Grado actualizado con éxito.', codigo: 200 });
                 }
             }
             catch (error) {
@@ -1109,12 +1109,12 @@ class GradoControlador {
                         }
                     }
                 }
-                var meCount = "registro";
+                var meCount = "registro eliminado";
                 if (count > 1) {
-                    meCount = "registros";
+                    meCount = "registros eliminados";
                 }
-                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' eliminados con éxito',
-                    ms2: 'Existen datos relacionados con el grado - ',
+                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.',
+                    ms2: 'Existen datos relacionados con ',
                     codigo: 200,
                     eliminados: count,
                     relacionados: count_no,
@@ -1128,11 +1128,11 @@ class GradoControlador {
                 if (error) {
                     if (err.table == 'map_empleado_grado') {
                         if (count <= 1) {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con el grado ', eliminados: count,
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
                                 relacionados: count_no, listaNoEliminados: list_Grados });
                         }
                         else if (count > 1) {
-                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con el grado ', eliminados: count,
+                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
                                 relacionados: count_no, listaNoEliminados: list_Grados });
                         }
                     }

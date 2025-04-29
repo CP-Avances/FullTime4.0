@@ -228,7 +228,7 @@ export class RegistroContratoComponent implements OnInit {
         nombre: (tipo_contrato.descripcion).toUpperCase()
       }
       this.rest.BuscarModalidadLaboralNombre(modalidad).subscribe(res => {
-        this.toastr.warning('Modalidad Laboral ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Modalidad Laboral ya existe en el sistema.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }, vacio => {
@@ -252,7 +252,7 @@ export class RegistroContratoComponent implements OnInit {
     }
     this.rest.CrearContratoEmpleado(datos).subscribe(response => {
       if (response.message === 'error' || response.message === 'error_carpeta') {
-        this.toastr.success('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+        this.toastr.success('Intente nuevamente.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -267,7 +267,7 @@ export class RegistroContratoComponent implements OnInit {
       }
       this.CerrarVentana(2);
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', '', {
+      this.toastr.error('Ups! algo salio mal.', '', {
         timeOut: 6000,
       })
     });
@@ -292,7 +292,7 @@ export class RegistroContratoComponent implements OnInit {
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.contador === 1) {
-        this.toastr.warning('Existe un contrato vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Existe un contrato vigente en las fechas ingresadas.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
         this.contador = 0;
@@ -383,7 +383,7 @@ export class RegistroContratoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }, error => {
-      this.toastr.info('Intente cargar nuevamente el archivo.', 'Ups!!! algo salio mal.', {
+      this.toastr.info('Intente cargar nuevamente el archivo.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }

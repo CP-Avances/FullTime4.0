@@ -897,7 +897,7 @@ export class ListaSucursalesComponent implements OnInit {
             this.selectionSucursales.clear();
             this.ObtenerSucursal();
           } else {
-            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

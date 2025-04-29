@@ -32,7 +32,7 @@ class EmpleadoProcesoControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      res.jsonp({ message: 'Procesos del empleado guardados con éxito' });
+      res.jsonp({ message: 'Procesos del empleado guardados con éxito.' });
 
     } catch (error) {
       console.log('error ', error)

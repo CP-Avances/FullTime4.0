@@ -142,7 +142,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       })
       this.CerrarVentana();
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Período de Vacaciones no fue actualizado', {
+      this.toastr.error('Ups! algo salio mal.', 'Período de Vacaciones no fue actualizado', {
         timeOut: 6000,
       })
     });

@@ -884,7 +884,7 @@ export class ListarRegimenComponent implements OnInit {
             this.selectionRegimen.clear();
             this.ObtenerRegimen();
           } else {
-            this.toastr.warning('No ha seleccionado RÉGIMENES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado RÉGIMENES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

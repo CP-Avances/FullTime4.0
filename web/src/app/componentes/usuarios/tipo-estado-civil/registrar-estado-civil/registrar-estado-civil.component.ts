@@ -56,7 +56,7 @@ export class RegistrarEstadoCivilComponent {
     // VERIIFCAR DUPLICIDAD
     let estado = (genero.estado).toUpperCase();
     this.estadoS.BuscarEstadoCivil(nombre_estado).subscribe(response => {
-      this.toastr.warning('El estado civil ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El estado civil ingresado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 3000,
       });
     }, vacio => {

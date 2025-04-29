@@ -133,7 +133,7 @@ export class EditarDepartamentoComponent implements OnInit {
     }
     if (this.contador === 1) {
       this.contador = 0;
-      this.toastr.warning('Nombre de departamento ya se encuentra registrado.', 'Ups!!! algo ha salido mal.', {
+      this.toastr.warning('Nombre de departamento ya se encuentra registrado.', 'Ups! algo ha salido mal.', {
         timeOut: 6000,
       });
     }
