@@ -225,6 +225,12 @@ export class EditarVacunaComponent implements OnInit {
     });
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }  
+  
+
   // METODO PARA SELECCIONAR UN ARCHIVO
   nameFile: string;
   archivoSubido: Array<File>;

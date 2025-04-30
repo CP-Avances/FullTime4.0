@@ -115,6 +115,11 @@ export class CrearVacunaComponent implements OnInit {
     });
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }  
+
   // METODO PARA VISUALIZAR CAMPO REGISTRO DE TIPO DE VACUNA
   AbrirVentana(form: any) {
     if (form.vacunaForm === undefined) {

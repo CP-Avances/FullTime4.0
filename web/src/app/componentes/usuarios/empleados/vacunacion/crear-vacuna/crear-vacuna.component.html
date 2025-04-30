@@ -62,7 +62,7 @@
                     <div class="col-12 m-auto">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
-                                <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
+                                <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
                                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
                                     matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
                                     Subir Carnet
