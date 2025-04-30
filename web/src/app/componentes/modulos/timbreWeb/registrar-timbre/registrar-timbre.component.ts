@@ -774,5 +774,18 @@ export class RegistrarTimbreComponent implements OnInit {
     console.log('Cámara cerrada y variable imagenCamara reiniciada');
   }
 
+  // METODO PARA ACTUALIZAR EL ESTADO DE LOS BOTONES
+  toggleEstado(item: string, tipo: string) {
+    this.ver_camara = !this.ver_camara;
+    if(this.ver_camara){
+      this.reproducirSonido()
+    }
+  }
+  reproducirSonido() {
+    const audio = new Audio();
+    audio.src = 'assets/sounds/click_confirmed.mp3'; // Ruta del sonido
+    audio.load();
+    audio.play();
+  }
 
 }
