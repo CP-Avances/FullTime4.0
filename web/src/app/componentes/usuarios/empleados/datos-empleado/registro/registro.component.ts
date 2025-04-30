@@ -16,6 +16,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-registro',
@@ -59,7 +60,9 @@ export class RegistroComponent implements OnInit {
     public ventana: MatDialog,
     public generoS: GenerosService,
     public estadoS: EstadoCivilService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private restParametros: ParametrosService,
+
   ) {
 
   }
@@ -78,7 +81,7 @@ export class RegistroComponent implements OnInit {
     this.ObtenerNacionalidades();
     this.ObtenerEstadoCivil()
     this.ObtenerGeneros();
-
+    this.CargarEstadoValidacionCedula();
   }
 
   // METODO DE FILTRACION DE DATOS DE NACIONALIDAD
@@ -117,6 +120,7 @@ export class RegistroComponent implements OnInit {
       codigoForm: [''],
       emailForm: ['', Validators.email],
       fechaForm: ['', Validators.required],
+      tipoIdentificacionForm: ['', Validators.required],
     });
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
@@ -129,6 +133,7 @@ export class RegistroComponent implements OnInit {
       userForm: ['', Validators.required],
       passForm: ['', Validators.required],
       rolForm: ['', Validators.required],
+      partidaForm: [''],
     });
   }
 
@@ -214,11 +219,13 @@ export class RegistroComponent implements OnInit {
       apellido: ApellidoCapitalizado,
       telefono: form2.telefonoForm,
       identificacion: form1.cedulaForm,
+      tipo_identificacion: form1.tipoIdentificacionForm === 'Cedula' ? 1 : 2,
       nombre: NombreCapitalizado,
       genero: form2.generoForm,
       correo: form1.emailForm,
       codigo: form1.codigoForm,
       estado: 1,
+      numero_partida_individual: form3.partidaForm,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     };
@@ -366,31 +373,41 @@ export class RegistroComponent implements OnInit {
   }
 
 
-
-  CambiarIdentificacion(ob: MatRadioChange){
-    this.identificacion=ob.value;
+  //METODO QUE DETECTA EL CAMBIO EN TIPO DE IDENTIFICACION DE CEDULA A PASAPORTE
+  CambiarIdentificacion(ob: MatRadioChange) {
+    this.identificacion = ob.value;
+    const valor = this.primeroFormGroup.get('cedulaForm')?.value;
+  
+    if (this.identificacion === 'Cedula') {
+      this.ValidarCedula({ cedulaForm: valor }); 
+    } else {
+      this.cedulaValida = true;
+      this.pasaporteValida = true;
+      this.primeroFormGroup.get('cedulaForm')?.setErrors(null); 
+    }
   }
 
-  cedulaValida:boolean=false;
+  //METODO QUE VALIDA LA CEDULA POR ALGORITMO
+  cedulaValida: boolean = false;
   ValidarCedula(cedula: any) {
-    console.log("entra a validar Cedula", cedula);
+    if (!this.validarCedulaActiva) {
+      this.cedulaValida = true;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors(null);
+      return;
+    }
     const inputElement = cedula.cedulaForm;
-  
     const cad: string = inputElement;
     let total: number = 0;
     const longitud: number = cad.length;
     const longcheck: number = longitud - 1;
   
-    // 👉 Si es menos de 10 dígitos, marcar como inválido
     if (longitud < 10) {
       this.cedulaValida = false;
       this.cdRef.detectChanges();
       this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
-      console.log("Cédula con menos de 10 dígitos");
-      return; // salir
+      return;
     }
   
-    // 👉 Validación normal si tiene 10 dígitos
     if (cad !== "" && longitud === 10) {
       for (let i = 0; i < longcheck; i++) {
         let num = parseInt(cad.charAt(i), 10);
@@ -405,27 +422,31 @@ export class RegistroComponent implements OnInit {
   
       total = total % 10 ? 10 - (total % 10) : 0;
   
-      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
+      if (parseInt(cad.charAt(longcheck), 10) === total) {
         this.cedulaValida = true;
-        console.log("Cédula Válida");
+        this.primeroFormGroup.controls['cedulaForm'].setErrors(null); 
       } else {
         this.cedulaValida = false;
         this.cdRef.detectChanges();
         this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
-        console.log("Cédula Inválida");
       }
     }
   }
   
 
+  //METODO PARA OBTENER EL  DETALLE DEL PARAMETRO VALIDAR CEDULA (ACTIVADO/DESACTIVADO)
+  validarCedulaActiva: boolean = true;
+  CargarEstadoValidacionCedula() {
+    this.restParametros.BuscarDetallesParametros().subscribe(detalles => {
+      const parametro36 = detalles.find((d: any) => d.id_parametro === 36);
+      this.validarCedulaActiva = parametro36?.descripcion?.toLowerCase() !== 'no';
+    });
+  }
 
   pasaporteValida:boolean=false;
   ValidarPasaporte(pasaporte:any){
 
-
   }
-
-
 }
 
 

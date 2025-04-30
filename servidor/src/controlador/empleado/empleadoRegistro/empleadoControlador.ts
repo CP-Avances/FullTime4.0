@@ -226,19 +226,19 @@ class EmpleadoControlador {
   public async InsertarEmpleado(req: Request, res: Response) {
     try {
       const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-        domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
-
+        domicilio, telefono, id_nacionalidad, codigo, tipo_identificacion, user_name, ip, ip_local, numero_partida_individual } = req.body;
+        const numero_partida_individual_final = numero_partida_individual === '' ? null : numero_partida_individual;
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
         INSERT INTO eu_empleados (identificacion, apellido, nombre, estado_civil, genero, correo, 
-          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *
+          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, tipo_identificacion, numero_partida_individual) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
         `
         , [identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
-          telefono, id_nacionalidad, codigo]);
+          telefono, id_nacionalidad, codigo, tipo_identificacion, numero_partida_individual_final]);
 
       const [empleado] = response.rows;
 
@@ -281,8 +281,8 @@ class EmpleadoControlador {
     try {
       const id = req.params.id;
       const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-        domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local } = req.body;
-
+        domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local, numero_partida_individual} = req.body;
+      const partidaFinal = numero_partida_individual === '' ? null : numero_partida_individual;
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -318,11 +318,11 @@ class EmpleadoControlador {
         `
         UPDATE eu_empleados SET identificacion = $2, apellido = $3, nombre = $4, estado_civil = $5, 
           genero = $6, correo = $7, fecha_nacimiento = $8, estado = $9, domicilio = $10, 
-          telefono = $11, id_nacionalidad = $12, codigo = $13 
+          telefono = $11, id_nacionalidad = $12, codigo = $13, numero_partida_individual = $14
         WHERE id = $1 RETURNING *
         `
         , [id, identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-          domicilio, telefono, id_nacionalidad, codigo]);
+          domicilio, telefono, id_nacionalidad, codigo, partidaFinal]);
 
       const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd');
       const fechaNacimientoN = await FormatearFecha2(datosNuevos.rows[0].fecha_nacimiento, 'ddd');

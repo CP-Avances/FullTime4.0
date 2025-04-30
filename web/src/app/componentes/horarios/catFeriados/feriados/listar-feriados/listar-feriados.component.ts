@@ -919,21 +919,19 @@ export class ListarFeriadosComponent implements OnInit {
     this.contador = 0;
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
-      this.feriados = this.feriados.filter((item: any) => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarFeriado(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
+          this.feriados = this.feriados.filter((item: any) => item.id !== datos.id);
+          this.contador = this.contador + 1;
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
             this.ingresar = true;
-            this.feriados = [];
             this.LimpiarCampos();
           }
         }

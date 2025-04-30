@@ -235,6 +235,13 @@
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field>
+                        <mat-label>Núm. de partida individual</mat-label>
+                        <input matInput placeholder="Ej: 123456" formControlName="partidaForm" type="text" maxlength="100">
+                        <mat-icon matSuffix matTooltip="Dato opcional que puede usarse para registros institucionales.">
+                          assignment
+                        </mat-icon>
+                    </mat-form-field>                      
+                    <mat-form-field>
                         <mat-label>Usuario</mat-label>
                         <input matInput placeholder="Ej: kevin.curay" formControlName="userForm" type="text" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
