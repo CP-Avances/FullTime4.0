@@ -487,6 +487,7 @@ class TimbresControlador {
             // Iniciar transacción
             await client.query('BEGIN');
 
+            // FIXME: timbres_verificar NO EXISTE LA FUNCION EN LA BASE DE DATOS
             const timbrePromises = code_empleados.map(async (codigo) => {
                 const res = await client.query(
                     `SELECT   public.timbres_verificar ($1, to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)  AS resultado`,

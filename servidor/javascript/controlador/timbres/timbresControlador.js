@@ -444,6 +444,7 @@ class TimbresControlador {
                 const code_empleados = code.rows.map((empl) => empl.codigo);
                 // Iniciar transacción
                 yield client.query('BEGIN');
+                // FIXME: timbres_verificar NO EXISTE LA FUNCION EN LA BASE DE DATOS
                 const timbrePromises = code_empleados.map((codigo) => __awaiter(this, void 0, void 0, function* () {
                     const res = yield client.query(`SELECT   public.timbres_verificar ($1, to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)  AS resultado`, [codigo, hora_fecha_timbre]);
                     return { codigo, resultado: res.rows[0].resultado }; // Retorna el código y el resultado

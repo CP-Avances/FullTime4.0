@@ -1129,7 +1129,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosTimbreVirtualTimbresWeb) {
-                    this.childrenTimbreVirtual.push({ name: 'Timbre Virtual', url: '/timbresWeb', color: true, ver: true });
+                    this.childrenTimbreVirtual.push({ name: 'Habilitar Timbre Virtual', url: '/timbresWeb', color: true, ver: true });
                   }
                   break;
                 case 'configurar-timbre-web':
@@ -1141,7 +1141,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosTimbreVirtualConfigurarTimbreVirtual) {
-                    this.childrenTimbreVirtual.push({ name: 'Configurar Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true });
+                    this.childrenTimbreVirtual.push({ name: 'Opciones Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true });
                   }
                   break;
                 case 'timbres-personal':
