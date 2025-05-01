@@ -224,26 +224,27 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             const id_empleado = this.empleados.map((empl: any) => empl.id);
             let data_ = {
                 id_empleado: '',
-                vaca_mail: form.vacaMail,
-                vaca_notificacion: form.vacaNoti,
-                permiso_mail: form.permisoMail,
-                permiso_notificacion: form.permisoNoti,
-                hora_extra_mail: form.horaExtraMail,
-                hora_extra_notificacion: form.horaExtraNoti,
-                comida_mail: form.comidaMail,
-                comida_notificacion: form.comidaNoti,
-                comunicado_mail: form.comunicadoMail,
-                comunicado_notificacion: form.comunicadoNoti,
-                atrasos_mail: form.atrasosMail,
-                atrasos_notificacion: form.atrasosNoti,
-                faltas_mail: form.faltasMail,
-                faltas_notificacion: form.faltasNoti,
-                salidas_anticipadas_mail: form.salidasAnticipadasMail,
-                salidas_anticipadas_notificacion: form.salidasAnticipadasNoti,
+                vaca_mail: this.vacaCorreo,
+                vaca_notificacion: this.vacaNotificacion,
+                permiso_mail: this.permisosCorreo,
+                permiso_notificacion: this.permisosNotificacion,
+                hora_extra_mail: this.horaExtraCorreo,
+                hora_extra_notificacion: this.horaExtraNotificacion,
+                comida_mail: this.comidaCorreo,
+                comida_notificacion: this.comidaNotificacion,
+                comunicado_mail: this.cominicadoCorreo,
+                comunicado_notificacion: this.cominicadoNotificacion,
+                atrasos_mail: this.atrasosCorreo,
+                atrasos_notificacion: this.atrasosNotificacion,
+                faltas_mail: this.faltasCorreo,
+                faltas_notificacion: this.faltasNotificacion,
+                salidas_anticipadas_mail: this.salidaCorreo,
+                salidas_anticipadas_notificacion: this.salidaNotificacion,
                 user_name: this.user_name,
                 ip: this.ip,
                 ip_local: this.ips_locales,
             }
+
 
             let data: any = Object.fromEntries(
                 Object.entries(data_).filter(([key, value]) =>
