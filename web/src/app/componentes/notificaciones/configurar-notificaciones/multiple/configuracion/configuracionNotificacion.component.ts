@@ -168,7 +168,11 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 });
                 this.CerrarVentana(true);
             }
-        });
+        },
+        error => {
+          this.toaster.error('Servicio no disponible temporalmente, intente más tarde.')
+        }
+      );
 
     }
 
@@ -283,6 +287,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                     }
                 },
                 async error => {
+                  console.log('error J')
                     if (error.status === 404) {
                         console.log('El backend devolvió un 404: No se encontraron datos.');
                         // REALIZAR ACCIONES ESPECIFICAS PARA EL CASO DE 404
@@ -295,6 +300,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                         });
                     } else {
                         console.error('Error inesperado:', error);
+                        this.toaster.error('Servicio no disponible temporalmente, intente más tarde.')
                     }
                 }
             )
@@ -404,6 +410,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             }
         }
     }
+
     reproducirSonido() {
         const audio = new Audio();
         audio.src = 'assets/sounds/click_confirmed.mp3'; // Ruta del sonido
