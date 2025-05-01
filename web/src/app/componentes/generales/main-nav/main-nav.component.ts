@@ -1165,7 +1165,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilAppMovil) {
-                    this.childrenAplicacionMovil.push({ name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Habilitar Reloj Virtual', url: '/app-movil', color: true, ver: true });
                   }
                   break;
                 case 'configurar-timbre':
@@ -1177,7 +1177,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilConfigurarTimbre) {
-                    this.childrenAplicacionMovil.push({ name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Opciones Timbre', url: '/configurar-timbre', color: true, ver: true });
                   }
                   break;
                 case 'registro-dispositivos':
@@ -1189,7 +1189,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilRegistroDispositivos) {
-                    this.childrenAplicacionMovil.push({ name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Dispositivos Registrados', url: '/registro-dispositivos', color: true, ver: true });
                   }
                   break;
                 case 'listarRelojes':
