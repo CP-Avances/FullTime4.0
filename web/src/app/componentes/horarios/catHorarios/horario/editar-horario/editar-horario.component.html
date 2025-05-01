@@ -128,7 +128,7 @@
                     <section class="d-flex flex-column bd-highlight" *ngIf="activar">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
-                                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
+                                <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
                                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="i-cursor" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Subir documento que respalde la creación de horario, solo en caso de ser necesario como un respaldo de cambios en el horario.">

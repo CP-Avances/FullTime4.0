@@ -121,17 +121,16 @@ export class RolPermisosMovilComponent implements OnInit {
     public rest: RolPermisosService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
-    
-  ) {
-  }
+
+  ) { }
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
@@ -501,9 +500,25 @@ export class RolPermisosMovilComponent implements OnInit {
   InsertarPaginaRol() {
     this.ingresar = false;
     this.contador = 0;
+    let contadorOperaciones = 0;
+    let totalOperaciones = 0;
+
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (this.paginasSeleccionadas.length != 0) {
       this.habilitarprogress = true;
+
+      this.paginasSeleccionadas.forEach((obj: any) => {
+        if (this.ObtenerTodasPaginasAcciones()[obj.id].length != 0) {
+          if (this.accionesSeleccionadasPorPagina[obj.id].length > 0) {
+            totalOperaciones += this.accionesSeleccionadasPorPagina[obj.id].length;
+          } else {
+            totalOperaciones += 1;
+          }
+        } else {
+          totalOperaciones += 1;
+        }
+      });
+
       // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
       this.paginasSeleccionadas.map((obj: any) => {
         // VERIFICAR SI LA PAGINA TIENE ACCIONES
@@ -520,12 +535,18 @@ export class RolPermisosMovilComponent implements OnInit {
               this.paginasRol = [];
               this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
                 datos => {
-                  this.contador = this.contador + 1;
                   this.paginasRol = datos;
                   this.habilitarprogress = false;
                   this.toastr.info('Se indica que ' + obj.nombre + ' con accion ' + this.MetodoParaMostrarAccion(accion.id) + ' ya fue asignada a este Rol.', '', {
                     timeOut: 7000,
-                  })
+                  });
+                  contadorOperaciones++;
+                  if (contadorOperaciones === totalOperaciones && this.contador > 0) {
+                    this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                      timeOut: 6000,
+                    });
+                    this.ObtenerRoles();
+                  }
                 }, error => {
                   // INSERTAR PAGINA Y ACCION
                   var rolPermisosbody = {
@@ -537,21 +558,27 @@ export class RolPermisosMovilComponent implements OnInit {
                     user_name: this.user_name,
                     ip: this.ip, ip_local: this.ips_locales,
                   }
-                  this.contador = this.contador + 1;
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
-                    if (!this.ingresar) {
+                    this.contador = this.contador + 1;
+                    contadorOperaciones++;
+                    if (contadorOperaciones === totalOperaciones && this.contador > 0) {
                       this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
                         timeOut: 6000,
-                      })
+                      });
                       this.ObtenerRoles();
-                      this.ingresar = true;
                     }
                     this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                       this.paginas = datos;
                     })
                   }, error => {
-                    this.contador = this.contador + 1;
-                    this.toastr.error('Ups! algo salio mal.', 'VERIFICAR.', {
+                    contadorOperaciones++;
+                    if (contadorOperaciones === totalOperaciones && this.contador > 0) {
+                      this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                        timeOut: 6000,
+                      });
+                      this.ObtenerRoles();
+                    }
+                    this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
                       timeOut: 6000,
                     })
                   });
@@ -579,27 +606,40 @@ export class RolPermisosMovilComponent implements OnInit {
           }
           // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
-            this.contador = this.contador + 1;
             this.habilitarprogress = false;
             this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
               timeOut: 7000,
-            })
+            });
+            contadorOperaciones++;
+            if (contadorOperaciones === totalOperaciones && this.contador > 0) {
+              this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                timeOut: 6000,
+              });
+              this.ObtenerRoles();
+            }
           }, error => {
             // INSERTAR PAGINA
-            this.contador = this.contador + 1;
             this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
-              if (!this.ingresar) {
+              this.contador = this.contador + 1;
+              contadorOperaciones++;
+              if (contadorOperaciones === totalOperaciones && this.contador > 0) {
                 this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
                   timeOut: 6000,
-                })
+                });
                 this.ObtenerRoles();
-                this.ingresar = true;
               }
               this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                 this.paginas = datos;
               })
             }, error => {
-              this.toastr.error('Ups! algo salio mal..', 'Ups! algo salio mal.', {
+              contadorOperaciones++;
+              if (contadorOperaciones === totalOperaciones && this.contador > 0) {
+                this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                  timeOut: 6000,
+                });
+                this.ObtenerRoles();
+              }
+              this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
                 timeOut: 6000,
               })
             });
@@ -626,6 +666,7 @@ export class RolPermisosMovilComponent implements OnInit {
       })
     }
   }
+
 
   //INSERTAR PAGINA DE LOS MODULOS
   InsertarPaginaModulosRol() {

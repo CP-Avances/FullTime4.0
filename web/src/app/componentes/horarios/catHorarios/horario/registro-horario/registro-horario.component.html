@@ -109,7 +109,7 @@
                     <div class="d-flex flex-wrap justify-content-center" *ngIf="isChecked">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
-                                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
+                                <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
                                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="i-cursor" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cargar archivo como respaldo de registro de horario. (Opcional)">

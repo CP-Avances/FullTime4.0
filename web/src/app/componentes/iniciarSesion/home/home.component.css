@@ -29,7 +29,20 @@ label {
 .icon-menu {
     margin: auto;
     vertical-align: middle;
-    margin-right: 8px !important;
+    margin-right: 5px !important;
+    color: white;
+}
+
+.icon-menu-correo {
+    vertical-align: middle;
+    margin-right: 6px !important;
+    color: white;
+}
+
+.text-menu {
+    margin-right: 0px !important;
+    width: auto !important;
+    vertical-align: middle;
     color: white;
 }
 
