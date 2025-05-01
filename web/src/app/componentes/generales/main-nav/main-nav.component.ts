@@ -1258,15 +1258,15 @@ export class MainNavComponent implements OnInit {
                     this.childrenNotificaciones.push({ name: 'Documentos', url: '/archivos', color: true, ver: true });
                   }
                   break;
-                case 'cumpleanios':
+                case 'mensaje_notificaciones':
                   this.itemNotificaciones = true;
                   for (const parametrizacion of this.childrenNotificaciones) {
-                    if (parametrizacion.url === '/cumpleanios') {
+                    if (parametrizacion.url === '/mensaje_notificaciones') {
                       this.vistaModulosNotificacionesCumpleanios = true;
                     }
                   }
                   if (!this.vistaModulosNotificacionesCumpleanios) {
-                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/cumpleanios', color: true, ver: true });
+                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/mensaje_notificaciones', color: true, ver: true });
                   }
                   break;
                 case 'comunicados':
@@ -2095,7 +2095,7 @@ export class MainNavComponent implements OnInit {
                 this.menuGeneralUsuarios.splice(indexNotificaciones, 1);
               }
             }
-            //Modulos-Permisos              
+            //Modulos-Permisos
             if (!this.HabilitarPermisos || !this.subItemModulosPermisos) {
               const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
               if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
