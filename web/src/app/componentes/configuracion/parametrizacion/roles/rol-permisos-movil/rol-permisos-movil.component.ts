@@ -121,17 +121,16 @@ export class RolPermisosMovilComponent implements OnInit {
     public rest: RolPermisosService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
-    
-  ) {
-  }
+
+  ) { }
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
@@ -503,11 +502,11 @@ export class RolPermisosMovilComponent implements OnInit {
     this.contador = 0;
     let contadorOperaciones = 0;
     let totalOperaciones = 0;
-  
+
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (this.paginasSeleccionadas.length != 0) {
       this.habilitarprogress = true;
-  
+
       this.paginasSeleccionadas.forEach((obj: any) => {
         if (this.ObtenerTodasPaginasAcciones()[obj.id].length != 0) {
           if (this.accionesSeleccionadasPorPagina[obj.id].length > 0) {
@@ -519,7 +518,7 @@ export class RolPermisosMovilComponent implements OnInit {
           totalOperaciones += 1;
         }
       });
-  
+
       // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
       this.paginasSeleccionadas.map((obj: any) => {
         // VERIFICAR SI LA PAGINA TIENE ACCIONES
@@ -531,7 +530,7 @@ export class RolPermisosMovilComponent implements OnInit {
                 id_rol: this.id_rol,
                 id_accion: accion.id
               };
-  
+
               // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
               this.paginasRol = [];
               this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
@@ -667,7 +666,7 @@ export class RolPermisosMovilComponent implements OnInit {
       })
     }
   }
-  
+
 
   //INSERTAR PAGINA DE LOS MODULOS
   InsertarPaginaModulosRol() {
