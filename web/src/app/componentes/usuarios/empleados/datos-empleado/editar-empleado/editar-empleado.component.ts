@@ -120,6 +120,7 @@ export class EditarEmpleadoComponent implements OnInit {
     this.terceroFormGroup = this._formBuilder.group({
       userForm: ['', Validators.required],
       rolForm: ['', Validators.required],
+      partidaForm: [''],
     });
   }
 
@@ -161,7 +162,7 @@ export class EditarEmpleadoComponent implements OnInit {
   // CARGAR DATOS DE EMPLEADO Y USUARIO
   ObtenerEmpleado() {
     const { apellido, identificacion, codigo, correo, domicilio, estado_civil, estado, fecha_nacimiento, genero,
-      id, id_nacionalidad, nombre, telefono } = this.empleado;
+      id, id_nacionalidad, nombre, telefono, numero_partida_individual } = this.empleado;
 
 
     this.primeroFormGroup.setValue({
@@ -189,6 +190,7 @@ export class EditarEmpleadoComponent implements OnInit {
       this.terceroFormGroup.patchValue({
         rolForm: this.usuario[0].id_rol,
         userForm: this.usuario[0].usuario,
+        partidaForm: numero_partida_individual || ''
       });
     });
   }
@@ -274,6 +276,7 @@ export class EditarEmpleadoComponent implements OnInit {
       estado: form2.estadoForm,
       codigo: form1.codigoForm,
       user_name: this.user_name,
+      numero_partida_individual: form3.partidaForm === '' ? null : form3.partidaForm,
       ip: this.ip, ip_local: this.ips_locales,
     };
 

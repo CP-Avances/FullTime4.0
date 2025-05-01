@@ -373,6 +373,7 @@
                     <tr style="text-align: center;">
                         <th id="td_usuario" scope="col">Item</th>
                         <th id="td_usuario" scope="col">Observación</th>
+                        <th id="td_usuario" scope="col">Tipo de identificación</th>
                         <th id="td_usuario" scope="col">Identificación</th>
                         <th id="td_usuario" scope="col" *ngIf="datosManuales">Código</th>
                         <th id="td_usuario" scope="col">Apellido</th>
@@ -399,6 +400,7 @@
                             </div>
                             {{e.observacion}}
                         </td>
+                        <td [style.color]="EstiloTextoCelda(e.tipo_identificacion)">{{e.tipo_identificacion}}</td>
                         <td [style.color]="EstiloTextoCelda(e.identificacion)">{{e.identificacion}}</td>
                         <td [style.color]="EstiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
                         <td [style.color]="EstiloTextoCelda(e.apellido)">{{e.apellido}}</td>

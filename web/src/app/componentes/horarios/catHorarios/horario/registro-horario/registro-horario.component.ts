@@ -193,6 +193,11 @@ export class RegistroHorarioComponent implements OnInit {
     }
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }    
+
   // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO   
   SubirRespaldo(id: number, codigo: any) {
     let formData = new FormData();

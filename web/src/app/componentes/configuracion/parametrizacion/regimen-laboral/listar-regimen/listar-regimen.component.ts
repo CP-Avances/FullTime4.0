@@ -475,9 +475,9 @@ export class ListarRegimenComponent implements OnInit {
                   widths: ['70%', '30%'],
                   body: [
                     [{ text: 'POR MES (HÁBILES)', style: 'tableHeader' }, { text: obj.vacacion_dias_laboral_mes, style: 'itemsTableCentrado' }],
-                    [{ text: 'POR MES (CALEND.)', style: 'tableHeader' }, { text: obj.vacacion_dias_calendario_mes, style: 'itemsTableCentrado' }],
+                    [{ text: 'POR MES (CALENDARIO)', style: 'tableHeader' }, { text: obj.vacacion_dias_calendario_mes, style: 'itemsTableCentrado' }],
                     [{ text: 'POR DÍA (HÁBILES)', style: 'tableHeader' }, { text: obj.laboral_dias, style: 'itemsTableCentrado' }],
-                    [{ text: 'POR DÍA (CALEND.)', style: 'tableHeader' }, { text: obj.calendario_dias, style: 'itemsTableCentrado' }]
+                    [{ text: 'POR DÍA (CALENDARIO)', style: 'tableHeader' }, { text: obj.calendario_dias, style: 'itemsTableCentrado' }]
                   ]
                 },
                 layout: {
@@ -516,7 +516,7 @@ export class ListarRegimenComponent implements OnInit {
                           [{ text: 'TIPO', style: 'tableHeader' }, { text: 'VARIABLE', style: 'itemsTableCentrado' }],
                           ...(rangos.length > 0
                             ? rangos.map((r: any) => [
-                                { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta}`, style: 'tableHeader' },
+                                { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta} años`, style: 'tableHeader' },
                                 { text: `${r.dias_antiguedad} días`, style: 'itemsTableCentrado' }
                               ])
                             : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]])

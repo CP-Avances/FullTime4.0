@@ -77,7 +77,7 @@
                                         <mat-datepicker touchUi #picker2></mat-datepicker>
                                 </mat-form-field>
 
-                                <mat-form-field>
+                                <mat-form-field *ngIf="habilitarSeleccion">
                                     <mat-label id="letras">Seleccionar cargo</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccione el tipo de cargo que va a desempeñar el usuario.">

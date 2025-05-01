@@ -307,6 +307,11 @@ export class EditarHorarioComponent implements OnInit {
     }
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }  
+
   // METODO PARA GUARDAR DATOS DE ARCHIVO SELECCIONADO
   SubirRespaldo(id: number) {
     let formData = new FormData();
