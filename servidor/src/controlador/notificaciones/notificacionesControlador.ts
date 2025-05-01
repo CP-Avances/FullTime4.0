@@ -573,7 +573,7 @@ class NotificacionTiempoRealControlador {
         atrasos_mail,
         atrasos_notificacion,
         faltas_mail,
-        faltas_noti,
+        faltas_notificacion,
         salidas_anticipadas_mail,
         salidas_anticipadas_notificacion,
         user_name,
@@ -606,7 +606,7 @@ class NotificacionTiempoRealControlador {
         atrasos_mail: atrasos_mail,
         atrasos_notificacion: atrasos_notificacion,
         faltas_mail: faltas_mail,
-        faltas_notificacion: faltas_noti,
+        faltas_notificacion: faltas_notificacion,
         salidas_anticipadas_mail: salidas_anticipadas_mail,
         salidas_anticipadas_notificacion: salidas_anticipadas_notificacion
       };
@@ -889,7 +889,6 @@ class NotificacionTiempoRealControlador {
 
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
-
 
       const id_empleados = Array.isArray(id_empl_recive) ? id_empl_recive : [id_empl_recive];
       const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
