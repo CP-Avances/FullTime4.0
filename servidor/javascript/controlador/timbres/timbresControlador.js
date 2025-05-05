@@ -312,7 +312,7 @@ class TimbresControlador {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos, ip_local } = req.body;
-                console.log('datos del timbre ', req.body);
+                // console.log('datos del timbre ', req.body)
                 const id_empleado = req.userIdEmpleado;
                 var hora_diferente = false;
                 var fecha_validada;
@@ -373,15 +373,19 @@ class TimbresControlador {
                 var codigo = parseInt(code[0].codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
+                // CONVERTIR FECHAS A FORMATO ACEPTADO POR POSTGRESQL
+                const fec_hora_timbre_sql = luxon_1.DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
+                const fecha_servidor_sql = luxon_1.DateTime.fromFormat(fecha_servidor_final, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
+                const fecha_validada_sql = luxon_1.DateTime.fromFormat(fecha_validada_final, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
+                database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, 
-                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                    $3::timestamp without time zone, 
+                    $4::timestamp without time zone, 
+                    $5::timestamp without time zone, 
                     $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-                `, [codigo, id_reloj, fec_hora_timbre, fecha_servidor_final, fecha_validada_final, tecl_funcion, accion,
-                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
-                    zona_dispositivo, gmt_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                `, [codigo, id_reloj, fec_hora_timbre_sql, fecha_servidor_sql, fecha_validada_sql,
+                    tecl_funcion, accion, observacion, latitud, longitud, ubicacion, 'APP_WEB',
+                    imagen, true, zona_servidor, gmt_servidor, zona_dispositivo, gmt_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
                     console.log('result ', results.rows[0].timbres_web);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);

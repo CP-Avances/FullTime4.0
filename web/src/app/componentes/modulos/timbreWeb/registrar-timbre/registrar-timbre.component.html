@@ -84,42 +84,42 @@
                     {{this.fecha_hora}}
                 </label>
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-globe"></i>
                     Zona Horaria:
                 </label>
                 {{timeZone}} ({{gmt_dispositivo}})
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-hand-o-right"></i>
                     Tipo timbre:
                 </label>
                 {{asistencia}}
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-map-marker"></i>
                     Ubicación:
                 </label>
                 {{ubicacion}}
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-location-arrow"></i>
                     Longitud:
                 </label>
                 {{longitud}}
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-location-arrow"></i>
                     Latitud:
                 </label>
                 {{latitud}}
             </span>
-        
+
             <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
                 <label><i id="ver" class="fa fa-camera"></i>
                     Cámara en uso:
@@ -128,7 +128,7 @@
             </span>
 
         </div>
-        
+
         <div class="col-12 col-md-6 m-auto mt-4 p-2 align-content-center">
 
             <div class="contenedor_btnImg" *ngIf="opcional && existe_camara && foto">
@@ -143,8 +143,8 @@
                     <mat-card-footer [ngClass]="ver_camara ? 'ocultar-contenido' : 'mostrar-contenido'">
                         <label style="font-size: x-small;">{{ ver_camara ? '' : 'Presione en la camara para activarla' }}</label>
                     </mat-card-footer>
-                </mat-card>      
-                
+                </mat-card>
+
                 <div class="camara" *ngIf="ver_camara && existe_camara">
                     <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
                         <webcam [height]="225" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
@@ -169,12 +169,12 @@
                         </button>
                     </div>
                 </div>
-                
+
             </div>
 
 
 
-            
+
         </div>
     </div>
 

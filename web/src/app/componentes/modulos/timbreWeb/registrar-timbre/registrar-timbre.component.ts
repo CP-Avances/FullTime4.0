@@ -521,7 +521,7 @@ export class RegistrarTimbreComponent implements OnInit {
     });
   }
 
-  // METODO PARA TOMAR DATOS DE MARCACION 
+  // METODO PARA TOMAR DATOS DE MARCACION
   informacion_timbre: any;
   dataTimbre: any;
   RegistrarDatosTimbre(ubicacion: any) {
