@@ -1116,6 +1116,7 @@ class TimbresControlador {
     public async IngresarOpcionTimbreWeb(req: Request, res: Response): Promise<void> {
 
         try {
+            console.log('opciones: ', req.body);
             const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
             const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
             const batches = [];
@@ -1163,216 +1164,83 @@ class TimbresControlador {
     public async ActualizarOpcionTimbreWeb(req: Request, res: Response): Promise<Response> {
 
         try {
-            const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
+            let { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
             console.log(req.body)
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-            let rowsAffected: number = 0;
 
+            let fields: string[] = [];
+            let values: any[] = [];
+            let index = 2; // $1 es id_empleado
 
+            if (timbre_foto !== null && timbre_foto !== undefined) {
+            fields.push(`timbre_foto = $${index++}`);
+            values.push(timbre_foto);
+                if (!timbre_foto) timbre_foto_obligatoria = false;
+            }
+            if (timbre_especial !== null && timbre_especial !== undefined) {
+            fields.push(`timbre_especial = $${index++}`);
+            values.push(timbre_especial);
+            }
+            if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined) {
+            fields.push(`timbre_ubicacion_desconocida = $${index++}`);
+            values.push(timbre_ubicacion_desconocida);
+            }
+            if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined) {
+            fields.push(`opcional_obligatorio = $${index++}`);
+            values.push(timbre_foto_obligatoria);
+            }
 
-            // Combinaciones de 4 parámetros (todos no nulos)
-            if (timbre_foto !== null && timbre_especial !== null && timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4, opcional_obligatorio = $5
+            if (fields.length === 0) {
+            await pool.query('ROLLBACK');
+            return res.status(400).json({ message: 'No hay campos válidos para actualizar.' });
+            }
+
+            // Agrega el arreglo de ID de empleados al principio de los valores
+            values.unshift(id_empleado);
+
+            const updateQuery = `
+            UPDATE mtv_opciones_marcacion
+            SET ${fields.join(', ')}
             WHERE id_empleado = ANY($1::int[])
-            `,
-                    [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
+            `;
 
-            // Combinaciones de 3 parámetros
-            else if (timbre_foto !== null && timbre_especial !== null && timbre_ubicacion_desconocida !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4
-            WHERE id_empleado = ANY($1::int[])
-            `,
-                    [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]
-                );
-                rowsAffected = response.rowCount || 0;
-            } else if (timbre_foto !== null && timbre_especial !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_especial = $3, opcional_obligatorio = $4
-            WHERE id_empleado = ANY($1::int[])
-            `,
-                    [id_empleado, timbre_foto, timbre_especial, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            } else if (timbre_foto !== null && timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_ubicacion_desconocida = $3, opcional_obligatorio = $4
-            WHERE id_empleado = ANY($1::int[])
-            `,
-                    [id_empleado, timbre_foto, timbre_ubicacion_desconocida, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            } else if (timbre_especial !== null && timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_especial = $2, timbre_ubicacion_desconocida = $3, opcional_obligatorio = $4
-            WHERE id_empleado = ANY($1::int[])
-            `,
-                    [id_empleado, timbre_especial, timbre_ubicacion_desconocida, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // Combinaciones de 2 parámetros
-            else if (timbre_foto !== null && timbre_especial !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_foto, timbre_especial]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // timbre_foto y timbre_ubicacion_desconocida
-            else if (timbre_foto !== null && timbre_ubicacion_desconocida !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_foto, timbre_ubicacion_desconocida]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // timbre_foto y timbre_foto_obligatoria
-            else if (timbre_foto !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2, timbre_foto_obligatoria = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_foto, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // timbre_especial y timbre_ubicacion_desconocida
-            else if (timbre_especial !== null && timbre_ubicacion_desconocida !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_especial, timbre_ubicacion_desconocida]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // timbre_especial y timbre_foto_obligatoria
-            else if (timbre_especial !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_especial = $2, timbre_foto_obligatoria = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_especial, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // timbre_ubicacion_desconocida y timbre_foto_obligatoria
-            else if (timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_ubicacion_desconocida = $2, timbre_foto_obligatoria = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_ubicacion_desconocida, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
-
-            // Combinaciones de 1 parámetro
-            else if (timbre_foto !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_foto]
-                );
-                rowsAffected = response.rowCount || 0;
-            } else if (timbre_especial !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_especial = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_especial]
-                );
-                rowsAffected = response.rowCount || 0;
-            } else if (timbre_ubicacion_desconocida !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_ubicacion_desconocida = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_ubicacion_desconocida]
-                );
-                rowsAffected = response.rowCount || 0;
-            } else if (timbre_foto_obligatoria !== null) {
-                const response: QueryResult = await pool.query(
-                    `
-                    UPDATE mtv_opciones_marcacion 
-                    SET opcional_obligatorio = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `,
-                    [id_empleado, timbre_foto_obligatoria]
-                );
-                rowsAffected = response.rowCount || 0;
-            }
+            await pool.query(updateQuery, values);
 
 
-            const auditoria = id_empleado.map((id_empleado: number) => ({
-                tabla: 'mtv_opciones_marcacion',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `id_empleado: ${id_empleado}, , timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
-                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida} , opcional_obligatorio: ${timbre_foto_obligatoria}`,
-                ip: ip,
-                ip_local: ip_local,
-                observacion: null
-            }));
+            const auditoria = id_empleado.map((id: number) => {
+                const nuevosDatos: string[] = [`id_empleado: ${id}`];
+            
+                if (timbre_foto !== null && timbre_foto !== undefined)
+                    nuevosDatos.push(`timbre_foto: ${timbre_foto}`);
+            
+                if (timbre_especial !== null && timbre_especial !== undefined)
+                    nuevosDatos.push(`timbre_especial: ${timbre_especial}`);
+            
+                if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined)
+                    nuevosDatos.push(`timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`);
+            
+                if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined)
+                    nuevosDatos.push(`opcional_obligatorio: ${timbre_foto_obligatoria}`);
+            
+                return {
+                    tabla: 'mtv_opciones_marcacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: nuevosDatos.join(', '),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                };
+            });
+            
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            //console.log('opciones ', opciones)
-
-            if (rowsAffected > 0) {
-                return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected })
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
-            }
+            return res.status(200).json({ message: 'Actualización exitosa' });
 
         } catch (error) {
             // REVERTIR TRANSACCION
