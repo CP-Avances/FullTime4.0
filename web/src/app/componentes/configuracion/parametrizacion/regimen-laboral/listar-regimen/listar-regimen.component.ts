@@ -546,11 +546,33 @@ export class ListarRegimenComponent implements OnInit {
     let n: number = 1;
 
     this.regimen.map((obj: any) => {
+      const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
+      const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
+
+      const textoPeriodos = obj.vacacion_divisible
+        ? (periodos.length > 0
+            ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
+            : 'NO DEFINIDO')
+        : 'NO APLICA';
+
+      const textoRangos = obj.antiguedad_variable
+        ? (rangos.length > 0
+            ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
+            : 'NO DEFINIDO')
+        : 'NO APLICA';
+
+      // Tipo antigüedad
+      let tipoAntiguedad = 'NO APLICA';
+      if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
+      if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';
+
       datos.push([
         n++,
         obj.id,
         obj.descripcion,
         obj.pais,
+        obj.continuidad_laboral ? 'SI' : 'NO',
+        obj.antiguedad ? 'SI' : 'NO',
         obj.mes_periodo,
         obj.dias_mes,
         obj.trabajo_minimo_mes,
@@ -558,15 +580,20 @@ export class ListarRegimenComponent implements OnInit {
         obj.vacacion_dias_laboral,
         obj.vacacion_dias_libre,
         obj.vacacion_dias_calendario,
+        obj.acumular ? 'SI' : 'NO',
         obj.dias_maximo_acumulacion,
+        obj.vacacion_divisible ? 'SI' : 'NO',
+        textoPeriodos,
         obj.vacacion_dias_laboral_mes,
         obj.vacacion_dias_calendario_mes,
         obj.laboral_dias,
         obj.calendario_dias,
+        tipoAntiguedad,
         obj.anio_antiguedad,
         obj.dias_antiguedad,
-      ])
-    })
+        textoRangos,
+      ]);
+    });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Régimen");
@@ -579,69 +606,72 @@ export class ListarRegimenComponent implements OnInit {
       tl: { col: 0, row: 0 },
       ext: { width: 220, height: 105 },
     });
-    // COMBINAR CELDAS
-    worksheet.mergeCells("B1:R1");
-    worksheet.mergeCells("B2:R2");
-    worksheet.mergeCells("B3:R3");
-    worksheet.mergeCells("B4:R4");
-    worksheet.mergeCells("B5:R5");
 
-    // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
+    worksheet.mergeCells("B1:Y1");
+    worksheet.mergeCells("B2:Y2");
+
     worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
     worksheet.getCell("B2").value = "Lista de Régimen Laboral".toUpperCase();
 
-    // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
     ["B1", "B2"].forEach((cell) => {
-      worksheet.getCell(cell).alignment = {
-        horizontal: "center",
-        vertical: "middle",
-      };
+      worksheet.getCell(cell).alignment = { horizontal: "center", vertical: "middle" };
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
-      { key: "n", width: 10 },
-      { key: "codigo", width: 20 },
+      { key: "item", width: 7 },
+      { key: "codigo", width: 8 },
       { key: "descripcion", width: 20 },
-      { key: "pais", width: 20 },
-      //
-      { key: "mes_periodo", width: 20 },
-      { key: "dias_mes", width: 20 },
-      { key: "trabajo_minimo_mes", width: 30 },
-      { key: "trabajo_minimo_horas", width: 30 },
-      { key: "vacacion_dias_laboral", width: 30 },
-      { key: "vacacion_dias_libre", width: 30 },
-      { key: "vacacion_dias_calendario", width: 30 },      
-      { key: "dias_maximo_acumulacion", width: 30 },
-      { key: "vacacion_dias_laboral_mes", width: 40 },
-      { key: "vacacion_dias_calendario_mes", width: 40 },
-      { key: "laboral_dias", width: 40 },
-      { key: "calendario_dias", width: 40 },
-      { key: "anio_antiguedad", width: 30 },
-      { key: "dias_antiguedad", width: 30 },
+      { key: "pais", width: 10 },
+      { key: "continuidad", width: 25 },
+      { key: "antiguedad", width: 25 },
+      { key: "mes_periodo", width: 17 },
+      { key: "dias_mes", width: 15 },
+      { key: "trabajo_minimo_mes", width: 25 },
+      { key: "trabajo_minimo_horas", width: 25 },
+      { key: "vacacion_dias_laboral", width: 15 },
+      { key: "vacacion_dias_libre", width: 15 },
+      { key: "vacacion_dias_calendario", width: 20 },
+      { key: "acumula", width: 25 },
+      { key: "max_dias_acum", width: 30 },
+      { key: "vacacion_divisible", width: 30 },
+      { key: "detalle_periodos", width: 50 },
+      { key: "dias_laboral_mes", width: 27 },
+      { key: "dias_calendario_mes", width: 30 },
+      { key: "laboral_dia", width: 27 },
+      { key: "calendario_dia", width: 30 },
+      { key: "tipo_antiguedad", width: 20 },
+      { key: "anio_antiguedad", width: 20 },
+      { key: "dias_antiguedad", width: 20 },
+      { key: "detalle_rangos", width: 55 },
     ];
 
     const columnas = [
-      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: false },
-      { name: "DESCRIPCION", totalsRowLabel: "", filterButton: true },
-      { name: "PAÍS", totalsRowLabel: "", filterButton: true },
-      //
-      { name: "MESES_PERIODO", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_MES", totalsRowLabel: "", filterButton: true },
-      { name: "TRABAJO_MINIMO_MES", totalsRowLabel: "", filterButton: true },
-      { name: "TRABAJO_MINIMO_HORA", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_ANIO_VACACION", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_LIBRES", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_CALENDARIO_VACACION", totalsRowLabel: "", filterButton: true },
-      { name: "MAX_DIAS_ACUMULABLES", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_LABORALES_GANADOS_MES", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_CALENDARIO_GANADOS_MES", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_LABORALES_GANADOS_DIA", totalsRowLabel: "", filterButton: true },
-      { name: "DIAS_CALENDARIO_GANADOS_DIA", totalsRowLabel: "", filterButton: true },
-      { name: "ANIOS_ANTIGUEDAD", totalsRowLabel: "", filterButton: true },
-      { name: "DIA_INCR_ANTIGUEDAD", totalsRowLabel: "", filterButton: true },
+      { name: "ITEM" },
+      { name: "CÓDIGO" },
+      { name: "RÉGIMEN" },
+      { name: "PAÍS" },
+      { name: "CONTINUIDAD LABORAL" },
+      { name: "ANTIGÜEDAD LABORAL" },
+      { name: "PERIODO LABORAL" },
+      { name: "DÍAS POR MES" },
+      { name: "TRABAJO MÍNIMO (MES)" },
+      { name: "TRABAJO MÍNIMO (HORAS)" },
+      { name: "DÍAS HÁBILES" },
+      { name: "DÍAS LIBRES" },
+      { name: "DÍAS CALENDARIO" },
+      { name: "ACUMULA VACACIONES" },
+      { name: "MÁXIMOM DÍAS ACUMULABLES" },
+      { name: "VACASIONES POR PERÍODOS" },
+      { name: "DETALLE PERÍODOS" },
+      { name: "VACACIONES HÁBILES MES" },
+      { name: "VACACIONES CALENDARIO MES" },
+      { name: "VACACIONES HÁBILES DÍA" },
+      { name: "VACACIONES CALENDARIO DÍA" },
+      { name: "TIPO ANTIGÜEDAD" },
+      { name: "AÑOS ANTIGÜEDAD" },
+      { name: "DÍAS ANTIGÜEDAD" },
+      { name: "DETALLE RANGOS VARIABLE" },
     ];
 
     worksheet.addTable({
@@ -657,22 +687,18 @@ export class ListarRegimenComponent implements OnInit {
       rows: datos,
     });
 
-
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 18; j++) {
+      for (let j = 1; j <= 25; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
-        if (i === 0) {
-          cell.alignment = { vertical: "middle", horizontal: "center" };
-        } else {
-          cell.alignment = {
-            vertical: "middle",
-            horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
-          };
-        }
+        cell.alignment = {
+          vertical: "middle",
+          horizontal: i === 0 ? "center" : this.obtenerAlineacionHorizontalEmpleados(j),
+        };
         cell.border = this.bordeCompleto;
       }
     }
+
     worksheet.getRow(6).font = this.fontTitulo;
 
     try {
