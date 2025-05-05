@@ -4,6 +4,7 @@ import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { MatRadioChange } from '@angular/material/radio';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
@@ -12,7 +13,9 @@ import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/es
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { VerEmpleadoComponent } from '../../datos-empleado/ver-empleado/ver-empleado.component';
+import { ChangeDetectorRef } from '@angular/core';
 import { Console } from 'console';
 
 @Component({
@@ -33,6 +36,7 @@ export class EditarEmpleadoComponent implements OnInit {
 
   roles: any = [];
   usuario: any = [];
+  identificacion ="Cedula"
 
   isLinear = true;
   primeroFormGroup: FormGroup;
@@ -61,6 +65,8 @@ export class EditarEmpleadoComponent implements OnInit {
     public loginService: LoginService,
     public generoS: GenerosService,
     public estadoS: EstadoCivilService,
+    private restParametros: ParametrosService,
+    private cdRef: ChangeDetectorRef,
   ) {
     this.empleado_inicia = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -108,6 +114,7 @@ export class EditarEmpleadoComponent implements OnInit {
       cedulaForm: ['', Validators.required],
       emailForm: ['', Validators.email],
       fechaForm: ['', Validators.required],
+
     });
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
@@ -442,6 +449,81 @@ export class EditarEmpleadoComponent implements OnInit {
         }, 200);
       }
     }
+  }
+
+  //METODO QUE DETECTA EL CAMBIO EN TIPO DE IDENTIFICACION DE CEDULA A PASAPORTE
+  CambiarIdentificacion(ob: MatRadioChange) {
+    this.identificacion = ob.value;
+    const valor = this.primeroFormGroup.get('cedulaForm')?.value;
+  
+    if (this.identificacion === 'Cedula') {
+      this.ValidarCedula({ cedulaForm: valor }); 
+    } else {
+      this.cedulaValida = true;
+      this.pasaporteValida = true;
+      this.primeroFormGroup.get('cedulaForm')?.setErrors(null); 
+    }
+  }
+
+  //METODO QUE VALIDA LA CEDULA POR ALGORITMO
+  cedulaValida: boolean = false;
+  ValidarCedula(cedula: any) {
+    if (!this.validarCedulaActiva) {
+      this.cedulaValida = true;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors(null);
+      return;
+    }
+    const inputElement = cedula.cedulaForm;
+    const cad: string = inputElement;
+    let total: number = 0;
+    const longitud: number = cad.length;
+    const longcheck: number = longitud - 1;
+  
+    if (longitud < 10) {
+      this.cedulaValida = false;
+      this.cdRef.detectChanges();
+      this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
+      return;
+    }
+  
+    if (cad !== "" && longitud === 10) {
+      for (let i = 0; i < longcheck; i++) {
+        let num = parseInt(cad.charAt(i), 10);
+        if (isNaN(num)) return;
+  
+        if (i % 2 === 0) {
+          num *= 2;
+          if (num > 9) num -= 9;
+        }
+        total += num;
+      }
+  
+      total = total % 10 ? 10 - (total % 10) : 0;
+  
+      if (parseInt(cad.charAt(longcheck), 10) === total) {
+        this.cedulaValida = true;
+        this.primeroFormGroup.controls['cedulaForm'].setErrors(null); 
+      } else {
+        this.cedulaValida = false;
+        this.cdRef.detectChanges();
+        this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
+      }
+    }
+  }
+  
+
+  //METODO PARA OBTENER EL  DETALLE DEL PARAMETRO VALIDAR CEDULA (ACTIVADO/DESACTIVADO)
+  validarCedulaActiva: boolean = true;
+  CargarEstadoValidacionCedula() {
+    this.restParametros.BuscarDetallesParametros().subscribe(detalles => {
+      const parametro36 = detalles.find((d: any) => d.id_parametro === 36);
+      this.validarCedulaActiva = parametro36?.descripcion?.toLowerCase() !== 'no';
+    });
+  }
+
+  pasaporteValida:boolean=false;
+  ValidarPasaporte(pasaporte:any){
+
   }
 
 }
