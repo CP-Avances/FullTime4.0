@@ -1177,7 +1177,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilConfigurarTimbre) {
-                    this.childrenAplicacionMovil.push({ name: 'Opciones Timbre', url: '/configurar-timbre', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Opciones Reloj Virtual', url: '/configurar-timbre', color: true, ver: true });
                   }
                   break;
                 case 'registro-dispositivos':
