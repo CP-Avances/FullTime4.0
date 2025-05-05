@@ -252,7 +252,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local, numero_partida_individual } = req.body;
+                const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local, numero_partida_individual, tipo_identificacion } = req.body;
                 const partidaFinal = numero_partida_individual === '' ? null : numero_partida_individual;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -281,10 +281,10 @@ class EmpleadoControlador {
                 const datosNuevos = yield database_1.default.query(`
         UPDATE eu_empleados SET identificacion = $2, apellido = $3, nombre = $4, estado_civil = $5, 
           genero = $6, correo = $7, fecha_nacimiento = $8, estado = $9, domicilio = $10, 
-          telefono = $11, id_nacionalidad = $12, codigo = $13, numero_partida_individual = $14
+          telefono = $11, id_nacionalidad = $12, codigo = $13, numero_partida_individual = $14, tipo_identificacion = $15
         WHERE id = $1 RETURNING *
         `, [id, identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-                    domicilio, telefono, id_nacionalidad, codigo, partidaFinal]);
+                    domicilio, telefono, id_nacionalidad, codigo, partidaFinal, tipo_identificacion]);
                 const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                 const fechaNacimientoN = yield (0, settingsMail_1.FormatearFecha2)(datosNuevos.rows[0].fecha_nacimiento, 'ddd');
                 datosOriginales.fecha_nacimiento = fechaNacimientoO;

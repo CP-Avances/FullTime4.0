@@ -76,12 +76,11 @@
                                     matTooltip="Seleccione el tipo de cargo que va a desempeñar el usuario.">
                                     help_outline
                                 </mat-icon>
-                                <mat-select [formControl]="tipoF" required>
-                                    <mat-option *ngFor="let tc of tipoCargo" [value]="tc.id"
-                                        (click)="IngresarOtro(formulario.value)">
-                                        {{tc.cargo}}
+                                <mat-select [formControl]="tipoF" required (selectionChange)="IngresarOtro($event.value)">
+                                    <mat-option *ngFor="let tc of tipoCargo" [value]="tc.id">
+                                      {{tc.cargo}}
                                     </mat-option>
-                                </mat-select>
+                                  </mat-select>
                             </mat-form-field>
 
                             <mat-form-field *ngIf="habilitarCargo">

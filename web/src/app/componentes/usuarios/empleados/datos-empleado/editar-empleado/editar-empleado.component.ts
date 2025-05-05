@@ -84,6 +84,7 @@ export class EditarEmpleadoComponent implements OnInit {
     this.ObtenerEstadoCivil();
     this.ObtenerGeneros();
     this.VerificarCodigo();
+    this.CargarEstadoValidacionCedula();
   }
 
   // METODO PARA FILTRAR DATOS DE NACIONALIDAD
@@ -114,7 +115,7 @@ export class EditarEmpleadoComponent implements OnInit {
       cedulaForm: ['', Validators.required],
       emailForm: ['', Validators.email],
       fechaForm: ['', Validators.required],
-
+      tipoIdentificacionForm: ['', Validators.required],
     });
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
@@ -169,8 +170,8 @@ export class EditarEmpleadoComponent implements OnInit {
   // CARGAR DATOS DE EMPLEADO Y USUARIO
   ObtenerEmpleado() {
     const { apellido, identificacion, codigo, correo, domicilio, estado_civil, estado, fecha_nacimiento, genero,
-      id, id_nacionalidad, nombre, telefono, numero_partida_individual } = this.empleado;
-
+      id, id_nacionalidad, nombre, telefono, numero_partida_individual, tipo_identificacion } = this.empleado;
+      this.identificacion = tipo_identificacion === 1 ? 'Cedula' : 'Pasaporte';      
 
     this.primeroFormGroup.setValue({
       apellidoForm: apellido,
@@ -179,6 +180,7 @@ export class EditarEmpleadoComponent implements OnInit {
       cedulaForm: identificacion,
       emailForm: correo,
       fechaForm: fecha_nacimiento,
+      tipoIdentificacionForm: this.identificacion,
     });
 
     this.segundoFormGroup.setValue({
@@ -284,6 +286,7 @@ export class EditarEmpleadoComponent implements OnInit {
       codigo: form1.codigoForm,
       user_name: this.user_name,
       numero_partida_individual: form3.partidaForm === '' ? null : form3.partidaForm,
+      tipo_identificacion: form1.tipoIdentificacionForm === 'Cedula' ? 1 : 2,
       ip: this.ip, ip_local: this.ips_locales,
     };
 
