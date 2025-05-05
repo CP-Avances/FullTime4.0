@@ -97,7 +97,7 @@ export class GrupoOcupacionalComponent implements OnInit {
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -156,7 +156,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       next: (respuesta: any) => {
         this.ListGrupoOcupacional = respuesta
       }, error: (err) => {
-        this.toastr.error(err.error.message, 'Ups!!! se ha producido un error.', {
+        this.toastr.error(err.error.message, 'Ups! se ha producido un error.', {
           timeOut: 6000,
         });
       },
@@ -277,7 +277,7 @@ export class GrupoOcupacionalComponent implements OnInit {
             this.grupoOcupacionalEliminar = [];
             this.selectionUno.clear();
           } else {
-            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -299,7 +299,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         });
         if (response.relacionados > 0) {
           response.listaNoEliminados.forEach(item => {
-            this.toastr.warning(response.ms2 + ' ' + item.trim(), 'Advertencia.', {
+            this.toastr.warning(response.ms2 + ' ' + item.trim() + '.', 'No fue posible eliminar.', {
               timeOut: 5000,
             });
           });
@@ -312,7 +312,7 @@ export class GrupoOcupacionalComponent implements OnInit {
           this.toastr.error(err.error.message, '', {
             timeOut: 4500,
           });
-          this.toastr.warning(err.error.ms2, 'Advertencia.', {
+          this.toastr.warning(err.error.ms2, 'No fue posible eliminar.', {
             timeOut: 5000,
           });
         } else {
@@ -583,13 +583,13 @@ export class GrupoOcupacionalComponent implements OnInit {
               [
                 { text: 'CÓDIGO', style: 'tableHeader' },
                 { text: 'GRUPO OCUPACIONAL', style: 'tableHeader' },
-                { text: 'NÚMERO DE PARTIDA', style: 'tableHeader' },
+                //{ text: 'NÚMERO DE PARTIDA', style: 'tableHeader' },
               ],
               ...this.ListGrupoOcupacional.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.descripcion, style: 'itemsTable' },
-                  { text: obj.numero_partida, style: 'itemsTable' }
+                  //{ text: obj.numero_partida, style: 'itemsTable' }
                 ];
               })
             ]
@@ -624,7 +624,7 @@ export class GrupoOcupacionalComponent implements OnInit {
         index + 1,
         accion.id,
         accion.descripcion,
-        accion.numero_partida
+        //accion.numero_partida
       ]);
     });
 
@@ -665,14 +665,14 @@ export class GrupoOcupacionalComponent implements OnInit {
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
       { key: "grupo_ocupacional", width: 20 },
-      { key: "numero_partida", width: 20 },
+      //{ key: "numero_partida", width: 20 },
     ];
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
       { name: "GRUPO OCUPACIONAL", totalsRowLabel: "", filterButton: true },
-      { name: "NUMERO PARTIDA", totalsRowLabel: "", filterButton: true },
+      //{ name: "NUMERO PARTIDA", totalsRowLabel: "", filterButton: true },
     ];
     console.log("ver Grupo Ocupacional", grupoOcupacional);
     console.log("Columnas:", columnas);
@@ -695,7 +695,7 @@ export class GrupoOcupacionalComponent implements OnInit {
 
     const numeroFilas = grupoOcupacional.length;
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 4; j++) {
+      for (let j = 1; j <= 3; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -740,7 +740,7 @@ export class GrupoOcupacionalComponent implements OnInit {
     worksheet.columns = [
       { header: 'ID', key: 'id', width: 30 },
       { header: 'DESCRIPCION', key: 'descripcion', width: 15 },
-      { header: 'NUMERO_PARTIDA', key: 'numero_partida', width: 15 },
+      //{ header: 'NUMERO_PARTIDA', key: 'numero_partida', width: 15 },
     ];
 
     // 4. Llenar las filas con los datos
@@ -748,7 +748,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       worksheet.addRow({
         id: obj.id,
         descripcion: obj.descripcion,
-        numero_partida: obj.numero_partida,
+        //numero_partida: obj.numero_partida,
       }).commit();
     });
 
@@ -773,10 +773,10 @@ export class GrupoOcupacionalComponent implements OnInit {
     console.log('this.GrupoOcupaciona: ',this.ListGrupoOcupacional)
     this.ListGrupoOcupacional.forEach((obj: any) => {
       objeto = {
-        "tipo_accion_personal": {
+        "grupo_ocupacional": {
           "$": { "id": obj.id },
           "descripcion": obj.descripcion,
-          "numero_partida": obj.numero_partida,
+          //"numero_partida": obj.numero_partida,
         }
       }
       arregloGrupoOcupaciona.push(objeto)

@@ -107,7 +107,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
             this.mensaje = res;
             if (this.mensaje.expiro === 'si') {
               this.router.navigate(['/olvidar-contrasenia']);
-              this.toastr.error(this.mensaje.message, 'Ups!!! algo a salido mal.', {
+              this.toastr.error(this.mensaje.message, 'Ups! algo a salido mal.', {
                 timeOut: 6000,
               });
             } else {

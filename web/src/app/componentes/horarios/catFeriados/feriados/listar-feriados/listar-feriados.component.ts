@@ -953,7 +953,7 @@ export class ListarFeriadosComponent implements OnInit {
             this.feriadosEliminar = [];
             this.selectionFeriados.clear();
           } else {
-            this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

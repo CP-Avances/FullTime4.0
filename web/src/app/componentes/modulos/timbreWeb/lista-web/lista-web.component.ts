@@ -240,7 +240,7 @@ export class ListaWebComponent implements OnInit {
     if (this.habilitarTimbreWeb === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Teletrabajo. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Teletrabajo. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -249,10 +249,10 @@ export class ListaWebComponent implements OnInit {
     else {
       this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');  
+      this.ip = localStorage.getItem('ip');
       this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
 
@@ -303,10 +303,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  AdministrarInformacion() {
-    this.BuscarInformacionGeneral(false);
-    this.BuscarInformacionGeneral(true);
-
+  async AdministrarInformacion() {
+    this.empleados = [];
+    this.empleados_dh = [];
+    await this.BuscarInformacionGeneral(false);
+    await this.BuscarInformacionGeneral(true);
   }
 
   filtrarRoles(valor: string): any[] {
@@ -317,38 +318,12 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE DATOS GENERALES TIMBRE WEB
-  BuscarInformacionGeneral(estado: any) {
+  async BuscarInformacionGeneral(estado: any) {
+    this.ver_imagen = true;
     this.informacion.UsuariosTimbreWebGeneral(1, estado).subscribe((res: any[]) => {
       console.log('ver infor ', estado, '   ', res)
-
-      this.inactivar = true;
-      this.ver_imagen = true;
-      this.activar = true;
-
-      /*
-      if (estado === false) {
-        this.inactivar = true;
-        this.ver_imagen = true;
-      }
-      else {
-        this.activar = true;
-        this.ver_imagen = true;
-      }
-*/
       this.ProcesarDatos(res, estado);
-    }, err => {
-      /*
-      if (estado === false) {
-        this.inactivar = false;
-      }
-      else {
-        this.activar = false;
-      }
-        */
-      this.inactivar = true;
-      this.ver_imagen = true;
-      this.activar = true;
-    })
+    });
   }
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
@@ -408,13 +383,14 @@ export class ListaWebComponent implements OnInit {
           this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
         );
       }
+
+      console.log('Lista empleados: ', this.empleados)
       if (this.empleados.length > 0) {
         this.activar = true;
       } else {
         this.activar = false;
       }
-    }
-    else {
+    } else {
       this.departamentos_dh = [];
       this.sucursales_dh = [];
       this.empleados_dh = [];
@@ -467,7 +443,9 @@ export class ListaWebComponent implements OnInit {
           this.idSucursalesAcceso_dh.has(cargo.id_suc) && this.idCargosAcceso_dh.has(cargo.id)
         );
       }
-      
+
+      console.log('Lista empleados inactivos: ', this.empleados_dh)
+
       if (this.empleados_dh.length > 0) {
         this.inactivar = true;
       } else {
@@ -1098,8 +1076,8 @@ export class ListaWebComponent implements OnInit {
       this.toastr.success(res.message)
       this.individual = true;
       this.individual_dh = true;
-      this.LimpiarFormulario(tipo);
       this.AdministrarInformacion();
+      this.LimpiarFormulario(tipo);
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -1140,6 +1118,7 @@ export class ListaWebComponent implements OnInit {
     if (this.empleados_dh.length > 0) {
       this.inactivar = true;
     }
+
     if (tipo === 2) {
       if (this._booleanOptions.bool_emp) {
         this.codigo.reset();
@@ -1306,11 +1285,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   getActivarUsuarios(){
-    return this.tienePermiso('Activar Usuarios', 42);
+    return this.tienePermiso('Activar Usuarios', 40);
   }
 
   getDesactivarUsuarios(){
-    return this.tienePermiso('Inactivar Usuarios', 42);
+    return this.tienePermiso('Inactivar Usuarios', 40);
   }
 
 }

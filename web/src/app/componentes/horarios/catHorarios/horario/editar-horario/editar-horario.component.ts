@@ -245,7 +245,7 @@ export class EditarHorarioComponent implements OnInit {
       }
       this.SalirActualizar(datos, response);
     }, error => {
-      this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Limite de horas superado.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.CerrarVentana();
@@ -263,7 +263,7 @@ export class EditarHorarioComponent implements OnInit {
       }
       this.SalirActualizar(datos, response);
     }, error => {
-      this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Limite de horas superado.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.CerrarVentana()

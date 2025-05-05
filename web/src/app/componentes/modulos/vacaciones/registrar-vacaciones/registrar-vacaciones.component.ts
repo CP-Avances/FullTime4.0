@@ -320,7 +320,7 @@ export class RegistrarVacacionesComponent implements OnInit {
       })
       this.CerrarVentanaRegistroVacaciones();
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Registro Inválido', {
+      this.toastr.error('Ups! algo salio mal.', 'Registro Inválido', {
         timeOut: 6000,
       })
     });

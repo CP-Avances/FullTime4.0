@@ -983,7 +983,7 @@ export class ListarRelojesComponent implements OnInit {
             this.selectionDispositivos.clear();
             this.ObtenerReloj();
           } else {
-            this.toastr.warning('No ha seleccionado DISPOSITIVOS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado DISPOSITIVOS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

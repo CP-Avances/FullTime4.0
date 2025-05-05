@@ -68,7 +68,7 @@ export class EditarDetalleMenuComponent implements OnInit {
       })
       this.Salir(2);
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'No se pudo registrar.', {
+      this.toastr.error('Ups! algo salio mal.', 'No se pudo registrar.', {
         timeOut: 6000,
       })
     });

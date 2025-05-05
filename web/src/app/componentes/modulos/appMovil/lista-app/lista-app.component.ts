@@ -238,7 +238,7 @@ export class ListaAppComponent implements OnInit {
     if (this.habilitarMovil === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Aplicación Móvil. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Aplicación Móvil. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -247,10 +247,10 @@ export class ListaAppComponent implements OnInit {
     else {
       this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');  
+      this.ip = localStorage.getItem('ip');
       this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);;
       this.AdministrarInformacion();
@@ -300,6 +300,8 @@ export class ListaAppComponent implements OnInit {
 
   // METODO PARA BUSCAR DATOS DE USUARIOS
   AdministrarInformacion() {
+    this.empleados = [];
+    this.empleados_dh = [];
     this.BuscarInformacionGeneral(false);
     this.BuscarInformacionGeneral(true);
   }
@@ -313,24 +315,10 @@ export class ListaAppComponent implements OnInit {
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
   BuscarInformacionGeneral(estado: any) {
+    this.ver_imagen = true;
     this.informacion.UsuariosTimbreMovilGeneral(1, estado).subscribe((res: any[]) => {
-      if (estado === false) {
-        this.inactivar = true;
-        this.ver_imagen = true;
-      }
-      else {
-        this.activar = true;
-        this.ver_imagen = true;
-      }
       this.ProcesarDatos(res, estado);
-    }, err => {
-      if (estado === false) {
-        this.inactivar = false;
-      }
-      else {
-        this.activar = false;
-      }
-    })
+    });
   }
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
@@ -1305,11 +1293,11 @@ export class ListaAppComponent implements OnInit {
   }
 
   getActivarUsuarios(){
-    return this.tienePermiso('Activar Usuarios', 44);
+    return this.tienePermiso('Activar Usuarios', 40);
   }
 
   getDesactivarUsuarios(){
-    return this.tienePermiso('Inactivar Usuarios', 44);
+    return this.tienePermiso('Inactivar Usuarios', 40);
   }
 
 }

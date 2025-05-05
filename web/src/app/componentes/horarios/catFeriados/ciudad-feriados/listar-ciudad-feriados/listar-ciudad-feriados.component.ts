@@ -197,7 +197,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
         this.ConfirmarDelete(datos, opcion);
       }
       else {
-        this.toastr.warning('Ups!!! algo ha salido mal.', 'No ha seleccionado registros.', {
+        this.toastr.warning('Ups! algo ha salido mal.', 'No ha seleccionado registros.', {
           timeOut: 6000,
         });
       }

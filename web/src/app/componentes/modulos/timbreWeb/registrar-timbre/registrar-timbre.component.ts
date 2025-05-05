@@ -272,7 +272,7 @@ export class RegistrarTimbreComponent implements OnInit {
         this.convertida = canvas.toDataURL('image/jpeg', quality);
       } else {
         this.toastr.warning(
-          'Ups!!! algo salio mal.', 'Intente nuevamente.', {
+          'Ups! algo salio mal.', 'Intente nuevamente.', {
           timeOut: 6000,
         })
       }
@@ -390,7 +390,7 @@ export class RegistrarTimbreComponent implements OnInit {
               break;
             default:
               this.toastr.warning(
-                'Ups!!! algo salio mal.', 'Volver a intentar.', {
+                'Ups! algo salio mal.', 'Volver a intentar.', {
                 timeOut: 6000,
               })
           }
@@ -398,7 +398,7 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     else {
       this.toastr.warning(
-        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
+        'Ups! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
         timeOut: 6000,
       })
     }
@@ -561,7 +561,7 @@ export class RegistrarTimbreComponent implements OnInit {
       else if (res.message === 'Registro duplicado.') {
         this.toastr.info(res.message);
       }
-      else if (res.message === 'Ups!!! algo salio mal.') {
+      else if (res.message === 'Ups! algo salio mal.') {
         this.toastr.warning(res.message);
       }
       else {
@@ -727,7 +727,7 @@ export class RegistrarTimbreComponent implements OnInit {
       })
     }
     else {
-      this.toastr.warning('No tiene permitido timbrar en perímetros desconocidos.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No tiene permitido timbrar en perímetros desconocidos.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.CerrarProcesos();
@@ -774,5 +774,18 @@ export class RegistrarTimbreComponent implements OnInit {
     console.log('Cámara cerrada y variable imagenCamara reiniciada');
   }
 
+  // METODO PARA ACTUALIZAR EL ESTADO DE LOS BOTONES
+  toggleEstado(item: string, tipo: string) {
+    this.ver_camara = !this.ver_camara;
+    if(this.ver_camara){
+      this.reproducirSonido()
+    }
+  }
+  reproducirSonido() {
+    const audio = new Audio();
+    audio.src = 'assets/sounds/click_confirmed.mp3'; // Ruta del sonido
+    audio.load();
+    audio.play();
+  }
 
 }

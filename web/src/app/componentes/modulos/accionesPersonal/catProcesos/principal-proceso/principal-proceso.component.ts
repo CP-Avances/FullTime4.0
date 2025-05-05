@@ -100,7 +100,7 @@ export class PrincipalProcesoComponent implements OnInit {
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -270,7 +270,7 @@ export class PrincipalProcesoComponent implements OnInit {
             this.procesoEliminar = [];
             this.selectionUno.clear();
           } else {
-            this.toastr.warning('No ha seleccionado registros.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado registros.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -291,8 +291,8 @@ export class PrincipalProcesoComponent implements OnInit {
         });
         if (response.relacionados > 0) {
           if (response.relacionados > 0) {
-            response.listaNoEliminados.forEach(item => {
-              this.toastr.warning(response.ms2 + ' ' + item.trim(), 'Advertencia.', {
+            response.listaNoEliminados.forEach((item: any) => {
+              this.toastr.warning(response.ms2 + ' ' + item.trim() + '.', 'No fue posible eliminar.', {
                 timeOut: 5000,
               });
             });
@@ -305,7 +305,7 @@ export class PrincipalProcesoComponent implements OnInit {
           this.toastr.error(err.error.message, '', {
             timeOut: 4500,
           });
-          this.toastr.warning(err.error.ms2, 'Advertencia.', {
+          this.toastr.warning(err.error.ms2, 'No fue posible eliminar.', {
             timeOut: 5000,
           });
         } else {
@@ -397,7 +397,7 @@ export class PrincipalProcesoComponent implements OnInit {
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }
@@ -619,7 +619,7 @@ export class PrincipalProcesoComponent implements OnInit {
             body: [
               [
                 { text: 'CÓDIGO', style: 'tableHeader' },
-                { text: 'NOMBRE', style: 'tableHeader' },
+                { text: 'PROCESO', style: 'tableHeader' },
                 { text: 'PROCESO SUPERIOR', style: 'tableHeader' },
               ],
               ...this.procesos.map((obj: any) => {
@@ -710,7 +710,7 @@ export class PrincipalProcesoComponent implements OnInit {
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
       { name: "PROCESO", totalsRowLabel: "", filterButton: true },
-      { name: "PROCESO PADRE", totalsRowLabel: "", filterButton: true },
+      { name: "PROCESO SUPERIOR", totalsRowLabel: "", filterButton: true },
     ];
     console.log("ver list Procesos", listProcesos);
     console.log("Columnas:", columnas);
@@ -770,6 +770,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
     exportToCVS() {
       var arreglo = this.procesos;
+      console.log('proceso: ',this.procesos)
       // 1. Crear un nuevo workbook
       const workbook = new ExcelJS.Workbook();
       // 2. Crear una hoja en el workbook
@@ -778,14 +779,15 @@ export class PrincipalProcesoComponent implements OnInit {
       worksheet.columns = [
         { header: 'ID', key: 'id', width: 30 },
         { header: 'PROCESO', key: 'nombre', width: 15 },
-        { header: 'PROCESO_PADRE', key: 'proc_padre', width: 15 }
+        { header: 'PROCESO_SUPERIOR', key: 'proc_padre', width: 15 }
       ];
   
       // 4. Llenar las filas con los datos
       arreglo.map((obj: any) => {
         worksheet.addRow({
           id: obj.id,
-          descripcion: obj.descripcion,
+          nombre: obj.nombre,
+          proc_padre: obj.proc_padre,
         }).commit();
       });
   
@@ -810,10 +812,10 @@ export class PrincipalProcesoComponent implements OnInit {
     console.log('this.procesos: ', this.procesos);
     this.procesos.forEach((obj: any) => {
       objeto = {
-        "tipo_accion_personal": {
+        "proceso": {
           "$": { "id": obj.id },
           "proceso": obj.nombre,
-          "proceso_padre": obj.proc_padre,
+          "proceso_superior": obj.proc_padre,
         }
       }
       arregloProcesos.push(objeto)

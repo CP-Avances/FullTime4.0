@@ -195,7 +195,7 @@ ConfirmarDeleteMultiple() {
           this.selectionNacionalidades.clear();
           this.ListarNacionalidades();
         } else {
-          this.toastr.warning('No ha seleccionado nacionalidades.', 'Ups!!! algo salio mal.', {
+          this.toastr.warning('No ha seleccionado nacionalidades.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           })
         }

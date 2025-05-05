@@ -378,7 +378,7 @@ export class PrincipalHorarioComponent implements OnInit {
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }
@@ -413,7 +413,7 @@ export class PrincipalHorarioComponent implements OnInit {
         this.detallesCorrectos = this.listaDetalleCorrectos.length;
       },
       error: (err) => {
-        this.toastr.error('Error al verificar la plantilla.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al verificar la plantilla.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -482,7 +482,7 @@ export class PrincipalHorarioComponent implements OnInit {
     } else {
       this.rest.CargarHorariosMultiples(data).subscribe(res => {
         if (res.mensaje === 'error') {
-          this.toastr.error('Error al importar horarios y detalles', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Error al importar horarios y detalles', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
           this.archivo1Form.reset();
@@ -510,7 +510,7 @@ export class PrincipalHorarioComponent implements OnInit {
           this.LimpiarCampos();
         }
       }, error => {
-        this.toastr.error('Error al importar horarios y detalles', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al importar horarios y detalles', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
         this.LimpiarCamposPlantilla();
@@ -1095,7 +1095,7 @@ export class PrincipalHorarioComponent implements OnInit {
             this.HabilitarSeleccion();
             this.ObtenerHorarios();
           } else {
-            this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

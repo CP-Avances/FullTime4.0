@@ -185,7 +185,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }
@@ -207,7 +207,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
         });
       },
       error: (error: any) => {
-        this.toastr.error('Error al verificar la plantilla de planificación horaria.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al verificar la plantilla de planificación horaria.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -318,7 +318,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
         });
       }
     }, (error: any) => {
-      this.toastr.error('Error al importar la plantilla de planificaciones horarias.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al importar la plantilla de planificaciones horarias.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     });

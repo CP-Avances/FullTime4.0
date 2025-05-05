@@ -1129,7 +1129,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosTimbreVirtualTimbresWeb) {
-                    this.childrenTimbreVirtual.push({ name: 'Timbre Virtual', url: '/timbresWeb', color: true, ver: true });
+                    this.childrenTimbreVirtual.push({ name: 'Habilitar Timbre Virtual', url: '/timbresWeb', color: true, ver: true });
                   }
                   break;
                 case 'configurar-timbre-web':
@@ -1141,7 +1141,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosTimbreVirtualConfigurarTimbreVirtual) {
-                    this.childrenTimbreVirtual.push({ name: 'Configurar Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true });
+                    this.childrenTimbreVirtual.push({ name: 'Opciones Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true });
                   }
                   break;
                 case 'timbres-personal':
@@ -1165,7 +1165,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilAppMovil) {
-                    this.childrenAplicacionMovil.push({ name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Habilitar Reloj Virtual', url: '/app-movil', color: true, ver: true });
                   }
                   break;
                 case 'configurar-timbre':
@@ -1177,7 +1177,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilConfigurarTimbre) {
-                    this.childrenAplicacionMovil.push({ name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Opciones Reloj Virtual', url: '/configurar-timbre', color: true, ver: true });
                   }
                   break;
                 case 'registro-dispositivos':
@@ -1189,7 +1189,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilRegistroDispositivos) {
-                    this.childrenAplicacionMovil.push({ name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Dispositivos Registrados', url: '/registro-dispositivos', color: true, ver: true });
                   }
                   break;
                 case 'listarRelojes':
@@ -1258,15 +1258,15 @@ export class MainNavComponent implements OnInit {
                     this.childrenNotificaciones.push({ name: 'Documentos', url: '/archivos', color: true, ver: true });
                   }
                   break;
-                case 'cumpleanios':
+                case 'mensaje_notificaciones':
                   this.itemNotificaciones = true;
                   for (const parametrizacion of this.childrenNotificaciones) {
-                    if (parametrizacion.url === '/cumpleanios') {
+                    if (parametrizacion.url === '/mensaje_notificaciones') {
                       this.vistaModulosNotificacionesCumpleanios = true;
                     }
                   }
                   if (!this.vistaModulosNotificacionesCumpleanios) {
-                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/cumpleanios', color: true, ver: true });
+                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/mensaje_notificaciones', color: true, ver: true });
                   }
                   break;
                 case 'comunicados':
@@ -2095,7 +2095,7 @@ export class MainNavComponent implements OnInit {
                 this.menuGeneralUsuarios.splice(indexNotificaciones, 1);
               }
             }
-            //Modulos-Permisos              
+            //Modulos-Permisos
             if (!this.HabilitarPermisos || !this.subItemModulosPermisos) {
               const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
               if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {

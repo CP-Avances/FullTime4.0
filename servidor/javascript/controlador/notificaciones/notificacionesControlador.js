@@ -469,7 +469,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleadoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_notificacion, permiso_mail, permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_notificacion, user_name, ip, ip_local } = req.body;
+                const { id_empleado, vaca_mail, vaca_notificacion, permiso_mail, permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, faltas_notificacion, salidas_anticipadas_mail, salidas_anticipadas_notificacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ORIGINALES
@@ -490,7 +490,7 @@ class NotificacionTiempoRealControlador {
                     atrasos_mail: atrasos_mail,
                     atrasos_notificacion: atrasos_notificacion,
                     faltas_mail: faltas_mail,
-                    faltas_notificacion: faltas_noti,
+                    faltas_notificacion: faltas_notificacion,
                     salidas_anticipadas_mail: salidas_anticipadas_mail,
                     salidas_anticipadas_notificacion: salidas_anticipadas_notificacion
                 };
@@ -671,7 +671,7 @@ class NotificacionTiempoRealControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -882,7 +882,7 @@ class NotificacionTiempoRealControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }

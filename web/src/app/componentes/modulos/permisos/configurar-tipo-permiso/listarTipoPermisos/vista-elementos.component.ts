@@ -70,7 +70,7 @@ export class VistaElementosComponent implements OnInit {
     if (this.habilitarPermiso === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }

@@ -133,7 +133,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     if (this.habilitarPermiso === false) {
       let mensaje = {
         access: false,
-        message: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos. \n
+        message: `Ups! al parecer no tienes activado en tu plan el Módulo de Permisos. \n
         ¿Te gustaría activarlo? Comunícate con nosotros. \n`,
         url: 'www.casapazmino.com.ec'
       }

@@ -554,12 +554,12 @@ export class EditarPlanificacionComponent implements OnInit {
         }
       }
       if (verificador === 1) {
-        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else if (verificador === 2) {
-        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
@@ -574,7 +574,7 @@ export class EditarPlanificacionComponent implements OnInit {
         }
 
         if (verificador === 3) {
-          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
             timeOut: 6000,
           });
         }
@@ -595,7 +595,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
           // FIN DE LAS VALIDACIONES
           if (verificador === 4) {
-            this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+            this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
               timeOut: 6000,
             });
           }
@@ -609,7 +609,7 @@ export class EditarPlanificacionComponent implements OnInit {
       }
     }
     else {
-      this.toastr.warning('Dia configurado como feriado en el sistema. Puede ingresar horarios de tipo Feriado.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Dia configurado como feriado en el sistema. Puede ingresar horarios de tipo Feriado.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -647,7 +647,7 @@ export class EditarPlanificacionComponent implements OnInit {
   asignado_libre: any = [];
   AgregarLibre() {
     if (this.horas.length != 0) {
-      this.toastr.warning('Este día ya tiene configurado horarios. No puede ser libre.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Este día ya tiene configurado horarios. No puede ser libre.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -804,7 +804,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 }
               }
               else {
-                this.toastr.error('Ups!!! se ha producido un error.',
+                this.toastr.error('Ups! se ha producido un error.',
                   'Verificar nuevamente.', {
                   timeOut: 6000,
                 });
@@ -824,7 +824,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 }
               }
               else {
-                this.toastr.error('Ups!!! se ha producido un error.',
+                this.toastr.error('Ups! se ha producido un error.',
                   'Verificar nuevamente.', {
                   timeOut: 6000,
                 });
@@ -977,13 +977,13 @@ export class EditarPlanificacionComponent implements OnInit {
         this.ver_guardar = false;
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+        this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana(2);
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+      this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
       this.CerrarVentana(2);
@@ -1043,7 +1043,7 @@ export class EditarPlanificacionComponent implements OnInit {
       }
       else if (datos.message === 'error') {
         this.toastr.info(
-          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          'Ups! algo salio mal', 'No se cargaron todos los registros.', {
           timeOut: 6000,
         })
       }

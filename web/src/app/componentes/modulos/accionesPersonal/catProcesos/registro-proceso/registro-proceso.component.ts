@@ -80,7 +80,7 @@ export class RegistroProcesoComponent implements OnInit {
           this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
-          this.LimpiarCampos();
+          this.CerrarVentana();
         }, error => { 
           this.toastr.error(error.error.message, 'Registro.', {
             timeOut: 6000,

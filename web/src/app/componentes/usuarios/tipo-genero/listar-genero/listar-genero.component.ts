@@ -197,7 +197,7 @@ export class ListarGeneroComponent {
             this.selectionGeneros.clear();
             this.ListarGeneros();
           } else {
-            this.toastr.warning('No ha seleccionado ningun genero.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ningun genero.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

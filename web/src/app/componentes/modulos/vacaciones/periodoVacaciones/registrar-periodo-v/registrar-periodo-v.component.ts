@@ -147,7 +147,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
       })
       this.CerrarVentana();
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Período de Vacaciones no fue registrado', {
+      this.toastr.error('Ups! algo salio mal.', 'Período de Vacaciones no fue registrado', {
         timeOut: 6000,
       })
     });

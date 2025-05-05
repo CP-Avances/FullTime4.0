@@ -304,7 +304,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();

@@ -915,7 +915,7 @@ class PlanComidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito' });
+      res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito.' });
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1145,7 +1145,7 @@ class PlanComidasControlador {
 
     }
     else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -1269,7 +1269,7 @@ class PlanComidasControlador {
 
     }
     else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -1404,7 +1404,7 @@ class PlanComidasControlador {
       });
 
     } else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 

@@ -386,7 +386,7 @@ export class VerSucursalComponent implements OnInit {
             this.selectionDepartamentos.clear();
             this.ListaDepartamentos();
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

@@ -238,7 +238,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
           }
         }
         else {
-          this.toastr.warning('Las fechas ingresadas no estan dentro del contrato vigente del empleado.', 'Ups!!! algo salio mal.', {
+          this.toastr.warning('Las fechas ingresadas no estan dentro del contrato vigente del empleado.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }
@@ -246,7 +246,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     else {
       // METODO PARA VERIFICAR SI EL EMPLEADO INGRESO CORRECTAMENTE LAS FECHAS
-      this.toastr.warning('La fecha no se registro. Ups!!! la fecha no es correcta.', 'VERIFICAR', {
+      this.toastr.warning('La fecha no se registro. Ups! la fecha no es correcta.', 'VERIFICAR', {
         timeOut: 6000,
       });
     }
@@ -606,18 +606,18 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
       }
       else if (verificador === 1) {
-        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else if (verificador === 2) {
-        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
     }
     else {
-      this.toastr.warning('Día configurado como FERIADO dentro del sistema.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Día configurado como FERIADO dentro del sistema.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -640,18 +640,18 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }]
     if (this.fechas_mes[index].registrados.length === 1) {
       if (this.fechas_mes[index].registrados[0].default_ === 'DL') {
-        this.toastr.info('Ya se encuentra registrado como día de descanso.', 'Ups!!! VERIFICAR.', {
+        this.toastr.info('Ya se encuentra registrado como día de descanso.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else {
-        this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
     }
     else if (this.fechas_mes[index].registrados.length > 1) {
-      this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -721,7 +721,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.VerificarDuplicidad(opcion);
     }
     else {
-      this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('No ha registrado horarios.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -871,7 +871,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
     })
     if (datos.length === 0) {
-      this.toastr.warning('', 'Ups!!! verificar calendario.', {
+      this.toastr.warning('', 'Ups! verificar calendario.', {
         timeOut: 6000,
       });
       this.ControlarBotones(true, false);
@@ -1053,7 +1053,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
     })
     if (datos.length === 0) {
-      this.toastr.warning('No se han encontrado datos para registrar.', 'Ups!!! verificar calendario.', {
+      this.toastr.warning('No se han encontrado datos para registrar.', 'Ups! verificar calendario.', {
         timeOut: 6000,
       });
       this.ControlarBotones(true, false);
@@ -1212,13 +1212,13 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.ver_guardar = false;
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+        this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+      this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
       this.CerrarVentana();
@@ -1245,7 +1245,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
       else if (datos.message === 'error') {
         this.toastr.info(
-          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          'Ups! algo salio mal', 'No se cargaron todos los registros.', {
           timeOut: 6000,
         })
       }

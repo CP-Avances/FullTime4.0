@@ -594,7 +594,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
               );
             })
           } else {
-            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -669,7 +669,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       };
     }
     else {
-      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }
@@ -761,7 +761,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
               );
             });
           } else {
-            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -835,7 +835,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         tipo: this.plataforma,
       }
     } else {
-      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }
@@ -935,7 +935,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             this.plan_multiple_ = false;
             this.selectionPaginas.clear();
           } else {
-            this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

@@ -322,7 +322,7 @@ export class EditarContratoComponent implements OnInit {
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.duplicado === 1) {
-        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
         this.duplicado = 0;
@@ -339,7 +339,7 @@ export class EditarContratoComponent implements OnInit {
   GuardarDatos(datos: any) {
     this.rest.ActualizarContratoEmpleado(this.idSelectContrato, datos).subscribe(response => {
       if (response.message === 'error') {
-        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -354,7 +354,7 @@ export class EditarContratoComponent implements OnInit {
       }
 
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups! algo salio mal.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     });

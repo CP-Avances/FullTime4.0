@@ -804,7 +804,7 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
           }
           else if (datos.message === 'error') {
             this.toastr.info(
-              'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+              'Ups! algo salio mal', 'No se cargaron todos los registros.', {
               timeOut: 6000,
             })
           }
