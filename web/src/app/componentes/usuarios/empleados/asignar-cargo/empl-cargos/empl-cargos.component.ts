@@ -127,7 +127,7 @@ export class EmplCargosComponent implements OnInit {
     this.tipoCargo = [];
     this.cargos.ObtenerTipoCargos().subscribe(datos => {
       this.tipoCargo = datos;
-      this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+      this.tipoCargo[this.tipoCargo.length] = { id: 'OTRO', cargo: "OTRO" };
     })
   }
 
@@ -168,30 +168,24 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO PARA ACTIVAR INGRESO DE CARGO
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined || form.tipoForm === 'OTRO') {
+  IngresarOtro(valor: any) {
+    if (valor === 'OTRO') {
       this.formulario.patchValue({
         cargoForm: '',
       });
       this.habilitarCargo = true;
       this.habilitarSeleccion = false;
-
       this.cargoF.setValidators([Validators.required, Validators.minLength(3)]);
       this.cargoF.updateValueAndValidity();
-
       this.tipoF.clearValidators();
       this.tipoF.setValue(null);
       this.tipoF.updateValueAndValidity();
-
       this.toastr.info('Ingresar nombre del nuevo cargo.', 'Etiqueta Cargo a desempeñar activa.', {
         timeOut: 4000,
       });
-
     } else {
-      // Ocultar input, limpiar campo y revalidar correctamente
       this.habilitarCargo = false;
       this.habilitarSeleccion = true;
-
       this.cargoF.clearValidators();
       this.cargoF.setValue('');
       this.cargoF.updateValueAndValidity();
@@ -209,6 +203,7 @@ export class EmplCargosComponent implements OnInit {
     });
     this.habilitarCargo = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // METODO PARA VALIDAR INFORMACION

@@ -134,7 +134,7 @@ export class RegistroContratoComponent implements OnInit {
     this.tipoContrato = [];
     this.rest.BuscarTiposContratos().subscribe(datos => {
       this.tipoContrato = datos;
-      this.tipoContrato[this.tipoContrato.length] = { descripcion: "OTRO" };
+      this.tipoContrato[this.tipoContrato.length] = { id: 'OTRO', descripcion: 'OTRO' };
     })
   }
 
@@ -154,6 +154,7 @@ export class RegistroContratoComponent implements OnInit {
     });
     this.habilitarContrato = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // VALIDACIONES DE INGRESO DE FECHAS
@@ -197,20 +198,30 @@ export class RegistroContratoComponent implements OnInit {
   }
 
   // ACTIVAR REGISTRO DE MODALIDAD DE TRABAJO
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined) {
+  IngresarOtro(valor: any) {
+    if (valor === undefined || valor === 'OTRO') {
       this.formulario.patchValue({
         contratoForm: '',
       });
       this.habilitarContrato = true;
-      this.toastr.info('Ingresar nueva modalidad de trabajo.', '', {
-        timeOut: 6000,
-      })
       this.habilitarSeleccion = false;
       this.contratoF.setValidators([Validators.required, Validators.minLength(3)]);
       this.contratoF.updateValueAndValidity();
       this.tipoF.clearValidators();
-      this.tipoF.setValue(null);
+      this.tipoF.setValue(null); 
+      this.tipoF.updateValueAndValidity();
+      this.toastr.info('Ingresar nueva modalidad de trabajo.', '', {
+        timeOut: 6000,
+      });
+    } else {
+      this.habilitarContrato = false;
+      this.habilitarSeleccion = true;
+
+      this.contratoF.clearValidators();
+      this.contratoF.setValue('');
+      this.contratoF.updateValueAndValidity();
+
+      this.tipoF.setValidators(Validators.required);
       this.tipoF.updateValueAndValidity();
     }
   }

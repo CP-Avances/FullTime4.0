@@ -230,7 +230,7 @@ export class EditarCargoComponent implements OnInit {
     this.tipoCargo = [];
     this.restEmplCargos.ObtenerTipoCargos().subscribe(datos => {
       this.tipoCargo = datos;
-      this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+      this.tipoCargo[this.tipoCargo.length] = { id: 'OTRO', cargo: "OTRO" };
     })
   }
 
@@ -344,24 +344,21 @@ export class EditarCargoComponent implements OnInit {
   // METODO PARA MOSTRAR INGRESO DE CARGO
   habilitarCargo: boolean = false;
   habilitarSeleccion: boolean = true;
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined || form.tipoForm === 'OTRO') {
-      // Activar campo para ingresar nuevo cargo
+  IngresarOtro(valor: any) {
+    if (valor === undefined || valor === 'OTRO') {
       this.formulario.patchValue({ cargoForm: '' });
       this.habilitarCargo = true;
       this.habilitarSeleccion = false;
       this.cargoF.setValidators([Validators.required, Validators.minLength(3)]);
       this.cargoF.updateValueAndValidity();
       this.tipoF.clearValidators();
-      this.tipoF.setValue(null);
+      this.tipoF.setValue(null); 
       this.tipoF.updateValueAndValidity();
-
       this.toastr.info('Ingresar nombre del nuevo cargo.', 'Etiqueta Cargo a desempeñar activa.', {
         timeOut: 6000,
       });
 
     } else {
-      // 👉 Usuario seleccionó un cargo existente, ocultar campo manual
       this.habilitarCargo = false;
       this.habilitarSeleccion = true;
 
@@ -381,6 +378,7 @@ export class EditarCargoComponent implements OnInit {
     });
     this.habilitarCargo = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // METODO PARA REGISTRAR TIPO CARGO
