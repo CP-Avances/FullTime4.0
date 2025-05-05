@@ -1265,7 +1265,7 @@ class EmpleadoControlador {
     // METODO PARA VERIFICAR PLANTILLA CODIGO AUTOMATICO    **USADO
     VerificarPlantilla_Automatica(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
@@ -1340,29 +1340,31 @@ class EmpleadoControlador {
                             !headers['LONGITUD'] || !headers['NACIONALIDAD'] || !headers['TIPO_IDENTIFICACION'] || !headers['NUMERO_PARTIDA_INDIVIDUAL']) {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
-                        plantilla.eachRow((row, rowNumber) => {
-                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+                        for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++) {
+                            const row = plantilla.getRow(rowNumber);
+                            if (!row || row.hasValues === false)
+                                continue;
                             // SALTAR LA FILA DE LAS CABECERAS
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const IDENTIFICACION = (_a = row.getCell(headers['IDENTIFICACION']).value) === null || _a === void 0 ? void 0 : _a.toString();
-                            const APELLIDO = (_b = row.getCell(headers['APELLIDO']).value) === null || _b === void 0 ? void 0 : _b.toString();
-                            const NOMBRE = (_c = row.getCell(headers['NOMBRE']).value) === null || _c === void 0 ? void 0 : _c.toString();
-                            const USUARIO = (_d = row.getCell(headers['USUARIO']).value) === null || _d === void 0 ? void 0 : _d.toString();
-                            const CONTRASENA = (_e = row.getCell(headers['CONTRASENA']).value) === null || _e === void 0 ? void 0 : _e.toString();
-                            const ROL = (_f = row.getCell(headers['ROL']).value) === null || _f === void 0 ? void 0 : _f.toString();
-                            const ESTADO_CIVIL = (_g = row.getCell(headers['ESTADO_CIVIL']).value) === null || _g === void 0 ? void 0 : _g.toString();
-                            const GENERO = (_h = row.getCell(headers['GENERO']).value) === null || _h === void 0 ? void 0 : _h.toString();
-                            const FECHA_NACIMIENTO = (_j = row.getCell(headers['FECHA_NACIMIENTO']).value) === null || _j === void 0 ? void 0 : _j.toString();
-                            const LATITUD = (_k = row.getCell(headers['LATITUD']).value) === null || _k === void 0 ? void 0 : _k.toString();
-                            const LONGITUD = (_l = row.getCell(headers['LONGITUD']).value) === null || _l === void 0 ? void 0 : _l.toString();
-                            const DOMICILIO = (_m = row.getCell(headers['DOMICILIO']).value) === null || _m === void 0 ? void 0 : _m.toString();
-                            const TELEFONO = (_o = row.getCell(headers['TELEFONO']).value) === null || _o === void 0 ? void 0 : _o.toString();
-                            const NACIONALIDAD = (_p = row.getCell(headers['NACIONALIDAD']).value) === null || _p === void 0 ? void 0 : _p.toString();
-                            const TIPO_IDENTIFICACION = (_q = row.getCell(headers['TIPO_IDENTIFICACION']).value) === null || _q === void 0 ? void 0 : _q.toString();
-                            const NUMERO_PARTIDA_INDIVIDUAL = (_r = row.getCell(headers['NUMERO_PARTIDA_INDIVIDUAL']).value) === null || _r === void 0 ? void 0 : _r.toString();
+                            const IDENTIFICACION = (_b = row.getCell(headers['IDENTIFICACION']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                            const APELLIDO = (_c = row.getCell(headers['APELLIDO']).value) === null || _c === void 0 ? void 0 : _c.toString();
+                            const NOMBRE = (_d = row.getCell(headers['NOMBRE']).value) === null || _d === void 0 ? void 0 : _d.toString();
+                            const USUARIO = (_e = row.getCell(headers['USUARIO']).value) === null || _e === void 0 ? void 0 : _e.toString();
+                            const CONTRASENA = (_f = row.getCell(headers['CONTRASENA']).value) === null || _f === void 0 ? void 0 : _f.toString();
+                            const ROL = (_g = row.getCell(headers['ROL']).value) === null || _g === void 0 ? void 0 : _g.toString();
+                            const ESTADO_CIVIL = (_h = row.getCell(headers['ESTADO_CIVIL']).value) === null || _h === void 0 ? void 0 : _h.toString();
+                            const GENERO = (_j = row.getCell(headers['GENERO']).value) === null || _j === void 0 ? void 0 : _j.toString();
+                            const FECHA_NACIMIENTO = (_k = row.getCell(headers['FECHA_NACIMIENTO']).value) === null || _k === void 0 ? void 0 : _k.toString();
+                            const LATITUD = (_l = row.getCell(headers['LATITUD']).value) === null || _l === void 0 ? void 0 : _l.toString();
+                            const LONGITUD = (_m = row.getCell(headers['LONGITUD']).value) === null || _m === void 0 ? void 0 : _m.toString();
+                            const DOMICILIO = (_o = row.getCell(headers['DOMICILIO']).value) === null || _o === void 0 ? void 0 : _o.toString();
+                            const TELEFONO = (_p = row.getCell(headers['TELEFONO']).value) === null || _p === void 0 ? void 0 : _p.toString();
+                            const NACIONALIDAD = (_q = row.getCell(headers['NACIONALIDAD']).value) === null || _q === void 0 ? void 0 : _q.toString();
+                            const TIPO_IDENTIFICACION = (_r = row.getCell(headers['TIPO_IDENTIFICACION']).value) === null || _r === void 0 ? void 0 : _r.toString();
+                            const NUMERO_PARTIDA_INDIVIDUAL = (_s = row.getCell(headers['NUMERO_PARTIDA_INDIVIDUAL']).value) === null || _s === void 0 ? void 0 : _s.toString();
                             let CORREO = row.getCell(headers['CORREO']).value;
                             if (typeof CORREO === 'object' && CORREO !== null) {
                                 if ('text' in CORREO) {
@@ -1459,7 +1461,7 @@ class EmpleadoControlador {
                                     }
                                     else {
                                         console.log("Cedula seleccionado");
-                                        const cedulaValida = ValidarCedula(data.identificacion);
+                                        const cedulaValida = yield ValidarCedula(data.identificacion);
                                         if (data.identificacion.toString().length != 10 || !cedulaValida) {
                                             data.observacion = 'La identificación ingresada no es válida';
                                         }
@@ -1704,7 +1706,7 @@ class EmpleadoControlador {
                                             }
                                         }
                                         else {
-                                            const cedulaValida = ValidarCedula(data.identificacion);
+                                            const cedulaValida = yield ValidarCedula(data.identificacion);
                                             if (data.identificacion.toString().length != 10 || !cedulaValida) {
                                                 data.observacion = 'La identificación ingresada no es válida';
                                             }
@@ -1775,7 +1777,8 @@ class EmpleadoControlador {
                                 listEmpleados.push(data);
                             }
                             data = {};
-                        });
+                        }
+                        ;
                     }
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
@@ -2097,7 +2100,7 @@ class EmpleadoControlador {
     // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL    **USADO
     VerificarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
@@ -2167,30 +2170,32 @@ class EmpleadoControlador {
                             !headers['TELEFONO'] || !headers['NACIONALIDAD'] || !headers['TIPO_IDENTIFICACION'] || !headers['NUMERO_PARTIDA_INDIVIDUAL']) {
                             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                         }
-                        plantilla.eachRow((row, rowNumber) => {
-                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
+                        for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++) {
+                            const row = plantilla.getRow(rowNumber);
+                            if (!row || row.hasValues === false)
+                                continue;
                             // SALTAR LA FILA DE LAS CABECERAS
                             if (rowNumber === 1)
                                 return;
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
-                            const CODIGO = (_a = row.getCell(headers['CODIGO']).value) === null || _a === void 0 ? void 0 : _a.toString();
-                            const IDENTIFICACION = (_b = row.getCell(headers['IDENTIFICACION']).value) === null || _b === void 0 ? void 0 : _b.toString();
-                            const APELLIDO = (_c = row.getCell(headers['APELLIDO']).value) === null || _c === void 0 ? void 0 : _c.toString();
-                            const NOMBRE = (_d = row.getCell(headers['NOMBRE']).value) === null || _d === void 0 ? void 0 : _d.toString();
-                            const USUARIO = (_e = row.getCell(headers['USUARIO']).value) === null || _e === void 0 ? void 0 : _e.toString();
-                            const CONTRASENA = (_f = row.getCell(headers['CONTRASENA']).value) === null || _f === void 0 ? void 0 : _f.toString();
-                            const ROL = (_g = row.getCell(headers['ROL']).value) === null || _g === void 0 ? void 0 : _g.toString();
-                            const ESTADO_CIVIL = (_h = row.getCell(headers['ESTADO_CIVIL']).value) === null || _h === void 0 ? void 0 : _h.toString();
-                            const GENERO = (_j = row.getCell(headers['GENERO']).value) === null || _j === void 0 ? void 0 : _j.toString();
-                            const FECHA_NACIMIENTO = (_k = row.getCell(headers['FECHA_NACIMIENTO']).value) === null || _k === void 0 ? void 0 : _k.toString();
-                            const LATITUD = (_l = row.getCell(headers['LATITUD']).value) === null || _l === void 0 ? void 0 : _l.toString();
-                            const LONGITUD = (_m = row.getCell(headers['LONGITUD']).value) === null || _m === void 0 ? void 0 : _m.toString();
-                            const DOMICILIO = (_o = row.getCell(headers['DOMICILIO']).value) === null || _o === void 0 ? void 0 : _o.toString();
-                            const TELEFONO = (_p = row.getCell(headers['TELEFONO']).value) === null || _p === void 0 ? void 0 : _p.toString();
-                            const NACIONALIDAD = (_q = row.getCell(headers['NACIONALIDAD']).value) === null || _q === void 0 ? void 0 : _q.toString();
-                            const TIPO_IDENTIFICACION = (_r = row.getCell(headers['TIPO_IDENTIFICACION']).value) === null || _r === void 0 ? void 0 : _r.toString();
-                            const NUMERO_PARTIDA_INDIVIDUAL = (_s = row.getCell(headers['NUMERO_PARTIDA_INDIVIDUAL']).value) === null || _s === void 0 ? void 0 : _s.toString();
+                            const CODIGO = (_b = row.getCell(headers['CODIGO']).value) === null || _b === void 0 ? void 0 : _b.toString();
+                            const IDENTIFICACION = (_c = row.getCell(headers['IDENTIFICACION']).value) === null || _c === void 0 ? void 0 : _c.toString();
+                            const APELLIDO = (_d = row.getCell(headers['APELLIDO']).value) === null || _d === void 0 ? void 0 : _d.toString();
+                            const NOMBRE = (_e = row.getCell(headers['NOMBRE']).value) === null || _e === void 0 ? void 0 : _e.toString();
+                            const USUARIO = (_f = row.getCell(headers['USUARIO']).value) === null || _f === void 0 ? void 0 : _f.toString();
+                            const CONTRASENA = (_g = row.getCell(headers['CONTRASENA']).value) === null || _g === void 0 ? void 0 : _g.toString();
+                            const ROL = (_h = row.getCell(headers['ROL']).value) === null || _h === void 0 ? void 0 : _h.toString();
+                            const ESTADO_CIVIL = (_j = row.getCell(headers['ESTADO_CIVIL']).value) === null || _j === void 0 ? void 0 : _j.toString();
+                            const GENERO = (_k = row.getCell(headers['GENERO']).value) === null || _k === void 0 ? void 0 : _k.toString();
+                            const FECHA_NACIMIENTO = (_l = row.getCell(headers['FECHA_NACIMIENTO']).value) === null || _l === void 0 ? void 0 : _l.toString();
+                            const LATITUD = (_m = row.getCell(headers['LATITUD']).value) === null || _m === void 0 ? void 0 : _m.toString();
+                            const LONGITUD = (_o = row.getCell(headers['LONGITUD']).value) === null || _o === void 0 ? void 0 : _o.toString();
+                            const DOMICILIO = (_p = row.getCell(headers['DOMICILIO']).value) === null || _p === void 0 ? void 0 : _p.toString();
+                            const TELEFONO = (_q = row.getCell(headers['TELEFONO']).value) === null || _q === void 0 ? void 0 : _q.toString();
+                            const NACIONALIDAD = (_r = row.getCell(headers['NACIONALIDAD']).value) === null || _r === void 0 ? void 0 : _r.toString();
+                            const TIPO_IDENTIFICACION = (_s = row.getCell(headers['TIPO_IDENTIFICACION']).value) === null || _s === void 0 ? void 0 : _s.toString();
+                            const NUMERO_PARTIDA_INDIVIDUAL = (_t = row.getCell(headers['NUMERO_PARTIDA_INDIVIDUAL']).value) === null || _t === void 0 ? void 0 : _t.toString();
                             let CORREO = row.getCell(headers['CORREO']).value;
                             if (typeof CORREO === 'object' && CORREO !== null) {
                                 if ('text' in CORREO) {
@@ -2295,7 +2300,7 @@ class EmpleadoControlador {
                                         }
                                     }
                                     else {
-                                        const cedulaValida = ValidarCedula(data.identificacion);
+                                        const cedulaValida = yield ValidarCedula(data.identificacion);
                                         if (data.identificacion.toString().length > 10 || data.identificacion.toString().length < 10 || !cedulaValida) {
                                             data.observacion = 'La identificación ingresada no es válida';
                                         }
@@ -2546,7 +2551,8 @@ class EmpleadoControlador {
                                 listEmpleadosManual.push(data);
                             }
                             data = {};
-                        });
+                        }
+                        ;
                     }
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
@@ -3079,32 +3085,46 @@ class EmpleadoControlador {
 exports.EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 exports.default = exports.EMPLEADO_CONTROLADOR;
 function ValidarCedula(cedula) {
-    console.log("entra a validar Cedula");
-    const cad = cedula.toString().trim();
-    if (cad === "" || cad.length !== 10 || isNaN(Number(cad))) {
-        console.log("Cédula vacía, no numérica o con longitud distinta de 10");
-        return false;
-    }
-    let total = 0;
-    for (let i = 0; i < 9; i++) {
-        let num = parseInt(cad.charAt(i), 10);
-        if (isNaN(num))
-            return false;
-        if (i % 2 === 0) {
-            num *= 2;
-            if (num > 9)
-                num -= 9;
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        console.log("entra a validar Cedula");
+        const result = yield database_1.default.query(`
+    SELECT descripcion 
+    FROM ep_detalle_parametro 
+    WHERE id_parametro = 36 
+    LIMIT 1
+  `);
+        const activarValidacion = ((_b = (_a = result.rows[0]) === null || _a === void 0 ? void 0 : _a.descripcion) === null || _b === void 0 ? void 0 : _b.toLowerCase().trim()) === 'si';
+        if (!activarValidacion) {
+            console.log("Validación de cédula desactivada por parámetro");
+            return true;
         }
-        total += num;
-    }
-    const verificador = parseInt(cad.charAt(9), 10);
-    const resultado = total % 10 ? 10 - (total % 10) : 0;
-    if (verificador === resultado) {
-        console.log("Cédula Válida");
-        return true;
-    }
-    else {
-        console.log("Cédula Inválida");
-        return false;
-    }
+        const cad = cedula.toString().trim();
+        if (cad === "" || cad.length !== 10 || isNaN(Number(cad))) {
+            console.log("Cédula vacía, no numérica o con longitud distinta de 10");
+            return false;
+        }
+        let total = 0;
+        for (let i = 0; i < 9; i++) {
+            let num = parseInt(cad.charAt(i), 10);
+            if (isNaN(num))
+                return false;
+            if (i % 2 === 0) {
+                num *= 2;
+                if (num > 9)
+                    num -= 9;
+            }
+            total += num;
+        }
+        const verificador = parseInt(cad.charAt(9), 10);
+        const resultado = total % 10 ? 10 - (total % 10) : 0;
+        if (verificador === resultado) {
+            console.log("Cédula Válida");
+            return true;
+        }
+        else {
+            console.log("Cédula Inválida");
+            return false;
+        }
+    });
 }

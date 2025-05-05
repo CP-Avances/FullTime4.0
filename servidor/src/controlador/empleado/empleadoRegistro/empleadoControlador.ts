@@ -1545,7 +1545,9 @@ class EmpleadoControlador {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
 
-          plantilla.eachRow((row, rowNumber) => {
+          for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++){
+            const row = plantilla.getRow(rowNumber);
+            if (!row || row.hasValues === false) continue;
             // SALTAR LA FILA DE LAS CABECERAS
             if (rowNumber === 1) return;
             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
@@ -1665,7 +1667,7 @@ class EmpleadoControlador {
                   }
                 } else {
                   console.log("Cedula seleccionado")
-                  const cedulaValida = ValidarCedula(data.identificacion);
+                  const cedulaValida = await ValidarCedula(data.identificacion);
                   if (data.identificacion.toString().length != 10 || !cedulaValida) {
                     data.observacion = 'La identificación ingresada no es válida';
                   }
@@ -1915,7 +1917,7 @@ class EmpleadoControlador {
                       }
                     }
                   }else{
-                    const cedulaValida=ValidarCedula(data.identificacion);
+                    const cedulaValida= await ValidarCedula(data.identificacion);
                     if (data.identificacion.toString().length != 10 || !cedulaValida) {
                       data.observacion = 'La identificación ingresada no es válida';
                     }
@@ -1988,7 +1990,7 @@ class EmpleadoControlador {
               listEmpleados.push(data);
             }
             data = {}
-          });
+          };
         }
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -2432,7 +2434,10 @@ class EmpleadoControlador {
           ) {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
-          plantilla.eachRow((row, rowNumber) => {
+
+          for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++){
+            const row = plantilla.getRow(rowNumber);
+            if (!row || row.hasValues === false) continue;
             // SALTAR LA FILA DE LAS CABECERAS
             if (rowNumber === 1) return;
             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
@@ -2566,7 +2571,7 @@ class EmpleadoControlador {
                   
 
                 } else {
-                const cedulaValida=ValidarCedula(data.identificacion);
+                const cedulaValida= await ValidarCedula(data.identificacion);
                 if (data.identificacion.toString().length > 10 || data.identificacion.toString().length < 10 || !cedulaValida) {
                   data.observacion = 'La identificación ingresada no es válida';
                 }
@@ -2827,7 +2832,7 @@ class EmpleadoControlador {
               listEmpleadosManual.push(data);
             }
             data = {}
-          });
+          };
         }
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -3426,9 +3431,22 @@ export const EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 export default EMPLEADO_CONTROLADOR;
 
 
-export function ValidarCedula(cedula: string): boolean {
+export async function ValidarCedula(cedula: string): Promise<boolean> {
   console.log("entra a validar Cedula");
 
+  const result = await pool.query(`
+    SELECT descripcion 
+    FROM ep_detalle_parametro 
+    WHERE id_parametro = 36 
+    LIMIT 1
+  `);
+
+  const activarValidacion = result.rows[0]?.descripcion?.toLowerCase().trim() === 'si';
+
+  if (!activarValidacion) {
+    console.log("Validación de cédula desactivada por parámetro");
+    return true;
+  }
   const cad = cedula.toString().trim();
 
   if (cad === "" || cad.length !== 10 || isNaN(Number(cad))) {
