@@ -60,18 +60,54 @@
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
-                            <mat-form-field>
-                                <mat-label>Identificación</mat-label>
-                                <input matInput type="tel" placeholder="1788300293" maxlength="10"
-                                    formControlName="cedulaForm"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    (keypress)="IngresarSoloNumeros($event)" required
-                                    (input)="LlenarCodigo(primeroFormGroup.value)">
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Ingresar la cédula de identidad o pasaporte del nuevo empleado">
+                            <mat-radio-group formControlName="tipoIdentificacionForm" aria-label="Select an option" style="display: flex;" required>
+                                <div>
+                                  <mat-radio-button (change)="CambiarIdentificacion($event)" value="Cedula">
+                                    Cédula
+                                  </mat-radio-button>
+                                </div>
+                                <div>
+                                  <mat-radio-button (change)="CambiarIdentificacion($event)" value="Pasaporte">
+                                    Pasaporte
+                                  </mat-radio-button>
+                                </div>
+                              </mat-radio-group>                      
+                              <div *ngIf="identificacion === 'Cedula'">
+                                <mat-form-field>
+                                  <mat-label>Cédula</mat-label>
+                                  <input matInput type="tel" placeholder="1788300293" maxlength="10"
+                                      formControlName="cedulaForm"
+                                      oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                      (keypress)="IngresarSoloNumeros($event)" required
+                                      (input)="ValidarCedula(primeroFormGroup.value)">
+                                  <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                      matTooltip="Ingresar la cédula de identidad del empleado.">
                                     help_outline
-                                </mat-icon>
-                            </mat-form-field>
+                                  </mat-icon>
+                                  <mat-error *ngIf="!cedulaValida">
+                                    <mat-icon>error</mat-icon> Cédula incorrecta
+                                  </mat-error>
+                                </mat-form-field>
+                              </div>
+                              
+                              <div *ngIf="identificacion === 'Pasaporte'">
+                                <mat-form-field>
+                                  <mat-label>Pasaporte</mat-label>
+                                  <input matInput type="text" placeholder="pasaporte" maxlength="10"
+                                      formControlName="cedulaForm"
+                                      oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                      (keypress)="IngresarSoloNumeros($event)" required
+                                      (input)="ValidarPasaporte(primeroFormGroup.value)">
+                                  <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                      matTooltip="Ingresar el pasaporte del empleado.">
+                                    help_outline
+                                  </mat-icon>
+                                  <mat-error *ngIf="!pasaporteValida">
+                                    <mat-icon>error</mat-icon> Pasaporte incorrecto
+                                  </mat-error>
+                                </mat-form-field>
+                              </div>
+                              
                         </div>
                     </div>
                     <div class="col-md">
