@@ -575,10 +575,21 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA GUARDAR TIMBRE CON IMAGEN
   GuardarImagen(form: any): void {
-    //console.log('observacion ', form.observacionForm)
+
+
+    if(this.foto_obligatorio && !this.imagenCamara){
+      this.toastr.info(
+        '', 'La foto es obligatoria.', {
+        timeOut: 6000,
+      });
+
+      return;
+    }
+
     if (this.imagenCamara) {
       this.informacion_timbre.imagen = this.convertida;
     }
+
     this.informacion_timbre.observacion = form.observacionForm;
     if (this.boton_abierto === true) {
       if (form.observacionForm != '' && form.observacionForm != undefined) {
