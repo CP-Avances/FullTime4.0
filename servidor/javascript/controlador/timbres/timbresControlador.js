@@ -798,7 +798,7 @@ class TimbresControlador {
                 VALUES ${valores}`);
                 }
                 const auditoria = id_empleado.map((id_empleado) => ({
-                    tabla: 'mtv_opciones_marcacion',
+                    tabla: 'mrv_opciones_marcacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -825,50 +825,63 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
-                console.log(req.body);
-                var opciones;
+                let { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // Crear un objeto con los valores a actualizar
+                // CREAR UN OBJETO CON LOS VALORES A ACTUALIZAR
                 const updateValues = {};
-                // Agregar los parámetros al objeto si no son nulos
+                // AGREGAR LOS PARÁMETROS AL OBJETO SI NO SON NULOS
                 if (timbre_internet != null)
                     updateValues.timbre_internet = timbre_internet;
-                if (timbre_foto != null)
+                if (timbre_foto != null) {
                     updateValues.timbre_foto = timbre_foto;
+                    if (!timbre_foto)
+                        timbre_foto_obligatoria = false;
+                }
                 if (timbre_especial != null)
                     updateValues.timbre_especial = timbre_especial;
                 if (timbre_ubicacion_desconocida != null)
                     updateValues.timbre_ubicacion_desconocida = timbre_ubicacion_desconocida;
                 if (timbre_foto_obligatoria != null)
                     updateValues.opcional_obligatorio = timbre_foto_obligatoria;
-                // Si no hay valores para actualizar, retornar
+                // SI NO HAY VALORES PARA ACTUALIZAR, RETORNAR
                 if (Object.keys(updateValues).length === 0) {
                     console.log('No hay parámetros para actualizar');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                // Construir la parte SET de la consulta
+                // CONSTRUIR LA PARTE SET DE LA CONSULTA
                 const setClause = Object.keys(updateValues)
                     .map((key, index) => `${key} = $${index + 2}`)
                     .join(', ');
-                // Crear los valores para la consulta SQL
+                // CREAR LOS VALORES PARA LA CONSULTA SQL
                 const queryValues = [id_empleado, ...Object.values(updateValues)];
-                // Ejecutar la consulta
+                // EJECUTAR LA CONSULTA
                 const response = yield database_1.default.query(`UPDATE mrv_opciones_marcacion SET ${setClause} WHERE id_empleado = ANY($1::int[])`, queryValues);
-                // Obtener las filas afectadas
+                // OBTENER LAS FILAS AFECTADAS
                 let rowsAffected = (_a = response.rowCount) !== null && _a !== void 0 ? _a : 0;
-                const auditoria = id_empleado.map((id_empleado) => ({
-                    tabla: 'mrv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
-                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}, opcional_obligatorio: ${timbre_foto_obligatoria} `,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                }));
+                const auditoria = id_empleado.map((id) => {
+                    const nuevosDatos = [`id_empleado: ${id}`];
+                    if (timbre_internet !== null && timbre_internet !== undefined)
+                        nuevosDatos.push(`timbre_internet: ${timbre_internet}`);
+                    if (timbre_foto !== null && timbre_foto !== undefined)
+                        nuevosDatos.push(`timbre_foto: ${timbre_foto}`);
+                    if (timbre_especial !== null && timbre_especial !== undefined)
+                        nuevosDatos.push(`timbre_especial: ${timbre_especial}`);
+                    if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined)
+                        nuevosDatos.push(`timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`);
+                    if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined)
+                        nuevosDatos.push(`opcional_obligatorio: ${timbre_foto_obligatoria}`);
+                    return {
+                        tabla: 'mrv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: nuevosDatos.join(', '),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    };
+                });
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -1001,7 +1014,6 @@ class TimbresControlador {
     IngresarOpcionTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log('opciones: ', req.body);
                 const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
                 const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
                 const batches = [];
@@ -1046,7 +1058,6 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
-                console.log(req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 let fields = [];
@@ -1074,7 +1085,7 @@ class TimbresControlador {
                     yield database_1.default.query('ROLLBACK');
                     return res.status(400).json({ message: 'No hay campos válidos para actualizar.' });
                 }
-                // Agrega el arreglo de ID de empleados al principio de los valores
+                // AGREGA EL ARREGLO DE ID DE EMPLEADOS AL PRINCIPIO DE LOS VALORES
                 values.unshift(id_empleado);
                 const updateQuery = `
             UPDATE mtv_opciones_marcacion

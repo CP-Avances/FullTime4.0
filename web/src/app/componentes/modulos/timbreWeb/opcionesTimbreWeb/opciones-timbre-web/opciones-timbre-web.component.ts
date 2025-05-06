@@ -806,7 +806,6 @@ export class OpcionesTimbreWebComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR OPCION DE MARCACION
   ActualizarOpcionMarcacion(informacion: any, arregloIngreso) {
-    console.log("ver arregloIngreso: ", arregloIngreso)
     this.restTimbres.ActualizarOpcionesMarcacionWeb(informacion).subscribe((a) => {
       if (arregloIngreso.length  == 0) {
         this.MostrarMensaje();
