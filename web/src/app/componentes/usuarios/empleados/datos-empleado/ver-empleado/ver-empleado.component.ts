@@ -18,8 +18,7 @@ import ExcelJS, { FillPattern } from "exceljs";
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
-// ELIMINA LAS URLS POR DEFECTO
-delete L.Icon.Default.prototype._getIconUrl;
+
 // ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -145,6 +144,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   get frase_m(): string { return this.plantillaPDF.marca_Agua }
   get logoE(): string { return this.plantillaPDF.logoBase64 }
 
+  // VARIABLES PARA EL MAPA
+  latitud: number;
+  longitud: number;
+  nombreMarcador: string = '';
+
   constructor(
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS EMPLEADO
     public restEmpleHorario: EmpleadoHorariosService, // SERVICIO DATOS HORARIO DE EMPLEADOS
@@ -243,7 +247,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     } else {
       this.SeleccionarPestana(0);
     }
+
+    // VERIFICAR QUE EL MAPA ESTA DEFINIDO
+    if (this.MAP) {
+      this.MAP.invalidateSize();
+    }
+
+    const intervalo = setInterval(() => {
+      if (this.latitud && this.longitud && this.nombreMarcador) {
+        this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
+        clearInterval(intervalo); // Detener el intervalo después de ejecutarlo
+      }
+    }, 200); // Revisa cada 200ms si ya están disponibles
   }
+
+  // ngOnDestroy(): void {
+  //   // LIMPIAR MARCADORES EXISTENTES
+  //   if (this.MARKER) {
+  //     this.MAP.removeLayer(this.MARKER);
+  //   }
+  //   // ELIMINAR MAPA
+  //   if (this.MAP) {
+  //     this.MAP.remove();
+  //     this.MAP = null;
+  //   }
+  // }
 
   // METODO PARA CAMBIAR DE PESTAÑA
   SeleccionarPestana(index: number): void {
@@ -528,7 +556,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-      var empleado = data[0].nombre + ' ' + data[0].apellido;
+      this.nombreMarcador = data[0].nombre + ' ' + data[0].apellido;
+      this.latitud = data[0].latitud;
+      this.longitud = data[0].longitud;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         //this.perfil.SetImagen(this.urlImagen);
@@ -552,7 +582,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           (result) => (this.imagenEmpleado = result)
         );
       }
-      this.MapGeolocalizar(data[0].latitud, data[0].longitud, empleado);
+      // this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
 
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
@@ -609,7 +639,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
       this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
       this.MARKER.bindPopup(empleado).openPopup();
-    }, 100);
+    }, 500);
   }
 
 
@@ -663,14 +693,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.empleado_editar=datoEmpleado;
     this.pagina_empleado='ver-empleado';
   }
-
-
-
-
-
-
-
-
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
