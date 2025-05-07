@@ -149,10 +149,10 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   public datosEmple: any = []
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.datos = this.solicita_permiso[0];
     var f = DateTime.now();
@@ -573,8 +573,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       // FORMATO DE FECHAS
       fecha_inicio = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
       fecha_final = DateTime.fromFormat(form.fechaFinalForm, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-      hora_inicio_ = DateTime.fromFormat(form.horaSalidaForm, "HH:mm:ss").format('HH:mm:ss');
-      hora_final_ = DateTime.fromFormat(form.horasIngresoForm, "HH:mm:ss").format('HH:mm:ss');
+      hora_inicio_ = DateTime.fromFormat(form.horaSalidaForm, "HH:mm:ss").toFormat('HH:mm:ss');
+      hora_final_ = DateTime.fromFormat(form.horasIngresoForm, "HH:mm:ss").toFormat('HH:mm:ss');
 
       if (hora_inicio_ === '00:00:00' && hora_final_ === '00:00:00') {
         this.toastr.warning(
@@ -746,9 +746,9 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         // RECORRER TODOS LOS DATOS DE HORARIOS EXISTENTES
         for (let i = 0; i < datos.length; i++) {
           // FORMATEAR FECHAS
-          var entrada = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-          var intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').add(1, 'days').toFormat('yyyy-MM-dd');
-          var salida = DateTime.fromFormat(datos[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+          let entrada = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+          let intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').plus({ days: 1 }).toFormat('yyyy-MM-dd');
+          let salida = DateTime.fromFormat(datos[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
 
           // CONDICION UNO: FECHA INGRESADA = A LA FECHA DE INGRESO DEL USUARIO
           if (entrada === fecha_inicio) {
@@ -869,7 +869,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         for (let i = 0; i < datos.length; i++) {
           // FORMATEAR FECHAS
           var entrada = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-          var intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').add(1, 'days').toFormat('yyyy-MM-dd');
+          var intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').plus({ days: 1 }).toFormat('yyyy-MM-dd');
 
           if (entrada === fecha_inicio) {
             if (hora_inicio_ >= datos[i].hora_inicio) {
@@ -1053,8 +1053,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
             var inicio_dia = Duration.fromISOTime('00:00:00');
 
             // RESTAR HORAS
-            var entrada = media_noche.subtract(inicio);
-            var salida = fin.subtract(inicio_dia);
+            var entrada = media_noche.minus(inicio);
+            var salida = fin.minus(inicio_dia);
 
             resta = entrada.plus(salida);
           }
@@ -1107,17 +1107,17 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       this.horasF.setValue('');
     }
     else {
-      var total = tiempo_solicitado.subtract(descuento_comida);
+      var total = tiempo_solicitado.minus(descuento_comida);
 
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
-      var horast = String(total.hours());
-      var minutost = String(total.minutes());
+      var horast = String(total.hours);
+      var minutost = String(total.minutes);
 
-      if (total.hours() < 10) {
-        horast = '0' + total.hours();
+      if (total.hours < 10) {
+        horast = '0' + total.hours;
       }
-      if (total.minutes() < 10) {
-        minutost = '0' + total.minutes();
+      if (total.minutes < 10) {
+        minutost = '0' + total.minutes;
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       var valorTotal: string = horast + ':' + minutost;

@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
@@ -59,10 +59,10 @@ export class RegistroHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // VARAIBLE DE ALMACENAMIENTO DE DATOS DE AUDITORIA
@@ -104,7 +104,11 @@ export class RegistroHorarioComponent implements OnInit {
       dataHorario.min_almuerzo = 0;
     }
     else if (dataHorario.hora_trabajo >= '72:00' || dataHorario.hora_trabajo >= '72:00:00') {
-      dataHorario.hora_trabajo = DateTime.fromISO(dataHorario.hora_trabajo, 'HH:mm:ss').toFormat('HH:mm:ss');
+      if (typeof dataHorario.hora_trabajo === 'string' && dataHorario.hora_trabajo.split(':').length === 2) {
+        const [hours, minutes] = dataHorario.hora_trabajo.split(':').map(Number);
+        const duration = Duration.fromObject({ hours, minutes });
+        dataHorario.hora_trabajo = duration.toFormat('hh:mm:ss');
+      }
     }
 
     // VERIFICAR INGRESO DE MINUTOS DE ALIMENTACION
@@ -195,10 +199,10 @@ export class RegistroHorarioComponent implements OnInit {
 
   // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
   ReseteoArchivo(event: any) {
-    event.target.value = null; 
-  }    
+    event.target.value = null;
+  }
 
-  // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO   
+  // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO
   SubirRespaldo(id: number, codigo: any) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {

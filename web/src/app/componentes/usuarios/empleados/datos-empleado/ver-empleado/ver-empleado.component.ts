@@ -190,10 +190,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     var a = DateTime.now();
     this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params
@@ -587,31 +587,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       longitud = -78.4875258;
       zoom = 7;
     }
-  
+
     setTimeout(() => {
       if (this.MAP) {
         this.MAP.remove();
         this.MAP = null;
       }
-  
+
       this.MAP = L.map('geolocalizacion', {
         center: [latitud, longitud],
         zoom: zoom
       });
-  
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
       }).addTo(this.MAP);
-  
+
       if (this.MARKER) {
         this.MAP.removeLayer(this.MARKER);
       }
-  
+
       this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
       this.MARKER.bindPopup(empleado).openPopup();
-    }, 100); 
+    }, 100);
   }
-  
+
 
   // METODO INCLUIR EL CROKIS
   AbrirUbicacion(nombre: string, apellido: string) {
@@ -670,7 +670,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
 
 
-  
+
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
@@ -896,7 +896,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       .afterClosed().subscribe(result => {
         setTimeout(() => {
         this.ObtenerDatosVacunas(this.formato_fecha);
-      }, 200); 
+      }, 200);
       });
   }
 
@@ -906,8 +906,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
     }).afterClosed().subscribe(result => {
       setTimeout(() => {
-        this.ObtenerDatosVacunas(this.formato_fecha); 
-      }, 200); 
+        this.ObtenerDatosVacunas(this.formato_fecha);
+      }, 200);
     });
   }
 
@@ -1419,7 +1419,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
+        let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
@@ -2643,7 +2643,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
       fin: h_fin,
     }
 
@@ -3090,7 +3090,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       }
     });
 
-    
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
@@ -3384,7 +3384,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                 { text: 'Fecha: ' + obj.fecha_ },
                 { text: 'Carnet: ' + obj.carnet }
               ],
-              [{ text: '', colSpan: 2 }, {}] 
+              [{ text: '', colSpan: 2 }, {}]
             ];
           })
         ]
@@ -4548,7 +4548,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
-  
+
   getCrearDatos(){
     return this.tienePermiso('Crear datos');
   }

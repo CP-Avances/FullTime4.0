@@ -81,10 +81,10 @@ export class EditarContratoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;
@@ -303,10 +303,10 @@ export class EditarContratoComponent implements OnInit {
     }
     this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd');
+      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd')!;
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd');
+        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd')!;
         if (ingreso < fecha_salida) {
           this.duplicado = 1;
         }
@@ -456,8 +456,8 @@ export class EditarContratoComponent implements OnInit {
 
   // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
   ReseteoArchivo(event: any) {
-    event.target.value = null; 
-  }  
+    event.target.value = null;
+  }
 
   // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
@@ -495,7 +495,7 @@ export class EditarContratoComponent implements OnInit {
       if (opcion === 2) {
         setTimeout(() => {
           this.componentev.VerDatosActuales(this.componentev.formato_fecha);
-        }, 300); 
+        }, 300);
       }
     }
   }

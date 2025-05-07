@@ -215,14 +215,11 @@ export class EmplCargosComponent implements OnInit {
   ValidarDatosRegistro(form: any) {
     //console.log('fechas ', form.fecInicioForm, ' ----  ', form.fecFinalForm)
     // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
-    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd');
-    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd');
-    let contrato_inicio = DateTime.fromISO(this.contrato_actual.fecha_ingreso).toFormat('yyyy-MM-dd');
-    let contrato_fin = DateTime.fromISO(this.contrato_actual.fecha_salida).toFormat('yyyy-MM-dd');
-    //console.log('inicio ', registro_inicio)
-    //console.log('fin ', registro_fin)
-    //console.log('inicio ', contrato_inicio)
-    //console.log('fin ', contrato_fin)
+    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd')!;
+    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd')!;
+    let contrato_inicio = DateTime.fromISO(this.contrato_actual.fecha_ingreso).toFormat('yyyy-MM-dd')!;
+    let contrato_fin = DateTime.fromISO(this.contrato_actual.fecha_salida).toFormat('yyyy-MM-dd')!;
+
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
     if ((contrato_inicio <= registro_inicio) &&
       (contrato_fin >= registro_fin)) {

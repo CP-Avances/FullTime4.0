@@ -76,10 +76,10 @@ export class EditarPlanComidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerServicios();
     this.CargarDatos();
@@ -320,7 +320,7 @@ export class EditarPlanComidasComponent implements OnInit {
           var end = new Date(this.finDate);
           // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DÍA DEL PERIODO INDICADO
           while (start <= end) {
-            this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
+            this.fechasHorario.push(DateTime.fromISO(start.toISOString()).toFormat('yyyy-MM-dd'));
             var newDate = start.setDate(start.getDate() + 1);
             start = new Date(newDate);
           }
@@ -538,7 +538,7 @@ export class EditarPlanComidasComponent implements OnInit {
       var end = new Date(this.finDate);
       // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DÍA DEL PERIODO INDICADO
       while (start <= end) {
-        this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
+        this.fechasHorario.push(DateTime.fromISO(start.toISOString()).toFormat('yyyy-MM-dd'));
         var newDate = start.setDate(start.getDate() + 1);
         start = new Date(newDate);
       }

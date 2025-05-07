@@ -92,10 +92,10 @@ export class EditarCargoComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.BuscarUsuarioDepartamento();
@@ -237,15 +237,11 @@ export class EditarCargoComponent implements OnInit {
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
     // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
-    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd');
-    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd');
-    let contrato_inicio = this.validar.DarFormatoFecha(this.contrato_actual.fecha_ingreso, 'yyyy-MM-dd');
-    let contrato_fin = this.validar.DarFormatoFecha(this.contrato_actual.fecha_salida, 'yyyy-MM-dd');
-    /*console.log('inicio ', registro_inicio)
-    console.log('fin ', registro_fin)
-    console.log('inicio ', contrato_inicio)
-    console.log('fin ', contrato_fin)
-    */
+    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd')!;
+    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd')!;
+    let contrato_inicio = this.validar.DarFormatoFecha(this.contrato_actual.fecha_ingreso, 'yyyy-MM-dd')!;
+    let contrato_fin = this.validar.DarFormatoFecha(this.contrato_actual.fecha_salida, 'yyyy-MM-dd')!;
+
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
     if ((contrato_inicio <= registro_inicio) &&
       (contrato_fin >= registro_fin)) {

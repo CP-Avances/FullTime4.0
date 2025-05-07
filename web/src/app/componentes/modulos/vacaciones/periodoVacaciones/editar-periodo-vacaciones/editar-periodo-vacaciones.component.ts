@@ -62,15 +62,15 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     private toastr: ToastrService,
     public componentev: VerEmpleadoComponent,
     public validar: ValidacionesService,
-    
+
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     //console.log('ver data ', this.data)
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ImprimirDatos();
@@ -179,7 +179,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     });
     this.dInicio = event.value._i;
     var fecha = this.dInicio.toISOString();
-    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').format('yyyy-MM-dd');
+    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
     this.rest.BuscarDatosContrato(this.data.datosPeriodo.id_empl_contrato).subscribe(data => {
       if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(ingreso)) {
         fecha.setMonth(fecha.getMonth() + parseInt(data[0].meses_periodo));

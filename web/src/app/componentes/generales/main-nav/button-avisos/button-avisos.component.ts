@@ -58,9 +58,9 @@ export class ButtonAvisosComponent implements OnInit {
 
             let fecha = this.validar.DarFormatoFecha(res.fecha_hora.split('T')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
-            res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            res.fecha_ = this.validar.FormatearFecha(fecha || '', this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
 
-           
+
             res.hora_ = this.validar.FormatearHora( DateTime.fromISO(res.fecha_hora).toFormat("HH:mm:ss"), this.formato_hora);
 
             if (res.tipo != 6) {
@@ -159,7 +159,7 @@ export class ButtonAvisosComponent implements OnInit {
             }
             let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd');
             // FORMATEAR DATOS DE FECHA Y HORA
-            obj.fecha_ = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+            obj.fecha_ = this.validar.FormatearFecha(fecha || '', formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
             obj.hora_ = this.validar.FormatearHora(obj.create_at.split(' ')[1], formato_hora);
             // VERIFICAR DESCRIPCIONES DE AVISOS
             if (obj.tipo != 6) {

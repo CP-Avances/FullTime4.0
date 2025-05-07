@@ -249,11 +249,12 @@ export class MainNavComponent implements OnInit {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
     console.log(licencia);
     if (licencia !== null) {
-      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd');
-      this.fec_caducidad_licencia = fec_caducidad;
+      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd') ?? '';
+      this.fec_caducidad_licencia = fec_caducidad ? new Date(fec_caducidad) : new Date();
       // CONVERTIMOS LA FECHA ACTUAL Y LA FECHA DE CADUCIDAD A OBJETOS LUXON
       const fecha = DateTime.now();
-      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd');
+      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd') ?? '';
+      console.log('fechaActual 2121 ', fechaActual);
       const fechaInicio = DateTime.fromISO(fechaActual);
       const fechaFin = DateTime.fromISO(fec_caducidad);
       // CALCULAMOS LA DIFERENCIA EN DIAS ENTRE LAS DOS FECHAS

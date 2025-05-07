@@ -143,10 +143,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   ngOnInit(): void {
     console.log('datos permisos ', this.solicita_permiso[0])
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     var f = DateTime.now();
     this.info = this.solicita_permiso[0].permiso;
@@ -1195,17 +1195,17 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       this.horasF.setValue('');
     }
     else {
-      var total = tiempo_solicitado.subtract(descuento_comida);
+      let total = tiempo_solicitado.minus(descuento_comida);
 
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
-      var horast = String(total.hours());
-      var minutost = String(total.minutes());
+      let horast = String(total.hours);
+      let minutost = String(total.minutes);
 
-      if (total.hours() < 10) {
-        horast = '0' + total.hours();
+      if (total.hours < 10) {
+        horast = '0' + total.hours;
       }
-      if (total.minutes() < 10) {
-        minutost = '0' + total.minutes();
+      if (total.minutes < 10) {
+        minutost = '0' + total.minutes;
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       var valorTotal: string = horast + ':' + minutost;
@@ -1366,7 +1366,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         this.fechasHorario = this.fechasHorario + ', \'' + inicio_ + '\'';
       }
       this.totalFechas.push(inicio_);
-      var newDate = DateTime.fromISO.fromISO(inicio_).plus({ days: 1 }).toFormat('yyyy-MM-dd');
+      let newDate = DateTime.fromISO(inicio_).plus({ days: 1 }).toFormat('yyyy-MM-dd');
       inicio_ = newDate;
     }
 

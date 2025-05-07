@@ -67,10 +67,10 @@ export class RegistrarPeriodoVComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerContrato();
@@ -185,7 +185,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
     });
     this.dInicio = event.value._i;
     var fecha = this.dInicio.toISOString();
-    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').format('yyyy-MM-dd');
+    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
     this.rest.BuscarDatosContrato(this.datoEmpleado.idContrato).subscribe(data => {
       //console.log('ver data ', data)
       if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(ingreso)) {

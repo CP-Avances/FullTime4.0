@@ -51,7 +51,7 @@ export class ButtonNotificacionComponent implements OnInit {
         if (parseInt(data.id_receives_empl) === this.idEmpleadoIngresa) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.realTime.ObtenerUnaNotificacion(data.id).subscribe(res => {
-            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd');
+            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd') ?? '';
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
             res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
             res.hora_ = this.validar.FormatearHora(res.create_at.split(' ')[1], this.formato_hora);
@@ -84,10 +84,10 @@ export class ButtonNotificacionComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.BuscarParametro();
     this.VerificarConfiguracion(this.idEmpleadoIngresa);
 
@@ -142,7 +142,7 @@ export class ButtonNotificacionComponent implements OnInit {
       if (!this.avisos.text) {
         if (this.avisos.length > 0) {
           this.avisos.forEach((obj: any) => {
-            let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd');
+            let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd') ?? '';
             obj.fecha_ = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
             obj.hora_ = this.validar.FormatearHora(obj.create_at.split(' ')[1], formato_hora);
             if (obj.visto === false) {

@@ -790,7 +790,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wsa, 'Solicitud Horas Extras');
     var f = DateTime.now();
-    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toformat('yyyy-MM-dd') + '.xlsx');
+    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
     */
   }
 

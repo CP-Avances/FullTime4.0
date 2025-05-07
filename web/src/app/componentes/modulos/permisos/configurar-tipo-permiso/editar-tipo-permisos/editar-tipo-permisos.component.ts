@@ -80,11 +80,11 @@ export class EditarTipoPermisosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    
+
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');  this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ValidarFormulario();
     this.CargarDatosPermiso();
@@ -334,8 +334,8 @@ export class EditarTipoPermisosComponent implements OnInit {
       contar_feriados: form2.feriadosForm,
       num_dia_justifica: form2.numDiaJustificaForm,
       gene_justificacion: form2.geneJustificacionForm,
-      fecha_inicio: DateTime.fromISO(this.rango.value.start).toFormat('yyyy-MM-dd'),
-      fecha_fin: DateTime.fromISO(this.rango.value.end).toFormat('yyyy-MM-dd'),
+      fecha_inicio: this.rango.value.start ? DateTime.fromISO(this.rango.value.start).toFormat('yyyy-MM-dd') : null,
+      fecha_fin: this.rango.value.end ? DateTime.fromISO(this.rango.value.end).toFormat('yyyy-MM-dd') : null,
 
       // FORMULARIO TRES
       correo_crear: form3.correo_crearForm,
