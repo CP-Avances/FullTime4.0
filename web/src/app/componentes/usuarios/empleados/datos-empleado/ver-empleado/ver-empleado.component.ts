@@ -3090,7 +3090,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       }
     });
 
-    
+    let numeroPartida = this.empleadoUno[0].numero_partida_individual;
+    let textoNumeroPartida = numeroPartida ? 'Numero de partida individual: ' + numeroPartida + '\n' : '';
+    let tipoIdentificacionTexto = this.empleadoUno[0].tipo_identificacion == 1 ? 'Cédula' : 'Pasaporte';
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
@@ -3176,13 +3179,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                           [
                             {
                               text: [
-                                'CI: ' + this.empleadoUno[0].identificacion + '\n',
+                                'Tipo identificación: ' + tipoIdentificacionTexto + '\n',
+                                'Num. identificación: ' + this.empleadoUno[0].identificacion + '\n',
                                 'Nacionalidad: ' + nacionalidad + '\n',
-                                'Fecha Nacimiento: ' + '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
+                                'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                                 'Estado civil: ' + estadoCivil + '\n',
                                 'Género: ' + genero + '\n'
                               ],
-                              style: 'item'
+                              style: 'item',
+                              alignment: 'left',
+                              valign: 'top',
+                              lineHeight: 1.1
                             },
                             {
                               text: [
@@ -3190,18 +3197,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                                 'Teléfono: ' + this.empleadoUno[0].telefono + '\n',
                                 'Estado: ' + estado + '\n',
                                 'Domicilio: ' + this.empleadoUno[0].domicilio + '\n',
+                                textoNumeroPartida
                               ],
-                              style: 'item'
+                              style: 'item',
+                              alignment: 'left',
+                              valign: 'top',
+                              lineHeight: 1.1
+                            }
+                          ],
+                          [
+                            {
+                              text: 'Correo: ' + this.empleadoUno[0].correo,
+                              colSpan: 2,
+                              style: 'item',
+                              alignment: 'left',
+                              margin: [0, -4, 0, 0] 
                             },
+                            {} 
                           ]
-                        ]
+                        ]                        
                       },
-                      layout: 'noBorders', // Esto elimina los bordes de la tabla
-                      alignment: 'left', // Alinea la tabla a la izquierda
+                      layout: 'noBorders',
+                      alignment: 'left'
                     },
-                    {
-                      text: 'Correo: ' + this.empleadoUno[0].correo, style: 'item'
-                    }
                   ]
                 }
 
@@ -3761,24 +3779,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         'Codigo': obj.codigo,
         "Apellido": obj.apellido,
         "Nombre": obj.nombre,
+        "Tipo identificacion": obj.tipo_identificacion == 1 ? "Cédula" : "Pasaporte",
         "Identificacion": obj.identificacion,
         "Estado Civil": estadoCivil,
         "Genero": genero,
         "Correo": obj.correo,
-        "Fecha de Nacimiento": new Date(obj.fec_nacimiento_.split(" ")[1]),
+        "Fecha de Nacimiento": obj.fec_nacimiento_,
         "Estado": estado,
         "Domicilio": obj.domicilio,
         "Telefono": obj.telefono,
         "Nacionalidad": nacionalidad,
       };
+      if(obj.numero_partida_individual !== null){
+        objeto.numero_partida_individual = obj.numero_partida_individual;
+      }
       if (obj.longitud !== null) {
-        objeto.empleado.longitud = obj.longitud;
+        objeto.longitud = obj.longitud;
       }
       if (obj.latitud !== null) {
-        objeto.empleado.latitud = obj.latitud;
+        objeto.latitud = obj.latitud;
       }
       arregloEmpleado.push(objeto);
     });
+    console.log("DATOS PARA REPORTE", arregloEmpleado)
 
     if (this.discapacidadUser !== null) {
       this.discapacidadUser.map(discapacidad => {
@@ -3867,6 +3890,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   async generarHojaPerfil(workbook: ExcelJS.Workbook) {
     const datos: any = this.ObtenerDatos();
+    const hayLatitud = datos[0].some((emp: any) => emp.latitud !== null && emp.latitud !== undefined);
+    const hayLongitud = datos[0].some((emp: any) => emp.longitud !== null && emp.longitud !== undefined);
+    const hayPartida = datos[0].some((emp: any) => emp.numero_partida_individual !== null && emp.numero_partida_individual !== undefined && emp.numero_partida_individual !== '');
     let n = 0;
     const horarioslista: any[] = [];
 
@@ -3908,12 +3934,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-    worksheet.columns = [
-
-      { key: "codigo", width: 20 },
+    const columnasExcel: any[] = [
+      { key: "codigo", width: 10 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
       { key: "identificacion", width: 20 },
+      { key: "tipoIdentificacion", width: 25 },
       { key: "estadoCivil", width: 20 },
       { key: "genero", width: 20 },
       { key: "correo", width: 20 },
@@ -3922,13 +3948,18 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { key: "domicilio", width: 20 },
       { key: "telefono", width: 20 },
       { key: "nacionalidad", width: 20 },
-
     ];
+    if (hayPartida) columnasExcel.push({ key: "numero_partida_individual", width: 20 });
+    if (hayLatitud) columnasExcel.push({ key: "latitud", width: 20 });
+    if (hayLongitud) columnasExcel.push({ key: "longitud", width: 20 });
 
-    const columnas = [
+    worksheet.columns = columnasExcel;    
+
+    const columnasTabla: any[] = [
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "TIPO IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "ESTADO CIVIL", totalsRowLabel: "", filterButton: true },
       { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
@@ -3939,6 +3970,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { name: "TELÉFONO", totalsRowLabel: "", filterButton: true },
       { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
     ];
+    if (hayPartida) columnasTabla.push({ name: "NÚMERO DE PARTIDA", totalsRowLabel: "", filterButton: true });
+    if (hayLatitud) columnasTabla.push({ name: "LATITUD", totalsRowLabel: "", filterButton: true });
+    if (hayLongitud) columnasTabla.push({ name: "LONGITUD", totalsRowLabel: "", filterButton: true });    
 
     worksheet.addTable({
       name: "Perfil",
@@ -3949,14 +3983,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         theme: "TableStyleMedium16",
         showRowStripes: true,
       },
-      columns: columnas,
+      columns: columnasTabla,
       rows: horarioslista,
     });
 
     const numeroFilas = horarioslista.length;
+    const totalColumnas = worksheet.columns.length;
 
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 12; j++) {
+      for (let j = 1; j <= totalColumnas; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };

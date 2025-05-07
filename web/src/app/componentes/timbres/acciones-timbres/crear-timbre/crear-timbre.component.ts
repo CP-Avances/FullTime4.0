@@ -217,6 +217,11 @@ export class CrearTimbreComponent implements OnInit {
     }
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }    
+
   // METODO PARA REDUCIR CALIDAD Y CONVERTIR ARCHIVO A BASE64
   ReducirCalidadYConvertirABase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {

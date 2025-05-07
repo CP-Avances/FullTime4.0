@@ -1909,13 +1909,18 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("ENTRANDO A CARGAR PLANTILLA AUTOMATICO");
             const { plantilla, user_name, ip, ip_local } = req.body;
-            const VALOR = yield database_1.default.query(`
-      SELECT * FROM e_codigo
-      `);
+            const VALOR = yield database_1.default.query(`SELECT * FROM e_codigo`);
             var codigo_dato = VALOR.rows[0].valor;
             var codigo = 0;
             if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
                 codigo = codigo_dato = parseInt(codigo_dato);
+            }
+            // VERIFICAR SI EL CODIGO ESTA DESACTUALZIADO
+            const MAX_CODIGO = yield database_1.default.query(`SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados`);
+            const max_real = parseInt(MAX_CODIGO.rows[0].codigo) || 0;
+            // SI HAY UN CODIGO MAS ALTO, LO ACTUALIZA
+            if (max_real > codigo) {
+                codigo = max_real;
             }
             var contador = 1;
             let ocurrioError = false;

@@ -53,8 +53,8 @@
     </div>
     <div class="d-flex flex-wrap justify-content-evenly" id="contenedorBotones">
         <div class="bd-highlight d-flex align-items-center">
-            <form method="post">
-                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
+            <form method="post"> 
+                <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
                     accept="image/png, image/jpeg">
                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
                     Subir justificación

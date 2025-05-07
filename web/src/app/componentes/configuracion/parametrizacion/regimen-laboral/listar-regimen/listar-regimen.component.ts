@@ -661,8 +661,8 @@ export class ListarRegimenComponent implements OnInit {
       { name: "DÍAS LIBRES" },
       { name: "DÍAS CALENDARIO" },
       { name: "ACUMULA VACACIONES" },
-      { name: "MÁXIMOM DÍAS ACUMULABLES" },
-      { name: "VACASIONES POR PERÍODOS" },
+      { name: "MÁXIMO DÍAS ACUMULABLES" },
+      { name: "VACACIONES POR PERÍODOS" },
       { name: "DETALLE PERÍODOS" },
       { name: "VACACIONES HÁBILES MES" },
       { name: "VACACIONES CALENDARIO MES" },
@@ -670,7 +670,7 @@ export class ListarRegimenComponent implements OnInit {
       { name: "VACACIONES CALENDARIO DÍA" },
       { name: "TIPO ANTIGÜEDAD" },
       { name: "AÑOS ANTIGÜEDAD" },
-      { name: "DÍAS ANTIGÜEDAD" },
+      { name: "DÍAS ADICIONALES" },
       { name: "DETALLE RANGOS VARIABLE" },
     ];
 
@@ -728,82 +728,146 @@ export class ListarRegimenComponent implements OnInit {
   data: any = [];
   ExportToXML() {
     this.OrdenarDatos(this.regimen);
-    var objeto: any;
-    var arregloRegimen: any = [];
+    const arregloRegimen: any[] = [];
     this.regimen.forEach((obj: any) => {
-      objeto = {
+      const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
+      const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
+      let tipoAntiguedad = 'NO APLICA';
+      if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
+      if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';
+  
+      const objeto = {
         regimen_laboral: {
-          "$": { "id": obj.id },
+          $: { id: obj.id },
           descripcion: obj.descripcion,
           pais: obj.pais,
+          continuidad_laboral: obj.continuidad_laboral ? 'SI' : 'NO',
+          antiguedad_laboral: obj.antiguedad ? 'SI' : 'NO',
           meses_periodo: obj.mes_periodo,
           dias_mes: obj.dias_mes,
           trabajo_minimo_mes: obj.trabajo_minimo_mes,
           trabajo_minimo_hora: obj.trabajo_minimo_horas,
-          dias_anio_vacacion: obj.vacacion_dias_laboral,
+          dias_habiles: obj.vacacion_dias_laboral,
           dias_libres: obj.vacacion_dias_libre,
-          dias_calendario_vacacion: obj.vacacion_dias_calendario,
+          dias_calendario: obj.vacacion_dias_calendario,
+          acumula_vacaciones: obj.acumular ? 'SI' : 'NO',
           max_dias_acumulables: obj.dias_maximo_acumulacion,
+          vacaciones_por_periodos: obj.vacacion_divisible ? 'SI' : 'NO',
           dias_laborales_ganados_mes: obj.vacacion_dias_laboral_mes,
           dias_calendario_ganados_mes: obj.vacacion_dias_calendario_mes,
           dias_laborales_ganados_dia: obj.laboral_dias,
           dias_calendario_ganados_dia: obj.calendario_dias,
+          tipo_antiguedad: tipoAntiguedad,
           anios_antiguedad: obj.anio_antiguedad,
-          dia_incr_antiguedad: obj.dias_antiguedad,
+          dias_adicionales: obj.dias_antiguedad,
+          detalle_vacaciones_periodos: obj.vacacion_divisible
+            ? (periodos.length > 0
+                ? { periodo: periodos.map(p => ({ descripcion: p.descripcion, dias: p.dias_vacacion })) }
+                : 'NO DEFINIDO')
+            : 'NO APLICA',
+          detalle_rangos_antiguedad_variable: obj.antiguedad_variable
+            ? (rangos.length > 0
+                ? { rango: rangos.map(r => ({ desde: r.anio_desde, hasta: r.anio_hasta, dias: r.dias_antiguedad })) }
+                : 'NO DEFINIDO')
+            : 'NO APLICA',
         },
       };
       arregloRegimen.push(objeto);
     });
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Regimen_laboral' });
-    const xml = xmlBuilder.buildObject(arregloRegimen);
-
-    if (xml === undefined) {
-      return;
-    }
-
+  
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Regimen_laboral_listado', xmldec: { version: '1.0', encoding: 'UTF-8' } });
+    const xml = xmlBuilder.buildObject({ regimen: arregloRegimen });
+    if (!xml) return;
+  
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
-
-    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
-      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+      newTab.opener = null;
+      newTab.focus();
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Regimen_laboral.xml';
-    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
     this.ObtenerRegimen();
-  }
+  }  
 
   /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
    ** ************************************************************************************************** **/
   ExportToCSV() {
-  
     this.OrdenarDatos(this.regimen);
-  
-    const workbook = new ExcelJS.Workbook();
-  
-    const worksheet = workbook.addWorksheet('RegimenCSV');
-  
-    //  Agregar encabezados dinámicos basados en las claves del primer objeto
-    const keys = Object.keys(this.regimen[0] || {}); // Obtener las claves
-    worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
-  
-    // Llenar las filas con los datos
+
+    const datos: any[] = [];
+    let n: number = 1;
+
     this.regimen.forEach((obj: any) => {
-      worksheet.addRow(obj);
+      const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
+      const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
+
+      const textoPeriodos = obj.vacacion_divisible
+        ? (periodos.length > 0
+            ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
+            : 'NO DEFINIDO')
+        : 'NO APLICA';
+
+      const textoRangos = obj.antiguedad_variable
+        ? (rangos.length > 0
+            ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
+            : 'NO DEFINIDO')
+        : 'NO APLICA';
+
+      let tipoAntiguedad = 'NO APLICA';
+      if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
+      if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';
+
+      datos.push({
+        ITEM: n++,
+        CÓDIGO: obj.id,
+        RÉGIMEN: obj.descripcion,
+        PAÍS: obj.pais,
+        'CONTINUIDAD LABORAL': obj.continuidad_laboral ? 'SI' : 'NO',
+        'ANTIGÜEDAD LABORAL': obj.antiguedad ? 'SI' : 'NO',
+        'PERIODO LABORAL': obj.mes_periodo,
+        'DÍAS POR MES': obj.dias_mes,
+        'TRABAJO MÍNIMO (MES)': obj.trabajo_minimo_mes,
+        'TRABAJO MÍNIMO (HORAS)': obj.trabajo_minimo_horas,
+        'DÍAS HÁBILES': obj.vacacion_dias_laboral,
+        'DÍAS LIBRES': obj.vacacion_dias_libre,
+        'DÍAS CALENDARIO': obj.vacacion_dias_calendario,
+        'ACUMULA VACACIONES': obj.acumular ? 'SI' : 'NO',
+        'MÁXIMO DÍAS ACUMULABLES': obj.dias_maximo_acumulacion,
+        'VACACIONES POR PERÍODOS': obj.vacacion_divisible ? 'SI' : 'NO',
+        'DETALLE PERÍODOS': textoPeriodos,
+        'VACACIONES HÁBILES MES': obj.vacacion_dias_laboral_mes,
+        'VACACIONES CALENDARIO MES': obj.vacacion_dias_calendario_mes,
+        'VACACIONES HÁBILES DÍA': obj.laboral_dias,
+        'VACACIONES CALENDARIO DÍA': obj.calendario_dias,
+        'TIPO ANTIGÜEDAD': tipoAntiguedad,
+        'AÑOS ANTIGÜEDAD': obj.anio_antiguedad,
+        'DÍAS ADICIONALES': obj.dias_antiguedad,
+        'DETALLE RANGOS VARIABLE': textoRangos,
+      });
     });
-  
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('RegimenCSV');
+    worksheet.columns = Object.keys(datos[0]).map((key) => ({
+      header: key,
+      key: key,
+      width: 30,
+    }));
+
+    datos.forEach((fila) => {
+      worksheet.addRow(fila);
+    });
+
     workbook.csv.writeBuffer().then((buffer) => {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
-      FileSaver.saveAs(data, "RegimenCSV.csv");
+      FileSaver.saveAs(data, 'RegimenCSV.csv');
     });
 
     this.ObtenerRegimen();

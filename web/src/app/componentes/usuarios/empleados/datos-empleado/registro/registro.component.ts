@@ -76,7 +76,7 @@ export class RegistroComponent implements OnInit {
     });
 
     this.CargarRoles();
-    this.VerificarCodigo();
+    this.SincronizarYVerificarCodigo();
     this.AsignarFormulario();
     this.ObtenerNacionalidades();
     this.ObtenerEstadoCivil()
@@ -166,6 +166,7 @@ export class RegistroComponent implements OnInit {
         this.escritura = false;
 
       }
+      console.log("CODIGO PARA NUEVO USUARIO", this.datosCodigo)
 
     }, error => {
       this.toastr.info('Configurar ingreso de código de usuarios.', '', {
@@ -174,6 +175,49 @@ export class RegistroComponent implements OnInit {
       this.router.navigate(['/codigo/']);
     });
   }
+
+  //VERIFICA EL VALOR MAS ALTO CUANDO ESTA EN AUTOMATICO EL CODIGO EN TABLA e_codigo PARA EVITAR ERRORES DE CRUCE DE CODIGO
+  SincronizarYVerificarCodigo() {
+    this.rest.ObtenerCodigo().subscribe(config => {
+      this.datosCodigo = config[0];
+      if (this.datosCodigo.automatico === true) {
+        this.rest.ObtenerCodigoMAX().subscribe(max => {
+          const maximo = parseInt(max[0].codigo) || 0;
+          const actualValor = parseInt(this.datosCodigo.valor) || 0;
+          if (maximo > actualValor) {
+            const dataCodigo = {
+              id: 1,
+              valor: maximo,
+              manual: this.datosCodigo.manual,
+              automatico: this.datosCodigo.automatico,
+              identificacion: this.datosCodigo.cedula,
+              user_name: this.user_name,
+              ip: this.ip,
+              ip_local: this.ips_locales,
+            };
+            this.rest.ActualizarCodigoTotal(dataCodigo).subscribe(() => {
+              this.VerificarCodigo();
+            }, error => {
+              this.toastr.info('No se pudo actualizar el código automáticamente.', '', { timeOut: 6000 });
+              this.VerificarCodigo();
+            });
+          } else {
+            this.VerificarCodigo();
+          }
+        }, error => {
+          this.toastr.info('No se pudo obtener el código máximo.', '', { timeOut: 6000 });
+          this.VerificarCodigo();
+        });
+      } else {
+        this.VerificarCodigo(); 
+      }
+    }, error => {
+      this.toastr.info('Configurar ingreso de código de usuarios.', '', {
+        timeOut: 6000,
+      });
+      this.router.navigate(['/codigo/']);
+    });
+  }  
 
   // METODO PARA REGISTRAR EMPLEADO
   InsertarEmpleado(form1: any, form2: any, form3: any) {

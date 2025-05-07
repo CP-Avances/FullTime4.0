@@ -85,6 +85,21 @@ export class EditarEmpleadoComponent implements OnInit {
     this.ObtenerGeneros();
     this.VerificarCodigo();
     this.CargarEstadoValidacionCedula();
+
+    //VALIDACION DE CEDULA AL ABRIR LA EDICION Y SI EL PARAMETRO ESTA ACTIVADO
+    setTimeout(() => {
+      const tipo = this.primeroFormGroup.get('tipoIdentificacionForm')?.value;
+      const valor = this.primeroFormGroup.get('cedulaForm')?.value;
+  
+      if (tipo === 'Cedula' && valor) {
+        this.ValidarCedula({ cedulaForm: valor });
+  
+        const input = document.querySelector('input[formcontrolname="cedulaForm"]') as HTMLInputElement;
+        if (input) {
+          input.dispatchEvent(new Event('input'));
+        }
+      }
+    }, 600);
   }
 
   // METODO PARA FILTRAR DATOS DE NACIONALIDAD
@@ -457,14 +472,17 @@ export class EditarEmpleadoComponent implements OnInit {
   //METODO QUE DETECTA EL CAMBIO EN TIPO DE IDENTIFICACION DE CEDULA A PASAPORTE
   CambiarIdentificacion(ob: MatRadioChange) {
     this.identificacion = ob.value;
-    const valor = this.primeroFormGroup.get('cedulaForm')?.value;
-  
     if (this.identificacion === 'Cedula') {
-      this.ValidarCedula({ cedulaForm: valor }); 
+      setTimeout(() => {
+        const input = document.querySelector('input[formcontrolname="cedulaForm"]') as HTMLInputElement;
+        if (input) {
+          input.dispatchEvent(new Event('input'));
+        }
+      });
     } else {
       this.cedulaValida = true;
       this.pasaporteValida = true;
-      this.primeroFormGroup.get('cedulaForm')?.setErrors(null); 
+      this.primeroFormGroup.get('cedulaForm')?.setErrors(null);
     }
   }
 

@@ -47,8 +47,13 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
   }
 
   InsertarGrupo(form: any) {
+    //FORMATEA EL NOMBRE DEL GRUPO OCUPACIONAL PARA QUE SE REGISTRE CON LA PRIMERA LETRA EN MAYUSCULA
+    const formatearTexto = (texto: string) => {
+      texto = texto.trim().toLowerCase();
+      return texto.charAt(0).toUpperCase() + texto.slice(1);
+    };
     let dataGrupo = {
-      grupo: form.grupoForm,
+      grupo: formatearTexto(form.grupoForm),
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales
