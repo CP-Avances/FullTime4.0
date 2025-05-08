@@ -306,7 +306,7 @@ export class ListaEmpleadosComponent implements OnInit {
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })
-    } else if (opcion === 2 || opcion === 3) {
+    } else if (opcion === 2) {
       EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
@@ -339,10 +339,6 @@ export class ListaEmpleadosComponent implements OnInit {
             // ACTIVAR EMPLEADOS
             else if (opcion === 2) {
               res = await this.rest.ActivarVariosUsuarios(datos);
-            }
-            // REACTIVAR EMPLEADOS
-            else if (opcion === 3) {
-              res = await this.rest.ReActivarVariosUsuarios(datos);
             }
             this.toastr.success(res.message, '', {
               timeOut: 6000,
