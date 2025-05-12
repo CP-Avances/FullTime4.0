@@ -48,6 +48,8 @@ export class RegistrarTimbreComponent implements OnInit {
     return this.trigger.asObservable();
   }
 
+  get permisos(): boolean { return this.funciones.permisos; }
+
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
 

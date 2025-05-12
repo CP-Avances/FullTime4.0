@@ -9,6 +9,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 
 @Component({
   selector: 'app-crear-timbre',
@@ -55,9 +56,13 @@ export class CrearTimbreComponent implements OnInit {
     { value: 'F/P', name: 'Fin permiso' },
   ]
 
+  funciones: any = [];
+
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+
+  get permisos(): boolean { return this.funciones.permisos; }
 
   // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
@@ -76,6 +81,7 @@ export class CrearTimbreComponent implements OnInit {
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
     private restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public validar: ValidacionesService,
+     public restF: FuncionesService,
     @Inject(MAT_DIALOG_DATA) public data: any, // MANEJO DE DATOS ENTRE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -83,16 +89,23 @@ export class CrearTimbreComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     if (this.data.length === undefined) {
       this.nombre = this.data.name_empleado;
     }
     this.VerDatosEmpleado(this.idEmpleadoLogueado);
     this.BuscarParametros();
+
+    if (!this.permisos) {
+      this.accion = this.accion.filter((accion: any) => {
+        return accion.value !== 'I/P' && accion.value !== 'F/P';
+      }
+      );
+    }
   }
 
   // METODO PARA BUSCAR DATOS DE PARAMETROS
@@ -120,6 +133,17 @@ export class CrearTimbreComponent implements OnInit {
     this.empleadoUno = [];
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleadoUno = data;
+    })
+  }
+
+  // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA
+  VerificarFunciones() {
+    let funcionesSistema = {
+      "direccion": (localStorage.getItem('empresaURL') as string)
+    }
+
+    this.restF.ListarFunciones(funcionesSistema).subscribe(res => {
+      this.funciones = res;
     })
   }
 
@@ -177,13 +201,13 @@ export class CrearTimbreComponent implements OnInit {
 
       timbre.id_empleado = ids_empleados;
       this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
-    
+
           this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.data.length + ' timbres exitosamente.', {
             timeOut: 6000,
           })
       })
 
-  
+
     }
   }
 
