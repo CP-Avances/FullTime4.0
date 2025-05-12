@@ -150,7 +150,6 @@ export class RegistroComponent implements OnInit {
         this.escritura = true;
       }
       else if (this.datosCodigo.cedula === true) {
-        console.log("this.identificacion", this.identificacion)
         if(this.identificacion == 'Pasaporte')
         {
           this.escritura = false;
@@ -166,7 +165,6 @@ export class RegistroComponent implements OnInit {
         this.escritura = false;
 
       }
-      console.log("CODIGO PARA NUEVO USUARIO", this.datosCodigo)
 
     }, error => {
       this.toastr.info('Configurar ingreso de código de usuarios.', '', {

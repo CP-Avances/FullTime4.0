@@ -152,7 +152,6 @@ export class EditarEmpleadoComponent implements OnInit {
     this.rest.BuscarNacionalidades().subscribe(res => {
       this.nacionalidades = res;
       this.ObtenerEmpleado();
-      console.log(this.nacionalidades)
       this.filteredOptions = this.NacionalidadControl.valueChanges.pipe(
         startWith(''),
         map((value: any) => this._filter(value))
@@ -252,41 +251,17 @@ export class EditarEmpleadoComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR REGISTRO DE EMPLEADO
   ActualizarEmpleado(form1: any, form2: any, form3: any) {
-    // BUSCA EL ID DE LA NACIONALIDAD ELEGIDA EN EL AUTOCOMPLETADO
     this.nacionalidades.forEach((obj: any) => {
       if (form2.nacionalidadForm == obj.nombre) {
-        console.log(obj);
         this.idNacionalidad = obj.id;
       }
     });
-    // REALIZAR UN CAPITAL LETTER A LOS NOMBRES
-    var NombreCapitalizado: any;
-    let nombres = form1.nombreForm.split(' ');
-    if (nombres.length > 1) {
-      let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-      let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-      NombreCapitalizado = name1 + ' ' + name2;
-    }
-    else {
-      let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-      var NombreCapitalizado = name1
-    }
 
-    // REALIZAR UN CAPITAL LETTER A LOS APELLIDOS
-    var ApellidoCapitalizado: any;
-    let apellidos = form1.apellidoForm.split(' ');
-    if (apellidos.length > 1) {
-      let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-      let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-      ApellidoCapitalizado = lastname1 + ' ' + lastname2;
-    }
-    else {
-      let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-      ApellidoCapitalizado = lastname1
-    }
+    const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    const NombreCapitalizado = form1.nombreForm.split(' ').map(capitalizar).join(' ');
+    const ApellidoCapitalizado = form1.apellidoForm.split(' ').map(capitalizar).join(' ');
 
-    // CAPTURA DE DATOS DE FORMULARIO
-    let empleado = {
+    const empleado = {
       id_nacionalidad: this.idNacionalidad,
       fec_nacimiento: form1.fechaForm,
       esta_civil: form2.estadoCivilForm,
@@ -302,62 +277,54 @@ export class EditarEmpleadoComponent implements OnInit {
       user_name: this.user_name,
       numero_partida_individual: form3.partidaForm === '' ? null : form3.partidaForm,
       tipo_identificacion: form1.tipoIdentificacionForm === 'Cedula' ? 1 : 2,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
 
-    // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOLA VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
-    if (this.contador === 0) {
-      this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe(
-        (response: any) => {
-          if (response.message === 'Registro actualizado.') {
-            this.ActualizarUser(form3, form1, form2);
-            this.Cancelar(2);
-          }
-        },
-        error => {
-          this.toastr.error(error.error.message, 'Upss!!! algo salió mal.', {
-            timeOut: 6000,
-          });
-          this.Cancelar(2);
+    this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe({
+      next: (response: any) => {
+        if (response.message === 'Registro actualizado.') {
+          this.ActualizarUser(form3, form1, form2); 
         }
-      );
-    }
-    else {
-      this.ActualizarUser(form3, form1, form2);
-      this.Cancelar(2);
-    }
+      },
+      error: () => {
+        this.toastr.error('Identificación o código ya se encuentran registrados.', 'Upss!!! algo salió mal.', {
+          timeOut: 6000,
+        });
+      }
+    });
   }
 
   // METODO PARA ACTUALIZAR INFORMACION DE USUARIO
   contador: number = 0;
   ActualizarUser(form3: any, form1: any, form2: any) {
-    let estado_user: boolean = false;
-    if (form2.estadoForm === 1) {
-      estado_user = true;
-    }
-    this.contador = 0;
-    let dataUser = {
+    const estado_user: boolean = form2.estadoForm === 1;
+    const dataUser = {
       id_empleado: this.idEmpleado,
       usuario: form3.userForm,
       id_rol: form3.rolForm,
       estado: estado_user,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    this.user.ActualizarDatos(dataUser).subscribe(data => {
-      if (data.message === 'error') {
-        this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Upss!!! algo salio mal.', {
+      ip: this.ip,
+      ip_local: this.ips_locales,
+    };
+
+    this.user.ActualizarDatos(dataUser).subscribe({
+      next: (data) => {
+        if (data.message === 'error') {
+          this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Upss!!! algo salió mal.', {
+            timeOut: 6000,
+          });
+        } else {
+          this.toastr.success('Operación exitosa.', 'Registro actualizado.', { timeOut: 6000 });
+          this.ActualizarCodigo(form1.codigoForm);
+          this.Cancelar(2);
+        }
+      },
+      error: () => {
+        this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Upss!!! algo salió mal.', {
           timeOut: 6000,
         });
-        this.contador = 1;
-      }
-      else {
-        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-          timeOut: 6000,
-        });
-        this.ActualizarCodigo(form1.codigoForm);
-        this.Navegar(form3, estado_user);
-        this.contador = 0;
       }
     });
   }
@@ -495,40 +462,44 @@ export class EditarEmpleadoComponent implements OnInit {
       return;
     }
     const inputElement = cedula.cedulaForm;
-    const cad: string = inputElement;
+    const cad: string = inputElement.trim();
     let total: number = 0;
     const longitud: number = cad.length;
     const longcheck: number = longitud - 1;
-  
-    if (longitud < 10) {
+
+    if (!/^\d+$/.test(cad)) {
       this.cedulaValida = false;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors({ notNumeric: true });
       this.cdRef.detectChanges();
-      this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
       return;
     }
-  
-    if (cad !== "" && longitud === 10) {
-      for (let i = 0; i < longcheck; i++) {
-        let num = parseInt(cad.charAt(i), 10);
-        if (isNaN(num)) return;
-  
-        if (i % 2 === 0) {
-          num *= 2;
-          if (num > 9) num -= 9;
-        }
-        total += num;
+
+    if (longitud !== 10) {
+      this.cedulaValida = false;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
+      this.cdRef.detectChanges();
+      return;
+    }
+    for (let i = 0; i < longcheck; i++) {
+      let num = parseInt(cad.charAt(i), 10);
+
+      if (i % 2 === 0) {
+        num *= 2;
+        if (num > 9) num -= 9;
       }
-  
-      total = total % 10 ? 10 - (total % 10) : 0;
-  
-      if (parseInt(cad.charAt(longcheck), 10) === total) {
-        this.cedulaValida = true;
-        this.primeroFormGroup.controls['cedulaForm'].setErrors(null); 
-      } else {
-        this.cedulaValida = false;
-        this.cdRef.detectChanges();
-        this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
-      }
+
+      total += num;
+    }
+
+    total = total % 10 ? 10 - (total % 10) : 0;
+
+    if (parseInt(cad.charAt(longcheck), 10) === total) {
+      this.cedulaValida = true;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors(null);
+    } else {
+      this.cedulaValida = false;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
+      this.cdRef.detectChanges();
     }
   }
   
