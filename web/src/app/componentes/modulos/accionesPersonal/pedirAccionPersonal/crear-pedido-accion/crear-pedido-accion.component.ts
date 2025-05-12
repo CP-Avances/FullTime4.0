@@ -16,6 +16,12 @@ import { ProcesoService } from "src/app/servicios/modulos/modulo-acciones-person
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciudad/ciudad.service";
+import { SucursalService } from "src/app/servicios/configuracion/localizacion/sucursales/sucursal.service";
+import { DepartamentosService } from "src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service";
+import { CatGrupoOcupacionalService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service";
+import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service";
+import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
+import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 
 @Component({
   selector: "app-crear-pedido-accion",
@@ -33,8 +39,25 @@ export class CrearPedidoAccionComponent implements OnInit {
   filtroNombreR: Observable<any[]>;
   filtroNombre: Observable<any[]>;
 
+  // FILTRO DE TIPO DE ACCION
+  filtroTipoAccion: Observable<any[]>
+  // FILTRO DE TIPO DE ACCION
+  filtroSucursal: Observable<any[]>
+  filtroSucursalPropuesta: Observable<any[]>
+  // FILTRO DE TIPO DE ACCION
+  filtroDepartamentos: Observable<any[]>
+  filtroDepartamentosProuesta: Observable<any[]>
+  filtroDeparAdministrativaProuesta: Observable<any[]>
   //FILTRO CIUDAD
   filtroCiudad: Observable<any[]>;
+  //FILTRO PROCESO
+  filtroProceso: Observable<any[]>;
+  //FILTRO GRUPO OCUPACIONAL
+  filtroGrupoOcupacional: Observable<any[]>;
+  //FILTRO GRADO
+  filtroGrado: Observable<any[]>;
+  //FILTRO CARGOS
+  filtroCargos: Observable<any[]>;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -54,19 +77,29 @@ export class CrearPedidoAccionComponent implements OnInit {
     Validators.required,
     Validators.minLength(3),
   ]);
+  
   otroDecretoF = new FormControl("", [Validators.minLength(3)]);
   otroCargoF = new FormControl("", [Validators.minLength(3)]);
   fechaDesdeF = new FormControl("", [Validators.required]);
   numPartidaF = new FormControl("", [Validators.required]);
-  baseF = new FormControl("", [Validators.minLength(6)]);
-  accionF = new FormControl("", [Validators.required]);
+  baseLegalForm = new FormControl("", [Validators.minLength(6)]);
+  accionForm = new FormControl("");
   fechaF = new FormControl("", [Validators.required]);
   notificacionesPosesiones = new FormControl("");
   funcionesReemp = new FormControl("");
+  fechaRigeDesde = new FormControl("", [Validators.required]);
+  fechaRigeHasta = new FormControl("", [Validators.required]);
+  otroAccionF = new FormControl("");
+  idTipoAccion = new FormControl("");
+  otroEspecificacion = new FormControl("");
   numPropuestaF = new FormControl("");
   descripcionP = new FormControl("");
   tipoProcesoF = new FormControl("");
-  tipoDecretoF = new FormControl("");
+  DepartamentoForm = new FormControl("");
+  DepartamentoPropuestoForm = new FormControl("");
+  grupoOcupacionalF = new FormControl("");
+  gradoF = new FormControl("");
+  funcionarioF = new FormControl("");
   idEmpleadoHF = new FormControl("");
   idEmpleadoGF = new FormControl("");
   idEmpleadoRF = new FormControl("");
@@ -75,15 +108,23 @@ export class CrearPedidoAccionComponent implements OnInit {
   accionReemp = new FormControl("");
   fechaHastaF = new FormControl("");
   idEmpleadoF = new FormControl("");
+  idEmpleadoRNF = new FormControl("");
+  idDepaActual = new FormControl("");
   numPartidaI = new FormControl("");
   fechaReemp = new FormControl("");
   fechaActaF = new FormControl("");
   tipoCargoF = new FormControl("");
+  idSucursal = new FormControl("");
+  idSucursalPropues = new FormControl("");
+  idDepa = new FormControl("");
+  idDepaPropues = new FormControl("");
+  idDepaAdminPropuesta = new FormControl("");
   idCiudad = new FormControl("");
   sueldoF = new FormControl("");
   abrevHF = new FormControl("");
   abrevGF = new FormControl("");
   actaF = new FormControl("");
+  declaracionJuradaF = new FormControl(null);
 
   // ASIGNAR LOS CAMPOS DE LOS FORMULARIOS EN GRUPOS
   isLinear = true;
@@ -91,34 +132,43 @@ export class CrearPedidoAccionComponent implements OnInit {
   public firstFormGroup = new FormGroup({
     identificacionForm: this.identificacionF,
     fechaForm: this.fechaF,
-    tipoDecretoForm: this.tipoDecretoF,
-    otroDecretoForm: this.otroDecretoF,
-    baseForm: this.baseF,
-    accionForm: this.accionF,
+    funcionarioForm: this.funcionarioF,
+    fechaRigeDeseForm: this.fechaRigeDesde,
+    fechaRigeHastaForm: this.fechaRigeHasta,
   });
   public secondFormGroup = new FormGroup({
-    idEmpleadoForm: this.idEmpleadoF,
-    fechaDesdeForm: this.fechaDesdeF,
-    fechaHastaForm: this.fechaHastaF,
-    numPartidaForm: this.numPartidaF,
-    tipoProcesoForm: this.tipoProcesoF,
-    idCiudad: this.idCiudad,
-    tipoCargoForm: this.tipoCargoF,
-    otroCargoForm: this.otroCargoF,
-    sueldoForm: this.sueldoF,
-    numPropuestaForm: this.numPropuestaF,
-    numPartidaIForm: this.numPartidaI,
+    idTipoAccionFom: this.idTipoAccion,
+    otroAccionForm: this.otroAccionF,
+    otroEspecificacion: this.otroEspecificacion,
+    declaracionJuradaForm: this.declaracionJuradaF,
+    baseLegalForm: this.baseLegalForm
   });
   public thirdFormGroup = new FormGroup({
+    numPartidaIForm: this.numPartidaI,
+    numPropuestaForm: this.numPropuestaF,
+    tipoProcesoForm: this.tipoProcesoF,
+    DepartamentoForm: this.DepartamentoForm,
+    DepartamentoPropuestoForm: this.DepartamentoPropuestoForm,
+    idCiudad: this.idCiudad,
+    tipoCargoForm: this.tipoCargoF,
+    grupoOcupacionalForm: this.grupoOcupacionalF,
+    gradoForm: this.gradoF,
+    sueldoForm: this.sueldoF,
     actaForm: this.actaF,
+  });
+  public fourthFormGroup = new FormGroup({
+
+    idEmpleadoRForm: this.idEmpleadoRF,
+    idEmpleadoRNForm: this.idEmpleadoRNF,
+
     fechaActaForm: this.fechaActaF,
     idEmpleadoHForm: this.idEmpleadoHF,
     idEmpleadoGForm: this.idEmpleadoGF,
-    idEmpleadoRForm: this.idEmpleadoRF,
+    
+    otroCargoForm: this.otroCargoF,
     abrevHForm: this.abrevHF,
     abrevGForm: this.abrevGF,
-  });
-  public fourthFormGroup = new FormGroup({
+
     funcionesReempForm: this.funcionesReemp,
     nombreReempForm: this.nombreReemp,
     puestoReempForm: this.puestoReemp,
@@ -136,8 +186,10 @@ export class CrearPedidoAccionComponent implements OnInit {
   idUsuariosAcceso: Set<any> = new Set();
 
   empleados: any = [];
+  sucursal: any = [];
   ciudades: any = [];
   departamento: any;
+  departamentos: any = [];
   FechaActual: any;
 
   get habilitarAccion(): boolean {
@@ -147,13 +199,18 @@ export class CrearPedidoAccionComponent implements OnInit {
   constructor(
     private asignaciones: AsignacionesService,
     public restProcesos: ProcesoService,
+    public restGrupo: CatGrupoOcupacionalService,
+    public restGrado: CatGradoService,
     public restEmpresa: EmpresaService,
     public restAccion: AccionPersonalService,
     private funciones: MainNavService,
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restE: EmpleadoService,
+    public restSu: SucursalService,
+    public restDe: DepartamentosService,
     public restC: CiudadService,
+    public restCargo: CatTipoCargosService,
     public router: Router,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
@@ -189,8 +246,13 @@ export class CrearPedidoAccionComponent implements OnInit {
       // INVOCACION A LOS METODOS PARA CARGAR DATOS
       this.ObtenerTiposAccion();
       this.ObtenerEmpleados();
+      this.ObtenerSucursal();
+      this.ObtenerDepartamentos();
       this.ObtenerCiudades();
       this.ObtenerProcesos();
+      this.ObtenerGrupoOcupacional();
+      this.ObtenerGrados();
+      this.ObtenerCargos();
       this.MostrarDatos();
 }
   }
@@ -205,12 +267,72 @@ export class CrearPedidoAccionComponent implements OnInit {
     }
   }
 
+    // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarSucursal(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.sucursal.filter((info: any) =>
+        info.nombre.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
+     // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarDeparta(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.departamentos.filter((info: any) =>
+        info.nombre.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarCiudad(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
       return this.ciudades.filter((info: any) =>
         info.descripcion.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarProceso(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.procesos.filter((info: any) =>
+        info.nombre.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarGrupoOcupacional(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.grupoOcupacional.filter((info: any) =>
+        info.descripcion.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarGrado(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.grados.filter((info: any) =>
+        info.descripcion.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarCargo(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.cargos.filter((info: any) =>
+        info.cargo.toUpperCase().includes(filterValue)
       );
     }
   }
@@ -224,7 +346,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       .subscribe((data) => {
         this.empresa = data;
         this.secondFormGroup.patchValue({
-          numPartidaForm: this.empresa[0].numero_partida,
+          //numPartidaForm: this.empresa[0].numero_partida,
         });
       });
   }
@@ -235,6 +357,52 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.procesos = [];
     this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
+        console.log('procesos: ',this.procesos);
+        this.filtroProceso = this.tipoProcesoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarProceso(value))
+      );
+
+    });
+  }
+  // BUSQUEDA DE DATOS DE LA TABLA GRUPO OCUPACIONAL
+  grupoOcupacional: any = [];
+  ObtenerGrupoOcupacional() {
+    this.grupoOcupacional = [];
+    this.restGrupo.ConsultarGrupoOcupacion().subscribe((datos) => {
+      this.grupoOcupacional = datos;
+        console.log('grupoOcupacional: ',this.grupoOcupacional);
+        this.filtroGrupoOcupacional = this.grupoOcupacionalF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarGrupoOcupacional(value))
+      );
+
+    });
+  }
+  // BUSQUEDA DE DATOS DE LA TABLA GRADO
+  grados: any = [];
+  ObtenerGrados() {
+    this.grados = [];
+    this.restGrado.ConsultarGrados().subscribe((datos) => {
+      this.grados = datos;
+        console.log('grados: ',this.grados);
+        this.filtroGrado = this.gradoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarGrado(value))
+      );
+    });
+  }
+      // BUSQUEDA DE DATOS DE LA TABLA GRADO
+  cargos: any = [];
+  ObtenerCargos() {
+    this.cargos = [];
+    this.restCargo.ListaCargos().subscribe((datos) => {
+      this.cargos = datos;
+        console.log('cargos: ',this.cargos);
+        this.filtroCargos = this.tipoCargoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarCargo(value))
+      );
     });
   }
 
@@ -242,7 +410,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   IngresarOtro(form1: any) {
     if (form1.tipoDecretoForm === undefined) {
       this.firstFormGroup.patchValue({
-        otroDecretoForm: "",
+        //otroDecretoForm: "",
       });
       this.ingresoAcuerdo = true;
       this.toastr.info("Ingresar nombre de un nuevo tipo de proceso", "", {
@@ -255,7 +423,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   // METODO PARA VER LISTA DE DECRETOS
   VerDecretos() {
     this.firstFormGroup.patchValue({
-      otroDecretoForm: "",
+      //otroDecretoForm: "",
     });
     this.ingresoAcuerdo = false;
     this.vistaAcuerdo = true;
@@ -267,20 +435,30 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
+      console.log('tipos_accion',this.tipos_accion)
+      this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarTipoAccion(value))
+      );
+
     });
   }
 
-  // LISTA DE POSESIONES Y NOTIFICACIONES
-  posesiones_notificaciones: any = [
-    { nombre: "POSESIÓN DEL CARGO" },
-    { nombre: "NOTIFICACIÓN" },
-  ];
+    // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+    private _filtrarTipoAccion(value: string): any {
+      if (value != null) {
+        const filterValue = value.toUpperCase();
+        return this.tipos_accion.filter((info: any) =>
+          info.nombre.toUpperCase().includes(filterValue)
+        );
+      }
+    }
 
   // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO DE CARGO PROPUESTO
   IngresarCargo(form2: any) {
     if (form2.tipoCargoForm === undefined) {
       this.secondFormGroup.patchValue({
-        otroCargoForm: "",
+        //otroCargoForm: "",
       });
       this.ingresoCargo = true;
       this.toastr.info(
@@ -294,10 +472,21 @@ export class CrearPedidoAccionComponent implements OnInit {
     }
   }
 
+  onTipoAccionSeleccionado(e:MatAutocompleteSelectedEvent){
+    console.log('e: ',e.option.value);
+    if(e.option.value != undefined && e.option.value != null){
+      this.tipos_accion.forEach(item => {
+        if(item.nombre == e.option.value){
+          this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
+        }
+      });
+    }
+  }
+
   // METODO PARA VER LISTA DE CARGOS PROPUESTO
   VerCargos() {
     this.secondFormGroup.patchValue({
-      otroCargoForm: "",
+      //otroCargoForm: "",
     });
     this.ingresoCargo = false;
     this.vistaCargo = true;
@@ -308,6 +497,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
+
+      console.log('lista de empleado: ',this.empleados)
 
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
 
@@ -336,6 +527,50 @@ export class CrearPedidoAccionComponent implements OnInit {
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
     return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+  }
+
+    // METODO PARA OBTENER LISTA DE CIUDADES
+  ObtenerSucursal() {
+    this.sucursal = [];
+    this.restSu.BuscarSucursal().subscribe((data) => {
+      this.sucursal = data;
+      console.log('sucursales: ',this.sucursal)
+      
+      this.filtroSucursal = this.idSucursal.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarSucursal(value))
+      );
+
+      this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarSucursal(value))
+      );
+    });
+  }
+
+      // METODO PARA OBTENER LISTA DE CIUDADES
+  ObtenerDepartamentos() {
+    this.departamentos = [];
+    this.restDe.ConsultarDepartamentos().subscribe((data) => {
+      this.departamentos = data;
+      console.log('departamentos: ',this.departamentos)
+      
+      this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarDeparta(value))
+      );
+
+      this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarDeparta(value))
+      );
+
+      this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarDeparta(value))
+      );
+
+    });
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES
@@ -434,7 +669,7 @@ export class CrearPedidoAccionComponent implements OnInit {
               firma_empl_uno: idEmpl_firmaH,
               abrev_empl_dos: form3.abrevGForm,
               firma_empl_dos: idEmpl_firmaG,
-              adicion_legal: form1.baseForm,
+              adicion_legal: form2.baseLegalForm,
               tipo_accion: form1.accionForm,
               cargo_propuesto: form2.tipoCargoForm,
               proceso_propuesto: form2.tipoProcesoForm,

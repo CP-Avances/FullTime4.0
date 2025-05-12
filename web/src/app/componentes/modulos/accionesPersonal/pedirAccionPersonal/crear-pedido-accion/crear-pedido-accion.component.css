@@ -86,3 +86,21 @@ mat-form-field {
     font-size: small;
     font-weight: 900;
 }
+
+.declaracion-radio-group {
+    margin: 1rem 0;
+  }
+  
+  .declaracion-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 16px;
+  }
+  
+  .radio-options {
+    align-items: center;
+  }
+  
+  mat-radio-button {
+    font-size: 15px;
+  }
