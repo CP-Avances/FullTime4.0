@@ -16,6 +16,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 
 import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -48,7 +49,7 @@ export class RegistrarTimbreComponent implements OnInit {
     return this.trigger.asObservable();
   }
 
-  get permisos(): boolean { return this.funciones.permisos; }
+  get permisos(): boolean { return this.funcionesMain.permisos; }
 
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
@@ -96,6 +97,7 @@ export class RegistrarTimbreComponent implements OnInit {
     public restF: FuncionesService,
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
     public validar: ValidacionesService,
+    private funcionesMain: MainNavService,
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }

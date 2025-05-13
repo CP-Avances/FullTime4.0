@@ -10,6 +10,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-crear-timbre',
@@ -62,7 +63,7 @@ export class CrearTimbreComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  get permisos(): boolean { return this.funciones.permisos; }
+  get permisos(): boolean { return this.funcionesMain.permisos; }
 
   // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
@@ -81,7 +82,9 @@ export class CrearTimbreComponent implements OnInit {
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
     private restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public validar: ValidacionesService,
-     public restF: FuncionesService,
+    public restF: FuncionesService,
+    private funcionesMain: MainNavService,
+
     @Inject(MAT_DIALOG_DATA) public data: any, // MANEJO DE DATOS ENTRE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
