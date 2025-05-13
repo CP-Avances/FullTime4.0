@@ -18,6 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaCon
 const settingsMail_1 = require("../../libs/settingsMail");
 const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../../database"));
+const server_1 = require("../../server");
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     EliminarMultiplesAvisos(req, res) {
@@ -603,6 +604,25 @@ class TimbresControlador {
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
+        });
+    }
+    emitirAvisoPrueba(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('emitir aviso prueba');
+            console.log('req ', req.body);
+            const data_llega = {
+                id: 123, // ID único del aviso
+                create_at: new Date().toISOString(), // Fecha actual en formato ISO
+                id_send_empl: 1, // ID del empleado que envía
+                id_receives_empl: 88, // ID del empleado que recibe (ajústalo)
+                visto: false, // Estado de visualización
+                descripcion: 'Aviso de prueba emitido manualmente', // Descripción del aviso
+                mensaje: 'Este es un mensaje de prueba para probar el emit', // Contenido del mensaje
+                tipo: 6, // Tipo del aviso
+                usuario: 'PLATAFORMA WEB' // Origen del aviso
+            };
+            server_1.io.emit('recibir_aviso', data_llega);
+            return res.status(200).jsonp({ message: 'Aviso emitido correctamente' });
         });
     }
     ObtenerAvisosTimbresEmpleado(req, res) {

@@ -4,10 +4,13 @@ import { DateTime, Duration } from 'luxon';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
+// Servicios
 import { LoginService } from '../../../servicios/login/login.service';
+import { SocketService } from 'src/app/servicios/socket/socket.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { UrlService } from 'src/app/servicios/url/url.service';
 
 @Component({
   selector: 'app-login',
@@ -52,6 +55,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private asignacionesService: AsignacionesService,
+    private socketService: SocketService,
+    private urlService: UrlService,
   ) {
     this.formulario.setValue({
       usuarioF: '',
@@ -103,13 +108,18 @@ export class LoginComponent implements OnInit {
     //VALIDACION DE EMPRESA PARA DIRECCIONAMIENTO
     this.rest.getEmpresa(empresas).subscribe(
       {
-        next: (v) => 
+        next: (v) =>
         {
           //GUARDAMOS IP O DEVOLVEMOS ERROR
           this.mensaje = v;
           if (this.mensaje.message === 'ok') {
             console.log("empresaURL: ", this.mensaje.empresas[0].empresa_direccion);
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
+            console.log('datos empresa: ', this.mensaje.empresas[0].movil_socket_direccion);
+
+            const nuevaUrlSocket = this.mensaje.empresas[0].movil_socket_direccion;
+            localStorage.setItem('socketURL', nuevaUrlSocket);
+            this.urlService.updateSocketUrl(nuevaUrlSocket);
           }
           else if (this.mensaje.message === 'vacio') {
             this.toastr.error('Verifique código empresarial', 'Error.', {
@@ -117,17 +127,17 @@ export class LoginComponent implements OnInit {
             });
           }
         },
-        error: (e) => 
+        error: (e) =>
         {
           //En caso de error, devolvemos error
           this.toastr.error('Verifique código empresarial', 'Error.', {
             timeOut: 3000,
           });
         },
-        complete: () => 
+        complete: () =>
         {
           //TRAS VALIDACION CORRECTA DE EMPRESA, CONTINUA EL PROCESO NORMAL DE LOGIN
-          console.log('CONTINUAR LOGIN');          
+          console.log('CONTINUAR LOGIN');
           //LOGIN
           var local: boolean;
           this.intentos = this.intentos + 1;
@@ -230,6 +240,8 @@ export class LoginComponent implements OnInit {
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
         });
+
+        // await this.socketService.connectSocket();
 
         if (!!localStorage.getItem("redireccionar")) {
           let redi = localStorage.getItem("redireccionar");

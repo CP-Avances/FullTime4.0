@@ -22,6 +22,9 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 
+
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+
 @Component({
   selector: 'app-main-nav',
   standalone: false,
@@ -221,6 +224,7 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
+    private restTimbres: TimbresService,
   ) { }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
@@ -323,6 +327,19 @@ export class MainNavComponent implements OnInit {
   // METODO DE NAVEGACION SEGUN ROL DE ACCESO
   irHome() {
     this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
+  }
+
+  enviarAvisoPrueba() {
+    const datos = {
+      id_empleado: this.id_empleado_logueado,
+      id_empresa: this.idEmpresa,
+      ip: localStorage.getItem('ip'),
+      ip_local: localStorage.getItem('ip_local'),
+      user_name: localStorage.getItem('user_name')
+    }
+    this.restTimbres.EnviarAvisoPrueba(datos).subscribe(res => {
+      console.log(res);
+    });
   }
 
   // CONTROL DE FUNCIONES DEL SISTEMA
@@ -571,7 +588,7 @@ export class MainNavComponent implements OnInit {
           complete: () => {
             //Control de vistas activas
             this.paginasMG.forEach((row: any) => {
-              console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
+              // console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
               switch (row.link) {
                 case 'vistaEmpresa':
                   this.itemConfiguracion = true;

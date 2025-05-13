@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { SocketService } from 'src/app/servicios/socket/socket.service';
+
 import { ChangeDetectorRef } from '@angular/core';
 const { DateTime } = require("luxon");
 
@@ -30,18 +31,38 @@ export class ButtonAvisosComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  socket: any;
+
   constructor(
     public loginService: LoginService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
-    private socket: Socket,
     private aviso: TimbresService,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {
-    /** ********************************************************************************** **
-     ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
-     ** ********************************************************************************** **/
+    private cdr: ChangeDetectorRef,
+    private socketService: SocketService,
+  ) {}
+
+  ngOnInit(): void {
+    this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
+    console.log("ver id_empleado_logueado: ", this.id_empleado_logueado)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+    this.BuscarParametro();
+    this.EscucharNotificaciones();
+  }
+
+  /** ********************************************************************************** **
+  ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
+  ** ********************************************************************************** **/
+  EscucharNotificaciones() {
+    this.socket = this.socketService.getSocket();
+    console.log("ver socket: ", this.socket);
+
+    if (!this.socket) return;
 
     // VERIFICAR QUE EL USUARIO TIENEN INICIO DE SESION
     if (this.loginService.loggedIn()) {
@@ -91,17 +112,6 @@ export class ButtonAvisosComponent implements OnInit {
         }
       });
     }
-  }
-
-  ngOnInit(): void {
-    this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
-    console.log("ver id_empleado_logueado: ", this.id_empleado_logueado)
-    this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
-    this.validar.ObtenerIPsLocales().then((ips) => {
-      this.ips_locales = ips;
-    });
-    this.BuscarParametro();
   }
 
   /** **************************************************************************************** **

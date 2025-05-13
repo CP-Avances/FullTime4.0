@@ -4,6 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
+//Servicios
+import { SocketService } from '../socket/socket.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +15,9 @@ export class LoginService {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    public router: Router) { }
+    public router: Router,
+    private socket: SocketService,
+  ) { }
 
 
   // VALIDACIONES DE INGRESO AL SISTEMA     **USADO
@@ -60,6 +65,7 @@ export class LoginService {
   logout() {
     localStorage.clear();
     sessionStorage.clear();
+    this.socket.disconnectSocket();
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
 
@@ -67,5 +73,5 @@ export class LoginService {
   getEmpresa(data: any){
     return this.http.post<any>(`${environment.url}/fulltime`, data);
   }
- 
+
 }
