@@ -141,7 +141,7 @@ const salidasAnticipadasDiarios = function () {
                 }
             }
         }
-        const PARAMETRO_HORA_INDIVIDUAL = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id_parametro = 42`);
+        const PARAMETRO_HORA_INDIVIDUAL = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id_parametro = 35`);
         if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
             if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
                 (0, exports.salidasAnticipadasIndividual)(fecha, fecha);

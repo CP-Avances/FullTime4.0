@@ -116,7 +116,7 @@ export const salidasAnticipadasDiarios = async function () {
     }
 
     const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
-        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 42`
+        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 35`
     );
     
     if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {

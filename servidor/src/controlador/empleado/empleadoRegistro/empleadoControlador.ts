@@ -731,117 +731,6 @@ class EmpleadoControlador {
     return res.jsonp({ message: 'Upss!!! ocurrio un error.' });
   }
 
-  // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO    **USADO VERIFICAR FUNCIONAMIENTO
-  public async ReactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const { arrayIdsEmpleados, user_name, ip, ip_local } = req.body;
-    if (arrayIdsEmpleados.length > 0) {
-      for (const obj of arrayIdsEmpleados) {
-        try {
-          // INICIAR TRANSACCION
-          await pool.query('BEGIN');
-
-          // CONSULTAR DATOS ORIGINALES
-          const empleado = await pool.query(
-            `
-            SELECT * FROM eu_empleados WHERE id = $1
-            `,
-            [obj]
-          );
-          const [datosOriginales] = empleado.rows;
-
-          const usuario = await pool.query(
-            `
-            SELECT * FROM eu_usuarios WHERE id_empleado = $1
-            `,
-            [obj]
-          );
-          const [datosOriginalesUsuario] = usuario.rows;
-
-          if (!datosOriginales || !datosOriginalesUsuario) {
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'eu_empleados',
-              usuario: user_name,
-              accion: 'U',
-              datosOriginales: '',
-              datosNuevos: '',
-              ip: ip,
-              ip_local: ip_local,
-              observacion: `Error al reactivar empleado con id: ${obj}`
-            });
-
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'eu_usuarios',
-              usuario: user_name,
-              accion: 'U',
-              datosOriginales: '',
-              datosNuevos: '',
-              ip: ip,
-              ip_local: ip_local,
-              observacion: `Error al reactivar usuario con id_empleado: ${obj}`
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            throw new Error('Error al reactivar empleado con id: ' + obj);
-          }
-
-          // 1 => ACTIVADO
-          await pool.query(
-            `
-            UPDATE eu_empleados SET estado = 1 WHERE id = $1
-            `,
-            [obj]
-          );
-
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'eu_empleados',
-            usuario: user_name,
-            accion: 'U',
-            datosOriginales: JSON.stringify(datosOriginales),
-            datosNuevos: `{estado: 1}`,
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
-
-          // TRUE => TIENE ACCESO
-          await pool.query(
-            `
-            UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-            `,
-            [obj]
-          );
-
-          // AUDITORIA
-          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'eu_usuarios',
-            usuario: user_name,
-            accion: 'U',
-            datosOriginales: JSON.stringify(datosOriginalesUsuario),
-            datosNuevos: `{estado: true, app_habilita: true}`,
-            ip: ip,
-            ip_local: ip_local,
-            observacion: null
-          });
-
-          // FINALIZAR TRANSACCION
-          await pool.query('COMMIT');
-
-          // REVISAR
-          //EstadoHorarioPeriVacacion(obj);
-
-        } catch (error) {
-          // REVERTIR TRANSACCION
-          await pool.query('ROLLBACK');
-        }
-      }
-
-      return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
-    }
-    return res.jsonp({ message: 'Upps!!! ocurrio un error.' });
-  }
-
   // CARGAR IMAGEN DE EMPLEADO   **USADO
   public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
     sharp.cache(false);
@@ -2128,15 +2017,18 @@ class EmpleadoControlador {
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<any> {
     console.log("ENTRANDO A CARGAR PLANTILLA AUTOMATICO")
     const { plantilla, user_name, ip, ip_local } = req.body;
-    const VALOR = await pool.query(
-      `
-      SELECT * FROM e_codigo
-      `
-    );
+    const VALOR = await pool.query(`SELECT * FROM e_codigo`);
     var codigo_dato = VALOR.rows[0].valor;
     var codigo = 0;
     if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
       codigo = codigo_dato = parseInt(codigo_dato);
+    }
+    // VERIFICAR SI EL CODIGO ESTA DESACTUALZIADO
+    const MAX_CODIGO = await pool.query(`SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados`);
+    const max_real = parseInt(MAX_CODIGO.rows[0].codigo) || 0;
+    // SI HAY UN CODIGO MAS ALTO, LO ACTUALIZA
+    if (max_real > codigo) {
+      codigo = max_real;
     }
 
     var contador = 1;
