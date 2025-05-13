@@ -48,6 +48,8 @@ export class RegistrarTimbreComponent implements OnInit {
     return this.trigger.asObservable();
   }
 
+  get permisos(): boolean { return this.funciones.permisos; }
+
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
 
@@ -521,7 +523,7 @@ export class RegistrarTimbreComponent implements OnInit {
     });
   }
 
-  // METODO PARA TOMAR DATOS DE MARCACION 
+  // METODO PARA TOMAR DATOS DE MARCACION
   informacion_timbre: any;
   dataTimbre: any;
   RegistrarDatosTimbre(ubicacion: any) {
@@ -575,10 +577,21 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA GUARDAR TIMBRE CON IMAGEN
   GuardarImagen(form: any): void {
-    //console.log('observacion ', form.observacionForm)
+
+
+    if(this.foto_obligatorio && !this.imagenCamara){
+      this.toastr.info(
+        '', 'La foto es obligatoria.', {
+        timeOut: 6000,
+      });
+
+      return;
+    }
+
     if (this.imagenCamara) {
       this.informacion_timbre.imagen = this.convertida;
     }
+
     this.informacion_timbre.observacion = form.observacionForm;
     if (this.boton_abierto === true) {
       if (form.observacionForm != '' && form.observacionForm != undefined) {

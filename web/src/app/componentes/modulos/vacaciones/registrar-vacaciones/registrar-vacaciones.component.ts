@@ -76,13 +76,13 @@ export class RegistrarVacacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     var f = DateTime.now();
-    this.FechaActual = f.toformat('yyyy-MM-dd');
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
 
     this.obtenerInformacionEmpleado();
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);

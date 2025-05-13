@@ -76,10 +76,10 @@ export class PlanHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
@@ -348,7 +348,7 @@ export class PlanHoraExtraComponent implements OnInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
       fin: h_fin,
     }
 

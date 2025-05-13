@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { SocketService } from 'src/app/servicios/socket/socket.service';
+import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-button-notificacion',
@@ -29,6 +30,8 @@ export class ButtonNotificacionComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  socket: Socket | null = null;
+
   constructor(
     public loginService: LoginService,
     public parametro: ParametrosService,
@@ -36,12 +39,31 @@ export class ButtonNotificacionComponent implements OnInit {
     public validar: ValidacionesService,
     private realTime: RealTimeService,
     private toaster: ToastrService,
-    private socket: Socket,
     private router: Router,
-  ) {
-    /** ********************************************************************************** **
-     ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
-     ** ********************************************************************************** **/
+    private socketService: SocketService,
+  ) {}
+
+  ngOnInit(): void {
+    this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+    this.BuscarParametro();
+    this.VerificarConfiguracion(this.idEmpleadoIngresa);
+    this.EscucharNotificaciones();
+
+  }
+
+  /** ********************************************************************************** **
+  ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
+  ** ********************************************************************************** **/
+  EscucharNotificaciones() {
+    this.socket = this.socketService.getSocket();
+    console.log("ver socket: ", this.socket);
+
+    if (!this.socket) return;
 
     // VERIFICAR QUE EL USUARIO TIENEN INICIO DE SESION
     if (this.loginService.loggedIn()) {
@@ -51,7 +73,7 @@ export class ButtonNotificacionComponent implements OnInit {
         if (parseInt(data.id_receives_empl) === this.idEmpleadoIngresa) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.realTime.ObtenerUnaNotificacion(data.id).subscribe(res => {
-            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd');
+            let fecha = this.validar.DarFormatoFecha(res.create_at.split(' ')[0], 'yyyy-MM-dd') ?? '';
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
             res.fecha_ = this.validar.FormatearFecha(fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
             res.hora_ = this.validar.FormatearHora(res.create_at.split(' ')[1], this.formato_hora);
@@ -79,18 +101,6 @@ export class ButtonNotificacionComponent implements OnInit {
         }
       });
     }
-  }
-
-  ngOnInit(): void {
-    this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
-    this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
-    this.validar.ObtenerIPsLocales().then((ips) => {
-      this.ips_locales = ips;
-    }); 
-    this.BuscarParametro();
-    this.VerificarConfiguracion(this.idEmpleadoIngresa);
-
   }
 
   /** **************************************************************************************** **
@@ -142,7 +152,7 @@ export class ButtonNotificacionComponent implements OnInit {
       if (!this.avisos.text) {
         if (this.avisos.length > 0) {
           this.avisos.forEach((obj: any) => {
-            let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd');
+            let fecha = this.validar.DarFormatoFecha(obj.create_at.split(' ')[0], 'yyyy-MM-dd') ?? '';
             obj.fecha_ = this.validar.FormatearFecha(fecha, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
             obj.hora_ = this.validar.FormatearHora(obj.create_at.split(' ')[1], formato_hora);
             if (obj.visto === false) {

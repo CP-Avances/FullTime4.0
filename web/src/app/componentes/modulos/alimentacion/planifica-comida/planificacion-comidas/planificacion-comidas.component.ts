@@ -77,10 +77,10 @@ export class PlanificacionComidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     console.log('DATOS RECIBIDOS', this.data);
 
@@ -251,6 +251,7 @@ export class PlanificacionComidasComponent implements OnInit {
       // REGISTRAR PLANIFICACIÓN
       this.PlanificacionIndividual(form, datosPlanComida);
     }, error => {
+      console.log('error ', error)
       this.toastr.info(this.data.nombre + ' no tiene registro de horario laboral (planificación) en las fechas indicadas.', '', {
         timeOut: 6000,
       })
@@ -277,7 +278,7 @@ export class PlanificacionComidasComponent implements OnInit {
 
         // LÓGICA PARA OBTENER TODAS LAS FECHAS DEL MES
         while (start <= end) {
-          this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
+          this.fechasHorario.push(DateTime.fromISO(start.toISOString()).toFormat('yyyy-MM-dd'));
           var newDate = start.setDate(start.getDate() + 1);
           start = new Date(newDate);
         }
@@ -500,7 +501,7 @@ export class PlanificacionComidasComponent implements OnInit {
           var end = new Date(this.finDate);
           // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIA DEL PERIODO INDICADO
           while (start <= end) {
-            this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
+            this.fechasHorario.push(DateTime.fromISO(start.toISOString()).toFormat('yyyy-MM-dd'));
             var newDate = start.setDate(start.getDate() + 1);
             start = new Date(newDate);
           }

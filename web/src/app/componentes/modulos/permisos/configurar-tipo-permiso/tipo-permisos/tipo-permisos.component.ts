@@ -328,8 +328,8 @@ export class TipoPermisosComponent implements OnInit {
       contar_feriados: form2.feriadosForm,
       num_dia_justifica: form2.numDiaJustificaForm,
       gene_justificacion: form2.geneJustificacionForm,
-      fecha_inicio: DateTime.fromISO(this.rango.value.start).toFormat('yyyy-MM-dd'),
-      fecha_fin: DateTime.fromISO(this.rango.value.end).toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromISO(this.rango.value.start ?? '').toFormat('yyyy-MM-dd'),
+      fecha_fin: DateTime.fromISO(this.rango.value.end ?? '').toFormat('yyyy-MM-dd'),
 
       // FORMULARIO TRES
       correo_crear: form3.correo_crearForm,

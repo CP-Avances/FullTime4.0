@@ -18,8 +18,7 @@ import ExcelJS, { FillPattern } from "exceljs";
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
-// ELIMINA LAS URLS POR DEFECTO
-delete L.Icon.Default.prototype._getIconUrl;
+
 // ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -145,6 +144,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   get frase_m(): string { return this.plantillaPDF.marca_Agua }
   get logoE(): string { return this.plantillaPDF.logoBase64 }
 
+  // VARIABLES PARA EL MAPA
+  latitud: number;
+  longitud: number;
+  nombreMarcador: string = '';
+
   constructor(
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS EMPLEADO
     public restEmpleHorario: EmpleadoHorariosService, // SERVICIO DATOS HORARIO DE EMPLEADOS
@@ -190,10 +194,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     var a = DateTime.now();
     this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params
@@ -243,7 +247,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     } else {
       this.SeleccionarPestana(0);
     }
+
+    // VERIFICAR QUE EL MAPA ESTA DEFINIDO
+    if (this.MAP) {
+      this.MAP.invalidateSize();
+    }
+
+    const intervalo = setInterval(() => {
+      if (this.latitud && this.longitud && this.nombreMarcador) {
+        this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
+        clearInterval(intervalo); // Detener el intervalo después de ejecutarlo
+      }
+    }, 200); // Revisa cada 200ms si ya están disponibles
   }
+
+  // ngOnDestroy(): void {
+  //   // LIMPIAR MARCADORES EXISTENTES
+  //   if (this.MARKER) {
+  //     this.MAP.removeLayer(this.MARKER);
+  //   }
+  //   // ELIMINAR MAPA
+  //   if (this.MAP) {
+  //     this.MAP.remove();
+  //     this.MAP = null;
+  //   }
+  // }
 
   // METODO PARA CAMBIAR DE PESTAÑA
   SeleccionarPestana(index: number): void {
@@ -528,7 +556,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-      var empleado = data[0].nombre + ' ' + data[0].apellido;
+      this.nombreMarcador = data[0].nombre + ' ' + data[0].apellido;
+      this.latitud = data[0].latitud;
+      this.longitud = data[0].longitud;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         //this.perfil.SetImagen(this.urlImagen);
@@ -552,7 +582,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           (result) => (this.imagenEmpleado = result)
         );
       }
-      this.MapGeolocalizar(data[0].latitud, data[0].longitud, empleado);
+      // this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
 
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
@@ -587,31 +617,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       longitud = -78.4875258;
       zoom = 7;
     }
-  
+
     setTimeout(() => {
       if (this.MAP) {
         this.MAP.remove();
         this.MAP = null;
       }
-  
+
       this.MAP = L.map('geolocalizacion', {
         center: [latitud, longitud],
         zoom: zoom
       });
-  
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
       }).addTo(this.MAP);
-  
+
       if (this.MARKER) {
         this.MAP.removeLayer(this.MARKER);
       }
-  
+
       this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
       this.MARKER.bindPopup(empleado).openPopup();
-    }, 100); 
+    }, 500);
   }
-  
+
 
   // METODO INCLUIR EL CROKIS
   AbrirUbicacion(nombre: string, apellido: string) {
@@ -663,14 +693,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.empleado_editar=datoEmpleado;
     this.pagina_empleado='ver-empleado';
   }
-
-
-
-
-
-
-
-  
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
@@ -896,7 +918,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       .afterClosed().subscribe(result => {
         setTimeout(() => {
         this.ObtenerDatosVacunas(this.formato_fecha);
-      }, 200); 
+      }, 200);
       });
   }
 
@@ -906,8 +928,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
     }).afterClosed().subscribe(result => {
       setTimeout(() => {
-        this.ObtenerDatosVacunas(this.formato_fecha); 
-      }, 200); 
+        this.ObtenerDatosVacunas(this.formato_fecha);
+      }, 200);
     });
   }
 
@@ -1419,7 +1441,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
+        let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
@@ -2643,7 +2665,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
       fin: h_fin,
     }
 
@@ -3090,7 +3112,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       }
     });
 
-    
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
@@ -3384,7 +3406,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                 { text: 'Fecha: ' + obj.fecha_ },
                 { text: 'Carnet: ' + obj.carnet }
               ],
-              [{ text: '', colSpan: 2 }, {}] 
+              [{ text: '', colSpan: 2 }, {}]
             ];
           })
         ]
@@ -4548,7 +4570,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
-  
+
   getCrearDatos(){
     return this.tienePermiso('Crear datos');
   }

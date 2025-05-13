@@ -22,6 +22,9 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 
+
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+
 @Component({
   selector: 'app-main-nav',
   standalone: false,
@@ -221,6 +224,7 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
+    private restTimbres: TimbresService,
   ) { }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
@@ -249,11 +253,12 @@ export class MainNavComponent implements OnInit {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
     console.log(licencia);
     if (licencia !== null) {
-      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd');
-      this.fec_caducidad_licencia = fec_caducidad;
+      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd') ?? '';
+      this.fec_caducidad_licencia = fec_caducidad ? new Date(fec_caducidad) : new Date();
       // CONVERTIMOS LA FECHA ACTUAL Y LA FECHA DE CADUCIDAD A OBJETOS LUXON
       const fecha = DateTime.now();
-      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd');
+      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd') ?? '';
+      console.log('fechaActual 2121 ', fechaActual);
       const fechaInicio = DateTime.fromISO(fechaActual);
       const fechaFin = DateTime.fromISO(fec_caducidad);
       // CALCULAMOS LA DIFERENCIA EN DIAS ENTRE LAS DOS FECHAS
@@ -570,7 +575,7 @@ export class MainNavComponent implements OnInit {
           complete: () => {
             //Control de vistas activas
             this.paginasMG.forEach((row: any) => {
-              console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
+              // console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
               switch (row.link) {
                 case 'vistaEmpresa':
                   this.itemConfiguracion = true;

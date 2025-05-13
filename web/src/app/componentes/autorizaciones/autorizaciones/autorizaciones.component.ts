@@ -101,10 +101,10 @@ export class AutorizacionesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     if (this.filtroDepa != '' && this.filtroDepa != undefined) {
       this.id_depart = this.data.datosPermiso[0].id_depa;
@@ -132,7 +132,7 @@ export class AutorizacionesComponent implements OnInit {
     }
 
     var f = DateTime.now();
-    this.FechaActual = f.toformat('yyyy-MM-dd');
+    this.FechaActual = f.toFormat('yyyy-MM-dd');
     this.obtenerDepartamento();
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
     this.BuscarTipoAutorizacion();

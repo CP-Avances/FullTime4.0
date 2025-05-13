@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Socket } from 'ngx-socket-io';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +8,6 @@ export class AutorizacionService {
 
   constructor(
     private http: HttpClient,
-    private socket: Socket
   ) { }
 
 

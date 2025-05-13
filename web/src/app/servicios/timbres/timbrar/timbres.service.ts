@@ -56,7 +56,7 @@ export class TimbresService {
   }
 
   /** ********************************************************************************** **
-   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **
    ** ********************************************************************************** **/
 
   // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
@@ -90,7 +90,7 @@ export class TimbresService {
 
 
   /** ********************************************************************************** **
-   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **
    ** ********************************************************************************** **/
 
   // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
@@ -148,7 +148,5 @@ export class TimbresService {
   EliminarAvisos(Seleccionados: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
-
-
 
 }
