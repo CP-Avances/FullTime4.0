@@ -62,7 +62,6 @@ class TimbresRutas {
         this.router.get('/avisos-generales/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
         this.router.get('/aviso-individual/:id', TokenValidation, TIMBRES_CONTROLADOR.ObtenerUnAviso);
-        this.router.post('/emitir-aviso', TokenValidation, TIMBRES_CONTROLADOR.emitirAvisoPrueba);
         this.router.get('/noti-timbres/avisos/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosTimbresEmpleado);
         this.router.put('/noti-timbres/vista/:id_noti_timbre', TokenValidation, TIMBRES_CONTROLADOR.ActualizarVista);
         // METODO PARA BUSCAR TIMBRES DEL USUARIO   **USADO

@@ -329,19 +329,6 @@ export class MainNavComponent implements OnInit {
     this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
   }
 
-  enviarAvisoPrueba() {
-    const datos = {
-      id_empleado: this.id_empleado_logueado,
-      id_empresa: this.idEmpresa,
-      ip: localStorage.getItem('ip'),
-      ip_local: localStorage.getItem('ip_local'),
-      user_name: localStorage.getItem('user_name')
-    }
-    this.restTimbres.EnviarAvisoPrueba(datos).subscribe(res => {
-      console.log(res);
-    });
-  }
-
   // CONTROL DE FUNCIONES DEL SISTEMA
   get HabilitarGeolocalizacion(): boolean { return this.funciones.geolocalizacion; }
   get HabilitarAlimentacion(): boolean { return this.funciones.alimentacion; }

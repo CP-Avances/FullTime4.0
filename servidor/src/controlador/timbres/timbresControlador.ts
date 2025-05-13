@@ -694,30 +694,6 @@ class TimbresControlador {
         }
     }
 
-    public async emitirAvisoPrueba(req: Request, res: Response): Promise<any> {
-
-        console.log('emitir aviso prueba');
-        console.log('req ', req.body);
-
-        const data_llega = {
-            id: 123, // ID único del aviso
-            create_at: new Date().toISOString(), // Fecha actual en formato ISO
-            id_send_empl: 1, // ID del empleado que envía
-            id_receives_empl: 88, // ID del empleado que recibe (ajústalo)
-            visto: false, // Estado de visualización
-            descripcion: 'Aviso de prueba emitido manualmente', // Descripción del aviso
-            mensaje: 'Este es un mensaje de prueba para probar el emit', // Contenido del mensaje
-            tipo: 6, // Tipo del aviso
-            usuario: 'PLATAFORMA WEB' // Origen del aviso
-        };
-        
-        io.emit('recibir_aviso', data_llega);
-
-        return res.status(200).jsonp({ message: 'Aviso emitido correctamente' });
-        
-    }
-
-
     public async ObtenerAvisosTimbresEmpleado(req: Request, res: Response) {
         const { id_empleado } = req.params
         console.log(id_empleado);
