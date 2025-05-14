@@ -27,22 +27,22 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     user_name: string | null;
     ip: string | null;
 
-    permisosCorreo = false;
-    permisosNotificacion = false;
-    vacaCorreo = false;
-    vacaNotificacion = false;
-    horaExtraCorreo = false;
-    horaExtraNotificacion = false;
-    comidaCorreo = false;
-    comidaNotificacion = false;
-    cominicadoCorreo = false;
-    cominicadoNotificacion = false;
-    atrasosCorreo = false;
-    atrasosNotificacion = false;
-    faltasCorreo = false;
-    faltasNotificacion = false;
-    salidaCorreo = false;
-    salidaNotificacion = false;
+    permisosCorreo: boolean | null = null;
+    permisosNotificacion: boolean | null = null;
+    vacaCorreo: boolean | null = null;
+    vacaNotificacion: boolean | null = null;
+    horaExtraCorreo: boolean | null = null;
+    horaExtraNotificacion: boolean | null = null;
+    comidaCorreo: boolean | null = null;
+    comidaNotificacion: boolean | null = null;
+    cominicadoCorreo: boolean | null = null;
+    cominicadoNotificacion: boolean | null = null;
+    atrasosCorreo: boolean | null = null;
+    atrasosNotificacion: boolean | null = null;
+    faltasCorreo: boolean | null = null;
+    faltasNotificacion: boolean | null = null;
+    salidaCorreo: boolean | null = null;
+    salidaNotificacion: boolean | null = null;
 
     // BUSQUEDA DE MODULOS ACTIVOS
     get habilitarPermisos(): boolean { return this.funciones.permisos; }
@@ -68,7 +68,11 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             this.ips_locales = ips;
         });
         this.VerModulos();
-        this.ImprimirDatosUsuario();
+        if (this.empleados.length > 0) {
+            this.InicializarConfiguracionNula();
+        } else {
+            this.ImprimirDatosUsuario();
+        }
     }
 
     // METODO PARA HABILITAR SELECCION DE OPCIONES DE MODULOS
@@ -101,6 +105,27 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             salidasAnticipadasNoti: '',
         });
     }
+
+    //MOSTRAR VACIO/NULO CUANDO SE REGISTRA CONFIGURACION MULTIPLE
+    InicializarConfiguracionNula(): void {
+        this.permisosCorreo = null;
+        this.permisosNotificacion = null;
+        this.vacaCorreo = null;
+        this.vacaNotificacion = null;
+        this.horaExtraCorreo = null;
+        this.horaExtraNotificacion = null;
+        this.comidaCorreo = null;
+        this.comidaNotificacion = null;
+        this.cominicadoCorreo = null;
+        this.cominicadoNotificacion = null;
+        this.atrasosCorreo = null;
+        this.atrasosNotificacion = null;
+        this.faltasCorreo = null;
+        this.faltasNotificacion = null;
+        this.salidaCorreo = null;
+        this.salidaNotificacion = null;
+    }
+
 
     // MOSTRAR INFORMACION DEL USUARIO
     ImprimirDatosUsuario() {
@@ -169,10 +194,10 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 this.CerrarVentana(true);
             }
         },
-        error => {
-          this.toaster.error('Servicio no disponible temporalmente, intente más tarde.')
-        }
-      );
+            error => {
+                this.toaster.error('Servicio no disponible temporalmente, intente más tarde.')
+            }
+        );
 
     }
 
@@ -256,6 +281,17 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 )
             );
 
+            const camposEditables = Object.keys(data).filter(k =>
+                k !== 'id_empleado' && k !== 'user_name' && k !== 'ip' && k !== 'ip_local'
+            );
+
+            if (camposEditables.length === 0) {
+                this.toaster.warning('Debe presionar al menos un botón para actualizar la configuración.', '', {
+                    timeOut: 5000,
+                });
+                return;
+            }
+
             console.log('ver data ', data)
 
             this.avisos.ObtenerConfiguracionEmpleadoMultiple({ id_empleado }).subscribe(
@@ -287,7 +323,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                     }
                 },
                 async error => {
-                  console.log('error J')
+                    console.log('error J')
                     if (error.status === 404) {
                         console.log('El backend devolvió un 404: No se encontraron datos.');
                         // REALIZAR ACCIONES ESPECIFICAS PARA EL CASO DE 404
@@ -304,14 +340,11 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                     }
                 }
             )
-
-
         } else {
             this.toaster.warning('No ha seleccionado usuarios.', '', {
                 timeOut: 6000,
             });
         }
-
     }
 
     // METODO DE CONFIGURACION DE NOTIFICACIONES
@@ -406,6 +439,82 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 this.salidaNotificacion = !this.salidaNotificacion
                 if (this.salidaNotificacion) {
                     this.reproducirSonido()
+                }
+            }
+        }
+    }
+
+    cambiarEstado(item: string, tipo: string, valor: boolean) {
+        if (item === 'comunicado') {
+            if (tipo === 'correo') {
+                this.cominicadoCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.cominicadoNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'atrasos') {
+            if (tipo === 'correo') {
+                this.atrasosCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.atrasosNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'faltas') {
+            if (tipo === 'correo') {
+                this.faltasCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.faltasNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'salida') {
+            if (tipo === 'correo') {
+                this.salidaCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.salidaNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'permisos') {
+            if (tipo === 'correo') {
+                this.permisosCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.permisosNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'vacaciones') {
+            if (tipo === 'correo') {
+                this.vacaCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.vacaNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'horaExtra') {
+            if (tipo === 'correo') {
+                this.horaExtraCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.horaExtraNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
+                }
+            }
+        } else if (item === 'comida') {
+            if (tipo === 'correo') {
+                this.comidaCorreo = valor;
+            } else if (tipo === 'notificacion') {
+                this.comidaNotificacion = valor;
+                if (valor) {
+                    this.reproducirSonido();
                 }
             }
         }
