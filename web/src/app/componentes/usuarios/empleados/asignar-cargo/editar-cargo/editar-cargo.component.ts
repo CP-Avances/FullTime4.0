@@ -92,19 +92,17 @@ export class EditarCargoComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-
+    });
+    this.BuscarUsuarioDepartamento(() => {
+      this.ObtenerCargoEmpleado();
+    });
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
-    this.BuscarUsuarioDepartamento();
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
-    this.ObtenerCargoEmpleado();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
-
-    console.log('id cargo ', this.idSelectCargo)
   }
 
   // BUSCAR DATOS DE CONTRATO
@@ -192,36 +190,33 @@ export class EditarCargoComponent implements OnInit {
     this.restEmplCargos.BuscarCargoID(this.idSelectCargo).subscribe(res => {
       this.cargo = res;
       this.id_empl_contrato = this.cargo[0].id_contrato;
-      this.cargo.forEach((obj: any) => {
-        this.ObtenerDepartamentosImprimir(obj.id_sucursal);
-        // FORMATEAR HORAS
-        if (obj.hora_trabaja.split(':').length === 3) {
-          this.horaTrabaja.setValue(obj.hora_trabaja.split(':')[0] + ':' + obj.hora_trabaja.split(':')[1]);
-        }
-        else if (obj.hora_trabaja.split(':').length === 2) {
-          if (parseInt(obj.hora_trabaja.split(':')[0]) < 10) {
-            this.horaTrabaja.setValue('0' + parseInt(obj.hora_trabaja.split(':')[0]) + ':00');
-          }
-          else {
-            this.horaTrabaja.setValue(obj.hora_trabaja);
-          }
-        }
-        this.formulario.patchValue({
-          idSucursalForm: obj.id_sucursal,
-          fecInicioForm: obj.fecha_inicio,
-          fecFinalForm: obj.fecha_final,
-          idDeparForm: obj.id_departamento,
-          sueldoForm: obj.sueldo.split('.')[0],
-          tipoForm: obj.id_tipo_cargo,
-          jefeForm: obj.jefe,
-          administraForm: this.administra,
-          personalForm: this.personal,
-        })
-      });
+      this.BuscarUsuarioDepartamento(() => {
+        this.cargo.forEach((obj: any) => {
+          this.ObtenerDepartamentosImprimir(obj.id_sucursal);
 
-      // BUSCAR DATOS DE CONTRATO
-      this.BuscarDatosContrato();
-    })
+          // FORMATEAR HORAS
+          const partesHora = obj.hora_trabaja.split(':');
+          if (partesHora.length === 3) {
+            this.horaTrabaja.setValue(`${partesHora[0]}:${partesHora[1]}`);
+          } else if (partesHora.length === 2) {
+            const hora = parseInt(partesHora[0]) < 10 ? `0${parseInt(partesHora[0])}` : partesHora[0];
+            this.horaTrabaja.setValue(`${hora}:00`);
+          }
+          this.formulario.patchValue({
+            idSucursalForm: obj.id_sucursal,
+            fecInicioForm: obj.fecha_inicio,
+            fecFinalForm: obj.fecha_final,
+            idDeparForm: obj.id_departamento,
+            sueldoForm: obj.sueldo.split('.')[0],
+            tipoForm: obj.id_tipo_cargo,
+            jefeForm: obj.jefe,
+            administraForm: this.administra,
+            personalForm: this.personal,
+          });
+        });
+        this.BuscarDatosContrato();
+      });
+    });
   }
 
   // METODO DE BUSQUEDA DE TIPO DE CARGOS
@@ -352,7 +347,7 @@ export class EditarCargoComponent implements OnInit {
       this.cargoF.setValidators([Validators.required, Validators.minLength(3)]);
       this.cargoF.updateValueAndValidity();
       this.tipoF.clearValidators();
-      this.tipoF.setValue(null); 
+      this.tipoF.setValue(null);
       this.tipoF.updateValueAndValidity();
       this.toastr.info('Ingresar nombre del nuevo cargo.', 'Etiqueta Cargo a desempeñar activa.', {
         timeOut: 6000,
@@ -463,24 +458,22 @@ export class EditarCargoComponent implements OnInit {
   asignaciones: any = [];
   principal_false: number = 0;
   principal_true: number = 0;
-  BuscarUsuarioDepartamento() {
+  BuscarUsuarioDepartamento(callback: () => void) {
     this.asignaciones = [];
     this.principal_false = 0;
     this.principal_true = 0;
-    let datos = {
-      id_empleado: this.idEmpleado,
-    }
+    const datos = { id_empleado: this.idEmpleado };
     this.usuario.BuscarAsignacionesUsuario(datos).subscribe(res => {
       if (res != null) {
-        console.log('res ', res)
         this.asignaciones = res;
         this.asignaciones.forEach((a: any) => {
           if (a.principal === true) {
             this.personal = a.personal;
             this.administra = a.administra;
           }
-        })
+        });
       }
+      callback();
     });
   }
 

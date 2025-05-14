@@ -1319,7 +1319,7 @@ class EmpleadoControlador {
                                 data.observacion = 'no registrado';
                                 if (regex.test(data.identificacion)) {
                                     if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                                        if (data.identificacion.toString().length == 0) {
+                                        if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
                                             data.observacion = 'La identificación ingresada no es válida';
                                         }
                                         else {
@@ -1555,7 +1555,7 @@ class EmpleadoControlador {
                                     data.rol = data.rol.trim();
                                     if (regex.test(data.identificacion)) {
                                         if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                                            if (data.identificacion.toString().length == 0) {
+                                            if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
                                                 data.observacion = 'La identificación ingresada no es válida';
                                             }
                                             else {
@@ -2160,7 +2160,7 @@ class EmpleadoControlador {
                                 if (regex.test(data.identificacion)) {
                                     if (TIPO_IDENTIFICACION == 'Pasaporte') {
                                         if (regex.test(data.codigo)) {
-                                            if (data.codigo.toString().length > 10) {
+                                            if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
                                                 data.observacion = 'El código debe tener máximo 10 caracteres';
                                             }
                                             else {
