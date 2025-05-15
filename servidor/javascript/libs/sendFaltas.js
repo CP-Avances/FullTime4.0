@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -45,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatearHora = exports.FormatearFecha = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.faltasIndividual = exports.faltasDepartamentos = exports.faltas = exports.faltasDiarios = exports.faltasSemanal = exports.ImportarPDF = void 0;
+exports.FormatearHora = exports.FormatearFecha = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.faltasIndividual = exports.faltasDepartamentos = exports.faltas = exports.faltasDiarios = exports.faltasSemanal = void 0;
 const accesoCarpetas_1 = require("./accesoCarpetas");
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
@@ -55,20 +22,7 @@ const reportesFaltasControlador_1 = require("../controlador/reportes/reportesFal
 const ImagenCodificacion_1 = require("./ImagenCodificacion");
 const server_1 = require("../server");
 const settingsMail_2 = require("../libs/settingsMail");
-/** ********************************************************************************* **
-   ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
-   ** ********************************************************************************* **/
-const ImportarPDF = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        // @ts-ignore
-        const pdfMake = yield Promise.resolve().then(() => __importStar(require('../assets/build/pdfmake.js')));
-        // @ts-ignore
-        const pdfFonts = yield Promise.resolve().then(() => __importStar(require('../assets/build/vfs_fonts.js')));
-        pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
-        return pdfMake.default;
-    });
-};
-exports.ImportarPDF = ImportarPDF;
+const pdf_1 = require("./pdf");
 const faltasSemanal = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date(); // Fecha actual
@@ -206,7 +160,7 @@ const faltas = function (desde, hasta, semanal) {
         }).filter(e => { return e.empleados.length > 0; });
         //console.log("ver datos del reporte general: ", nuevo)
         if (nuevo.length != 0) {
-            const pdfMake = yield (0, exports.ImportarPDF)();
+            const pdfMake = yield (0, pdf_1.ImportarPDF)();
             // DEFINIR INFORMACIÓN
             const resultado = yield (0, exports.EstructurarDatosPDF)(nuevo);
             resultado.map((obj) => {
@@ -480,7 +434,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length != 0) {
-                const pdfMake = yield (0, exports.ImportarPDF)();
+                const pdfMake = yield (0, pdf_1.ImportarPDF)();
                 // DEFINIR INFORMACIÓN
                 const resultado = yield (0, exports.EstructurarDatosPDF)(nuevo);
                 resultado.map((obj) => {

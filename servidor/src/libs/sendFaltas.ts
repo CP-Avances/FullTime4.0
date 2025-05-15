@@ -6,24 +6,8 @@ import { DateTime } from 'luxon';
 import { BuscarFaltas } from '../controlador/reportes/reportesFaltasControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
 import { io } from '../server';
-import {
-    fechaHora
-} from '../libs/settingsMail';
-
-
-/** ********************************************************************************* **
-   ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
-   ** ********************************************************************************* **/
-
-
-export const ImportarPDF = async function () {
-    // @ts-ignore
-    const pdfMake = await import('../assets/build/pdfmake.js');
-    // @ts-ignore
-    const pdfFonts = await import('../assets/build/vfs_fonts.js');
-    pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
-    return pdfMake.default;
-}
+import { fechaHora } from '../libs/settingsMail';
+import { ImportarPDF } from './pdf';
 
 
 export const faltasSemanal = async function () {

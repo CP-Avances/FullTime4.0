@@ -5,27 +5,9 @@ import path from 'path'
 import { DateTime } from 'luxon';
 import { BuscarSalidasAnticipadas } from '../controlador/reportes/salidaAntesControlador';
 import { ConvertirImagenBase64 } from './ImagenCodificacion';
-import {
-    fechaHora
-} from '../libs/settingsMail';
+import { fechaHora } from '../libs/settingsMail';
 import { io } from '../server';
-
-// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
-
-/** ********************************************************************************* **
-   ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
-   ** ********************************************************************************* **/
-
-
-export const ImportarPDF = async function () {
-    // @ts-ignore
-    const pdfMake = await import('../assets/build/pdfmake.js');
-    // @ts-ignore
-    const pdfFonts = await import('../assets/build/vfs_fonts.js');
-    pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
-    return pdfMake.default;
-}
-
+import { ImportarPDF } from './pdf';
 
 export const salidasAnticipadasSemanal = async function () {
     const date = new Date(); // Fecha actual
