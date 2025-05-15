@@ -296,6 +296,7 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
+const sendAtraso_1 = require("./libs/sendAtraso");
 const sendAniversario_1 = require("./libs/sendAniversario");
 const sendBirthday_1 = require("./libs/sendBirthday");
 /** **************************************************************************************************** **
@@ -305,13 +306,13 @@ const sendBirthday_1 = require("./libs/sendBirthday");
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 exports.io = SERVIDOR.io;
 setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    //atrasosDiarios();
+    (0, sendAtraso_1.atrasosDiarios)();
     //atrasosSemanal();
     //faltasDiarios();
     //faltasSemanal();
     //salidasAnticipadasSemanal();
     //salidasAnticipadasDiarios();
-}), 2700000);
+}), 60000);
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendAniversario_1.aniversario)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES

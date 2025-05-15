@@ -4,31 +4,10 @@ import pool from '../database';
 import path from 'path'
 import { DateTime } from 'luxon';
 import { BuscarAtrasos } from '../controlador/reportes/reportesAtrasosControlador';
-import { ConvertirImagenBase64 } from './ImagenCodificacion';
 import { io } from '../server';
-import {
-    fechaHora
-} from '../libs/settingsMail';
-//import { Socket } from 'ngx-socket-io';
-
-
-// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
-
-/** ********************************************************************************* **
-   ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
-   ** ********************************************************************************* **/
-
-
-export const ImportarPDF = async function () {
-
-    // @ts-ignore
-    const pdfMake = await import('../assets/build/pdfmake.js');
-    // @ts-ignore
-    const pdfFonts = await import('../assets/build/vfs_fonts.js');
-    pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
-    return pdfMake.default;
-}
-
+import { fechaHora } from '../libs/settingsMail';
+import { EMPRESA_CONTROLADOR } from '../controlador/configuracion/parametrizacion/catEmpresaControlador';
+import { ImportarPDF } from './pdf';
 
 export const atrasosSemanal = async function () {
     const date = new Date(); // Fecha actual
@@ -40,6 +19,8 @@ export const atrasosSemanal = async function () {
 
     const fecha = date.toJSON().split("T")[0]; // Fecha actual
     const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
+
+    console.log("ver fecha: ", fecha);
 
     const PARAMETRO_SEMANAL = await pool.query(
         `
@@ -85,6 +66,8 @@ export const atrasosSemanal = async function () {
 export const atrasosDiarios = async function () {
     const date = new Date();
     const fecha = date.toJSON().split("T")[0];
+
+    console.log("ver fecha: ", fecha);
     
     const hora = date.getHours();
     const minutos = date.getMinutes();
@@ -201,21 +184,11 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
             return obj;
         });
 
-
-        const file_name = await pool.query(
-            `
-           SELECT nombre, logo FROM e_empresa 
-           `
-        )
-            .then((result: any) => {
-                return result.rows[0];
-            });
-
         let separador = path.sep;
 
-        let ruta = ObtenerRutaLogos() + separador + file_name.logo;
+        const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
 
-        const codificado = await ConvertirImagenBase64(ruta);
+        const codificado = imagenEmpresa.imagen;
 
         let logo = 'data:image/jpeg;base64,' + codificado;
 
@@ -349,6 +322,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
         if (PARAMETRO_CORREO.rowCount != 0) {
 
             const correos = PARAMETRO_CORREO.rows;
+            console.log("ver correos: ", correos)
             correos.forEach(async (itemCorreo: any) => {
                 const correo = itemCorreo.descripcion
                 console.log("ver correo de reporte general: ", correo)
@@ -362,6 +336,8 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                                             AND da.estado = 1 AND s.id_empresa = ce.id 
                                         `
                     , [correo]);
+
+                console.log("ver empleados: ", EMPLEADOS.rows[0])
 
                 if (EMPLEADOS.rowCount != 0) {
 
@@ -394,7 +370,7 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                                                 Mediante el presente correo se adjunta el reporte de atrasos.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto} <br>
                                             <b>Fecha de envío:</b> ${fecha} <br> 
                                             <b>Hora de envío:</b> ${hora_reporte} <br>
@@ -541,20 +517,11 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
 
             const today = DateTime.now().toFormat('yyyy-MM-dd');
 
-            const file_name = await pool.query(
-                `
-               SELECT nombre, logo FROM e_empresa 
-               `
-            )
-                .then((result: any) => {
-                    return result.rows[0];
-                });
-
             let separador = path.sep;
 
-            let ruta = ObtenerRutaLogos() + separador + file_name.logo;
+            const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
 
-            const codificado = await ConvertirImagenBase64(ruta);
+            const codificado = imagenEmpresa.imagen;
 
             let logo = 'data:image/jpeg;base64,' + codificado;
 
@@ -714,7 +681,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                                                 Mediante el presente correo se adjunta el reporte de atrasos.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto}<br>
                                             <b>Departamento:</b> ${departamento}<br> 
                                             <b>Fecha de envío:</b> ${fecha} <br> 
@@ -866,14 +833,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
         let dia_abreviado: string = 'ddd';
         let dia_completo: string = 'dddd'
 
-        const file_name = await pool.query(
-            `
-               SELECT nombre, logo FROM e_empresa 
-               `
-        )
-            .then((result: any) => {
-                return result.rows[0];
-            });
+        const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
 
         const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
         const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
@@ -941,7 +901,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
                                                 El presente correo es para informarle que se ha registrado un atraso en su marcación.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> NOTIFICACIÓN DE ATRASO <br>
                                             <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
                                             <b>Cargo:</b> ${item.cargo} <br> 

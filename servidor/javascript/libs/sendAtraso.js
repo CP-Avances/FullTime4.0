@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -45,32 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasosIndividual = exports.atrasosDepartamentos = exports.atrasos = exports.atrasosDiarios = exports.atrasosSemanal = exports.ImportarPDF = void 0;
+exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasosIndividual = exports.atrasosDepartamentos = exports.atrasos = exports.atrasosDiarios = exports.atrasosSemanal = void 0;
 const accesoCarpetas_1 = require("./accesoCarpetas");
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 const luxon_1 = require("luxon");
 const reportesAtrasosControlador_1 = require("../controlador/reportes/reportesAtrasosControlador");
-const ImagenCodificacion_1 = require("./ImagenCodificacion");
 const server_1 = require("../server");
 const settingsMail_2 = require("../libs/settingsMail");
-//import { Socket } from 'ngx-socket-io';
-// METODO PARA ENVIAR LISTA DE ATRASOS A UNA HORA DETERMINADA 
-/** ********************************************************************************* **
-   ** **                     IMPORTAR SCRIPT DE ARCHIVOS DE PDF                      ** **
-   ** ********************************************************************************* **/
-const ImportarPDF = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        // @ts-ignore
-        const pdfMake = yield Promise.resolve().then(() => __importStar(require('../assets/build/pdfmake.js')));
-        // @ts-ignore
-        const pdfFonts = yield Promise.resolve().then(() => __importStar(require('../assets/build/vfs_fonts.js')));
-        pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
-        return pdfMake.default;
-    });
-};
-exports.ImportarPDF = ImportarPDF;
+const catEmpresaControlador_1 = require("../controlador/configuracion/parametrizacion/catEmpresaControlador");
+const pdf_1 = require("./pdf");
 const atrasosSemanal = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date(); // Fecha actual
@@ -81,6 +33,7 @@ const atrasosSemanal = function () {
         dateAntes.setDate(dateAntes.getDate() - 7); // Restar 7 días a la copia
         const fecha = date.toJSON().split("T")[0]; // Fecha actual
         const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
+        console.log("ver fecha: ", fecha);
         const PARAMETRO_SEMANAL = yield database_1.default.query(`
         SELECT * FROM ep_detalle_parametro WHERE id_parametro = 13
         `);
@@ -118,6 +71,7 @@ const atrasosDiarios = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date();
         const fecha = date.toJSON().split("T")[0];
+        console.log("ver fecha: ", fecha);
         const hora = date.getHours();
         const minutos = date.getMinutes();
         const PARAMETRO_DIARIO = yield database_1.default.query(`
@@ -205,21 +159,15 @@ const atrasos = function (desde, hasta, semanal) {
             return e;
         }).filter(e => { return e.empleados.length > 0; });
         if (nuevo.length != 0) {
-            const pdfMake = yield (0, exports.ImportarPDF)();
+            const pdfMake = yield (0, pdf_1.ImportarPDF)();
             // DEFINIR INFORMACIÓN
             const resultado = yield (0, exports.EstructurarDatosPDF)(nuevo);
             resultado.map((obj) => {
                 return obj;
             });
-            const file_name = yield database_1.default.query(`
-           SELECT nombre, logo FROM e_empresa 
-           `)
-                .then((result) => {
-                return result.rows[0];
-            });
             let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
-            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+            const imagenEmpresa = yield catEmpresaControlador_1.EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
+            const codificado = imagenEmpresa.imagen;
             let logo = 'data:image/jpeg;base64,' + codificado;
             const EMPRESA = yield database_1.default.query(`
            SELECT * FROM e_empresa 
@@ -323,6 +271,7 @@ const atrasos = function (desde, hasta, semanal) {
                         `, [id_parametro_correo]);
             if (PARAMETRO_CORREO.rowCount != 0) {
                 const correos = PARAMETRO_CORREO.rows;
+                console.log("ver correos: ", correos);
                 correos.forEach((itemCorreo) => __awaiter(this, void 0, void 0, function* () {
                     const correo = itemCorreo.descripcion;
                     console.log("ver correo de reporte general: ", correo);
@@ -334,6 +283,7 @@ const atrasos = function (desde, hasta, semanal) {
                                         WHERE da.correo = $1 AND da.id_suc = s.id
                                             AND da.estado = 1 AND s.id_empresa = ce.id 
                                         `, [correo]);
+                    console.log("ver empleados: ", EMPLEADOS.rows[0]);
                     if (EMPLEADOS.rowCount != 0) {
                         var usuarios = (0, exports.PresentarUsuarios)(EMPLEADOS);
                         // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
@@ -359,7 +309,7 @@ const atrasos = function (desde, hasta, semanal) {
                                                 Mediante el presente correo se adjunta el reporte de atrasos.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto} <br>
                                             <b>Fecha de envío:</b> ${fecha} <br> 
                                             <b>Hora de envío:</b> ${hora_reporte} <br>
@@ -481,22 +431,16 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length != 0) {
-                const pdfMake = yield (0, exports.ImportarPDF)();
+                const pdfMake = yield (0, pdf_1.ImportarPDF)();
                 // DEFINIR INFORMACIÓN
                 const resultado = yield (0, exports.EstructurarDatosPDF)(nuevo);
                 resultado.map((obj) => {
                     return obj;
                 });
                 const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
-                const file_name = yield database_1.default.query(`
-               SELECT nombre, logo FROM e_empresa 
-               `)
-                    .then((result) => {
-                    return result.rows[0];
-                });
                 let separador = path_1.default.sep;
-                let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
-                const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+                const imagenEmpresa = yield catEmpresaControlador_1.EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
+                const codificado = imagenEmpresa.imagen;
                 let logo = 'data:image/jpeg;base64,' + codificado;
                 const EMPRESA = yield database_1.default.query(`
                SELECT * FROM e_empresa 
@@ -627,7 +571,7 @@ const atrasosDepartamentos = function (desde, hasta, semanal) {
                                                 Mediante el presente correo se adjunta el reporte de atrasos.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto}<br>
                                             <b>Departamento:</b> ${departamento}<br> 
                                             <b>Fecha de envío:</b> ${fecha} <br> 
@@ -756,12 +700,7 @@ const atrasosIndividual = function (desde, hasta) {
             let idioma_fechas = 'es';
             let dia_abreviado = 'ddd';
             let dia_completo = 'dddd';
-            const file_name = yield database_1.default.query(`
-               SELECT nombre, logo FROM e_empresa 
-               `)
-                .then((result) => {
-                return result.rows[0];
-            });
+            const imagenEmpresa = yield catEmpresaControlador_1.EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
             const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
             const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
             console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
@@ -813,7 +752,7 @@ const atrasosIndividual = function (desde, hasta) {
                                                 El presente correo es para informarle que se ha registrado un atraso en su marcación.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> NOTIFICACIÓN DE ATRASO <br>
                                             <b>Colaborador:</b> ${item.nombre + ' ' + item.apellido} <br>
                                             <b>Cargo:</b> ${item.cargo} <br> 

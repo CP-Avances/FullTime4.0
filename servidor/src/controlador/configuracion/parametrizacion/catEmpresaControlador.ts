@@ -48,6 +48,28 @@ class EmpresaControlador {
         }
     }
 
+    public async ObtenerImagenEmpresa(): Promise<any> {
+        const file_name = await pool.query(
+            `
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
+            `
+            , [1])
+            .then((result: any) => {
+                return result.rows[0];
+            });
+        if (file_name.logo === null) {
+            file_name.logo = 'logo_reportes.png';
+        }
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name.logo;
+        const codificado = await ConvertirImagenBase64(ruta);
+        if (codificado === 0) {
+            return { imagen: 0, nom_empresa: file_name.nombre };
+        } else {
+            return { imagen: codificado, nom_empresa: file_name.nombre };
+        }
+    }
+
     // METODO PARA EDITAR LOGO DE EMPRESA **USADO
     public async ActualizarLogoEmpresa(req: Request, res: Response): Promise<any> {
         sharp.cache(false);
