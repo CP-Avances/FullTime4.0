@@ -45,7 +45,6 @@ export class ButtonAvisosComponent implements OnInit {
 
   ngOnInit(): void {
     this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
-    console.log("ver id_empleado_logueado: ", this.id_empleado_logueado)
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
@@ -60,7 +59,6 @@ export class ButtonAvisosComponent implements OnInit {
   ** ********************************************************************************** **/
   EscucharNotificaciones() {
     this.socket = this.socketService.getSocket();
-    console.log("ver socket: ", this.socket);
 
     if (!this.socket) return;
 
@@ -68,14 +66,12 @@ export class ButtonAvisosComponent implements OnInit {
     if (this.loginService.loggedIn()) {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
       this.socket.on('recibir_aviso', (data: any) => {
-        console.log('Escuchando aviso', data);
+
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
         if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
-          console.log("se esjecuta")
+
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
-            console.log("ver res ObtenerUnAviso: ", res)
-
 
             let fecha = this.validar.DarFormatoFecha(res.fecha_hora.split('T')[0], 'yyyy-MM-dd');
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION

@@ -117,7 +117,7 @@ export class ValidacionesService {
 
   FormatearFecha(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    console.log('ingresa fecha ', fecha)
+    //console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaLuxon = DateTime.fromISO(fecha).setLocale(idioma);
     // MANEJAR EL FORMATO PARA EL DIA
@@ -138,19 +138,15 @@ export class ValidacionesService {
   }
 
   FormatearHora(hora: string, formato: string) {
-    console.log('hora ', hora, ' formato ', formato)
-
+    //console.log('hora ', hora, ' formato ', formato)
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;
   }
 
   DarFormatoFecha(fechaString: any, formatoSalida: any) {
-
-    console.log("fechaString: ", fechaString)
-    console.log("formatoSalida: ", formatoSalida)
-
-
+    //console.log("fechaString: ", fechaString)
+    //console.log("formatoSalida: ", formatoSalida)
     let formatos = ['yyyy-MM-dd', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd'];
     let fecha: DateTime;
     // VERIFICAR SI LA FECHA ES UN OBJETO MOMENT
@@ -171,13 +167,13 @@ export class ValidacionesService {
       }
     }
     // SI NO ES VALIDA EN NINGUNO DE LOS FORMATOS, DEVUELVE UN ERROR
-    console.error('Formato de fecha no válido:', fechaString);
+    //console.error('Formato de fecha no válido:', fechaString);
     return null;
   }
 
   FormatearFechaAuditoria(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    console.log('ingresa fecha ', fecha)
+    //console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaISO = fecha.replace(' ', 'T').replace(/-\d{2}$/, '');
 
