@@ -1,7 +1,7 @@
 <div class="container" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo" class="row w-100 m-auto">
-            <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+            <div class="col-2 col-md-2 mb-2 mb-md-0">
             </div>
             <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
                 <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
@@ -38,7 +38,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="inputText">
                                     <mat-label class="letra">Número acción de personal</mat-label>
-                                    <input matInput placeholder="HU-001" formControlName="identificacionForm" required>
+                                    <input matInput placeholder="HU-001" formControlName="identificacionForm" required autocomplete="off" >
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar un identificador del registro de acción de personal.">
                                         help_outline
@@ -72,15 +72,15 @@
                             <span>DATOS DEL FUNCIONARIO</span>
                         </div>
                         <div class="col-md">
-                            
-                             <div class="d-flex flex-wrap justify-content-start">
+
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
-                                    <mat-label >Seleccionar el empleado</mat-label>
+                                    <mat-label>Seleccionar el empleado</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoF"
-                                        [matAutocomplete]="auto7" required>
-                                    <mat-autocomplete #auto7="matAutocomplete">
+                                        [matAutocomplete]="auto7" required autocomplete="off">
+                                    <mat-autocomplete #auto7="matAutocomplete" >
                                         <mat-option *ngFor="let option of filtroNombre | async"
-                                            [value]="option.empleado">
+                                            [value]="option.empleado" (click)="oninfoEmpleado(option)">
                                             {{option.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -100,7 +100,8 @@
                                         <mat-form-field class="inputDate">
                                             <mat-label>Rige desde</mat-label>
                                             <input matInput [matDatepicker]="pickerFechaDesde" placeholder="dd/mm/aaaa"
-                                                formControlName="fechaRigeDeseForm" min="1950-01-31" max="2050-01-31" required>
+                                                formControlName="fechaRigeDeseForm" min="1950-01-31" max="2050-01-31"
+                                                required>
                                             <mat-datepicker-toggle matSuffix [for]="pickerFechaDesde" id="i-cursor"
                                                 matTooltipPosition="right"
                                                 matTooltip="Fecha en la que inicio a trabajar.">
@@ -114,7 +115,8 @@
                                         <mat-form-field class="inputDate">
                                             <mat-label>Rige hasta</mat-label>
                                             <input matInput [matDatepicker]="pickerFechaHasta" placeholder="dd/mm/aaaa"
-                                                formControlName="fechaRigeHastaForm" min="1950-01-31" max="2050-01-31" required>
+                                                formControlName="fechaRigeHastaForm" min="1950-01-31" max="2050-01-31"
+                                                required>
                                             <mat-datepicker-toggle matSuffix [for]="pickerFechaHasta" id="i-cursor"
                                                 matTooltipPosition="right"
                                                 matTooltip="Fecha en la que inicio a trabajar.">
@@ -124,10 +126,10 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                         </div>
                         <div class="col-md">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -145,15 +147,17 @@
                 <form [formGroup]="secondFormGroup">
                     <div class="row">
                         <div class="subtitulo">
-                            <span>TIPO DE ACCION (Configuracion de tipo de accion, al seleccionar el tipo de accion OTRO se mostrara la informacion ingresada en el campo OTRO)</span>
+                            <span>TIPO DE ACCION (Configuracion de tipo de accion, al seleccionar el tipo de accion OTRO
+                                se mostrara la informacion ingresada en el campo OTRO)</span>
                         </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 50%;">
-                                    <mat-label >Tipo de acción</mat-label>
+                                    <mat-label>Tipo de acción</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idTipoAccion"
                                         [matAutocomplete]="auto8" required>
-                                    <mat-autocomplete #auto8="matAutocomplete" (optionSelected)="onTipoAccionSeleccionado($event)">
+                                    <mat-autocomplete #auto8="matAutocomplete"
+                                        (optionSelected)="onTipoAccionSeleccionado($event)">
                                         <mat-option *ngFor="let option of filtroTipoAccion | async"
                                             [value]="option.nombre">
                                             {{option.nombre.toUpperCase()}}
@@ -177,7 +181,7 @@
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese otro accion.">
                                         help_outline
-                                    </mat-icon> 
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -185,7 +189,8 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 85%;">
                                     <mat-label>En caso de requerir especificación:</mat-label>
-                                    <textarea matInput maxlength="200" placeholder="Ej: Laboratorista" [formControl]="otroEspecificacion"></textarea>
+                                    <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
+                                        [formControl]="otroEspecificacion"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese una explicación o detalle de otro.">
                                         help_outline
@@ -219,7 +224,8 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 90%;">
                                     <mat-label>Adición a base legal:</mat-label>
-                                    <textarea matInput maxlength="200" placeholder="Ej: Laboratorista" [formControl]="baseLegalForm" readonly></textarea>
+                                    <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
+                                        [formControl]="baseLegalForm" readonly></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Regresar a la lista de opciones existentes.">
                                         help_outline
@@ -240,271 +246,382 @@
                     <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 3:">
                         settings
                     </mat-icon>
-                </ng-template>
-                <form [formGroup]="thirdFormGroup">
-                    <div class="row">
-                        <div class="subtitulo">
-                            <span>SITUACION ACTUAL (Datos tomados desde la ficha del empleado)</span>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label class="letra">Partida individual</mat-label>
-                                    <input class="numero" type="tel" matInput placeholder="13369689656312"
-                                        formControlName="numPartidaIForm" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de partida individual.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
+                    </ng-template>
+                    <form [formGroup]="thirdFormGroup">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="subtitulo">
+                                    <span>SITUACION ACTUAL (Datos tomados desde la ficha del empleado)</span>
+                                </div>
+                                <!-- <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Partida individual</mat-label>
+                                            <input class="numero" type="tel" matInput placeholder="13369689656312"
+                                                formControlName="numPartidaIForm" (keypress)="IngresarSoloNumeros($event)">
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Ingresar número de partida individual.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div> -->
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Proceso</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="tipoProcesoF" [matAutocomplete]="auto12"
+                                                readonly>
+                                            <mat-autocomplete #auto12="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroProceso | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Seleccionar el proceso que se encuentra propuesto.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Sucursal</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idSucursal"
+                                                [matAutocomplete]="auto9" readonly>
+                                            <mat-autocomplete #auto9="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroSucursal | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Lista de departamentos.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Nivel o unidad de gestión</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idDepa"
+                                                [matAutocomplete]="auto10" required>
+                                            <mat-autocomplete #auto10="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroDepartamentos | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Lista de departamentos.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Unidad Administrativa</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idDepaActual"
+                                                [matAutocomplete]="auto15" >
+                                            <mat-autocomplete #auto15="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroDeparAdministrativaProuesta | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de departamentos.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Lugar de trabajo</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idCiudad" 
+                                            [matAutocomplete]="auto4" readonly>
+                                            <mat-autocomplete #auto4="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroCiudad | async" [value]="option.descripcion">
+                                                    {{option.descripcion.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Ciudades registradas en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Grupo Ocupacional</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="grupoOcupacionalF" 
+                                                [matAutocomplete]="auto16" readonly>
+                                            <mat-autocomplete #auto16="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroGrupoOcupacional | async" [value]="option.descripcion">
+                                                    {{option.descripcion.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Grupo ocupacional registrado en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Grado</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="gradoF" [matAutocomplete]="auto17" readonly>
+                                            <mat-autocomplete #auto17="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroGrado | async" [value]="option.descripcion">
+                                                    {{option.descripcion.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Grados registrados en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class=" w-75">
+                                            <mat-label class="letra">Denominacion del puesto propuesto</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="tipoCargoF" [matAutocomplete]="auto18"
+                                                readonly>
+                                            <mat-autocomplete #auto18="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroCargos | async" [value]="option.cargo">
+                                                    {{option.cargo.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Seleccionar el puesto que se encuentra propuesto.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Remuneración propuesta</mat-label>
+                                            <input matInput type="tel" [formControl]="sueldoF" style="text-align: right;"
+                                                (keypress)="IngresarSoloNumeros($event)" value="0" readonly>
+                                            <span matTextPrefix>$&nbsp;</span>
+                                            <span matTextSuffix>.00</span>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Indicar cual es el salario propuesto.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo w-100">
+                                            <mat-label>Partida Presupuestaria Individual</mat-label>
+                                            <textarea matInput #acta maxlength="200" placeholder="Ingresar número del acta final del concurso"
+                                                formControlName="actaForm"></textarea>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Ingresar el número del acta final del consurso.">
+                                                help_outline
+                                            </mat-icon>
+                                            <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
+                                            <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-1" style="border-right: 1px solid #ccc;"></div>
+                            <div class="col-1"></div>
+                            <div class="col-5">
+                                <div class="subtitulo">
+                                    <span>SITUACIÓN PROPUESTA</span>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Proceso propuesto</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="procesoPropuesto" [matAutocomplete]="auto12"
+                                                required>
+                                            <mat-autocomplete #auto12="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroProceso | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Seleccionar el proceso que se encuentra propuesto.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Sucursal</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idSucursalPropues" [matAutocomplete]="auto13"
+                                                required>
+                                            <mat-autocomplete #auto13="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroSucursalPropuesta | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de departamentos.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Nivel o unidad de gestión</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idDepaPropues" [matAutocomplete]="auto14"
+                                                required>
+                                            <mat-autocomplete #auto14="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroDepartamentosProuesta | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de departamentos.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Unidad Administrativa propuesta</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idDepaAdminPropuesta"
+                                                [matAutocomplete]="auto15" required>
+                                            <mat-autocomplete #auto15="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroDeparAdministrativaProuesta | async" [value]="option.nombre">
+                                                    {{option.nombre.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de departamentos.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label class="letra">Lugar de trabajo</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="idCiudadPropuesta" [matAutocomplete]="auto4" required>
+                                            <mat-autocomplete #auto4="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroCiudad | async" [value]="option.descripcion">
+                                                    {{option.descripcion.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Ciudades registradas en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Grupo Ocupacional</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="grupoOcupacionalPropuestoF" [matAutocomplete]="auto16"
+                                                required>
+                                            <mat-autocomplete #auto16="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroGrupoOcupacional | async" [value]="option.descripcion">
+                                                    {{option.descripcion.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Grupo ocupacional registrado en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Grado</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="gradoPropuestoF" [matAutocomplete]="auto17" required>
+                                            <mat-autocomplete #auto17="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroGrado | async" [value]="option.descripcion">
+                                                    {{option.descripcion.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Grados registrados en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class=" w-75">
+                                            <mat-label class="letra">Denominacion del puesto propuesto</mat-label>
+                                            <input type="text" aria-label="Number" matInput [formControl]="tipoCargoPropuestoF" [matAutocomplete]="auto18"
+                                                required>
+                                            <mat-autocomplete #auto18="matAutocomplete">
+                                                <mat-option *ngFor="let option of filtroCargos | async" [value]="option.cargo">
+                                                    {{option.cargo.toUpperCase()}}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Seleccionar el puesto que se encuentra propuesto.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo">
+                                            <mat-label>Remuneración propuesta</mat-label>
+                                            <input matInput type="tel" [formControl]="sueldoPropuestoF" style="text-align: right;"
+                                                (keypress)="IngresarSoloNumeros($event)" value="0">
+                                            <span matTextPrefix>$&nbsp;</span>
+                                            <span matTextSuffix>.00</span>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Indicar cual es el salario propuesto.">
+                                                help_outline
+                                            </mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-form-field class="contenedor-completo w-100">
+                                            <mat-label>Partida Presupuestaria Individual</mat-label>
+                                            <textarea matInput #acta maxlength="200" placeholder="Ingresar número del acta final del concurso"
+                                                formControlName="actaPropuestaF"></textarea>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Ingresar el número del acta final del consurso.">
+                                                help_outline
+                                            </mat-icon>
+                                            <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
+                                            <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label >Sucursal</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idSucursal"
-                                        [matAutocomplete]="auto9" required>
-                                    <mat-autocomplete #auto9="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroSucursal | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de departamentos.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label >Unidad de gestión</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idDepa"
-                                        [matAutocomplete]="auto10" required>
-                                    <mat-autocomplete #auto10="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroDepartamentos | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de departamentos.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-2">
-                        <div class="subtitulo">
-                            <span>SITUACIÓN PROPUESTA</span>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label class="letra">Proceso propuesto</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="tipoProcesoF"
-                                        [matAutocomplete]="auto12" required>
-                                    <mat-autocomplete #auto12="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroProceso | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Seleccionar el proceso que se encuentra propuesto.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label >Sucursal</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idSucursalPropues"
-                                        [matAutocomplete]="auto13" required>
-                                    <mat-autocomplete #auto13="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroSucursalPropuesta | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de departamentos.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-
-                        <div class="col-md">
-                           <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label >Unidad de gestión</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idDepaPropues"
-                                        [matAutocomplete]="auto14" required>
-                                    <mat-autocomplete #auto14="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroDepartamentosProuesta | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de departamentos.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label class="letra">Unidad Administrativa propuesta</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idDepaAdminPropuesta"
-                                        [matAutocomplete]="auto15" required>
-                                    <mat-autocomplete #auto15="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroDeparAdministrativaProuesta | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de departamentos.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label class="letra">Ciudad</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idCiudad"
-                                        [matAutocomplete]="auto4" required>
-                                    <mat-autocomplete #auto4="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroCiudad | async"
-                                            [value]="option.descripcion">
-                                            {{option.descripcion.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ciudades registradas en el sistema.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label>Grupo Ocupacional</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="grupoOcupacionalF"
-                                        [matAutocomplete]="auto16" required>
-                                    <mat-autocomplete #auto16="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroGrupoOcupacional | async"
-                                            [value]="option.descripcion">
-                                            {{option.descripcion.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Grupo ocupacional registrado en el sistema.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-
-                            </div>  
-                        </div>  
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label>Grado</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="gradoF"
-                                        [matAutocomplete]="auto17" required>
-                                    <mat-autocomplete #auto17="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroGrado | async"
-                                            [value]="option.descripcion">
-                                            {{option.descripcion.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Grados registrados en el sistema.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-7">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class=" w-75">
-                                    <mat-label class="letra">Denominacion del puesto propuesto</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="tipoCargoF"
-                                        [matAutocomplete]="auto18" required>
-                                    <mat-autocomplete #auto18="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroCargos | async"
-                                            [value]="option.cargo">
-                                            {{option.cargo.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Seleccionar el puesto que se encuentra propuesto.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
-                                    <mat-label>Remuneración propuesta</mat-label>
-                                    <input matInput type="tel" [formControl]="sueldoF" style="text-align: right;"
-                                        (keypress)="IngresarSoloNumeros($event)" value="0">
-                                    <span matTextPrefix>$&nbsp;</span>
-                                    <span matTextSuffix>.00</span>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Indicar cual es el salario propuesto.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-2"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo w-100">
-                                    <mat-label>Partida Presupuestaria Individual</mat-label>
-                                    <textarea matInput #acta maxlength="200"
-                                        placeholder="Ingresar número del acta final del concurso"
-                                        formControlName="actaForm"></textarea>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el número del acta final del consurso.">
-                                        help_outline
-                                    </mat-icon>
-                                    <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
-                                    <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                    </div>
 
                 </form>
-                <br>
-                <div class="d-flex flex-wrap justify-content-between">
+                <br><br>
+                <div class="d-flex flex-wrap justify-content-between w-75 m-auto">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
                     <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
                 </div>
@@ -563,7 +680,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
-                        </div>      
+                        </div>
                     </div>
                     <div class="subtitulo">
                         <span>RESPONSABLES DE FIRMAS</span>
@@ -606,7 +723,7 @@
                         </div>
                     </div>
 
-                     <div class="row">
+                    <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="abrv">
@@ -646,10 +763,10 @@
                                         matTooltip="Colaboradores registrados en el sistema.">
                                         help_outline
                                     </mat-icon>
-                                </mat-form-field> 
+                                </mat-form-field>
                             </div>
-                        </div>    
-                     </div>
+                        </div>
+                    </div>
 
                     <div class="row">
                         <div class="col-md">
@@ -670,12 +787,12 @@
                                         matTooltip="Colaboradores registrados en el sistema.">
                                         help_outline
                                     </mat-icon>
-                                </mat-form-field> 
-                        
+                                </mat-form-field>
+
                             </div>
                         </div>
                     </div>
-                    
+
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-between">
