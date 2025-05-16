@@ -130,7 +130,7 @@
           <app-button-avisos></app-button-avisos>
 
           <!-- BOTON NOTIFICACION -->
-          <app-button-notificacion></app-button-notificacion>
+          <app-button-notificacion *ngIf="boton_notificaciones"></app-button-notificacion>
 
           <!-- BOTON CONFIGURACIONES DE TODO -->
           <app-button-opciones></app-button-opciones>
@@ -147,8 +147,8 @@
             <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
           </button>
 
-          <app-navbar id="nombreUsuario" ></app-navbar>
-           
+          <app-navbar id="nombreUsuario"></app-navbar>
+
           <div>
             <span class="example-spacer"></span>
             <!-- BOTON HOME -->
@@ -161,7 +161,7 @@
             <app-button-avisos></app-button-avisos>
 
             <!-- BOTON NOTIFICACION -->
-            <app-button-notificacion></app-button-notificacion>
+            <app-button-notificacion *ngIf="boton_notificaciones"></app-button-notificacion>
 
             <!-- BOTON CONFIGURACIONES DE TODO -->
             <app-button-opciones></app-button-opciones>

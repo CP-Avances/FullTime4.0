@@ -249,11 +249,21 @@ export class ListarParametroComponent implements OnInit {
       n.push({
         style: 'tableMarginCabecera',
         table: {
-          widths: ['*'],
+          widths: ['*', '*'],
           headerRows: 1,
           body: [
             [
-              { text: `PARÁMETRO: ${obj.descripcion}`, style: 'itemsTableInfo', border: [true, true, true, true] },
+              { 
+                text: `PARÁMETRO: ${obj.descripcion}`, 
+                style: 'itemsTableInfo', 
+                border: [true, true, false, true] 
+              },
+              { 
+                text: `CÓDIGO: ${obj.id}`, 
+                style: 'itemsTableInfo', 
+                alignment: 'right', 
+                border: [false, true, true, true] 
+              }
             ],
           ]
         },
@@ -304,6 +314,7 @@ export class ListarParametroComponent implements OnInit {
         obj.detalles.forEach((det: any) => {
           parametroslista.push([
             n++,
+            obj.id,
             obj.descripcion,
             det.descripcion,
             det.observacion
@@ -312,6 +323,7 @@ export class ListarParametroComponent implements OnInit {
       } else {
         parametroslista.push([
           n++,
+          obj.id,
           obj.descripcion,
           "", 
           ""  
@@ -322,8 +334,6 @@ export class ListarParametroComponent implements OnInit {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Parametros");
 
-
-    console.log("ver logo. ", this.logo)
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -356,7 +366,8 @@ export class ListarParametroComponent implements OnInit {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "parametro", width: 20 },
+      { key: "codigo", width: 10 },
+      { key: "parametro", width: 50 },
       { key: "detalle", width: 20 },
       { key: "descripcion", width: 160 },
     ];
@@ -364,6 +375,7 @@ export class ListarParametroComponent implements OnInit {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: false },
       { name: "PARÁMETRO", totalsRowLabel: "Total:", filterButton: true },
       { name: "DETALLE", totalsRowLabel: "", filterButton: true },
       { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
@@ -385,7 +397,7 @@ export class ListarParametroComponent implements OnInit {
 
     const numeroFilas = parametroslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 4; j++) {
+      for (let j = 1; j <= 5; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -433,6 +445,7 @@ export class ListarParametroComponent implements OnInit {
     // 3. Agregar encabezados de las columnas
     worksheet.columns = [
       { header: 'n', key: 'n', width: 10 },
+      { header: 'codigo', key: 'codigo', width: 10 },
       { header: 'parametro', key: 'parametro', width: 30 },
       { header: 'detalle', key: 'detalle', width: 15 },
       { header: 'descripcion', key: 'descripcion', width: 15 }
@@ -443,6 +456,7 @@ export class ListarParametroComponent implements OnInit {
         obj.detalles.forEach((det: any) => {
           worksheet.addRow({
             n: n++,
+            codigo: obj.id,
             parametro: obj.descripcion,
             detalle: det.descripcion,
             descripcion: det.observacion
@@ -451,6 +465,7 @@ export class ListarParametroComponent implements OnInit {
       } else {
         worksheet.addRow({
           n: n++,
+          codigo: obj.id,
           parametro: obj.descripcion,
           detalle: "",       
           descripcion: ""     

@@ -11,7 +11,7 @@ p {
     margin-bottom: -1px !important;
 }
 
-label{
+label {
     font-weight: bold;
     font-size: x-small;
 }
@@ -33,40 +33,141 @@ label{
     text-align: center;
     transition: background-color 0.3s ease;
     border-radius: 10px;
-    height: 100%;
-    width: 80%;
+    height: 70%;
+    width: 70%;
     margin: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
-    &.activo {
-        background-color: #1391df;
-        color: #125982;
-    }
+.estado-card.inactivo {
+    background-color: #b8b8b8;
+    color: white;
+}
 
-    &.inactivo {
-        background-color: #b8b8b8; 
-        color: #6d6d6d;
-    }
+.estado-card.inactivo:hover {
+    background-color: #959595;
+    color: white;
+}
+
+.estado-card.activo-comunicado {
+    background-color: #ff69b4; 
+    color: white;
+}
+
+.estado-card.activo-comunicado:hover {
+    background-color: #e0579f;
+    color: white;
+}
+
+.estado-card.activo-atrasos {
+    background-color: #ffc107; 
+    color: black;
+}
+
+.estado-card.activo-atrasos:hover {
+    background-color: #e0a800;
+    color: black;
+}
+
+.estado-card.activo-faltas {
+    background-color: #dc3545; 
+    color: white;
+}
+
+.estado-card.activo-faltas:hover {
+    background-color: #c82333;
+    color: white;
+}
+
+.estado-card.activo-salida {
+    background-color: #007bff; 
+    color: white;
+}
+
+.estado-card.activo-salida:hover {
+    background-color: #0069d9;
+    color: white;
+}
+
+.estado-card.activo-permisos {
+    background-color: #e9bb03; 
+    color: black;
+}
+
+.estado-card.activo-permisos:hover {
+    background-color: #e9bb03;
+    color: black;
+}
+
+.estado-card.activo-vacaciones {
+    background-color: #28a745; 
+    color: white;
+}
+
+.estado-card.activo-vacaciones:hover {
+    background-color: #218838;
+    color: white;
+}
+
+.estado-card.activo-horaExtra {
+    background-color: #6f42c1; 
+    color: white;
+}
+
+.estado-card.activo-horaExtra:hover {
+    background-color: #5936a2;
+    color: white;
+}
+
+.estado-card.activo-comida {
+    background-color: #fd7e14; 
+    color: white;
+}
+
+.estado-card.activo-comida:hover {
+    background-color: #e96b0c;
+    color: white;
 }
 
 .estado-card:hover {
-    cursor: pointer;
     transform: scale(1.03);
+}
 
-    &.activo {
-        background-color: #0875b8;
-        color: #125982;
-    }
+.estado-card mat-icon {
+    font-size: 28px;
+    color: white;
+    margin-bottom: 5px;
+    padding: 0 4px;
+    box-sizing: content-box;
+}
 
-    &.inactivo {
-        background-color: #959595; 
-        color: #787878;
-    }
+.estado-card label {
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+    text-align: center;
+}
+
+.estado-card mat-card-title,
+.estado-card mat-card-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    line-height: normal;
+    overflow: visible;
 }
 
 @media (max-width: 530px) {
     .estado-card {
-        height: 100%;
         width: 100%;
+        height: auto;
     }
 
     p {

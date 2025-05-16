@@ -16,7 +16,6 @@
             </div>
         </div>
 
-
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
             <mat-step [stepControl]="primeroFormGroup">
                 <ng-template matStepLabel>
@@ -78,10 +77,10 @@
                         </div>
                         
                         <div class="col-12 col-md-6" style="margin-top: 9px;">
-                            <mat-radio-group aria-label="Select an option" [value]="identificacion" style="display: flex;" required >
+                            <mat-radio-group formControlName="tipoIdentificacionForm" aria-label="Select an option" style="display: flex;" required >
                                 <div>
                                     <mat-radio-button (change)="CambiarIdentificacion($event); VerificarCodigo()" value="Cedula">
-                                        Identificación
+                                        Cédula
                                     </mat-radio-button>
                                 </div>
                                 <div>
@@ -89,8 +88,8 @@
                                         Pasaporte
                                     </mat-radio-button>
                                 </div>
-                        
-                            </mat-radio-group> 
+                            </mat-radio-group>
+
                             <div  *ngIf="identificacion=='Cedula'">
                                 <mat-form-field>
                                     <mat-label>Identificación</mat-label>
@@ -114,8 +113,7 @@
                                     <mat-label>Pasaporte</mat-label>
                                     <input matInput type="text" placeholder="pasaporte" maxlength="10"
                                         formControlName="cedulaForm"
-                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                        (keypress)="IngresarSoloNumeros($event)" required
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"                                     
                                         (input)="LlenarCodigo(primeroFormGroup.value); ValidarPasaporte(primeroFormGroup.value)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
@@ -160,7 +158,6 @@
                     <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
                 </div>
             </mat-step>
-
 
             <mat-step [stepControl]="segundoFormGroup">
                 <form [formGroup]="segundoFormGroup">
@@ -256,7 +253,6 @@
                 </div>
             </mat-step>
 
-
             <mat-step [stepControl]="terceroFormGroup">
                 <form [formGroup]="terceroFormGroup">
                     <ng-template matStepLabel>
@@ -314,6 +310,16 @@
                                 </button>
                             </mat-form-field>
                         </div>
+                        <div class="col-12 col-md-6">
+                            <mat-form-field>
+                              <mat-label>Número de partida individual</mat-label>
+                              <input matInput placeholder="Ej: 67894" formControlName="partidaForm" type="text" maxlength="100">
+                              <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Dato opcional para referencias legales o institucionales.">
+                                assignment
+                              </mat-icon>
+                            </mat-form-field>
+                          </div>                          
                     </div>
                     <div class="row" style="text-align: center; padding-top: 15px;">
                         <div class="col-4 text-center">

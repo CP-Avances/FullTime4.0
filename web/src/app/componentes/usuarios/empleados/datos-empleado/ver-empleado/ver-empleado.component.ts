@@ -18,8 +18,7 @@ import ExcelJS, { FillPattern } from "exceljs";
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
-// ELIMINA LAS URLS POR DEFECTO
-delete L.Icon.Default.prototype._getIconUrl;
+
 // ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -145,6 +144,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   get frase_m(): string { return this.plantillaPDF.marca_Agua }
   get logoE(): string { return this.plantillaPDF.logoBase64 }
 
+  // VARIABLES PARA EL MAPA
+  latitud: number;
+  longitud: number;
+  nombreMarcador: string = '';
+
   constructor(
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS EMPLEADO
     public restEmpleHorario: EmpleadoHorariosService, // SERVICIO DATOS HORARIO DE EMPLEADOS
@@ -190,10 +194,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     var a = DateTime.now();
     this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params
@@ -243,7 +247,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     } else {
       this.SeleccionarPestana(0);
     }
+
+    // VERIFICAR QUE EL MAPA ESTA DEFINIDO
+    if (this.MAP) {
+      this.MAP.invalidateSize();
+    }
+
+    const intervalo = setInterval(() => {
+      if (this.latitud && this.longitud && this.nombreMarcador) {
+        this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
+        clearInterval(intervalo); // Detener el intervalo después de ejecutarlo
+      }
+    }, 200); // Revisa cada 200ms si ya están disponibles
   }
+
+  // ngOnDestroy(): void {
+  //   // LIMPIAR MARCADORES EXISTENTES
+  //   if (this.MARKER) {
+  //     this.MAP.removeLayer(this.MARKER);
+  //   }
+  //   // ELIMINAR MAPA
+  //   if (this.MAP) {
+  //     this.MAP.remove();
+  //     this.MAP = null;
+  //   }
+  // }
 
   // METODO PARA CAMBIAR DE PESTAÑA
   SeleccionarPestana(index: number): void {
@@ -528,7 +556,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-      var empleado = data[0].nombre + ' ' + data[0].apellido;
+      this.nombreMarcador = data[0].nombre + ' ' + data[0].apellido;
+      this.latitud = data[0].latitud;
+      this.longitud = data[0].longitud;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         //this.perfil.SetImagen(this.urlImagen);
@@ -552,7 +582,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           (result) => (this.imagenEmpleado = result)
         );
       }
-      this.MapGeolocalizar(data[0].latitud, data[0].longitud, empleado);
+      // this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
 
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
@@ -587,31 +617,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       longitud = -78.4875258;
       zoom = 7;
     }
-  
+
     setTimeout(() => {
       if (this.MAP) {
         this.MAP.remove();
         this.MAP = null;
       }
-  
+
       this.MAP = L.map('geolocalizacion', {
         center: [latitud, longitud],
         zoom: zoom
       });
-  
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
       }).addTo(this.MAP);
-  
+
       if (this.MARKER) {
         this.MAP.removeLayer(this.MARKER);
       }
-  
+
       this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
       this.MARKER.bindPopup(empleado).openPopup();
-    }, 100); 
+    }, 500);
   }
-  
+
 
   // METODO INCLUIR EL CROKIS
   AbrirUbicacion(nombre: string, apellido: string) {
@@ -663,14 +693,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.empleado_editar=datoEmpleado;
     this.pagina_empleado='ver-empleado';
   }
-
-
-
-
-
-
-
-  
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
@@ -896,7 +918,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       .afterClosed().subscribe(result => {
         setTimeout(() => {
         this.ObtenerDatosVacunas(this.formato_fecha);
-      }, 200); 
+      }, 200);
       });
   }
 
@@ -906,8 +928,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
     }).afterClosed().subscribe(result => {
       setTimeout(() => {
-        this.ObtenerDatosVacunas(this.formato_fecha); 
-      }, 200); 
+        this.ObtenerDatosVacunas(this.formato_fecha);
+      }, 200);
     });
   }
 
@@ -1419,7 +1441,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
+        let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
@@ -2643,7 +2665,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
       fin: h_fin,
     }
 
@@ -3090,7 +3112,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       }
     });
 
-    
+    let numeroPartida = this.empleadoUno[0].numero_partida_individual;
+    let textoNumeroPartida = numeroPartida ? 'Numero de partida individual: ' + numeroPartida + '\n' : '';
+    let tipoIdentificacionTexto = this.empleadoUno[0].tipo_identificacion == 1 ? 'Cédula' : 'Pasaporte';
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
@@ -3176,13 +3201,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                           [
                             {
                               text: [
-                                'CI: ' + this.empleadoUno[0].identificacion + '\n',
+                                'Tipo identificación: ' + tipoIdentificacionTexto + '\n',
+                                'Num. identificación: ' + this.empleadoUno[0].identificacion + '\n',
                                 'Nacionalidad: ' + nacionalidad + '\n',
-                                'Fecha Nacimiento: ' + '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
+                                'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                                 'Estado civil: ' + estadoCivil + '\n',
                                 'Género: ' + genero + '\n'
                               ],
-                              style: 'item'
+                              style: 'item',
+                              alignment: 'left',
+                              valign: 'top',
+                              lineHeight: 1.1
                             },
                             {
                               text: [
@@ -3190,18 +3219,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                                 'Teléfono: ' + this.empleadoUno[0].telefono + '\n',
                                 'Estado: ' + estado + '\n',
                                 'Domicilio: ' + this.empleadoUno[0].domicilio + '\n',
+                                textoNumeroPartida
                               ],
-                              style: 'item'
+                              style: 'item',
+                              alignment: 'left',
+                              valign: 'top',
+                              lineHeight: 1.1
+                            }
+                          ],
+                          [
+                            {
+                              text: 'Correo: ' + this.empleadoUno[0].correo,
+                              colSpan: 2,
+                              style: 'item',
+                              alignment: 'left',
+                              margin: [0, -4, 0, 0] 
                             },
+                            {} 
                           ]
-                        ]
+                        ]                        
                       },
-                      layout: 'noBorders', // Esto elimina los bordes de la tabla
-                      alignment: 'left', // Alinea la tabla a la izquierda
+                      layout: 'noBorders',
+                      alignment: 'left'
                     },
-                    {
-                      text: 'Correo: ' + this.empleadoUno[0].correo, style: 'item'
-                    }
                   ]
                 }
 
@@ -3384,7 +3424,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                 { text: 'Fecha: ' + obj.fecha_ },
                 { text: 'Carnet: ' + obj.carnet }
               ],
-              [{ text: '', colSpan: 2 }, {}] 
+              [{ text: '', colSpan: 2 }, {}]
             ];
           })
         ]
@@ -3761,24 +3801,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         'Codigo': obj.codigo,
         "Apellido": obj.apellido,
         "Nombre": obj.nombre,
+        "Tipo identificacion": obj.tipo_identificacion == 1 ? "Cédula" : "Pasaporte",
         "Identificacion": obj.identificacion,
         "Estado Civil": estadoCivil,
         "Genero": genero,
         "Correo": obj.correo,
-        "Fecha de Nacimiento": new Date(obj.fec_nacimiento_.split(" ")[1]),
+        "Fecha de Nacimiento": obj.fec_nacimiento_,
         "Estado": estado,
         "Domicilio": obj.domicilio,
         "Telefono": obj.telefono,
         "Nacionalidad": nacionalidad,
       };
+      if(obj.numero_partida_individual !== null){
+        objeto.numero_partida_individual = obj.numero_partida_individual;
+      }
       if (obj.longitud !== null) {
-        objeto.empleado.longitud = obj.longitud;
+        objeto.longitud = obj.longitud;
       }
       if (obj.latitud !== null) {
-        objeto.empleado.latitud = obj.latitud;
+        objeto.latitud = obj.latitud;
       }
       arregloEmpleado.push(objeto);
     });
+    console.log("DATOS PARA REPORTE", arregloEmpleado)
 
     if (this.discapacidadUser !== null) {
       this.discapacidadUser.map(discapacidad => {
@@ -3867,6 +3912,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   async generarHojaPerfil(workbook: ExcelJS.Workbook) {
     const datos: any = this.ObtenerDatos();
+    const hayLatitud = datos[0].some((emp: any) => emp.latitud !== null && emp.latitud !== undefined);
+    const hayLongitud = datos[0].some((emp: any) => emp.longitud !== null && emp.longitud !== undefined);
+    const hayPartida = datos[0].some((emp: any) => emp.numero_partida_individual !== null && emp.numero_partida_individual !== undefined && emp.numero_partida_individual !== '');
     let n = 0;
     const horarioslista: any[] = [];
 
@@ -3908,12 +3956,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-    worksheet.columns = [
-
-      { key: "codigo", width: 20 },
+    const columnasExcel: any[] = [
+      { key: "codigo", width: 10 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
       { key: "identificacion", width: 20 },
+      { key: "tipoIdentificacion", width: 25 },
       { key: "estadoCivil", width: 20 },
       { key: "genero", width: 20 },
       { key: "correo", width: 20 },
@@ -3922,13 +3970,18 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { key: "domicilio", width: 20 },
       { key: "telefono", width: 20 },
       { key: "nacionalidad", width: 20 },
-
     ];
+    if (hayPartida) columnasExcel.push({ key: "numero_partida_individual", width: 20 });
+    if (hayLatitud) columnasExcel.push({ key: "latitud", width: 20 });
+    if (hayLongitud) columnasExcel.push({ key: "longitud", width: 20 });
 
-    const columnas = [
+    worksheet.columns = columnasExcel;    
+
+    const columnasTabla: any[] = [
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
+      { name: "TIPO IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "ESTADO CIVIL", totalsRowLabel: "", filterButton: true },
       { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
@@ -3939,6 +3992,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { name: "TELÉFONO", totalsRowLabel: "", filterButton: true },
       { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
     ];
+    if (hayPartida) columnasTabla.push({ name: "NÚMERO DE PARTIDA", totalsRowLabel: "", filterButton: true });
+    if (hayLatitud) columnasTabla.push({ name: "LATITUD", totalsRowLabel: "", filterButton: true });
+    if (hayLongitud) columnasTabla.push({ name: "LONGITUD", totalsRowLabel: "", filterButton: true });    
 
     worksheet.addTable({
       name: "Perfil",
@@ -3949,14 +4005,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         theme: "TableStyleMedium16",
         showRowStripes: true,
       },
-      columns: columnas,
+      columns: columnasTabla,
       rows: horarioslista,
     });
 
     const numeroFilas = horarioslista.length;
+    const totalColumnas = worksheet.columns.length;
 
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 12; j++) {
+      for (let j = 1; j <= totalColumnas; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -4548,7 +4605,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
-  
+
   getCrearDatos(){
     return this.tienePermiso('Crear datos');
   }

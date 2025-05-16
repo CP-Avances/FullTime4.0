@@ -114,7 +114,7 @@ export const faltasDiarios = async function () {
     console.log("formato de hora:", hora);
 
     const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
-        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 40`
+        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 33`
     );
     
     if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {

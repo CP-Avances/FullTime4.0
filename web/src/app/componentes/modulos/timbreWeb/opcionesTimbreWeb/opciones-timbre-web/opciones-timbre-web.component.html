@@ -134,90 +134,86 @@
                     </div>
                 </div>
             </form>
-            
+
             <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
             <form *ngIf="_booleanOptions.bool_emp">
                 <div class="row">
-                <!-- Primera fila -->
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Sucursal</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
-                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
-                    </mat-form-field>
+                    <!-- Primera fila -->
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Sucursal</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Nombres</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
+                                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras</mat-error>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Código</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
+                                    [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
                 </div>
-            
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Nombres</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
-                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras</mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
-                    </mat-form-field>
-                    </div>
-                </div>
-            
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Código</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
-                        [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
-                    </mat-form-field>
-                    </div>
-                </div>
-                </div>
-            
+
                 <!-- Segunda fila -->
                 <div class="row">
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Identificación</mat-label>
-                        <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
-                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                        [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
-                        <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de datos de empleado por número de identificación.">help_outline</mat-icon>
-                    </mat-form-field>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Identificación</mat-label>
+                                <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por número de identificación.">help_outline</mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                </div>
-            
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Rol</mat-label>
-                            <input type="text"
-                                   matInput
-                                   placeholder="Buscar"
-                                   aria-label="Rol"
-                                   [formControl]="nombre_rol"
-                                   [matAutocomplete]="autoRol"
-                                   (keypress)="IngresarSoloLetras($event)">  
-                            <mat-autocomplete #autoRol="matAutocomplete">
-                              <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
-                                {{ rol.nombre }}
-                              </mat-option>
-                            </mat-autocomplete>
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                              help_outline
-                            </mat-icon>
-                        </mat-form-field>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Rol</mat-label>
+                                <input type="text" matInput placeholder="Buscar" aria-label="Rol"
+                                    [formControl]="nombre_rol" [matAutocomplete]="autoRol"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-autocomplete #autoRol="matAutocomplete">
+                                    <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                        {{ rol.nombre }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                </div>
                 </div>
             </form>
-  
+
 
             <div class="row" *ngIf="activar_boton" style="text-align: center; font-size: 12px;">
                 <div class="col-md">
@@ -232,13 +228,21 @@
                     </mat-radio-group>
                     <!-- Nuevo Div debajo -->
                     <div class="mt-3" *ngIf="seleccion_foto.value">
-                        <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion_foto_obligatoria">
-                            <mat-radio-button class="example-radio-button" [value]="true">
-                                <label id="textoradiobtn">Obligatorio</label>
-                            </mat-radio-button>
-                            <mat-radio-button class="example-radio-button" [value]="false">
-                                <label id="textoradiobtn">Opcional</label>
-                            </mat-radio-button>
+                        <mat-radio-group class="d-flex flex-wrap justify-content-center"
+                            [formControl]="seleccion_foto_obligatoria">
+                            <div class="row">
+                                <div class="col-md">
+                                    <mat-radio-button style="margin-left: -15px;" class="example-radio-button"
+                                        [value]="false">
+                                        <label id="textoradiobtn">Opcional</label>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="col-md">
+                                    <mat-radio-button class="example-radio-button" [value]="true">
+                                        <label id="textoradiobtn">Obligatorio</label>
+                                    </mat-radio-button>
+                                </div>
+                            </div>
                         </mat-radio-group>
                     </div>
                 </div>
@@ -268,17 +272,19 @@
             </div>
             <hr>
             <div class="row w-100 p-0 mb-3" *ngIf="activar_boton" style="padding-bottom: 10px;">
-                <div class="col-3 col-md-4">
-                    <button class="btn btn-sm" (click)="GuardarRegistros(0, '')" *ngIf="getGuardarConfiguracionTimbreWeb()">
+                <div class="col-3 col-md-4 d-flex flex-wrap justify-content-center">
+                    <button class="btn btn-sm" (click)="GuardarRegistros(0, '')"
+                        *ngIf="getGuardarConfiguracionTimbreWeb()">
                         Guardar
                     </button>
                 </div>
-                <div class="col-5 col-md-4">
-                    <button class="btn btn-sm" (click)="GuardarRegistros(0, 'ver')" *ngIf="getVerConfiguracionTimbreWeb()">
+                <div class="col-5 col-md-4 d-flex flex-wrap justify-content-center">
+                    <button class="btn btn-sm" (click)="GuardarRegistros(0, 'ver')"
+                        *ngIf="getVerConfiguracionTimbreWeb()">
                         Ver Configuración
                     </button>
                 </div>
-                <div class="col-4 col-md-4">
+                <div class="col-4 col-md-4 d-flex flex-wrap justify-content-center">
                     <button class="btn btn-sm" (click)="MostrarLista()">
                         Mostrar lista
                     </button>
@@ -323,12 +329,14 @@
                                 </td>
                                 <td>{{s.sucursal}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
-                                        (click)="GuardarRegistros(s, 'ver')" matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye"
+                                        id="t-ver" (click)="GuardarRegistros(s, 'ver')" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(s, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
+                                    <i (click)="GuardarRegistros(s, '')" id="accion"
+                                        *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -386,12 +394,14 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
-                                        (click)="GuardarRegistros(r, 'ver')" matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye"
+                                        id="t-ver" (click)="GuardarRegistros(r, 'ver')" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(r, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
+                                    <i (click)="GuardarRegistros(r, '')" id="accion"
+                                        *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -450,12 +460,14 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
-                                        (click)="GuardarRegistros(c, 'ver')" matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye"
+                                        id="t-ver" (click)="GuardarRegistros(c, 'ver')" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(c, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
+                                    <i (click)="GuardarRegistros(c, '')" id="accion"
+                                        *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -513,12 +525,14 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
-                                        (click)="GuardarRegistros(d, 'ver')" matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye"
+                                        id="t-ver" (click)="GuardarRegistros(d, 'ver')" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(d, '')" id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
+                                    <i (click)="GuardarRegistros(d, '')" id="accion"
+                                        *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
                                         class="fa fa-hand-pointer-o" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
@@ -583,13 +597,14 @@
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td>{{e.rol}}</td>
                                 <td class="justify-content-center">
-                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye" id="t-ver"
-                                        (click)="VerOpciones([e], 'e')" matSuffix matTooltipPosition="right"
+                                    <i *ngIf="auto_individual && getVerConfiguracionTimbreWeb()" class="fas fa-eye"
+                                        id="t-ver" (click)="VerOpciones([e], 'e')" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Ver</p>
                                     </i>
-                                    <i id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()" class="fa fa-hand-pointer-o"
-                                        (click)="RegistrarMultiple([e])" matSuffix matTooltipPosition="right"
+                                    <i id="accion" *ngIf="auto_individual && getGuardarConfiguracionTimbreWeb()"
+                                        class="fa fa-hand-pointer-o" (click)="RegistrarMultiple([e])" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres.">
                                         <p>Configurar</p>
                                     </i>

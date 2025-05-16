@@ -380,7 +380,7 @@ class UbicacionControlador {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                res.status(404).jsonp({ text: 'Usuarios no asociados a la ubicación.', sin_usuarios: true });
             }
         });
     }

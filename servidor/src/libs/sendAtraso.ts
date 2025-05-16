@@ -111,7 +111,7 @@ export const atrasosDiarios = async function () {
     }
 
     const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
-        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 41`
+        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 34`
     );
     
     if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {

@@ -71,11 +71,11 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-      
+
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-  
+    });
+
     if (this.data.auto.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -228,8 +228,12 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     let desde = DateTime.fromISO(vacacion.fec_inicio).setLocale('es').weekdayLong;
     let hasta = DateTime.fromISO(vacacion.fec_final).setLocale('es').weekdayLong;
     // CAPITALIZAR LA PRIMERA LETRA
-    desde = desde.charAt(0).toUpperCase() + desde.slice(1);
-    hasta = hasta.charAt(0).toUpperCase() + hasta.slice(1);
+    if (desde) {
+      desde = desde.charAt(0).toUpperCase() + desde.slice(1);
+    }
+    if (hasta) {
+      hasta = hasta.charAt(0).toUpperCase() + hasta.slice(1);
+    }
     this.listaEnvioCorreo = [];
     this.id_departamento = this.solInfo.id_dep;
     this.lectura = 1;
@@ -388,8 +392,13 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     let desde = DateTime.fromISO(vacaciones.fec_inicio).setLocale('es').weekdayLong;
     let hasta = DateTime.fromISO(vacaciones.fec_final).setLocale('es').weekdayLong;
     // CAPITALIZAR LA PRIMERA LETRA
-    desde = desde.charAt(0).toUpperCase() + desde.slice(1);
-    hasta = hasta.charAt(0).toUpperCase() + hasta.slice(1);
+    if (desde) {
+      desde = desde.charAt(0).toUpperCase() + desde.slice(1);
+    }
+    if (hasta) {
+      hasta = hasta.charAt(0).toUpperCase() + hasta.slice(1);
+    }
+
     let notificacion = {
       id_receives_empl: '',
       id_receives_depa: '',

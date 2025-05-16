@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
@@ -161,7 +161,11 @@ export class EditarHorarioComponent implements OnInit {
       dataHorario.min_almuerzo = 0;
     }
     else if (dataHorario.hora_trabajo >= '72:00' || dataHorario.hora_trabajo >= '72:00:00') {
-      dataHorario.hora_trabajo = DateTime.fromISO(dataHorario.hora_trabajo, 'HH:mm:ss').toFormat('HH:mm:ss');
+      if (typeof dataHorario.hora_trabajo === 'string' && dataHorario.hora_trabajo.split(':').length === 2) {
+        const [hours, minutes] = dataHorario.hora_trabajo.split(':').map(Number);
+        const duration = Duration.fromObject({ hours, minutes });
+        dataHorario.hora_trabajo = duration.toFormat('hh:mm:ss');
+      }
     }
 
     // VALIDAR INGRESO DE MINUTOS DE ALIMENTACION
@@ -305,6 +309,11 @@ export class EditarHorarioComponent implements OnInit {
         });
       }
     }
+  }
+
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null;
   }
 
   // METODO PARA GUARDAR DATOS DE ARCHIVO SELECCIONADO

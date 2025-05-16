@@ -872,6 +872,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   // METODO PARA ELIMINAR REGISTROS
   Eliminar(id_feriado: number) {
+    console.log("METODO QUE ELIMINA");
     const datos = {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
@@ -893,6 +894,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    console.log("ENTRADO A CONFIRMACION DE DELETE");
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -909,38 +911,37 @@ export class ListarFeriadosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTROS MULTIPLES
   contador: number = 0;
-  ingresar: boolean = false;
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     };
-    this.ingresar = false;
     this.contador = 0;
+    let totalProcesados = 0;
+    const totalAEliminar = this.selectionFeriados.selected.length;
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
-      this.feriados = this.feriados.filter((item: any) => item.id !== datos.id);
-      this.contador = this.contador + 1;
       this.rest.EliminarFeriado(datos.id, data).subscribe((res: any) => {
+        totalProcesados++;
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+          this.toastr.warning('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-          this.contador = this.contador - 1;
         } else {
-          if (!this.ingresar) {
-            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+          this.feriados = this.feriados.filter((item: any) => item.id !== datos.id);
+          this.contador++;
+        }
+        if (totalProcesados === totalAEliminar) {
+          if (this.contador > 0) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registro(s).', '', {
               timeOut: 6000,
             });
-            this.ingresar = true;
-            this.feriados = [];
-            this.LimpiarCampos();
           }
+          this.LimpiarCampos();
         }
       });
-    }
-    )
-  }
+    });
+  }  
 
   // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS MULTIPLES
   ConfirmarDeleteMultiple() {

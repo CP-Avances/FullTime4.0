@@ -306,7 +306,7 @@ export class ListaEmpleadosComponent implements OnInit {
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })
-    } else if (opcion === 2 || opcion === 3) {
+    } else if (opcion === 2) {
       EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
@@ -339,10 +339,6 @@ export class ListaEmpleadosComponent implements OnInit {
             // ACTIVAR EMPLEADOS
             else if (opcion === 2) {
               res = await this.rest.ActivarVariosUsuarios(datos);
-            }
-            // REACTIVAR EMPLEADOS
-            else if (opcion === 3) {
-              res = await this.rest.ReActivarVariosUsuarios(datos);
             }
             this.toastr.success(res.message, '', {
               timeOut: 6000,
@@ -530,7 +526,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (this.datosCodigo[0].automatico === true) {
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula ===true) {
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
@@ -572,11 +568,12 @@ export class ListaEmpleadosComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
-  // METODO PARA VERIFICAR PLANTILLA MODO CODIGO AUTOMATICO
+  // METODO PARA VERIFICAR PLANTILLA MODO CODIGO AUTOMATICO Y IDENTIFICACION
   DataEmpleados: any;
   listUsuariosCorrectas: any = [];
   messajeExcel: string = '';
   VerificarPlantillaAutomatico() {
+    this.datosManuales = false;
     this.listUsuariosCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
@@ -681,7 +678,7 @@ export class ListaEmpleadosComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip, ip_local: this.ips_locales
       };
-      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].identificacion === true) {
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         this.rest.SubirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,

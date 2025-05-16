@@ -27,9 +27,7 @@ import { AuthGuard } from './servicios/generales/guards/auth.guard';
 // RUTA
 import { environment } from 'src/environments/environment';
 // NOTIFICACIONES EN TIEMPO REAL
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-const ruta = environment.url.split("/")[2];
-const config: SocketIoConfig = { url: ruta, options: {} };
+import { SocketIoModule } from 'ngx-socket-io';
 // COMPONETE PRINCIPAL
 import { AppComponent } from './app.component';
 // COMPONENTES DE PROGRESO
@@ -653,7 +651,7 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
 
   imports: [
     BrowserModule,
-    SocketIoModule.forRoot(config),
+    SocketIoModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,

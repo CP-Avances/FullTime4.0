@@ -104,6 +104,7 @@ class LoginControlador {
         //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
         const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
+        //console.log('llave ', public_key)
         const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
         {
           method: "POST",

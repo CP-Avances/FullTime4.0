@@ -81,10 +81,10 @@ export class EditarContratoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;
@@ -165,7 +165,7 @@ export class EditarContratoComponent implements OnInit {
     this.tipoContrato = [];
     this.rest.BuscarTiposContratos().subscribe(datos => {
       this.tipoContrato = datos;
-      this.tipoContrato[this.tipoContrato.length] = { descripcion: "OTRO" };
+      this.tipoContrato[this.tipoContrato.length] = { id: 'OTRO', descripcion: "OTRO" };
     })
   }
 
@@ -176,23 +176,32 @@ export class EditarContratoComponent implements OnInit {
     });
     this.habilitarContrato = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // INGRESAR MODALIDAD LABORAL
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined) {
+  IngresarOtro(valor: any) {
+    if (valor === undefined || valor === 'OTRO') {
       this.ContratoForm.patchValue({
         contratoForm: '',
       });
       this.habilitarContrato = true;
-      this.toastr.info('Ingresar modalidad laboral.', '', {
-        timeOut: 6000,
-      })
       this.habilitarSeleccion = false;
       this.contratoF.setValidators([Validators.required, Validators.minLength(3)]);
       this.contratoF.updateValueAndValidity();
       this.tipoF.clearValidators();
-      this.tipoF.setValue(null);
+      this.tipoF.setValue(null); 
+      this.tipoF.updateValueAndValidity();
+      this.toastr.info('Ingresar modalidad laboral.', '', {
+        timeOut: 6000,
+      });
+    } else {
+      this.habilitarContrato = false;
+      this.habilitarSeleccion = true;
+      this.contratoF.clearValidators();
+      this.contratoF.setValue('');
+      this.contratoF.updateValueAndValidity();
+      this.tipoF.setValidators(Validators.required);
       this.tipoF.updateValueAndValidity();
     }
   }
@@ -303,10 +312,10 @@ export class EditarContratoComponent implements OnInit {
     }
     this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd');
+      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd')!;
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd');
+        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd')!;
         if (ingreso < fecha_salida) {
           this.duplicado = 1;
         }
@@ -456,8 +465,8 @@ export class EditarContratoComponent implements OnInit {
 
   // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
   ReseteoArchivo(event: any) {
-    event.target.value = null; 
-  }  
+    event.target.value = null;
+  }
 
   // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
@@ -495,7 +504,7 @@ export class EditarContratoComponent implements OnInit {
       if (opcion === 2) {
         setTimeout(() => {
           this.componentev.VerDatosActuales(this.componentev.formato_fecha);
-        }, 300); 
+        }, 300);
       }
     }
   }
