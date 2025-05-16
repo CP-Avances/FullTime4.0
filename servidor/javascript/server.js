@@ -296,7 +296,6 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
-const sendAtraso_1 = require("./libs/sendAtraso");
 const sendAniversario_1 = require("./libs/sendAniversario");
 const sendBirthday_1 = require("./libs/sendBirthday");
 /** **************************************************************************************************** **
@@ -306,7 +305,7 @@ const sendBirthday_1 = require("./libs/sendBirthday");
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 exports.io = SERVIDOR.io;
 setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    (0, sendAtraso_1.atrasosDiarios)();
+    // atrasosDiarios();
     //atrasosSemanal();
     //faltasDiarios();
     //faltasSemanal();

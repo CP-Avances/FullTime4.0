@@ -83,7 +83,7 @@ const atrasosDiarios = function () {
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
             `);
                 if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
-                    if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                    if (true) {
                         (0, exports.atrasos)(fecha, fecha, false);
                         (0, exports.atrasosDepartamentos)(fecha, fecha, false);
                         (0, exports.atrasosIndividual)(fecha, fecha);

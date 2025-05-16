@@ -84,7 +84,7 @@ export const atrasosDiarios = async function () {
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
             `);
             if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
-                if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                if (true) {
                 atrasos(fecha, fecha, false);
                 atrasosDepartamentos(fecha, fecha, false);
                 atrasosIndividual(fecha, fecha);
@@ -670,7 +670,7 @@ export const atrasosDepartamentos = async function (desde: any, hasta: any, sema
                 let data = {
                     to: correos,
                     from: EMPLEADOS.rows[0].correo_empresa,
-                    subject: asunto,
+                    subject: asunto,    
                     html:
                         `
                                         <body>
