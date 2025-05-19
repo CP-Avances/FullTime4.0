@@ -360,7 +360,7 @@ export class RegistroContratoComponent implements OnInit {
             timeOut: 6000,
           });
           console.error('Error en EditarEstadoCargo:', err);
-          return of(null); // Continúa el flujo aunque falle
+          return of(null); 
         })
       );
     } else {
