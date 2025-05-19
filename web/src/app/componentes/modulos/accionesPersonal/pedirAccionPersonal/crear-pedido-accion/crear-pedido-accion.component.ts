@@ -77,40 +77,22 @@ export class CrearPedidoAccionComponent implements OnInit {
   
   otroDecretoF = new FormControl("", [Validators.minLength(3)]);
   otroCargoF = new FormControl("", [Validators.minLength(3)]);
-  fechaDesdeF = new FormControl("", [Validators.required]);
-  fechaHastaF = new FormControl("");
-
   numPartidaF = new FormControl("", [Validators.required]);
-  
   accionForm = new FormControl("");
   
-  notificacionesPosesiones = new FormControl("");
+  
   funcionesReemp = new FormControl("");
   numPropuestaF = new FormControl("");
   descripcionP = new FormControl("");
   DepartamentoForm = new FormControl("");
   DepartamentoPropuestoForm = new FormControl("");
-  idEmpleadoHF = new FormControl("");
-  idEmpleadoGF = new FormControl("");
-  idEmpleadoRF = new FormControl("");
+  
   nombreReemp = new FormControl("");
   puestoReemp = new FormControl("");
   accionReemp = new FormControl("");
   numPartidaI = new FormControl("");
-  fechaReemp = new FormControl("");
+  
   fechaActaF = new FormControl("");
-
-  procesoPropuesto = new FormControl("",[Validators.required])
-  idSucursalPropues = new FormControl("");
-  idDepaPropues = new FormControl("");
-  idDepaAdminPropuesta = new FormControl("");
-  idCiudadPropuesta = new FormControl("");
-  tipoCargoPropuestoF = new FormControl("");
-  grupoOcupacionalPropuestoF = new FormControl("");
-  gradoPropuestoF = new FormControl("");
-  sueldoPropuestoF = new FormControl("");
-  actaPropuestaF = new FormControl("");
- 
 
   //Formulario 1 accion personal
   identificacionF = new FormControl("", [Validators.required,Validators.minLength(3),]);
@@ -123,27 +105,60 @@ export class CrearPedidoAccionComponent implements OnInit {
   idTipoAccion = new FormControl("");
   otroAccionF = new FormControl("");
   otroEspecificacion = new FormControl("");
-  declaracionJuradaF = new FormControl(null);
+  declaracionJuradaF = new FormControl(false);
+  observacionForm = new FormControl("");
   baseLegalForm = new FormControl("", [Validators.minLength(6)]);
 
   //Formulario 3 situacion actual
-  tipoProcesoF = new FormControl("");
-  idSucursal = new FormControl("");
-  idDepa = new FormControl("");
-  idDepaActual = new FormControl("");
-  idCiudad = new FormControl("");
-  tipoCargoF = new FormControl("");
-  grupoOcupacionalF = new FormControl("");
-  gradoF = new FormControl("");
-  sueldoF = new FormControl("");
+  tipoProcesoF = new FormControl("", [Validators.required]);
+  idSucursal = new FormControl("", [Validators.required]);
+  idDepa = new FormControl("", [Validators.required]);
+  idDepaActual = new FormControl("", [Validators.required]);
+  idCiudad = new FormControl("", [Validators.required]);
+  tipoCargoF = new FormControl("", [Validators.required]);
+  grupoOcupacionalF = new FormControl("", [Validators.required]);
+  gradoF = new FormControl("", [Validators.required]);
+  sueldoF = new FormControl("", [Validators.required]);
   actaF = new FormControl("");
 
+  procesoPropuesto = new FormControl("")
+  idSucursalPropues = new FormControl("");
+  idDepaPropues = new FormControl("");
+  idDepaAdminPropuesta = new FormControl("");
+  idCiudadPropuesta = new FormControl("");
+  tipoCargoPropuestoF = new FormControl("");
+  grupoOcupacionalPropuestoF = new FormControl("");
+  gradoPropuestoF = new FormControl("");
+  sueldoPropuestoF = new FormControl("");
+  actaPropuestaF = new FormControl("");
+
   //Formulario 4 responsables aprovacion
+  abrevHA = new FormControl("");
+  abrevGA = new FormControl("");
   abrevHF = new FormControl("");
   abrevGF = new FormControl("");
-  idEmpleadoF = new FormControl("");
-  idEmpleadoRNF = new FormControl("");
 
+  idEmpleadoRA = new FormControl("");
+  idEmpleadoF = new FormControl("");
+  idEmpleadoHF = new FormControl("");
+  idEmpleadoGF = new FormControl("");
+  idEmpleadoRF = new FormControl("");
+  razonForm = new FormControl("");
+
+  idEmpleadoRNF = new FormControl("");
+  idEmpleadoRNA = new FormControl("");
+  idEmpleadoRRC = new FormControl("");
+  abrevRGF = new FormControl("");
+  abrevRHF = new FormControl("");
+  abrevRRC = new FormControl("");
+
+  //Formulario 5 posesion
+  cedualF = new FormControl("");
+  fechaPosesionForm = new FormControl("");
+
+  //Formulario 6 notificaciones
+  fechaReemp = new FormControl("");
+  notificacionesPosesiones = new FormControl("");
 
   // ASIGNAR LOS CAMPOS DE LOS FORMULARIOS EN GRUPOS
   isLinear = true;
@@ -160,6 +175,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     otroAccionForm: this.otroAccionF,
     otroEspecificacion: this.otroEspecificacion,
     declaracionJuradaForm: this.declaracionJuradaF,
+    observacionForm: this.observacionForm,
     baseLegalForm: this.baseLegalForm
   });
   public thirdFormGroup = new FormGroup({
@@ -176,7 +192,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     sueldoForm: this.sueldoF,
     actaForm: this.actaF,
 
-
     procesoPropuestoForm: this.procesoPropuesto,
     sucursalPropuestoForm: this.idSucursalPropues,
     NivelDepaPropuestoForm: this.idDepaPropues,
@@ -187,31 +202,44 @@ export class CrearPedidoAccionComponent implements OnInit {
     gradoPropuestoForm: this.gradoPropuestoF,
     sueldoPropuestoForm: this.sueldoPropuestoF,
     actaPropuestaFom: this.actaPropuestaF
-
-
   });
   public fourthFormGroup = new FormGroup({
-
+    
+    idEmpleadoRAForm: this.idEmpleadoRA,
     idEmpleadoRForm: this.idEmpleadoRF,
-    idEmpleadoRNForm: this.idEmpleadoRNF,
-
-    fechaActaForm: this.fechaActaF,
     idEmpleadoHForm: this.idEmpleadoHF,
     idEmpleadoGForm: this.idEmpleadoGF,
-    
-    otroCargoForm: this.otroCargoF,
+    abrevHAForm: this.abrevHA,
+    abrevGAForm: this.abrevGA,
     abrevHForm: this.abrevHF,
     abrevGForm: this.abrevGF,
+    
+    fechaActaForm: this.fechaActaF,
+    razonForm: this.razonForm,
+
+    idEmpleadoRNAForm: this.idEmpleadoRNA,
+    idEmpleadoRNForm: this.idEmpleadoRNF,
+    idEmpleadoRRCorm: this.idEmpleadoRRC,
+    abrevRGForm: this.abrevRGF,
+    abrevRHForm: this.abrevRHF,
+    abrevRRCorm: this.abrevRRC,
 
     funcionesReempForm: this.funcionesReemp,
     nombreReempForm: this.nombreReemp,
     puestoReempForm: this.puestoReemp,
     accionReempForm: this.accionReemp,
+    
+  });
+  public fivethFormGroup = new FormGroup({
+    funcionarioForm: this.funcionarioF,
+    cedulaForm: this.cedualF,
+    fechaPosesionForm: this.fechaPosesionForm
+  })
+  public sixthFormGroup = new FormGroup({
     fechaReempForm: this.fechaReemp,
     posesionNotificacionForm: this.notificacionesPosesiones,
     descripcionPForm: this.descripcionP,
-  });
-
+  })
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
@@ -507,26 +535,39 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.vistaCargo = false;
     }
   }
-
+  activarOtro = true;
   onTipoAccionSeleccionado(e:MatAutocompleteSelectedEvent){
-    console.log('e: ',e.option.value);
     if(e.option.value != undefined && e.option.value != null){
       this.tipos_accion.forEach(item => {
         if(item.nombre == e.option.value){
           this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
         }
       });
+
+      if(e.option.value == 'OTRO'){
+        this.activarOtro = false
+      }else{
+        this.activarOtro = true
+      }
+
+      this.secondFormGroup.controls['otroAccionForm'].setValue("");
+      this.secondFormGroup.controls['otroEspecificacion'].setValue("");
+
     }
   }
-
+  
   InfoUser: any = {}
   oninfoEmpleado(e: any){
-    console.log('e: ',e.id);
+    console.log('e: ',e)
      if(e.id != undefined && e.id != null){
         this.restUsu.BuscarInfoUsuarioAcci(e.id).subscribe((datos) => {
           this.InfoUser = datos
           console.log('informacion usuario: ',datos)
           this.InfoUser.forEach(valor => {
+
+              this.firstFormGroup.controls['funcionarioForm'].setValue(e.id);
+              this.fivethFormGroup.controls['funcionarioForm'].setValue(e.empleado)
+              this.fivethFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
               //Proceso
               const proceso = this.procesos.find((info: any) => info.id == valor.id_proceso);
@@ -555,7 +596,6 @@ export class CrearPedidoAccionComponent implements OnInit {
                   this.thirdFormGroup.controls['NivelDepaForm'].setValue(departamento.departamento_padre)
                 }
               }
-              
               
               //Lugar de trabajo
               this.thirdFormGroup.controls['idCiudadForm'].setValue(sucursal.descripcion)

@@ -16,6 +16,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 // CAMBIAR EL LOCAL DE LA APP
@@ -667,6 +668,7 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     MatPaginatorModule,
     MatTableModule,
     MatDatepickerModule,
+    MatTimepickerModule,
     MatNativeDateModule,
     ReportesModule,
     SpinnerModule,
