@@ -333,7 +333,8 @@ DesactivarFinContratoEmpleado();
 export const io = SERVIDOR.io;
 
 setInterval(async () => {
-    atrasosDiarios();
+    //console.log('ingresa')
+    //atrasosDiarios();
     //atrasosSemanal();
     //faltasDiarios();
     //faltasSemanal();

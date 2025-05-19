@@ -14,9 +14,11 @@ export class SocketService {
 
   constructor(private urlService: UrlService) {
     this.urlSubscription = this.urlService.getSocketUrl().subscribe(url => {
+      console.error('URL del socket disponible.');
       if (url && url !== this.serverUrl) {
         this.serverUrl = url;
         if (!this.socketConnected) {
+          console.error('URL del socket conectado.');
           this.initSocket();
         }
       }
