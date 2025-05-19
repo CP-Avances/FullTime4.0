@@ -84,16 +84,27 @@ export const atrasosDiarios = async function () {
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
             `);
             if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
-                if (true) {
-                atrasos(fecha, fecha, false);
-                atrasosDepartamentos(fecha, fecha, false);
-                atrasosIndividual(fecha, fecha);
+                if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
+                    atrasos(fecha, fecha, false);
+                    atrasosDepartamentos(fecha, fecha, false);
+                  //  atrasosIndividual(fecha, fecha);  
                 } 
             }
         }
     }
 
-    const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
+}
+
+export const atrasosDiariosIndividual = async function () {
+    const date = new Date();
+    const fecha = date.toJSON().split("T")[0];
+
+    console.log("ver fecha: ", fecha);
+    
+    const hora = date.getHours();
+    const minutos = date.getMinutes();
+
+     const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
         `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 34`
     );
     

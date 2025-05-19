@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasosIndividual = exports.atrasosDepartamentos = exports.atrasos = exports.atrasosDiarios = exports.atrasosSemanal = void 0;
+exports.FormatearHora = exports.FormatearFecha = exports.MinutosAHorasMinutosSegundos = exports.SegundosAMinutosConDecimales = exports.SumarRegistros = exports.EstructurarDatosPDF = exports.PresentarUsuarios = exports.BuscarCorreos = exports.atrasosIndividual = exports.atrasosDepartamentos = exports.atrasos = exports.atrasosDiariosIndividual = exports.atrasosDiarios = exports.atrasosSemanal = void 0;
 const accesoCarpetas_1 = require("./accesoCarpetas");
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
@@ -83,14 +83,24 @@ const atrasosDiarios = function () {
             SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
             `);
                 if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
-                    if (true) {
+                    if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
                         (0, exports.atrasos)(fecha, fecha, false);
                         (0, exports.atrasosDepartamentos)(fecha, fecha, false);
-                        (0, exports.atrasosIndividual)(fecha, fecha);
+                        //  atrasosIndividual(fecha, fecha);  
                     }
                 }
             }
         }
+    });
+};
+exports.atrasosDiarios = atrasosDiarios;
+const atrasosDiariosIndividual = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        const date = new Date();
+        const fecha = date.toJSON().split("T")[0];
+        console.log("ver fecha: ", fecha);
+        const hora = date.getHours();
+        const minutos = date.getMinutes();
         const PARAMETRO_HORA_INDIVIDUAL = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id_parametro = 34`);
         if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
             if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
@@ -99,7 +109,7 @@ const atrasosDiarios = function () {
         }
     });
 };
-exports.atrasosDiarios = atrasosDiarios;
+exports.atrasosDiariosIndividual = atrasosDiariosIndividual;
 const atrasos = function (desde, hasta, semanal) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('ver desde: ', desde);

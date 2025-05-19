@@ -322,6 +322,7 @@ import { cumpleanios } from './libs/sendBirthday';
 import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
 
+import { tareasAutomaticas } from './libs/tareasAutomaticas';
 
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
@@ -332,14 +333,17 @@ DesactivarFinContratoEmpleado();
 
 export const io = SERVIDOR.io;
 
-setInterval(async () => {
+// INICIO DE TAREAS AUTOMATICAS
+tareasAutomaticas.iniciarTareasAutomaticas();
+
+// setInterval(async () => {
     // atrasosDiarios();
     //atrasosSemanal();
     //faltasDiarios();
     //faltasSemanal();
     //salidasAnticipadasSemanal();
     //salidasAnticipadasDiarios();
-}, 60000);
+// }, 60000);
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
 aniversario();
