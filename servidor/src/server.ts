@@ -338,12 +338,12 @@ tareasAutomaticas.iniciarTareasAutomaticas();
 
 // setInterval(async () => {
     // atrasosDiarios();
-    //atrasosSemanal();
-    //faltasDiarios();
-    //faltasSemanal();
-    //salidasAnticipadasSemanal();
-    //salidasAnticipadasDiarios();
-// }, 60000);
+    // atrasosSemanal();
+    // faltasDiarios();
+    // faltasSemanal();
+    // salidasAnticipadasSemanal();
+    // salidasAnticipadasDiarios();
+// }, 3600);
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
 aniversario();

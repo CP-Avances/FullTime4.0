@@ -10,57 +10,15 @@ import { EMPRESA_CONTROLADOR } from '../controlador/configuracion/parametrizacio
 import { ImportarPDF } from './pdf';
 
 export const atrasosSemanal = async function () {
-    const date = new Date(); // Fecha actual
-    const hora = date.getHours();
-    const dia = date.getDay();
-    // Crear una copia del objeto Date antes de modificarlo
-    const dateAntes = new Date(date);
-    dateAntes.setDate(dateAntes.getDate() - 7); // Restar 7 días a la copia
+    const date = DateTime.now(); // Fecha actual
 
-    const fecha = date.toJSON().split("T")[0]; // Fecha actual
-    const fechaSemanaAntes = dateAntes.toJSON().split("T")[0]; // 
+    const fecha = date.toFormat('yyyy-MM-dd'); // Fecha actual
+    const fechaSemanaAntes = date.minus({ week: 1 }).toFormat('yyyy-MM-dd'); // Fecha hace una semana
 
-    console.log("ver fecha: ", fecha);
+    console.log("ver fecha: ", fecha, fechaSemanaAntes);
 
-    const PARAMETRO_SEMANAL = await pool.query(
-        `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 13
-        `);
-
-    const diasSemana = [
-        "Domingo",
-        "Lunes",
-        "Martes",
-        "Miércoles",
-        "Jueves",
-        "Viernes",
-        "Sábado"
-    ];
-
-
-    if (PARAMETRO_SEMANAL.rows[0].descripcion == 'Si') {
-        const PARAMETRO_DIA_SEMANAL = await pool.query(
-            `
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 15
-            `);
-
-        if (PARAMETRO_DIA_SEMANAL.rowCount != 0) {
-            console.log("ver Parametro DIA SEMANAL: ", PARAMETRO_DIA_SEMANAL.rows[0].descripcion)
-            if (diasSemana[dia] === PARAMETRO_DIA_SEMANAL.rows[0].descripcion) {
-                const PARAMETRO_HORA_SEMANAL = await pool.query(
-                    `
-                    SELECT * FROM ep_detalle_parametro WHERE id_parametro = 14
-                    `);
-
-                console.log("ver Parametro hora semanal: ", PARAMETRO_HORA_SEMANAL.rows[0].descripcion)
-
-                if (hora === parseInt(PARAMETRO_HORA_SEMANAL.rows[0].descripcion)) {
-                    atrasos(fechaSemanaAntes, fecha, true);
-                    atrasosDepartamentos(fechaSemanaAntes, fecha, true);
-                }
-            }
-        }
-    }
+    atrasos(fechaSemanaAntes, fecha, true);
+    atrasosDepartamentos(fechaSemanaAntes, fecha, true);
 }
 
 export const atrasosDiarios = async function () {

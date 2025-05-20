@@ -300,12 +300,12 @@ exports.io = SERVIDOR.io;
 tareasAutomaticas_1.tareasAutomaticas.iniciarTareasAutomaticas();
 // setInterval(async () => {
 // atrasosDiarios();
-//atrasosSemanal();
-//faltasDiarios();
-//faltasSemanal();
-//salidasAnticipadasSemanal();
-//salidasAnticipadasDiarios();
-// }, 60000);
+// atrasosSemanal();
+// faltasDiarios();
+// faltasSemanal();
+// salidasAnticipadasSemanal();
+// salidasAnticipadasDiarios();
+// }, 3600);
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendAniversario_1.aniversario)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES

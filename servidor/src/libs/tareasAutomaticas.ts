@@ -1,25 +1,34 @@
 import cron, { ScheduledTask } from "node-cron";
 import pool from "../database";
-import { atrasosDiarios, atrasosDiariosIndividual } from "./sendAtraso";
+import { atrasosDiarios, atrasosDiariosIndividual, atrasosSemanal } from "./sendAtraso";
 
 class TareasAutomaticas {
   private parametroAtrasosDiarios: string;
   private parametroHoraAtrasosDiarios: string;
   private parametroHoraAtrasosIndividuales: string;
 
+  private parametroAtrasosSemanal: string;
+  private parametroDiaAtrasosSemanal: string;
+  private parametroHoraAtrasosSemanal: string;
+
   private tareaAtrasosDiarios: ScheduledTask | null = null;
+  private tareaAtrasosSemanal: ScheduledTask | null = null;
   private tareaAtrasosIndividuales: ScheduledTask | null = null;
 
   constructor() {
     this.parametroAtrasosDiarios = "";
     this.parametroHoraAtrasosDiarios = "";
     this.parametroHoraAtrasosIndividuales = "";
+    this.parametroAtrasosSemanal = "";
+    this.parametroDiaAtrasosSemanal = "";
+    this.parametroHoraAtrasosSemanal = "";
   }
 
   public async iniciarTareasAutomaticas() {
     console.log("Iniciando tareas automáticas...");
     this.programarEnvioAtrasosDiarios();
     this.programarEnvioAtrasosIndividuales();
+    this.programarEnvioAtrasosSemanales();
   }
 
   public detenerTareasAutomaticas() {
@@ -28,6 +37,9 @@ class TareasAutomaticas {
     }
     if (this.tareaAtrasosIndividuales) {
       this.tareaAtrasosIndividuales.stop();
+    }
+    if (this.tareaAtrasosSemanal) {
+      this.tareaAtrasosSemanal.stop();
     }
   }
 
@@ -51,10 +63,10 @@ class TareasAutomaticas {
       const partes = this.parametroHoraAtrasosDiarios.split(":");
 
       const hora = parseInt(partes[0], 10);
-      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : "*";
+      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
 
       const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
-      const minutosValido = minutos === "*" || (!isNaN(minutos) && minutos >= 0 && minutos <= 59);
+      const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
 
       if (horaValida && minutosValido) {
         horaCron = `${minutos} ${hora} * * *`;
@@ -63,7 +75,7 @@ class TareasAutomaticas {
           this.tareaAtrasosDiarios.stop();
         }
 
-        console.log("Programando tarea de atrasos diarios a la hora:", horaCron);
+        console.log("Programando tarea de atrasos diarios:", horaCron);
 
         this.tareaAtrasosDiarios = cron.schedule(horaCron, async () => {
           try {
@@ -129,7 +141,7 @@ class TareasAutomaticas {
           this.tareaAtrasosIndividuales.stop();
         }
 
-        console.log("Programando tarea de atrasos individuales a la hora:", horaCron);
+        console.log("Programando tarea de atrasos individuales:", horaCron);
         this.tareaAtrasosIndividuales = cron.schedule(horaCron, async () => {
           try {
             // Aquí va la lógica para enviar los atrasos individuales
@@ -161,6 +173,91 @@ class TareasAutomaticas {
       this.tareaAtrasosIndividuales = null;
     }
     this.programarEnvioAtrasosIndividuales();
+  }
+
+  /*
+    * Método para programar el envío de atrasos semanales.
+    * Este método consulta los parámetros necesarios y programa una tarea cron
+    * para enviar los atrasos semanales a la hora y día especificados.
+  */
+  private async programarEnvioAtrasosSemanales() {
+    try {
+      // PARAMETRO 13 INDICA INDICA SI ESTA ACTIVO EL ENVIO ATRASOS SEMANALES
+      this.parametroAtrasosSemanal = await this.consultarDetalleParametros(13);
+      // PARAMETRO 14 INDICA LA HORA EN QUE SE ENVIAN LOS ATRASOS SEMANALES
+      this.parametroHoraAtrasosSemanal = await this.consultarDetalleParametros(14);
+      // PARAMETRO 15 INDICA EL DIA EN QUE SE ENVIAN LOS ATRASOS SEMANALES
+      this.parametroDiaAtrasosSemanal = await this.consultarDetalleParametros(15);
+
+      if (!this.parametroAtrasosSemanal || this.parametroAtrasosSemanal != 'Si') return;
+      if (!this.parametroHoraAtrasosSemanal || !this.parametroDiaAtrasosSemanal) return;
+      
+      let horaCron = null;
+
+      const partes = this.parametroHoraAtrasosSemanal.split(":");
+
+      const hora = parseInt(partes[0], 10);
+      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
+
+      const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
+      const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
+      
+      const diasSemana = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado"
+      ];
+
+      const diaValido = diasSemana.includes(this.parametroDiaAtrasosSemanal);
+
+      // CONVERTIR EL DÍA A SU ÍNDICE CORRESPONDIENTE (0-6)
+      const diaIndex = diasSemana.indexOf(this.parametroDiaAtrasosSemanal);
+
+      // VALIDAR QUE EL DÍA ESTÉ EN EL RANGO CORRECTO
+      const diaValidoRango = diaIndex >= 0 && diaIndex <= 6;
+
+      if (horaValida && minutosValido && diaValido && diaValidoRango) {
+        horaCron = `${minutos} ${hora} * * ${diaIndex}`;
+        if (this.tareaAtrasosSemanal) {
+          this.tareaAtrasosSemanal.stop();
+        }
+        console.log("Programando tarea de atrasos semanales:", horaCron);
+        this.tareaAtrasosSemanal = cron.schedule(horaCron, async () => {
+          try {
+            // Aquí va la lógica para enviar los atrasos semanales
+            console.log("Enviando atrasos semanales...");
+            // Llama a la función que maneja el envío de atrasos semanales
+            atrasosSemanal();
+          } catch (error) {
+            throw new Error("Error al enviar atrasos semanales");
+          }
+        });
+      }
+      else {
+        console.error("Hora o día inválido para cron:", this.parametroHoraAtrasosSemanal, this.parametroDiaAtrasosSemanal);
+        throw new Error("Hora o día inválido para cron");
+      }
+      
+    } catch (error) {
+      console.error("Error al programar el envío de atrasos semanales:", error);
+    }
+  }
+
+  /*
+    * Método para actualizar la tarea de envío de atrasos semanales.
+    * Este método detiene la tarea actual y programa una nueva.
+  */
+  public async actualizarEnvioAtrasosSemanales() {
+    if (this.tareaAtrasosDiarios) {
+      this.tareaAtrasosDiarios.stop();
+      this.tareaAtrasosDiarios = null;
+    }
+
+    this.programarEnvioAtrasosSemanales();
   }
 
   /*

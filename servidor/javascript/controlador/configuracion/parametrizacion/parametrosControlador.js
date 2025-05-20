@@ -290,11 +290,13 @@ class ParametrosControlador {
 function reiniciarTareasAutomaticas(id) {
     var _a;
     console.log(`Reiniciando tareas automáticas para el parámetro con id: ${id}`);
-    const tareasMap = {
-        '10': () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosDiarios(),
-        '11': () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosDiarios(),
-        '34': () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosIndividuales(),
+    const tareasMap = {};
+    const mapGroup = (ids, tarea) => {
+        ids.forEach(i => tareasMap[i] = tarea);
     };
+    mapGroup(['10', '11'], () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosDiarios());
+    mapGroup(['13', '14', '15'], () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosSemanales());
+    mapGroup(['34'], () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosIndividuales());
     (_a = tareasMap[id]) === null || _a === void 0 ? void 0 : _a.call(tareasMap);
 }
 exports.PARAMETROS_CONTROLADOR = new ParametrosControlador();
