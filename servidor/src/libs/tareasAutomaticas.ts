@@ -1,5 +1,6 @@
 import cron, { ScheduledTask } from "node-cron";
 import pool from "../database";
+import { atrasosDiarios, atrasosDiariosIndividual } from "./sendAtraso";
 
 class TareasAutomaticas {
   private parametroAtrasosDiarios: string;
@@ -69,6 +70,7 @@ class TareasAutomaticas {
             // Aquí va la lógica para enviar los atrasos diarios
             console.log("Enviando atrasos diarios...");
             // Llama a la función que maneja el envío de atrasos diarios
+            atrasosDiarios();
           } catch (error) {
             throw new Error("Error al enviar atrasos diarios");
           }
@@ -115,10 +117,10 @@ class TareasAutomaticas {
       const partes = this.parametroHoraAtrasosIndividuales.split(":");
 
       const hora = parseInt(partes[0], 10);
-      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : "*";
+      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
 
       const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
-      const minutosValido = minutos === "*" || (!isNaN(minutos) && minutos >= 0 && minutos <= 59);
+      const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
 
       if (horaValida && minutosValido) {
         horaCron = `${minutos} ${hora} * * *`;
@@ -133,6 +135,7 @@ class TareasAutomaticas {
             // Aquí va la lógica para enviar los atrasos individuales
             console.log("Enviando atrasos individuales...");
             // Llama a la función que maneja el envío de atrasos individuales
+            atrasosDiariosIndividual();
           }
           catch (error) {
             throw new Error("Error al enviar atrasos individuales");

@@ -64,58 +64,19 @@ export const atrasosSemanal = async function () {
 }
 
 export const atrasosDiarios = async function () {
-    const date = new Date();
-    const fecha = date.toJSON().split("T")[0];
-
+    const fecha = DateTime.now().toFormat('yyyy-MM-dd');
     console.log("ver fecha: ", fecha);
-    
-    const hora = date.getHours();
-    const minutos = date.getMinutes();
 
-    const PARAMETRO_DIARIO = await pool.query(
-        `
-        SELECT * FROM ep_detalle_parametro WHERE id_parametro = 10
-        `);
-
-    if (PARAMETRO_DIARIO.rowCount != 0) {   
-        if (PARAMETRO_DIARIO.rows[0].descripcion == 'Si') {
-        const PARAMETRO_HORA_DIARIO = await pool.query(
-            `
-            SELECT * FROM ep_detalle_parametro WHERE id_parametro = 11
-            `);
-            if (PARAMETRO_HORA_DIARIO.rowCount != 0) {
-                if (hora === parseInt(PARAMETRO_HORA_DIARIO.rows[0].descripcion)) {
-                    atrasos(fecha, fecha, false);
-                    atrasosDepartamentos(fecha, fecha, false);
-                  //  atrasosIndividual(fecha, fecha);  
-                } 
-            }
-        }
-    }
-
+    atrasos(fecha, fecha, false);
+    atrasosDepartamentos(fecha, fecha, false);
 }
 
 export const atrasosDiariosIndividual = async function () {
-    const date = new Date();
-    const fecha = date.toJSON().split("T")[0];
-
+    const fecha =  DateTime.now().toFormat('yyyy-MM-dd');
     console.log("ver fecha: ", fecha);
-    
-    const hora = date.getHours();
-    const minutos = date.getMinutes();
 
-     const PARAMETRO_HORA_INDIVIDUAL = await pool.query(
-        `SELECT * FROM ep_detalle_parametro WHERE id_parametro = 34`
-    );
-    
-    if (PARAMETRO_HORA_INDIVIDUAL.rowCount != 0) {
-        if (hora === parseInt(PARAMETRO_HORA_INDIVIDUAL.rows[0].descripcion)) {
-            atrasosIndividual(fecha, fecha); 
-        }
-    }
-
+    atrasosIndividual(fecha, fecha); 
 }
-
 
 
 export const atrasos = async function (desde: any, hasta: any, semanal: any) {
@@ -351,7 +312,6 @@ export const atrasos = async function (desde: any, hasta: any, semanal: any) {
                 console.log("ver empleados: ", EMPLEADOS.rows[0])
 
                 if (EMPLEADOS.rowCount != 0) {
-
                     var usuarios = PresentarUsuarios(EMPLEADOS);
 
                     // LEER IMAGEN DE CORREO CONFIGURADA - CABECERA
@@ -1007,9 +967,6 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
     } else {
         console.log("no existen datos individuales")
     }
-
-
-
 }
 
 

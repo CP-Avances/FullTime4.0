@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.tareasAutomaticas = void 0;
 const node_cron_1 = __importDefault(require("node-cron"));
 const database_1 = __importDefault(require("../database"));
+const sendAtraso_1 = require("./sendAtraso");
 class TareasAutomaticas {
     constructor() {
         this.tareaAtrasosDiarios = null;
@@ -71,6 +72,7 @@ class TareasAutomaticas {
                             // Aquí va la lógica para enviar los atrasos diarios
                             console.log("Enviando atrasos diarios...");
                             // Llama a la función que maneja el envío de atrasos diarios
+                            (0, sendAtraso_1.atrasosDiarios)();
                         }
                         catch (error) {
                             throw new Error("Error al enviar atrasos diarios");
@@ -115,9 +117,9 @@ class TareasAutomaticas {
                 let horaCron = null;
                 const partes = this.parametroHoraAtrasosIndividuales.split(":");
                 const hora = parseInt(partes[0], 10);
-                const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : "*";
+                const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
                 const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
-                const minutosValido = minutos === "*" || (!isNaN(minutos) && minutos >= 0 && minutos <= 59);
+                const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
                 if (horaValida && minutosValido) {
                     horaCron = `${minutos} ${hora} * * *`;
                     if (this.tareaAtrasosIndividuales) {
@@ -129,6 +131,7 @@ class TareasAutomaticas {
                             // Aquí va la lógica para enviar los atrasos individuales
                             console.log("Enviando atrasos individuales...");
                             // Llama a la función que maneja el envío de atrasos individuales
+                            (0, sendAtraso_1.atrasosDiariosIndividual)();
                         }
                         catch (error) {
                             throw new Error("Error al enviar atrasos individuales");
