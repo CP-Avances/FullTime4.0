@@ -14,17 +14,17 @@ export class SocketService {
 
   constructor(private urlService: UrlService) {
     this.urlSubscription = this.urlService.getSocketUrl().subscribe(url => {
-      console.error('URL del socket disponible.');
+      console.log('URL del socket disponible.');
       if (url && url !== this.serverUrl) {
         this.serverUrl = url;
         if (!this.socketConnected) {
-          console.error('URL del socket conectado.');
+          console.log('Conectando al socket...');
           this.initSocket();
         }
       }
     });
 
-    // Intentar cargar desde localStorage si no se ha recibido aún
+    // INTENTAR CARGAR DESDE LOCALSTORAGE SI NO SE HA RECIBIDO AÚN
     const storedUrl = localStorage.getItem('socketURL');
     if (storedUrl) {
       this.serverUrl = storedUrl;

@@ -110,7 +110,9 @@ export class LoginComponent implements OnInit {
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
             //console.log('datos empresa: ', this.mensaje.empresas[0].movil_socket_direccion);
             const nuevaUrlSocket = this.mensaje.empresas[0].movil_socket_direccion;
-            //localStorage.setItem('socketURL', nuevaUrlSocket);
+            
+            localStorage.setItem('socketURL', nuevaUrlSocket);
+
             this.urlService.updateSocketUrl(nuevaUrlSocket);
           }
           else if (this.mensaje.message === 'vacio') {
