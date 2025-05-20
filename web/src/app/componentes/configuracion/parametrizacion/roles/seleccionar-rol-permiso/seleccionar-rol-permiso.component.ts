@@ -73,6 +73,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     "vacaciones": this.vacaciones,
     "acciones_personal": this.acciones_personal,
     "reloj_virtual": this.reloj_virtual,
+    "notificaciones": this.permisos || this.vacaciones || this.horas_extras || this.alimentacion,
   };
 
   nombreRol: string;
@@ -130,10 +131,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
@@ -268,6 +269,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     'geolocalizacion',
     'timbre_virtual',
     'reloj_virtual',
+    'notificaciones'
   ]
 
   // METODO PARA BUSCAR PAGINAS QUE PERTENECEN A MODULOS
@@ -508,8 +510,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   InsertarPaginaRol() {
     this.ingresar = false;
     this.contador = 0;
-    let contadorOperaciones = 0; 
-    let totalOperaciones = 0; 
+    let contadorOperaciones = 0;
+    let totalOperaciones = 0;
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (this.paginasSeleccionadas.length != 0) {
       this.habilitarprogress = true;
@@ -1146,7 +1148,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                                     ? 'Aplicación Móvil'
                                     : detalle.nombre_modulo === 'aprobar'
                                       ? 'Aprobaciones Solicitudes'
-                                      : detalle.nombre_modulo, style: 'itemsTableCentrado'
+                                      : detalle.nombre_modulo === 'notificaciones'
+                                        ? 'Notificaciones'
+                                        : detalle.nombre_modulo, style: 'itemsTableCentrado'
                   },
                   { text: detalle.movil == false ? 'Sí' : '', style: 'itemsTableCentrado' },
                   { text: detalle.movil == true ? 'Sí' : '', style: 'itemsTableCentrado' },
@@ -1199,7 +1203,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           det.movil == false ? 'Sí' : '',
           det.movil == true ? 'Sí' : '',
         ])
@@ -1340,6 +1346,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
+                             : det.nombre_modulo === 'notificaciones'
+                            ? 'Notificaciones'
                             : det.nombre_modulo,
           "aplicacion_web": det.movil == false ? 'Sí' : '',
           "aplicacion_movil": det.movil == true ? 'Sí' : '',
@@ -1414,6 +1422,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
+                            : det.nombre_modulo === 'notificaciones'
+                            ? 'Notificaciones'
                             : det.nombre_modulo,
           aplicacion_web: det.movil == false ? 'Sí' : '',
           aplicacion_movil: det.movil == true ? 'Sí' : '',
@@ -1463,7 +1473,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     return this.tienePermiso('Ver Funciones Rol - Eliminar');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Roles', 4);
   }
 

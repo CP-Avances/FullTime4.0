@@ -108,7 +108,7 @@ export class ConfiguracionComponent implements OnInit {
       })
   }
 
-  //CONTROL BOTONES
+  // CONTROL BOTONES
   private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
@@ -119,7 +119,7 @@ export class ConfiguracionComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }

@@ -1154,7 +1154,9 @@ export class RolPermisosMovilComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           det.movil == false ? 'Sí' : '',
           det.movil == true ? 'Sí' : '',
         ])
@@ -1297,7 +1299,9 @@ export class RolPermisosMovilComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           "aplicacion_web": det.movil == false ? 'Sí' : '',
           "aplicacion_movil": det.movil == true ? 'Sí' : '',
         });
@@ -1371,7 +1375,9 @@ export class RolPermisosMovilComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           aplicacion_web: det.movil == false ? 'Sí' : '',
           aplicacion_movil: det.movil == true ? 'Sí' : '',
         });
