@@ -16,7 +16,7 @@ export class NombreCompletoPipe implements PipeTransform {
     for (const resultados of value) {
       const nombreCompleto = `${resultados.nombre || ''} ${resultados.apellido || ''}`.toLowerCase();
 
-      // VERIFICA SI CADA PALABRA ESTÁ PRESENTE EN EL NOMBRE O APELLIDO DEL USUARIO
+      // VERIFICA SI CADA PALABRA ESTA PRESENTE EN EL NOMBRE O APELLIDO DEL USUARIO
       const coincide = palabrasBusqueda.every((palabra: any) => nombreCompleto.includes(palabra));
 
       if (coincide) {

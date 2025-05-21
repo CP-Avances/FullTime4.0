@@ -8,6 +8,9 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { EliminarRealtimeComponent } from '../eliminar-realtime/eliminar-realtime.component';
+import { ParametrosService } from '../../../../servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
+import { DateTime } from 'luxon';
+import { SpinnerModule } from '../../../generales/spinner/spinner.module';
 
 export interface TimbresAvisos {
   create_at: string,
@@ -28,7 +31,7 @@ export interface TimbresAvisos {
 export class RealtimeAvisosComponent implements OnInit {
 
   id_empleado_logueado: number;
-  timbres_noti: any = [];
+  lista_avisos: any = [];
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
@@ -45,17 +48,96 @@ export class RealtimeAvisosComponent implements OnInit {
     private avisos: TimbresService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
+    public parametro: ParametrosService,
   ) { }
 
   ngOnInit(): void {
     this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
-    this.LlamarNotificacionesTimbres(this.id_empleado_logueado);
+    this.BuscarParametro();
+  }
+
+  /** **************************************************************************************** **
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
+   ** **************************************************************************************** **/
+
+  formato_fecha: string = 'dd/MM/yyyy';
+  formato_hora: string = 'HH:mm:ss';
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR DATOS DE PARAMETROS
+  BuscarParametro() {
+    let datos: any = [];
+    let detalles = { parametros: '1, 2' };
+    this.parametro.ListarVariosDetallesParametros(detalles).subscribe(
+      res => {
+        datos = res;
+        //console.log('datos ', datos)
+        datos.forEach((p: any) => {
+          // id_tipo_parametro Formato fecha = 1
+          if (p.id_parametro === 1) {
+            this.formato_fecha = p.descripcion;
+          }
+          // id_tipo_parametro Formato hora = 2
+          else if (p.id_parametro === 2) {
+            this.formato_hora = p.descripcion;
+          }
+        })
+        this.LlamarNotificacionesTimbres(this.formato_fecha, this.formato_hora, this.id_empleado_logueado);
+      }, vacio => {
+        this.LlamarNotificacionesTimbres(this.formato_fecha, this.formato_hora, this.id_empleado_logueado);
+      });
+  }
+
+  // METODO PARA BUSCAR NOTIFICACIONES DE AVISOS
+  LlamarNotificacionesTimbres(fecha: any, hora: any, id: number) {
+    this.lista_avisos = [];
+    this.avisos.ListarAvisos(id).subscribe(res => {
+      this.lista_avisos = res;
+      console.log("ver avisos: ", this.lista_avisos)
+      this.lista_avisos.forEach((aviso: any) => {
+        let fecha_registro = this.validar.DarFormatoFecha(aviso.create_at.split(' ')[0], 'yyyy-MM-dd');
+        // FORMATEAR DATOS DE FECHA Y HORA
+        aviso.fecha = this.validar.FormatearFecha(fecha_registro || '', fecha, this.validar.dia_completo, this.idioma_fechas);
+        aviso.hora_registro = this.validar.FormatearHora(aviso.create_at.split(' ')[1], hora);
+        if (aviso.tipo === 100) {
+          aviso.notificacion = aviso.mensaje.split('//')[4];
+          let fechaHorario = (aviso.mensaje.split('//')[0]).split(' ')[0];
+          aviso.horario_fecha = this.validar.FormatearFecha(fechaHorario, fecha, this.validar.dia_completo, this.idioma_fechas);
+          aviso.horario_hora = this.validar.FormatearHora((aviso.mensaje.split('//')[0]).split(' ')[1], hora);
+          aviso.timbre_fecha = this.validar.FormatearFecha((aviso.mensaje.split('//')[1]).split(' ')[0], fecha, this.validar.dia_completo, this.idioma_fechas);
+          aviso.timbre_hora = this.validar.FormatearHora((aviso.mensaje.split('//')[1]).split(' ')[1], hora);
+          aviso.tolerancia = aviso.mensaje.split('//')[2];
+          aviso.atraso = aviso.mensaje.split('//')[3];
+        }
+
+        // NOTIFICACION DE FALTA
+        if (aviso.tipo === 101) {
+          aviso.notificacion = aviso.mensaje.split('//')[1];
+          aviso.horario_fecha = this.validar.FormatearFecha(aviso.mensaje.split('//')[0], fecha, this.validar.dia_completo, this.idioma_fechas);
+        }
+
+        // NOTIFICACION DE SALIDA ANTICIPADA
+        if (aviso.tipo === 102) {
+          aviso.notificacion = aviso.mensaje.split('//')[3];
+          let fechaHorario = (aviso.mensaje.split('//')[0]).split(' ')[0];
+          aviso.horario_fecha = this.validar.FormatearFecha(fechaHorario, fecha, this.validar.dia_completo, this.idioma_fechas);
+          aviso.horario_hora = this.validar.FormatearHora((aviso.mensaje.split('//')[0]).split(' ')[1], this.formato_hora);
+          aviso.timbre_fecha = this.validar.FormatearFecha((aviso.mensaje.split('//')[1]).split(' ')[0], fecha, this.validar.dia_completo, this.idioma_fechas);
+          aviso.timbre_hora = this.validar.FormatearHora((aviso.mensaje.split('//')[1]).split(' ')[1], this.formato_hora);
+          aviso.salida = aviso.mensaje.split('//')[2];
+        }
+
+        if (aviso.tipo === 6) {
+          aviso.notificacion = aviso.mensaje;
+        }
+
+      })
+    });
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
-    const numRows = this.timbres_noti.length;
+    const numRows = this.lista_avisos.length;
     return numSelected === numRows;
   }
 
@@ -63,7 +145,7 @@ export class RealtimeAvisosComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.timbres_noti.forEach((row: any) => this.selectionUno.select(row));
+      this.lista_avisos.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -90,14 +172,6 @@ export class RealtimeAvisosComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1;
   }
 
-  // METODO PARA BUSCAR NOTIFICACIONES DE AVISOS
-  LlamarNotificacionesTimbres(id: number) {
-    this.timbres_noti = [];
-    this.avisos.AvisosTimbresRealtime(id).subscribe(res => {
-      this.timbres_noti = res;
-      console.log("ver avisos: ", this.timbres_noti )
-    });
-  }
 
   // METODO PARA ABRIR VENTANA DE ELIMINACION DE NOTIFICACIONES
   EliminarNotificaciones(opcion: number) {
@@ -110,7 +184,7 @@ export class RealtimeAvisosComponent implements OnInit {
     this.ventana.open(EliminarRealtimeComponent,
       { width: '500px', data: { opcion: opcion, lista: EmpleadosSeleccionados } }).afterClosed().subscribe(item => {
         if (item === true) {
-          this.LlamarNotificacionesTimbres(this.id_empleado_logueado);
+          this.LlamarNotificacionesTimbres(this.formato_fecha, this.formato_fecha, this.id_empleado_logueado);
           this.btnCheckHabilitar = false;
           this.selectionUno.clear();
         };
@@ -128,5 +202,29 @@ export class RealtimeAvisosComponent implements OnInit {
     this.descripcion.reset();
     this.fecha.reset();
   }
+
+  // METODO PARA CAMBIAR EL ICONO SEGUN EL TIPO DE NOTIFICACION
+  CambiarIcono(tipo: number): string {
+    switch (tipo) {
+      case 6: return 'mark_email_read';
+      case 100: return 'watch_later';
+      case 101: return 'event_busy';
+      case 102: return 'directions_run';
+      default: return 'help_outline';
+    }
+  }
+
+  // CAMBIAR COLOR DEL ICONO
+  CambiarEstiloIcono(tipo: number): string {
+    switch (tipo) {
+      case 6: return 'ncomunicados';
+      case 100: return 'natrasos';
+      case 101: return 'nfaltas';
+      case 102: return 'nsalidasAnticipadas';
+      default: return '';
+    }
+  }
+
+
 
 }
