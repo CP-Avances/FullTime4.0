@@ -16,6 +16,7 @@ exports.PARAMETROS_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
+const tareasAutomaticas_1 = require("./../../../libs/tareasAutomaticas");
 class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES  **USADO
     ListarParametros(req, res) {
@@ -98,6 +99,7 @@ class ParametrosControlador {
             try {
                 const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
+                console.log("id eliminar detalle parametro: ", id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
@@ -134,6 +136,9 @@ class ParametrosControlador {
                 });
                 //FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
+                console.log("datos originales: ", datosOriginales);
+                // REINICIAR TAREAS AUTOMATICAS
+                reiniciarTareasAutomaticas(datosOriginales.id_parametro);
                 return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (_a) {
@@ -167,7 +172,9 @@ class ParametrosControlador {
                 });
                 //FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro exitoso.' });
+                // REINICIAR TAREAS AUTOMATICAS
+                reiniciarTareasAutomaticas(id_tipo);
+                return res.jsonp({ message: 'Registro exitoso.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -219,6 +226,8 @@ class ParametrosControlador {
                 });
                 //FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
+                // REINICIAR TAREAS AUTOMATICAS
+                reiniciarTareasAutomaticas(datosOriginales.id_parametro);
                 return res.jsonp({ message: 'Registro exitoso.' });
             }
             catch (error) {
@@ -277,6 +286,18 @@ class ParametrosControlador {
         });
     }
     ;
+}
+function reiniciarTareasAutomaticas(id) {
+    var _a;
+    console.log(`Reiniciando tareas automáticas para el parámetro con id: ${id}`);
+    const tareasMap = {};
+    const mapGroup = (ids, tarea) => {
+        ids.forEach(i => tareasMap[i] = tarea);
+    };
+    mapGroup(['10', '11'], () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosDiarios());
+    mapGroup(['13', '14', '15'], () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosSemanales());
+    mapGroup(['34'], () => tareasAutomaticas_1.tareasAutomaticas.actualizarEnvioAtrasosIndividuales());
+    (_a = tareasMap[id]) === null || _a === void 0 ? void 0 : _a.call(tareasMap);
 }
 exports.PARAMETROS_CONTROLADOR = new ParametrosControlador();
 exports.default = exports.PARAMETROS_CONTROLADOR;

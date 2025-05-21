@@ -497,6 +497,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.datoActual = [];
     this.informacion.ObtenerDatosActuales(parseInt(this.idEmpleado)).subscribe(res => {
       this.datoActual = res[0];
+      console.log('datoActual ', this.datoActual)
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);

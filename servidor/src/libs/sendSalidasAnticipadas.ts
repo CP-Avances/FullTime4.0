@@ -8,6 +8,7 @@ import { ConvertirImagenBase64 } from './ImagenCodificacion';
 import { fechaHora } from '../libs/settingsMail';
 import { io } from '../server';
 import { ImportarPDF } from './pdf';
+import EMPRESA_CONTROLADOR from '../controlador/configuracion/parametrizacion/catEmpresaControlador';
 
 export const salidasAnticipadasSemanal = async function () {
     const date = new Date(); // Fecha actual
@@ -185,21 +186,11 @@ export const salidasAnticipadas = async function (desde: any, hasta: any, semana
             return obj;
         });
 
-
-        const file_name = await pool.query(
-            `
-           SELECT nombre, logo FROM e_empresa 
-           `
-        )
-            .then((result: any) => {
-                return result.rows[0];
-            });
-
         let separador = path.sep;
 
-        let ruta = ObtenerRutaLogos() + separador + file_name.logo;
-
-        const codificado = await ConvertirImagenBase64(ruta);
+        const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
+        
+        const codificado = imagenEmpresa.imagen;
 
         let logo = 'data:image/jpeg;base64,' + codificado;
 
@@ -378,7 +369,7 @@ export const salidasAnticipadas = async function (desde: any, hasta: any, semana
                                                 Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto} <br>
                                             <b>Fecha de envío:</b> ${fecha} <br> 
                                             <b>Hora de envío:</b> ${hora_reporte} <br>
@@ -525,20 +516,11 @@ export const salidasAnticipadasDepartamentos = async function (desde: any, hasta
 
             const today = DateTime.now().toFormat('yyyy-MM-dd');
 
-            const file_name = await pool.query(
-                `
-               SELECT nombre, logo FROM e_empresa 
-               `
-            )
-                .then((result: any) => {
-                    return result.rows[0];
-                });
-
             let separador = path.sep;
 
-            let ruta = ObtenerRutaLogos() + separador + file_name.logo;
-
-            const codificado = await ConvertirImagenBase64(ruta);
+            const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
+            
+            const codificado = imagenEmpresa.imagen;
 
             let logo = 'data:image/jpeg;base64,' + codificado;
 
@@ -698,7 +680,7 @@ export const salidasAnticipadasDepartamentos = async function (desde: any, hasta
                                                 Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto}<br>
                                             <b>Departamento:</b> ${departamento}<br> 
                                             <b>Fecha de envío:</b> ${fecha} <br> 

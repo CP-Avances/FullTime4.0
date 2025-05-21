@@ -8,6 +8,7 @@ import { ConvertirImagenBase64 } from './ImagenCodificacion';
 import { io } from '../server';
 import { fechaHora } from '../libs/settingsMail';
 import { ImportarPDF } from './pdf';
+import EMPRESA_CONTROLADOR from '../controlador/configuracion/parametrizacion/catEmpresaControlador';
 
 
 export const faltasSemanal = async function () {
@@ -182,20 +183,12 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
 
         const today = DateTime.now().toFormat('yyyy-MM-dd');
 
-        const file_name = await pool.query(
-            `
-           SELECT nombre, logo FROM e_empresa 
-           `
-        )
-            .then((result: any) => {
-                return result.rows[0];
-            });
-
         let separador = path.sep;
 
-        let ruta = ObtenerRutaLogos() + separador + file_name.logo;
-
-        const codificado = await ConvertirImagenBase64(ruta);
+        const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
+       
+        const codificado = imagenEmpresa.imagen;
+       
 
         let logo = 'data:image/jpeg;base64,' + codificado;
 
@@ -367,7 +360,7 @@ export const faltas = async function (desde: any, hasta: any, semanal: any) {
                                                 Mediante el presente correo se adjunta el reporte de faltas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto} <br>
                                             <b>Fecha de envío:</b> ${fecha} <br> 
                                             <b>Hora de envío:</b> ${hora_reporte} <br>
@@ -506,21 +499,12 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
 
             const today = DateTime.now().toFormat('yyyy-MM-dd');
 
-            const file_name = await pool.query(
-                `
-                       SELECT nombre, logo FROM e_empresa 
-                    `
-            )
-                .then((result: any) => {
-                    return result.rows[0];
-                });
-
             let separador = path.sep;
 
-            let ruta = ObtenerRutaLogos() + separador + file_name.logo;
-
-            const codificado = await ConvertirImagenBase64(ruta);
-
+            const imagenEmpresa = await EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
+            
+            const codificado = imagenEmpresa.imagen;
+            
             let logo = 'data:image/jpeg;base64,' + codificado;
 
             const EMPRESA = await pool.query(
@@ -678,7 +662,7 @@ export const faltasDepartamentos = async function (desde: any, hasta: any, seman
                                                 Mediante el presente correo se adjunta el reporte de faltas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto}<br>
                                             <b>Departamento:</b> ${departamento}<br> 
                                             <b>Fecha de envío:</b> ${fecha} <br> 

@@ -19,10 +19,10 @@ const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 const luxon_1 = require("luxon");
 const salidaAntesControlador_1 = require("../controlador/reportes/salidaAntesControlador");
-const ImagenCodificacion_1 = require("./ImagenCodificacion");
 const settingsMail_2 = require("../libs/settingsMail");
 const server_1 = require("../server");
 const pdf_1 = require("./pdf");
+const catEmpresaControlador_1 = __importDefault(require("../controlador/configuracion/parametrizacion/catEmpresaControlador"));
 const salidasAnticipadasSemanal = function () {
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date(); // Fecha actual
@@ -166,15 +166,9 @@ const salidasAnticipadas = function (desde, hasta, semanal) {
             resultado.map((obj) => {
                 return obj;
             });
-            const file_name = yield database_1.default.query(`
-           SELECT nombre, logo FROM e_empresa 
-           `)
-                .then((result) => {
-                return result.rows[0];
-            });
             let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
-            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+            const imagenEmpresa = yield catEmpresaControlador_1.default.ObtenerImagenEmpresa();
+            const codificado = imagenEmpresa.imagen;
             let logo = 'data:image/jpeg;base64,' + codificado;
             const EMPRESA = yield database_1.default.query(`
            SELECT * FROM e_empresa 
@@ -314,7 +308,7 @@ const salidasAnticipadas = function (desde, hasta, semanal) {
                                                 Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto} <br>
                                             <b>Fecha de envío:</b> ${fecha} <br> 
                                             <b>Hora de envío:</b> ${hora_reporte} <br>
@@ -443,15 +437,9 @@ const salidasAnticipadasDepartamentos = function (desde, hasta, semanal) {
                     return obj;
                 });
                 const today = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
-                const file_name = yield database_1.default.query(`
-               SELECT nombre, logo FROM e_empresa 
-               `)
-                    .then((result) => {
-                    return result.rows[0];
-                });
                 let separador = path_1.default.sep;
-                let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
-                const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+                const imagenEmpresa = yield catEmpresaControlador_1.default.ObtenerImagenEmpresa();
+                const codificado = imagenEmpresa.imagen;
                 let logo = 'data:image/jpeg;base64,' + codificado;
                 const EMPRESA = yield database_1.default.query(`
                SELECT * FROM e_empresa 
@@ -582,7 +570,7 @@ const salidasAnticipadasDepartamentos = function (desde, hasta, semanal) {
                                                 Mediante el presente correo se adjunta el reporte de salidas anticipadas.<br>  
                                             </p>
                                             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                                            <b>Empresa:</b> ${file_name.nombre}<br>
+                                            <b>Empresa:</b> ${imagenEmpresa.nom_empresa}<br>
                                             <b>Asunto:</b> ${asunto}<br>
                                             <b>Departamento:</b> ${departamento}<br> 
                                             <b>Fecha de envío:</b> ${fecha} <br> 

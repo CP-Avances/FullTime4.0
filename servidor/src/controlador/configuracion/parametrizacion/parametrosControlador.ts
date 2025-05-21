@@ -2,6 +2,8 @@ import { BuscarFecha, BuscarHora } from '../../../libs/settingsMail';
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
+import { tareasAutomaticas } from './../../../libs/tareasAutomaticas';
+
 
 class ParametrosControlador {
 
@@ -92,6 +94,7 @@ class ParametrosControlador {
         try {
             const { user_name, ip, ip_local } = req.body;
             const id = req.params.id;
+            console.log("id eliminar detalle parametro: ", id);
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -137,6 +140,12 @@ class ParametrosControlador {
 
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+
+            console.log("datos originales: ", datosOriginales);
+
+            // REINICIAR TAREAS AUTOMATICAS
+            reiniciarTareasAutomaticas(datosOriginales.id_parametro);          
+
             return res.jsonp({ message: 'Registro eliminado.' });
         }
         catch {
@@ -175,7 +184,10 @@ class ParametrosControlador {
 
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            res.jsonp({ message: 'Registro exitoso.' });
+
+            // REINICIAR TAREAS AUTOMATICAS
+            reiniciarTareasAutomaticas(id_tipo);
+            return res.jsonp({ message: 'Registro exitoso.' });
 
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -237,6 +249,8 @@ class ParametrosControlador {
 
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+            // REINICIAR TAREAS AUTOMATICAS
+            reiniciarTareasAutomaticas(datosOriginales.id_parametro);
             return res.jsonp({ message: 'Registro exitoso.' });
 
         } catch (error) {
@@ -299,8 +313,25 @@ class ParametrosControlador {
         }
     };
 
-
 }
+
+function reiniciarTareasAutomaticas(id: string) {
+  console.log(`Reiniciando tareas automáticas para el parámetro con id: ${id}`);
+
+  const tareasMap: Record<string, () => void> = {};
+
+  const mapGroup = (ids: string[], tarea: () => void) => {
+    ids.forEach(i => tareasMap[i] = tarea);
+  };
+
+  mapGroup(['10', '11'], () => tareasAutomaticas.actualizarEnvioAtrasosDiarios());
+  mapGroup(['13', '14', '15'], () => tareasAutomaticas.actualizarEnvioAtrasosSemanales());
+  mapGroup(['34'], () => tareasAutomaticas.actualizarEnvioAtrasosIndividuales());
+
+  tareasMap[id]?.();
+}
+
+
 
 export const PARAMETROS_CONTROLADOR = new ParametrosControlador();
 

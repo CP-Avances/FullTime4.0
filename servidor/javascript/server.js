@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -298,21 +289,23 @@ SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 const sendAniversario_1 = require("./libs/sendAniversario");
 const sendBirthday_1 = require("./libs/sendBirthday");
+const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 exports.io = SERVIDOR.io;
-setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    //console.log('ingresa')
-    //atrasosDiarios();
-    //atrasosSemanal();
-    //faltasDiarios();
-    //faltasSemanal();
-    //salidasAnticipadasSemanal();
-    //salidasAnticipadasDiarios();
-}), 60000);
+// INICIO DE TAREAS AUTOMATICAS
+tareasAutomaticas_1.tareasAutomaticas.iniciarTareasAutomaticas();
+// setInterval(async () => {
+// atrasosDiarios();
+// atrasosSemanal();
+// faltasDiarios();
+// faltasSemanal();
+// salidasAnticipadasSemanal();
+// salidasAnticipadasDiarios();
+// }, 3600);
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendAniversario_1.aniversario)();
 // LLAMA AL METODO DE AVISOS DE VACACIONES
