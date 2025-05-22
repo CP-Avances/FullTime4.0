@@ -227,7 +227,7 @@ class EmpleadoControlador {
     try {
       const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
         domicilio, telefono, id_nacionalidad, codigo, tipo_identificacion, user_name, ip, ip_local, numero_partida_individual } = req.body;
-        const numero_partida_individual_final = numero_partida_individual === '' ? null : numero_partida_individual;
+      const numero_partida_individual_final = numero_partida_individual === '' ? null : numero_partida_individual;
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -754,13 +754,13 @@ class EmpleadoControlador {
         , [id]);
 
       let ruta_temporal = ObtenerRutaLeerPlantillas() + separador + req.file?.originalname;
-      console.log('ruta_temporal_',ruta_temporal);
+      console.log('ruta_temporal_', ruta_temporal);
       if (unEmpleado.rowCount != 0) {
         const imagen = `${unEmpleado.rows[0].codigo}_${anio}_${mes}_${dia}_${req.file?.originalname}`;
         let verificar_imagen = 0;
         // RUTA DE LA CARPETA IMAGENES DEL USUARIO
         const carpetaImagenes = await ObtenerRutaUsuario(id);
-        console.log('carpetaImagenes_',carpetaImagenes);
+        console.log('carpetaImagenes_', carpetaImagenes);
         // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
         fs.access(carpetaImagenes, fs.constants.F_OK, (err) => {
           if (err) {
@@ -1383,7 +1383,6 @@ class EmpleadoControlador {
           observacion: '',
           tipo_identificacion: '',
           numero_partida_individual: '',
-         // identificacion: ''
         };
 
         var ARREGLO_ESTADO_CIVIL = await pool.query(
@@ -1406,6 +1405,8 @@ class EmpleadoControlador {
         const tipogenero = generos.map(g => g.toLowerCase());
         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
         const regex = /^[0-9]+$/;
+        // VALIDA EL FORMATO DEL CORREO: XXXXXXX@XXXXXXXXX.XXX
+        const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         const valiContra = /\s/;
         // Expresión regular para validar la latitud y longitud
         const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
@@ -1434,7 +1435,7 @@ class EmpleadoControlador {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
 
-          for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++){
+          for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++) {
             const row = plantilla.getRow(rowNumber);
             if (!row || row.hasValues === false) continue;
             // SALTAR LA FILA DE LAS CABECERAS
@@ -1479,7 +1480,7 @@ class EmpleadoControlador {
               (NACIONALIDAD != undefined) && (USUARIO != undefined) &&
               (CONTRASENA != undefined) && (ROL != undefined) && (TIPO_IDENTIFICACION != undefined) && (NUMERO_PARTIDA_INDIVIDUAL != undefined)
             ) {
-              console.log("entra a todo los datos llenos")
+              console.log("entra porque tiene todos los datos llenos automatico")
               data.fila = ITEM;
               data.identificacion = IDENTIFICACION;
               data.nombre = NOMBRE;
@@ -1501,18 +1502,22 @@ class EmpleadoControlador {
               data.observacion = 'no registrado';
 
 
-              if (regex.test(data.identificacion)) {
-
+              if (data.identificacion.toString().length != 0) {
                 if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                  if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10 ) {
+                  console.log("ENTRA A VALIDAR AQUI PASAPORTE")
+                  if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
                     data.observacion = 'La identificación ingresada no es válida';
                   }
-                  else { 
+                  else {
                     if (!valiContra.test(data.contrasena.toString())) {
+                      console.log("ENTRA A VALIDAR AQUI DESPUES DE VALIDAR EL ASAPORTE")
                       if (data.contrasena.toString().length <= 10) {
                         if (estadoCivilArray.includes(data.estado_civil)) {
                           if (tipogenero.includes(data.genero.toLowerCase())) {
                             // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                            if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                              data.observacion = 'Verificar correo';
+                            }
                             if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
                               // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
                               if (LONGITUD != undefined || LATITUD != undefined) {
@@ -1522,7 +1527,7 @@ class EmpleadoControlador {
                               } else if (LONGITUD == undefined || LATITUD == undefined) {
                                 data.observacion = 'Verificar ubicación';
                               }
-  
+
                               // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
                               if (TELEFONO != undefined) {
                                 if (regex.test(data.telefono.toString())) {
@@ -1535,6 +1540,7 @@ class EmpleadoControlador {
                                 }
                               }
                             } else {
+                              console.log("FORMATO DE FECHA INCORRECTA")
                               data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                             }
                           }
@@ -1555,60 +1561,64 @@ class EmpleadoControlador {
                     }
                   }
                 } else {
-                  console.log("Cedula seleccionado")
-                  const cedulaValida = await ValidarCedula(data.identificacion);
-                  if (data.identificacion.toString().length != 10 || !cedulaValida) {
-                    data.observacion = 'La identificación ingresada no es válida';
-                  }
-                  else {
-                    if (!valiContra.test(data.contrasena.toString())) {
-                      if (data.contrasena.toString().length <= 10) {
-                        if (estadoCivilArray.includes(data.estado_civil)) {
-                          if (tipogenero.includes(data.genero.toLowerCase())) {
-                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                            if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                              // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                              if (LONGITUD != undefined || LATITUD != undefined) {
-                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                  if (regex.test(data.identificacion)) {
+                    const cedulaValida = await ValidarCedula(data.identificacion);
+                    if (data.identificacion.toString().length != 10 || !cedulaValida) {
+                      data.observacion = 'La identificación ingresada no es válida';
+                    }
+                    else {
+                      if (!valiContra.test(data.contrasena.toString())) {
+                        if (data.contrasena.toString().length <= 10) {
+                          if (estadoCivilArray.includes(data.estado_civil)) {
+                            if (tipogenero.includes(data.genero.toLowerCase())) {
+                              // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                              if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                data.observacion = 'Verificar correo';
+                              }
+                              if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+                                // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                if (LONGITUD != undefined || LATITUD != undefined) {
+                                  if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                    data.observacion = 'Verificar ubicación';
+                                  }
+                                } else if (LONGITUD == undefined || LATITUD == undefined) {
                                   data.observacion = 'Verificar ubicación';
                                 }
-                              } else if (LONGITUD == undefined || LATITUD == undefined) {
-                                data.observacion = 'Verificar ubicación';
-                              }
-  
-                              // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
-                              if (TELEFONO != undefined) {
-                                if (regex.test(data.telefono.toString())) {
-                                  if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+
+                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
+                                if (TELEFONO != undefined) {
+                                  if (regex.test(data.telefono.toString())) {
+                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                      data.observacion = 'El teléfono ingresado no es válido';
+                                    }
+                                  }
+                                  else {
                                     data.observacion = 'El teléfono ingresado no es válido';
                                   }
                                 }
-                                else {
-                                  data.observacion = 'El teléfono ingresado no es válido';
-                                }
+                              } else {
+                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                               }
-                            } else {
-                              data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            }
+                            else {
+                              data.observacion = 'Género no es válido';
                             }
                           }
                           else {
-                            data.observacion = 'Género no es válido';
+                            data.observacion = 'Estado civil no es válido';
                           }
                         }
                         else {
-                          data.observacion = 'Estado civil no es válido';
+                          data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                         }
                       }
                       else {
-                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                        data.observacion = 'La contraseña ingresada no es válida';
                       }
                     }
-                    else {
-                      data.observacion = 'La contraseña ingresada no es válida';
-                    }
                   }
+
                 }
-               
               }
               else {
                 data.observacion = 'La identificación ingresada no es válida';
@@ -1628,12 +1638,72 @@ class EmpleadoControlador {
               data.usuario = data.usuario.trim();
               data.contrasena = data.contrasena.trim();
               data.rol = data.rol.trim();
-              data.tipo_identificacion= data.tipo_identificacion.trim();
-              data.numero_partida_individual= data.numero_partida_individual.trim();
+              data.tipo_identificacion = data.tipo_identificacion.trim();
+              data.numero_partida_individual = data.numero_partida_individual.trim();
+
+              // VALIDACIONES EN BASE DE DATOS
+              var VERIFICAR_CEDULA = await pool.query(
+                `SELECT * FROM eu_empleados WHERE identificacion = $1`,
+                [data.identificacion]
+              );
+              if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                data.observacion = 'Identificación ya existe en el sistema';
+              } else {
+                var VERIFICAR_USUARIO = await pool.query(
+                  `SELECT * FROM eu_usuarios WHERE usuario = $1`,
+                  [data.usuario]
+                );
+                if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                  data.observacion = 'Usuario ya existe en el sistema';
+                } else {
+                  if (data.rol != 'No registrado') {
+                    var VERIFICAR_ROL = await pool.query(
+                      `SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`,
+                      [data.rol.toUpperCase()]
+                    );
+                    if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
+                      data.observacion = 'Rol no existe en el sistema';
+                    } else {
+                      if (data.nacionalidad != 'No registrado') {
+                        var VERIFICAR_NACIONALIDAD = await pool.query(
+                          `SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,
+                          [data.nacionalidad.toUpperCase()]
+                        );
+                        if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
+                          data.observacion = 'Nacionalidad no existe en el sistema';
+                        } else {
+                          // Aquí añadimos la validación de estado civil
+                          if (data.estado_civil != 'No registrado') {
+                            var VERIFICAR_ESTADO_CIVIL = await pool.query(
+                              `SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`,
+                              [data.estado_civil.toUpperCase()]
+                            );
+                            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
+                              data.observacion = 'Estado civil no existe en el sistema';
+                            } else {
+                              // Y la validación de género
+                              if (data.genero != 'No registrado') {
+                                var VERIFICAR_GENERO = await pool.query(
+                                  `SELECT * FROM e_genero WHERE UPPER(genero) = $1`,
+                                  [data.genero.toUpperCase()]
+                                );
+                                if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
+                                  data.observacion = 'Género no existe en el sistema';
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
 
               listEmpleados.push(data);
             }
             else {
+              console.log("entra aqui porque no estan llenos los datos")
               data.fila = ITEM;
               data.identificacion = IDENTIFICACION;
               data.nombre = NOMBRE;
@@ -1650,82 +1720,113 @@ class EmpleadoControlador {
               data.domicilio = DOMICILIO;
               data.telefono = TELEFONO;
               data.nacionalidad = NACIONALIDAD;
-              data.tipo_identificacion= TIPO_IDENTIFICACION;
-              data.numero_partida_individual= NUMERO_PARTIDA_INDIVIDUAL;
+              data.tipo_identificacion = TIPO_IDENTIFICACION;
+              data.numero_partida_individual = NUMERO_PARTIDA_INDIVIDUAL;
               data.observacion = 'no registrado';
+
+              let hayDatosFaltantes = false;
 
               if (data.fila == '' || data.fila == undefined) {
                 data.fila = 'error';
                 mensaje = 'error'
+                hayDatosFaltantes = true;
               }
               if (APELLIDO == undefined) {
                 data.apellido = 'No registrado';
                 data.observacion = 'Apellido no registrado';
+                hayDatosFaltantes = true;
               }
               if (NOMBRE == undefined) {
                 data.nombre = 'No registrado';
                 data.observacion = 'Nombre no registrado';
+                hayDatosFaltantes = true;
               }
               if (ESTADO_CIVIL == undefined) {
                 data.estado_civil = 'No registrado';
                 data.observacion = 'Estado civil no registrado';
+                hayDatosFaltantes = true;
               }
               if (GENERO == undefined) {
                 data.genero = 'No registrado';
                 data.observacion = 'Género no registrado';
+                hayDatosFaltantes = true;
               }
               if (CORREO == undefined) {
                 data.correo = 'No registrado';
                 data.observacion = 'Correo no registrado';
+                hayDatosFaltantes = true;
               }
               if (FECHA_NACIMIENTO == undefined) {
                 data.fec_nacimiento = 'No registrado';
                 data.observacion = 'Fecha de nacimiento no registrado';
+                hayDatosFaltantes = true;
               }
-              if (LATITUD == undefined) {
-                data.latitud = 'No registrado';
-                data.observacion = 'Latitud no registrado';
-              }
-              if (LONGITUD == undefined) {
-                data.longitud = 'No registrado';
-                data.observacion = 'Longitud no registrado';
-              }
+
               if (DOMICILIO == undefined) {
                 data.domicilio = 'No registrado';
-                data.observacion = " ";
+                if (!data.observacion || data.observacion.trim() === '') {
+                  data.observacion = " ";
+                }
               }
+
               if (TELEFONO == undefined) {
                 data.telefono = 'No registrado';
-                data.observacion = " ";
+                if (!data.observacion || data.observacion.trim() === '') {
+                  data.observacion = " ";
+                }
               }
+
+              if ((!LATITUD || LATITUD === undefined) && (!LONGITUD || LONGITUD === undefined)) {
+                data.latitud = 'No registrado';
+                data.longitud = 'No registrado';
+                data.observacion = " ";
+                hayDatosFaltantes = true;
+              } else {
+                if (!LATITUD || LATITUD === undefined) {
+                  data.latitud = 'No registrado';
+                  data.observacion = 'Verificar ubicación';
+                }
+                if (!LONGITUD || LONGITUD === undefined) {
+                  data.longitud = 'No registrado';
+                  data.observacion = 'Verificar ubicación';
+                }
+
+              }
+
               if (NACIONALIDAD == undefined) {
                 data.nacionalidad = 'No registrado';
                 data.observacion = 'Nacionalidad no registrado';
+                hayDatosFaltantes = true;
               }
               if (USUARIO == undefined) {
                 data.usuario = 'No registrado';
                 data.observacion = 'Usuario no registrado';
+                hayDatosFaltantes = true;
               }
               if (CONTRASENA == undefined) {
                 data.contrasena = 'No registrado';
                 data.observacion = 'Contraseña no registrada';
+                hayDatosFaltantes = true;
               }
               if (ROL == undefined) {
                 data.rol = 'No registrado'
                 data.observacion = 'Rol no registrado';
+                hayDatosFaltantes = true;
               }
-
               if (IDENTIFICACION == undefined) {
+                console.log("ENTRO PORQUE NO SE REGISTRA IDENTIFICACION")
                 data.identificacion = 'No registrado'
-                data.observacion = 'Identificación no registrado';
+                data.observacion = 'Identificación no registrada';
+                hayDatosFaltantes = true;
               }
-              
               if (TIPO_IDENTIFICACION == undefined) {
+                console.log("ENTRO PORQUE NO SE REGISTRA TIPO DE IDENTIFICACION")
                 data.tipo_identificacion = 'No registrado'
                 data.observacion = 'Tipo identificación no registrado';
+                hayDatosFaltantes = true;
               }
-              else {
-
+              if (!hayDatosFaltantes) {
+                console.log("ENTRA AQUI ?")
                 data.identificacion = data.identificacion.trim();
                 data.apellido = data.apellido.trim();
                 data.nombre = data.nombre.trim();
@@ -1742,71 +1843,76 @@ class EmpleadoControlador {
                 data.contrasena = data.contrasena.trim();
                 data.rol = data.rol.trim();
 
-                if (regex.test(data.identificacion)) {
-                  if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                    if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
-                      data.observacion = 'La identificación ingresada no es válida';
-                    }
-                    else {
-                      if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
-                        if (data.contrasena != 'No registrado') {
-                          if (!valiContra.test(data.contrasena.toString())) {
-                            if (data.contrasena.toString().length <= 10) {
-                              if (data.estado_civil != 'No registrado') {
-                                if (estadoCivilArray.includes(data.estado_civil)) {
-                                  if (data.genero != 'No registrado') {
-                                    if (tipogenero.includes(data.genero.toLowerCase())) {
-                                      // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                      if (data.fec_nacimiento != 'No registrado') {
-                                        if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                                          // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                          if (LONGITUD != undefined && LATITUD != undefined) {
-                                            if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                              data.observacion = 'Verificar ubicación';
-                                            }
-                                          } else if (LONGITUD == undefined || LATITUD == undefined) {
+
+                if (TIPO_IDENTIFICACION == 'Pasaporte') {
+                  if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
+                    data.observacion = 'La identificación ingresada no es válida';
+                  }
+                  else {
+                    if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
+                      if (data.contrasena != 'No registrado') {
+                        if (!valiContra.test(data.contrasena.toString())) {
+                          if (data.contrasena.toString().length <= 10) {
+                            if (data.estado_civil != 'No registrado') {
+                              if (estadoCivilArray.includes(data.estado_civil)) {
+                                if (data.genero != 'No registrado') {
+                                  if (tipogenero.includes(data.genero.toLowerCase())) {
+                                    if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                      data.observacion = 'Verificar correo';
+                                    }
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (data.fec_nacimiento != 'No registrado') {
+                                      if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+
+                                        // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                        if (LONGITUD != undefined && LATITUD != undefined) {
+                                          if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                             data.observacion = 'Verificar ubicación';
                                           }
-  
-                                          // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                          if (TELEFONO != undefined) {
-                                            if (regex.test(data.telefono.toString())) {
-                                              if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                data.observacion = 'El teléfono ingresado no es válido';
-                                              }
-                                            }
-                                            else {
+                                        } else if (LONGITUD == undefined || LATITUD == undefined) {
+                                          data.observacion = 'Verificar ubicación';
+                                        }
+
+                                        // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                        if (TELEFONO != undefined) {
+                                          if (regex.test(data.telefono.toString())) {
+                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                               data.observacion = 'El teléfono ingresado no es válido';
                                             }
                                           }
-                                        }
-                                        else {
-                                          data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                          else {
+                                            data.observacion = 'El teléfono ingresado no es válido';
+                                          }
                                         }
                                       }
-                                    }
-                                    else {
-                                      data.observacion = 'Género no es válido';
+                                      else {
+                                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                      }
                                     }
                                   }
-                                }
-                                else {
-                                  data.observacion = 'Estado civil no es válido';
+                                  else {
+                                    data.observacion = 'Género no es válido';
+                                  }
                                 }
                               }
-                            }
-                            else {
-                              data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                              else {
+                                data.observacion = 'Estado civil no es válido';
+                              }
                             }
                           }
                           else {
-                            data.observacion = 'La contraseña ingresada no es válida';
+                            data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                           }
+                        }
+                        else {
+                          data.observacion = 'La contraseña ingresada no es válida';
                         }
                       }
                     }
-                  }else{
-                    const cedulaValida= await ValidarCedula(data.identificacion);
+                  }
+                } else {
+                  if (regex.test(data.identificacion)) {
+                    const cedulaValida = await ValidarCedula(data.identificacion);
                     if (data.identificacion.toString().length != 10 || !cedulaValida) {
                       data.observacion = 'La identificación ingresada no es válida';
                     }
@@ -1819,6 +1925,9 @@ class EmpleadoControlador {
                                 if (estadoCivilArray.includes(data.estado_civil)) {
                                   if (data.genero != 'No registrado') {
                                     if (tipogenero.includes(data.genero.toLowerCase())) {
+                                      if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                        data.observacion = 'Verificar correo';
+                                      }
                                       // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                                       if (data.fec_nacimiento != 'No registrado') {
                                         if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
@@ -1830,7 +1939,7 @@ class EmpleadoControlador {
                                           } else if (LONGITUD == undefined || LATITUD == undefined) {
                                             data.observacion = 'Verificar ubicación';
                                           }
-  
+
                                           // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                           if (TELEFONO != undefined) {
                                             if (regex.test(data.telefono.toString())) {
@@ -1868,12 +1977,68 @@ class EmpleadoControlador {
                         }
                       }
                     }
+                  } else {
+                    console.log("PASAPORTE NO VALIDO")
+                    data.observacion = 'La identificación ingresada no es válida';
                   }
-
-                  
                 }
-                else {
-                  data.observacion = 'La identificación ingresada no es válida';
+              }
+
+              var VERIFICAR_CEDULA = await pool.query(
+                `SELECT * FROM eu_empleados WHERE identificacion = $1`,
+                [data.identificacion]
+              );
+              if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                data.observacion = 'Identificación ya existe en el sistema';
+              } else {
+                var VERIFICAR_USUARIO = await pool.query(
+                  `SELECT * FROM eu_usuarios WHERE usuario = $1`,
+                  [data.usuario]
+                );
+                if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                  data.observacion = 'Usuario ya existe en el sistema';
+                } else {
+                  if (data.rol != 'No registrado') {
+                    var VERIFICAR_ROL = await pool.query(
+                      `SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`,
+                      [data.rol.toUpperCase()]
+                    );
+                    if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
+                      data.observacion = 'Rol no existe en el sistema';
+                    } else {
+                      if (data.nacionalidad != 'No registrado') {
+                        var VERIFICAR_NACIONALIDAD = await pool.query(
+                          `SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,
+                          [data.nacionalidad.toUpperCase()]
+                        );
+                        if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
+                          data.observacion = 'Nacionalidad no existe en el sistema';
+                        } else {
+                          // Aquí añadimos la validación de estado civil
+                          if (data.estado_civil != 'No registrado') {
+                            var VERIFICAR_ESTADO_CIVIL = await pool.query(
+                              `SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`,
+                              [data.estado_civil.toUpperCase()]
+                            );
+                            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
+                              data.observacion = 'Estado civil no existe en el sistema';
+                            } else {
+                              // Y la validación de género
+                              if (data.genero != 'No registrado') {
+                                var VERIFICAR_GENERO = await pool.query(
+                                  `SELECT * FROM e_genero WHERE UPPER(genero) = $1`,
+                                  [data.genero.toUpperCase()]
+                                );
+                                if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
+                                  data.observacion = 'Género no existe en el sistema';
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
               listEmpleados.push(data);
@@ -1890,66 +2055,82 @@ class EmpleadoControlador {
             fs.unlinkSync(ruta);
           }
         });
+
+        ///VALIDACION DE COLUMNAS EN BASE SI EXISTEN O NO (VALIDACION CON COLUMNAS FALTANTES)
         listEmpleados.forEach(async (valor: any) => {
           var VERIFICAR_CEDULA = await pool.query(
-            `
-            SELECT * FROM eu_empleados WHERE identificacion = $1
-            `
-            , [valor.identificacion]);
+            `SELECT * FROM eu_empleados WHERE identificacion = $1`,
+            [valor.identificacion]
+          );
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
             valor.observacion = 'Identificación ya existe en el sistema';
-          }
-          else {
+          } else {
             var VERIFICAR_USUARIO = await pool.query(
-              `
-              SELECT * FROM eu_usuarios WHERE usuario = $1
-              `
-              , [valor.usuario]);
+              `SELECT * FROM eu_usuarios WHERE usuario = $1`,
+              [valor.usuario]
+            );
             if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
               valor.observacion = 'Usuario ya existe en el sistema';
-            }
-            else {
+            } else {
               if (valor.rol != 'No registrado') {
                 var VERIFICAR_ROL = await pool.query(
-                  `
-                  SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-                  `
-                  , [valor.rol.toUpperCase()]);
+                  `SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`,
+                  [valor.rol.toUpperCase()]
+                );
                 if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                   if (valor.nacionalidad != 'No registrado') {
                     var VERIFICAR_NACIONALIDAD = await pool.query(
-                      `
-                      SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-                      `
-                      , [valor.nacionalidad.toUpperCase()]);
+                      `SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,
+                      [valor.nacionalidad.toUpperCase()]
+                    );
                     if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-                      // DISCRIMINACION DE ELEMENTOS IGUALES
-                      if (duplicados1.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
-                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES
-                        if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
-                          duplicados2.push(valor);
+
+                      if (valor.estado_civil != 'No registrado') {
+                        var VERIFICAR_ESTADO_CIVIL = await pool.query(
+                          `SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`,
+                          [valor.estado_civil.toUpperCase()]
+                        );
+                        if (VERIFICAR_ESTADO_CIVIL.rows[0] != undefined && VERIFICAR_ESTADO_CIVIL.rows[0] != '') {
+
+                          if (valor.genero != 'No registrado') {
+                            var VERIFICAR_GENERO = await pool.query(
+                              `SELECT * FROM e_genero WHERE UPPER(genero) = $1`,
+                              [valor.genero.toUpperCase()]
+                            );
+                            if (VERIFICAR_GENERO.rows[0] != undefined && VERIFICAR_GENERO.rows[0] != '') {
+                              // DISCRIMINACIÓN DE ELEMENTOS IGUALES
+                              if (duplicados1.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
+                                if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
+                                  duplicados2.push(valor);
+                                } else {
+                                  valor.observacion = '2';
+                                }
+                                duplicados1.push(valor);
+                              } else {
+                                valor.observacion = '1';
+                              }
+                            } else {
+                              valor.observacion = 'Género no existe en el sistema';
+                            }
+                          }
+
+                        } else {
+                          valor.observacion = 'Estado civil no existe en el sistema';
                         }
-                        else {
-                          valor.observacion = '2';
-                        }
-                        duplicados1.push(valor);
                       }
-                      else {
-                        valor.observacion = '1';
-                      }
-                    }
-                    else {
+
+                    } else {
                       valor.observacion = 'Nacionalidad no existe en el sistema';
                     }
                   }
-                }
-                else {
+                } else {
                   valor.observacion = 'Rol no existe en el sistema';
                 }
               }
             }
           }
-        })
+        });
+
         var tiempo = 2000;
         if (listEmpleados.length > 500 && listEmpleados.length <= 1000) {
           tiempo = 4000;
@@ -2071,7 +2252,7 @@ class EmpleadoControlador {
         console.log('contraseña plantilla automatico: ', contrasena);
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
-        const { identificacion,tipo_identificacion, numero_partida_individual, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
+        const { identificacion, tipo_identificacion, numero_partida_individual, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
           nacionalidad, usuario, rol } = data;
 
         //OBTENER ID DEL ESTADO_CIVIL 
@@ -2098,7 +2279,7 @@ class EmpleadoControlador {
           id_genero = generoDB.rows[0].id;
         } else {
           throw new Error(`Género no registrado: ${genero}`);
-}
+        }
 
         var _longitud = null;
         if (longitud != 'No registrado') {
@@ -2298,6 +2479,9 @@ class EmpleadoControlador {
 
         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
         const regex = /^[0-9]+$/;
+        // VALIDA EL FORMATO DEL CORREO: XXXXXXX@XXXXXXXXX.XXX
+        const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
         const valiContra = /\s/;
         // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
         const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
@@ -2322,12 +2506,12 @@ class EmpleadoControlador {
             !headers['CONTRASENA'] || !headers['ROL'] || !headers['ESTADO_CIVIL'] ||
             !headers['GENERO'] || !headers['CORREO'] || !headers['FECHA_NACIMIENTO'] ||
             !headers['LATITUD'] || !headers['LONGITUD'] || !headers['DOMICILIO'] ||
-            !headers['TELEFONO'] || !headers['NACIONALIDAD']|| !headers['TIPO_IDENTIFICACION'] || !headers['NUMERO_PARTIDA_INDIVIDUAL']
+            !headers['TELEFONO'] || !headers['NACIONALIDAD'] || !headers['TIPO_IDENTIFICACION'] || !headers['NUMERO_PARTIDA_INDIVIDUAL']
           ) {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
 
-          for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++){
+          for (let rowNumber = 2; rowNumber <= plantilla.rowCount; rowNumber++) {
             const row = plantilla.getRow(rowNumber);
             if (!row || row.hasValues === false) continue;
             // SALTAR LA FILA DE LAS CABECERAS
@@ -2351,7 +2535,7 @@ class EmpleadoControlador {
             const NACIONALIDAD = row.getCell(headers['NACIONALIDAD']).value?.toString();
             const TIPO_IDENTIFICACION = row.getCell(headers['TIPO_IDENTIFICACION']).value?.toString();
             const NUMERO_PARTIDA_INDIVIDUAL = row.getCell(headers['NUMERO_PARTIDA_INDIVIDUAL']).value?.toString();
-            
+
             let CORREO = row.getCell(headers['CORREO']).value;
             if (typeof CORREO === 'object' && CORREO !== null) {
               if ('text' in CORREO) {
@@ -2371,8 +2555,9 @@ class EmpleadoControlador {
               (LATITUD != undefined) && (LONGITUD != undefined) &&
               (DOMICILIO != undefined) && (TELEFONO != undefined) &&
               (NACIONALIDAD != undefined) && (USUARIO != undefined) &&
-              (CONTRASENA != undefined) && (ROL != undefined) && (TIPO_IDENTIFICACION != undefined) 
+              (CONTRASENA != undefined) && (ROL != undefined) && (TIPO_IDENTIFICACION != undefined) && (NUMERO_PARTIDA_INDIVIDUAL != undefined)
             ) {
+              console.log("entra porque tiene todos los datos llenos manual")
               data.fila = ITEM;
               data.identificacion = IDENTIFICACION?.trim();
               data.apellido = APELLIDO?.trim();
@@ -2394,17 +2579,12 @@ class EmpleadoControlador {
               data.numero_partida_individual = NUMERO_PARTIDA_INDIVIDUAL?.trim();
               data.observacion = 'no registrado';
 
-              data.identificacion = parseInt(data.identificacion);
-              data.codigo = parseInt(data.codigo);
-              data.longitud = parseFloat(data.longitud);
-              data.latitud = parseFloat(data.latitud);
-
-              
-              if (regex.test(data.identificacion)) {
+              if (data.identificacion.toString().length != 0) {
                 if (TIPO_IDENTIFICACION == 'Pasaporte') {
+                  console.log("ENTRA AQUI PORQUE ES PASAPORTE")
                   if (regex.test(data.codigo)) {
                     if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
-                      data.observacion = 'El código debe tener máximo 10 caracteres';
+                      data.observacion = 'La identificación ingresada no es válida';
                     }
                     else {
                       if (!valiContra.test(data.contrasena.toString())) {
@@ -2414,6 +2594,9 @@ class EmpleadoControlador {
                         else {
                           if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
                             if (tipogenero.includes(data.genero.toUpperCase())) {
+                              if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                data.observacion = 'Verificar correo';
+                              }
                               // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                               if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
 
@@ -2460,82 +2643,147 @@ class EmpleadoControlador {
                   else {
                     data.observacion = 'Formato de código incorrecto';
                   }
-                  
 
                 } else {
-                const cedulaValida= await ValidarCedula(data.identificacion);
-                if (data.identificacion.toString().length > 10 || data.identificacion.toString().length < 10 || !cedulaValida) {
-                  data.observacion = 'La identificación ingresada no es válida';
-                }
-                else {
-                  if (regex.test(data.codigo)) {
-                    if (data.codigo.toString().length > 10) {
-                      data.observacion = 'El código debe tener máximo 10 caracteres';
+                  if (regex.test(data.identificacion)) {
+                    const cedulaValida = await ValidarCedula(data.identificacion);
+                    if (data.identificacion.toString().length > 10 || data.identificacion.toString().length < 10 || !cedulaValida) {
+                      data.observacion = 'La identificación ingresada no es válida';
                     }
                     else {
-                      if (!valiContra.test(data.contrasena.toString())) {
-                        if (data.contrasena.length > 10) {
-                          data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                      if (regex.test(data.codigo)) {
+                        if (data.codigo.toString().length > 10) {
+                          data.observacion = 'El código debe tener máximo 10 caracteres';
                         }
                         else {
-                          if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
-                            if (tipogenero.includes(data.genero.toUpperCase())) {
-                              // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                              if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-
-                                // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                if (LONGITUD != undefined || LATITUD != undefined) {
-                                  if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                    data.observacion = 'Verificar ubicación';
+                          if (!valiContra.test(data.contrasena.toString())) {
+                            if (data.contrasena.length > 10) {
+                              data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                            }
+                            else {
+                              if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
+                                if (tipogenero.includes(data.genero.toUpperCase())) {
+                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                  if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                    data.observacion = 'Verificar correo';
                                   }
-                                } else if (LONGITUD == undefined || LATITUD == undefined) {
-                                  data.observacion = 'Verificar ubicación';
-                                }
+                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                  if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
 
-                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                if (TELEFONO != undefined) {
-                                  if (regex.test(data.telefono)) {
-                                    if (data.telefono.length > 10 || data.telefono.length < 7) {
-                                      data.observacion = 'El teléfono ingresado no es válido';
+                                    // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                    if (LONGITUD != undefined || LATITUD != undefined) {
+                                      if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                        data.observacion = 'Verificar ubicación';
+                                      }
+                                    } else if (LONGITUD == undefined || LATITUD == undefined) {
+                                      data.observacion = 'Verificar ubicación';
                                     }
 
+                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                    if (TELEFONO != undefined) {
+                                      if (regex.test(data.telefono)) {
+                                        if (data.telefono.length > 10 || data.telefono.length < 7) {
+                                          data.observacion = 'El teléfono ingresado no es válido';
+                                        }
+
+                                      }
+                                      else {
+                                        data.observacion = 'El teléfono ingresado no es válido';
+                                      }
+                                    }
                                   }
                                   else {
-                                    data.observacion = 'El teléfono ingresado no es válido';
+                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                   }
+                                }
+                                else {
+                                  data.observacion = 'Género no es válido';
                                 }
                               }
                               else {
-                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                data.observacion = 'Estado civil no es válido';
                               }
-                            }
-                            else {
-                              data.observacion = 'Género no es válido';
                             }
                           }
                           else {
-                            data.observacion = 'Estado civil no es válido';
+                            data.observacion = 'La contraseña ingresada no es válida';
                           }
                         }
                       }
                       else {
-                        data.observacion = 'La contraseña ingresada no es válida';
+                        data.observacion = 'Formato de código incorrecto';
                       }
                     }
                   }
-                  else {
-                    data.observacion = 'Formato de código incorrecto';
-                  }
                 }
-              }
               }
               else {
                 data.observacion = 'La identificación ingresada no es válida';
               }
 
+              // VALIDACIONES EN BASE DE DATOS
+              var VERIFICAR_CEDULA = await pool.query(
+                `SELECT * FROM eu_empleados WHERE identificacion = $1`,
+                [data.identificacion]
+              );
+              if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                data.observacion = 'Identificación ya existe en el sistema';
+              } else {
+                var VERIFICAR_USUARIO = await pool.query(
+                  `SELECT * FROM eu_usuarios WHERE usuario = $1`,
+                  [data.usuario]
+                );
+                if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                  data.observacion = 'Usuario ya existe en el sistema';
+                } else {
+                  if (data.rol != 'No registrado') {
+                    var VERIFICAR_ROL = await pool.query(
+                      `SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`,
+                      [data.rol.toUpperCase()]
+                    );
+                    if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
+                      data.observacion = 'Rol no existe en el sistema';
+                    } else {
+                      if (data.nacionalidad != 'No registrado') {
+                        var VERIFICAR_NACIONALIDAD = await pool.query(
+                          `SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,
+                          [data.nacionalidad.toUpperCase()]
+                        );
+                        if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
+                          data.observacion = 'Nacionalidad no existe en el sistema';
+                        } else {
+                          // Aquí añadimos la validación de estado civil
+                          if (data.estado_civil != 'No registrado') {
+                            var VERIFICAR_ESTADO_CIVIL = await pool.query(
+                              `SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`,
+                              [data.estado_civil.toUpperCase()]
+                            );
+                            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
+                              data.observacion = 'Estado civil no existe en el sistema';
+                            } else {
+                              // Y la validación de género
+                              if (data.genero != 'No registrado') {
+                                var VERIFICAR_GENERO = await pool.query(
+                                  `SELECT * FROM e_genero WHERE UPPER(genero) = $1`,
+                                  [data.genero.toUpperCase()]
+                                );
+                                if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
+                                  data.observacion = 'Género no existe en el sistema';
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
               listEmpleadosManual.push(data);
             }
             else {
+              console.log("entra aqui porque no estan llenos los datos")
               data.fila = ITEM;
               data.identificacion = IDENTIFICACION?.trim();
               data.apellido = APELLIDO?.trim();
@@ -2557,55 +2805,14 @@ class EmpleadoControlador {
               data.numero_partida_individual = NUMERO_PARTIDA_INDIVIDUAL?.trim();
               data.observacion = 'no registrado';
 
-              data.identificacion = parseInt(data.identificacion);
-              data.codigo = parseInt(data.codigo);
-              data.longitud = parseFloat(data.longitud);
-              data.latitud = parseFloat(data.latitud);
+              let hayDatosFaltantes = false;
 
               if (data.fila == '' || data.fila == undefined) {
                 data.fila = 'error';
                 mensaje = 'error'
-              }
-              if (APELLIDO == undefined) {
-                data.apellido = 'No registrado';
-                data.observacion = 'Apellido no registrado';
-              }
-              if (NOMBRE == undefined) {
-                data.nombre = 'No registrado';
-                data.observacion = 'Nombre no registrado';
+                hayDatosFaltantes = true;
               }
 
-              if (TIPO_IDENTIFICACION == undefined) {
-                data.tipo_identificacion = 'No registrado';
-                data.observacion = 'Tipo de identificación no registrado';
-              }
-              
-              if (CODIGO == undefined) {
-                data.codigo = 'No registrado';
-                data.observacion = 'Código no registrado';
-              }
-              if (ESTADO_CIVIL == undefined) {
-                data.estado_civil = 'No registrado';
-                data.observacion = 'Estado civil no registrado';
-              }
-              if (GENERO == undefined) {
-                data.genero = 'No registrado';
-                data.observacion = 'Género no registrado';
-              }
-              if (CORREO == undefined) {
-                data.correo = 'No registrado';
-                data.observacion = 'Correo no registrado';
-              }
-              if (FECHA_NACIMIENTO == undefined) {
-                data.fec_nacimiento = 'No registrado';
-                data.observacion = 'Fecha de nacimiento no registrado';
-              }
-              if (LATITUD == undefined) {
-                data.latitud = 'No registrado';
-              }
-              if (LONGITUD == undefined) {
-                data.longitud = 'No registrado';
-              }
               if (DOMICILIO == undefined) {
                 data.domicilio = 'No registrado';
                 data.observacion = " ";
@@ -2614,84 +2821,146 @@ class EmpleadoControlador {
                 data.telefono = 'No registrado';
                 data.observacion = " ";
               }
+              if (APELLIDO == undefined) {
+                data.apellido = 'No registrado';
+                data.observacion = 'Apellido no registrado';
+                hayDatosFaltantes = true;
+              }
+              if (NOMBRE == undefined) {
+                data.nombre = 'No registrado';
+                data.observacion = 'Nombre no registrado';
+                hayDatosFaltantes = true;
+              }
+
+              if (CODIGO == undefined) {
+                data.codigo = 'No registrado';
+                data.observacion = 'Código no registrado';
+                hayDatosFaltantes = true;
+              }
+              if (ESTADO_CIVIL == undefined) {
+                data.estado_civil = 'No registrado';
+                data.observacion = 'Estado civil no registrado';
+                hayDatosFaltantes = true;
+              }
+              if (GENERO == undefined) {
+                data.genero = 'No registrado';
+                data.observacion = 'Género no registrado';
+                hayDatosFaltantes = true;
+              }
+              if (CORREO == undefined) {
+                data.correo = 'No registrado';
+                data.observacion = 'Correo no registrado';
+                hayDatosFaltantes = true;
+              }
+              if (FECHA_NACIMIENTO == undefined) {
+                data.fec_nacimiento = 'No registrado';
+                data.observacion = 'Fecha de nacimiento no registrado';
+                hayDatosFaltantes = true;
+              }
+              if ((!LATITUD || LATITUD === undefined) && (!LONGITUD || LONGITUD === undefined)) {
+                data.latitud = 'No registrado';
+                data.longitud = 'No registrado';
+                data.observacion = " ";
+                hayDatosFaltantes = true;
+              } else {
+                if (!LATITUD || LATITUD === undefined) {
+                  data.latitud = 'No registrado';
+                  data.observacion = 'Verificar ubicación';
+                }
+                if (!LONGITUD || LONGITUD === undefined) {
+                  data.longitud = 'No registrado';
+                  data.observacion = 'Verificar ubicación';
+                }
+
+              }
               if (NACIONALIDAD == undefined) {
                 data.nacionalidad = 'No registrado';
                 data.observacion = 'Nacionalidad no registrado';
+                hayDatosFaltantes = true;
               }
               if (USUARIO == undefined) {
                 data.usuario = 'No registrado';
                 data.observacion = 'Usuario no registrado';
+                hayDatosFaltantes = true;
               }
               if (CONTRASENA == undefined) {
                 data.contrasena = 'No registrado';
                 data.observacion = 'Contraseña no registrada';
+                hayDatosFaltantes = true;
               }
               if (ROL == undefined) {
                 data.rol = 'No registrado'
                 data.observacion = 'Rol no registrado';
+                hayDatosFaltantes = true;
               }
 
-              if (CODIGO != undefined) {
-                if (!regex.test(data.codigo)) {
-                  data.observacion = 'Formato de código incorrecto';
-                }
-                else {
-                  if (data.codigo.toString().length > 10) {
-                    data.observacion = 'El código debe tener máximo 10 caracteres';
-                  }
-                  else {
-                    if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
-                      if (CONTRASENA != undefined) {
-                        //console.log('data: ', data.contrasena);
+              if (IDENTIFICACION == undefined) {
+                data.identificacion = 'No registrado'
+                data.observacion = 'Identificación no registrada';
+                hayDatosFaltantes = true;
+              }
+              if (TIPO_IDENTIFICACION == undefined) {
+                console.log("ENTRA AQUI PORQUE NO HAY TIPO DE IDENTIFICACION", TIPO_IDENTIFICACION)
+                data.tipo_identificacion = 'No registrado';
+                data.observacion = 'Tipo de identificación no registrado';
+                hayDatosFaltantes = true;
+              }
+
+              if (!hayDatosFaltantes) {
+                console.log("ENTRA AQUI ?")
+                if (data.identificacion.toString().length != 0) {
+                  if (TIPO_IDENTIFICACION == 'Pasaporte') {
+                    console.log("ENTRA AQUI PORQUE ES PASAPORTE")
+                    if (regex.test(data.codigo)) {
+                      if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
+                        data.observacion = 'La identificación ingresada no es válida';
+                      }
+                      else {
                         if (!valiContra.test(data.contrasena.toString())) {
-                          //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
-                          if (data.contrasena.toString().length > 10) {
+                          if (data.contrasena.length > 10) {
                             data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                           }
                           else {
-                            if (data.estado_civil != 'No registrado') {
-                              if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
-                                if (data.genero != 'No registrado') {
-                                  if (tipogenero.includes(data.genero.toUpperCase())) {
-                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO 
-                                    if (data.fec_nacimiento != 'No registrado') {
-                                      if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+                            if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
+                              if (tipogenero.includes(data.genero.toUpperCase())) {
+                                if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                  data.observacion = 'Verificar correo';
+                                }
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
 
-                                        // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                        if (LONGITUD != undefined && LATITUD != undefined) {
-                                          if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                            data.observacion = 'Verificar ubicación';
-                                          }
-                                        } else if (LONGITUD == undefined || LATITUD == undefined) {
-                                          data.observacion = 'Verificar ubicación';
-                                        }
+                                  // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                  if (LONGITUD != undefined || LATITUD != undefined) {
+                                    if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                      data.observacion = 'Verificar ubicación';
+                                    }
+                                  } else if (LONGITUD == undefined || LATITUD == undefined) {
+                                    data.observacion = 'Verificar ubicación';
+                                  }
 
-                                        // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                        if (TELEFONO != undefined) {
-                                          const regex = /^[0-9]+$/;
-                                          if (regex.test(data.telefono)) {
-                                            if (data.telefono.length > 10 || data.telefono.length < 7) {
-                                              data.observacion = 'El teléfono ingresado no es válido';
-                                            }
-                                          }
-                                          else {
-                                            data.observacion = 'El teléfono ingresado no es válido';
-                                          }
-                                        }
+                                  // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                  if (TELEFONO != undefined) {
+                                    if (regex.test(data.telefono)) {
+                                      if (data.telefono.length > 10 || data.telefono.length < 7) {
+                                        data.observacion = 'El teléfono ingresado no es válido';
                                       }
-                                      else {
-                                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                      }
+
+                                    }
+                                    else {
+                                      data.observacion = 'El teléfono ingresado no es válido';
                                     }
                                   }
-                                  else {
-                                    data.observacion = 'Género no es válido';
-                                  }
+                                }
+                                else {
+                                  data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                 }
                               }
                               else {
-                                data.observacion = 'Estado civil no es válido';
+                                data.observacion = 'Género no es válido';
                               }
+                            }
+                            else {
+                              data.observacion = 'Estado civil no es válido';
                             }
                           }
                         }
@@ -2700,27 +2969,147 @@ class EmpleadoControlador {
                         }
                       }
                     }
-                  }
-                }
-              }
+                    else {
+                      data.observacion = 'Formato de código incorrecto';
+                    }
 
-              if (IDENTIFICACION == undefined) {
-                data.identificacion = 'No registrado'
-                data.observacion = 'Identificación no registrada';
-              }
-              else {
-                // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                const rege = /^[0-9]+$/;
-                if (rege.test(data.identificacion)) {
-                  if (data.identificacion.toString().length != 10) {
-                    console.log("Entro a validar cedula linea 2702")
-                    data.observacion = 'La identificación ingresada no es válida';
+                  } else {
+                    if (regex.test(data.identificacion)) {
+                      const cedulaValida = await ValidarCedula(data.identificacion);
+                      if (data.identificacion.toString().length > 10 || data.identificacion.toString().length < 10 || !cedulaValida) {
+                        data.observacion = 'La identificación ingresada no es válida';
+                      }
+                      else {
+                        if (regex.test(data.codigo)) {
+                          if (data.codigo.toString().length > 10) {
+                            data.observacion = 'El código debe tener máximo 10 caracteres';
+                          }
+                          else {
+                            if (!valiContra.test(data.contrasena.toString())) {
+                              if (data.contrasena.length > 10) {
+                                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                              }
+                              else {
+                                if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
+                                  if (tipogenero.includes(data.genero.toUpperCase())) {
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                      data.observacion = 'Verificar correo';
+                                    }
+                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
+                                    if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+
+                                      // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                      if (LONGITUD != undefined || LATITUD != undefined) {
+                                        if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                          data.observacion = 'Verificar ubicación';
+                                        }
+                                      } else if (LONGITUD == undefined || LATITUD == undefined) {
+                                        data.observacion = 'Verificar ubicación';
+                                      }
+
+                                      // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                      if (TELEFONO != undefined) {
+                                        if (regex.test(data.telefono)) {
+                                          if (data.telefono.length > 10 || data.telefono.length < 7) {
+                                            data.observacion = 'El teléfono ingresado no es válido';
+                                          }
+
+                                        }
+                                        else {
+                                          data.observacion = 'El teléfono ingresado no es válido';
+                                        }
+                                      }
+                                    }
+                                    else {
+                                      data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                    }
+                                  }
+                                  else {
+                                    data.observacion = 'Género no es válido';
+                                  }
+                                }
+                                else {
+                                  data.observacion = 'Estado civil no es válido';
+                                }
+                              }
+                            }
+                            else {
+                              data.observacion = 'La contraseña ingresada no es válida';
+                            }
+                          }
+                        }
+                        else {
+                          data.observacion = 'Formato de código incorrecto';
+                        }
+                      }
+                    }
                   }
                 }
                 else {
                   data.observacion = 'La identificación ingresada no es válida';
                 }
               }
+
+              // VALIDACIONES EN BASE DE DATOS
+              var VERIFICAR_CEDULA = await pool.query(
+                `SELECT * FROM eu_empleados WHERE identificacion = $1`,
+                [data.identificacion]
+              );
+              if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                data.observacion = 'Identificación ya existe en el sistema';
+              } else {
+                var VERIFICAR_USUARIO = await pool.query(
+                  `SELECT * FROM eu_usuarios WHERE usuario = $1`,
+                  [data.usuario]
+                );
+                if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                  data.observacion = 'Usuario ya existe en el sistema';
+                } else {
+                  if (data.rol != 'No registrado') {
+                    var VERIFICAR_ROL = await pool.query(
+                      `SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`,
+                      [data.rol.toUpperCase()]
+                    );
+                    if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
+                      data.observacion = 'Rol no existe en el sistema';
+                    } else {
+                      if (data.nacionalidad != 'No registrado') {
+                        var VERIFICAR_NACIONALIDAD = await pool.query(
+                          `SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,
+                          [data.nacionalidad.toUpperCase()]
+                        );
+                        if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
+                          data.observacion = 'Nacionalidad no existe en el sistema';
+                        } else {
+                          // Aquí añadimos la validación de estado civil
+                          if (data.estado_civil != 'No registrado') {
+                            var VERIFICAR_ESTADO_CIVIL = await pool.query(
+                              `SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`,
+                              [data.estado_civil.toUpperCase()]
+                            );
+                            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
+                              data.observacion = 'Estado civil no existe en el sistema';
+                            } else {
+                              // Y la validación de género
+                              if (data.genero != 'No registrado') {
+                                var VERIFICAR_GENERO = await pool.query(
+                                  `SELECT * FROM e_genero WHERE UPPER(genero) = $1`,
+                                  [data.genero.toUpperCase()]
+                                );
+                                if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
+                                  data.observacion = 'Género no existe en el sistema';
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
               listEmpleadosManual.push(data);
             }
             data = {}
@@ -2739,76 +3128,83 @@ class EmpleadoControlador {
         listEmpleadosManual.forEach(async (valor: any) => {
           if (valor.observacion == 'no registrado' || valor.observacion == ' ') {
             var VERIFICAR_CEDULA = await pool.query(
-              `
-              SELECT * FROM eu_empleados WHERE identificacion = $1
-              `
-              , [valor.identificacion]);
+              `SELECT * FROM eu_empleados WHERE identificacion = $1`,
+              [valor.identificacion]
+            );
             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-              valor.observacion = 'Identificación ya existe en el sistema'
-            }
-            else {
-
+              valor.observacion = 'Identificación ya existe en el sistema';
+            } else {
               var VERIFICAR_CODIGO = await pool.query(
-                `
-                SELECT * FROM eu_empleados WHERE codigo = $1
-                `
-                , [valor.codigo]);
+                `SELECT * FROM eu_empleados WHERE codigo = $1`,
+                [valor.codigo]
+              );
               if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
-                valor.observacion = 'Código ya existe en el sistema'
-              }
-              else {
+                valor.observacion = 'Código ya existe en el sistema';
+              } else {
                 var VERIFICAR_USUARIO = await pool.query(
-                  `
-                  SELECT * FROM eu_usuarios WHERE usuario = $1
-                  `
-                  , [valor.usuario]);
+                  `SELECT * FROM eu_usuarios WHERE usuario = $1`,
+                  [valor.usuario]
+                );
                 if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                  valor.observacion = 'Usuario ya existe en el sistema'
-                }
-                else {
+                  valor.observacion = 'Usuario ya existe en el sistema';
+                } else {
                   if (valor.rol != 'No registrado') {
                     var VERIFICAR_ROL = await pool.query(
-                      `
-                      SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-                      `
-                      , [valor.rol.toUpperCase()]);
+                      `SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`,
+                      [valor.rol.toUpperCase()]
+                    );
                     if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                       if (valor.nacionalidad != 'No registrado') {
                         var VERIFICAR_NACIONALIDAD = await pool.query(
-                          `
-                          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-                          `
-                          , [valor.nacionalidad.toUpperCase()]);
+                          `SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,
+                          [valor.nacionalidad.toUpperCase()]
+                        );
                         if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-                          // DISCRIMINACION DE ELEMENTOS IGUALES
-                          if (duplicados1.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
-                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES
-                            if (duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined) {
-                              // DISCRIMINACION DE ELEMENTOS IGUALES
-                              if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
-                                //valor.observacion = 'ok'
-                                duplicados2.push(valor);
+
+                          if (valor.estado_civil != 'No registrado') {
+                            var VERIFICAR_ESTADO_CIVIL = await pool.query(
+                              `SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`,
+                              [valor.estado_civil.toUpperCase()]
+                            );
+                            if (VERIFICAR_ESTADO_CIVIL.rows[0] != undefined && VERIFICAR_ESTADO_CIVIL.rows[0] != '') {
+
+                              if (valor.genero != 'No registrado') {
+                                var VERIFICAR_GENERO = await pool.query(
+                                  `SELECT * FROM e_genero WHERE UPPER(genero) = $1`,
+                                  [valor.genero.toUpperCase()]
+                                );
+                                if (VERIFICAR_GENERO.rows[0] != undefined && VERIFICAR_GENERO.rows[0] != '') {
+                                  // DISCRIMINACIÓN DE ELEMENTOS IGUALES
+                                  if (duplicados1.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
+                                    if (duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined) {
+                                      if (duplicados2.find((a: any) => a.usuario === valor.usuario) == undefined) {
+                                        duplicados2.push(valor);
+                                      } else {
+                                        valor.observacion = '2';
+                                      }
+                                      duplicados3.push(valor);
+                                    } else {
+                                      valor.observacion = '3';
+                                    }
+                                    duplicados1.push(valor);
+                                  } else {
+                                    valor.observacion = '1';
+                                  }
+                                } else {
+                                  valor.observacion = 'Género no existe en el sistema';
+                                }
                               }
-                              else {
-                                valor.observacion = '2';
-                              }
-                              duplicados3.push(valor);
+
+                            } else {
+                              valor.observacion = 'Estado civil no existe en el sistema';
                             }
-                            else {
-                              valor.observacion = '3';
-                            }
-                            duplicados1.push(valor);
                           }
-                          else {
-                            valor.observacion = '1';
-                          }
-                        }
-                        else {
+
+                        } else {
                           valor.observacion = 'Nacionalidad no existe en el sistema';
                         }
                       }
-                    }
-                    else {
+                    } else {
                       valor.observacion = 'Rol no existe en el sistema';
                     }
                   }
@@ -2816,7 +3212,8 @@ class EmpleadoControlador {
               }
             }
           }
-        })
+        });
+
         var tiempo = 2000;
         if (listEmpleadosManual.length > 500 && listEmpleadosManual.length <= 1000) {
           tiempo = 4000;
@@ -2927,7 +3324,7 @@ class EmpleadoControlador {
 
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         const { identificacion, tipo_identificacion, numero_partida_individual, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,
-          telefono, nacionalidad, usuario, rol,  } = data;  
+          telefono, nacionalidad, usuario, rol, } = data;
 
         // OBTENER ID DEL ESTADO_CIVIL 
         let id_estado_civil = 0;
@@ -2953,7 +3350,7 @@ class EmpleadoControlador {
           id_genero = generoDB.rows[0].id;
         } else {
           throw new Error(`Género no registrado: ${genero}`);
-}
+        }
 
         var _longitud = null;
         if (longitud != 'No registrado') {
@@ -3314,7 +3711,7 @@ class EmpleadoControlador {
     }
   }
 
- 
+
 
 
 }
