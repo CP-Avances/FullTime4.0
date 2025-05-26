@@ -48,7 +48,7 @@ import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
-import GENERO_RUTAS  from './rutas/empleado/generos/catGeneroRutas'
+import GENERO_RUTAS from './rutas/empleado/generos/catGeneroRutas'
 import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
@@ -125,12 +125,12 @@ class Servidor {
             },
         });
         this.io.on('connection', (socket: any) => {
-            console.log('Cliente conectado:', socket.id); 
-            
+            console.log('Cliente conectado:', socket.id);
+
             socket.on("connect_error", (err: any) => {
                 console.log("Error de conexión:", err.message);
-              });
-              
+            });
+
             // Verifica la conexión
             socket.on('disconnect', () => {
                 console.log('Cliente desconectado:', socket.id);
@@ -334,22 +334,17 @@ DesactivarFinContratoEmpleado();
 export const io = SERVIDOR.io;
 
 // INICIO DE TAREAS AUTOMATICAS
-tareasAutomaticas.iniciarTareasAutomaticas();
+(async () => {
+    // INICIO DE TAREAS AUTOMATICAS
+    await tareasAutomaticas.IniciarTarea();
 
-// setInterval(async () => {
-    // atrasosDiarios();
-    // atrasosSemanal();
-    // faltasDiarios();
-    // faltasSemanal();
-    // salidasAnticipadasSemanal();
-    // salidasAnticipadasDiarios();
-// }, 3600);
+    // LLAMA AL METODO DE CUMPLEAÑOS
+    aniversario();
 
-// LLAMA AL MEODO DE CUMPLEAÑOS
-aniversario();
+    // LLAMA AL METODO DE AVISOS DE VACACIONES
+    cumpleanios();
+})();
 
-// LLAMA AL METODO DE AVISOS DE VACACIONES
-cumpleanios();
 
 //beforeFiveDays();
 //beforeTwoDays();

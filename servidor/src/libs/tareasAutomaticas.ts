@@ -1,279 +1,217 @@
 import cron, { ScheduledTask } from "node-cron";
 import pool from "../database";
-import { atrasosDiarios, atrasosDiariosIndividual, atrasosSemanal } from "./sendAtraso";
 
+import {
+  atrasosDiarios,
+  atrasosDiariosIndividual,
+  atrasosSemanal,
+} from "./sendAtraso";
+
+import {
+  faltasDiarios,
+  faltasDiariosIndividual,
+  faltasSemanal,
+} from "./sendFaltas";
+import { salidasADiariosIndividual, salidasAnticipadasDiarios, salidasAnticipadasSemanal } from "./sendSalidasAnticipadas";
+
+// ENUMERACION DE IDS DE PARAMETROS
+export enum IDParametros {
+
+  /** *************************************************************************************** **
+   **                                PARAMETROS DE ATRASOS                                 ** ** 
+   ** *************************************************************************************** **/
+
+  ENVIA_ATRASOS_DIARIO = 10,         // PARAMETRO ENVIO DE ATRASOS DIARIO
+  HORA_ATRASOS_DIARIO = 11,          // PARAMETRO HORA DE ENVIO DE ATRASOS DIARIO JEFES
+  ENVIA_ATRASOS_SEMANAL = 13,        // PARAMETRO ENVIO DE ATRASOS SEMANAL
+  HORA_ATRASOS_SEMANAL = 14,         // PARAMETRO HORA DE ENVIO DE ATRASOS SEMANAL
+  DIA_ATRASOS_SEMANAL = 15,          // PARAMETRO DIA DE ENVIO DE ATRASOS SEMANAL
+  HORA_ATRASOS_INDIVIDUAL = 34,      // PARAMETRO HORA DE ENVIO DE ATRASOS INDIVIDUAL
+
+  /** *************************************************************************************** **
+   **                                PARAMETROS DE FALTAS                                  ** ** 
+   ** *************************************************************************************** **/
+
+  ENVIA_FALTAS_DIARIO = 17,          // PARAMETRO ENVIO DE FALTAS DIARIO
+  HORA_FALTAS_DIARIO = 18,           // PARAMETRO HORA DE ENVIO DE FALTAS DIARIO JEFES
+  ENVIA_FALTAS_SEMANAL = 20,         // PARAMETRO ENVIO DE FALTAS SEMANAL
+  HORA_FALTAS_SEMANAL = 21,          // PARAMETRO HORA DE ENVIO DE FALTAS SEMANAL
+  DIA_FALTAS_SEMANAL = 22,           // PARAMETRO DIA DE ENVIO DE FALTAS SEMANAL
+  HORA_FALTAS_INDIVIDUAL = 33,       // PARAMETRO HORA DE ENVIO DE FALTAS INDIVIDUAL
+
+  /** *************************************************************************************** **
+   **                       PARAMETROS DE SALIDAS ANTICIPADAS                              ** ** 
+   ** *************************************************************************************** **/
+
+  ENVIA_SALIDASA_DIARIO = 26,          // PARAMETRO ENVIO DE SALIDAS ANTICIPADAS DIARIO
+  HORA_SALIDASA_DIARIO = 27,           // PARAMETRO HORA DE ENVIO DE SALIDAS ANTICIPADAS DIARIO JEFES
+  ENVIA_SALIDASA_SEMANAL = 29,         // PARAMETRO ENVIO DE SALIDAS ANTICIPADAS SEMANAL
+  HORA_SALIDASA_SEMANAL = 30,          // PARAMETRO HORA DE ENVIO DE SALIDAS ANTICIPADAS SEMANAL
+  DIA_SALIDASA_SEMANAL = 31,           // PARAMETRO DIA DE ENVIO DE SALIDAS ANTICIPADAS SEMANAL
+  HORA_SALIDASA_INDIVIDUAL = 35,       // PARAMETRO HORA DE ENVIO DE SALIDAS ANTICIPADAS INDIVIDUAL
+
+}
+
+// TIPO DE CONFIGURACION PARA CADA TAREA
+export type configurarTarea = {
+  clave: string;
+  envioId?: IDParametros;
+  horaId: IDParametros;
+  diaId?: IDParametros;
+  task: () => Promise<void>;
+};
+
+const dias = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
+
+// FUNCION PARA DAR FORMATO AL CRON (PROGRAMADOR DE TAREAS)
+function toCron(horaRegistrada: string, nombreDia?: string): string | null {
+  const [hora, minuto = "0"] = horaRegistrada.split(":");
+
+  const horaCron = +hora,
+    minutosCron = +minuto;
+
+  if (horaCron < 0 || horaCron > 23 || minutosCron < 0 || minutosCron > 59) return null;
+
+  if (nombreDia) {
+    const diaIndex = dias.indexOf(nombreDia);
+    if (diaIndex === -1) return null;
+    return `${minutosCron} ${horaCron} * * ${diaIndex}`;
+  }
+  return `${minutosCron} ${horaCron} * * *`;
+}
+
+// DECLARACION DE LAS TAREAS AUTOMATICAS
+export const TAREAS: configurarTarea[] = [
+  {
+    clave: "ATRASOS_DIARIO",
+    envioId: IDParametros.ENVIA_ATRASOS_DIARIO,
+    horaId: IDParametros.HORA_ATRASOS_DIARIO,
+    task: atrasosDiarios,
+  },
+  {
+    clave: "ATRASOS_INDIVIDUAL",
+    horaId: IDParametros.HORA_ATRASOS_INDIVIDUAL,
+    task: atrasosDiariosIndividual,
+  },
+  {
+    clave: "ATRASOS_SEMANAL",
+    envioId: IDParametros.ENVIA_ATRASOS_SEMANAL,
+    horaId: IDParametros.HORA_ATRASOS_SEMANAL,
+    diaId: IDParametros.DIA_ATRASOS_SEMANAL,
+    task: atrasosSemanal,
+  },
+  {
+    clave: "FALTAS_DIARIO",
+    envioId: IDParametros.ENVIA_FALTAS_DIARIO,
+    horaId: IDParametros.HORA_FALTAS_DIARIO,
+    task: faltasDiarios,
+  },
+  {
+    clave: "FALTAS_INDIVIDUAL",
+    horaId: IDParametros.HORA_FALTAS_INDIVIDUAL,
+    task: faltasDiariosIndividual,
+  },
+  {
+    clave: "FALTAS_SEMANAL",
+    envioId: IDParametros.ENVIA_FALTAS_SEMANAL,
+    horaId: IDParametros.HORA_FALTAS_SEMANAL,
+    diaId: IDParametros.DIA_FALTAS_SEMANAL,
+    task: faltasSemanal,
+  },
+  {
+    clave: "SALIDASA_DIARIO",
+    envioId: IDParametros.ENVIA_SALIDASA_DIARIO,
+    horaId: IDParametros.HORA_SALIDASA_DIARIO,
+    task: salidasAnticipadasDiarios,
+  },
+  {
+    clave: "SALIDASA_INDIVIDUAL",
+    horaId: IDParametros.HORA_SALIDASA_INDIVIDUAL,
+    task: salidasADiariosIndividual,
+  },
+  {
+    clave: "SALIDASA_SEMANAL",
+    envioId: IDParametros.ENVIA_SALIDASA_SEMANAL,
+    horaId: IDParametros.HORA_SALIDASA_SEMANAL,
+    diaId: IDParametros.DIA_SALIDASA_SEMANAL,
+    task: salidasAnticipadasSemanal,
+  },
+];
+
+
+// CLASE PRINCIPAL DE TAREAS
 class TareasAutomaticas {
-  private parametroAtrasosDiarios: string;
-  private parametroHoraAtrasosDiarios: string;
-  private parametroHoraAtrasosIndividuales: string;
+  private tareas = new Map<string, ScheduledTask>();
 
-  private parametroAtrasosSemanal: string;
-  private parametroDiaAtrasosSemanal: string;
-  private parametroHoraAtrasosSemanal: string;
-
-  private tareaAtrasosDiarios: ScheduledTask | null = null;
-  private tareaAtrasosSemanal: ScheduledTask | null = null;
-  private tareaAtrasosIndividuales: ScheduledTask | null = null;
-
-  constructor() {
-    this.parametroAtrasosDiarios = "";
-    this.parametroHoraAtrasosDiarios = "";
-    this.parametroHoraAtrasosIndividuales = "";
-    this.parametroAtrasosSemanal = "";
-    this.parametroDiaAtrasosSemanal = "";
-    this.parametroHoraAtrasosSemanal = "";
+  private async param(id: IDParametros): Promise<string | null> {
+    const res = await pool.query<{ descripcion: string }>(
+      "SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro=$1 LIMIT 1",
+      [id]
+    );
+    return res.rows[0]?.descripcion ?? null;
   }
 
-  public async iniciarTareasAutomaticas() {
-    console.log("Iniciando tareas automáticas...");
-    this.programarEnvioAtrasosDiarios();
-    this.programarEnvioAtrasosIndividuales();
-    this.programarEnvioAtrasosSemanales();
+  // METODO PARA INICIRA TAREA
+  public async IniciarTarea(): Promise<void> {
+    console.log("Configurando tareas automáticas...");
+    for (const j of TAREAS) await this.ProgramarTareas(j);
   }
 
-  public detenerTareasAutomaticas() {
-    if (this.tareaAtrasosDiarios) {
-      this.tareaAtrasosDiarios.stop();
-    }
-    if (this.tareaAtrasosIndividuales) {
-      this.tareaAtrasosIndividuales.stop();
-    }
-    if (this.tareaAtrasosSemanal) {
-      this.tareaAtrasosSemanal.stop();
+  // METOOD PARA DETENER TODAS LAS TAREAS
+  public DetenerTareasALL(): void {
+    for (const t of this.tareas.values()) t.stop();
+    this.tareas.clear();
+  }
+
+  // METODO PARA DETENER UNA TAREA
+  public DetenerTarea(clave: string): void {
+    const tarea = this.tareas.get(clave);
+    if (tarea) {
+      tarea.stop();
+      this.tareas.delete(clave);
+      console.log(`Tarea detenida: ${clave}`);
     }
   }
 
-  /*
-    * Método para programar el envío de atrasos diarios.
-    * Este método consulta los parámetros necesarios y programa una tarea cron
-    * para enviar los atrasos diarios a la hora especificada.
-  */
-  private async programarEnvioAtrasosDiarios() {
-    try {
-      // PARAMETRO 10 INDICA SI ESTA ACTIVO EL ENVIO DE ATRASOS DIARIOS
-      this.parametroAtrasosDiarios = await this.consultarDetalleParametros(10);
-      // PARAMETRO 11 INDICA LA HORA EN QUE SE ENVIAN LOS ATRASOS DIARIOS
-      this.parametroHoraAtrasosDiarios = await this.consultarDetalleParametros(11);
-      
-      if (!this.parametroAtrasosDiarios || this.parametroAtrasosDiarios != 'Si') return;
-      if (!this.parametroHoraAtrasosDiarios) return;
+  // METODO PARA EJECUTAR PROGRAMACION DE TAREAS
+  public async EjecutarProgramacionTareas(cfg: configurarTarea): Promise<void> {
+    await this.ProgramarTareas(cfg);
+  }
 
-      let horaCron = null;
+  // METODO PARA PROGRAMAR TAREAS
+  private async ProgramarTareas(configurar: configurarTarea): Promise<void> {
+    if (configurar.envioId && (await this.param(configurar.envioId)) !== "Si") return;
 
-      const partes = this.parametroHoraAtrasosDiarios.split(":");
+    const tiempoRegistrado = await this.param(configurar.horaId);
+    if (!tiempoRegistrado) return;
 
-      const hora = parseInt(partes[0], 10);
-      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
+    const diaRegistrado = configurar.diaId ? await this.param(configurar.diaId) : undefined;
+    const diaEnvio = diaRegistrado ?? undefined;
 
-      const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
-      const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
+    const expr = toCron(tiempoRegistrado, diaEnvio);
+    if (!expr || !cron.validate(expr)) {
+      console.error(`Cron inválido para ${configurar.clave}: ${expr}`);
+      return;
+    }
 
-      if (horaValida && minutosValido) {
-        horaCron = `${minutos} ${hora} * * *`;
-
-        if (this.tareaAtrasosDiarios) {
-          this.tareaAtrasosDiarios.stop();
-        }
-
-        console.log("Programando tarea de atrasos diarios:", horaCron);
-
-        this.tareaAtrasosDiarios = cron.schedule(horaCron, async () => {
-          try {
-            // Aquí va la lógica para enviar los atrasos diarios
-            console.log("Enviando atrasos diarios...");
-            // Llama a la función que maneja el envío de atrasos diarios
-            atrasosDiarios();
-          } catch (error) {
-            throw new Error("Error al enviar atrasos diarios");
-          }
-        });
-
-      } else {
-        console.error("Hora inválida para cron:", this.parametroHoraAtrasosDiarios);
-        throw new Error("Hora inválida para cron");
+    console.log(`${configurar.clave} → ${expr}`);
+    const tarea = cron.schedule(expr, async () => {
+      try {
+        await configurar.task();
+      } catch (e) {
+        console.error(`Error ejecutando ${configurar.clave}:`, e);
       }
+    });
 
-    } catch (error) {
-      console.error("Error al programar el envío de atrasos diarios:", error);
-    }
-  }
-
-  /*
-    * Método para actualizar la tarea de envío de atrasos diarios.
-    * Este método detiene la tarea actual y programa una nueva.
-  */
-  public async actualizarEnvioAtrasosDiarios() {
-    if (this.tareaAtrasosDiarios) {
-      this.tareaAtrasosDiarios.stop();
-      this.tareaAtrasosDiarios = null;
-    }
-
-    this.programarEnvioAtrasosDiarios();
-  }
-
-  /*
-    * Método para programar el envío de atrasos individuales.
-    * Este método consulta los parámetros necesarios y programa una tarea cron
-    * para enviar los atrasos individuales a la hora especificada.
-  */
-  private async programarEnvioAtrasosIndividuales() {
-
-    try {
-      // PARAMETRO 34 INDICA LA HORA EN QUE SE ENVIAN LOS ATRASOS INDIVIDUALES
-      this.parametroHoraAtrasosIndividuales = await this.consultarDetalleParametros(34);
-  
-      if (!this.parametroHoraAtrasosIndividuales) return;
-
-      let horaCron = null;
-
-      const partes = this.parametroHoraAtrasosIndividuales.split(":");
-
-      const hora = parseInt(partes[0], 10);
-      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
-
-      const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
-      const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
-
-      if (horaValida && minutosValido) {
-        horaCron = `${minutos} ${hora} * * *`;
-
-        if (this.tareaAtrasosIndividuales) {
-          this.tareaAtrasosIndividuales.stop();
-        }
-
-        console.log("Programando tarea de atrasos individuales:", horaCron);
-        this.tareaAtrasosIndividuales = cron.schedule(horaCron, async () => {
-          try {
-            // Aquí va la lógica para enviar los atrasos individuales
-            console.log("Enviando atrasos individuales...");
-            // Llama a la función que maneja el envío de atrasos individuales
-            atrasosDiariosIndividual();
-          }
-          catch (error) {
-            throw new Error("Error al enviar atrasos individuales");
-          }
-        });
-      } else {
-        console.error("Hora inválida para cron:", this.parametroHoraAtrasosIndividuales);
-        throw new Error("Hora inválida para cron");
-      }
-      
-    } catch (error) {
-      console.error("Error al programar el envío de atrasos individuales:", error);
-    }
-  }
-
-  /*
-    * Método para actualizar la tarea de envío de atrasos individuales.
-    * Este método detiene la tarea actual y programa una nueva.
-  */
-  public async actualizarEnvioAtrasosIndividuales() {
-    if (this.tareaAtrasosIndividuales) {
-      this.tareaAtrasosIndividuales.stop();
-      this.tareaAtrasosIndividuales = null;
-    }
-    this.programarEnvioAtrasosIndividuales();
-  }
-
-  /*
-    * Método para programar el envío de atrasos semanales.
-    * Este método consulta los parámetros necesarios y programa una tarea cron
-    * para enviar los atrasos semanales a la hora y día especificados.
-  */
-  private async programarEnvioAtrasosSemanales() {
-    try {
-      // PARAMETRO 13 INDICA INDICA SI ESTA ACTIVO EL ENVIO ATRASOS SEMANALES
-      this.parametroAtrasosSemanal = await this.consultarDetalleParametros(13);
-      // PARAMETRO 14 INDICA LA HORA EN QUE SE ENVIAN LOS ATRASOS SEMANALES
-      this.parametroHoraAtrasosSemanal = await this.consultarDetalleParametros(14);
-      // PARAMETRO 15 INDICA EL DIA EN QUE SE ENVIAN LOS ATRASOS SEMANALES
-      this.parametroDiaAtrasosSemanal = await this.consultarDetalleParametros(15);
-
-      if (!this.parametroAtrasosSemanal || this.parametroAtrasosSemanal != 'Si') return;
-      if (!this.parametroHoraAtrasosSemanal || !this.parametroDiaAtrasosSemanal) return;
-      
-      let horaCron = null;
-
-      const partes = this.parametroHoraAtrasosSemanal.split(":");
-
-      const hora = parseInt(partes[0], 10);
-      const minutos = partes[1] !== undefined ? parseInt(partes[1], 10) : 0;
-
-      const horaValida = !isNaN(hora) && hora >= 0 && hora <= 23;
-      const minutosValido = !isNaN(minutos) && minutos >= 0 && minutos <= 59;
-      
-      const diasSemana = [
-        "Domingo",
-        "Lunes",
-        "Martes",
-        "Miércoles",
-        "Jueves",
-        "Viernes",
-        "Sábado"
-      ];
-
-      const diaValido = diasSemana.includes(this.parametroDiaAtrasosSemanal);
-
-      // CONVERTIR EL DÍA A SU ÍNDICE CORRESPONDIENTE (0-6)
-      const diaIndex = diasSemana.indexOf(this.parametroDiaAtrasosSemanal);
-
-      // VALIDAR QUE EL DÍA ESTÉ EN EL RANGO CORRECTO
-      const diaValidoRango = diaIndex >= 0 && diaIndex <= 6;
-
-      if (horaValida && minutosValido && diaValido && diaValidoRango) {
-        horaCron = `${minutos} ${hora} * * ${diaIndex}`;
-        if (this.tareaAtrasosSemanal) {
-          this.tareaAtrasosSemanal.stop();
-        }
-        console.log("Programando tarea de atrasos semanales:", horaCron);
-        this.tareaAtrasosSemanal = cron.schedule(horaCron, async () => {
-          try {
-            // Aquí va la lógica para enviar los atrasos semanales
-            console.log("Enviando atrasos semanales...");
-            // Llama a la función que maneja el envío de atrasos semanales
-            atrasosSemanal();
-          } catch (error) {
-            throw new Error("Error al enviar atrasos semanales");
-          }
-        });
-      }
-      else {
-        console.error("Hora o día inválido para cron:", this.parametroHoraAtrasosSemanal, this.parametroDiaAtrasosSemanal);
-        throw new Error("Hora o día inválido para cron");
-      }
-      
-    } catch (error) {
-      console.error("Error al programar el envío de atrasos semanales:", error);
-    }
-  }
-
-  /*
-    * Método para actualizar la tarea de envío de atrasos semanales.
-    * Este método detiene la tarea actual y programa una nueva.
-  */
-  public async actualizarEnvioAtrasosSemanales() {
-    if (this.tareaAtrasosDiarios) {
-      this.tareaAtrasosDiarios.stop();
-      this.tareaAtrasosDiarios = null;
-    }
-
-    this.programarEnvioAtrasosSemanales();
-  }
-
-  /*
-    * Método para consultar el detalle de los parámetros.
-    * Este método realiza una consulta a la base de datos para obtener la descripción
-    * del parámetro especificado por su ID.
-  */
-  private async consultarDetalleParametros(idParametro: number) {
-  try {
-      const sql = `SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = $1`;
-      const rows = await pool.query(sql, [idParametro]);
-      
-      return rows.rows[0]?.descripcion || null;
-  } catch (error) {
-    console.error("Error al consultar detalle de parámetros:", error);
-  }
+    this.tareas.set(configurar.clave, tarea);
   }
 }
 

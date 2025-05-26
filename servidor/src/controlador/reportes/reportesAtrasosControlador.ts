@@ -33,15 +33,29 @@ class ReportesAtrasosControlador {
 export const BuscarAtrasos = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
-        SELECT CAST(ag.fecha_hora_horario AS VARCHAR), CAST(ag.fecha_hora_timbre AS VARCHAR),
-            EXTRACT(epoch FROM (ag.fecha_hora_timbre - ag.fecha_hora_horario)) AS diferencia, 
-            ag.id_empleado, ag.estado_timbre, ag.tipo_accion AS accion, ag.tolerancia, ag.tipo_dia 
-        FROM eu_asistencia_general AS ag , eu_empleado_contratos AS ec
-        WHERE CAST(ag.fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND ag.id_empleado = $3 AND ec.id_empleado = ag.id_empleado AND ec.controlar_asistencia = true
-            AND ag.fecha_hora_timbre > ag.fecha_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') 
-            AND ag.tipo_accion = \'E\' 
-        ORDER BY ag.fecha_hora_horario ASC
+            SELECT 
+                ag.fecha_hora_horario::varchar,
+                ag.fecha_hora_timbre::varchar,
+                EXTRACT(EPOCH FROM (ag.fecha_hora_timbre - ag.fecha_hora_horario)) AS diferencia,
+                ag.id_empleado,
+                ag.estado_timbre,
+                ag.tipo_accion AS accion,
+                ag.tolerancia,
+                ag.tipo_dia
+            FROM eu_asistencia_general AS ag
+            JOIN 
+                contrato_cargo_vigente AS cv ON cv.id_cargo = ag.id_empleado_cargo
+            JOIN 
+                eu_empleado_contratos AS ec ON cv.id_contrato = ec.id
+            WHERE ag.fecha_hora_horario >= $1::timestamp
+                AND ag.fecha_hora_horario < ($2::timestamp + INTERVAL '1 day')
+                AND ag.id_empleado = $3
+                AND ec.controlar_asistencia = true
+                AND ag.fecha_hora_timbre > ag.fecha_hora_horario
+                AND ag.tipo_dia NOT IN ('L', 'FD')
+                AND ag.tipo_accion = 'E'
+            ORDER BY ag.fecha_hora_horario ASC;
+
         `
         , [fec_inicio, fec_final, id_empleado])
         .then(res => {

@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -297,19 +306,14 @@ const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 exports.io = SERVIDOR.io;
 // INICIO DE TAREAS AUTOMATICAS
-tareasAutomaticas_1.tareasAutomaticas.iniciarTareasAutomaticas();
-// setInterval(async () => {
-// atrasosDiarios();
-// atrasosSemanal();
-// faltasDiarios();
-// faltasSemanal();
-// salidasAnticipadasSemanal();
-// salidasAnticipadasDiarios();
-// }, 3600);
-// LLAMA AL MEODO DE CUMPLEAÑOS
-(0, sendAniversario_1.aniversario)();
-// LLAMA AL METODO DE AVISOS DE VACACIONES
-(0, sendBirthday_1.cumpleanios)();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    // INICIO DE TAREAS AUTOMATICAS
+    yield tareasAutomaticas_1.tareasAutomaticas.IniciarTarea();
+    // LLAMA AL METODO DE CUMPLEAÑOS
+    (0, sendAniversario_1.aniversario)();
+    // LLAMA AL METODO DE AVISOS DE VACACIONES
+    (0, sendBirthday_1.cumpleanios)();
+}))();
 //beforeFiveDays();
 //beforeTwoDays();
 // LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
