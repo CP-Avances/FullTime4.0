@@ -579,7 +579,7 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    
+    formData.append("modoCodigo", this.datosCodigo[0].cedula ? 'cedula' : 'automatico');
     this.rest.VerificarArchivoExcel_Automatico(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;

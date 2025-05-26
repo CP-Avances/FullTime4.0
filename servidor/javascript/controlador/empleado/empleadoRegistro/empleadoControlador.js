@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CONTROLADOR = void 0;
 exports.ValidarCedula = ValidarCedula;
+exports.validarEmpleadoCompleto = validarEmpleadoCompleto;
+exports.validarEmpleadoIncompleto = validarEmpleadoIncompleto;
 // SECCION LIBRERIAS
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
@@ -1185,6 +1187,7 @@ class EmpleadoControlador {
                 const workbook = new exceljs_1.default.Workbook();
                 yield workbook.xlsx.readFile(ruta);
                 let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'EMPLEADOS');
+                const modoCodigo = req.body.modoCodigo || 'automatico';
                 if (verificador === false) {
                     return res.jsonp({ message: 'no_existe', data: undefined });
                 }
@@ -1289,15 +1292,16 @@ class EmpleadoControlador {
                             }
                             CORREO = CORREO === null || CORREO === void 0 ? void 0 : CORREO.toString();
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                            if ((ITEM != undefined && ITEM != '') &&
-                                (IDENTIFICACION != undefined) && (APELLIDO != undefined) &&
-                                (NOMBRE != undefined) && (ESTADO_CIVIL != undefined) &&
-                                (GENERO != undefined) && (CORREO != undefined) &&
-                                (FECHA_NACIMIENTO != undefined) &&
-                                (LATITUD != undefined) && (LONGITUD != undefined) &&
-                                (DOMICILIO != undefined) && (TELEFONO != undefined) &&
-                                (NACIONALIDAD != undefined) && (USUARIO != undefined) &&
-                                (CONTRASENA != undefined) && (ROL != undefined) && (TIPO_IDENTIFICACION != undefined) && (NUMERO_PARTIDA_INDIVIDUAL != undefined)) {
+                            if (ITEM != undefined && ITEM != '' &&
+                                IDENTIFICACION != undefined && APELLIDO != undefined &&
+                                NOMBRE != undefined && ESTADO_CIVIL != undefined &&
+                                GENERO != undefined && CORREO != undefined &&
+                                FECHA_NACIMIENTO != undefined && LATITUD != undefined &&
+                                LONGITUD != undefined && DOMICILIO != undefined &&
+                                TELEFONO != undefined && NACIONALIDAD != undefined &&
+                                USUARIO != undefined && CONTRASENA != undefined &&
+                                ROL != undefined && TIPO_IDENTIFICACION != undefined &&
+                                NUMERO_PARTIDA_INDIVIDUAL != undefined) {
                                 console.log("entra porque tiene todos los datos llenos automatico");
                                 data.fila = ITEM;
                                 data.identificacion = IDENTIFICACION;
@@ -1318,511 +1322,11 @@ class EmpleadoControlador {
                                 data.tipo_identificacion = TIPO_IDENTIFICACION === null || TIPO_IDENTIFICACION === void 0 ? void 0 : TIPO_IDENTIFICACION.trim();
                                 data.numero_partida_individual = NUMERO_PARTIDA_INDIVIDUAL.trim();
                                 data.observacion = 'no registrado';
-                                if (data.identificacion.toString().length != 0) {
-                                    if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                                        console.log("ENTRA A VALIDAR AQUI PASAPORTE");
-                                        if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
-                                            data.observacion = 'La identificación ingresada no es válida';
-                                        }
-                                        else {
-                                            if (!valiContra.test(data.contrasena.toString())) {
-                                                console.log("ENTRA A VALIDAR AQUI DESPUES DE VALIDAR EL ASAPORTE");
-                                                if (data.contrasena.toString().length <= 10) {
-                                                    if (estadoCivilArray.includes(data.estado_civil)) {
-                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                                            if (data.correo == undefined || !regexCorreo.test(data.correo)) {
-                                                                data.observacion = 'Verificar correo';
-                                                            }
-                                                            if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                                                                // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                                                if (LONGITUD != undefined || LATITUD != undefined) {
-                                                                    if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                        data.observacion = 'Verificar ubicación';
-                                                                    }
-                                                                }
-                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
-                                                                    data.observacion = 'Verificar ubicación';
-                                                                }
-                                                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
-                                                                if (TELEFONO != undefined) {
-                                                                    if (regex.test(data.telefono.toString())) {
-                                                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                            data.observacion = 'El teléfono ingresado no es válido';
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                        data.observacion = 'El teléfono ingresado no es válido';
-                                                                    }
-                                                                }
-                                                            }
-                                                            else {
-                                                                console.log("FORMATO DE FECHA INCORRECTA");
-                                                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                                            }
-                                                        }
-                                                        else {
-                                                            data.observacion = 'Género no es válido';
-                                                        }
-                                                    }
-                                                    else {
-                                                        data.observacion = 'Estado civil no es válido';
-                                                    }
-                                                }
-                                                else {
-                                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                                }
-                                            }
-                                            else {
-                                                data.observacion = 'La contraseña ingresada no es válida';
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        if (regex.test(data.identificacion)) {
-                                            const cedulaValida = yield ValidarCedula(data.identificacion);
-                                            if (data.identificacion.toString().length != 10 || !cedulaValida) {
-                                                data.observacion = 'La identificación ingresada no es válida';
-                                            }
-                                            else {
-                                                if (!valiContra.test(data.contrasena.toString())) {
-                                                    if (data.contrasena.toString().length <= 10) {
-                                                        if (estadoCivilArray.includes(data.estado_civil)) {
-                                                            if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                                                if (data.correo == undefined || !regexCorreo.test(data.correo)) {
-                                                                    data.observacion = 'Verificar correo';
-                                                                }
-                                                                if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                                                                    // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                                                    if (LONGITUD != undefined || LATITUD != undefined) {
-                                                                        if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                            data.observacion = 'Verificar ubicación';
-                                                                        }
-                                                                    }
-                                                                    else if (LONGITUD == undefined || LATITUD == undefined) {
-                                                                        data.observacion = 'Verificar ubicación';
-                                                                    }
-                                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
-                                                                    if (TELEFONO != undefined) {
-                                                                        if (regex.test(data.telefono.toString())) {
-                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                data.observacion = 'El teléfono ingresado no es válido';
-                                                                            }
-                                                                        }
-                                                                        else {
-                                                                            data.observacion = 'El teléfono ingresado no es válido';
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                                                }
-                                                            }
-                                                            else {
-                                                                data.observacion = 'Género no es válido';
-                                                            }
-                                                        }
-                                                        else {
-                                                            data.observacion = 'Estado civil no es válido';
-                                                        }
-                                                    }
-                                                    else {
-                                                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                                    }
-                                                }
-                                                else {
-                                                    data.observacion = 'La contraseña ingresada no es válida';
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                else {
-                                    data.observacion = 'La identificación ingresada no es válida';
-                                }
-                                data.identificacion = data.identificacion.trim();
-                                data.apellido = data.apellido.trim();
-                                data.nombre = data.nombre.trim();
-                                data.estado_civil = data.estado_civil.trim();
-                                data.genero = data.genero.trim();
-                                data.correo = data.correo.trim();
-                                data.fec_nacimiento = data.fec_nacimiento.trim();
-                                data.latitud = data.latitud.trim();
-                                data.longitud = data.longitud.trim();
-                                data.domicilio = data.domicilio.trim();
-                                data.telefono = data.telefono.trim();
-                                data.nacionalidad = data.nacionalidad.trim();
-                                data.usuario = data.usuario.trim();
-                                data.contrasena = data.contrasena.trim();
-                                data.rol = data.rol.trim();
-                                data.tipo_identificacion = data.tipo_identificacion.trim();
-                                data.numero_partida_individual = data.numero_partida_individual.trim();
-                                // VALIDACIONES EN BASE DE DATOS
-                                var VERIFICAR_CEDULA = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE identificacion = $1`, [data.identificacion]);
-                                if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                    data.observacion = 'Identificación ya existe en el sistema';
-                                }
-                                else {
-                                    var VERIFICAR_USUARIO = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE usuario = $1`, [data.usuario]);
-                                    if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                                        data.observacion = 'Usuario ya existe en el sistema';
-                                    }
-                                    else {
-                                        if (data.rol != 'No registrado') {
-                                            var VERIFICAR_ROL = yield database_1.default.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [data.rol.toUpperCase()]);
-                                            if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
-                                                data.observacion = 'Rol no existe en el sistema';
-                                            }
-                                            else {
-                                                if (data.nacionalidad != 'No registrado') {
-                                                    var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [data.nacionalidad.toUpperCase()]);
-                                                    if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
-                                                        data.observacion = 'Nacionalidad no existe en el sistema';
-                                                    }
-                                                    else {
-                                                        // Aquí añadimos la validación de estado civil
-                                                        if (data.estado_civil != 'No registrado') {
-                                                            var VERIFICAR_ESTADO_CIVIL = yield database_1.default.query(`SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`, [data.estado_civil.toUpperCase()]);
-                                                            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
-                                                                data.observacion = 'Estado civil no existe en el sistema';
-                                                            }
-                                                            else {
-                                                                // Y la validación de género
-                                                                if (data.genero != 'No registrado') {
-                                                                    var VERIFICAR_GENERO = yield database_1.default.query(`SELECT * FROM e_genero WHERE UPPER(genero) = $1`, [data.genero.toUpperCase()]);
-                                                                    if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
-                                                                        data.observacion = 'Género no existe en el sistema';
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                yield validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, TIPO_IDENTIFICACION !== null && TIPO_IDENTIFICACION !== void 0 ? TIPO_IDENTIFICACION : 'No registrado', database_1.default, TELEFONO !== null && TELEFONO !== void 0 ? TELEFONO : '', LONGITUD !== null && LONGITUD !== void 0 ? LONGITUD : '', LATITUD !== null && LATITUD !== void 0 ? LATITUD : '', ValidarCedula, modoCodigo);
                                 listEmpleados.push(data);
                             }
                             else {
-                                console.log("entra aqui porque no estan llenos los datos");
-                                data.fila = ITEM;
-                                data.identificacion = IDENTIFICACION;
-                                data.nombre = NOMBRE;
-                                data.apellido = APELLIDO;
-                                data.usuario = USUARIO;
-                                data.contrasena = CONTRASENA;
-                                data.rol = ROL;
-                                data.estado_civil = ESTADO_CIVIL;
-                                data.genero = GENERO;
-                                data.correo = CORREO;
-                                data.fec_nacimiento = FECHA_NACIMIENTO;
-                                data.latitud = LATITUD;
-                                data.longitud = LONGITUD;
-                                data.domicilio = DOMICILIO;
-                                data.telefono = TELEFONO;
-                                data.nacionalidad = NACIONALIDAD;
-                                data.tipo_identificacion = TIPO_IDENTIFICACION;
-                                data.numero_partida_individual = NUMERO_PARTIDA_INDIVIDUAL;
-                                data.observacion = 'no registrado';
-                                let hayDatosFaltantes = false;
-                                if (data.fila == '' || data.fila == undefined) {
-                                    data.fila = 'error';
-                                    mensaje = 'error';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (APELLIDO == undefined) {
-                                    data.apellido = 'No registrado';
-                                    data.observacion = 'Apellido no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (NOMBRE == undefined) {
-                                    data.nombre = 'No registrado';
-                                    data.observacion = 'Nombre no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (ESTADO_CIVIL == undefined) {
-                                    data.estado_civil = 'No registrado';
-                                    data.observacion = 'Estado civil no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (GENERO == undefined) {
-                                    data.genero = 'No registrado';
-                                    data.observacion = 'Género no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (CORREO == undefined) {
-                                    data.correo = 'No registrado';
-                                    data.observacion = 'Correo no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (FECHA_NACIMIENTO == undefined) {
-                                    data.fec_nacimiento = 'No registrado';
-                                    data.observacion = 'Fecha de nacimiento no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (DOMICILIO == undefined) {
-                                    data.domicilio = 'No registrado';
-                                    if (!data.observacion || data.observacion.trim() === '') {
-                                        data.observacion = " ";
-                                    }
-                                }
-                                if (TELEFONO == undefined) {
-                                    data.telefono = 'No registrado';
-                                    if (!data.observacion || data.observacion.trim() === '') {
-                                        data.observacion = " ";
-                                    }
-                                }
-                                if ((!LATITUD || LATITUD === undefined) && (!LONGITUD || LONGITUD === undefined)) {
-                                    data.latitud = 'No registrado';
-                                    data.longitud = 'No registrado';
-                                    data.observacion = " ";
-                                    hayDatosFaltantes = true;
-                                }
-                                else {
-                                    if (!LATITUD || LATITUD === undefined) {
-                                        data.latitud = 'No registrado';
-                                        data.observacion = 'Verificar ubicación';
-                                    }
-                                    if (!LONGITUD || LONGITUD === undefined) {
-                                        data.longitud = 'No registrado';
-                                        data.observacion = 'Verificar ubicación';
-                                    }
-                                }
-                                if (NACIONALIDAD == undefined) {
-                                    data.nacionalidad = 'No registrado';
-                                    data.observacion = 'Nacionalidad no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (USUARIO == undefined) {
-                                    data.usuario = 'No registrado';
-                                    data.observacion = 'Usuario no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (CONTRASENA == undefined) {
-                                    data.contrasena = 'No registrado';
-                                    data.observacion = 'Contraseña no registrada';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (ROL == undefined) {
-                                    data.rol = 'No registrado';
-                                    data.observacion = 'Rol no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (IDENTIFICACION == undefined) {
-                                    console.log("ENTRO PORQUE NO SE REGISTRA IDENTIFICACION");
-                                    data.identificacion = 'No registrado';
-                                    data.observacion = 'Identificación no registrada';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (TIPO_IDENTIFICACION == undefined) {
-                                    console.log("ENTRO PORQUE NO SE REGISTRA TIPO DE IDENTIFICACION");
-                                    data.tipo_identificacion = 'No registrado';
-                                    data.observacion = 'Tipo identificación no registrado';
-                                    hayDatosFaltantes = true;
-                                }
-                                if (!hayDatosFaltantes) {
-                                    console.log("ENTRA AQUI ?");
-                                    data.identificacion = data.identificacion.trim();
-                                    data.apellido = data.apellido.trim();
-                                    data.nombre = data.nombre.trim();
-                                    data.estado_civil = data.estado_civil.trim();
-                                    data.genero = data.genero.trim();
-                                    data.correo = data.correo.trim();
-                                    data.fec_nacimiento = data.fec_nacimiento.trim();
-                                    data.latitud = data.latitud.trim();
-                                    data.longitud = data.longitud.trim();
-                                    data.domicilio = data.domicilio.trim();
-                                    data.telefono = data.telefono.trim();
-                                    data.nacionalidad = data.nacionalidad.trim();
-                                    data.usuario = data.usuario.trim();
-                                    data.contrasena = data.contrasena.trim();
-                                    data.rol = data.rol.trim();
-                                    if (TIPO_IDENTIFICACION == 'Pasaporte') {
-                                        if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
-                                            data.observacion = 'La identificación ingresada no es válida';
-                                        }
-                                        else {
-                                            if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
-                                                if (data.contrasena != 'No registrado') {
-                                                    if (!valiContra.test(data.contrasena.toString())) {
-                                                        if (data.contrasena.toString().length <= 10) {
-                                                            if (data.estado_civil != 'No registrado') {
-                                                                if (estadoCivilArray.includes(data.estado_civil)) {
-                                                                    if (data.genero != 'No registrado') {
-                                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                                            if (data.correo == undefined || !regexCorreo.test(data.correo)) {
-                                                                                data.observacion = 'Verificar correo';
-                                                                            }
-                                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                                                            if (data.fec_nacimiento != 'No registrado') {
-                                                                                if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                                                                                    // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                                                                    if (LONGITUD != undefined && LATITUD != undefined) {
-                                                                                        if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                                            data.observacion = 'Verificar ubicación';
-                                                                                        }
-                                                                                    }
-                                                                                    else if (LONGITUD == undefined || LATITUD == undefined) {
-                                                                                        data.observacion = 'Verificar ubicación';
-                                                                                    }
-                                                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                                                    if (TELEFONO != undefined) {
-                                                                                        if (regex.test(data.telefono.toString())) {
-                                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                                data.observacion = 'El teléfono ingresado no es válido';
-                                                                                            }
-                                                                                        }
-                                                                                        else {
-                                                                                            data.observacion = 'El teléfono ingresado no es válido';
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else {
-                                                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        else {
-                                                                            data.observacion = 'Género no es válido';
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    data.observacion = 'Estado civil no es válido';
-                                                                }
-                                                            }
-                                                        }
-                                                        else {
-                                                            data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                                        }
-                                                    }
-                                                    else {
-                                                        data.observacion = 'La contraseña ingresada no es válida';
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        if (regex.test(data.identificacion)) {
-                                            const cedulaValida = yield ValidarCedula(data.identificacion);
-                                            if (data.identificacion.toString().length != 10 || !cedulaValida) {
-                                                data.observacion = 'La identificación ingresada no es válida';
-                                            }
-                                            else {
-                                                if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
-                                                    if (data.contrasena != 'No registrado') {
-                                                        if (!valiContra.test(data.contrasena.toString())) {
-                                                            if (data.contrasena.toString().length <= 10) {
-                                                                if (data.estado_civil != 'No registrado') {
-                                                                    if (estadoCivilArray.includes(data.estado_civil)) {
-                                                                        if (data.genero != 'No registrado') {
-                                                                            if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                                                if (data.correo == undefined || !regexCorreo.test(data.correo)) {
-                                                                                    data.observacion = 'Verificar correo';
-                                                                                }
-                                                                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
-                                                                                if (data.fec_nacimiento != 'No registrado') {
-                                                                                    if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                                                                                        // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                                                                        if (LONGITUD != undefined && LATITUD != undefined) {
-                                                                                            if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                                                data.observacion = 'Verificar ubicación';
-                                                                                            }
-                                                                                        }
-                                                                                        else if (LONGITUD == undefined || LATITUD == undefined) {
-                                                                                            data.observacion = 'Verificar ubicación';
-                                                                                        }
-                                                                                        // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                                                        if (TELEFONO != undefined) {
-                                                                                            if (regex.test(data.telefono.toString())) {
-                                                                                                if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                                    data.observacion = 'El teléfono ingresado no es válido';
-                                                                                                }
-                                                                                            }
-                                                                                            else {
-                                                                                                data.observacion = 'El teléfono ingresado no es válido';
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                    else {
-                                                                                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            else {
-                                                                                data.observacion = 'Género no es válido';
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                        data.observacion = 'Estado civil no es válido';
-                                                                    }
-                                                                }
-                                                            }
-                                                            else {
-                                                                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                                            }
-                                                        }
-                                                        else {
-                                                            data.observacion = 'La contraseña ingresada no es válida';
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            console.log("PASAPORTE NO VALIDO");
-                                            data.observacion = 'La identificación ingresada no es válida';
-                                        }
-                                    }
-                                }
-                                var VERIFICAR_CEDULA = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE identificacion = $1`, [data.identificacion]);
-                                if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                    data.observacion = 'Identificación ya existe en el sistema';
-                                }
-                                else {
-                                    var VERIFICAR_USUARIO = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE usuario = $1`, [data.usuario]);
-                                    if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                                        data.observacion = 'Usuario ya existe en el sistema';
-                                    }
-                                    else {
-                                        if (data.rol != 'No registrado') {
-                                            var VERIFICAR_ROL = yield database_1.default.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [data.rol.toUpperCase()]);
-                                            if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
-                                                data.observacion = 'Rol no existe en el sistema';
-                                            }
-                                            else {
-                                                if (data.nacionalidad != 'No registrado') {
-                                                    var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [data.nacionalidad.toUpperCase()]);
-                                                    if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
-                                                        data.observacion = 'Nacionalidad no existe en el sistema';
-                                                    }
-                                                    else {
-                                                        // Aquí añadimos la validación de estado civil
-                                                        if (data.estado_civil != 'No registrado') {
-                                                            var VERIFICAR_ESTADO_CIVIL = yield database_1.default.query(`SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`, [data.estado_civil.toUpperCase()]);
-                                                            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
-                                                                data.observacion = 'Estado civil no existe en el sistema';
-                                                            }
-                                                            else {
-                                                                // Y la validación de género
-                                                                if (data.genero != 'No registrado') {
-                                                                    var VERIFICAR_GENERO = yield database_1.default.query(`SELECT * FROM e_genero WHERE UPPER(genero) = $1`, [data.genero.toUpperCase()]);
-                                                                    if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
-                                                                        data.observacion = 'Género no existe en el sistema';
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                yield validarEmpleadoIncompleto(data, ITEM, IDENTIFICACION, APELLIDO, NOMBRE, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD, USUARIO, CONTRASENA, ROL, TIPO_IDENTIFICACION, NUMERO_PARTIDA_INDIVIDUAL, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, database_1.default, ValidarCedula, modoCodigo);
                                 listEmpleados.push(data);
                             }
                             data = {};
@@ -3368,6 +2872,470 @@ function ValidarCedula(cedula) {
         else {
             console.log("Cédula Inválida");
             return false;
+        }
+    });
+}
+function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, TIPO_IDENTIFICACION, pool, TELEFONO, LONGITUD, LATITUD, ValidarCedula, modoCodigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (data.identificacion.toString().length != 0) {
+            if (TIPO_IDENTIFICACION == 'Pasaporte') {
+                if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
+                    data.observacion = 'La identificación ingresada no es válida';
+                    return;
+                }
+            }
+            else {
+                if (regex.test(data.identificacion)) {
+                    const cedulaValida = yield ValidarCedula(data.identificacion);
+                    if (data.identificacion.toString().length != 10 || !cedulaValida) {
+                        data.observacion = 'La identificación ingresada no es válida';
+                        return;
+                    }
+                }
+                else {
+                    data.observacion = 'La identificación ingresada no es válida';
+                    return;
+                }
+            }
+        }
+        else {
+            data.observacion = 'La identificación ingresada no es válida';
+            return;
+        }
+        if (!valiContra.test(data.contrasena.toString())) {
+            if (data.contrasena.toString().length <= 10) {
+                if (estadoCivilArray.includes(data.estado_civil)) {
+                    if (tipogenero.includes(data.genero.toLowerCase())) {
+                        if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                            data.observacion = 'Verificar correo';
+                            return;
+                        }
+                        if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+                            if (LONGITUD != undefined || LATITUD != undefined) {
+                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                    data.observacion = 'Verificar ubicación';
+                                    return;
+                                }
+                            }
+                            else if (LONGITUD == undefined || LATITUD == undefined) {
+                                data.observacion = 'Verificar ubicación';
+                                return;
+                            }
+                            if (TELEFONO != undefined) {
+                                if (regex.test(data.telefono.toString())) {
+                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                        data.observacion = 'El teléfono ingresado no es válido';
+                                        return;
+                                    }
+                                }
+                                else {
+                                    data.observacion = 'El teléfono ingresado no es válido';
+                                    return;
+                                }
+                            }
+                        }
+                        else {
+                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            return;
+                        }
+                    }
+                    else {
+                        data.observacion = 'Género no es válido';
+                        return;
+                    }
+                }
+                else {
+                    data.observacion = 'Estado civil no es válido';
+                    return;
+                }
+            }
+            else {
+                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                return;
+            }
+        }
+        else {
+            data.observacion = 'La contraseña ingresada no es válida';
+            return;
+        }
+        data.identificacion = data.identificacion.trim();
+        data.apellido = data.apellido.trim();
+        data.nombre = data.nombre.trim();
+        data.estado_civil = data.estado_civil.trim();
+        data.genero = data.genero.trim();
+        data.correo = data.correo.trim();
+        data.fec_nacimiento = data.fec_nacimiento.trim();
+        data.latitud = data.latitud.trim();
+        data.longitud = data.longitud.trim();
+        data.domicilio = data.domicilio.trim();
+        data.telefono = data.telefono.trim();
+        data.nacionalidad = data.nacionalidad.trim();
+        data.usuario = data.usuario.trim();
+        data.contrasena = data.contrasena.trim();
+        data.rol = data.rol.trim();
+        data.tipo_identificacion = data.tipo_identificacion.trim();
+        data.numero_partida_individual = data.numero_partida_individual.trim();
+        const VERIFICAR_CEDULA = yield pool.query(`SELECT * FROM eu_empleados WHERE identificacion = $1`, [data.identificacion]);
+        if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+            data.observacion = 'Identificación ya existe en el sistema';
+            return;
+        }
+        if (modoCodigo === 'cedula') {
+            const VERIFICAR_CODIGO = yield pool.query(`SELECT * FROM eu_empleados WHERE codigo = $1`, [data.identificacion] // <- Porque en modo cedula el código es la identificación
+            );
+            if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
+                data.observacion = 'Código ya existe en el sistema';
+                return;
+            }
+        }
+        const VERIFICAR_USUARIO = yield pool.query(`SELECT * FROM eu_usuarios WHERE usuario = $1`, [data.usuario]);
+        if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+            data.observacion = 'Usuario ya existe en el sistema';
+            return;
+        }
+        if (data.rol != 'No registrado') {
+            const VERIFICAR_ROL = yield pool.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [data.rol.toUpperCase()]);
+            if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
+                data.observacion = 'Rol no existe en el sistema';
+                return;
+            }
+        }
+        if (data.nacionalidad != 'No registrado') {
+            const VERIFICAR_NACIONALIDAD = yield pool.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [data.nacionalidad.toUpperCase()]);
+            if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
+                data.observacion = 'Nacionalidad no existe en el sistema';
+                return;
+            }
+        }
+        if (data.estado_civil != 'No registrado') {
+            const VERIFICAR_ESTADO_CIVIL = yield pool.query(`SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`, [data.estado_civil.toUpperCase()]);
+            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
+                data.observacion = 'Estado civil no existe en el sistema';
+                return;
+            }
+        }
+        if (data.genero != 'No registrado') {
+            const VERIFICAR_GENERO = yield pool.query(`SELECT * FROM e_genero WHERE UPPER(genero) = $1`, [data.genero.toUpperCase()]);
+            if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
+                data.observacion = 'Género no existe en el sistema';
+                return;
+            }
+        }
+        data.observacion = 'no registrado';
+    });
+}
+function validarEmpleadoIncompleto(data, ITEM, IDENTIFICACION, APELLIDO, NOMBRE, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD, USUARIO, CONTRASENA, ROL, TIPO_IDENTIFICACION, NUMERO_PARTIDA_INDIVIDUAL, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, pool, ValidarCedula, modoCodigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("entra aqui porque no estan llenos los datos");
+        data.fila = ITEM;
+        data.identificacion = IDENTIFICACION;
+        data.nombre = NOMBRE;
+        data.apellido = APELLIDO;
+        data.usuario = USUARIO;
+        data.contrasena = CONTRASENA;
+        data.rol = ROL;
+        data.estado_civil = ESTADO_CIVIL;
+        data.genero = GENERO;
+        data.correo = CORREO;
+        data.fec_nacimiento = FECHA_NACIMIENTO;
+        data.latitud = LATITUD;
+        data.longitud = LONGITUD;
+        data.domicilio = DOMICILIO;
+        data.telefono = TELEFONO;
+        data.nacionalidad = NACIONALIDAD;
+        data.tipo_identificacion = TIPO_IDENTIFICACION;
+        data.numero_partida_individual = NUMERO_PARTIDA_INDIVIDUAL;
+        data.observacion = 'no registrado';
+        let hayDatosFaltantes = false;
+        if (data.fila == '' || data.fila == undefined) {
+            data.fila = 'error';
+            hayDatosFaltantes = true;
+        }
+        if (APELLIDO == undefined) {
+            data.apellido = 'No registrado';
+            data.observacion = 'Apellido no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (NOMBRE == undefined) {
+            data.nombre = 'No registrado';
+            data.observacion = 'Nombre no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (ESTADO_CIVIL == undefined) {
+            data.estado_civil = 'No registrado';
+            data.observacion = 'Estado civil no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (GENERO == undefined) {
+            data.genero = 'No registrado';
+            data.observacion = 'Género no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (CORREO == undefined) {
+            data.correo = 'No registrado';
+            data.observacion = 'Correo no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (FECHA_NACIMIENTO == undefined) {
+            data.fec_nacimiento = 'No registrado';
+            data.observacion = 'Fecha de nacimiento no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (DOMICILIO == undefined) {
+            data.domicilio = 'No registrado';
+            if (!data.observacion || data.observacion.trim() === '') {
+                data.observacion = " ";
+            }
+        }
+        if (TELEFONO == undefined) {
+            data.telefono = 'No registrado';
+            if (!data.observacion || data.observacion.trim() === '') {
+                data.observacion = " ";
+            }
+        }
+        if ((!LATITUD || LATITUD === undefined) && (!LONGITUD || LONGITUD === undefined)) {
+            data.latitud = 'No registrado';
+            data.longitud = 'No registrado';
+            data.observacion = " ";
+            hayDatosFaltantes = true;
+        }
+        else {
+            if (!LATITUD || LATITUD === undefined) {
+                data.latitud = 'No registrado';
+                data.observacion = 'Verificar ubicación';
+            }
+            if (!LONGITUD || LONGITUD === undefined) {
+                data.longitud = 'No registrado';
+                data.observacion = 'Verificar ubicación';
+            }
+        }
+        if (NACIONALIDAD == undefined) {
+            data.nacionalidad = 'No registrado';
+            data.observacion = 'Nacionalidad no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (USUARIO == undefined) {
+            data.usuario = 'No registrado';
+            data.observacion = 'Usuario no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (CONTRASENA == undefined) {
+            data.contrasena = 'No registrado';
+            data.observacion = 'Contraseña no registrada';
+            hayDatosFaltantes = true;
+        }
+        if (ROL == undefined) {
+            data.rol = 'No registrado';
+            data.observacion = 'Rol no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (IDENTIFICACION == undefined) {
+            console.log("ENTRO PORQUE NO SE REGISTRA IDENTIFICACION");
+            data.identificacion = 'No registrado';
+            data.observacion = 'Identificación no registrada';
+            hayDatosFaltantes = true;
+        }
+        if (TIPO_IDENTIFICACION == undefined) {
+            console.log("ENTRO PORQUE NO SE REGISTRA TIPO DE IDENTIFICACION");
+            data.tipo_identificacion = 'No registrado';
+            data.observacion = 'Tipo identificación no registrado';
+            hayDatosFaltantes = true;
+        }
+        if (!hayDatosFaltantes) {
+            data.identificacion = data.identificacion.trim();
+            data.apellido = data.apellido.trim();
+            data.nombre = data.nombre.trim();
+            data.estado_civil = data.estado_civil.trim();
+            data.genero = data.genero.trim();
+            data.correo = data.correo.trim();
+            data.fec_nacimiento = data.fec_nacimiento.trim();
+            data.latitud = data.latitud.trim();
+            data.longitud = data.longitud.trim();
+            data.domicilio = data.domicilio.trim();
+            data.telefono = data.telefono.trim();
+            data.nacionalidad = data.nacionalidad.trim();
+            data.usuario = data.usuario.trim();
+            data.contrasena = data.contrasena.trim();
+            data.rol = data.rol.trim();
+            if (TIPO_IDENTIFICACION == 'Pasaporte') {
+                if (data.identificacion.toString().length == 0 || data.identificacion.toString().length > 10) {
+                    data.observacion = 'La identificación ingresada no es válida';
+                }
+                else {
+                    if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
+                        if (data.contrasena != 'No registrado') {
+                            if (!valiContra.test(data.contrasena.toString())) {
+                                if (data.contrasena.toString().length <= 10) {
+                                    if (data.estado_civil != 'No registrado') {
+                                        if (estadoCivilArray.includes(data.estado_civil)) {
+                                            if (data.genero != 'No registrado') {
+                                                if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                    if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                                        data.observacion = 'Verificar correo';
+                                                    }
+                                                    if (data.fec_nacimiento != 'No registrado') {
+                                                        if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+                                                            if (LONGITUD != undefined && LATITUD != undefined) {
+                                                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                    data.observacion = 'Verificar ubicación';
+                                                                }
+                                                            }
+                                                            else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                data.observacion = 'Verificar ubicación';
+                                                            }
+                                                            if (TELEFONO != undefined) {
+                                                                if (regex.test(data.telefono.toString())) {
+                                                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    data.observacion = 'El teléfono ingresado no es válido';
+                                                                }
+                                                            }
+                                                        }
+                                                        else {
+                                                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    data.observacion = 'Género no es válido';
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            data.observacion = 'Estado civil no es válido';
+                                        }
+                                    }
+                                }
+                                else {
+                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                                }
+                            }
+                            else {
+                                data.observacion = 'La contraseña ingresada no es válida';
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                if (regex.test(data.identificacion)) {
+                    const cedulaValida = yield ValidarCedula(data.identificacion);
+                    if (data.identificacion.toString().length != 10 || !cedulaValida) {
+                        data.observacion = 'La identificación ingresada no es válida';
+                    }
+                    else {
+                        if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
+                            if (data.contrasena != 'No registrado') {
+                                if (!valiContra.test(data.contrasena.toString())) {
+                                    if (data.contrasena.toString().length <= 10) {
+                                        if (data.estado_civil != 'No registrado') {
+                                            if (estadoCivilArray.includes(data.estado_civil)) {
+                                                if (data.genero != 'No registrado') {
+                                                    if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                        if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                                                            data.observacion = 'Verificar correo';
+                                                        }
+                                                        if (data.fec_nacimiento != 'No registrado') {
+                                                            if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+                                                                if (LONGITUD != undefined && LATITUD != undefined) {
+                                                                    if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                        data.observacion = 'Verificar ubicación';
+                                                                    }
+                                                                }
+                                                                else if (LONGITUD == undefined || LATITUD == undefined) {
+                                                                    data.observacion = 'Verificar ubicación';
+                                                                }
+                                                                if (TELEFONO != undefined) {
+                                                                    if (regex.test(data.telefono.toString())) {
+                                                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                                    }
+                                                                }
+                                                            }
+                                                            else {
+                                                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                            }
+                                                        }
+                                                    }
+                                                    else {
+                                                        data.observacion = 'Género no es válido';
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                data.observacion = 'Estado civil no es válido';
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                                    }
+                                }
+                                else {
+                                    data.observacion = 'La contraseña ingresada no es válida';
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    console.log("PASAPORTE NO VALIDO");
+                    data.observacion = 'La identificación ingresada no es válida';
+                }
+            }
+        }
+        const VERIFICAR_CEDULA = yield pool.query(`SELECT * FROM eu_empleados WHERE identificacion = $1`, [data.identificacion]);
+        if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+            data.observacion = 'Identificación ya existe en el sistema';
+            return;
+        }
+        if (modoCodigo === 'cedula') {
+            const VERIFICAR_CODIGO = yield pool.query(`SELECT * FROM eu_empleados WHERE codigo = $1`, [data.identificacion] // porque en modo cedula el código es la identificación
+            );
+            if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
+                data.observacion = 'Código ya existe en el sistema';
+                return;
+            }
+        }
+        const VERIFICAR_USUARIO = yield pool.query(`SELECT * FROM eu_usuarios WHERE usuario = $1`, [data.usuario]);
+        if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+            data.observacion = 'Usuario ya existe en el sistema';
+            return;
+        }
+        if (data.rol != 'No registrado') {
+            const VERIFICAR_ROL = yield pool.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [data.rol.toUpperCase()]);
+            if (VERIFICAR_ROL.rows[0] == undefined || VERIFICAR_ROL.rows[0] == '') {
+                data.observacion = 'Rol no existe en el sistema';
+                return;
+            }
+        }
+        if (data.nacionalidad != 'No registrado') {
+            const VERIFICAR_NACIONALIDAD = yield pool.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [data.nacionalidad.toUpperCase()]);
+            if (VERIFICAR_NACIONALIDAD.rows[0] == undefined || VERIFICAR_NACIONALIDAD.rows[0] == '') {
+                data.observacion = 'Nacionalidad no existe en el sistema';
+                return;
+            }
+        }
+        if (data.estado_civil != 'No registrado') {
+            const VERIFICAR_ESTADO_CIVIL = yield pool.query(`SELECT * FROM e_estado_civil WHERE UPPER(estado_civil) = $1`, [data.estado_civil.toUpperCase()]);
+            if (VERIFICAR_ESTADO_CIVIL.rows[0] == undefined || VERIFICAR_ESTADO_CIVIL.rows[0] == '') {
+                data.observacion = 'Estado civil no existe en el sistema';
+                return;
+            }
+        }
+        if (data.genero != 'No registrado') {
+            const VERIFICAR_GENERO = yield pool.query(`SELECT * FROM e_genero WHERE UPPER(genero) = $1`, [data.genero.toUpperCase()]);
+            if (VERIFICAR_GENERO.rows[0] == undefined || VERIFICAR_GENERO.rows[0] == '') {
+                data.observacion = 'Género no existe en el sistema';
+                return;
+            }
         }
     });
 }
