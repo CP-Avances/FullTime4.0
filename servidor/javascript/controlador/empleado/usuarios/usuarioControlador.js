@@ -70,7 +70,7 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ACCINACION DE ACCION PERSONAL **USADO
+    // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL **USADO
     ObtenerInformacionUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
