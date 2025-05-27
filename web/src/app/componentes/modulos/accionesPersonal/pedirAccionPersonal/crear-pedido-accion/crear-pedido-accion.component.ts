@@ -827,18 +827,38 @@ export class CrearPedidoAccionComponent implements OnInit {
     //BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA EL PEDIDO DE ACCION DE PERSONAL
     this.restE.BuscarEmpleadoNombre(datos1).subscribe((empl1) => {
       var idEmpl_pedido = empl1[0].id;
+      
       // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
       this.restE.BuscarEmpleadoNombre(datos2).subscribe((empl2) => {
         var idEmpl_firmaH = empl2[0].id;
+
         // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA SEGUNDA FIRMA
         this.restE.BuscarEmpleadoNombre(datos3).subscribe((empl3) => {
           var idEmpl_firmaG = empl3[0].id;
 
           this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
             var idEmpl_responsable = empl4[0].id;
-            let idCiudadSeleccionada = this.ObtenerIdCiudadSeleccionada(form3.idCiudadForm);
 
-            let lugar_trabajo_actual = this.sucursal.find(item => item.nombre === form3.sucursalForm);
+            console.log('form3.idCiudadPropuestaForm: ',form3.idCiudadPropuestaForm)
+
+            let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
+            let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
+            let unidad_admi_actual = this.departamentos.find(item => item.nombre === form3.DepartamentoForm)
+            let sucursal_actual = this.sucursal.find(item => item.nombre === form3.sucursalForm);
+            let lugar_trabajo_actual =  this.ObtenerIdCiudadSeleccionada(form3.idCiudadForm);
+            let cargo_actual = this.cargos.find(item => item.cargo === form3.tipoCargoForm);
+            let grupo_ocupacional_actual = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalForm)
+            let grado_actual = this.grados.find(item => item.descripcion === form3.gradoForm);
+
+            let procesoPropuesto = this.procesos.find(item => item.nombre === form3.procesoPropuestoForm);
+            let nivel_gestion_propuesto = this.departamentos.find(item => item.nombre === form3.NivelDepaPropuestoForm)
+            let unidad_admi_propuesto = this.departamentos.find(item => item.nombre === form3.DepartamentoPropuestoForm)
+            let sucursal_propuesto = this.sucursal.find(item => item.nombre === form3.sucursalPropuestoForm);
+            let lugar_trabajo_propuesto = form3.idCiudadPropuestaForm != '' ? this.ObtenerIdCiudadSeleccionada(form3.idCiudadPropuestaForm) : undefined;
+            let cargo_propuesto = this.cargos.find(item => item.cargo === form3.tipoCargoPropuestoForm);
+            let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
+            let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
+
 
             // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
             let datosAccion = {
@@ -865,35 +885,35 @@ export class CrearPedidoAccionComponent implements OnInit {
 
               //parte formulario 3
               formulario3: {
-                id_proceso_actual: form3.tipoProcesoForm,
-                id_nivel_gestion_actual: form3.NivelDepaForm,
-                id_unidad_administrativa: form3.DepartamentoForm,
-                id_sucursal_actual: form3.sucursalForm,
-                id_lugar_trabajo_actual: lugar_trabajo_actual.id,
-                id_tipo_cargo_actual: form3.tipoCargoForm,
-                id_grupo_ocupacional_actual: form3.grupoOcupacionalForm,
-                id_grado_actual: form3.gradoForm,
+                id_proceso_actual: procesoActual != undefined ? procesoActual.id : null,
+                id_nivel_gestion_actual: nivel_gestion_actual != undefined ? nivel_gestion_actual.id : null,
+                id_unidad_administrativa: unidad_admi_actual != undefined ? unidad_admi_actual.id : null,
+                id_sucursal_actual: sucursal_actual != undefined ? sucursal_actual.id : null,
+                id_lugar_trabajo_actual: lugar_trabajo_actual != undefined ? lugar_trabajo_actual : null,
+                id_tipo_cargo_actual: cargo_actual != undefined ? cargo_actual.id : null,
+                id_grupo_ocupacional_actual: grupo_ocupacional_actual != undefined ? grupo_ocupacional_actual.id : null,
+                id_grado_actual: grado_actual != undefined ? grado_actual.id : null,
                 remuneracion_actual: form3.sueldoForm,
                 partida_individual_actual: form3.actaForm,
 
-                id_proceso_propuesto: form3.procesoPropuestoForm,
-                id_nivel_gestion_propuesto: form3.NivelDepaPropuestoForm,
-                id_unidad_administrativa_propuesta: form3.DepartamentoPropuestoForm,
-                id_sucursal_propuesta: form3.sucursalPropuestoForm,
-                id_lugar_trabajo_propuesto: form3.idCiudadPropuestaForm,
-                id_tipo_cargo_propuesto: form3.tipoCargoPropuestoForm,
-                id_grupo_ocupacional_propuesto: form3.grupoOcupacionalPropuestoForm,
-                id_grado_propuesto: form3.gradoPropuestoForm,
+                id_proceso_propuesto: procesoPropuesto != undefined ? procesoPropuesto.id : null,
+                id_nivel_gestion_propuesto: nivel_gestion_propuesto != undefined ? nivel_gestion_propuesto.id : null,
+                id_unidad_administrativa_propuesta: unidad_admi_propuesto != undefined ? unidad_admi_propuesto.id : null,
+                id_sucursal_propuesta: sucursal_propuesto != undefined ? sucursal_propuesto.id : null,
+                id_lugar_trabajo_propuesto: lugar_trabajo_propuesto != undefined ? lugar_trabajo_propuesto : null,
+                id_tipo_cargo_propuesto: cargo_propuesto != undefined ? cargo_propuesto.id : null,
+                id_grupo_ocupacional_propuesto: grupo_ocupacional_propuesto != undefined ? grupo_ocupacional_propuesto.id : null,
+                id_grado_propuesto: grado_propuesto != undefined ? grado_propuesto.id : null,
                 remuneracion_propuesta: form3.sueldoPropuestoForm,
                 partida_individual_propuesta: form3.actaPropuestaFom,
               },
               
               //parte formulario 4
               formulario4: {
-                funcionario: form3.habilitarForm4 ? idEmpl_pedido: null,
-                cedual: form3.habilitarForm4 ? form4.cedulaForm: null,
-                lugar_trabajo: form3.habilitarForm4 ? form4.lugar_trabajo: null,
-                fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm: null
+                funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
+                cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
+                lugar_trabajo: form3.habilitarForm4 ? form4.lugar_trabajo : null,
+                fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null
               },
 
               //parte formulario 5

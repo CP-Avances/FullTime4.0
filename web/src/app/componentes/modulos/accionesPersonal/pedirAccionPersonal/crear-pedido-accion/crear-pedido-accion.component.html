@@ -757,7 +757,7 @@
                                 <mat-form-field style="width: 80%;">
                                     <mat-label>En caso de negativa de la recepción</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoGF"
-                                        [matAutocomplete]="auto23" required>
+                                        [matAutocomplete]="auto23">
                                     <mat-autocomplete #auto23="matAutocomplete">
                                         <mat-option *ngFor="let th of filtroNombreH | async" [value]="th.empleado">
                                             {{th.empleado.toUpperCase()}}
