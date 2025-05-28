@@ -335,14 +335,7 @@ export const io = SERVIDOR.io;
 
 // INICIO DE TAREAS AUTOMATICAS
 (async () => {
-    // INICIO DE TAREAS AUTOMATICAS
     await tareasAutomaticas.IniciarTarea();
-
-    // LLAMA AL METODO DE CUMPLEAÑOS
-    aniversario();
-
-    // LLAMA AL METODO DE AVISOS DE VACACIONES
-    cumpleanios();
 })();
 
 

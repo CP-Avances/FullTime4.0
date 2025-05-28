@@ -1277,7 +1277,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosNotificacionesCumpleanios) {
-                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/mensaje_notificaciones', color: true, ver: true });
+                    this.childrenNotificaciones.push({ name: 'Felicitaciones', url: '/mensaje_notificaciones', color: true, ver: true });
                   }
                   break;
                 case 'comunicados':

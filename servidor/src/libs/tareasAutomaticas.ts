@@ -14,6 +14,9 @@ import {
 } from "./sendFaltas";
 import { salidasADiariosIndividual, salidasAnticipadasDiarios, salidasAnticipadasSemanal } from "./sendSalidasAnticipadas";
 
+import { cumpleanios } from "./sendBirthday";
+import { aniversario } from "./sendAniversario";
+
 // ENUMERACION DE IDS DE PARAMETROS
 export enum IDParametros {
 
@@ -50,6 +53,18 @@ export enum IDParametros {
   DIA_SALIDASA_SEMANAL = 31,           // PARAMETRO DIA DE ENVIO DE SALIDAS ANTICIPADAS SEMANAL
   HORA_SALIDASA_INDIVIDUAL = 35,       // PARAMETRO HORA DE ENVIO DE SALIDAS ANTICIPADAS INDIVIDUAL
 
+
+  /** *************************************************************************************** **
+   **                           PARAMETROS DE CUMPLEANIOS                                  ** ** 
+   ** *************************************************************************************** **/
+  ENVIA_CUMPLEANIOS = 8,          // PARAMETRO ENVIO DE CUMPLEANIOS
+  HORA_CUMPLEANIOS = 9,           // PARAMETRO HORA DE ENVIO DE CUMPLEANIOS
+
+  /** *************************************************************************************** **
+   **                           PARAMETROS DE ANIVERSARIO                                 ** ** 
+   ** *************************************************************************************** **/
+  ENVIA_ANIVERSARIO = 24,          // PARAMETRO ENVIO DE ANIVERSARIO
+  HORA_ANIVERSARIO = 25,           // PARAMETRO HORA DE ENVIO DE ANIVERSARIO
 }
 
 // TIPO DE CONFIGURACION PARA CADA TAREA
@@ -143,6 +158,18 @@ export const TAREAS: configurarTarea[] = [
     horaId: IDParametros.HORA_SALIDASA_SEMANAL,
     diaId: IDParametros.DIA_SALIDASA_SEMANAL,
     task: salidasAnticipadasSemanal,
+  },
+  {
+    clave: "CUMPLEANIOS",
+    envioId: IDParametros.ENVIA_CUMPLEANIOS,
+    horaId: IDParametros.HORA_CUMPLEANIOS,
+    task: cumpleanios,
+  },
+  {
+    clave: "ANIVERSARIO",
+    envioId: IDParametros.ENVIA_ANIVERSARIO,
+    horaId: IDParametros.HORA_ANIVERSARIO,
+    task: aniversario,
   },
 ];
 

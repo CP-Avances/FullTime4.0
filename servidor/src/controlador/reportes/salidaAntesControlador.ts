@@ -1,4 +1,3 @@
-import { ReporteSalidaAntes } from '../../class/Salida_Antes';
 import { Request, Response } from 'express'
 import pool from '../../database'
 

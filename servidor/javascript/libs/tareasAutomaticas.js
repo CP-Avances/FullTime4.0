@@ -18,6 +18,8 @@ const database_1 = __importDefault(require("../database"));
 const sendAtraso_1 = require("./sendAtraso");
 const sendFaltas_1 = require("./sendFaltas");
 const sendSalidasAnticipadas_1 = require("./sendSalidasAnticipadas");
+const sendBirthday_1 = require("./sendBirthday");
+const sendAniversario_1 = require("./sendAniversario");
 // ENUMERACION DE IDS DE PARAMETROS
 var IDParametros;
 (function (IDParametros) {
@@ -48,6 +50,16 @@ var IDParametros;
     IDParametros[IDParametros["HORA_SALIDASA_SEMANAL"] = 30] = "HORA_SALIDASA_SEMANAL";
     IDParametros[IDParametros["DIA_SALIDASA_SEMANAL"] = 31] = "DIA_SALIDASA_SEMANAL";
     IDParametros[IDParametros["HORA_SALIDASA_INDIVIDUAL"] = 35] = "HORA_SALIDASA_INDIVIDUAL";
+    /** *************************************************************************************** **
+     **                           PARAMETROS DE CUMPLEANIOS                                  ** **
+     ** *************************************************************************************** **/
+    IDParametros[IDParametros["ENVIA_CUMPLEANIOS"] = 8] = "ENVIA_CUMPLEANIOS";
+    IDParametros[IDParametros["HORA_CUMPLEANIOS"] = 9] = "HORA_CUMPLEANIOS";
+    /** *************************************************************************************** **
+     **                           PARAMETROS DE ANIVERSARIO                                 ** **
+     ** *************************************************************************************** **/
+    IDParametros[IDParametros["ENVIA_ANIVERSARIO"] = 24] = "ENVIA_ANIVERSARIO";
+    IDParametros[IDParametros["HORA_ANIVERSARIO"] = 25] = "HORA_ANIVERSARIO";
 })(IDParametros || (exports.IDParametros = IDParametros = {}));
 const dias = [
     "Domingo",
@@ -127,6 +139,18 @@ exports.TAREAS = [
         horaId: IDParametros.HORA_SALIDASA_SEMANAL,
         diaId: IDParametros.DIA_SALIDASA_SEMANAL,
         task: sendSalidasAnticipadas_1.salidasAnticipadasSemanal,
+    },
+    {
+        clave: "CUMPLEANIOS",
+        envioId: IDParametros.ENVIA_CUMPLEANIOS,
+        horaId: IDParametros.HORA_CUMPLEANIOS,
+        task: sendBirthday_1.cumpleanios,
+    },
+    {
+        clave: "ANIVERSARIO",
+        envioId: IDParametros.ENVIA_ANIVERSARIO,
+        horaId: IDParametros.HORA_ANIVERSARIO,
+        task: sendAniversario_1.aniversario,
     },
 ];
 // CLASE PRINCIPAL DE TAREAS

@@ -296,8 +296,6 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
-const sendAniversario_1 = require("./libs/sendAniversario");
-const sendBirthday_1 = require("./libs/sendBirthday");
 const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
@@ -307,12 +305,7 @@ const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 exports.io = SERVIDOR.io;
 // INICIO DE TAREAS AUTOMATICAS
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    // INICIO DE TAREAS AUTOMATICAS
     yield tareasAutomaticas_1.tareasAutomaticas.IniciarTarea();
-    // LLAMA AL METODO DE CUMPLEAÑOS
-    (0, sendAniversario_1.aniversario)();
-    // LLAMA AL METODO DE AVISOS DE VACACIONES
-    (0, sendBirthday_1.cumpleanios)();
 }))();
 //beforeFiveDays();
 //beforeTwoDays();
