@@ -1215,6 +1215,7 @@ class EmpleadoControlador {
                         tipo_identificacion: '',
                         numero_partida_individual: '',
                     };
+                    //OBTIENE DATOS DE LA BASE PARA VALIDACIONES
                     var ARREGLO_ESTADO_CIVIL = yield database_1.default.query(`SELECT * FROM e_estado_civil`);
                     let lista_estados = ARREGLO_ESTADO_CIVIL.rows;
                     const estadoCivilArray = lista_estados.map(item => item.estado_civil.toUpperCase());
@@ -1296,7 +1297,6 @@ class EmpleadoControlador {
                                 USUARIO != undefined && CONTRASENA != undefined &&
                                 ROL != undefined && TIPO_IDENTIFICACION != undefined &&
                                 NUMERO_PARTIDA_INDIVIDUAL != undefined) {
-                                console.log("entra porque tiene todos los datos llenos automatico");
                                 data.fila = ITEM;
                                 data.identificacion = IDENTIFICACION;
                                 data.nombre = NOMBRE;
@@ -1464,7 +1464,6 @@ class EmpleadoControlador {
     // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("ENTRANDO A CARGAR PLANTILLA AUTOMATICO");
             const { plantilla, user_name, ip, ip_local } = req.body;
             const VALOR = yield database_1.default.query(`SELECT * FROM e_codigo`);
             var codigo_dato = VALOR.rows[0].valor;
@@ -1556,13 +1555,9 @@ class EmpleadoControlador {
                     var estado_user = true;
                     var app_habilita = false;
                     //OBTENER ID DE LA NACIONALIDAD
-                    const id_nacionalidad = yield database_1.default.query(`
-          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-          `, [nacionalidad.toUpperCase()]);
+                    const id_nacionalidad = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [nacionalidad.toUpperCase()]);
                     //OBTENER ID DEL ROL
-                    const id_rol = yield database_1.default.query(`
-          SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-          `, [rol.toUpperCase()]);
+                    const id_rol = yield database_1.default.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [rol.toUpperCase()]);
                     if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
                         // INCREMENTAR EL VALOR DEL CODIGO
                         codigo = codigo + 1;
@@ -1570,7 +1565,6 @@ class EmpleadoControlador {
                     else {
                         codigo = identificacion;
                     }
-                    console.log('Estado civil: ', id_estado_civil);
                     let id_tipo_identificacion = 0;
                     if (tipo_identificacion.toUpperCase() === 'CÉDULA') {
                         id_tipo_identificacion = 1;
@@ -1780,7 +1774,6 @@ class EmpleadoControlador {
                                 TELEFONO != undefined && NACIONALIDAD != undefined && USUARIO != undefined &&
                                 CONTRASENA != undefined && ROL != undefined && TIPO_IDENTIFICACION != undefined &&
                                 NUMERO_PARTIDA_INDIVIDUAL != undefined) {
-                                console.log("entra porque tiene todos los datos llenos manual");
                                 data.fila = ITEM;
                                 data.identificacion = IDENTIFICACION === null || IDENTIFICACION === void 0 ? void 0 : IDENTIFICACION.trim();
                                 data.apellido = APELLIDO === null || APELLIDO === void 0 ? void 0 : APELLIDO.trim();
@@ -1981,7 +1974,6 @@ class EmpleadoControlador {
     // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("ENTRANDO A CARGAR PLANTILLA MANUAL");
             const { plantilla, user_name, ip, ip_local } = req.body;
             var contador = 1;
             let ocurrioError = false;
@@ -2059,13 +2051,9 @@ class EmpleadoControlador {
                     var estado_user = true;
                     var app_habilita = false;
                     // OBTENER ID DE LA NACIONALIDAD
-                    const id_nacionalidad = yield database_1.default.query(`
-          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-          `, [nacionalidad.toUpperCase()]);
+                    const id_nacionalidad = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [nacionalidad.toUpperCase()]);
                     // OBTENER ID DEL ROL
-                    const id_rol = yield database_1.default.query(`
-          SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-          `, [rol.toUpperCase()]);
+                    const id_rol = yield database_1.default.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [rol.toUpperCase()]);
                     // REGISTRO DE NUEVO EMPLEADO
                     let id_tipo_identificacion = 0;
                     if (tipo_identificacion.toUpperCase() === 'CÉDULA') {
@@ -2370,7 +2358,6 @@ exports.default = exports.EMPLEADO_CONTROLADOR;
 function ValidarCedula(cedula) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
-        console.log("entra a validar Cedula");
         const result = yield database_1.default.query(`
     SELECT descripcion 
     FROM ep_detalle_parametro 
@@ -2379,12 +2366,10 @@ function ValidarCedula(cedula) {
   `);
         const activarValidacion = ((_b = (_a = result.rows[0]) === null || _a === void 0 ? void 0 : _a.descripcion) === null || _b === void 0 ? void 0 : _b.toLowerCase().trim()) === 'si';
         if (!activarValidacion) {
-            console.log("Validación de cédula desactivada por parámetro");
             return true;
         }
         const cad = cedula.toString().trim();
         if (cad === "" || cad.length !== 10 || isNaN(Number(cad))) {
-            console.log("Cédula vacía, no numérica o con longitud distinta de 10");
             return false;
         }
         let total = 0;
@@ -2402,15 +2387,14 @@ function ValidarCedula(cedula) {
         const verificador = parseInt(cad.charAt(9), 10);
         const resultado = total % 10 ? 10 - (total % 10) : 0;
         if (verificador === resultado) {
-            console.log("Cédula Válida");
             return true;
         }
         else {
-            console.log("Cédula Inválida");
             return false;
         }
     });
 }
+//METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA COMPLETA
 function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, TIPO_IDENTIFICACION, pool, TELEFONO, LONGITUD, LATITUD, ValidarCedula, modoCodigo) {
     return __awaiter(this, void 0, void 0, function* () {
         if (data.identificacion.toString().length != 0) {
@@ -2446,47 +2430,37 @@ function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLati
         }
         if (!valiContra.test(data.contrasena.toString())) {
             if (data.contrasena.toString().length <= 10) {
-                if (estadoCivilArray.includes(data.estado_civil.toUpperCase())) {
-                    if (tipogenero.includes(data.genero.toUpperCase())) {
-                        if (data.correo == undefined || !regexCorreo.test(data.correo)) {
-                            data.observacion = 'Verificar correo';
+                if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+                    data.observacion = 'Verificar correo';
+                    return;
+                }
+                if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+                    if (LONGITUD != undefined || LATITUD != undefined) {
+                        if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                            data.observacion = 'Verificar ubicación';
                             return;
                         }
-                        if (luxon_1.DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-                            if (LONGITUD != undefined || LATITUD != undefined) {
-                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                    data.observacion = 'Verificar ubicación';
-                                    return;
-                                }
-                            }
-                            else if (LONGITUD == undefined || LATITUD == undefined) {
-                                data.observacion = 'Verificar ubicación';
+                    }
+                    else if (LONGITUD == undefined || LATITUD == undefined) {
+                        data.observacion = 'Verificar ubicación';
+                        return;
+                    }
+                    if (TELEFONO != undefined) {
+                        if (regex.test(data.telefono.toString())) {
+                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                data.observacion = 'El teléfono ingresado no es válido';
                                 return;
-                            }
-                            if (TELEFONO != undefined) {
-                                if (regex.test(data.telefono.toString())) {
-                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                        data.observacion = 'El teléfono ingresado no es válido';
-                                        return;
-                                    }
-                                }
-                                else {
-                                    data.observacion = 'El teléfono ingresado no es válido';
-                                    return;
-                                }
                             }
                         }
                         else {
-                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            data.observacion = 'El teléfono ingresado no es válido';
                             return;
                         }
                     }
-                    else {
-                        data.observacion = 'Género no es válido';
-                    }
                 }
                 else {
-                    data.observacion = 'Estado civil no es válido';
+                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                    return;
                 }
             }
             else {
@@ -2521,8 +2495,7 @@ function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLati
             return;
         }
         if (modoCodigo === 'cedula') {
-            const VERIFICAR_CODIGO = yield pool.query(`SELECT * FROM eu_empleados WHERE codigo = $1`, [data.identificacion] // <- Porque en modo cedula el código es la identificación
-            );
+            const VERIFICAR_CODIGO = yield pool.query(`SELECT * FROM eu_empleados WHERE codigo = $1`, [data.identificacion]);
             if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
                 data.observacion = 'Código ya existe en el sistema';
                 return;
@@ -2564,9 +2537,9 @@ function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLati
         data.observacion = 'no registrado';
     });
 }
+//METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA INCOMPLETA
 function validarEmpleadoIncompleto(data, ITEM, IDENTIFICACION, APELLIDO, NOMBRE, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD, USUARIO, CONTRASENA, ROL, TIPO_IDENTIFICACION, NUMERO_PARTIDA_INDIVIDUAL, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, pool, ValidarCedula, modoCodigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("entra aqui porque no estan llenos los datos");
         data.fila = ITEM;
         data.identificacion = IDENTIFICACION;
         data.nombre = NOMBRE;
@@ -2675,13 +2648,11 @@ function validarEmpleadoIncompleto(data, ITEM, IDENTIFICACION, APELLIDO, NOMBRE,
             hayDatosFaltantes = true;
         }
         if (IDENTIFICACION == undefined) {
-            console.log("ENTRO PORQUE NO SE REGISTRA IDENTIFICACION");
             data.identificacion = 'No registrado';
             data.observacion = 'Identificación no registrada';
             hayDatosFaltantes = true;
         }
         if (TIPO_IDENTIFICACION == undefined) {
-            console.log("ENTRO PORQUE NO SE REGISTRA TIPO DE IDENTIFICACION");
             data.tipo_identificacion = 'No registrado';
             data.observacion = 'Tipo identificación no registrado';
             hayDatosFaltantes = true;
@@ -2837,7 +2808,6 @@ function validarEmpleadoIncompleto(data, ITEM, IDENTIFICACION, APELLIDO, NOMBRE,
                     }
                 }
                 else {
-                    console.log("PASAPORTE NO VALIDO");
                     data.observacion = 'La identificación ingresada no es válida';
                 }
             }
