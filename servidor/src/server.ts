@@ -48,7 +48,7 @@ import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import LICENCIAS_RUTAS from './utils/licencias';
-import GENERO_RUTAS  from './rutas/empleado/generos/catGeneroRutas'
+import GENERO_RUTAS from './rutas/empleado/generos/catGeneroRutas'
 import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
@@ -125,12 +125,12 @@ class Servidor {
             },
         });
         this.io.on('connection', (socket: any) => {
-            console.log('Cliente conectado:', socket.id); 
-            
+            console.log('Cliente conectado:', socket.id);
+
             socket.on("connect_error", (err: any) => {
                 console.log("Error de conexión:", err.message);
-              });
-              
+            });
+
             // Verifica la conexión
             socket.on('disconnect', () => {
                 console.log('Cliente desconectado:', socket.id);
@@ -322,6 +322,7 @@ import { cumpleanios } from './libs/sendBirthday';
 import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
 import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
 
+import { tareasAutomaticas } from './libs/tareasAutomaticas';
 
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
@@ -332,20 +333,11 @@ DesactivarFinContratoEmpleado();
 
 export const io = SERVIDOR.io;
 
-setInterval(async () => {
-    //atrasosDiarios();
-    //atrasosSemanal();
-    //faltasDiarios();
-    //faltasSemanal();
-    //salidasAnticipadasSemanal();
-    //salidasAnticipadasDiarios();
-}, 2700000);
+// INICIO DE TAREAS AUTOMATICAS
+(async () => {
+    await tareasAutomaticas.IniciarTarea();
+})();
 
-// LLAMA AL MEODO DE CUMPLEAÑOS
-aniversario();
-
-// LLAMA AL METODO DE AVISOS DE VACACIONES
-cumpleanios();
 
 //beforeFiveDays();
 //beforeTwoDays();

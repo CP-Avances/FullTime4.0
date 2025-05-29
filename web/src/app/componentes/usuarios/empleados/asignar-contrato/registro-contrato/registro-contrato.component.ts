@@ -1,8 +1,8 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
-import { startWith, map } from 'rxjs/operators';
+import { startWith, map, catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { DateTime } from 'luxon';
 
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
@@ -258,31 +258,40 @@ export class RegistroContratoComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DE CONTRATO
   RegistrarContrato(form: any, datos: any) {
-    if (this.isChecked === true && form.documentoForm != '') {
+    if (this.isChecked === true && form.documentoForm !== '') {
       datos.subir_documento = true;
     }
+
     this.rest.CrearContratoEmpleado(datos).subscribe(response => {
       if (response.message === 'error' || response.message === 'error_carpeta') {
-        this.toastr.success('Intente nuevamente.', 'Ups! algo salio mal.', {
+        this.toastr.success('Intente nuevamente.', 'Ups! algo salió mal.', {
           timeOut: 6000,
-        })
+        });
+      } else {
+        this.CambiarEstado().subscribe(() => {
+          // Mostrar mensaje al desactivar cargo
+          this.toastr.info('Se inactivó cargo del usuario.', 'Requerido registrar cargo del usuario.', {
+            timeOut: 6000,
+          });
+
+          this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+            timeOut: 6000,
+          });
+
+          if (this.isChecked === true && form.documentoForm !== '') {
+            this.CargarContrato(response.id, form);
+          }
+
+          this.CerrarVentana(2);
+        });
       }
-      else {
-        this.CambiarEstado();
-        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-          timeOut: 6000,
-        })
-        if (this.isChecked === true && form.documentoForm != '') {
-          this.CargarContrato(response.id, form);
-        }
-      }
-      this.CerrarVentana(2);
     }, error => {
-      this.toastr.error('Ups! algo salio mal.', '', {
+      this.toastr.error('Ups! algo salió mal.', '', {
         timeOut: 6000,
-      })
+      });
     });
   }
+
 
   // VERIFICAR QUE EL REGISTRO NO SE DUPLIQUE
   revisarFecha: any = [];
@@ -335,19 +344,27 @@ export class RegistroContratoComponent implements OnInit {
   }
 
   // METODO PARA EDITAR ESTADO DEL CARGO
-  CambiarEstado() {
-    let valores = {
+  CambiarEstado(): Observable<any> {
+    const valores = {
       user_name: this.user_name,
       id_cargo: this.cargo_id,
       estado: false,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    if (this.cargo_id != 0) {
-      this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
-        this.toastr.info('Se inactivo cargo del usuario.', 'Requerido registrar cargo del usuario.', {
-          timeOut: 6000,
+      ip: this.ip,
+      ip_local: this.ips_locales,
+    };
+
+    if (this.cargo_id !== 0) {
+      return this.restCargo.EditarEstadoCargo(valores).pipe(
+        catchError(err => {
+          this.toastr.error('Ocurrió un inconveniente al cambiar el estado del cargo.', '', {
+            timeOut: 6000,
+          });
+          console.error('Error en EditarEstadoCargo:', err);
+          return of(null); 
         })
-      });
+      );
+    } else {
+      return of(null);
     }
   }
 
@@ -434,6 +451,7 @@ export class RegistroContratoComponent implements OnInit {
     if (this.pagina === 'ver-empleado') {
       this.ventana.crear_contrato = false;
       if (opcion === 2) {
+        console.log('ver datos actuales opcion 2');
         this.ventana.VerDatosActuales(this.ventana.formato_fecha);
         this.ventana.ObtenerContratosEmpleado(this.ventana.formato_fecha);
       }

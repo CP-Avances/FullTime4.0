@@ -89,6 +89,11 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase/restaurar-frase/nueva`, data)
   }
 
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO PARA LA ACCINACION PERSONAL  **USADO
+  BuscarInfoUsuarioAcci(id: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/infoEmpleado/${id}`);
+  }
+
 
   /** *********************************************************************************************** **
    ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **

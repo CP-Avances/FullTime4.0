@@ -87,6 +87,7 @@ const enviarMail = function (servidor, puerto) {
 };
 exports.enviarMail = enviarMail;
 const enviarCorreos = function (servidor, puerto, email, pass) {
+    console.log('ver email y pass', email, pass, servidor, puerto);
     var seguridad = false;
     if (puerto === 465) {
         seguridad = true;

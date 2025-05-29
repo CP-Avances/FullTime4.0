@@ -59,6 +59,9 @@ export class MainNavComponent implements OnInit {
   menuGeneralAdministrador: any = [];//Menu Administrador
   paginasMG: any = []; //Variable para guardar los permisos de acceso a botones que tiene asignado
 
+  // BOTON DE ALERTAS MODULOS
+  boton_notificaciones: boolean = false;
+
   itemConfiguracion: boolean = false;
   subItemConfiguracionParametrizacion: boolean = false;
   childrenParametrizacion: any = [];
@@ -209,6 +212,16 @@ export class MainNavComponent implements OnInit {
   vistaReportesAuditoria: boolean = false;
   datosPaginaRol: any = [];
 
+  // CONTROL DE FUNCIONES DEL SISTEMA
+  get HabilitarGeolocalizacion(): boolean { return this.funciones.geolocalizacion; }
+  get HabilitarAlimentacion(): boolean { return this.funciones.alimentacion; }
+  get HabilitarVacaciones(): boolean { return this.funciones.vacaciones; }
+  get HabilitarHoraExtra(): boolean { return this.funciones.horasExtras; }
+  get HabilitarTimbreWeb(): boolean { return this.funciones.timbre_web; }
+  get HabilitarPermisos(): boolean { return this.funciones.permisos; }
+  get HabilitarAccion(): boolean { return this.funciones.accionesPersonal; }
+  get HabilitarMovil(): boolean { return this.funciones.app_movil; }
+
   constructor(
     private restRolPermiso: RolPermisosService,
     public restF: FuncionesService,
@@ -225,7 +238,8 @@ export class MainNavComponent implements OnInit {
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
     private restTimbres: TimbresService,
-  ) { }
+  ) {
+  }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
 
@@ -251,14 +265,14 @@ export class MainNavComponent implements OnInit {
   showMessageLicencia: Boolean = false;
   FuncionLicencia() {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
-    console.log(licencia);
+    //console.log(licencia);
     if (licencia !== null) {
       var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd') ?? '';
       this.fec_caducidad_licencia = fec_caducidad ? new Date(fec_caducidad) : new Date();
       // CONVERTIMOS LA FECHA ACTUAL Y LA FECHA DE CADUCIDAD A OBJETOS LUXON
       const fecha = DateTime.now();
       var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd') ?? '';
-      console.log('fechaActual 2121 ', fechaActual);
+      //console.log('fechaActual 2121 ', fechaActual);
       const fechaInicio = DateTime.fromISO(fechaActual);
       const fechaFin = DateTime.fromISO(fec_caducidad);
       // CALCULAMOS LA DIFERENCIA EN DIAS ENTRE LAS DOS FECHAS
@@ -284,10 +298,9 @@ export class MainNavComponent implements OnInit {
       this.breakpointObserver.observe('(max-width: 800px)').subscribe((result: BreakpointState) => {
         this.barraInicial = result.matches;
       });
-
-      //Inicio Consulta de menu
+      // INICIO CONSULTA DE MENU
       this.MenuGeneral();
-      //Fin Consulta de menu
+      // FIN CONSULTA DE MENU
     }
   }
 
@@ -329,16 +342,6 @@ export class MainNavComponent implements OnInit {
     this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
   }
 
-  // CONTROL DE FUNCIONES DEL SISTEMA
-  get HabilitarGeolocalizacion(): boolean { return this.funciones.geolocalizacion; }
-  get HabilitarAlimentacion(): boolean { return this.funciones.alimentacion; }
-  get HabilitarVacaciones(): boolean { return this.funciones.vacaciones; }
-  get HabilitarHoraExtra(): boolean { return this.funciones.horasExtras; }
-  get HabilitarTimbreWeb(): boolean { return this.funciones.timbre_web; }
-  get HabilitarPermisos(): boolean { return this.funciones.permisos; }
-  get HabilitarAccion(): boolean { return this.funciones.accionesPersonal; }
-  get HabilitarMovil(): boolean { return this.funciones.app_movil; }
-
   // CONTROL DE MENU PRINCIPAL
   nombreSelect: string = '';
   manejarEstadoActivo(name: any) {
@@ -368,11 +371,14 @@ export class MainNavComponent implements OnInit {
     if (this.menuGeneralUsuarios.length < 1) {
       this.restRolPermiso.BuscarPaginasMenuRol(buscarPagina).subscribe(
         {
+
           next: (v) => {
             this.paginasMG = v;
+            this.boton_notificaciones = this.HabilitarPermisos || this.HabilitarVacaciones || this.HabilitarHoraExtra || this.HabilitarAlimentacion;
           },
           error: (e) => {
-            //Armado de json con elementos de menu ERROR
+            this.boton_notificaciones = this.HabilitarPermisos || this.HabilitarVacaciones || this.HabilitarHoraExtra || this.HabilitarAlimentacion;
+            // ARMADO DE JSON CON ELEMENTOS DE MENU ERROR
             this.menuGeneralUsuarios = [
               {
                 name: 'Módulos',
@@ -1271,7 +1277,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosNotificacionesCumpleanios) {
-                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/mensaje_notificaciones', color: true, ver: true });
+                    this.childrenNotificaciones.push({ name: 'Felicitaciones', url: '/mensaje_notificaciones', color: true, ver: true });
                   }
                   break;
                 case 'comunicados':

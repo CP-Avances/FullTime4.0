@@ -12,24 +12,24 @@
                         <mat-label>Buscar por usuario</mat-label>
                         <input matInput [formControl]="nom_empleado" (keypress)="IngresarSoloLetras($event)">
                         <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
-                            matTooltip="Búsqueda por el nombre del usuario.">
-                            help_outline
+                            matTooltip="Búsqueda por el nombre del usuario que envía el aviso.">
+                            account_circle
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Buscar por descripción</mat-label>
-                        <input matInput [formControl]="descripcion" type="text" (keypress)="IngresarSoloLetras($event)">
+                        <input matInput [formControl]="descripcion" type="text">
                         <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
                             matTooltip="Búsqueda por descripción del aviso.">
-                            help_outline
+                            description
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field>
-                        <mat-label>Buscar por fecha</mat-label>
+                        <mat-label>Buscar por fecha u hora</mat-label>
                         <input matInput [formControl]="fecha" type="text">
                         <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
-                            matTooltip="Búsqueda por fecha del aviso.">
-                            help_outline
+                            matTooltip="Búsqueda por fecha u hora del aviso.">
+                            timelapse
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -43,87 +43,75 @@
     </div>
 </div>
 <div class="container table-responsive" style="padding-bottom: 50px;">
-    <div class="mat-elevation-z8" style="background-color: rgb(103, 112, 124)">
-        <div class="d-flex bd-highlight" id="titulo">
-            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
-                matTooltipPosition="right"
-                matTooltip="Activa o desactiva selección múltiple para desactivar empleados masivamente"
-                id="SelectCheck">
-                library_add_check
-            </mat-icon>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light" style="float: left; margin-left: 10px;"
-                (click)="EliminarNotificaciones(1)">
-                Confirmar
-            </button>
-            <span class="w-100 bd-highlight">LISTA DE TODOS LOS AVISOS</span>
+    <div class="mat-elevation-z8" style="background-color: #f0f2f5">
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+                <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Activar o desactivar la selección múltiple para eliminar notificaciones."
+                    id="SelectCheck">
+                    library_add_check
+                </mat-icon>
+            </div>
+            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>LISTA DE TODOS LOS AVISOS</span>
+            </div>
+            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                    (click)="EliminarNotificaciones(1)" *ngIf="btnCheckHabilitar">Eliminar</button>
+            </div>
         </div>
-
-        <!--
-       
-        <table class="table table-hover table-sm ">
-            <thead class="thead-light">
-                <tr style="text-align: center;">
-                    <th>
-                        <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
-                            [checked]="selectionUno.hasValue() && isAllSelected()"
-                            [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
-                            [aria-label]="checkboxLabel()">
-                        </mat-checkbox>
-                    </th>
-                    <th scope="col">Empleado</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Hora</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                    *ngFor="let t of timbres_noti | avisoEmpl: nom_empleado.value | filtroDescripcion: descripcion.value | filtroFecha: fecha.value | paginate:tamanio_pagina:numero_pagina">
-                    <td>
-                        <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
-                            (change)="$event ? selectionUno.toggle(t) : null" [checked]="selectionUno.isSelected(t)"
-                            [aria-label]="checkboxLabel(t)">
-                        </mat-checkbox>
-                    </td>
-                    <td>{{t.empleado}}</td>
-                    <td>{{t.descripcion}}</td>
-                    <td>{{t.create_at.split('T')[0]}}</td>
-                    <td>{{t.create_at.slice(11,16)}}</td>
-                </tr>
-            </tbody>
-        </table>
- -->
 
         <div class="card-container">
             <mat-card class="card"
-                *ngFor="let t of timbres_noti | avisoEmpl: nom_empleado.value | filtroDescripcion: descripcion.value | filtroFecha: fecha.value | paginate:tamanio_pagina:numero_pagina"
+                *ngFor="let t of lista_avisos | avisoEmpl: nom_empleado.value | filtroDescripcion: descripcion.value | filtroFecha: fecha.value | paginate:tamanio_pagina:numero_pagina"
                 appearance="outlined">
                 <div class="card-content">
-                    <!-- Columna izquierda: Checkbox -->
+                    <!-- COLUMNA IZQUIERDA: Checkbox -->
                     <div class="checkbox-column">
                         <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                             (change)="$event ? selectionUno.toggle(t) : null" [checked]="selectionUno.isSelected(t)"
                             [aria-label]="checkboxLabel(t)">
                         </mat-checkbox>
                     </div>
-                    <!-- Columna derecha: Contenido -->
+                    <!-- COLUMNA DERECHA: Contenido -->
                     <div class="content-column">
-                        <mat-card-header>
-                            <mat-card-title>{{ t.empleado }}</mat-card-title>
-                            <mat-card-subtitle>{{ t.descripcion }}</mat-card-subtitle>
-                        </mat-card-header>
-                        <mat-card-content>
-                            <p><strong>Fecha:</strong> {{ t.create_at.split('T')[0] }}</p>
-                            <p><strong>Hora:</strong> {{ t.create_at.slice(11, 16) }}</p>
-                            <p><strong>Mensaje:</strong> {{ t.mensaje }}</p>
+                        <mat-icon [class]="CambiarEstiloIcono(t.tipo)">
+                            {{ CambiarIcono(t.tipo) }}
+                        </mat-icon>
+                        <mat-card-content class="contenido-compacto">
+
+                            <p><strong>{{ t.descripcion }}</strong></p>
+                            <p><strong>Enviado por:</strong> {{ t.empleado_envia }}</p>
+                            <p><strong>Fecha de envío:</strong> {{ t.fecha }}</p>
+                            <p><strong>Hora de envío:</strong> {{ t.hora_registro }}</p>
+                            <p><strong>Notificación: <em>{{ t.notificacion}}</em></strong></p>
+
+                            <div *ngIf="t.tipo === 100">
+                                <p><strong>Horario:</strong> {{ t.horario_fecha }} {{ t.horario_hora }} </p>
+                                <p><strong>Timbre:</strong> {{ t.timbre_fecha }} {{ t.timbre_hora }} </p>
+                                <p><strong>Tolerancia:</strong> {{ t.tolerancia }} minutos</p>
+                                <p><strong>Tiempo total de atraso:</strong> {{ t.atraso }} minutos</p>
+                            </div>
+
+                            <div *ngIf="t.tipo === 101">
+                                <p><strong>Horario:</strong> {{ t.horario_fecha }}</p>
+                            </div>
+
+                            <div *ngIf="t.tipo === 102">
+                                <p><strong>Horario:</strong> {{ t.horario_fecha }} {{ t.horario_hora }} </p>
+                                <p><strong>Timbre:</strong> {{ t.timbre_fecha }} {{ t.timbre_hora }} </p>
+                                <p><strong>Tiempo total de anticipación:</strong> {{ t.salida }} minutos</p>
+                            </div>
 
                         </mat-card-content>
+
                     </div>
                 </div>
             </mat-card>
         </div>
 
-        <mat-paginator id="pagina" [length]="timbres_noti.length" [pageSize]="tamanio_pagina"
+        <mat-paginator id="pagina" [length]="lista_avisos.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
 

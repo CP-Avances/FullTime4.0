@@ -1,7 +1,7 @@
 <button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="timbre" (click)="MostarNumeroAvisos()">
     <mat-icon id="iconos-navegador" [matBadgeHidden]="estadoTimbres" matBadge="{{num_timbre_false}}"
         matBadgeColor="warn" style="margin-left: 8px; margin-right: 8px;" matSuffix matTooltip="Avisos Generales"
-        aria-hidden="false">
+        aria-hidden="false" aria-label="Lista de avisos.">
         report
     </mat-icon>
 </button>
@@ -13,37 +13,19 @@
         <div *ngFor="let n of avisos">
 
             <!-- MENSAJE DE COMUNICADOS -->
-            <div *ngIf="n.visto === false && n.tipo === 6" style="background: rgb(245, 202, 252)">
+            <div *ngIf="n.tipo === 6"
+                [ngStyle]="{ 'background': n.visto ? 'rgb(226, 226, 226)' : 'rgb(245, 202, 252)' }">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
-                        <li style="font-size: 11px; margin-top: 3%;">
-                            <b>Enviado por:</b> {{n.empleado}}
-                        </li>
                         <li style="font-size: 12px; margin-top: 1%;">
-                            <b>Comunicado:</b> &nbsp;
-                            <i class="fa fa-exclamation" aria-hidden="false" style="color: red;"></i>
+                            <i class="fa fa-envelope-o" style="color: rgb(38, 13, 230);">&nbsp;&nbsp;</i>
+                            <b>COMUNICADO</b>
                         </li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            {{n.descripcion}}
-                        </li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            <b>Fecha:</b> {{n.fecha_}}
-                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
-                        </li>
-                    </ul>
-                    <mat-divider class="divider"></mat-divider>
-                </a>
-            </div>
-
-            <!-- MENSAJE DE COMUNICADOS VISTOS-->
-            <div *ngIf="n.visto === true && n.tipo === 6" style="background: rgb(226, 226, 226)">
-                <a mat-menu-item type="submit" class="noti_menu">
-                    <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 11px; margin-top: 3%;">
                             <b>Enviado por:</b> {{n.empleado}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
-                            <b>Comunicado:</b> {{n.descripcion}}.
+                            <b>Notificación:</b>&nbsp;<em>{{n.descripcion}}</em>
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
@@ -54,31 +36,26 @@
                 </a>
             </div>
 
-
-
-            <!-- FORMA DE AVISO PARA 'LLEGO ATRASADO AL TRABAJO' -->
-            <div *ngIf="n.visto == false && n.descripcion === 'Llego atrasado al trabajo'"
-                style="background: rgb(201,79,78);">
+            <!-- NOTIFICACIONES DE ATRASOS / FALTAS / SALIDAS ANTICIPADAS -->
+            <div *ngIf="CambiarEstiloNotificacion[n.tipo]"
+                [ngStyle]="{ 'background': n.visto ? 'rgb(226, 226, 226)' : CambiarEstiloNotificacion[n.tipo].color }">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
-                        <li style="font-size: 12px; margin-top: 3%;"><b>{{n.empleado}}</b></li>
-                        <li style="font-size: 11px; margin-top: 1%;"><b>{{n.descripcion}}</b></li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            <b>Fecha:</b> {{n.fecha_}}
-                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
+                        <li style="font-size: 12px; margin-top: 1%;">
+                            <i class="fa" [ngClass]="CambiarEstiloNotificacion[n.tipo].icon"
+                                [ngStyle]="{'color': CambiarEstiloNotificacion[n.tipo].iconColor}">&nbsp;&nbsp;</i>
+                            <b>{{n.descripcion}}</b>
                         </li>
-                    </ul>
-                    <mat-divider class="divider"></mat-divider>
-                </a>
-            </div>
-
-            <!-- FORMA DE AVISO PARA 'SALIO ANTES AL TRABAJO' -->
-            <div *ngIf="n.visto == false && n.descripcion === 'Salio antes al trabajo'"
-                style="background: rgb(201,79,78);">
-                <a mat-menu-item type="submit" class="noti_menu">
-                    <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
-                        <li style="font-size: 12px; margin-top: 3%;"><b>{{n.empleado}}</b></li>
-                        <li style="font-size: 11px; margin-top: 1%;"><b>{{n.descripcion}}</b></li>
+                        <li style="font-size: 11px; margin-top: 3%;">
+                            <b>Enviado por:</b> {{n.empleado}}
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Notificación:</b>&nbsp;<em>{{n.notificacion}}</em>
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Horario:</b> {{n.horario_fecha}}
+                            &nbsp;&nbsp;{{n.horario_hora}}
+                        </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
                             <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}

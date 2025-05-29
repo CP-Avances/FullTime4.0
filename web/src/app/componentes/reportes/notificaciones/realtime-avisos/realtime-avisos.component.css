@@ -1,69 +1,99 @@
 .btn {
-    margin-left: 20px;
-    background-color: rgb(80, 87, 97);
-    color: white;
+  margin-left: 20px;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 td {
-    padding-top: 10px;
-    text-align: center;
+  padding-top: 10px;
+  text-align: center;
 }
 
 table {
-    width: 100%;
-    font-size: 14px;
+  width: 100%;
+  font-size: 14px;
 }
 
 #boton {
-    background-color: rgb(80, 87, 97);
-    color: white;
-    margin-top: 10px;
+  background-color: rgb(80, 87, 97);
+  color: white;
+  margin-top: 10px;
 }
 
 mat-form-field {
-    padding: 10px 15px 0px 15px;
+  padding: 10px 15px 0px 15px;
 }
 
 #SelectCheck {
-    cursor: pointer;
-    margin-left: 10px;
+  cursor: pointer;
+  margin-left: 10px;
 }
 
 .card-container {
-    display: flex;
-    flex-direction: column;
-    /* Tarjetas en columna */
-    gap: 16px;
-    /* Espacio entre tarjetas */
-    align-items: center;
-    /* Centrar tarjetas horizontalmente */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 COLUMNAS DE IGUAL TAMAÑO */
+  gap: 16px; /* ESPACIO ENTRE LAS TARJETAs */
+  padding: 15px;
+  /* CENTRAR TARJETAS HORIZONTALMENTE */
+  align-items: center;
 }
 
 .card {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    /* Ancho completo */
-    /* Ancho máximo */
-    padding: 16px;
+  display: flex;
+  flex-direction: column;
+  /* ANCHO COMPLETO */
+  width: 100%;
+  /* ANCHO MÁXIMO */
+  padding: 16px;
 }
 
 .card-content {
-    display: flex;
-    flex-direction: row;
-    /* Contenido en dos columnas */
-    align-items: center;
+  display: flex;
+  /* CONTENIDO EN DOS COLUMNAS */
+  flex-direction: row;
+  align-items: center;
 }
 
 .checkbox-column {
-    margin-right: 16px;
-    /* Espacio entre checkbox y contenido */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  /* ESPACIO ENTRE CHECKBOX Y CONTENIDO */
+  margin-right: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .content-column {
-    flex: 1;
-    /* Ocupa el resto del espacio */
+  /* OCUPA EL RESTO DEL ESPACIO */
+  flex: 1;
+  font-size: smaller;
+}
+
+@media (max-width: 768px) {
+  .card-container {
+    grid-template-columns: 1fr; /* SOLO UNA COLUMNA EN PANTALLAS PEQUEÑAS */
+  }
+}
+
+
+/* COLORES POR TIPO */
+.natrasos {
+  color: #ffff00;
+}
+.nfaltas {
+  color: #b13026;
+}
+.nsalidasAnticipadas {
+  color: #104acf;
+}
+.ncomunicados {
+  color: #f62cde;
+}
+
+.contenido-compacto p {
+  margin: 2px 0;
+  line-height: 1.5;
+}
+
+mat-icon {
+    cursor: pointer;
 }

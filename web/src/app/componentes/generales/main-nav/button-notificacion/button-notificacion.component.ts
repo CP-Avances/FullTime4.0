@@ -61,7 +61,6 @@ export class ButtonNotificacionComponent implements OnInit {
   ** ********************************************************************************** **/
   EscucharNotificaciones() {
     this.socket = this.socketService.getSocket();
-    console.log("ver socket: ", this.socket);
 
     if (!this.socket) return;
 

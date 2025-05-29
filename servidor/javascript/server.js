@@ -296,26 +296,17 @@ class Servidor {
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
-const sendAniversario_1 = require("./libs/sendAniversario");
-const sendBirthday_1 = require("./libs/sendBirthday");
+const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 exports.io = SERVIDOR.io;
-setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    //atrasosDiarios();
-    //atrasosSemanal();
-    //faltasDiarios();
-    //faltasSemanal();
-    //salidasAnticipadasSemanal();
-    //salidasAnticipadasDiarios();
-}), 2700000);
-// LLAMA AL MEODO DE CUMPLEAÑOS
-(0, sendAniversario_1.aniversario)();
-// LLAMA AL METODO DE AVISOS DE VACACIONES
-(0, sendBirthday_1.cumpleanios)();
+// INICIO DE TAREAS AUTOMATICAS
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield tareasAutomaticas_1.tareasAutomaticas.IniciarTarea();
+}))();
 //beforeFiveDays();
 //beforeTwoDays();
 // LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR

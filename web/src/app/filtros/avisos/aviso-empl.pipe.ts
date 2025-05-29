@@ -8,18 +8,23 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class AvisoEmplPipe implements PipeTransform {
 
   transform(value: any, arg: any): any {
+    if (!arg || arg.length < 2) return value;
 
-    if(arg === undefined || arg === null || arg.length < 2 ) return value;
-    
-    const resultadoAvisos : any = [];
+    const RESULTADO_BUSQUEDAS: any[] = [];
+    const palabrasBusqueda = arg.toLowerCase().split(' ');  // DIVIDE EL ARGUMENTO EN PALABRAS
 
-    for(const avisos of value){
-      if(avisos.empleado && avisos.empleado.toLowerCase().indexOf(arg.toLowerCase()) > -1){
-        resultadoAvisos.push(avisos);
-      };
-    };
-    
-    return resultadoAvisos;
+    for (const resultados of value) {
+      const nombreCompleto = `${resultados.empleado_envia || ''}`.toLowerCase();
+
+      // VERIFICA SI CADA PALABRA ESTA PRESENTE EN EL NOMBRE O APELLIDO DEL USUARIO
+      const coincide = palabrasBusqueda.every((palabra: any) => nombreCompleto.includes(palabra));
+
+      if (coincide) {
+        RESULTADO_BUSQUEDAS.push(resultados);
+      }
+    }
+
+    return RESULTADO_BUSQUEDAS;
   }
 
 }

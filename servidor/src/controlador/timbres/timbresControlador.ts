@@ -73,7 +73,7 @@ class TimbresControlador {
             return res.status(500).jsonp({ message: 'error' });
         }
     }
-    
+
     // METODO PARA LISTAR MARCACIONES    **USADO
     public async ObtenerTimbres(req: Request, res: Response): Promise<any> {
         try {
@@ -394,7 +394,7 @@ class TimbresControlador {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-            
+
             // CONVERTIR FECHAS A FORMATO ACEPTADO POR POSTGRESQL
             const fec_hora_timbre_sql = DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
             const fecha_servidor_sql = DateTime.fromFormat(fecha_servidor_final, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
@@ -409,9 +409,9 @@ class TimbresControlador {
                     $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                 `,
                 [codigo, id_reloj, fec_hora_timbre_sql, fecha_servidor_sql, fecha_validada_sql,
-                 tecl_funcion, accion, observacion, latitud, longitud, ubicacion, 'APP_WEB',
-                 imagen, true, zona_servidor, gmt_servidor, zona_dispositivo, gmt_dispositivo, hora_diferente],
-            
+                    tecl_funcion, accion, observacion, latitud, longitud, ubicacion, 'APP_WEB',
+                    imagen, true, zona_servidor, gmt_servidor, zona_dispositivo, gmt_dispositivo, hora_diferente],
+
 
                 async (error, results) => {
                     console.log('error ', error);
@@ -618,123 +618,6 @@ class TimbresControlador {
 
     }
 
-    // METODO DE BUSQUEDA DE AVISOS GENERALES POR EMPLEADO
-    public async ObtenerAvisosColaborador(req: Request, res: Response) {
-        const { id_empleado } = req.params
-
-        const TIMBRES_NOTIFICACION = await pool.query(
-            `
-            SELECT id, to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, id_empleado_envia, visto, 
-                descripcion, mensaje, id_timbre, tipo, id_empleado_recibe
-            FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
-            ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
-            `
-            , [id_empleado])
-            .then(async (result: any) => {
-
-                if (result.rowCount != 0) {
-                    return await Promise.all(result.rows.map(async (obj: any): Promise<any> => {
-                        let nombre = await pool.query(
-                            `
-                            SELECT nombre, apellido FROM eu_empleados WHERE id = $1
-                            `,
-                            [obj.id_empleado_envia]
-                        ).then((ele: any) => {
-                            if (ele.rows.length > 0) {
-                                return ele.rows[0].nombre + ' ' + ele.rows[0].apellido;
-                            } else {
-                                return 'Sistema'; // Valor predeterminado si no se encuentra el registro
-                            }
-                        });
-
-                        return {
-                            id_receives_empl: obj.id_empleado_recibe,
-                            descripcion: obj.descripcion,
-                            create_at: obj.fecha_hora,
-                            id_timbre: obj.id_timbre,
-                            empleado: nombre,
-                            mensaje: obj.mensaje,
-                            visto: obj.visto,
-                            tipo: obj.tipo,
-                            id: obj.id,
-                        };
-
-
-                    }));
-                }
-                return []
-            });
-
-        if (TIMBRES_NOTIFICACION.length != 0) {
-            return res.jsonp(TIMBRES_NOTIFICACION)
-        }
-        else {
-            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
-        }
-
-
-    }
-
-    // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
-    public async ObtenerUnAviso(req: Request, res: Response): Promise<any> {
-        const id = req.params.id;
-        const AVISOS = await pool.query(
-            `
-            SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.fecha_hora, r.tipo, r.visto, 
-                r.id_timbre, r.descripcion, (e.nombre || ' ' || e.apellido) AS empleado 
-            FROM ecm_realtime_timbres AS r, eu_empleados AS e 
-            WHERE r.id = $1 AND e.id = r.id_empleado_envia
-            `
-            , [id]);
-        if (AVISOS.rowCount != 0) {
-            return res.jsonp(AVISOS.rows[0])
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        }
-    }
-
-    public async ObtenerAvisosTimbresEmpleado(req: Request, res: Response) {
-        const { id_empleado } = req.params
-        console.log(id_empleado);
-        const TIMBRES_NOTIFICACION = await pool.query(
-            `
-            SELECT * FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
-            ORDER BY fecha_hora DESC
-            `
-            , [id_empleado])
-            .then((result: any) => { return result.rows });
-
-        if (TIMBRES_NOTIFICACION.length === 0) return res.status(404).jsonp({ message: 'No se encuentran registros.' });
-        console.log(TIMBRES_NOTIFICACION);
-
-        const tim = await Promise.all(TIMBRES_NOTIFICACION.map(async (obj: any): Promise<any> => {
-            let [empleado] = await pool.query(
-                `
-                SELECT  (nombre || \' \' || apellido) AS fullname FROM eu_empleados WHERE id = $1
-                `
-                , [obj.id_empleado_envia]).then((ele: any) => {
-                    console.log('¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨', ele.rows);
-                    return ele.rows
-                })
-            const fullname = (empleado === undefined) ? '' : empleado.fullname;
-            return {
-                create_at: obj.fecha_hora,
-                descripcion: obj.descripcion,
-                visto: obj.visto,
-                id_timbre: obj.id_timbre,
-                empleado: fullname,
-                id: obj.id,
-                mensaje: obj.mensaje
-            }
-        }));
-        console.log(tim);
-
-        if (tim.length > 0) {
-            return res.jsonp(tim)
-        }
-
-    }
 
     public async ActualizarVista(req: Request, res: Response): Promise<Response> {
         try {
@@ -963,13 +846,13 @@ class TimbresControlador {
 
                 if (timbre_foto !== null && timbre_foto !== undefined)
                     nuevosDatos.push(`timbre_foto: ${timbre_foto}`);
-            
+
                 if (timbre_especial !== null && timbre_especial !== undefined)
                     nuevosDatos.push(`timbre_especial: ${timbre_especial}`);
-            
+
                 if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined)
                     nuevosDatos.push(`timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`);
-            
+
                 if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined)
                     nuevosDatos.push(`opcional_obligatorio: ${timbre_foto_obligatoria}`);
 
@@ -1195,26 +1078,26 @@ class TimbresControlador {
             let index = 2; // $1 es id_empleado
 
             if (timbre_foto !== null && timbre_foto !== undefined) {
-            fields.push(`timbre_foto = $${index++}`);
-            values.push(timbre_foto);
+                fields.push(`timbre_foto = $${index++}`);
+                values.push(timbre_foto);
                 if (!timbre_foto) timbre_foto_obligatoria = false;
             }
             if (timbre_especial !== null && timbre_especial !== undefined) {
-            fields.push(`timbre_especial = $${index++}`);
-            values.push(timbre_especial);
+                fields.push(`timbre_especial = $${index++}`);
+                values.push(timbre_especial);
             }
             if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined) {
-            fields.push(`timbre_ubicacion_desconocida = $${index++}`);
-            values.push(timbre_ubicacion_desconocida);
+                fields.push(`timbre_ubicacion_desconocida = $${index++}`);
+                values.push(timbre_ubicacion_desconocida);
             }
             if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined) {
-            fields.push(`opcional_obligatorio = $${index++}`);
-            values.push(timbre_foto_obligatoria);
+                fields.push(`opcional_obligatorio = $${index++}`);
+                values.push(timbre_foto_obligatoria);
             }
 
             if (fields.length === 0) {
-            await pool.query('ROLLBACK');
-            return res.status(400).json({ message: 'No hay campos válidos para actualizar.' });
+                await pool.query('ROLLBACK');
+                return res.status(400).json({ message: 'No hay campos válidos para actualizar.' });
             }
 
             // AGREGA EL ARREGLO DE ID DE EMPLEADOS AL PRINCIPIO DE LOS VALORES
@@ -1231,19 +1114,19 @@ class TimbresControlador {
 
             const auditoria = id_empleado.map((id: number) => {
                 const nuevosDatos: string[] = [`id_empleado: ${id}`];
-            
+
                 if (timbre_foto !== null && timbre_foto !== undefined)
                     nuevosDatos.push(`timbre_foto: ${timbre_foto}`);
-            
+
                 if (timbre_especial !== null && timbre_especial !== undefined)
                     nuevosDatos.push(`timbre_especial: ${timbre_especial}`);
-            
+
                 if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined)
                     nuevosDatos.push(`timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`);
-            
+
                 if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined)
                     nuevosDatos.push(`opcional_obligatorio: ${timbre_foto_obligatoria}`);
-            
+
                 return {
                     tabla: 'mtv_opciones_marcacion',
                     usuario: user_name,
@@ -1255,7 +1138,7 @@ class TimbresControlador {
                     observacion: null
                 };
             });
-            
+
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
             // FINALIZAR TRANSACCION
@@ -1638,6 +1521,126 @@ class TimbresControlador {
             return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
         }
     };
+
+
+    /** ************************************************************************************************** **
+     ** **                      NOTIFICACIONES DE AVISOS GENERALES DEL SISTEMA                          ** **        
+     ** ************************************************************************************************** **/
+
+    // METODO PARA LEER AVISOS QUE RECIBE EL EMPLEADO
+    public async ObtenerAvisosTimbresEmpleado(req: Request, res: Response) {
+        const { id_empleado } = req.params;
+
+        try {
+            const { rows: avisos } = await pool.query(
+                `
+                SELECT id, id_empleado_envia, id_empleado_recibe, 
+                   to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, tipo, visto, 
+                   id_timbre, descripcion, mensaje
+                FROM ecm_realtime_timbres
+                WHERE id_empleado_recibe = $1
+                ORDER BY fecha_hora DESC
+                `,
+                [id_empleado]
+            );
+
+            if (avisos.length === 0) {
+                return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+            }
+
+            const tim = await Promise.all(avisos.map(async (a) => {
+                // NOMBRE EMPLEADO QUE ENVIA
+                const { rows } = await pool.query(
+                    `
+                    SELECT (nombre || ' ' || apellido) AS fullname
+                    FROM eu_empleados
+                    WHERE id = $1
+                    `,
+                    [a.id_empleado_envia]
+                );
+
+                const fullname = rows[0]?.fullname || 'Sistema Fulltime Web';
+
+                return {
+                    create_at: a.fecha_hora,
+                    descripcion: a.descripcion,
+                    visto: a.visto,
+                    id_timbre: a.id_timbre,
+                    empleado_envia: fullname,
+                    id: a.id,
+                    mensaje: a.mensaje,
+                    tipo: a.tipo || null
+                };
+            }));
+
+            return res.jsonp(tim);
+        } catch (error) {
+            console.error('Error al obtener avisos:', error);
+            return res.status(500).jsonp({ message: 'Error interno del servidor.' });
+        }
+    }
+
+    // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA SOCKET
+    public async ObtenerUnAviso(req: Request, res: Response): Promise<any> {
+        const id = req.params.id;
+        const AVISOS = await pool.query(
+            `
+            SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, 
+                   to_char(r.fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS create_at, r.tipo, r.visto, 
+                   r.id_timbre, r.descripcion, r.mensaje,
+                   CASE 
+                       WHEN r.id_empleado_envia = 0 THEN 'Sistema Fulltime Web'
+                       ELSE COALESCE(e.nombre || ' ' || e.apellido, 'Empleado desconocido')
+                   END AS empleado
+            FROM ecm_realtime_timbres AS r
+            LEFT JOIN eu_empleados AS e ON e.id = r.id_empleado_envia
+            WHERE r.id = $1
+            `,
+            [id]
+        );
+
+        if (AVISOS.rowCount !== 0) {
+            return res.jsonp(AVISOS.rows[0]);
+        } else {
+            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        }
+    }
+
+    // METODO DE BUSQUEDA DE AVISOS GENERALES POR EMPLEADO
+    public async ObtenerAvisosColaborador(req: Request, res: Response): Promise<any> {
+        const { id_empleado } = req.params;
+
+        const result = await pool.query(
+            `
+            SELECT 
+                r.id,
+                to_char(r.fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS create_at,
+                r.id_empleado_envia,
+                r.id_empleado_recibe AS id_receives_empl,
+                r.visto,
+                r.descripcion,
+                r.mensaje,
+                r.id_timbre,
+                r.tipo,
+                CASE 
+                    WHEN r.id_empleado_envia = 0 THEN 'Sistema Fulltime Web'
+                    ELSE COALESCE(e.nombre || ' ' || e.apellido, 'Empleado desconocido')
+                END AS empleado
+            FROM ecm_realtime_timbres r
+            LEFT JOIN eu_empleados e ON e.id = r.id_empleado_envia
+            WHERE r.id_empleado_recibe = $1 
+            ORDER BY (r.visto IS FALSE) DESC, r.id DESC 
+            LIMIT 20
+            `,
+            [id_empleado]
+        );
+
+        if (result.rowCount !== 0) {
+            return res.jsonp(result.rows);
+        } else {
+            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+        }
+    }
 
 }
 

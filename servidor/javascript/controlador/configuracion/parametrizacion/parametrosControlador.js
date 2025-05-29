@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PARAMETROS_CONTROLADOR = void 0;
+const reiniciraTareasAutomaticas_1 = require("../../../libs/reiniciraTareasAutomaticas");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
@@ -98,6 +99,7 @@ class ParametrosControlador {
             try {
                 const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
+                console.log("id eliminar detalle parametro: ", id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
@@ -134,6 +136,9 @@ class ParametrosControlador {
                 });
                 //FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
+                console.log("datos originales: ", datosOriginales);
+                // REINICIAR TAREAS AUTOMATICAS
+                yield (0, reiniciraTareasAutomaticas_1.reiniciarTareasAutomaticas)(datosOriginales.id_parametro);
                 return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (_a) {
@@ -167,7 +172,9 @@ class ParametrosControlador {
                 });
                 //FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro exitoso.' });
+                // REINICIAR TAREAS AUTOMATICAS
+                (0, reiniciraTareasAutomaticas_1.reiniciarTareasAutomaticas)(id_tipo);
+                return res.jsonp({ message: 'Registro exitoso.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -219,6 +226,8 @@ class ParametrosControlador {
                 });
                 //FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
+                // REINICIAR TAREAS AUTOMATICAS
+                (0, reiniciraTareasAutomaticas_1.reiniciarTareasAutomaticas)(datosOriginales.id_parametro);
                 return res.jsonp({ message: 'Registro exitoso.' });
             }
             catch (error) {

@@ -63,6 +63,9 @@ class UsuarioRutas {
         this.router.post('/usuario-departamento/multiple', TokenValidation, USUARIO_CONTROLADOR.RegistrarUsuarioDepartamentoMultiple);
         //METODO PARA DEVOLVER STRING ENCRIPTADO
         this.router.post('/datos-usuario', TokenValidation, USUARIO_CONTROLADOR.ObtenerDatoEncriptado);
+        //METODO PARA DEVOLVER LOS DATOS DEL EMPLEADO PARA LA ASIGNACION DE ACCION PERSONAL **USADO
+        this.router.get('/infoEmpleado/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerInformacionUsuario) 
+
         //--------------------------------------------------------------------------------------------------------------------------------------
         // METODOS PARA APP MOVIL
         this.router.get('/IDdispositivos/:id_empleado',TokenValidation,  USUARIO_CONTROLADOR.getidDispositivo);

@@ -1,6 +1,6 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -94,13 +94,7 @@ export class LoginComponent implements OnInit {
     if (form.passwordF.trim().length === 0) return;
     if (form.empresaF.trim().length === 0) return;
 
-    //Inicio Encriptacion código empresarial
-    console.log('empresaF: ', form.empresaF, ' ', form.empresaF.length);
-    //this.datoEncriptado = this.rsaKeysService.encriptarLogin(form.empresaF.toString());
-    //console.log('Encrypted Data:', this.datoEncriptado, ' ', this.datoEncriptado.length);
-    //Fin Encriptacion código empresarial
-
-    //Codigo empresarial encriptado a JSON para uso con servicio
+    // CODIGO EMPRESARIAL ENCRIPTADO A JSON PARA USO CON SERVICIO
     let empresas = {
       "codigo_empresa": form.empresaF.toString()
     };
@@ -108,15 +102,13 @@ export class LoginComponent implements OnInit {
     //VALIDACION DE EMPRESA PARA DIRECCIONAMIENTO
     this.rest.getEmpresa(empresas).subscribe(
       {
-        next: (v) =>
-        {
+        next: (v) => {
           //GUARDAMOS IP O DEVOLVEMOS ERROR
           this.mensaje = v;
           if (this.mensaje.message === 'ok') {
-            console.log("empresaURL: ", this.mensaje.empresas[0].empresa_direccion);
+            //console.log("empresaURL: ", this.mensaje.empresas[0].empresa_direccion);
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
-            console.log('datos empresa: ', this.mensaje.empresas[0].movil_socket_direccion);
-
+            //console.log('datos empresa: ', this.mensaje.empresas[0].movil_socket_direccion);
             const nuevaUrlSocket = this.mensaje.empresas[0].movil_socket_direccion;
             localStorage.setItem('socketURL', nuevaUrlSocket);
             this.urlService.updateSocketUrl(nuevaUrlSocket);
@@ -127,18 +119,15 @@ export class LoginComponent implements OnInit {
             });
           }
         },
-        error: (e) =>
-        {
-          //En caso de error, devolvemos error
+        error: (e) => {
+          // EN CASO DE ERROR, DEVOLVEMOS ERROR
           this.toastr.error('Verifique código empresarial', 'Error.', {
             timeOut: 3000,
           });
         },
-        complete: () =>
-        {
-          //TRAS VALIDACION CORRECTA DE EMPRESA, CONTINUA EL PROCESO NORMAL DE LOGIN
-          console.log('CONTINUAR LOGIN');
-          //LOGIN
+        complete: () => {
+          // TRAS VALIDACION CORRECTA DE EMPRESA, CONTINUA EL PROCESO NORMAL DE LOGIN
+          // LOGIN
           var local: boolean;
           this.intentos = this.intentos + 1;
 
@@ -165,7 +154,7 @@ export class LoginComponent implements OnInit {
               timeOut: 3000,
             });
           }
-          //FIN LOGIN
+          // FIN LOGIN
         }
       }
     );
@@ -173,7 +162,6 @@ export class LoginComponent implements OnInit {
 
   // METODO PARA INICIAR SESION
   async IniciarSesion(form: any) {
-    console.log('IniciarSesion');
     // CIFRADO DE CONTRASENA
     let clave = form.passwordF.toString();
 
@@ -182,11 +170,9 @@ export class LoginComponent implements OnInit {
       pass: clave,
       movil: false
     };
-    console.log('dataUsuario', dataUsuario);
 
     try {
       const datos = await this.rest.ValidarCredenciales(dataUsuario);
-      console.log('res login ', datos)
 
       if (datos.message === 'error') {
         const f = DateTime.now();
@@ -240,8 +226,6 @@ export class LoginComponent implements OnInit {
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
         });
-
-        // await this.socketService.connectSocket();
 
         if (!!localStorage.getItem("redireccionar")) {
           let redi = localStorage.getItem("redireccionar");

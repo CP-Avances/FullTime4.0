@@ -141,7 +141,8 @@ export class TimbresService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
-  AvisosTimbresRealtime(id_empleado: number) {
+  // LISTA DE AVISOS
+  ListarAvisos(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/avisos/${id_empleado}`);
   }
 
