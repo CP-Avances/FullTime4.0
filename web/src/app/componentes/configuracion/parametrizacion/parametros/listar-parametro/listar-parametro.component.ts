@@ -259,7 +259,7 @@ export class ListarParametroComponent implements OnInit {
                 border: [true, true, false, true] 
               },
               { 
-                text: `CÓDIGO: ${obj.id}`, 
+                text: `CÓDIGO PARÁMETRO: ${obj.id}`, 
                 style: 'itemsTableInfo', 
                 alignment: 'right', 
                 border: [false, true, true, true] 
@@ -272,11 +272,11 @@ export class ListarParametroComponent implements OnInit {
         n.push({
           style: 'tableMargin',
           table: {
-            widths: ['auto', '*', '*'],
+            widths: ['15%', '*', '*'],
             headerRows: 1,
             body: [
               [
-                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'CÓDIGO DETALLE', style: 'tableHeader' },
                 { text: 'DETALLE', style: 'tableHeader' },
                 { text: 'DESCRIPCIÓN', style: 'tableHeader' },
               ],
@@ -366,7 +366,7 @@ export class ListarParametroComponent implements OnInit {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "codigo", width: 10 },
+      { key: "codigo", width: 25 },
       { key: "parametro", width: 50 },
       { key: "detalle", width: 20 },
       { key: "descripcion", width: 160 },
@@ -375,7 +375,7 @@ export class ListarParametroComponent implements OnInit {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO PARAMETRO", totalsRowLabel: "Total:", filterButton: false },
       { name: "PARÁMETRO", totalsRowLabel: "Total:", filterButton: true },
       { name: "DETALLE", totalsRowLabel: "", filterButton: true },
       { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
@@ -424,7 +424,7 @@ export class ListarParametroComponent implements OnInit {
   private obtenerAlineacionHorizontalEmpleados(
     j: number
   ): "left" | "center" | "right" {
-    if (j === 1 || j === 9 || j === 10 || j === 11) {
+    if (j === 1 || j === 2 || j === 9 || j === 10 || j === 11) {
       return "center";
     } else {
       return "left";
@@ -445,7 +445,7 @@ export class ListarParametroComponent implements OnInit {
     // 3. Agregar encabezados de las columnas
     worksheet.columns = [
       { header: 'n', key: 'n', width: 10 },
-      { header: 'codigo', key: 'codigo', width: 10 },
+      { header: 'codigoParametro', key: 'codigo', width: 10 },
       { header: 'parametro', key: 'parametro', width: 30 },
       { header: 'detalle', key: 'detalle', width: 15 },
       { header: 'descripcion', key: 'descripcion', width: 15 }
@@ -493,7 +493,7 @@ export class ListarParametroComponent implements OnInit {
       let detalles: any = [];
       obj.detalles.forEach((det: any) => {
         detalles.push({
-          "$": { "id": det.id },
+          "$": { "codigo": det.id },
           "detalle": det.descripcion,
           "descripcion": det.observacion
         });

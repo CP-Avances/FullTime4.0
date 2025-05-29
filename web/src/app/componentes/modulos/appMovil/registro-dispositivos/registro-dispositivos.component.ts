@@ -436,7 +436,6 @@ export class RegistroDispositivosComponent implements OnInit {
    ** ********************************************************************************* **/
 
   async generarExcel() {
-    console.log("this.logo: ", this.logo)
     let datos: any[] = [];
     let n: number = 1;
 

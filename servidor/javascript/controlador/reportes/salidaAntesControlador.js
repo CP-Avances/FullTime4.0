@@ -54,6 +54,7 @@ const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, id_empleado) {
         ORDER BY ag.fecha_hora_horario ASC
         `, [fec_inicio, fec_final, id_empleado])
             .then(res => {
+            console.log('Resultado BuscarSalidasAnticipadas:', res.rows);
             return res.rows;
         });
     });

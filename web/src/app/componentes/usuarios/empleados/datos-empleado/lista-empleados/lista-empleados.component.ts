@@ -1004,7 +1004,7 @@ export class ListaEmpleadosComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Empleados");
 
 
-    console.log("ver logo. ", this.logo)
+    
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",

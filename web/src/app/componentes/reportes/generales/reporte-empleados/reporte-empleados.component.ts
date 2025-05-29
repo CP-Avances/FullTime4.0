@@ -524,7 +524,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     n.push({
       style: 'tableMargin',
       table: {
-        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto','auto','auto','auto'],
+        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto','auto','auto',94],
         headerRows: 1,
         body: [
           [
@@ -558,7 +558,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
               { style: 'itemsTableCentrado', text: usu.departamento },
               { style: 'itemsTableCentrado', text: usu.cargo },
               { style: 'itemsTableCentrado', text: usu.rol },
-              { style: 'itemsTable', text: usu.correo }
+              { style: 'itemsTable', text: usu.correo,  noWrap: false}
             ];
           })
         ]
@@ -666,7 +666,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "identificacion", width: 20 },
-      { key: "codigo", width: 30 },
+      { key: "codigo", width: 20 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
       { key: "usuario", width: 20 },
@@ -677,7 +677,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       { key: "regimen", width: 20 },
       { key: "departamento", width: 20 },
       { key: "cargo", width: 20 },
-      { key: "rol", width: 20 },
+      { key: "rol", width: 30 },
       { key: "correo", width: 35 },
     ]
 
@@ -715,7 +715,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 12; j++) {
+      for (let j = 1; j <= 15; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };

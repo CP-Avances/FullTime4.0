@@ -322,7 +322,7 @@ export class VistaRolesComponent implements OnInit {
             widths: ['*'],
             headerRows: 1,
             body: [
-              [{ rowSpan: 1, text: 'FUNCIONES DEL SISTEMA ASIGNADAS', style: 'tableHeader', border: [true, true, true, false] }],
+              [{ rowSpan: 1, text: 'FUNCIONES DEL SISTEMA ASIGNADAS', style: 'tableHeader', border: [true, true, true, true] }],
             ]
           }
         });

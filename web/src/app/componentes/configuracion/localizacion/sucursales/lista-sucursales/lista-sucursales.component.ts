@@ -381,7 +381,6 @@ export class ListaSucursalesComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Sucursales");
 
 
-    console.log("ver logo. ", this.logo)
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
