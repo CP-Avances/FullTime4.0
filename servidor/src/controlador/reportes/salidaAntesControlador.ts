@@ -45,9 +45,9 @@ export const BuscarSalidasAnticipadas = async function (fec_inicio: string, fec_
             FROM 
                 eu_asistencia_general ag
             JOIN 
-                contrato_cargo_vigente AS cv ON cv.id_cargo = ag.id_empleado_cargo
+                cargos_empleado AS car ON car.id_cargo = ag.id_empleado_cargo
             JOIN 
-                eu_empleado_contratos AS ec ON cv.id_contrato = ec.id
+                eu_empleado_contratos AS ec ON car.id_contrato = ec.id
             WHERE 
                 ag.fecha_hora_horario::DATE BETWEEN $1::DATE AND $2::DATE
                 AND ag.id_empleado = $3

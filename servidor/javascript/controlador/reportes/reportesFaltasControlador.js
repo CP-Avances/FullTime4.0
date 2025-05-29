@@ -47,9 +47,9 @@ const BuscarFaltas = function (fec_inicio, fec_final, id_empleado) {
             FROM 
                 eu_asistencia_general ag
             JOIN 
-                contrato_cargo_vigente AS cv ON cv.id_cargo = ag.id_empleado_cargo
+                cargos_empleado AS car ON car.id_cargo = ag.id_empleado_cargo
             JOIN 
-                eu_empleado_contratos AS ec ON cv.id_contrato = ec.id
+                eu_empleado_contratos AS ec ON car.id_contrato = ec.id
             WHERE 
                 ag.fecha_horario BETWEEN $1 AND $2
                 AND ag.id_empleado = $3

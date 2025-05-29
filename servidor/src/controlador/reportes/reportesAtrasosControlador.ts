@@ -44,9 +44,9 @@ export const BuscarAtrasos = async function (fec_inicio: string, fec_final: stri
                 ag.tipo_dia
             FROM eu_asistencia_general AS ag
             JOIN 
-                contrato_cargo_vigente AS cv ON cv.id_cargo = ag.id_empleado_cargo
+                cargos_empleado AS car ON car.id_cargo = ag.id_empleado_cargo
             JOIN 
-                eu_empleado_contratos AS ec ON cv.id_contrato = ec.id
+                eu_empleado_contratos AS ec ON car.id_contrato = ec.id
             WHERE ag.fecha_hora_horario >= $1::timestamp
                 AND ag.fecha_hora_horario < ($2::timestamp + INTERVAL '1 day')
                 AND ag.id_empleado = $3
