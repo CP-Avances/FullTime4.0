@@ -149,6 +149,10 @@ export class CrearPedidoAccionComponent implements OnInit {
   //Formulario 4 posesion
   cedualF = new FormControl("");
   fechaPosesionFor = new FormControl("");
+  actaFinalForm = new FormControl("");
+  fechaActaFinalForm = new FormControl("");
+  abrevServidorPubli = new FormControl("");
+  idEmpleadoSP = new FormControl("");
 
   //Formulario 5 responsables aprovacion
   abrevHA = new FormControl("");
@@ -227,11 +231,14 @@ export class CrearPedidoAccionComponent implements OnInit {
     habilitarForm4: this.habilitarForm4
   });
   public fourthFormGroup = new FormGroup({
-
     funcionarioForm: this.funcionarioF,
     cedulaForm: this.cedualF,
     lugar_trabajo: this.idCiudad,
-    fechaPosesionForm: this.fechaPosesionFor
+    fechaPosesionForm: this.fechaPosesionFor,
+    actaFinalForm: this.actaFinalForm,
+    fechaActaFinalForm: this.fechaActaFinalForm,
+    abrevServidorPubliForm: this.abrevServidorPubli,
+    idEmpleadoSPForm: this.idEmpleadoSP
   });
   public fivethFormGroup = new FormGroup({
 
@@ -811,176 +818,200 @@ export class CrearPedidoAccionComponent implements OnInit {
       informacion: form1.funcionarioForm.toUpperCase(),
     };
     
+    //Talento humano
     let datos2 = {
-      informacion: form5.idEmpleadoHForm.toUpperCase(),
+      informacion: form5.idEmpleadoRAForm.toUpperCase(),
     };
+    //Delegado
     let datos3 = {
-      informacion: form5.idEmpleadoGForm.toUpperCase(),
-    };
-    let datos4 = {
       informacion: form5.idEmpleadoRForm.toUpperCase(),
     };
+    //Servidor publico
+    let datos4 = {
+      informacion: form5.idEmpleadoHForm.toUpperCase(),
+    };
+    
+    //Caso negativa
+    let datos5 = {
+      informacion: form5.idEmpleadoGForm.toUpperCase(),
+    }
+
+    //Responsable elaboracion
+    let datos6 = {
+      informacion: form5.idEmpleadoRNAForm.toUpperCase(),
+    }
+    //Responsable revision
+    let datos7 = {
+      informacion: form5.idEmpleadoRNForm.toUpperCase(),
+    }
+    //Responsable control
+    let datos8 = {
+      informacion: form5.idEmpleadoRRCForm.toUpperCase(),
+    }
 
     const ahora = new Date();
     const horaActual = ahora.toTimeString().split(' ')[0];
 
     //BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA EL PEDIDO DE ACCION DE PERSONAL
     this.restE.BuscarEmpleadoNombre(datos1).subscribe((empl1) => {
+      console.log('empl1: ',empl1)
       var idEmpl_pedido = empl1[0].id;
       
       // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
       this.restE.BuscarEmpleadoNombre(datos2).subscribe((empl2) => {
-        var idEmpl_firmaH = empl2[0].id;
+        var idEmpl_firmaTH = empl2[0].id;
+        var Empl_firmaTH_cargo = empl2[0].cargo
 
         // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA SEGUNDA FIRMA
         this.restE.BuscarEmpleadoNombre(datos3).subscribe((empl3) => {
           var idEmpl_firmaG = empl3[0].id;
+          var Empl_firmaG_cargo = empl3[0].cargo
 
           this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
-            var idEmpl_responsable = empl4[0].id;
+            var idEmpl_firmaS = empl4[0].id;
+            var Empl_firmaS_cargo = empl4[0].cargo
 
-            console.log('form3.idCiudadPropuestaForm: ',form3.idCiudadPropuestaForm)
+            this.restE.BuscarEmpleadoNombre(datos6).subscribe((empl5) => {
+              var idEmpl_firmaRE = empl5[0].id;
+              var Empl_firmaRE_cargo = empl5[0].cargo
 
-            let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
-            let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
-            let unidad_admi_actual = this.departamentos.find(item => item.nombre === form3.DepartamentoForm)
-            let sucursal_actual = this.sucursal.find(item => item.nombre === form3.sucursalForm);
-            let lugar_trabajo_actual =  this.ObtenerIdCiudadSeleccionada(form3.idCiudadForm);
-            let cargo_actual = this.cargos.find(item => item.cargo === form3.tipoCargoForm);
-            let grupo_ocupacional_actual = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalForm)
-            let grado_actual = this.grados.find(item => item.descripcion === form3.gradoForm);
+              this.restE.BuscarEmpleadoNombre(datos7).subscribe((empl6) => {
+                var idEmpl_firmaRR = empl6[0].id;
+                var Empl_firmaRR_cargo = empl6[0].cargo
 
-            let procesoPropuesto = this.procesos.find(item => item.nombre === form3.procesoPropuestoForm);
-            let nivel_gestion_propuesto = this.departamentos.find(item => item.nombre === form3.NivelDepaPropuestoForm)
-            let unidad_admi_propuesto = this.departamentos.find(item => item.nombre === form3.DepartamentoPropuestoForm)
-            let sucursal_propuesto = this.sucursal.find(item => item.nombre === form3.sucursalPropuestoForm);
-            let lugar_trabajo_propuesto = form3.idCiudadPropuestaForm != '' ? this.ObtenerIdCiudadSeleccionada(form3.idCiudadPropuestaForm) : undefined;
-            let cargo_propuesto = this.cargos.find(item => item.cargo === form3.tipoCargoPropuestoForm);
-            let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
-            let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
+                this.restE.BuscarEmpleadoNombre(datos8).subscribe((empl7) => {
+                  var idEmpl_firmaRC = empl7[0].id;
+                  var Empl_firmaRC_cargo = empl7[0].cargo
 
+                    let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
+                    let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
+                    let unidad_admi_actual = this.departamentos.find(item => item.nombre === form3.DepartamentoForm)
+                    let sucursal_actual = this.sucursal.find(item => item.nombre === form3.sucursalForm);
+                    let lugar_trabajo_actual = this.ObtenerIdCiudadSeleccionada(form3.idCiudadForm);
+                    let cargo_actual = this.cargos.find(item => item.cargo === form3.tipoCargoForm);
+                    let grupo_ocupacional_actual = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalForm)
+                    let grado_actual = this.grados.find(item => item.descripcion === form3.gradoForm);
 
-            // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
-            let datosAccion = {
+                    let procesoPropuesto = this.procesos.find(item => item.nombre === form3.procesoPropuestoForm);
+                    let nivel_gestion_propuesto = this.departamentos.find(item => item.nombre === form3.NivelDepaPropuestoForm)
+                    let unidad_admi_propuesto = this.departamentos.find(item => item.nombre === form3.DepartamentoPropuestoForm)
+                    let sucursal_propuesto = this.sucursal.find(item => item.nombre === form3.sucursalPropuestoForm);
+                    let lugar_trabajo_propuesto = form3.idCiudadPropuestaForm != '' ? this.ObtenerIdCiudadSeleccionada(form3.idCiudadPropuestaForm) : undefined;
+                    let cargo_propuesto = this.cargos.find(item => item.cargo === form3.tipoCargoPropuestoForm);
+                    let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
+                    let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
 
-              //parte formulario 1
-              formulario1: {
-                numero_accion_personal: form1.identificacionForm,
-                fecha_elaboracion: form1.fechaForm,
-                hora_elaboracion: horaActual,
-                id_empleado_personal: idEmpl_pedido,
-                fecha_rige_desde: form1.fechaRigeDeseForm,
-                fecha_rige_hasta: form1.fechaRigeHastaForm,
-              },
+                    // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
+                    let datosAccion = {
 
-              //parte formulario 2
-              formulario2: {
-                id_tipo_accion_personal: form2.idTipoAccionFom,
-                detalle_otro: form2.otroAccionForm,
-                especificacion: form2.otroEspecificacion,
-                declaracion_jurada: form2.declaracionJuradaForm,
-                adicion_base_legal: form2.baseLegalForm,
-                observacion: form2.observacionForm,
-              },
+                      //parte formulario 1
+                      formulario1: {
+                        numero_accion_personal: form1.identificacionForm,
+                        fecha_elaboracion: form1.fechaForm,
+                        hora_elaboracion: horaActual,
+                        id_empleado_personal: idEmpl_pedido,
+                        fecha_rige_desde: form1.fechaRigeDeseForm,
+                        fecha_rige_hasta: form1.fechaRigeHastaForm,
+                      },
 
-              //parte formulario 3
-              formulario3: {
-                id_proceso_actual: procesoActual != undefined ? procesoActual.id : null,
-                id_nivel_gestion_actual: nivel_gestion_actual != undefined ? nivel_gestion_actual.id : null,
-                id_unidad_administrativa: unidad_admi_actual != undefined ? unidad_admi_actual.id : null,
-                id_sucursal_actual: sucursal_actual != undefined ? sucursal_actual.id : null,
-                id_lugar_trabajo_actual: lugar_trabajo_actual != undefined ? lugar_trabajo_actual : null,
-                id_tipo_cargo_actual: cargo_actual != undefined ? cargo_actual.id : null,
-                id_grupo_ocupacional_actual: grupo_ocupacional_actual != undefined ? grupo_ocupacional_actual.id : null,
-                id_grado_actual: grado_actual != undefined ? grado_actual.id : null,
-                remuneracion_actual: form3.sueldoForm,
-                partida_individual_actual: form3.actaForm,
+                      //parte formulario 2
+                      formulario2: {
+                        id_tipo_accion_personal: form2.idTipoAccionFom,
+                        detalle_otro: form2.otroAccionForm,
+                        especificacion: form2.otroEspecificacion,
+                        declaracion_jurada: form2.declaracionJuradaForm,
+                        adicion_base_legal: form2.baseLegalForm,
+                        observacion: form2.observacionForm,
+                      },
 
-                id_proceso_propuesto: procesoPropuesto != undefined ? procesoPropuesto.id : null,
-                id_nivel_gestion_propuesto: nivel_gestion_propuesto != undefined ? nivel_gestion_propuesto.id : null,
-                id_unidad_administrativa_propuesta: unidad_admi_propuesto != undefined ? unidad_admi_propuesto.id : null,
-                id_sucursal_propuesta: sucursal_propuesto != undefined ? sucursal_propuesto.id : null,
-                id_lugar_trabajo_propuesto: lugar_trabajo_propuesto != undefined ? lugar_trabajo_propuesto : null,
-                id_tipo_cargo_propuesto: cargo_propuesto != undefined ? cargo_propuesto.id : null,
-                id_grupo_ocupacional_propuesto: grupo_ocupacional_propuesto != undefined ? grupo_ocupacional_propuesto.id : null,
-                id_grado_propuesto: grado_propuesto != undefined ? grado_propuesto.id : null,
-                remuneracion_propuesta: form3.sueldoPropuestoForm,
-                partida_individual_propuesta: form3.actaPropuestaFom,
-              },
-              
-              //parte formulario 4
-              formulario4: {
-                funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
-                cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
-                lugar_trabajo: form3.habilitarForm4 ? form4.lugar_trabajo : null,
-                fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null
-              },
+                      //parte formulario 3
+                      formulario3: {
+                        id_proceso_actual: procesoActual != undefined ? procesoActual.id : null,
+                        id_nivel_gestion_actual: nivel_gestion_actual != undefined ? nivel_gestion_actual.id : null,
+                        id_unidad_administrativa: unidad_admi_actual != undefined ? unidad_admi_actual.id : null,
+                        id_sucursal_actual: sucursal_actual != undefined ? sucursal_actual.id : null,
+                        id_lugar_trabajo_actual: lugar_trabajo_actual != undefined ? lugar_trabajo_actual : null,
+                        id_tipo_cargo_actual: cargo_actual != undefined ? cargo_actual.id : null,
+                        id_grupo_ocupacional_actual: grupo_ocupacional_actual != undefined ? grupo_ocupacional_actual.id : null,
+                        id_grado_actual: grado_actual != undefined ? grado_actual.id : null,
+                        remuneracion_actual: form3.sueldoForm,
+                        partida_individual_actual: form3.actaForm,
 
-              //parte formulario 5
-              formulario5: {
-                abrevia_talentoHunamo: form5.abrevHAForm,
-                firma_talentoHumano: form5.idEmpleadoRAForm,
-                abrevia_delegado: form5.abrevGAForm,
-                firma_delegado: form5.idEmpleadoRForm,
-                abrevia_servidorPublico: form5.abrevHForm,
-                firma_servidorPublico: form5.idEmpleadoHForm,
-                fecha_servidorPublico: form5.fechaServidorForm,
+                        id_proceso_propuesto: procesoPropuesto != undefined ? procesoPropuesto.id : null,
+                        id_nivel_gestion_propuesto: nivel_gestion_propuesto != undefined ? nivel_gestion_propuesto.id : null,
+                        id_unidad_administrativa_propuesta: unidad_admi_propuesto != undefined ? unidad_admi_propuesto.id : null,
+                        id_sucursal_propuesta: sucursal_propuesto != undefined ? sucursal_propuesto.id : null,
+                        id_lugar_trabajo_propuesto: lugar_trabajo_propuesto != undefined ? lugar_trabajo_propuesto : null,
+                        id_tipo_cargo_propuesto: cargo_propuesto != undefined ? cargo_propuesto.id : null,
+                        id_grupo_ocupacional_propuesto: grupo_ocupacional_propuesto != undefined ? grupo_ocupacional_propuesto.id : null,
+                        id_grado_propuesto: grado_propuesto != undefined ? grado_propuesto.id : null,
+                        remuneracion_propuesta: form3.sueldoPropuestoForm,
+                        partida_individual_propuesta: form3.actaPropuestaFom,
+                      },
 
-                abrevia_negativa: form5.abrevGForm,
-                firma_negativa: form5.idEmpleadoGForm,
-                fecha_negativa: form5.fechaNegativaF,
-                razon_negativa: form5.razonForm,
+                      //parte formulario 4
+                      formulario4: {
+                        funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
+                        cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
+                        lugar_posesion: form3.habilitarForm4 ? form4.lugar_trabajo : null,
+                        fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
+                        actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
+                        fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
+                        abreviaSP: form3.habilitarForm4 ? form4.abrevServidorPubliForm : null,
+                        firma_servidorPublico: form3.habilitarForm4 ? form4.idEmpleadoSPForm : null,
+                      },
 
-                abrevia_RespElaboracion: form5.abrevRGForm,
-                firma_RespElaboracion: form5.idEmpleadoRNAForm,
-                abrevia_RespRevision: form5.abrevRHForm,
-                firma_RespRevision: form5.idEmpleadoRNForm,
-                abrevia_RespRegistro_control: form5.abrevRRCForm,
-                firma_RespRegistro_control: form5.idEmpleadoRRCForm,
-              },      
+                      //parte formulario 5
+                      formulario5: {
+                        abrevia_talentoHunamo: form5.abrevHAForm,
+                        firma_talentoHumano: idEmpl_firmaTH,
+                        cargo_talentoHumano: Empl_firmaTH_cargo,
+                        abrevia_delegado: form5.abrevGAForm,
+                        firma_delegado: idEmpl_firmaG,
+                        cargo_delegado: Empl_firmaG_cargo,
+                        abrevia_servidorPublico: form5.abrevHForm,
+                        firma_servidorPublico: idEmpl_firmaS,
+                        cargo_servidorPublico: Empl_firmaS_cargo,
+                        fecha_servidorPublico: form5.fechaServidorForm,
 
-              //parte formulario 6
-              formulario6: {
-                ComunicacionElect: form6.ComunicacionElectForm,
-                fechaComunicacion: form6.fechaReempForm,
-                horaComunicado: form6.horaComunicadoForm,
-                medioComunicacionForm: form6.medioComunicacionForm,
-                abrevCForm: form6.abrevCForm,
-                firma_Resp_Notificacion: form6.idEmpleadoCForm,
-              },
+                        abrevia_negativa: form5.abrevGForm,
+                        firma_negativa: form5.idEmpleadoGForm,
+                        fecha_negativa: form5.fechaNegativaF,
+                        razon_negativa: form5.razonForm,
 
-              user_name: this.user_name,
-              ip: this.ip, ip_local: this.ips_locales,
-            };
+                        abrevia_RespElaboracion: form5.abrevRGForm,
+                        firma_RespElaboracion: idEmpl_firmaRE,
+                        cargo_RespElaboracion: Empl_firmaRE_cargo,
+                        abrevia_RespRevision: form5.abrevRHForm,
+                        firma_RespRevision: idEmpl_firmaRR,
+                        cargo_RespRevision: Empl_firmaRR_cargo,
+                        abrevia_RespRegistro_control: form5.abrevRRCForm,
+                        firma_RespRegistro_control: idEmpl_firmaRC,
+                        cargo_RespRegistro_control: Empl_firmaRC_cargo,
+                      },
 
-            console.log("informacion", datosAccion);
+                      //parte formulario 6
+                      formulario6: {
+                        ComunicacionElect: form6.ComunicacionElectForm,
+                        fechaComunicacion: form6.fechaReempForm,
+                        horaComunicado: form6.horaComunicadoForm,
+                        medioComunicacionForm: form6.medioComunicacionForm,
+                        abrevCForm: form6.abrevCForm,
+                        firma_Resp_Notificacion: form6.idEmpleadoCForm,
+                      },
 
-            // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
-            if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
-              //datosAccion.primera_fecha_reemp = null;
-            }
+                      user_name: this.user_name,
+                      ip: this.ip, ip_local: this.ips_locales,
+                    };
 
-            if (form2.fechaHastaForm === "" || form2.fechaHastaForm === null) {
-              //datosAccion.fecha_rige_hasta = null;
-              //console.log("informacion", datosAccion);
+                    console.log("informacion", datosAccion);
+                    this.ValidacionesIngresos(form1, form2, datosAccion);
 
-              //this.ValidacionesIngresos(form1, form2, datosAccion);
-            } else {
-              if (
-                Date.parse(form2.fechaDesdeForm) <
-                Date.parse(form2.fechaHastaForm)
-              ) {
-                //this.ValidacionesIngresos(form1, form2, datosAccion);
-              } else {
-                this.toastr.info(
-                  "Las fechas ingresadas no son las correctas.",
-                  "Revisar los datos ingresados.",
-                  {
-                    timeOut: 6000,
-                  }
-                );
-              }
-            }
+                })
+
+              })
+
+            })
 
           })
 
@@ -1015,7 +1046,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       form2.tipoCargoForm === undefined
     ) {
       console.log("INGRESA 5", datosAccion);
-
+      this.GuardarDatos(datosAccion);
     } else {
       console.log("INGRESA 9", datosAccion);
       this.GuardarDatos(datosAccion);

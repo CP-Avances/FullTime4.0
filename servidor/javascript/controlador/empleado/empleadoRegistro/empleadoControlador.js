@@ -1008,7 +1008,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { informacion } = req.body;
             const EMPLEADO = yield database_1.default.query(`
-      SELECT * FROM eu_empleados WHERE
+      SELECT * FROM informacion_general WHERE
       (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
       `, [informacion]);
             if (EMPLEADO.rowCount != 0) {
