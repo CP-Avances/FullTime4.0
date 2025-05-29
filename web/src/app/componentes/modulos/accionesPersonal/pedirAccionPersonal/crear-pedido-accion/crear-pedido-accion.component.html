@@ -128,7 +128,7 @@
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-end">
-                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right">Siguiente</button>
+                    <button mat-raised-button matStepperNext [disabled]="btnForm1" id="btn-raised" class="float-right">Siguiente</button>
                 </div>
             </mat-step>
             <!-- ****************************** SEGUNDO FORMULARIO ******************************************* -->
@@ -144,9 +144,9 @@
                             <span>TIPO DE ACCION (Configuracion de tipo de accion, al seleccionar el tipo de accion OTRO
                                 se mostrara la informacion ingresada en el campo OTRO)</span>
                         </div>
-                        <div class="col-md">
+                        <div class="col-11 col-md-6">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field style="width: 50%;">
+                                <mat-form-field>
                                     <mat-label>Tipo de acción</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idTipoAccion"
                                         [matAutocomplete]="auto2" required>
@@ -179,7 +179,7 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-8">
+                        <div class="col-12 col-md-8">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 85%;">
                                     <mat-label>En caso de requerir especificación:</mat-label>
@@ -261,16 +261,16 @@
                 </ng-template>
                 <form [formGroup]="thirdFormGroup">
                     <div class="row">
-                        <div class="col-5">
+                        <div class="col-12 col-md-5">
                             <div class="subtitulo">
                                 <span>SITUACION ACTUAL (Datos tomados desde la ficha del empleado)</span>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label class="letra">Proceso</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="tipoProcesoF"
-                                            [matAutocomplete]="auto3" readonly>
+                                            [matAutocomplete]="auto3" readonly required>
                                         <mat-autocomplete #auto3="matAutocomplete">
                                             <mat-option *ngFor="let option of filtroProceso | async"
                                                 [value]="option.nombre">
@@ -282,7 +282,7 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Sucursal</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idSucursal"
                                             [matAutocomplete]="auto4" readonly>
@@ -297,10 +297,10 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Nivel o unidad de gestión</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idDepa"
-                                            [matAutocomplete]="auto5" required>
+                                            [matAutocomplete]="auto5">
                                         <mat-autocomplete #auto5="matAutocomplete">
                                             <mat-option *ngFor="let option of filtroDepartamentos | async"
                                                 [value]="option.nombre">
@@ -312,10 +312,10 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label class="letra">Unidad Administrativa</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idDepaActual"
-                                            [matAutocomplete]="auto6">
+                                            [matAutocomplete]="auto6" readonly>
                                         <mat-autocomplete #auto6="matAutocomplete">
                                             <mat-option *ngFor="let option of filtroDeparAdministrativaProuesta | async"
                                                 [value]="option.nombre">
@@ -327,7 +327,7 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label class="letra">Lugar de trabajo</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idCiudad"
                                             [matAutocomplete]="auto7" readonly>
@@ -342,7 +342,7 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Grupo Ocupacional</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="grupoOcupacionalF" [matAutocomplete]="auto8" readonly>
@@ -358,22 +358,28 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Grado</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="gradoF"
-                                            [matAutocomplete]="auto9" readonly>
+                                            [matAutocomplete]="auto9" readonly required>
                                         <mat-autocomplete #auto9="matAutocomplete">
                                             <mat-option *ngFor="let option of filtroGrado | async"
                                                 [value]="option.descripcion">
                                                 {{option.descripcion.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
+                                        <mat-error *ngIf="gradoF.hasError('noRegistrado')">
+                                            El campo contiene un valor inválido ("NO REGISTRADO").
+                                        </mat-error>
+                                        <mat-error *ngIf="gradoF.hasError('required')">
+                                            Este campo es obligatorio.
+                                        </mat-error>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class=" w-75">
+                                    <mat-form-field class="w-100">
                                         <mat-label class="letra">Denominacion del puesto propuesto</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="tipoCargoF"
                                             [matAutocomplete]="auto10" readonly>
@@ -389,7 +395,7 @@
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Remuneración propuesta</mat-label>
                                         <input matInput type="tel" [formControl]="sueldoF" style="text-align: right;"
                                             (keypress)="IngresarSoloNumeros($event)" value="0" readonly>
@@ -413,14 +419,14 @@
                             </div>
                         </div>
                         <div class="col-1" style="border-right: 1px solid #ccc;"></div>
-                        <div class="col-1"></div>
-                        <div class="col-5">
+                        <div class="col-1 mt-4"></div>
+                        <div class="col-12 col-md-5">
                             <div class="subtitulo">
                                 <span>SITUACIÓN PROPUESTA</span>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label class="letra">Proceso propuesto</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="procesoPropuesto"
                                             [matAutocomplete]="auto11">
@@ -430,16 +436,12 @@
                                                 {{option.nombre.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Seleccionar el proceso que se encuentra propuesto.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Sucursal</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="idSucursalPropues" [matAutocomplete]="auto12">
@@ -449,16 +451,12 @@
                                                 {{option.nombre.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Lista de departamentos.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Nivel o unidad de gestión</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idDepaPropues"
                                             [matAutocomplete]="auto13">
@@ -468,16 +466,12 @@
                                                 {{option.nombre.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Lista de departamentos.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label class="letra">Unidad Administrativa propuesta</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="idDepaAdminPropuesta" [matAutocomplete]="auto14">
@@ -487,16 +481,12 @@
                                                 {{option.nombre.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Lista de departamentos.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label class="letra">Lugar de trabajo</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="idCiudadPropuesta" [matAutocomplete]="auto15">
@@ -506,16 +496,12 @@
                                                 {{option.descripcion.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Ciudades registradas en el sistema.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Grupo Ocupacional</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="grupoOcupacionalPropuestoF" [matAutocomplete]="auto16">
@@ -525,17 +511,13 @@
                                                 {{option.descripcion.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Grupo ocupacional registrado en el sistema.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
 
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Grado</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="gradoPropuestoF"
                                             [matAutocomplete]="auto17">
@@ -545,16 +527,12 @@
                                                 {{option.descripcion.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Grados registrados en el sistema.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class=" w-75">
+                                    <mat-form-field class="w-100">
                                         <mat-label class="letra">Denominacion del puesto propuesto</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="tipoCargoPropuestoF" [matAutocomplete]="auto18">
@@ -564,27 +542,19 @@
                                                 {{option.cargo.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Seleccionar el puesto que se encuentra propuesto.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
 
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
-                                    <mat-form-field class="contenedor-completo">
+                                    <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Remuneración propuesta</mat-label>
                                         <input matInput type="tel" [formControl]="sueldoPropuestoF"
                                             style="text-align: right;" (keypress)="IngresarSoloNumeros($event)"
                                             value="0">
                                         <span matTextPrefix>$&nbsp;</span>
                                         <span matTextSuffix>.00</span>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Indicar cual es el salario propuesto.">
-                                            help_outline
-                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -607,32 +577,42 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <div class="declaracion-radio-group ml-3">
+                                    <mat-label class="letra">HABILITAR EL FORMULARIO DE POSESIÓN DEL PUESTO </mat-label>
+                                    <mat-checkbox class="example-margin" [formControl]="habilitarForm4"></mat-checkbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <br><br>
                 <div class="d-flex flex-wrap justify-content-between w-75 m-auto">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
+                    <button mat-raised-button id="btn-raised" class="float-right" (click)="validarForm(thirdFormGroup.value, stepper)">Siguiente</button>
                 </div>
             </mat-step>
             <!-- ****************************** CUARTO FORMULARIO ******************************************* -->
-            <mat-step [stepControl]="fivethFormGroup">
+            <mat-step *ngIf="habilitarformPosesion" [stepControl]="fourthFormGroup">
                 <ng-template matStepLabel>
                     <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 4:">
                         settings
                     </mat-icon>
                 </ng-template>
-                <form [formGroup]="fivethFormGroup">
+                <form [formGroup]="fourthFormGroup">
                     <div class="subtitulo">
                         <span>POSESIÓN DEL PUESTO</span>
                     </div>
                     <div class="row">
-                        <div class="col-5">
+                        <div class="col-12 col-md-5">
                             <label class="ml-3">YO,</label>
                             <mat-form-field class="contenedor-completo">
                                 <input type="text" style="font-size: small; width: 100%;" matInput [formControl]="funcionarioF" readonly>
                             </mat-form-field>
                         </div>
-                        <div class="col-7">
+                        <div class="col-12 col-md-7">
                             <label>CON NRO. DE DOCUMENTO DE IDENTIFICACIÓN:</label>
                             <mat-form-field style="width: 30%;">
                                 <input type="text" style="font-size: small;" matInput [formControl]="cedualF" required readonly>
@@ -643,7 +623,7 @@
                         <div class="col-md ml-3"><label>JURO LEALTAD AL ESTADO ECUATORIANO.</label></div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Lugar de trabajo</mat-label>
@@ -658,16 +638,65 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="inputDate">
                                     <mat-label>Fecha</mat-label>
-                                    <input matInput [matDatepicker]="pickerFechaHasta" placeholder="dd/mm/aaaa"
+                                    <input matInput [matDatepicker]="pickerFecha" placeholder="dd/mm/aaaa"
                                         formControlName="fechaPosesionForm" min="1950-01-31" max="2050-01-31">
-                                    <mat-datepicker-toggle matSuffix [for]="pickerFechaHasta" id="i-cursor"
+                                    <mat-datepicker-toggle matSuffix [for]="pickerFecha" id="i-cursor"
                                         matTooltipPosition="right" matTooltip="Fecha en la que inicio a trabajar.">
                                     </mat-datepicker-toggle>
-                                    <mat-datepicker touchUi #pickerFechaHasta></mat-datepicker>
+                                    <mat-datepicker touchUi #pickerFecha></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md ml-3"><label>** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)</label></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-3">
+                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label class="letra">Número acta final</mat-label>
+                                    <input matInput placeholder="0001" formControlName="actaFinalForm" required
+                                        autocomplete="off">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el numero de acta final.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="inputDate">
+                                    <mat-label>Fecha</mat-label>
+                                    <input matInput [matDatepicker]="pickerFechaActa" placeholder="dd/mm/aaaa"
+                                        formControlName="fechaActaFinalForm" min="1950-01-31" max="2050-01-31">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerFechaActa" id="i-cursor"
+                                        matTooltipPosition="right" matTooltip="Fecha de acta final.">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #pickerFechaActa></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field style="width: 20%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevServidorPubli">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Servidor Publico</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoSP"
+                                        [matAutocomplete]="auto20">
+                                    <mat-autocomplete #auto20="matAutocomplete">
+                                        <mat-option *ngFor="let option of filtroNombreR | async"
+                                            [value]="option.empleado">
+                                            {{option.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -680,23 +709,23 @@
                 </div>
             </mat-step>
             <!-- ****************************** QUINTO FORMULARIO ******************************************* -->
-            <mat-step [stepControl]="fourthFormGroup">
+            <mat-step [stepControl]="fivethFormGroup">
                 <ng-template matStepLabel>
                     <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 5:">
                         settings
                     </mat-icon>
                 </ng-template>
-                <form [formGroup]="fourthFormGroup">
+                <form [formGroup]="fivethFormGroup">
                     <div class="subtitulo">
                         <span>RESPONSABLES DE APROBACIÓN</span>
                     </div>
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="abrv">
+                                <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevHA">
                                 </mat-form-field>
-                                <mat-form-field>
+                                <mat-form-field style="width: 80%;">
                                     <mat-label>Director(a) o responsable de Talento Humano</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRA"
                                         [matAutocomplete]="auto20" required>
@@ -711,7 +740,7 @@
                         </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="abrv">
+                                <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevGA">
                                 </mat-form-field>
                                 <mat-form-field>
@@ -732,7 +761,7 @@
                         <span>RESPONSABLES DE FIRMAS</span>
                     </div>
                     <div class="row">
-                        <div class="col-5">
+                        <div class="col-12 col-md-5">
                             <label>ACEPTACIÓN Y/O RECEPCIÓN DEL SERVIDOR PÚBLICO</label>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 20%;">
@@ -757,7 +786,7 @@
                                 <mat-form-field class="contenedor-completo w-90">
                                     <mat-label>Fecha</mat-label>
                                     <input matInput [matDatepicker]="picker4" placeholder="dd/mm/aaaa"
-                                        formControlName="fechaReempForm">
+                                        formControlName="fechaServidorF">
                                     <mat-datepicker-toggle matSuffix [for]="picker4" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Ingresar la fecha. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
@@ -768,7 +797,7 @@
                             
                         </div>
                         <div class="col-1" style="border-right: 1px solid #ccc;"></div>
-                        <div class="col-5">
+                        <div class="col-12 col-md-5">
                             <label style="margin-left: 5px;">EN CASO DE NEGATIVA DE LA RECEPCIÓN (TESTIGO)</label>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 20%;">
@@ -777,7 +806,7 @@
                                 <mat-form-field style="width: 80%;">
                                     <mat-label>En caso de negativa de la recepción</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoGF"
-                                        [matAutocomplete]="auto23" required>
+                                        [matAutocomplete]="auto23">
                                     <mat-autocomplete #auto23="matAutocomplete">
                                         <mat-option *ngFor="let th of filtroNombreH | async" [value]="th.empleado">
                                             {{th.empleado.toUpperCase()}}
@@ -793,7 +822,7 @@
                                 <mat-form-field class="contenedor-completo w-90">
                                     <mat-label>Fecha en caso de negativa</mat-label>
                                     <input matInput [matDatepicker]="picker4" placeholder="dd/mm/aaaa"
-                                        formControlName="fechaActaForm">
+                                        formControlName="fechaNegativaF">
                                     <mat-datepicker-toggle matSuffix [for]="picker4" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Ingresar la fecha. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
@@ -817,7 +846,7 @@
                     </div>
                     <div class="row mt-4 w-100">
                         <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRGF">
@@ -838,7 +867,7 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRHF">
@@ -859,7 +888,7 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRRC">
@@ -882,6 +911,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-between">
@@ -909,31 +939,31 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="declaracion-radio-group ml-3">
                                     <mat-label class="letra">COMUNICACIÓN ELECTRÓNICA:</mat-label>
-                                    <mat-checkbox class="example-margin"> </mat-checkbox>
+                                    <mat-checkbox class="example-margin" formControlName="ComunicacionElectForm"> </mat-checkbox>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md">
+                            <div class="col-6 col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="inputDate">
                                         <mat-label>Fecha</mat-label>
-                                        <input matInput [matDatepicker]="pickerFechaHasta" placeholder="dd/mm/aaaa"
-                                            formControlName="fechaReempForm" min="1950-01-31" max="2050-01-31"
+                                        <input matInput [matDatepicker]="pickerFecha_" placeholder="dd/mm/aaaa"
+                                            formControlName="fechaComunicadoForm" min="1950-01-31" max="2050-01-31"
                                             required>
-                                        <mat-datepicker-toggle matSuffix [for]="pickerFechaHasta" id="i-cursor"
+                                        <mat-datepicker-toggle matSuffix [for]="pickerFecha_" id="i-cursor"
                                             matTooltipPosition="right" matTooltip="Ingrese la fecha.">
                                         </mat-datepicker-toggle>
-                                        <mat-datepicker touchUi #pickerFechaHasta></mat-datepicker>
+                                        <mat-datepicker touchUi #pickerFecha_></mat-datepicker>
                                     </mat-form-field>
                                 </div>
                             </div>
-                            <div class="col-md">
+                            <div class="col-6 col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="inputDate">
                                         <mat-label>Hora</mat-label>
                                         <input matInput [matTimepicker]="pickerHora" placeholder="hh:mm:00"
-                                            formControlName="fechaRigeHastaForm" min="1950-01-31" max="2050-01-31"
+                                            formControlName="horaComunicadoForm" min="1950-01-31" max="2050-01-31"
                                             required>
                                         <mat-timepicker-toggle matSuffix [for]="pickerHora" id="i-cursor"
                                             matTooltipPosition="right" matTooltip="Ingrese la hora.">
@@ -951,7 +981,7 @@
                                         <mat-label>**MEDIO</mat-label>
                                         <textarea matInput #acta maxlength="200"
                                             placeholder="Ingresar número del acta final del concurso"
-                                            formControlName="actaPropuestaF"></textarea>
+                                            formControlName="medioComunicacionForm"></textarea>
                                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                             matTooltip="Ingresar el número del acta final del consurso.">
                                             help_outline
@@ -964,15 +994,15 @@
                             </div>
                         </div>
                         <div class="row mt-5">
-                            <div class="col-5 m-auto">
+                            <div class="col-12 col-md-5 m-auto">
                                 <div><label class="ml-3">FIRMA DEL RESPONSABLE QUE NOTIFICÓ</label></div>
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field style="width: 20%;">
-                                        <input type="text" placeholder="ING." matInput [formControl]="abrevGF">
+                                        <input type="text" placeholder="ING." matInput [formControl]="abrevC">
                                     </mat-form-field>
                                     <mat-form-field style="width: 80%;">
-                                        <mat-label>Responsable de Registro y Control*</mat-label>
-                                        <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoGF"
+                                        <mat-label>Responsable de notificar</mat-label>
+                                        <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoC"
                                             [matAutocomplete]="auto27" required>
                                         <mat-autocomplete #auto27="matAutocomplete">
                                             <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
@@ -999,7 +1029,7 @@
         </mat-horizontal-stepper>
         <div style="text-align: center; margin-bottom: 3%;">
             <button id="btn-raised" class="btn btn-sm"
-                (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value)"
+                (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value, fivethFormGroup.value, sixthFormGroup.value)"
                 [disabled]="!firstFormGroup.valid || !secondFormGroup.valid || !thirdFormGroup.valid || !fourthFormGroup.valid"
                 value="Guardar" *ngIf="getRegistrarPedidoAccionPersonal()">
                 Guardar
