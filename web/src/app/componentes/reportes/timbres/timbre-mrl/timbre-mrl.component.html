@@ -279,8 +279,8 @@
                                 <td class="t_horarios">{{ timbres.indexOf(t) + 1 }}</td>
                                 <td class="t_horarios">{{ t.identificacion }}</td>
                                 <td class="t_horarios">{{ t.accion }}</td>
-                                <td class="t_horarios">{{ t.fecha_hora.split(' ')[0] }}</td>
-                                <td class="t_horarios">{{ t.fecha_hora.split(' ')[1] }}</td>
+                                <td class="t_horarios">{{ t.fecha_hora.split(' ').slice(0, 2).join(' ') }}</td>
+                                <td class="t_horarios">{{ t.fecha_hora.split(' ').slice(2).join(' ') }}</td>
                             </tr>
                         </tbody>
                     </table>

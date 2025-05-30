@@ -414,7 +414,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       this.datosPedido[0].id_proceso_propuesto === null &&
       this.datosPedido[0].id_cargo_propuesto != null
     ) {
-        tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
+      tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
     }
   }
 
@@ -569,8 +569,8 @@ export class ListarPedidoAccionComponent implements OnInit {
       decretoTexto = '';
       let texto: string = decretoTexto.toUpperCase();
       this.decreto[3] = texto;
-                this.decreto[4] = "X";
-                this.decreto[5] = "black";
+      this.decreto[4] = "X";
+      this.decreto[5] = "black";
     }
   }
 
@@ -3948,6 +3948,10 @@ export class ListarPedidoAccionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   async GenerarPdf(action = "open") {
+    if (!this.listaPedidos || this.listaPedidos.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -4130,6 +4134,10 @@ export class ListarPedidoAccionComponent implements OnInit {
   urlxml: string;
   data: any = [];
   ExportToXML() {
+    if (!this.listaPedidos || this.listaPedidos.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return; 
+    }
     var objeto;
     var arregloPedidos: any = [];
     this.listaPedidos.forEach((obj) => {
@@ -4201,27 +4209,27 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
-  getVerPedidoAccionPersonal(){
+  getVerPedidoAccionPersonal() {
     return this.tienePermiso('Ver Pedido Acción Personal');
   }
 
-  getEditarPedidoAccionPersonal(){
+  getEditarPedidoAccionPersonal() {
     return this.tienePermiso('Editar Pedido Acción Personal');
   }
 
-  getVerAccionPersonalPDF(){
+  getVerAccionPersonalPDF() {
     return this.tienePermiso('Ver Acción Personal en formato PDF');
   }
 
-  getVerAccionPersonalEXCEL(){
+  getVerAccionPersonalEXCEL() {
     return this.tienePermiso('Ver Acción Personal en formato EXCEL');
   }
 
-  getDescargarReporteListaPedidosAccionesPersonal(){
+  getDescargarReporteListaPedidosAccionesPersonal() {
     return this.tienePermiso('Descargar Reporte Lista Pedidos Acciones Personal');
   }
 
-  getRegistrarPedidoAccionPersonal(){
+  getRegistrarPedidoAccionPersonal() {
     return this.tienePermiso('Registrar Pedido Acción Personal');
   }
 

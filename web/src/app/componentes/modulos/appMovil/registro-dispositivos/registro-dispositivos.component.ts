@@ -118,10 +118,10 @@ export class RegistroDispositivosComponent implements OnInit {
     else {
       this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');  
+      this.ip = localStorage.getItem('ip');
       this.validar.ObtenerIPsLocales().then((ips) => {
-      this.ips_locales = ips;
-    }); 
+        this.ips_locales = ips;
+      });
 
       this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
@@ -337,6 +337,10 @@ export class RegistroDispositivosComponent implements OnInit {
 
 
   async GenerarPdf(action = 'open') {
+    if (!this.dispositivosRegistrados || this.dispositivosRegistrados.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -345,7 +349,6 @@ export class RegistroDispositivosComponent implements OnInit {
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   DefinirInformacionPDF() {
@@ -436,6 +439,10 @@ export class RegistroDispositivosComponent implements OnInit {
    ** ********************************************************************************* **/
 
   async generarExcel() {
+    if (!this.dispositivosRegistrados || this.dispositivosRegistrados.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     let datos: any[] = [];
     let n: number = 1;
 
@@ -554,6 +561,10 @@ export class RegistroDispositivosComponent implements OnInit {
    ** ********************************************************************************************** **/
 
   ExportToCSV() {
+    if (!this.dispositivosRegistrados || this.dispositivosRegistrados.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     var cont: number = 1;
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('DispositivosCSV');
@@ -597,6 +608,10 @@ export class RegistroDispositivosComponent implements OnInit {
   urlxml: string;
   data: any = [];
   exportToXML() {
+    if (!this.dispositivosRegistrados || this.dispositivosRegistrados.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return; 
+    }
     var objeto: any;
     var arregloDispositivos: any = [];
     let count: number = 0;
@@ -656,11 +671,11 @@ export class RegistroDispositivosComponent implements OnInit {
     }
   }
 
-  getEliminarDispositivos(){
+  getEliminarDispositivos() {
     return this.tienePermiso('Eliminar Dispositivos Móviles');
   }
 
-  getDescargaReportesDispositivos(){
+  getDescargaReportesDispositivos() {
     return this.tienePermiso('Descargar Reportes Dispositivos Móviles');
   }
 

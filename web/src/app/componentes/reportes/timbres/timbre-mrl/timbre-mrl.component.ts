@@ -340,6 +340,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
             fecha_hora: `${servidor_fecha} ${servidor_hora}`,
           }
           this.timbres.push(ele);
+          console.log("INFOMRACION", ele)
         })
       })
     });

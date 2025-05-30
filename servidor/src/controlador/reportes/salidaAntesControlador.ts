@@ -60,7 +60,6 @@ export const BuscarSalidasAnticipadas = async function (fec_inicio: string, fec_
         `
         , [fec_inicio, fec_final, id_empleado])
         .then(res => {
-            console.log('Resultado BuscarSalidasAnticipadas:', res.rows);
             return res.rows;
         })
 }
