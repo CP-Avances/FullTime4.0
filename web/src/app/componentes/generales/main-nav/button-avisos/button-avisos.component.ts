@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
+const { DateTime } = require("luxon");
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
-import { LoginService } from 'src/app/servicios/login/login.service';
 import { SocketService } from 'src/app/servicios/socket/socket.service';
-
-import { ChangeDetectorRef } from '@angular/core';
-const { DateTime } = require("luxon");
+import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({
   selector: 'app-button-avisos',
@@ -21,26 +20,25 @@ export class ButtonAvisosComponent implements OnInit {
   ips_locales: any = '';
 
   estado: boolean = true;
+  avisos: any = [];
+  socket: any;
 
   estadoTimbres: boolean = true;
   num_timbre_false: number = 0;
-  avisos: any = [];
   id_empleado_logueado: number;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
 
-  socket: any;
-
   constructor(
     public loginService: LoginService,
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    private socketService: SocketService,
     private aviso: TimbresService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private socketService: SocketService,
   ) { }
 
   ngOnInit(): void {
@@ -59,9 +57,9 @@ export class ButtonAvisosComponent implements OnInit {
   ** ********************************************************************************** **/
   EscucharNotificaciones() {
     this.socket = this.socketService.getSocket();
-    console.log('ingresa aqui en escuchar', this.socket)
+    //console.log('ingresa aqui en escuchar', this.socket)
     if (!this.socket) return;
-    console.log('ingresa despues del socket')
+    //console.log('ingresa despues del socket')
     // VERIFICAR QUE EL USUARIO TIENE INICIO DE SESION
     if (this.loginService.loggedIn()) {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
