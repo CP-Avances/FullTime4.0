@@ -1,6 +1,6 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -110,7 +110,7 @@ export class LoginComponent implements OnInit {
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
             //console.log('datos empresa: ', this.mensaje.empresas[0].movil_socket_direccion);
             const nuevaUrlSocket = this.mensaje.empresas[0].movil_socket_direccion;
-            //localStorage.setItem('socketURL', nuevaUrlSocket);
+            localStorage.setItem('socketURL', nuevaUrlSocket);
             this.urlService.updateSocketUrl(nuevaUrlSocket);
           }
           else if (this.mensaje.message === 'vacio') {
@@ -127,7 +127,6 @@ export class LoginComponent implements OnInit {
         },
         complete: () => {
           // TRAS VALIDACION CORRECTA DE EMPRESA, CONTINUA EL PROCESO NORMAL DE LOGIN
-          console.log('CONTINUAR LOGIN');
           // LOGIN
           var local: boolean;
           this.intentos = this.intentos + 1;

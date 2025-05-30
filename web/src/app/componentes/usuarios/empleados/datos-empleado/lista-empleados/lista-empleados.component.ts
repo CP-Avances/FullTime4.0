@@ -579,7 +579,7 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    
+    formData.append("modoCodigo", this.datosCodigo[0].cedula ? 'cedula' : 'automatico');
     this.rest.VerificarArchivoExcel_Automatico(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
@@ -733,11 +733,15 @@ export class ListaEmpleadosComponent implements OnInit {
       (observacion == 'La identificación ingresada no es válida') ||
       (observacion == 'Género no es válido') ||
       (observacion == 'Estado civil no es válido') ||
-      (observacion == 'Verificar ubicación')) {
+      (observacion == 'Verificar ubicación') ||
+      (observacion == 'Verificar correo')) {
       return 'rgb(222, 162, 73)';
     }
     else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema')) {
+      (observacion == 'Nacionalidad no existe en el sistema')||
+      (observacion == 'Estado civil no existe en el sistema')||
+      (observacion == 'Género no existe en el sistema')
+    ) {
       return 'rgb(255, 192, 203)';
     }
     else if ((observacion == 'La contraseña debe tener máximo 10 caracteres') || (observacion == 'El código debe tener máximo 10 caracteres')) {

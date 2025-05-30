@@ -183,7 +183,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar el mensaje de cumpleaños a los colaboradores. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar el mensaje de cumpleaños a los colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -201,7 +201,7 @@ export class VerParametroComponent implements OnInit {
       this.nota_parametro =
         `
         NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de atrasos de los 
-        colaboradores. Por ejemplo: 23.
+        colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -228,7 +228,7 @@ export class VerParametroComponent implements OnInit {
       this.nota_parametro =
         `
         NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de atrasos de los 
-        colaboradores. Por ejemplo: 23.
+        colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -328,7 +328,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar el mensaje de aniversario a los colaboradores. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar el mensaje de aniversario a los colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -347,7 +347,7 @@ export class VerParametroComponent implements OnInit {
       this.nota_parametro =
         `
         NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de salidas anticipadas de los 
-        colaboradores. Por ejemplo: 23.
+        colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -374,7 +374,7 @@ export class VerParametroComponent implements OnInit {
       this.nota_parametro =
         `
         NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
-        colaboradores. Por ejemplo: 23.
+        colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -402,7 +402,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar las notificaciones de faltas a cada colaborador. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar las notificaciones de faltas a cada colaborador. Por ejemplo: 23:30.
         `
         ;
     }
@@ -411,7 +411,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar las notificaciones de atrasos a cada colaborador. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar las notificaciones de atrasos a cada colaborador. Por ejemplo: 23:30.
         `
         ;
     }
@@ -420,7 +420,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar las notificaciones de salidas anticipadas a cada colaborador. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar las notificaciones de salidas anticipadas a cada colaborador. Por ejemplo: 23:30.
         `
         ;
     }

@@ -59,6 +59,28 @@ class EmpresaControlador {
             }
         });
     }
+    ObtenerImagenEmpresa() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const file_name = yield database_1.default.query(`
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
+            `, [1])
+                .then((result) => {
+                return result.rows[0];
+            });
+            if (file_name.logo === null) {
+                file_name.logo = 'logo_reportes.png';
+            }
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
+            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+            if (codificado === 0) {
+                return { imagen: 0, nom_empresa: file_name.nombre };
+            }
+            else {
+                return { imagen: codificado, nom_empresa: file_name.nombre };
+            }
+        });
+    }
     // METODO PARA EDITAR LOGO DE EMPRESA **USADO
     ActualizarLogoEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -33,7 +33,7 @@ label {
     text-align: center;
     transition: background-color 0.3s ease;
     border-radius: 10px;
-    height: 70%;
+    height: 80px;
     width: 70%;
     margin: auto;
     padding: 10px;
@@ -44,6 +44,22 @@ label {
     justify-content: center;
 }
 
+.estado-card.redondo {
+    border-radius: 50%;
+    width: 66%;
+    height: 83px;
+    aspect-ratio: 1 / 1;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    white-space: normal;
+    word-wrap: break-word;
+}
 .estado-card.inactivo {
     background-color: #b8b8b8;
     color: white;
@@ -55,7 +71,7 @@ label {
 }
 
 .estado-card.activo-comunicado {
-    background-color: #ff69b4; 
+    background-color: #ff69b4;
     color: white;
 }
 
@@ -65,7 +81,7 @@ label {
 }
 
 .estado-card.activo-atrasos {
-    background-color: #ffc107; 
+    background-color: #ffc107;
     color: black;
 }
 
@@ -75,7 +91,7 @@ label {
 }
 
 .estado-card.activo-faltas {
-    background-color: #dc3545; 
+    background-color: #dc3545;
     color: white;
 }
 
@@ -85,7 +101,7 @@ label {
 }
 
 .estado-card.activo-salida {
-    background-color: #007bff; 
+    background-color: #007bff;
     color: white;
 }
 
@@ -95,7 +111,7 @@ label {
 }
 
 .estado-card.activo-permisos {
-    background-color: #e9bb03; 
+    background-color: #e9bb03;
     color: black;
 }
 
@@ -105,7 +121,7 @@ label {
 }
 
 .estado-card.activo-vacaciones {
-    background-color: #28a745; 
+    background-color: #28a745;
     color: white;
 }
 
@@ -115,7 +131,7 @@ label {
 }
 
 .estado-card.activo-horaExtra {
-    background-color: #6f42c1; 
+    background-color: #6f42c1;
     color: white;
 }
 
@@ -125,7 +141,7 @@ label {
 }
 
 .estado-card.activo-comida {
-    background-color: #fd7e14; 
+    background-color: #fd7e14;
     color: white;
 }
 

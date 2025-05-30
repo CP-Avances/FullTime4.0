@@ -70,7 +70,6 @@ import { EditarPlanComidasComponent } from 'src/app/componentes/modulos/alimenta
 import { CambiarContrasenaComponent } from 'src/app/componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
 import { AdministraComidaComponent } from 'src/app/componentes/modulos/alimentacion/administra-comida/administra-comida.component';
 import { CancelarPermisoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
-import { EditarEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/editar-empleado/editar-empleado.component';
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { TituloEmpleadoComponent } from '../../asignar-titulo/titulo-empleado/titulo-empleado.component';
 import { PlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/plan-hora-extra/plan-hora-extra.component';
@@ -256,22 +255,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const intervalo = setInterval(() => {
       if (this.latitud && this.longitud && this.nombreMarcador) {
         this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
-        clearInterval(intervalo); // Detener el intervalo después de ejecutarlo
+        clearInterval(intervalo); // DETENER EL INTERVALO DESPUÉS DE EJECUTARLO
       }
-    }, 200); // Revisa cada 200ms si ya están disponibles
+    }, 200); // REVISA CADA 200MS SI YA ESTÁN DISPONIBLES
   }
-
-  // ngOnDestroy(): void {
-  //   // LIMPIAR MARCADORES EXISTENTES
-  //   if (this.MARKER) {
-  //     this.MAP.removeLayer(this.MARKER);
-  //   }
-  //   // ELIMINAR MAPA
-  //   if (this.MAP) {
-  //     this.MAP.remove();
-  //     this.MAP = null;
-  //   }
-  // }
 
   // METODO PARA CAMBIAR DE PESTAÑA
   SeleccionarPestana(index: number): void {
@@ -510,6 +497,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.datoActual = [];
     this.informacion.ObtenerDatosActuales(parseInt(this.idEmpleado)).subscribe(res => {
       this.datoActual = res[0];
+      console.log('datoActual ', this.datoActual)
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
@@ -670,28 +658,16 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
   }
 
-  /*
-  // METODO EDICION DE REGISTRO DE EMPLEADO
-  AbrirVentanaEditarEmpleado(dataEmpley: any) {
-    this.ventana.open(EditarEmpleadoComponent, { data: dataEmpley, width: '800px' })
-      .afterClosed().subscribe(result => {
-        if (result) {
-          this.VerEmpleado(this.formato_fecha)
-        }
-      })
-  }
-      */
-
   editar_empleado: boolean = false;
-  pagina_empleado: any ="";
-  empleado_editar: any=[];
-  ver_empleado: boolean=true;
+  pagina_empleado: any = "";
+  empleado_editar: any = [];
+  ver_empleado: boolean = true;
 
-  AbirVentanaEditarEmpleado(datoEmpleado: any){
-    this.ver_empleado=false;
-    this.editar_empleado=true;
-    this.empleado_editar=datoEmpleado;
-    this.pagina_empleado='ver-empleado';
+  AbirVentanaEditarEmpleado(datoEmpleado: any) {
+    this.ver_empleado = false;
+    this.editar_empleado = true;
+    this.empleado_editar = datoEmpleado;
+    this.pagina_empleado = 'ver-empleado';
   }
 
   /** ********************************************************************************************* **
@@ -759,7 +735,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     localStorage.removeItem('fullname');
     localStorage.removeItem('correo');
     localStorage.removeItem('iniciales');
-    // localStorage.removeItem('view_imagen');
   }
 
 
@@ -917,8 +892,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     })
       .afterClosed().subscribe(result => {
         setTimeout(() => {
-        this.ObtenerDatosVacunas(this.formato_fecha);
-      }, 200);
+          this.ObtenerDatosVacunas(this.formato_fecha);
+        }, 200);
       });
   }
 
@@ -3092,8 +3067,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   DefinirInformacionPDF() {
-    let estadoCivil : any;
-    let genero : any;
+    let estadoCivil: any;
+    let genero: any;
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
     this.nacionalidades.forEach((element: any) => {
@@ -3101,14 +3076,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         nacionalidad = element.nombre;
       }
     });
-    this.generos.forEach((element:any)=>{
-      if(this.empleadoUno[0].genero == element.id){
-        genero=element.genero;
+    this.generos.forEach((element: any) => {
+      if (this.empleadoUno[0].genero == element.id) {
+        genero = element.genero;
       }
     });
-    this.estadosCiviles.forEach((element:any)=>{
-      if(this.empleadoUno[0].estado_civil == element.id){
-        estadoCivil=element.estado_civil;
+    this.estadosCiviles.forEach((element: any) => {
+      if (this.empleadoUno[0].estado_civil == element.id) {
+        estadoCivil = element.estado_civil;
       }
     });
 
@@ -3233,11 +3208,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                               colSpan: 2,
                               style: 'item',
                               alignment: 'left',
-                              margin: [0, -4, 0, 0] 
+                              margin: [0, -4, 0, 0]
                             },
-                            {} 
+                            {}
                           ]
-                        ]                        
+                        ]
                       },
                       layout: 'noBorders',
                       alignment: 'left'
@@ -3408,31 +3383,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   PresentarDataPDFvacunasEmpleado() {
-  if (this.datosVacuna.length > 0) {
-    return {
-      table: {
-        widths: ['*', '*'],
-        body: [
-          ...this.datosVacuna.flatMap((obj: any) => {
-            console.log("Datos para vacuna:", obj);
-            return [
-              [
-                { text: 'Vacuna: ' + obj.nombre, bold: true },
-                { text: 'Descripción: ' + obj.descripcion }
-              ],
-              [
-                { text: 'Fecha: ' + obj.fecha_ },
-                { text: 'Carnet: ' + obj.carnet }
-              ],
-              [{ text: '', colSpan: 2 }, {}]
-            ];
-          })
-        ]
-      },
-      layout: 'noBorders',
-    };
+    if (this.datosVacuna.length > 0) {
+      return {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            ...this.datosVacuna.flatMap((obj: any) => {
+              console.log("Datos para vacuna:", obj);
+              return [
+                [
+                  { text: 'Vacuna: ' + obj.nombre, bold: true },
+                  { text: 'Descripción: ' + obj.descripcion }
+                ],
+                [
+                  { text: 'Fecha: ' + obj.fecha_ },
+                  { text: 'Carnet: ' + obj.carnet }
+                ],
+                [{ text: '', colSpan: 2 }, {}]
+              ];
+            })
+          ]
+        },
+        layout: 'noBorders',
+      };
+    }
   }
-}
 
   PresentarDataPDFcontratoEmpleado() {
     if (this.contratoEmpleado.length > 0) {
@@ -3530,25 +3505,25 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   DefinirInfoHistoricoPDF() {
     const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido;
-      let estadoCivil : any;
-      let genero : any;
-      let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
-      let nacionalidad: any;
-      this.nacionalidades.forEach((element: any) => {
-        if (this.empleadoUno[0].id_nacionalidad == element.id) {
-          nacionalidad = element.nombre;
-        }
-      });
-      this.generos.forEach((element:any)=>{
-        if(this.empleadoUno[0].genero == element.id){
-          genero=element.genero;
-        }
-      });
-      this.estadosCiviles.forEach((element:any)=>{
-        if(this.empleadoUno[0].estado_civil == element.id){
-          estadoCivil=element.estado_civil;
-        }
-      });
+    let estadoCivil: any;
+    let genero: any;
+    let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
+    let nacionalidad: any;
+    this.nacionalidades.forEach((element: any) => {
+      if (this.empleadoUno[0].id_nacionalidad == element.id) {
+        nacionalidad = element.nombre;
+      }
+    });
+    this.generos.forEach((element: any) => {
+      if (this.empleadoUno[0].genero == element.id) {
+        genero = element.genero;
+      }
+    });
+    this.estadosCiviles.forEach((element: any) => {
+      if (this.empleadoUno[0].estado_civil == element.id) {
+        estadoCivil = element.estado_civil;
+      }
+    });
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -3776,8 +3751,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let arregloContrato: any = [];
     let arregloCargo: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil : any;
-      let genero : any;
+      let estadoCivil: any;
+      let genero: any;
       let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
@@ -3785,14 +3760,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           nacionalidad = element.nombre;
         }
       });
-      this.generos.forEach((element:any)=>{
-        if(this.empleadoUno[0].genero == element.id){
-          genero=element.genero;
+      this.generos.forEach((element: any) => {
+        if (this.empleadoUno[0].genero == element.id) {
+          genero = element.genero;
         }
       });
-      this.estadosCiviles.forEach((element:any)=>{
-        if(this.empleadoUno[0].estado_civil == element.id){
-          estadoCivil=element.estado_civil;
+      this.estadosCiviles.forEach((element: any) => {
+        if (this.empleadoUno[0].estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
         }
       });
 
@@ -3812,7 +3787,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         "Telefono": obj.telefono,
         "Nacionalidad": nacionalidad,
       };
-      if(obj.numero_partida_individual !== null){
+      if (obj.numero_partida_individual !== null) {
         objeto.numero_partida_individual = obj.numero_partida_individual;
       }
       if (obj.longitud !== null) {
@@ -3975,7 +3950,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     if (hayLatitud) columnasExcel.push({ key: "latitud", width: 20 });
     if (hayLongitud) columnasExcel.push({ key: "longitud", width: 20 });
 
-    worksheet.columns = columnasExcel;    
+    worksheet.columns = columnasExcel;
 
     const columnasTabla: any[] = [
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
@@ -3994,7 +3969,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     ];
     if (hayPartida) columnasTabla.push({ name: "NÚMERO DE PARTIDA", totalsRowLabel: "", filterButton: true });
     if (hayLatitud) columnasTabla.push({ name: "LATITUD", totalsRowLabel: "", filterButton: true });
-    if (hayLongitud) columnasTabla.push({ name: "LONGITUD", totalsRowLabel: "", filterButton: true });    
+    if (hayLongitud) columnasTabla.push({ name: "LONGITUD", totalsRowLabel: "", filterButton: true });
 
     worksheet.addTable({
       name: "Perfil",
@@ -4415,13 +4390,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ExportToCSV() {
     const datos: any = this.ObtenerDatos();
-    console.log("ver datos: ",  datos)
+    console.log("ver datos: ", datos)
 
-    const objeto = {...datos[0][0],
-    ...this.discapacidadUser[0],
-    ...this.tituloEmpleado[0],
-    ...datos[1][0],
-    ...datos[2][0],}
+    const objeto = {
+      ...datos[0][0],
+      ...this.discapacidadUser[0],
+      ...this.tituloEmpleado[0],
+      ...datos[1][0],
+      ...datos[2][0],
+    }
 
     const arregloFinal = [objeto];
     const workbook = new ExcelJS.Workbook();
@@ -4452,15 +4429,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  generos: any=[];
-  ObtenerGeneros(){
+  generos: any = [];
+  ObtenerGeneros() {
     this.restGenero.ListarGeneros().subscribe(datos => {
       this.generos = datos;
     })
   }
 
-  estadosCiviles: any=[];
-  ObtenerEstadosCiviles(){
+  estadosCiviles: any = [];
+  ObtenerEstadosCiviles() {
     this.restEstadoCivil.ListarEstadoCivil().subscribe(datos => {
       this.estadosCiviles = datos;
     })
@@ -4475,8 +4452,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let objeto: any;
     let arregloEmpleado: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil : any;
-      let genero : any;
+      let estadoCivil: any;
+      let genero: any;
       let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
@@ -4484,14 +4461,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           nacionalidad = element.nombre;
         }
       });
-      this.generos.forEach((element:any)=>{
-        if(this.empleadoUno[0].genero == element.id){
-          genero=element.genero;
+      this.generos.forEach((element: any) => {
+        if (this.empleadoUno[0].genero == element.id) {
+          genero = element.genero;
         }
       });
-      this.estadosCiviles.forEach((element:any)=>{
-        if(this.empleadoUno[0].estado_civil == element.id){
-          estadoCivil=element.estado_civil;
+      this.estadosCiviles.forEach((element: any) => {
+        if (this.empleadoUno[0].estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
         }
       });
 
@@ -4606,15 +4583,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getCrearDatos(){
+  getCrearDatos() {
     return this.tienePermiso('Crear datos');
   }
 
-  getEditarDatos(){
+  getEditarDatos() {
     return this.tienePermiso('Editar datos');
   }
 
-  getEliminarDatos(){
+  getEliminarDatos() {
     return this.tienePermiso('Eliminar datos');
   }
 

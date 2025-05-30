@@ -43,7 +43,8 @@ class MensajesNotificacionesControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                INSERT INTO e_message_notificaciones (id_empresa, asunto, mensaje, link, tipo_notificacion) VALUES ($1, $2, $3, $4, $5) RETURNING *
+                    INSERT INTO e_message_notificaciones (id_empresa, asunto, mensaje, link, tipo_notificacion) 
+                        VALUES ($1, $2, $3, $4, $5) RETURNING *
                 `, [id_empresa, titulo, mensaje, link, tipo]);
                 const [notificacion] = response.rows;
                 // AUDITORIA
@@ -64,6 +65,7 @@ class MensajesNotificacionesControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
+                console.log('error ', error);
                 return res.status(500).jsonp({ text: 'Error al guardar el registro.' });
             }
         });

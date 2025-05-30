@@ -190,7 +190,7 @@ export class EditarContratoComponent implements OnInit {
       this.contratoF.setValidators([Validators.required, Validators.minLength(3)]);
       this.contratoF.updateValueAndValidity();
       this.tipoF.clearValidators();
-      this.tipoF.setValue(null); 
+      this.tipoF.setValue(null);
       this.tipoF.updateValueAndValidity();
       this.toastr.info('Ingresar modalidad laboral.', '', {
         timeOut: 6000,
@@ -313,11 +313,27 @@ export class EditarContratoComponent implements OnInit {
     this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
       var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd')!;
+      console.log('ingresar ', ingreso)
       // COMPARACION DE CADA REGISTRO
-      for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd')!;
-        if (ingreso < fecha_salida) {
+      for (var i = 0; i < this.revisarFecha.length; i++) {
+        const actual = this.revisarFecha[i];
+
+        const ingresoNuevo = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd')!;
+        const salidaNueva = datos.fec_salida
+          ? this.validar.DarFormatoFecha(datos.fec_salida, 'yyyy-MM-dd')!
+          : ingresoNuevo; // Si no hay salida, se considera el mismo día
+
+        const ingresoExistente = this.validar.DarFormatoFecha(actual.fecha_ingreso, 'yyyy-MM-dd')!;
+        const salidaExistente = actual.fecha_salida
+          ? this.validar.DarFormatoFecha(actual.fecha_salida, 'yyyy-MM-dd')!
+          : ingresoExistente;
+
+        // VERIFICA SI LOS RANGOS SE SOBREPONEN
+        const haySobreposicion = ingresoNuevo <= salidaExistente && salidaNueva >= ingresoExistente;
+
+        if (haySobreposicion) {
           this.duplicado = 1;
+          break;
         }
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
