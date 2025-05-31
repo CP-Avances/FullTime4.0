@@ -271,38 +271,90 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local } = req.body;
+                console.log('req.body: ', req.body);
                 let datosNuevos = req.body;
                 const fechaActual = new Date();
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response_accion = yield database_1.default.query(`
-                INSERT INTO map_documento_accion_personal (numero_accion_personal, fecha_elaboracion, hora_elaboracion, id_empleado_personal, fecha_rige_desde, fecha_rige_hasta, 
-                    id_tipo_accion_personal, id_detalle_tipo_accion, detalle_otro, especificacion, declaracion_jurada, adicion_base_legal,
-                    observacion, id_proceso_actual, id_nivel_gestion_actual, id_unidad_administrativa, id_sucursal_actual, 
-                    id_lugar_trbajo_actual, id_tipo_cargo_actual, id_grupo_ocupacional_actual, id_grado_actual, 
-                    remuneracion_actual, partida_individual_actual, id_proceso_propuesto, id_sucursal_propuesta, id_nivel_gestion_propuesta, 
-                    id_unidad_adminstrativa_propuesta, id_lugar_trabajo_propuesto, id_tipo_cargo_propuesto, funciones_reemplazo, 
-                    id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, partida_individual_propuesta, lugar_posesion, fecha_posesion, numero_acta_final,
-                    id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo,
-                    id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
+                INSERT INTO map_documento_accion_personal (
+                    numero_accion_personal, fecha_elaboracion, hora_elaboracion, id_empleado_personal, fecha_rige_desde, fecha_rige_hasta, id_tipo_accion_personal, id_detalle_tipo_accion, detalle_otro, especificacion, 
+                    declaracion_jurada, adicion_base_legal, observacion, 
+                    id_proceso_actual, id_nivel_gestion_actual, id_unidad_administrativa, id_sucursal_actual, id_lugar_trabajo_actual, id_tipo_cargo_actual, id_grupo_ocupacional_actual, 
+                    id_grado_actual, remuneracion_actual, partida_individual_actual, 
+                    id_proceso_propuesto, id_sucursal_propuesta, id_nivel_gestion_propuesto, id_unidad_adminsitrativa_propuesta, id_lugar_trabajo_propuesto,id_tipo_cargo_propuesto, 
+                    id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, partida_individual_propuesta, 
+                    lugar_posesion, fecha_posesion, numero_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
+                    id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
                     fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, 
-                    $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49,
-                    $50, $51, $52, $53, $54, $55, $56, $57, $58, $59) RETURNING *
-                `, [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion, formulario1.id_empleado_personal,
-                    formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta, formulario2.id_tipo_accion_personal, formulario2.detalle_otro,
-                    formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
-                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual, formulario3.id_unidad_administrativa, formulario3.id_sucursal_actual, formulario3.id_lugar_trabajo_actual,
-                    formulario3.id_tipo_cargo_actual, formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual, formulario3.partida_individual_actual,
-                    formulario3.id_proceso_propuesto, formulario3.id_nivel_gestion_propuesto, formulario3.id_unidad_administrativa_propuesta, formulario3.id_sucursal_propuesta,
-                    formulario3.id_lugar_trabajo_propuesto, formulario3.id_tipo_cargo_propuesto, formulario3.id_grupo_ocupacional_propuesto, formulario3.id_grado_propuesto,
-                    formulario3.remuneracion_propuesta, formulario3.partida_individual_propuesta, formulario4.lugar_posesion, formulario4.fecha_posesion, formulario4.actaFinal,
-                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado, formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
-                    formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control, formulario5.cargo_RespRegistro_control,
-                    formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, formulario6.firma_Resp_Notificacion, null, fechaActual, null, null, null
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
+                    $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
+                    $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
+                    $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, 
+                    $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, 
+                    $51, $52, $53, $54, $55, $56, $57, $58) RETURNING *
+                `, [formulario1.numero_accion_personal,
+                    formulario1.fecha_elaboracion,
+                    formulario1.hora_elaboracion,
+                    formulario1.id_empleado_personal,
+                    formulario1.fecha_rige_desde,
+                    formulario1.fecha_rige_hasta,
+                    formulario2.id_tipo_accion_personal,
+                    formulario2.id_detalle_accion,
+                    formulario2.detalle_otro,
+                    formulario2.especificacion,
+                    formulario2.declaracion_jurada,
+                    formulario2.adicion_base_legal,
+                    formulario2.observacion,
+                    formulario3.id_proceso_actual,
+                    formulario3.id_nivel_gestion_actual,
+                    formulario3.id_unidad_administrativa,
+                    formulario3.id_sucursal_actual,
+                    formulario3.id_lugar_trabajo_actual,
+                    formulario3.id_tipo_cargo_actual,
+                    formulario3.id_grupo_ocupacional_actual,
+                    formulario3.id_grado_actual,
+                    formulario3.remuneracion_actual,
+                    formulario3.partida_individual_actual,
+                    formulario3.id_proceso_propuesto,
+                    formulario3.id_sucursal_propuesta,
+                    formulario3.id_nivel_gestion_propuesto,
+                    formulario3.id_unidad_administrativa_propuesta,
+                    formulario3.id_lugar_trabajo_propuesto,
+                    formulario3.id_tipo_cargo_propuesto,
+                    formulario3.id_grupo_ocupacional_propuesto,
+                    formulario3.id_grado_propuesto,
+                    formulario3.remuneracion_propuesta,
+                    formulario3.partida_individual_propuesta,
+                    formulario4.lugar_posesion,
+                    formulario4.fecha_posesion,
+                    formulario4.actaFinal,
+                    formulario5.firma_talentoHumano,
+                    formulario5.cargo_talentoHumano,
+                    formulario5.firma_delegado,
+                    formulario5.cargo_delegado,
+                    formulario5.firma_servidorPublico,
+                    formulario5.fecha_servidorPublico,
+                    formulario5.firma_RespElaboracion,
+                    formulario5.cargo_RespElaboracion,
+                    formulario5.firma_RespRevision,
+                    formulario5.cargo_RespRevision,
+                    formulario5.firma_RespRegistro_control,
+                    formulario5.cargo_RespRegistro_control,
+                    formulario6.ComunicacionElect,
+                    formulario6.fechaComunicacion,
+                    formulario6.horaComunicado,
+                    formulario6.medioComunicacionForm,
+                    formulario6.firma_Resp_Notificacion,
+                    null,
+                    fechaActual,
+                    null,
+                    null,
+                    null
                 ]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
+                console.log('response_accion: ', response_accion);
                 const [registroPedido] = response_accion.rows;
                 // var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
                 // var fecha_rige_desdeN = await FormatearFecha2(fec_rige_desde, 'ddd');
@@ -337,8 +389,9 @@ class AccionPersonalControlador {
                 return res.jsonp({ message: 'Registro realizado con éxito.' });
             }
             catch (error) {
+                console.log('response_accion: ', error);
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
