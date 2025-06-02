@@ -421,7 +421,7 @@
                 </app-registro-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="editar_contrato">
-                <app-editar-contrato [contrato]="contrato_editar" [pagina]="pagina_contrato">
+                <app-editar-contrato [contrato]="contrato_editar" [fecha]="fecha_seleccionada" [pagina]="pagina_contrato">
                 </app-editar-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="crear_cargo">
@@ -520,7 +520,7 @@
                                                 </a>
                                                 <ng-template #ContratoCargar>
                                                     <a mat-raised-button id="btndocumento" type="submit"
-                                                        (click)="AbrirVentanaEditarContrato(ce)">
+                                                        (click)="AbrirVentanaEditarContrato(ce, '')">
                                                         Cargar Contrato de Trabajo
                                                     </a>
                                                 </ng-template>
@@ -529,7 +529,7 @@
                                     </div>
                                     <div style="text-align: right; padding-top: 5%;" *ngIf="!editar_contrato">
                                         <i type="submit" id="edit" style="margin-right: 6px;"
-                                            (click)="AbrirVentanaEditarContrato(ce)" matSuffix
+                                            (click)="AbrirVentanaEditarContrato(ce, '')" matSuffix
                                             matTooltipPosition="right"
                                             matTooltip="Modificar los datos generales de este registro"
                                             class="fas fa-edit">
@@ -797,7 +797,7 @@
                                 <div style="text-align: right; margin-top: 5px;"
                                     *ngIf="ce.id != datoActual.id_contrato">
                                     <i type="submit" id="edit" style="margin-right: 6px;"
-                                        (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
+                                        (click)="AbrirVentanaEditarContrato(ce, contratoForm.value)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
