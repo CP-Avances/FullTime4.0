@@ -907,9 +907,17 @@ export class CrearPedidoAccionComponent implements OnInit {
                     let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
                     let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
 
-                   
+                    let hora_comuni = '';
 
-                  console.log('form5.fecha: ',form5.fechaServidorF,' - ' ,form5.fechaServidorForm)
+                    if (form6.horaComunicadoForm != ''){
+                      const hora_comunicacion = form6.horaComunicadoForm.c;
+                      const horas = hora_comunicacion.hour.toString().padStart(2, '0');
+                      const minutos = hora_comunicacion.minute.toString().padStart(2, '0');
+                      const segundos = hora_comunicacion.second.toString().padStart(2, '0');                      
+                      hora_comuni = horas+':'+minutos+':'+segundos
+                      console.log('hora_comuni: ',hora_comuni);
+                    }
+                    
 
                     // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
                     let datosAccion = {
@@ -1005,7 +1013,7 @@ export class CrearPedidoAccionComponent implements OnInit {
                       formulario6: {
                         ComunicacionElect: form6.ComunicacionElectForm == '' ? false : form6.ComunicacionElectForm,
                         fechaComunicacion: form6.fechaComunicadoForm == '' ? null : form6.fechaComunicadoForm,
-                        horaComunicado: form6.horaComunicadoForm == '' ? null : form6.horaComunicadoForm,
+                        horaComunicado: form6.horaComunicadoForm == '' ? null :  hora_comuni,
                         medioComunicacionForm: form6.medioComunicacionForm == '' ? null : form6.medioComunicacionForm,
                         abrevCForm: form6.abrevCForm == '' ? null : form6.abrevCForm,
                         firma_Resp_Notificacion: form6.idEmpleadoCForm == '' ? null : form6.idEmpleadoCForm,

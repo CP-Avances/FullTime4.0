@@ -299,6 +299,28 @@ class AccionPersonalControlador {
             console.log('req.body: ',req.body)
             let datosNuevos = req.body;
             const fechaActual = new Date();
+            let id_empleado_comunicacion = null;
+            let id_empleado_comunica_cargo = null;
+
+            if (formulario6.firma_Resp_Notificacion != '' && formulario6.firma_Resp_Notificacion != null){
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                const response: QueryResult = await pool.query(
+                    `
+                        SELECT * FROM informacion_general WHERE
+                        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+                    `
+                , [formulario6.firma_Resp_Notificacion.trim().toUpperCase()]);
+
+                id_empleado_comunicacion = response.rows[0].id;
+                id_empleado_comunica_cargo = response.rows[0].id_cargo;
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+            } 
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -312,7 +334,7 @@ class AccionPersonalControlador {
                     id_grado_actual, remuneracion_actual, partida_individual_actual, 
                     id_proceso_propuesto, id_sucursal_propuesta, id_nivel_gestion_propuesto, id_unidad_adminsitrativa_propuesta, id_lugar_trabajo_propuesto,id_tipo_cargo_propuesto, 
                     id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, partida_individual_propuesta, 
-                    lugar_posesion, fecha_posesion, numero_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
+                    lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
                     id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
                     fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
@@ -320,123 +342,61 @@ class AccionPersonalControlador {
                     $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
                     $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, 
                     $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, 
-                    $51, $52, $53, $54, $55, $56, $57, $58) RETURNING *
+                    $51, $52, $53, $54, $55, $56, $57, $58, $59) RETURNING *
                 `
-                , [formulario1.numero_accion_personal, 
-                    formulario1.fecha_elaboracion, 
-                    formulario1.hora_elaboracion, 
-                    formulario1.id_empleado_personal, 
-                    formulario1.fecha_rige_desde, 
-                    formulario1.fecha_rige_hasta, 
-
-                    formulario2.id_tipo_accion_personal, 
-                    formulario2.id_detalle_accion,
-                    formulario2.detalle_otro, 
-                    formulario2.especificacion, 
-                    formulario2.declaracion_jurada, 
-                    formulario2.adicion_base_legal, 
-                    formulario2.observacion, 
-
-                    formulario3.id_proceso_actual, 
-                    formulario3.id_nivel_gestion_actual, 
-                    formulario3.id_unidad_administrativa, 
-                    formulario3.id_sucursal_actual, 
-                    formulario3.id_lugar_trabajo_actual,
-                    formulario3.id_tipo_cargo_actual, 
-                    formulario3.id_grupo_ocupacional_actual, 
-                    formulario3.id_grado_actual, 
-                    formulario3.remuneracion_actual, 
-                    formulario3.partida_individual_actual,
+                , [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion, formulario1.id_empleado_personal, formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta, 
+                    formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro, formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion, 
+                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual, formulario3.id_unidad_administrativa, formulario3.id_sucursal_actual, formulario3.id_lugar_trabajo_actual,formulario3.id_tipo_cargo_actual, 
+                    formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual, formulario3.partida_individual_actual,
                     
-                    formulario3.id_proceso_propuesto, 
-                    formulario3.id_sucursal_propuesta,
-                    formulario3.id_nivel_gestion_propuesto, 
-                    formulario3.id_unidad_administrativa_propuesta, 
-                    formulario3.id_lugar_trabajo_propuesto, 
-                    formulario3.id_tipo_cargo_propuesto, 
-                    formulario3.id_grupo_ocupacional_propuesto, 
-                    formulario3.id_grado_propuesto,
-                    formulario3.remuneracion_propuesta, 
-                    formulario3.partida_individual_propuesta, 
+                    formulario3.id_proceso_propuesto, formulario3.id_sucursal_propuesta, formulario3.id_nivel_gestion_propuesto, formulario3.id_unidad_administrativa_propuesta, formulario3.id_lugar_trabajo_propuesto, 
+                    formulario3.id_tipo_cargo_propuesto, formulario3.id_grupo_ocupacional_propuesto, formulario3.id_grado_propuesto,formulario3.remuneracion_propuesta,formulario3.partida_individual_propuesta, 
                     
-                    formulario4.lugar_posesion, 
-                    formulario4.fecha_posesion, 
-                    formulario4.actaFinal,
+                    formulario4.lugar_posesion, formulario4.fecha_posesion, formulario4.actaFinal, formulario4.fechaActa,
                     
-                    formulario5.firma_talentoHumano, 
-                    formulario5.cargo_talentoHumano, 
-                    formulario5.firma_delegado, 
-                    formulario5.cargo_delegado, 
-                    formulario5.firma_servidorPublico, 
-                    formulario5.fecha_servidorPublico,
-                    formulario5.firma_RespElaboracion, 
-                    formulario5.cargo_RespElaboracion, 
-                    formulario5.firma_RespRevision, 
-                    formulario5.cargo_RespRevision, 
-                    formulario5.firma_RespRegistro_control, 
-                    formulario5.cargo_RespRegistro_control,
+                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado, formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
+                    formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control, formulario5.cargo_RespRegistro_control,
 
-                    formulario6.ComunicacionElect, 
-                    formulario6.fechaComunicacion, 
-                    formulario6.horaComunicado, 
-                    formulario6.medioComunicacionForm, 
-                    formulario6.firma_Resp_Notificacion, 
-                    null, 
-                    fechaActual, 
-                    null, 
-                    null, 
-                    null
+                    formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion, 
+                    id_empleado_comunica_cargo, fechaActual, null, null, null
                 ]);
 
             delete datosNuevos.user_name;
             delete datosNuevos.ip;
 
-            console.log('response_accion: ',response_accion)
-
+            console.log('response_accion: ',response_accion.rows[0])
             const [registroPedido] = response_accion.rows;
-            // var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
-            // var fecha_rige_desdeN = await FormatearFecha2(fec_rige_desde, 'ddd');
-            // var fecha_rige_hastaN = await FormatearFecha2(fec_rige_hasta, 'ddd');
-            // var primera_fecha_reemplazoN = await FormatearFecha2(primera_fecha_reemp, 'ddd');
-            // var fecha_acta_final_concurso = await FormatearFecha2(fec_act_final_concurso, 'ddd');
 
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'map_solicitud_accion_personal',
+                tabla: 'map_documento_accion_personal',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{}`,
+                datosNuevos: `{id: ${response_accion.rows[0].id}, numero_accion_personal: ${response_accion.rows[0].numero_accion_personal}, fecha_elaboracion: ${response_accion.rows[0].fecha_elaboracion}, 
+                    hora_elaboracion: ${response_accion.rows[0].hora_elaboracion}, id_empleado_personal: ${response_accion.rows[0].id_empleado_personal}, fecha_rige_desde: ${response_accion.rows[0].fecha_rige_desde}, 
+                    fecha_rige_hasta: ${response_accion.rows[0].fecha_rige_hasta}, id_tipo_accion_personal: ${response_accion.rows[0].id_tipo_accion_personal}, id_detalle_tipo_accion: ${response_accion.rows[0].id_detalle_tipo_accion}, detalle_otro: ${response_accion.rows[0].detalle_otro}, 
+                    especificacion: ${response_accion.rows[0].especificacion}, declaracion_jurada: ${response_accion.rows[0].declaracion_jurada}, adicion_base_legal: ${response_accion.rows[0].adicion_base_legal}, observacion: ${response_accion.rows[0].observacion}, 
+                    id_proceso_actual: ${response_accion.rows[0].id_proceso_actual}, id_nivel_gestion_actual: ${response_accion.rows[0].id_nivel_gestion_actual}, id_unidad_administrativa: ${response_accion.rows[0].id_unidad_administrativa}, id_sucursal_actual: ${response_accion.rows[0].id_sucursal_actual}, 
+                    id_lugar_trabajo_actual: ${response_accion.rows[0].lugar_trabajo_actual}, id_tipo_cargo_actual: ${response_accion.rows[0].id_tipo_cargo_actual}, id_grupo_ocupacional_actual: ${response_accion.rows[0].id_grupo_ocupacional_actual}, 
+                    id_grado_actual: ${response_accion.rows[0].id_grado_actual}, remuneracion_actual: ${response_accion.rows[0].remuneracion_actual}, partida_individual_actual: ${response_accion.rows[0].partida_individual_actual}, 
+                    id_proceso_propuesto: ${response_accion.rows[0].id_proceso_propuesto}, id_sucursal_propuesta: ${response_accion.rows[0].id_sucursal_propuesta}, id_nivel_gestion_propuesto: ${response_accion.rows[0].id_nivel_gestion_propuesto}, id_unidad_adminsitrativa_propuesta: ${response_accion.rows[0].id_unidad_administrativa_propuesta}, 
+                    id_lugar_trabajo_propuesto: ${response_accion.rows[0].id_lugar_trabajo_propuesto},id_tipo_cargo_propuesto: ${response_accion.rows[0].id_tipo_cargo_propuesto}, id_grupo_ocupacional_propuesto: ${response_accion.rows[0].id_grupo_ocupacional_propuesto}, id_grado_propuesto: ${response_accion.rows[0].id_grado_propuesto}, 
+                    remuneracion_propuesta: ${response_accion.rows[0].remuneracion_propuesta}, partida_individual_propuesta: ${response_accion.rows[0].partida_individual_propuesta}, lugar_posesion: ${response_accion.rows[0].lugar_posesion}, fecha_posesion: ${response_accion.rows[0].fecha_posesion}, numero_acta_final: ${response_accion.rows[0].numero_acta_final}, fecha_acta_final: ${response_accion.rows[0].fecha_acta_final},
+                    id_empleado_director: ${response_accion.rows[0].id_empleado_director}, id_tipo_cargo_director: ${response_accion.rows[0].id_tipo_cargo_director}, id_empleado_autoridad_delegado: ${response_accion.rows[0].id_empleado_autoridad_delegado}, id_tipo_cargo_autoridad_delegado: ${response_accion.rows[0].id_tipo_cargo_autoridad_delegado}, 
+                    id_empleado_testigo: ${response_accion.rows[0].id_empleado_testigo}, fecha_testigo: ${response_accion.rows[0].fecha_testigo}, id_empleado_elaboracion: ${response_accion.rows[0].id_empleado_elaboracion}, id_tipo_cargo_elaboracion: ${response_accion.rows[0].id_tipo_cargo_elaboracion}, id_empleado_revision: ${response_accion.rows[0].id_empleado_revision}, 
+                    id_tipo_cargo_revisio: ${response_accion.rows[0].id_tipo_cargo_revisio}n, id_empleado_control: ${response_accion.rows[0].id_empleado_control}, id_tipo_cargo_control: ${response_accion.rows[0].id_tipo_cargo_control}, comunicacion_electronica: ${response_accion.rows[0].comunicacion_electronica},
+                    fecha_comunicacion: ${response_accion.rows[0].fecha_comunicacion}, hora_comunicacion: ${response_accion.rows[0].hora_comunicacion}, medio_comunicacion: ${response_accion.rows[0].medio_comunicacion}, id_empleado_comunicacion: ${response_accion.rows[0].id_empleado_comunicacion}, id_tipo_cargo_comunicacion: ${response_accion.rows[0].id_tipo_cargo_comunicacion}, 
+                    fecha_registro: ${response_accion.rows[0].fecha_registro}, fecha_actualizacion: ${response_accion.rows[0].fecha_actualizacion}, proceso: ${response_accion.rows[0].proceso}, id_vacacion: ${response_accion.rows[0].id_vacacion}}`,
                 ip: ip,
                 ip_local: ip_local,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-
-
-            if( formulario6.firma_Resp_Notificacion != ''){
-                 // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-                const response = await pool.query(
-                    `
-                    SELECT id_cargo FROM informacion_general WHERE id = $1
-                    `
-                    , [formulario6.firma_Resp_Notificacion]);
-
-                const [datos] = response.rows;
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-
-                console.log('datos: ',datos)
-                console.log('registroPedido: ',registroPedido)
-
-            }
-
-
-            
+            await pool.query('COMMIT');            
             return res.jsonp({ message: 'Registro realizado con éxito.' });
+
         } catch (error) {
              console.log('response_accion: ',error)
             await pool.query('ROLLBACK');
@@ -601,8 +561,8 @@ class AccionPersonalControlador {
         const { id } = req.params;
         const ACCION = await pool.query(
             `
-            SELECT ap.id, ap.id_empleado, ap.fecha_creacion, ap.fecha_rige_desde, 
-                ap.fecha_rige_hasta, ap.identificacion_accion_personal, ap.numero_partida_empresa, ap.id_contexto_legal,
+            SELECT ap.id, ap.id_empleado_personal, ap.fecha_elaboracion, ap.fecha_rige_desde, ap.fecha_rige_hasta, 
+                ap.id_tipo_accion_personal, ap.numero_accion_personal, ap.id_contexto_legal,
                 ap.titulo_empleado_uno, ap.firma_empleado_uno, ap.titulo_empleado_dos, ap.firma_empleado_dos, 
                 ap.adicion_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
                 ap.numero_partida_propuesta, ap.salario_propuesto, ap.id_ciudad, ap.id_empleado_responsable, 
@@ -610,7 +570,7 @@ class AccionPersonalControlador {
                 ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 
                 ap.posesion_notificacion, ap.descripcion_posesion_notificacion, tap.base_legal, tap.id_tipo_accion_personal, 
                 ta.descripcion AS tipo 
-            FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, map_tipo_accion_personal AS ta 
+            FROM map_documento_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, map_tipo_accion_personal AS ta 
             WHERE ap.id_detalle_tipo_accion_personal = tap.id AND ap.id = $1 AND ta.id = tap.id_tipo_accion_personal
             `
             , [id]);
