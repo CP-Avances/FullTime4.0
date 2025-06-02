@@ -590,7 +590,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 { text: 'FECHA', style: 'tableHeader' },
               ],
               ...empl.faltas.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+                const fecha = this.validar.FormatearFecha(usu.fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 totalFaltasEmpleado++;
                 c = c + 1;
                 return [
@@ -698,7 +698,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
        
 
         empl.faltas.map((obj3: any) => {
-          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha = this.validar.FormatearFecha(obj3.fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           datos.push([
             n++,
             empl.identificacion,
@@ -846,7 +846,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
        
         empl.faltas.forEach((usu: any) => {
-          const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha = this.validar.FormatearFecha(usu.fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           n = n + 1;
           let ele = {
             n: n,

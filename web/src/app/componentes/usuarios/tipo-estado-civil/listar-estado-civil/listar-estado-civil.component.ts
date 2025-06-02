@@ -459,7 +459,7 @@ export class ListarEstadoCivilComponent {
       const worksheet = workbook.addWorksheet("Estado Civil");
   
   
-      console.log("ver logo. ", this.logo)
+      
       this.imagen = workbook.addImage({
         base64: this.logo,
         extension: "png",

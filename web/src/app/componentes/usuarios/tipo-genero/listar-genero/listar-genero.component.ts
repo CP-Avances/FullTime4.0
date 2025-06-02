@@ -478,8 +478,6 @@ export class ListarGeneroComponent {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Género");
 
-
-    console.log("ver logo. ", this.logo)
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",

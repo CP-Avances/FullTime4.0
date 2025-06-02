@@ -593,7 +593,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
-          n++;
           const hora = this.validar.FormatearHora(t.fecha_hora_horario.split(' ')[1], this.formato_hora);
           switch (t.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;

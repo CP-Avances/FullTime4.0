@@ -107,10 +107,10 @@ export class ListarRelojesComponent implements OnInit {
   ngOnInit(): void {
     this.totalDispositivos = 3;
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
@@ -473,6 +473,10 @@ export class ListarRelojesComponent implements OnInit {
 
 
   async GenerarPdf(action = 'open') {
+    if (!this.relojes || this.relojes.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -591,6 +595,10 @@ export class ListarRelojesComponent implements OnInit {
 
 
   async generarExcel() {
+    if (!this.relojes || this.relojes.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     let datos: any[] = [];
     let n: number = 1;
 
@@ -757,6 +765,10 @@ export class ListarRelojesComponent implements OnInit {
    ** ********************************************************************************************** **/
 
   ExportToCSV() {
+    if (!this.relojes || this.relojes.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('RelojesCSV');
     //  Agregar encabezados dinámicos basados en las claves del primer objeto
@@ -794,6 +806,10 @@ export class ListarRelojesComponent implements OnInit {
   data: any = [];
 
   ExportToXML() {
+    if (!this.relojes || this.relojes.length === 0) {
+      this.toastr.info('No hay datos para mostrar en el reporte.');
+      return;
+    }
     this.OrdenarDatos(this.relojes);
     var objeto: any;
     var arregloRelojes: any = [];
@@ -1010,27 +1026,27 @@ export class ListarRelojesComponent implements OnInit {
     }
   }
 
-  getCrearDispositivos(){
+  getCrearDispositivos() {
     return this.tienePermiso('Crear Dispositivos');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Dispositivos');
   }
 
-  getVerDispositivos(){
+  getVerDispositivos() {
     return this.tienePermiso('Ver Información Dipositivo');
   }
 
-  getEditarDispositivos(){
+  getEditarDispositivos() {
     return this.tienePermiso('Editar Dispositivos');
   }
 
-  getEliminarDispositivos(){
+  getEliminarDispositivos() {
     return this.tienePermiso('Eliminar Dispositivos');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Dispositivos');
   }
 

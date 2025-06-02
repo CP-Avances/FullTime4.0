@@ -636,8 +636,8 @@ export class ListarTipoAccionComponent implements OnInit {
       { key: "n", width: 10 },
       { key: "id_tipo_accion_personal", width: 20 },
       { key: "nombre", width: 20 },
-      { key: "descripcion", width: 20 },
-      { key: "base_legal", width: 20 },
+      { key: "descripcion", width: 30 },
+      { key: "base_legal", width: 60 },
     ]
 
     const columnas = [
