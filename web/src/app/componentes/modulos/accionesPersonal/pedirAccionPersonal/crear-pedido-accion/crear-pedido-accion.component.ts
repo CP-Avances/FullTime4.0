@@ -859,29 +859,35 @@ export class CrearPedidoAccionComponent implements OnInit {
       
       // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
       this.restE.BuscarEmpleadoNombre(datos2).subscribe((empl2) => {
+
+        console.log('empl2: ',empl2);
+
         var idEmpl_firmaTH = empl2[0].id;
-        var Empl_firmaTH_cargo = empl2[0].cargo
+        var Empl_firmaTH_cargo = empl2[0].id_cargo
 
         // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA SEGUNDA FIRMA
         this.restE.BuscarEmpleadoNombre(datos3).subscribe((empl3) => {
           var idEmpl_firmaG = empl3[0].id;
-          var Empl_firmaG_cargo = empl3[0].cargo
+          var Empl_firmaG_cargo = empl3[0].id_cargo
 
           this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
             var idEmpl_firmaS = empl4[0].id;
-            var Empl_firmaS_cargo = empl4[0].cargo
+            var Empl_firmaS_cargo = empl4[0].id_cargo
 
             this.restE.BuscarEmpleadoNombre(datos6).subscribe((empl5) => {
               var idEmpl_firmaRE = empl5[0].id;
-              var Empl_firmaRE_cargo = empl5[0].cargo
+              var Empl_firmaRE_cargo = empl5[0].id_cargo
 
               this.restE.BuscarEmpleadoNombre(datos7).subscribe((empl6) => {
                 var idEmpl_firmaRR = empl6[0].id;
-                var Empl_firmaRR_cargo = empl6[0].cargo
+                var Empl_firmaRR_cargo = empl6[0].id_cargo
 
                 this.restE.BuscarEmpleadoNombre(datos8).subscribe((empl7) => {
                   var idEmpl_firmaRC = empl7[0].id;
-                  var Empl_firmaRC_cargo = empl7[0].cargo
+                  var Empl_firmaRC_cargo = empl7[0].id_cargo
+
+                  
+                    let id_tipo_accion_personal = this.tipos_accion.find(item => item.nombre === form2.idTipoAccionFom)
 
                     let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
                     let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
@@ -901,6 +907,18 @@ export class CrearPedidoAccionComponent implements OnInit {
                     let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
                     let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
 
+                    let hora_comuni = '';
+
+                    if (form6.horaComunicadoForm != ''){
+                      const hora_comunicacion = form6.horaComunicadoForm.c;
+                      const horas = hora_comunicacion.hour.toString().padStart(2, '0');
+                      const minutos = hora_comunicacion.minute.toString().padStart(2, '0');
+                      const segundos = hora_comunicacion.second.toString().padStart(2, '0');                      
+                      hora_comuni = horas+':'+minutos+':'+segundos
+                      console.log('hora_comuni: ',hora_comuni);
+                    }
+                    
+
                     // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
                     let datosAccion = {
 
@@ -916,7 +934,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
                       //parte formulario 2
                       formulario2: {
-                        id_tipo_accion_personal: form2.idTipoAccionFom,
+                        id_tipo_accion_personal: id_tipo_accion_personal.id_tipo_accion_personal,
+                        id_detalle_accion: id_tipo_accion_personal.id,
                         detalle_otro: form2.otroAccionForm,
                         especificacion: form2.otroEspecificacion,
                         declaracion_jurada: form2.declaracionJuradaForm,
@@ -934,7 +953,7 @@ export class CrearPedidoAccionComponent implements OnInit {
                         id_tipo_cargo_actual: cargo_actual != undefined ? cargo_actual.id : null,
                         id_grupo_ocupacional_actual: grupo_ocupacional_actual != undefined ? grupo_ocupacional_actual.id : null,
                         id_grado_actual: grado_actual != undefined ? grado_actual.id : null,
-                        remuneracion_actual: form3.sueldoForm,
+                        remuneracion_actual: parseFloat(form3.sueldoForm) ,
                         partida_individual_actual: form3.actaForm,
 
                         id_proceso_propuesto: procesoPropuesto != undefined ? procesoPropuesto.id : null,
@@ -945,7 +964,7 @@ export class CrearPedidoAccionComponent implements OnInit {
                         id_tipo_cargo_propuesto: cargo_propuesto != undefined ? cargo_propuesto.id : null,
                         id_grupo_ocupacional_propuesto: grupo_ocupacional_propuesto != undefined ? grupo_ocupacional_propuesto.id : null,
                         id_grado_propuesto: grado_propuesto != undefined ? grado_propuesto.id : null,
-                        remuneracion_propuesta: form3.sueldoPropuestoForm,
+                        remuneracion_propuesta: form3.sueldoPropuestoForm != '' ? parseFloat(form3.sueldoPropuestoForm) : null,
                         partida_individual_propuesta: form3.actaPropuestaFom,
                       },
 
@@ -953,7 +972,7 @@ export class CrearPedidoAccionComponent implements OnInit {
                       formulario4: {
                         funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
                         cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
-                        lugar_posesion: form3.habilitarForm4 ? form4.lugar_trabajo : null,
+                        lugar_posesion: form3.habilitarForm4 ? lugar_trabajo_actual : null,
                         fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
                         actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
                         fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
@@ -972,11 +991,11 @@ export class CrearPedidoAccionComponent implements OnInit {
                         abrevia_servidorPublico: form5.abrevHForm,
                         firma_servidorPublico: idEmpl_firmaS,
                         cargo_servidorPublico: Empl_firmaS_cargo,
-                        fecha_servidorPublico: form5.fechaServidorForm,
+                        fecha_servidorPublico: form5.fechaServidorForm == '' ? null : form5.fechaServidorForm,
 
                         abrevia_negativa: form5.abrevGForm,
                         firma_negativa: form5.idEmpleadoGForm,
-                        fecha_negativa: form5.fechaNegativaF,
+                        fecha_negativa: form5.fechaNegativaF == '' ? null : form5.fechaNegativaF,
                         razon_negativa: form5.razonForm,
 
                         abrevia_RespElaboracion: form5.abrevRGForm,
@@ -992,12 +1011,12 @@ export class CrearPedidoAccionComponent implements OnInit {
 
                       //parte formulario 6
                       formulario6: {
-                        ComunicacionElect: form6.ComunicacionElectForm,
-                        fechaComunicacion: form6.fechaReempForm,
-                        horaComunicado: form6.horaComunicadoForm,
-                        medioComunicacionForm: form6.medioComunicacionForm,
-                        abrevCForm: form6.abrevCForm,
-                        firma_Resp_Notificacion: form6.idEmpleadoCForm,
+                        ComunicacionElect: form6.ComunicacionElectForm == '' ? false : form6.ComunicacionElectForm,
+                        fechaComunicacion: form6.fechaComunicadoForm == '' ? null : form6.fechaComunicadoForm,
+                        horaComunicado: form6.horaComunicadoForm == '' ? null :  hora_comuni,
+                        medioComunicacionForm: form6.medioComunicacionForm == '' ? null : form6.medioComunicacionForm,
+                        abrevCForm: form6.abrevCForm == '' ? null : form6.abrevCForm,
+                        firma_Resp_Notificacion: form6.idEmpleadoCForm == '' ? null : form6.idEmpleadoCForm,
                       },
 
                       user_name: this.user_name,
@@ -1025,6 +1044,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // METODO PARA VERIFICAR LAS POSIBLES OPCIONES DE INGRESOS EN EL FORMULARIO
   ValidacionesIngresos(form1: any, form2: any, datosAccion: any) {
+
     // INGRESO DE DATOS DE ACUERDO A LO INGRESADO POR EL USUARIO
     if (form1.tipoDecretoForm != undefined && form2.tipoCargoForm != undefined) {
       console.log("INGRESA 1", datosAccion);
