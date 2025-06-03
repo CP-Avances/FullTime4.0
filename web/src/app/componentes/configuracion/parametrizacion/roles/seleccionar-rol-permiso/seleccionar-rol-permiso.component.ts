@@ -566,7 +566,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_accion: accion.id,
                     movil: this.plataforma,
                     user_name: this.user_name,
-                    ip: this.ip, ip_local: this.ips_locales,
+                    ip: this.ip, 
+                    ip_local: this.ips_locales,
                   }
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
                     this.contador = this.contador + 1;

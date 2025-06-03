@@ -191,6 +191,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA REGISTRO DE MODALIDAD LABORAL
   AbrirVentanaRegistrarModalidad(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroModalidadComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
