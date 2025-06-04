@@ -334,9 +334,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
   // METODO PARA RETIRAR ACCIONES
-  QuitarAccion(id: any, data: any) {
+  QuitarAccion(id: any, data: any, j: number) {
     this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter((s: any) => s !== data);
-    (<HTMLInputElement>document.getElementById('seleccionarAccion' + id)).checked = false;
+    if (this.nombresAccionesPorPagina[id][0].length > 1) (<HTMLInputElement>document.getElementById(`seleccionarAccion${id}_${j}`)).checked = false;
   }
 
   // METODO PARA AGREGAR TODAS LAS PAGINAS
@@ -490,16 +490,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SELECCION DE ACCIONES
   isCheckedAccion_: boolean = false;
-  SeleccionarIndividualAccion(event: any, id: any, valor: any) {
+  SeleccionarIndividualAccion(event: any, id: any, valor: any, j: number) {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {
       this.AgregarAccion(id, valor);
-      if (this.accionesSeleccionadasPorPagina[id].length == this.nombresAccionesPorPagina[id][0].length) {
-        (<HTMLInputElement>document.getElementById('seleccionarAccion' + id)).checked = true;
+      if (this.nombresAccionesPorPagina[id][0].length > 1 && this.accionesSeleccionadasPorPagina[id].length == this.nombresAccionesPorPagina[id][0].length) {
+        (<HTMLInputElement>document.getElementById(`seleccionarAccion${id}_${j}`)).checked = true;
       }
     }
     else {
-      this.QuitarAccion(id, valor);
+      this.QuitarAccion(id, valor, j);
     }
   }
 
