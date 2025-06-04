@@ -617,6 +617,7 @@ class ContratoEmpleadoControlador {
         const workbook = new Excel.Workbook();
         await workbook.xlsx.readFile(ruta);
         let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS_CONTRATOS');
+        console.log('ingresa ', verificador)
         if (verificador === false) {
             return res.jsonp({ message: 'no_existe', data: undefined });
         }
@@ -639,6 +640,7 @@ class ContratoEmpleadoControlador {
             var listContratos: any = [];
             var duplicados: any = [];
             var mensaje: string = 'correcto';
+            console.log('plantilla ', plantilla)
             if (plantilla) {
                 // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
                 const headerRow = plantilla.getRow(1);
@@ -647,6 +649,7 @@ class ContratoEmpleadoControlador {
                 headerRow.eachCell((cell: any, colNumber) => {
                     headers[cell.value.toString().toUpperCase()] = colNumber;
                 });
+                console.log('plantilla cabeceras ', headers['ITEM'])
                 // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
                 if (!headers['ITEM'] || !headers['IDENTIFICACION'] || !headers['PAIS'] ||
                     !headers['REGIMEN_LABORAL'] || !headers['MODALIDAD_LABORAL'] || !headers['FECHA_DESDE'] ||

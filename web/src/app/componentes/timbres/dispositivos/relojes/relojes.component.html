@@ -31,7 +31,7 @@
                                     <mat-label id="letras">Seleccionar sucursal</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar en que sucursal se encuentra el dispositivo.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                     <mat-select [formControl]="idSucursalF" required>
                                         <mat-option *ngFor="let s of sucursales" [value]="s.id"
@@ -44,7 +44,7 @@
                                     <mat-label id="letras">Seleccionar departamento</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar en que departamento se encuentra el dispositivo.">
-                                        help_outline
+                                        account_balance
                                     </mat-icon>
                                     <mat-select [formControl]="idDepartamentoF" required>
                                         <mat-option *ngFor="let d of departamento" [value]="d.id">
@@ -59,7 +59,8 @@
                                         required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar nombre del nuevo dispositivo.">
-                                        help_outline</mat-icon>
+                                        schedule
+                                    </mat-icon>
                                     <mat-error *ngIf="nombreF.invalid">Ingresar un nombre válido.</mat-error>
                                 </mat-form-field>
 
@@ -69,7 +70,7 @@
                                         required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el código que tiene el dispositivo.">
-                                        help_outline
+                                        code
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -82,19 +83,20 @@
                                         (keypress)="IngresarIp($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar dirección IP del dispositivo.">
-                                        help_outline
+                                        dns
                                     </mat-icon>
                                     <mat-error *ngIf="ipF.invalid">{{ObtenerMensajeErrorIp()}}</mat-error>
                                 </mat-form-field>
 
                                 <mat-form-field>
                                     <mat-label id="letras">Puerto</mat-label>
-                                    <input matInput type="tel" placeholder="Ingresar puerto" [formControl]="puertoF" maxlength="6"
+                                    <input matInput type="tel" placeholder="Ingresar puerto" [formControl]="puertoF"
+                                        maxlength="6"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         (keypress)="IngresarSoloNumeros($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar puerto que usa el dispositivo.">
-                                        help_outline
+                                        settings_ethernet
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -162,7 +164,7 @@
                                     <mat-label>Marca</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar el estado civil del colaborador.">
-                                        help_outline
+                                        branding_watermark
                                     </mat-icon>
                                     <mat-select required formControlName="marcaForm">
                                         <mat-option value="ZKteco">ZKteco</mat-option>
@@ -174,7 +176,7 @@
                                     <input matInput placeholder="Ingresar modelo" [formControl]="modeloF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el modelo del dispositivo.">
-                                        help_outline
+                                        category
                                     </mat-icon>
                                     <mat-error *ngIf="modeloF.invalid">Ingresar un modelo válido</mat-error>
                                 </mat-form-field>
@@ -184,7 +186,7 @@
                                         [formControl]="idFabricacionF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
                                         matTooltip="Ingresar ID de fabricación del dispositivo.">
-                                        help_outline
+                                        factory
                                     </mat-icon>
                                     <mat-error id="mensaje" *ngIf="idFabricacionF.invalid">
                                         Ingresar un id de fabricación válido.
@@ -195,7 +197,7 @@
                                     <input matInput placeholder="Ingresar fabricante" [formControl]="fabricanteF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
                                         matTooltip="Ingresar nombre de empresa fabricante del dispositivo.">
-                                        help_outline
+                                        factory
                                     </mat-icon>
                                     <mat-error *ngIf="fabricanteF.invalid">Ingresar un modelo válido.</mat-error>
                                 </mat-form-field>
@@ -208,7 +210,7 @@
                                     <input matInput placeholder="Ingresar serie" [formControl]="serieF" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar la serie del dispositivo.">
-                                        help_outline
+                                        confirmation_number
                                     </mat-icon>
                                     <mat-error *ngIf="serieF.invalid">Ingresar una serie válida</mat-error>
                                 </mat-form-field>
@@ -217,7 +219,7 @@
                                     <input matInput placeholder="Ingresar dirección MAC" [formControl]="macF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
                                         matTooltip="Ingresar dirección física (MAC) del dispositivo ">
-                                        help_outline
+                                        settings_ethernet
                                     </mat-icon>
                                     <mat-error *ngIf="macF.invalid">Ingresar una dirección MAC válida</mat-error>
                                 </mat-form-field>
@@ -241,7 +243,7 @@
                                     </mat-autocomplete>
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar la nacionalidad del colaborador.">
-                                        help_outline
+                                        schedule
                                     </mat-icon>
                                 </mat-form-field>
                             </div>

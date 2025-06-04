@@ -35,7 +35,7 @@
                                 (keypress)="IngresarSoloLetras($event)" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Es obligatorio ingresar los dos nombres del nuevo empleado">
-                                help_outline
+                                person
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -46,7 +46,7 @@
                                 (keypress)="IngresarSoloLetras($event)" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Es obligatorio ingresar los dos apellidos del nuevo empleado">
-                                help_outline
+                                person
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -62,7 +62,7 @@
                                 (keypress)="IngresarSoloLetrasNumeros($event)" required maxlength="10">
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar el código del colaborador.">
-                                help_outline
+                                fingerprint
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -92,7 +92,7 @@
                                     (input)="ValidarCedula(primeroFormGroup.value)">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
-                                    help_outline
+                                    badge
                                 </mat-icon>
                                 <mat-error *ngIf="!cedulaValida">
                                     <mat-icon>error</mat-icon> Cédula incorrecta
@@ -196,7 +196,7 @@
                             <mat-label>Estado civil</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Seleccionar el estado civil del colaborador.">
-                                help_outline
+                                diversity_1
                             </mat-icon>
                             <mat-select required formControlName="estadoCivilForm">
                                 <mat-option *ngFor="let ec of estados_civil" [value]="ec.id">
@@ -210,7 +210,7 @@
                             <mat-label>Género</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Seleccionar el género del colaborador.">
-                                help_outline
+                                wc
                             </mat-icon>
                             <mat-select required formControlName="generoForm">
                                 <mat-option *ngFor="let g of generos" [value]="g.id">
@@ -232,7 +232,9 @@
                                 </mat-option>
                             </mat-autocomplete>
                             <mat-icon matSuffix matTooltipPosition="right"
-                                matTooltip="Seleccionar la nacionalidad del colaborador.">help_outline</mat-icon>
+                                matTooltip="Seleccionar la nacionalidad del colaborador.">
+                                person_pin
+                            </mat-icon>
                         </mat-form-field>
                     </div>
                     <div class="col-12 col-md-6">
@@ -240,7 +242,7 @@
                             <mat-label>Estado</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Seleccionar el estado del nuevo empleado. Por defecto seleccionar Activo">
-                                help_outline
+                                adjust
                             </mat-icon>
                             <mat-select required formControlName="estadoForm">
                                 <mat-option [value]="1">Activo</mat-option>
@@ -281,7 +283,7 @@
                             <mat-label>Seleccionar un Rol</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="El rol es el nivel de autorización que el usaurio tendra en el sistema">
-                                help_outline
+                                admin_panel_settings
                             </mat-icon>
                             <mat-select required formControlName="rolForm">
                                 <mat-option *ngFor="let r of roles" [value]="r.id">{{r.nombre}}</mat-option>

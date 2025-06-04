@@ -164,6 +164,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // METODO PARA REGISTRAR PROVINCIAS
   AbrirVentanaRegistrarProvincia() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroProvinciaComponent, { width: '550px' }).afterClosed().subscribe(item => {
       this.ListarProvincias();
     });
@@ -573,6 +574,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -635,6 +637,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINAR MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

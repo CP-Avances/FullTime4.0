@@ -268,6 +268,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   // METODO PARA SOLICITAR CONFIRMACION DE REGISTRO DE PLANIFICACIONES
   ConfirmarRegistroPlanificaciones() {
     const mensaje = 'registro-planificacion';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed().subscribe((confimado: Boolean) => {
       if (confimado) {
         this.RegistrarPlanificaciones();

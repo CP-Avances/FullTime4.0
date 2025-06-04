@@ -100,10 +100,10 @@ export class CatTipoCargosComponent {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.listaTipoCargos = [];
     this.ObtenerEmpleados(this.idEmpleado);
@@ -190,6 +190,7 @@ export class CatTipoCargosComponent {
 
   // METODO PARA ABRIR VENTA DE REGISTRO DE TIPO CARGO
   AbrirVentanaRegistrarCargo(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarCargoComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
@@ -212,9 +213,11 @@ export class CatTipoCargosComponent {
   // METODO DE CONFIRMAICON DE ELIMINACION
   ConfirmarDelete(cargo: any) {
     const mensaje = 'eliminar';
+    (document.activeElement as HTMLElement)?.blur();
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     }
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -310,16 +313,6 @@ export class CatTipoCargosComponent {
       this.Datos_tipo_cargos = res.data;
       this.messajeExcel = res.message;
 
-      this.Datos_tipo_cargos.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -333,6 +326,15 @@ export class CatTipoCargosComponent {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.Datos_tipo_cargos.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.Datos_tipo_cargos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaCargosCorrectas.push(item);
@@ -377,6 +379,7 @@ export class CatTipoCargosComponent {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -527,7 +530,7 @@ export class CatTipoCargosComponent {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-  
+
   async generarExcelModalidad() {
     let datos: any[] = [];
     let n: number = 1;
@@ -687,7 +690,7 @@ export class CatTipoCargosComponent {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
- 
+
 
   ExportToCSV() {
     this.OrdenarDatos(this.listaTipoCargos);
@@ -765,7 +768,7 @@ export class CatTipoCargosComponent {
       ip: this.ip,
       ip_local: this.ips_locales,
     };
-  
+
     const peticiones = this.selectionTipoCargo.selected.map((datos: any) =>
       this._TipoCargos.Eliminar(datos.id, data).pipe(
         map((res: any) => ({ success: true, cargo: datos.cargo, relacionado: false })),
@@ -781,10 +784,10 @@ export class CatTipoCargosComponent {
         })
       )
     );
-  
+
     forkJoin(peticiones).subscribe(resultados => {
       let eliminados = 0;
-  
+
       resultados.forEach((resultado: any) => {
         if (resultado.success) {
           eliminados++;
@@ -794,22 +797,23 @@ export class CatTipoCargosComponent {
           });
         }
       });
-  
+
       if (eliminados > 0) {
         this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
           timeOut: 6000,
         });
       }
-  
+
       this.tiposCargoEliminar = [];
       this.selectionTipoCargo.clear();
       this.ngOnInit();
     });
   }
-  
+
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -847,23 +851,23 @@ export class CatTipoCargosComponent {
     }
   }
 
-  getCrearTipoCargo(){
+  getCrearTipoCargo() {
     return this.tienePermiso('Crear Tipo Cargo');
   }
 
-  getEditarTipoCargo(){
+  getEditarTipoCargo() {
     return this.tienePermiso('Editar Tipo Cargo');
   }
 
-  getEliminarTipoCargo(){
+  getEliminarTipoCargo() {
     return this.tienePermiso('Eliminar Tipo Cargo');
   }
 
-  getCargarPlantillaTipoCargo(){
+  getCargarPlantillaTipoCargo() {
     return this.tienePermiso('Cargar Plantilla Tipo Cargo');
   }
 
-  getDescargarReportesTipoCargo(){
+  getDescargarReportesTipoCargo() {
     return this.tienePermiso('Descargar Reportes Tipo Cargo');
   }
 

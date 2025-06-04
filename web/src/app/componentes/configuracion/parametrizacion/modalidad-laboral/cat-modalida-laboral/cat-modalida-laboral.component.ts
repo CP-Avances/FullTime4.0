@@ -36,7 +36,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   ips_locales: any = '';
 
   private imagen: any;
-  
+
   private bordeCompleto!: Partial<ExcelJS.Borders>;
 
   private bordeGrueso!: Partial<ExcelJS.Borders>;
@@ -103,10 +103,10 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);
@@ -272,21 +272,10 @@ export class CatModalidaLaboralComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
-    console.log('datossss: ',formData)
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
       this.messajeExcel = res.message;
-      this.Datos_modalidad_laboral.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -300,6 +289,15 @@ export class CatModalidaLaboralComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.Datos_modalidad_laboral.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.Datos_modalidad_laboral.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaModalidadCorrectas.push(item);
@@ -344,6 +342,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -358,7 +357,8 @@ export class CatModalidaLaboralComponent implements OnInit {
       const data = {
         plantilla: this.listaModalidadCorrectas,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       }
       this._ModalidaLaboral.SubirArchivoExcel(data).subscribe({
         next: (response: any) => {
@@ -496,7 +496,7 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
- 
+
   async generarExcelModalidad() {
     let datos: any[] = [];
     let n: number = 1;
@@ -655,7 +655,7 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-  
+
   ExportToCSV() {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const workbook = new ExcelJS.Workbook();
@@ -727,8 +727,10 @@ export class CatModalidaLaboralComponent implements OnInit {
     const mensaje = 'eliminar';
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -764,17 +766,17 @@ export class CatModalidaLaboralComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     const peticiones = this.selectionModalidad.selected.map((datos: any) =>
       this._ModalidaLaboral.Eliminar(datos.id, data).pipe(
         map((res: any) => ({ success: res.message !== 'error', descripcion: datos.descripcion })),
         catchError(() => of({ success: false, descripcion: datos.descripcion }))
       )
     );
-  
+
     forkJoin(peticiones).subscribe(resultados => {
       let eliminados = 0;
-  
+
       resultados.forEach(resultado => {
         if (resultado.success) {
           eliminados++;
@@ -784,13 +786,13 @@ export class CatModalidaLaboralComponent implements OnInit {
           });
         }
       });
-  
+
       if (eliminados > 0) {
         this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
           timeOut: 6000,
         });
       }
-  
+
       this.modalidadesEliminar = [];
       this.selectionModalidad.clear();
       this.ngOnInit();
@@ -799,6 +801,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -835,23 +838,23 @@ export class CatModalidaLaboralComponent implements OnInit {
     }
   }
 
-  getEditarModalidadLaboral(){
+  getEditarModalidadLaboral() {
     return this.tienePermiso('Editar Modalidad Laboral');
   }
 
-  getEliminarModalidadLaboral(){
+  getEliminarModalidadLaboral() {
     return this.tienePermiso('Eliminar Modalidad Laboral');
   }
 
-  getCargarPlantillaModalidadLaboral(){
+  getCargarPlantillaModalidadLaboral() {
     return this.tienePermiso('Cargar Plantilla Modalidad Laboral');
   }
 
-  getDescargarReportesModalidadLaboral(){
+  getDescargarReportesModalidadLaboral() {
     return this.tienePermiso('Descargar Reportes Modalidad Laboral');
   }
 
-  getCrearModalidadLaboral(){
+  getCrearModalidadLaboral() {
     return this.tienePermiso('Crear Modalidad Laboral');
   }
 

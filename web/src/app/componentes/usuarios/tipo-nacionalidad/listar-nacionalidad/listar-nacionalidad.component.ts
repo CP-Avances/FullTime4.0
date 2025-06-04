@@ -156,6 +156,7 @@ ObtenerColores() {
 }
 
 AbrirVentanaRegistrarNacionalidad() {
+  (document.activeElement as HTMLElement)?.blur();
   this.ventana.open(RegistrarNacionalidadComponent, { width: '550px' }).afterClosed().subscribe(item => {
     this.ListarNacionalidades();
   });
@@ -183,6 +184,7 @@ LimpiarCampos() {
 }
 
 ConfirmarDeleteMultiple() {
+  (document.activeElement as HTMLElement)?.blur();
   this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
     .subscribe((confirmado: Boolean) => {
       if (confirmado) {
@@ -294,7 +296,7 @@ checkboxLabelPag(row?: any): string {
 
 
 ConfirmarDelete(datos: any) {
-
+  (document.activeElement as HTMLElement)?.blur();
   this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
     .subscribe((confirmado: Boolean) => {
       if (confirmado) {

@@ -161,6 +161,7 @@ export class ListarCiudadComponent implements OnInit {
 
   // METODO PARA REGISTRAR CIUDAD
   AbrirVentanaRegistrarCiudad() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarCiudadComponent, { width: '600px' }).afterClosed().subscribe(item => {
       this.ListarCiudades();
     });
@@ -572,6 +573,7 @@ export class ListarCiudadComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -635,6 +637,7 @@ export class ListarCiudadComponent implements OnInit {
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

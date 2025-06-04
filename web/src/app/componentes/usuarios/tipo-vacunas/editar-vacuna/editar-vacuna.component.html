@@ -5,7 +5,7 @@
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
         <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-            MODIFICAR VACUNA
+            MODIFICAR TIPO DE VACUNA
         </span>
     </div>
     <div class="col-2 col-md-2 mb-2 mb-md-0">
@@ -22,12 +22,12 @@
         </div>
         <div class="d-flex flex-wrap justify-content-center">
             <mat-form-field>
-                <mat-label>Discapacidad</mat-label>
+                <mat-label>Nombre</mat-label>
                 <input matInput placeholder="Indefinido" [formControl]="vacuna" 
                     required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                    matTooltip="Ingresar la discapacidad.">
-                    help_outline
+                    matTooltip="Ingresar el nombre del tipo de vacuna.">
+                    medication
                 </mat-icon>
             </mat-form-field>
         </div>

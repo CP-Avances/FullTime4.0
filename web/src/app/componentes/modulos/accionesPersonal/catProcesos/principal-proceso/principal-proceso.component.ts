@@ -209,6 +209,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA ABRIR PANTALLA DE REGISTRO DE PROCESO
   AbrirVentanaRegistrarProceso() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroProcesoComponent,
       { width: '450px' }).afterClosed().subscribe(items => {
         this.ObtenerProcesos();
@@ -249,6 +250,7 @@ export class PrincipalProcesoComponent implements OnInit {
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
     //console.log(datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -261,6 +263,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -464,6 +467,7 @@ export class PrincipalProcesoComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

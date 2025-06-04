@@ -21,8 +21,9 @@
                         <mat-label>Sucursal</mat-label>
                         <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
                             [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
-                            help_outline
+                        <mat-icon matSuffix matTooltipPosition="right" matTooltipPosition="right"
+                            matTooltip="Búsqueda de sucursales por nombre.">
+                            location_city
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -38,7 +39,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -51,7 +52,7 @@
                                     [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de régimen laboral por nombre.">
-                                    help_outline
+                                    article
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -69,7 +70,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -82,7 +83,7 @@
                                     [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de cargos por su descripción.">
-                                    help_outline
+                                    group
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -100,7 +101,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -113,7 +114,7 @@
                                     [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de departamentos por nombre.">
-                                    help_outline
+                                    account_balance
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -123,108 +124,113 @@
             <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
             <form *ngIf="_booleanOptions.bool_emp">
                 <div class="row">
-                <!-- Primera fila -->
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Sucursal</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
-                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
-                    </mat-form-field>
+                    <!-- Primera fila -->
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Sucursal</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de sucursales por nombre.">
+                                    location_city
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Nombres</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
+                                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras</mat-error>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por nombre.">
+                                    person
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Código</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
+                                    [formControl]="codigo">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por código.">
+                                    code
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
                 </div>
-            
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Nombres</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
-                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras</mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
-                    </mat-form-field>
-                    </div>
-                </div>
-            
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Código</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
-                        [formControl]="codigo">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
-                    </mat-form-field>
-                    </div>
-                </div>
-                </div>
-            
+
                 <!-- Segunda fila -->
                 <div class="row">
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Identificación</mat-label>
-                        <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
-                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                        [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
-                        <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right"
-                        matTooltip="Búsqueda de datos de empleado por número de identificación.">help_outline</mat-icon>
-                    </mat-form-field>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Identificación</mat-label>
+                                <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores</mat-error>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por número de identificación.">
+                                    badge
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                </div>
-            
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Rol</mat-label>
-                            <input type="text"
-                                   matInput
-                                   placeholder="Buscar"
-                                   aria-label="Rol"
-                                   [formControl]="nombre_rol"
-                                   [matAutocomplete]="autoRol"
-                                   (keypress)="IngresarSoloLetras($event)">  
-                            <mat-autocomplete #autoRol="matAutocomplete">
-                              <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
-                                {{ rol.nombre }}
-                              </mat-option>
-                            </mat-autocomplete>
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                              help_outline
-                            </mat-icon>
-                        </mat-form-field>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Rol</mat-label>
+                                <input type="text" matInput placeholder="Buscar" aria-label="Rol"
+                                    [formControl]="nombre_rol" [matAutocomplete]="autoRol"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-autocomplete #autoRol="matAutocomplete">
+                                    <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                        {{ rol.nombre }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                    admin_panel_settings
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                </div>
                 </div>
             </form>
 
             <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)" *ngIf="getRegistrarTimbres()">Timbrar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)"
+                    *ngIf="getRegistrarTimbres()">Timbrar</button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
 
             <hr>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
                             RESULTADO SUCURSALES
                         </span>
                     </div>
-                   <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                      <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                         (click)="MostrarLista()">
-                         Mostrar lista
-                     </button>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
                     </div>
                 </div>
 
@@ -260,9 +266,10 @@
                                 </td>
                                 <td>{{s.sucursal}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="GuardarRegistros(s)" id="accion" *ngIf="auto_individual && getRegistrarTimbres()"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
+                                    <i (click)="GuardarRegistros(s)" id="accion"
+                                        *ngIf="auto_individual && getRegistrarTimbres()" class="fas fa-clock" matSuffix
+                                        matTooltipPosition="right" matTooltip="Abrir formulario de registro de timbres."
+                                        [ngStyle]="habilitado">
                                         <p>Timbrar</p>
                                     </i>
                                 </td>
@@ -281,18 +288,18 @@
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
                             RESULTADO RÉGIMEN LABORAL
                         </span>
                     </div>
-                   <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                      <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                         (click)="MostrarLista()">
-                         Mostrar lista
-                     </button>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
                     </div>
                 </div>
 
@@ -330,9 +337,10 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i (click)="GuardarRegistros(r)" id="accion" *ngIf="auto_individual && getRegistrarTimbres()"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
+                                    <i (click)="GuardarRegistros(r)" id="accion"
+                                        *ngIf="auto_individual && getRegistrarTimbres()" class="fas fa-clock" matSuffix
+                                        matTooltipPosition="right" matTooltip="Abrir formulario de registro de timbres."
+                                        [ngStyle]="habilitado">
                                         <p>Timbrar</p>
                                     </i>
                                 </td>
@@ -352,18 +360,18 @@
                 style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
                             RESULTADO CARGOS
                         </span>
                     </div>
-                   <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                      <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                         (click)="MostrarLista()">
-                         Mostrar lista
-                     </button>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
                     </div>
                 </div>
 
@@ -401,9 +409,10 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i (click)="GuardarRegistros(c)" id="accion" *ngIf="auto_individual && getRegistrarTimbres()"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
+                                    <i (click)="GuardarRegistros(c)" id="accion"
+                                        *ngIf="auto_individual && getRegistrarTimbres()" class="fas fa-clock" matSuffix
+                                        matTooltipPosition="right" matTooltip="Abrir formulario de registro de timbres."
+                                        [ngStyle]="habilitado">
                                         <p>Timbrar</p>
                                     </i>
                                 </td>
@@ -422,18 +431,18 @@
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
                             RESULTADO DEPARTAMENTOS
                         </span>
                     </div>
-                   <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                      <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                         (click)="MostrarLista()">
-                         Mostrar lista
-                     </button>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
                     </div>
                 </div>
 
@@ -471,9 +480,10 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="GuardarRegistros(d)" id="accion" *ngIf="auto_individual && getRegistrarTimbres()"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
+                                    <i (click)="GuardarRegistros(d)" id="accion"
+                                        *ngIf="auto_individual && getRegistrarTimbres()" class="fas fa-clock" matSuffix
+                                        matTooltipPosition="right" matTooltip="Abrir formulario de registro de timbres."
+                                        [ngStyle]="habilitado">
                                         <p>Timbrar</p>
                                     </i>
                                 </td>
@@ -492,18 +502,18 @@
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
                             RESULTADO USUARIOS
                         </span>
                     </div>
-                   <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                      <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                         (click)="MostrarLista()">
-                         Mostrar lista
-                     </button>
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
                     </div>
                 </div>
 
@@ -547,9 +557,10 @@
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td>{{e.rol}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="ConfirmarTimbre(e)" id="accion" *ngIf="auto_individual && getRegistrarTimbres()"
-                                        class="fas fa-clock" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
+                                    <i (click)="ConfirmarTimbre(e)" id="accion"
+                                        *ngIf="auto_individual && getRegistrarTimbres()" class="fas fa-clock" matSuffix
+                                        matTooltipPosition="right" matTooltip="Abrir formulario de registro de timbres."
+                                        [ngStyle]="habilitado">
                                         <p>Timbrar</p>
                                     </i>
                                 </td>

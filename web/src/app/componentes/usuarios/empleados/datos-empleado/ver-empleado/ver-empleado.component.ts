@@ -786,6 +786,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteTitulo(id: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -829,6 +830,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteDiscapacidad(id: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -925,6 +927,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminarVacuna(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -1089,6 +1092,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS
   ConfirmarEliminacionDatos(data: any, tipo: string, estado: any) {
     const mensaje = 'eliminar';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -2580,6 +2584,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -2787,6 +2792,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         timeOut: 6000,
       })
     }, error => {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
@@ -2968,6 +2974,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteAutorizacion(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

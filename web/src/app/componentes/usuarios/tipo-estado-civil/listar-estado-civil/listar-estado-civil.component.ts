@@ -163,6 +163,7 @@ export class ListarEstadoCivilComponent {
     }
   
     AbrirVentanaRegistrarEstadoCivil() {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(RegistrarEstadoCivilComponent, { width: '550px' }).afterClosed().subscribe(item => {
         this.ListarEstadoCivil();
       });
@@ -190,6 +191,7 @@ export class ListarEstadoCivilComponent {
     }
   
     ConfirmarDeleteMultiple() {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
@@ -303,7 +305,7 @@ export class ListarEstadoCivilComponent {
   
   
     ConfirmarDelete(datos: any) {
-  
+      (document.activeElement as HTMLElement)?.blur();
           this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
             .subscribe((confirmado: Boolean) => {
               if (confirmado) {

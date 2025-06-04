@@ -315,6 +315,7 @@ export class ListarPlanificacionComponent implements OnInit {
         timeOut: 6000,
       })
     }, error => {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
@@ -594,6 +595,7 @@ export class ListarPlanificacionComponent implements OnInit {
   // METODO PARA ABRIR VENTA DE SELECCION ELIMINAR DATOS
   MetodoEliminar(datos_eliminar: any) {
     if (datos_eliminar.length > 0) {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {

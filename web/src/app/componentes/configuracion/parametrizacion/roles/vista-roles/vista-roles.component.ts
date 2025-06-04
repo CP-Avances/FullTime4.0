@@ -168,6 +168,7 @@ export class VistaRolesComponent implements OnInit {
 
   // METODO PARA REGISTRAR ROL
   AbrirVentanaRegistrarRol() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroRolComponent, { width: '400px' }).afterClosed().subscribe(items => {
       if (items == true) {
         this.ObtenerRoles();
@@ -726,6 +727,7 @@ export class VistaRolesComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -786,6 +788,7 @@ export class VistaRolesComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO LOS REGISTROS
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

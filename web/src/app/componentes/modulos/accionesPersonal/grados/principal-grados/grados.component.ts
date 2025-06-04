@@ -208,7 +208,7 @@ export class GradosComponent implements OnInit {
 
   //METODO PARA ABRIR VENTANA EDITAR GRADO
   AbrirVentanaRegistrarGrado() {
-    //console.log(datosSeleccionados);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarGradoComponent,
       { width: '450px' }).afterClosed().subscribe(items => {
         this.OptenerListaGrados();
@@ -229,6 +229,7 @@ export class GradosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
     //console.log(datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -265,6 +266,7 @@ export class GradosComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -455,6 +457,7 @@ export class GradosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

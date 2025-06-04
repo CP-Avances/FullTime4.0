@@ -645,6 +645,7 @@ export class VerParametroComponent implements OnInit {
 
   // METODO PARA INGRESAR DETALLE DE PARAMETRO
   AbrirVentanaDetalles(datos: any): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(CrearDetalleParametroComponent,
       { width: '400px', data: { parametros: datos, actualizar: true } })
       .afterClosed().subscribe(item => {
@@ -681,6 +682,7 @@ export class VerParametroComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

@@ -192,6 +192,7 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA REGISTRAR TITULO
   AbrirVentanaRegistrarTitulo(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(TitulosComponent, { width: '400px' })
       .afterClosed().subscribe(items => {
         this.ObtenerTitulos();
@@ -362,6 +363,7 @@ export class ListarTitulosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -750,6 +752,7 @@ export class ListarTitulosComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -813,6 +816,7 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

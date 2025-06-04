@@ -526,7 +526,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula ===true) {
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
@@ -542,20 +542,20 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-     
-          if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
-            this.numero_paginaMul = 1;
-            this.tamanio_paginaMul = 5;
-            this.VerificarPlantillaManual();
-          } else {
-            this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
-              timeOut: 6000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-            this.LimpiarCampos();
-            this.mostrarbtnsubir = false;
-          }
+
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+          this.numero_paginaMul = 1;
+          this.tamanio_paginaMul = 5;
+          this.VerificarPlantillaManual();
+        } else {
+          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
+            timeOut: 6000,
+          });
+          this.archivoForm.reset();
+          this.nameFile = '';
+          this.LimpiarCampos();
+          this.mostrarbtnsubir = false;
+        }
       }
     } else {
       this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
@@ -584,22 +584,21 @@ export class ListaEmpleadosComponent implements OnInit {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
 
-      this.DataEmpleados.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
       } else {
+        this.DataEmpleados.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.DataEmpleados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok' || item.observacion.toLowerCase() == 'ok (verificar ubicación)') {
             this.listUsuariosCorrectas.push(item);
@@ -627,15 +626,6 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.VerificarArchivoExcel_Manual(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
-      this.DataEmpleados.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -643,6 +633,15 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
+        this.DataEmpleados.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.DataEmpleados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok' || item.observacion.toLowerCase() == 'ok (verificar ubicación)') {
             this.listUsuariosCorrectas.push(item);
@@ -662,6 +661,7 @@ export class ListaEmpleadosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -738,8 +738,8 @@ export class ListaEmpleadosComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
     else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema')||
-      (observacion == 'Estado civil no existe en el sistema')||
+      (observacion == 'Nacionalidad no existe en el sistema') ||
+      (observacion == 'Estado civil no existe en el sistema') ||
       (observacion == 'Género no existe en el sistema')
     ) {
       return 'rgb(255, 192, 203)';
@@ -880,7 +880,7 @@ export class ListaEmpleadosComponent implements OnInit {
                     nacionalidad = element.nombre;
                   }
                 });
-                
+
                 let genero: any;
                 this.generos.forEach((element: any) => {
                   if (obj.genero == element.id) {
@@ -888,7 +888,7 @@ export class ListaEmpleadosComponent implements OnInit {
                   }
                 });
 
-                let estadoCivil:any;
+                let estadoCivil: any;
                 this.estadosCiviles.forEach((element: any) => {
                   if (obj.estado_civil == element.id) {
                     estadoCivil = element.estado_civil;
@@ -898,7 +898,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
                 return [
                   { text: obj.codigo, style: 'itemsTableD' },
-                  { text: `${obj.apellido} ${obj.nombre}`, style: 'itemsTableD'  },
+                  { text: `${obj.apellido} ${obj.nombre}`, style: 'itemsTableD' },
                   { text: obj.identificacion, style: 'itemsTableD' },
                   { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
@@ -932,22 +932,22 @@ export class ListaEmpleadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
-  
-   generos: any=[];
-   ObtenerGeneros(){
-     this.restGenero.ListarGeneros().subscribe(datos => {
-       this.generos = datos;
-     })
-   }
 
-   estadosCiviles: any=[];
-   ObtenerEstadosCiviles(){
-     this.restEstadosCiviles.ListarEstadoCivil().subscribe(datos => {
-       this.estadosCiviles = datos;
-     })
-   }
-  
-   async generarExcelEmpleados(numero: any) {
+  generos: any = [];
+  ObtenerGeneros() {
+    this.restGenero.ListarGeneros().subscribe(datos => {
+      this.generos = datos;
+    })
+  }
+
+  estadosCiviles: any = [];
+  ObtenerEstadosCiviles() {
+    this.restEstadosCiviles.ListarEstadoCivil().subscribe(datos => {
+      this.estadosCiviles = datos;
+    })
+  }
+
+  async generarExcelEmpleados(numero: any) {
 
     //const { usuarios, empresa, id_empresa } = datos;
     if (numero === 1) {
@@ -977,7 +977,7 @@ export class ListaEmpleadosComponent implements OnInit {
           genero = element.genero;
         }
       });
-      let estadoCivil:any;
+      let estadoCivil: any;
       this.estadosCiviles.forEach((element: any) => {
         if (usuario.estado_civil == element.id) {
           estadoCivil = element.estado_civil;
@@ -1004,7 +1004,7 @@ export class ListaEmpleadosComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Empleados");
 
 
-    
+
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -1155,7 +1155,7 @@ export class ListaEmpleadosComponent implements OnInit {
           genero = element.genero;
         }
       });
-      let estadoCivil:any;
+      let estadoCivil: any;
       this.estadosCiviles.forEach((element: any) => {
         if (obj.estado_civil == element.id) {
           estadoCivil = element.estado_civil;
@@ -1254,7 +1254,7 @@ export class ListaEmpleadosComponent implements OnInit {
           genero = element.genero;
         }
       });
-      let estadoCivil:any;
+      let estadoCivil: any;
       this.estadosCiviles.forEach((element: any) => {
         if (obj.estado_civil == element.id) {
           estadoCivil = element.estado_civil;
@@ -1297,10 +1297,12 @@ export class ListaEmpleadosComponent implements OnInit {
     const datos = {
       empleados: empleadosSeleccionados,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
+    (document.activeElement as HTMLElement)?.blur();
     empleadosSeleccionados.length > 0 ? this.ventana.open(MetodosComponent, { width: '450px' })
       .afterClosed().subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -1343,23 +1345,23 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
-  getCrearUsuarios(){
+  getCrearUsuarios() {
     return this.tienePermiso('Crear Usuarios');
   }
 
-  getActivarDesactivarUsuarios(){
+  getActivarDesactivarUsuarios() {
     return this.tienePermiso('Activar o Desactivar Usuarios');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Usuarios');
   }
 
-  getVerUsuario(){
+  getVerUsuario() {
     return this.tienePermiso('Ver Datos');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Usuarios');
   }
 
