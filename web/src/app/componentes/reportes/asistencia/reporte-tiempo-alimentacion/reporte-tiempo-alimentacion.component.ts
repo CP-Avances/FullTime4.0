@@ -14,6 +14,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { error } from 'console';
 
 @Component({
   selector: 'app-reporte-tiempo-alimentacion',
@@ -280,7 +281,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = []
+    console.log("Seleccionado modulos", seleccionados.modulos)
+    
     this.restAlimentacion.BuscarTimbresAlimentacion(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      console.log('Respuesta del backend:', res);  // Imprime la respuesta para verificar
       this.data_pdf = res;
       switch (accion) {
         case 'excel': this.ExportarExcel(); break;

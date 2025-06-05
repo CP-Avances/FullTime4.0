@@ -227,6 +227,7 @@ class AlimentacionControlador {
     // METODO PARA BUSCAR DATOS DE ALIMENTACION   **USADO
     ReporteTimbresAlimentacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("LLEGA HASTA AQUI EN EL BACKEND");
             let { desde, hasta } = req.params;
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
@@ -242,7 +243,7 @@ class AlimentacionControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de timbres de alimentación.' });
             return res.status(200).jsonp(nuevo);
         });
     }
