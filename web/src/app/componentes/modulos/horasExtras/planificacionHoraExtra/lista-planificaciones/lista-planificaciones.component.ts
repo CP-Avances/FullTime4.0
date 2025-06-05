@@ -304,7 +304,8 @@ export class ListaPlanificacionesComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
-    console.log('ver data seleccionada... ', datos)
+    console.log('ver data seleccionada... ', datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -369,7 +370,8 @@ export class ListaPlanificacionesComponent implements OnInit {
   contar: number = 0;
   contar_eliminados: number = 0;
   ConfirmarDeletePlanMultiple(datos: any) {
-    console.log('ver data seleccionada... ', datos)
+    console.log('ver data seleccionada... ', datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

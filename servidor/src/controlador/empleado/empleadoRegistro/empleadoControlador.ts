@@ -1163,7 +1163,7 @@ class EmpleadoControlador {
     const { informacion } = req.body;
     const EMPLEADO = await pool.query(
       `
-      SELECT * FROM eu_empleados WHERE
+      SELECT * FROM informacion_general WHERE
       (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
       `
       , [informacion]);

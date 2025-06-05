@@ -50,6 +50,7 @@ export class AccionPersonalService {
 
   /** SERVICIOS PARA TABLA PEDIDO_ACCION_EMPLEADO */
   IngresarPedidoAccion(datos: any) {
+    console.log('datos a enviar: ',datos)
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion`, datos);
   }
 

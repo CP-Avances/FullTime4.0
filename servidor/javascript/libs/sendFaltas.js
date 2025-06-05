@@ -170,7 +170,7 @@ const faltasIndividual = function (desde, hasta) {
 
                                     <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
 
-                                    <p style="color: black; font-style: italic;">
+                                    <p style="color: #555; font-style: italic; font-size: 11px;">
                                         <strong>Este correo ha sido generado automáticamente. Por favor, no responda a este mensaje.</strong>
                                     </p>
 
@@ -495,7 +495,7 @@ const faltasDepartamentos = function (desde, hasta, semanal) {
                             
                                 <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
 
-                                <p style="color: black; font-style: italic;">
+                                <p style="color: #555; font-style: italic; font-size: 11px;">
                                     <strong>Este correo ha sido generado automáticamente. Por favor, no responda a este mensaje.</strong>
                                 </p>
                                 

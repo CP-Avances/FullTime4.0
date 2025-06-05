@@ -561,6 +561,7 @@ class ContratoEmpleadoControlador {
             const workbook = new exceljs_1.default.Workbook();
             yield workbook.xlsx.readFile(ruta);
             let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'EMPLEADOS_CONTRATOS');
+            console.log('ingresa ', verificador);
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
@@ -582,6 +583,7 @@ class ContratoEmpleadoControlador {
                 var listContratos = [];
                 var duplicados = [];
                 var mensaje = 'correcto';
+                console.log('plantilla ', plantilla);
                 if (plantilla) {
                     // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
                     const headerRow = plantilla.getRow(1);
@@ -590,6 +592,7 @@ class ContratoEmpleadoControlador {
                     headerRow.eachCell((cell, colNumber) => {
                         headers[cell.value.toString().toUpperCase()] = colNumber;
                     });
+                    console.log('plantilla cabeceras ', headers['ITEM']);
                     // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
                     if (!headers['ITEM'] || !headers['IDENTIFICACION'] || !headers['PAIS'] ||
                         !headers['REGIMEN_LABORAL'] || !headers['MODALIDAD_LABORAL'] || !headers['FECHA_DESDE'] ||

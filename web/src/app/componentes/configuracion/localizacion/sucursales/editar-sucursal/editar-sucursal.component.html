@@ -1,5 +1,5 @@
 <div id="titulo" class="row w-100 m-auto">
-    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
         <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
@@ -25,7 +25,8 @@
                     <mat-form-field class="m-auto w-100">
                         <mat-label>Seleccionar Continente</mat-label>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de continentes.">
-                            help_outline</mat-icon>
+                            language
+                        </mat-icon>
                         <mat-select [formControl]="nombreContinenteF" required>
                             <mat-option *ngFor="let c of continentes" [value]="c.continente"
                                 (click)="FiltrarPaises(formulario.value)">
@@ -45,7 +46,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de países del continente seleccionado.">
-                            help_outline
+                            public
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field class="m-auto w-100">
@@ -60,7 +61,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de provincias, departamentos o estados ubicados en el país seleccionado.">
-                            help_outline
+                            travel_explore
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -79,7 +80,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de ciudades de la provincia, departamento o estado seleccionado.">
-                            help_outline
+                            place
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field class="m-auto w-100">
@@ -88,7 +89,7 @@
                             [readonly]="sucursal">
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingresar nombre de identificación del establecimiento.">
-                            help_outline
+                            account_balance
                         </mat-icon>
                     </mat-form-field>
                 </div>

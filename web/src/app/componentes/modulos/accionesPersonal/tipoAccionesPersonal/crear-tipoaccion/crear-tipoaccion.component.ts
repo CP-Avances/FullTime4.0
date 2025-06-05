@@ -25,10 +25,6 @@ export class CrearTipoaccionComponent implements OnInit {
   selec2: boolean = false;
   selec3: boolean = false;
 
-  // EVENTOS RELACIONADOS A SELECCION E INGRESO DE PROCESOS PROPUESTOS
-  ingresoTipo: boolean = false;
-  vistaTipo: boolean = true;
-
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
@@ -133,39 +129,13 @@ export class CrearTipoaccionComponent implements OnInit {
     })
   }
 
-  // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO_ACCION
-  IngresarTipoAccion(form: any, descripcion: string) {
-    if (descripcion.toLocaleLowerCase() === 'otro') {
-      this.formulario.patchValue({
-        otroTipoForm: '',
-      });
-      
-      this.ingresoTipo = true;
-      this.toastr.info('Ingresar nombre de un nuevo tipo de acción personal.', '', {
-        timeOut: 6000,
-      })
-      this.vistaTipo = false;
-    }
-  }
-
-  // METODO PARA VER LA LISTA DE TIPOS_ACCION
-  VerTiposAccion() {
-    this.formulario.patchValue({
-      otroTipoForm: '',
-    });
-    this.ingresoTipo = false;
-    this.vistaTipo = true;
-  }
-
   // METODO PARA INGRESAR NUEVO TIPO_ACCION
   IngresarNuevoTipo(form: any, datos: any) {
-
     let tipo = {
       descripcion: form.descripcionForm,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     }
-
     console.log('form: ',form);
     console.log('datosAccion: ',datos);
     this.VerificarDuplicidad(form, tipo, datos);

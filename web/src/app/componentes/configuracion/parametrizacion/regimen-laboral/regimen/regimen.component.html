@@ -29,7 +29,7 @@
                                 <mat-form-field>
                                     <mat-label id="letras_4">Seleccionar país</mat-label>
                                     <input type="text" placeholder="Ingresar nombre" aria-label="Number" matInput
-                                        [formControl]="nombrePaisF" [matAutocomplete]="auto" required >
+                                        [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
                                     <mat-autocomplete #auto="matAutocomplete">
                                         <mat-option *ngFor="let option of filtro | async" [value]="option.nombre">
                                             {{option.nombre}}
@@ -37,7 +37,7 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar uno de los paises de la lista.">
-                                        help_outline
+                                        public
                                     </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
@@ -45,27 +45,27 @@
                                     <input matInput [formControl]="nombreF" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar un nuevo nombre de Régimen Laboral">
-                                        help_outline
+                                        article
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field id="periodo">
                                     <mat-label id="letras_2">Meses período</mat-label>
-                                    <input matInput type="tel" [formControl]="mesesF" (keypress)="IngresarSoloNumeros($event)"
-                                        required (click)="LimpiarCalcular()">
+                                    <input matInput type="tel" [formControl]="mesesF"
+                                        (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses de duración del período laboral.">
-                                        help_outline
+                                        date_range
                                     </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field id="periodo">
                                     <mat-label id="letras_2">Días por mes</mat-label>
-                                    <input matInput type="tel" [formControl]="diasF" (keypress)="IngresarSoloNumeros($event)"
-                                        required (click)="LimpiarCalcular()">
+                                    <input matInput type="tel" [formControl]="diasF"
+                                        (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de días totales dentro de un mes.">
-                                        help_outline
+                                        today
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -354,13 +354,13 @@
                                         <div class="d-flex flex-wrap justify-content-start">
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_1">Años antiguedad</mat-label>
-                                                <input matInput type="tel" [formControl]="aniosAntiguedadF" [required]="fija"
-                                                    (keypress)="IngresarSoloNumeros($event)">
+                                                <input matInput type="tel" [formControl]="aniosAntiguedadF"
+                                                    [required]="fija" (keypress)="IngresarSoloNumeros($event)">
                                             </mat-form-field>
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días adicionales</mat-label>
-                                                <input matInput type="tel" [formControl]="diasAdicionalesF" [required]="fija"
-                                                    (keypress)="IngresarSoloNumeros($event)">
+                                                <input matInput type="tel" [formControl]="diasAdicionalesF"
+                                                    [required]="fija" (keypress)="IngresarSoloNumeros($event)">
                                             </mat-form-field>
                                         </div>
                                     </div>
@@ -437,8 +437,9 @@
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput type="tel" [formControl]="vacaciones_tresF" [required]="antiguo_tres"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
+                                    <input matInput type="tel" [formControl]="vacaciones_tresF"
+                                        [required]="antiguo_tres" [readonly]="escritura_antiguo"
+                                        (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_tres"
                                     matTooltipPosition="right" matTooltip="Eliminar Registro."
@@ -464,8 +465,9 @@
                                 </mat-form-field>
                                 <mat-form-field id="campos_antiguedad">
                                     <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput type="tel" [formControl]="vacaciones_cuatroF" [required]="antiguo_cuatro"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
+                                    <input matInput type="tel" [formControl]="vacaciones_cuatroF"
+                                        [required]="antiguo_cuatro" [readonly]="escritura_antiguo"
+                                        (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
                                 <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_cuatro"
                                     matTooltipPosition="right" matTooltip="Eliminar Registro."
@@ -495,7 +497,7 @@
                                         (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses considerados para el cálculo.">
-                                        help_outline
+                                        date_range
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -518,7 +520,8 @@
                                 <div class="col-md">
                                     <div class="d-flex flex-wrap justify-content-start">
                                         <label style="padding-top: 10px; position: relative; left:10px;">
-                                            Vacaciones ganadas por mes:</label>
+                                            Vacaciones ganadas por mes:
+                                        </label>
                                     </div>
                                     <div class="d-flex flex-wrap justify-content-start">
                                         <mat-form-field id="periodo_calculo">
@@ -526,7 +529,7 @@
                                             <input matInput [formControl]="diasMesLaborableF" readonly>
                                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                                 matTooltip="Días laborables de vacaciones ganados por mes.">
-                                                help_outline
+                                                event
                                             </mat-icon>
                                         </mat-form-field>
                                     </div>
@@ -536,7 +539,7 @@
                                             <input matInput [formControl]="diasMesCalendarioF" readonly>
                                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                                 matTooltip="Días calendario de vacaciones ganados por mes.">
-                                                help_outline
+                                                event
                                             </mat-icon>
                                         </mat-form-field>
                                     </div>
@@ -552,7 +555,7 @@
                                             <input matInput [formControl]="dias_LaborableF" readonly>
                                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                                 matTooltip="Días labaorables de vacaciones ganados por día.">
-                                                help_outline
+                                                event
                                             </mat-icon>
                                         </mat-form-field>
                                     </div>
@@ -562,7 +565,7 @@
                                             <input matInput [formControl]="dias_CalendarioF" readonly>
                                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                                 matTooltip="Dias calendario de vacaciones ganados por día.">
-                                                help_outline
+                                                event
                                             </mat-icon>
                                         </mat-form-field>
                                     </div>

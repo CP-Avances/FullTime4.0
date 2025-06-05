@@ -124,7 +124,6 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ASIGNAR CIUDADES A FERIADO
   // METODO PARA ASIGNAR FUNCIONES AL ROL
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
@@ -157,9 +156,10 @@ class RolPermisosControlador {
         return res.status(200).jsonp({ message: 'OK', reloj: rol })
       }
       else {
-        return res.status(404).jsonp({ message: 'error' })
+        return res.jsonp({ message: 'error' })
       }
     } catch (error) {
+      console.log('rol permisos ', error)
       return res.status(500).jsonp({ message: 'error' })
     }
   }
@@ -300,7 +300,7 @@ class RolPermisosControlador {
     }
     else if (CON_ACCIONES.rowCount != 0) {
       respuesta = CON_ACCIONES.rows;
-    } 
+    }
     else if (SIN_ACCIONES.rowCount != 0) {
       respuesta = SIN_ACCIONES.rows;
     }

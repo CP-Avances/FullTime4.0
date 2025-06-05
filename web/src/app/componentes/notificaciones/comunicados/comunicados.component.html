@@ -17,10 +17,11 @@
                         <input matInput #message_a maxlength="45" [formControl]="tituloF" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingrese una descripción del mensaje.">
-                            help_outline
+                            notes
                         </mat-icon>
-                        <mat-hint style="color:rgb(42, 66, 101)" align="start">Puede ingresar hasta 45
-                            caracteres.</mat-hint>
+                        <mat-hint style="color:rgb(42, 66, 101)" align="start">
+                            Puede ingresar hasta 45 caracteres.
+                        </mat-hint>
                         <mat-hint style="color:rgb(52, 65, 84)" align="end">{{message_a.value.length}} / 45</mat-hint>
                     </mat-form-field>
                 </div>
@@ -30,7 +31,7 @@
                         <textarea matInput #message maxlength="255" [formControl]="mensajeF" required></textarea>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingrese el mensaje que desea compartir.">
-                            help_outline
+                            subject
                         </mat-icon>
                         <mat-hint style="color:rgb(42, 66, 101)" align="start">
                             Puede ingresar hasta 255 caracteres.
@@ -68,8 +69,9 @@
                         <mat-label>Sucursal</mat-label>
                         <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
                             [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
-                            help_outline
+                        <mat-icon matSuffix matTooltipPosition="right" matTooltipPosition="right"
+                            matTooltip="Búsqueda de sucursales por nombre.">
+                            location_city
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -85,7 +87,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -97,8 +99,8 @@
                                 <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 7)"
                                     [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    matTooltip="Búsqueda de régimen laboral por nombre.">
+                                    article
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -116,7 +118,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -129,7 +131,7 @@
                                     [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de cargos por su descripción.">
-                                    help_outline
+                                    group
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -147,7 +149,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -160,7 +162,7 @@
                                     [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de departamentos por nombre.">
-                                    help_outline
+                                    account_balance
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -178,7 +180,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -189,7 +191,7 @@
                                     [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por nombre.">
-                                    help_outline
+                                    person
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -202,7 +204,7 @@
                                     [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por código.">
-                                    help_outline
+                                    code
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -214,7 +216,7 @@
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por número de identificación.">
-                                    help_outline
+                                    badge
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -224,9 +226,9 @@
             <hr>
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -235,8 +237,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -283,9 +285,9 @@
             </div>
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -294,8 +296,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -345,9 +347,9 @@
             <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
             <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
-                
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -356,8 +358,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -409,7 +411,7 @@
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -418,8 +420,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>
@@ -470,7 +472,7 @@
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -478,8 +480,8 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                        (click)="MostrarLista()">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
                             Mostrar lista
                         </button>
                     </div>

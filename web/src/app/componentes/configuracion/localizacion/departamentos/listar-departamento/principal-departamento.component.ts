@@ -109,10 +109,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
@@ -201,6 +201,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO
   AbrirVentanaRegistrarDepartamento(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroDepartamentoComponent,
       { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
@@ -325,17 +326,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataDepartamentos = res.data;
       this.messajeExcel = res.message;
-
-      this.DataDepartamentos.sort((a, b) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       console.log('probando plantilla1 departamentos', this.DataDepartamentos);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -350,6 +340,15 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.DataDepartamentos.sort((a, b) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.DataDepartamentos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listDepartamentosCorrectos.push(item);
@@ -369,6 +368,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -383,7 +383,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       const data = {
         plantilla: this.listDepartamentosCorrectos,
         user_name: this.user_name,
-        ip: this.ip, 
+        ip: this.ip,
         ip_local: this.ips_locales
       }
       this.rest.subirArchivoExcel(data).subscribe({
@@ -543,7 +543,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                 ** **
    ** ************************************************************************************************** **/
- 
+
   async generarExcelDepartamento() {
 
     const departamentoslista: any[] = [];
@@ -835,6 +835,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -857,17 +858,17 @@ export class PrincipalDepartamentoComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionDepartamentos.selected.length;
-  
+
     this.departamentosEliminar = this.selectionDepartamentos.selected;
-  
+
     this.departamentosEliminar.forEach((datos: any) => {
       this.rest.EliminarRegistro(datos.id, datosGenerales).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -875,14 +876,14 @@ export class PrincipalDepartamentoComponent implements OnInit {
         } else {
           eliminados++;
           this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-  
+
           const id_departamento = datos.id;
           const id_establecimiento = datos.id_sucursal;
-  
+
           if (datos.nivel != 0) {
             this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(niveles => {
               const nivelesArray = Array.isArray(niveles) ? niveles : [];
-  
+
               nivelesArray.forEach((item: any) => {
                 this.rest.EliminarRegistroNivelDepa(item.id, datosGenerales).subscribe((res: any) => {
                   if (res.message === 'error') {
@@ -906,7 +907,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
               timeOut: 6000,
             });
           }
-  
+
           this.selectionDepartamentos.clear();
           this.departamentosEliminar = [];
           this.ListaDepartamentos();
@@ -914,8 +915,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
     });
   }
-  
+
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -954,23 +956,23 @@ export class PrincipalDepartamentoComponent implements OnInit {
     }
   }
 
-  getCrearDepartamento(){
+  getCrearDepartamento() {
     return this.tienePermiso('Crear Departamento');
   }
 
-  getEditarDepartamento(){
+  getEditarDepartamento() {
     return this.tienePermiso('Editar Departamento');
   }
 
-  getEliminarDepartamento(){
+  getEliminarDepartamento() {
     return this.tienePermiso('Eliminar Departamento');
   }
 
-  getNiveles(){
+  getNiveles() {
     return this.tienePermiso('Ver Niveles');
   }
 
-  getReportesDepartamento(){
+  getReportesDepartamento() {
     return this.tienePermiso('Descargar Reportes Departamentos');
   }
 

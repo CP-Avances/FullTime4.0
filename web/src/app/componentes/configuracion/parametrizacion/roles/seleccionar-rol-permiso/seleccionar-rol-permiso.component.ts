@@ -566,7 +566,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_accion: accion.id,
                     movil: this.plataforma,
                     user_name: this.user_name,
-                    ip: this.ip, ip_local: this.ips_locales,
+                    ip: this.ip, 
+                    ip_local: this.ips_locales,
                   }
                   this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
                     this.contador = this.contador + 1;
@@ -927,6 +928,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

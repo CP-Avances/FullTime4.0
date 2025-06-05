@@ -58,6 +58,7 @@ export class VerAniversarioComponent implements OnInit {
 
   // METODO PARA EDITAR MENSAJE DE ANIVERSARIO
   EditarMensaje(dataSelect: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(EditarAniversarioComponent, { width: '500px', data: dataSelect })
       .afterClosed().subscribe(items => {
         this.ObtenerMensajeAniversario();

@@ -1,10 +1,10 @@
 <div id="titulo" class="row w-100 m-auto">
-    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
         <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
         <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-            REGISTRA PROVINCIA - DEPARTAMENTO - ESTADO
+            REGISTRAR PROVINCIA - DEPARTAMENTO - ESTADO
         </span>
     </div>
     <div class="col-2 col-md-2 mb-2 mb-md-0">
@@ -26,7 +26,7 @@
                         <mat-label>Seleccionar continente</mat-label>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Seleccionar un continente.">
-                            help_outline
+                            language
                         </mat-icon>
                         <mat-select [formControl]="nombreContinenteF" required>
                             <mat-option *ngFor="let c of continentes" [value]="c.continente"
@@ -46,7 +46,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de países que se encuentran en el continente seleccionado.">
-                            help_outline
+                            public
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -54,12 +54,12 @@
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
-                        <mat-label id="letras">Provincia-Departamento-Estado</mat-label>
+                        <mat-label class="letras">Provincia-Departamento-Estado</mat-label>
                         <input matInput placeholder="Ej: Pichincha" [formControl]="nombreProvinciaF"
                             (keypress)="IngresarSoloLetras($event)" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingresar nombre de una provincia, departamento o estado ubicado en el país seleccionado.">
-                            help_outline
+                            place
                         </mat-icon>
                     </mat-form-field>
                 </div>

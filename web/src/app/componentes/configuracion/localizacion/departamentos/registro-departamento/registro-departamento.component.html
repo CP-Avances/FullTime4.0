@@ -1,5 +1,5 @@
 <div id="titulo" class="row w-100 m-auto">
-    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
         <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
@@ -24,10 +24,10 @@
                 <div class="col-md m-auto w-100 p-0">
                     <div class="d-flex flex-wrap justify-content-center p-0">
                         <mat-form-field *ngIf="Habilitar">
-                            <mat-label id="letras">Seleccionar establecimiento</mat-label>
+                            <mat-label class="letras">Seleccionar establecimiento</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Lista de establecimientos.">
-                                help_outline
+                                location_city
                             </mat-icon>
                             <mat-select [formControl]="idSucursal" required>
                                 <mat-option *ngFor="let suc of sucursales" [value]="suc.id"
@@ -42,7 +42,7 @@
                             <input matInput placeholder="Ej: Contabilidad" [formControl]="nombre" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar nombre del nuevo departamento.">
-                                help_outline
+                                account_balance
                             </mat-icon>
                         </mat-form-field>
                     </div>

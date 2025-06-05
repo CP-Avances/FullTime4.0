@@ -101,10 +101,10 @@ export class CatDiscapacidadComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.discapacidades = [];
     this.ObtenerEmpleados(this.idEmpleado);
@@ -176,6 +176,7 @@ export class CatDiscapacidadComponent implements OnInit {
 
   // METODO PARA ABRI VENTANA DE REGISTRO
   AbrirVentanaRegistrarDiscapacidad(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroDiscapacidadComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
@@ -276,16 +277,6 @@ export class CatDiscapacidadComponent implements OnInit {
       this.Datos_discapacidad = res.data;
       this.messajeExcel = res.message;
 
-      this.Datos_discapacidad.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -299,6 +290,16 @@ export class CatDiscapacidadComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.Datos_discapacidad.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+
         this.Datos_discapacidad.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaDiscapacidadCorrectas.push(item);
@@ -344,6 +345,7 @@ export class CatDiscapacidadComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -483,7 +485,7 @@ export class CatDiscapacidadComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
-  
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -642,7 +644,7 @@ export class CatDiscapacidadComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
-  
+
   ExportToCSV() {
 
     const workbook = new ExcelJS.Workbook();
@@ -709,7 +711,8 @@ export class CatDiscapacidadComponent implements OnInit {
     const data = {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
-    }
+    };
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -744,17 +747,17 @@ export class CatDiscapacidadComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales,
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionDiscapacidad.selected.length;
-  
+
     this.discapacidadesEliminar = this.selectionDiscapacidad.selected;
-  
+
     this.discapacidadesEliminar.forEach((datos: any) => {
       this.rest.Eliminar(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -763,14 +766,14 @@ export class CatDiscapacidadComponent implements OnInit {
           eliminados++;
           this.discapacidades = this.discapacidades.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
           }
-  
+
           this.selectionDiscapacidad.clear();
           this.discapacidadesEliminar = [];
           this.ngOnInit();
@@ -778,10 +781,11 @@ export class CatDiscapacidadComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -819,23 +823,23 @@ export class CatDiscapacidadComponent implements OnInit {
     }
   }
 
-  getCrearTipoDiscapacidad(){
+  getCrearTipoDiscapacidad() {
     return this.tienePermiso('Crear Tipo Discapacidad');
   }
 
-  getEditarTipoDiscapacidad(){
+  getEditarTipoDiscapacidad() {
     return this.tienePermiso('Editar Tipo Discapacidad');
   }
 
-  getEliminarTipoDiscapacidad(){
+  getEliminarTipoDiscapacidad() {
     return this.tienePermiso('Eliminar Tipo Discapacidad');
   }
 
-  getCargarPlantillaTipoDiscapacidad(){
+  getCargarPlantillaTipoDiscapacidad() {
     return this.tienePermiso('Cargar Plantilla Tipo Discapacidad');
   }
 
-  getDescargarReportesTipoDiscapacidad(){
+  getDescargarReportesTipoDiscapacidad() {
     return this.tienePermiso('Descargar Reportes Tipo Discapacidad');
   }
 

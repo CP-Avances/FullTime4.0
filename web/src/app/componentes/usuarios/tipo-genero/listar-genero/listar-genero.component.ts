@@ -158,6 +158,7 @@ export class ListarGeneroComponent {
   }
 
   AbrirVentanaRegistrarGenero() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarGeneroComponent, { width: '550px' }).afterClosed().subscribe(item => {
       this.ListarGeneros();
     });
@@ -185,6 +186,7 @@ export class ListarGeneroComponent {
   }
 
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -300,7 +302,7 @@ export class ListarGeneroComponent {
 
 
   ConfirmarDelete(datos: any) {
-
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

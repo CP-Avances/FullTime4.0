@@ -163,6 +163,7 @@ export class VistaMenuComponent implements OnInit {
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
     console.log(datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

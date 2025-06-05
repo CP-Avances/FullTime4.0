@@ -23,6 +23,7 @@ export class EditarContratoComponent implements OnInit {
   ips_locales: any = '';
 
   @Input() contrato: any;
+  @Input() fecha: any;
   @Input() pagina: any;
 
   idSelectContrato: number;
@@ -80,6 +81,7 @@ export class EditarContratoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('fecha --- ', this.fecha)
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
@@ -383,7 +385,8 @@ export class EditarContratoComponent implements OnInit {
         documento: this.contrato.documento,
         id: parseInt(this.contrato.id),
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       }
       this.GuardarDatos(datos);
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
@@ -520,6 +523,9 @@ export class EditarContratoComponent implements OnInit {
       if (opcion === 2) {
         setTimeout(() => {
           this.componentev.VerDatosActuales(this.componentev.formato_fecha);
+          if (this.fecha.fechaContratoForm) {
+            this.componentev.ObtenerContratoSeleccionado(this.fecha)
+          }
         }, 300);
       }
     }

@@ -74,7 +74,7 @@ class UsuarioControlador {
     }
   }
 
-  // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ACCINACION DE ACCION PERSONAL **USADO
+  // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL **USADO
   public async ObtenerInformacionUsuario(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const USUARIO = await pool.query(

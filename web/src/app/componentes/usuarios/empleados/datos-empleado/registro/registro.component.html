@@ -43,7 +43,7 @@
                                     formControlName="nombreForm" (keypress)="IngresarSoloLetras($event)" required>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar dos nombres del colaborador.">
-                                    help_outline
+                                    person
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -54,14 +54,14 @@
                                     formControlName="apellidoForm" (keypress)="IngresarSoloLetras($event)" required>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar dos apellidos del colaborador.">
-                                    help_outline
+                                    person
                                 </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>
 
                     <div class="row">
-                        
+
                         <div class="col-12 col-md-6">
                             <br>
                             <br>
@@ -71,26 +71,29 @@
                                     (keypress)="IngresarSoloLetrasNumeros($event)" required maxlength="10">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar el código del colaborador.">
-                                    help_outline
+                                    fingerprint
                                 </mat-icon>
                             </mat-form-field>
                         </div>
-                        
+
                         <div class="col-12 col-md-6" style="margin-top: 9px;">
-                            <mat-radio-group formControlName="tipoIdentificacionForm" aria-label="Select an option" style="display: flex;" required >
+                            <mat-radio-group formControlName="tipoIdentificacionForm" aria-label="Select an option"
+                                style="display: flex;" required>
                                 <div>
-                                    <mat-radio-button (change)="CambiarIdentificacion($event); VerificarCodigo()" value="Cedula">
+                                    <mat-radio-button (change)="CambiarIdentificacion($event); VerificarCodigo()"
+                                        value="Cedula">
                                         Cédula
                                     </mat-radio-button>
                                 </div>
                                 <div>
-                                    <mat-radio-button (change)="CambiarIdentificacion($event); VerificarCodigo()" value="Pasaporte">
+                                    <mat-radio-button (change)="CambiarIdentificacion($event); VerificarCodigo()"
+                                        value="Pasaporte">
                                         Pasaporte
                                     </mat-radio-button>
                                 </div>
                             </mat-radio-group>
 
-                            <div  *ngIf="identificacion=='Cedula'">
+                            <div *ngIf="identificacion=='Cedula'">
                                 <mat-form-field>
                                     <mat-label>Identificación</mat-label>
                                     <input matInput type="tel" placeholder="1788300293" maxlength="10"
@@ -100,20 +103,20 @@
                                         (input)="LlenarCodigo(primeroFormGroup.value); ValidarCedula(primeroFormGroup.value);  ">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
-                                        help_outline
+                                        badge
                                     </mat-icon>
                                     <mat-error *ngIf="!cedulaValida">
                                         <mat-icon>error</mat-icon> Cédula incorrecta
                                     </mat-error>
                                 </mat-form-field>
                             </div>
-    
-                            <div *ngIf="identificacion=='Pasaporte'" >
+
+                            <div *ngIf="identificacion=='Pasaporte'">
                                 <mat-form-field>
                                     <mat-label>Pasaporte</mat-label>
                                     <input matInput type="text" placeholder="pasaporte" maxlength="10"
                                         formControlName="cedulaForm"
-                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"                                     
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         (input)="LlenarCodigo(primeroFormGroup.value); ValidarPasaporte(primeroFormGroup.value)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
@@ -126,7 +129,7 @@
                             </div>
                         </div>
 
-                        
+
 
                     </div>
                     <div class="row">
@@ -205,13 +208,12 @@
                                 <mat-label>Estado civil</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Seleccionar el estado civil del colaborador.">
-                                    help_outline
+                                    diversity_1
                                 </mat-icon>
                                 <mat-select required formControlName="estadoCivilForm">
                                     <mat-option *ngFor="let ec of estados_civil" [value]="ec.id">
                                         {{ec.estado_civil}}
                                     </mat-option>
-                                
                                 </mat-select>
                             </mat-form-field>
                         </div>
@@ -220,7 +222,7 @@
                                 <mat-label>Género</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Seleccionar el género del colaborador.">
-                                    help_outline
+                                    wc
                                 </mat-icon>
                                 <mat-select required formControlName="generoForm">
                                     <mat-option *ngFor="let g of generos" [value]="g.id">
@@ -241,7 +243,8 @@
                                     </mat-option>
                                 </mat-autocomplete>
                                 <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Seleccionar la nacionalidad del colaborador.">help_outline
+                                    matTooltip="Seleccionar la nacionalidad del colaborador.">
+                                    person_pin
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -278,7 +281,7 @@
                                 <mat-label>Seleccionar un rol</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Rol que el usuario tendrá en la navegación del sistema.">
-                                    help_outline
+                                    admin_panel_settings
                                 </mat-icon>
                                 <mat-select required formControlName="rolForm">
                                     <mat-option *ngFor="let r of roles" [value]="r.id">{{r.nombre}}</mat-option>
@@ -292,7 +295,8 @@
                                     required>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Nombre usuario con el cual podrá ingresar al sistema.">
-                                    account_circle</mat-icon>
+                                    account_circle
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                         <div class="col-12 col-md-6">
@@ -306,20 +310,22 @@
                                     [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Contraseña del usuario con la cual podrá ingresar al sistema.">
-                                        {{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                        {{hide ? 'visibility_off' : 'visibility'}}
+                                    </mat-icon>
                                 </button>
                             </mat-form-field>
                         </div>
                         <div class="col-12 col-md-6">
                             <mat-form-field>
-                              <mat-label>Número de partida individual</mat-label>
-                              <input matInput placeholder="Ej: 67894" formControlName="partidaForm" type="text" maxlength="100">
-                              <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Dato opcional para referencias legales o institucionales.">
-                                assignment
-                              </mat-icon>
+                                <mat-label>Número de partida individual</mat-label>
+                                <input matInput placeholder="Ej: 67894" formControlName="partidaForm" type="text"
+                                    maxlength="100">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Dato opcional para referencias legales o institucionales.">
+                                    assignment
+                                </mat-icon>
                             </mat-form-field>
-                          </div>                          
+                        </div>
                     </div>
                     <div class="row" style="text-align: center; padding-top: 15px;">
                         <div class="col-4 text-center">

@@ -786,6 +786,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteTitulo(id: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -829,6 +830,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteDiscapacidad(id: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -925,6 +927,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminarVacuna(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -972,6 +975,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       })
     });
   }
+
   listaCargosEmple: any = [];
   listaContratosEmple: any = []
   obtenerContratoCargosEmplrado() {
@@ -1030,6 +1034,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
+
   // METODO PARA LIMPIAR REGISTRO DE CONTRATO
   LimpiarContrato() {
     this.contratoSeleccionado = [];
@@ -1044,10 +1049,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   editar_contrato: boolean = false;
   pagina_contrato: any = '';
   contrato_editar: any = [];
-  AbrirVentanaEditarContrato(dataContrato: any) {
+  fecha_seleccionada: string = '';
+  AbrirVentanaEditarContrato(dataContrato: any, form: any) {
     this.ver_contrato_cargo = false;
     this.editar_contrato = true;
     this.contrato_editar = dataContrato;
+    this.fecha_seleccionada = form;
     this.pagina_contrato = 'ver-empleado';
   }
 
@@ -1056,7 +1063,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let eliminar = {
       id: dataContrato.id,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
     this.restEmpleado.EliminarContrato(eliminar).subscribe({
       next: (res: any) => {
@@ -1068,6 +1076,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           this.toastr.success(res.message, 'Correcto.', {
             timeOut: 4500,
           });
+          //console.log('contrato empleado ', this.contratoSeleccionado)
+          this.contratoSeleccionado = this.contratoSeleccionado.filter((obj: any) => obj.id !== dataContrato.id);
           this.VerDatosActuales(this.formato_fecha);
           this.ObtenerContratosEmpleado(this.formato_fecha);
         }
@@ -1082,6 +1092,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS
   ConfirmarEliminacionDatos(data: any, tipo: string, estado: any) {
     const mensaje = 'eliminar';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -2573,6 +2584,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -2780,6 +2792,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         timeOut: 6000,
       })
     }, error => {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
@@ -2961,6 +2974,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteAutorizacion(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
