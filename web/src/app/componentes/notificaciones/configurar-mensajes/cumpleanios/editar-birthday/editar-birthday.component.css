@@ -13,10 +13,6 @@ mat-form-field {
     padding: 10px 10px 0px 10px;
 }
 
-textarea {
-    height: 200px;
-}
-
 #imagen {
     font-size: 13px;
     display: inline-block;

@@ -22,27 +22,17 @@
             <div class="row">
                 <div class="col-sm">
                     <div class="d-flex flex-wrap justify-content-between">
-                        <mat-form-field *ngIf="vistaTipo">
+                        <mat-form-field>
                             <mat-label id="letra">Tipo acción personal</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Seleccionar uno de los tipos de acción de personal">
-                                help_outline
+                                person
                             </mat-icon>
                             <mat-select [formControl]="tipoAccionF">
-                                <mat-option *ngFor="let t of tipos" [value]="t.id"
-                                    (click)="IngresarTipoAccion(formulario.value, t.descripcion)">
+                                <mat-option *ngFor="let t of tipos" [value]="t.id">
                                     {{t.descripcion}}
                                 </mat-option>
                             </mat-select>
-                        </mat-form-field>
-                        <mat-form-field *ngIf="ingresoTipo">
-                            <mat-label id="letra">Ingresar tipo acción personal</mat-label>
-                            <input matInput placeholder="Ej: Traspaso" [formControl]="otroTipoF">
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Regresar a la lista de tipos de acción de personal."
-                                (click)="VerTiposAccion()">
-                                help_outline
-                            </mat-icon>
                         </mat-form-field>
                     </div>
                 </div>
@@ -53,10 +43,11 @@
                         <mat-form-field style="width: 100%;">
                             <mat-label id="letra">Descripción</mat-label>
                             <textarea matInput #des maxlength="500" placeholder="Ingresar base legal"
-                                [formControl]="descripcionF" required></textarea>
+                                [formControl]="descripcionF" required>
+                            </textarea>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar una descripción del nuevo tipo de acción de personal.">
-                                help_outline
+                                article
                             </mat-icon>
                             <mat-hint align="start"><strong>Ingresar hasta 500 caracteres</strong></mat-hint>
                             <mat-hint align="end">{{des.value.length}} / 500</mat-hint>
@@ -67,7 +58,7 @@
                                 [formControl]="baseLegalF"></textarea>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Escribir fundamento legal del nuevo tipo de acción de personal.">
-                                help_outline
+                                gavel
                             </mat-icon>
                             <mat-hint align="start"><strong>Ingresar hasta 500 caracteres</strong></mat-hint>
                             <mat-hint align="end">{{legal.value.length}} / 500</mat-hint>
