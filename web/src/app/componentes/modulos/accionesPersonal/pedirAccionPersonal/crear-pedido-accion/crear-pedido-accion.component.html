@@ -25,8 +25,9 @@
             <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
             <mat-step [stepControl]="firstFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 1:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 1: Selección Funcionario">
+                        manage_accounts
                     </mat-icon>
                 </ng-template>
                 <form [formGroup]="firstFormGroup">
@@ -42,7 +43,7 @@
                                         autocomplete="off">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar un identificador del registro de acción de personal.">
-                                        help_outline
+                                        confirmation_number
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -84,7 +85,7 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Empleados registrados en el sistema.">
-                                        help_outline
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -128,14 +129,16 @@
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-end">
-                    <button mat-raised-button matStepperNext [disabled]="btnForm1" id="btn-raised" class="float-right">Siguiente</button>
+                    <button mat-raised-button matStepperNext [disabled]="btnForm1" id="btn-raised"
+                        class="float-right">Siguiente</button>
                 </div>
             </mat-step>
             <!-- ****************************** SEGUNDO FORMULARIO ******************************************* -->
             <mat-step [stepControl]="secondFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 2:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 2: Tipo acción personal">
+                        article
                     </mat-icon>
                 </ng-template>
                 <form [formGroup]="secondFormGroup">
@@ -159,7 +162,7 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Lista de tipos de acción de personal registrados en el sistema.">
-                                        help_outline
+                                        manage_accounts
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -174,7 +177,7 @@
                                         [readonly]="activarOtro">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese otro accion.">
-                                        help_outline
+                                        more_horiz
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -187,7 +190,7 @@
                                         [formControl]="otroEspecificacion" [readonly]="activarOtro"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese una explicación o detalle de otro.">
-                                        help_outline
+                                        notes
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -221,7 +224,7 @@
                                     <textarea matInput maxlength="200" [formControl]="observacionForm"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese una observación.">
-                                        help_outline
+                                        article
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -239,7 +242,7 @@
                                         [formControl]="baseLegalForm" readonly></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Regresar a la lista de opciones existentes.">
-                                        help_outline
+                                        gavel
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -255,15 +258,16 @@
             <!-- ****************************** TERCER FORMULARIO ******************************************* -->
             <mat-step [stepControl]="thirdFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 3:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 3: Situación del Funcionario">
+                        manage_accounts
                     </mat-icon>
                 </ng-template>
                 <form [formGroup]="thirdFormGroup">
                     <div class="row">
                         <div class="col-12 col-md-5">
                             <div class="subtitulo">
-                                <span>SITUACION ACTUAL (Datos tomados desde la ficha del empleado)</span>
+                                <span>SITUACIÓN ACTUAL (Datos tomados desde la ficha del empleado)</span>
                             </div>
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
@@ -565,10 +569,6 @@
                                         <textarea matInput #acta maxlength="200"
                                             placeholder="Ingresar número del acta final del concurso"
                                             [formControl]="actaPropuestaF"></textarea>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Ingresar el número del acta final del consurso.">
-                                            help_outline
-                                        </mat-icon>
                                         <mat-hint align="start"><strong>Ingresar hasta 200
                                                 caracteres</strong></mat-hint>
                                         <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
@@ -591,14 +591,16 @@
                 <br><br>
                 <div class="d-flex flex-wrap justify-content-between w-75 m-auto">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" class="float-right" (click)="validarForm(thirdFormGroup.value, stepper)">Siguiente</button>
+                    <button mat-raised-button id="btn-raised" class="float-right"
+                        (click)="validarForm(thirdFormGroup.value, stepper)">Siguiente</button>
                 </div>
             </mat-step>
             <!-- ****************************** CUARTO FORMULARIO ******************************************* -->
             <mat-step *ngIf="habilitarformPosesion" [stepControl]="fourthFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 4:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 4: Posesión del puesto">
+                        how_to_reg
                     </mat-icon>
                 </ng-template>
                 <form [formGroup]="fourthFormGroup">
@@ -609,13 +611,15 @@
                         <div class="col-12 col-md-5">
                             <label class="ml-3">YO,</label>
                             <mat-form-field class="contenedor-completo">
-                                <input type="text" style="font-size: small; width: 100%;" matInput [formControl]="funcionarioF" readonly>
+                                <input type="text" style="font-size: small; width: 100%;" matInput
+                                    [formControl]="funcionarioF" readonly>
                             </mat-form-field>
                         </div>
                         <div class="col-12 col-md-7">
                             <label>CON NRO. DE DOCUMENTO DE IDENTIFICACIÓN:</label>
                             <mat-form-field class="inputCedula">
-                                <input type="text" style="font-size: small;" matInput [formControl]="cedualF" required readonly>
+                                <input type="text" style="font-size: small;" matInput [formControl]="cedualF" required
+                                    readonly>
                             </mat-form-field>
                         </div>
                     </div>
@@ -653,18 +657,19 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-md ml-3"><label>** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)</label></div>
+                        <div class="col-md ml-3"><label>** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y
+                                OPOSICIÓN)</label></div>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-3">
-                             <div class="d-flex flex-wrap justify-content-start">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Número acta final</mat-label>
                                     <input matInput placeholder="0001" formControlName="actaFinalForm" required
                                         autocomplete="off">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el numero de acta final.">
-                                        help_outline
+                                        matTooltip="Ingresar el número de acta final.">
+                                        confirmation_number
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -711,8 +716,9 @@
             <!-- ****************************** QUINTO FORMULARIO ******************************************* -->
             <mat-step [stepControl]="fivethFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 5:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 5: Responsables de aprobación">
+                        assignment_turned_in
                     </mat-icon>
                 </ng-template>
                 <form [formGroup]="fivethFormGroup">
@@ -735,6 +741,10 @@
                                             {{option.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Responsable de Talento Humano.">
+                                        person
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -753,6 +763,10 @@
                                             {{option.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Autoridad nominadora o su delegado.">
+                                        person
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -777,8 +791,8 @@
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline
+                                        matTooltip="Identificación del funcionario.">
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -794,7 +808,7 @@
                                     <mat-datepicker touchUi #pickerfechaS></mat-datepicker>
                                 </mat-form-field>
                             </div>
-                            
+
                         </div>
                         <div class="col-1" style="border-right: 1px solid #ccc;"></div>
                         <div class="col-12 col-md-5">
@@ -813,8 +827,8 @@
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline
+                                        matTooltip="Funcionario testigo en caso de negativa.">
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -842,7 +856,7 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="row mt-4 w-100">
                         <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
@@ -852,7 +866,7 @@
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRGF">
                                 </mat-form-field>
                                 <mat-form-field style="width: 80%;">
-                                    <mat-label>Responsable de Elaboración*</mat-label>
+                                    <mat-label>Responsable de Elaboración</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRNA"
                                         [matAutocomplete]="auto24" required>
                                     <mat-autocomplete #auto24="matAutocomplete">
@@ -861,8 +875,8 @@
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline
+                                        matTooltip="Funcionario responsable de la elaboración de la acción de personal.">
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -873,7 +887,7 @@
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRHF">
                                 </mat-form-field>
                                 <mat-form-field style="width: 80%;">
-                                    <mat-label>Responsable de Revisión*</mat-label>
+                                    <mat-label>Responsable de Revisión</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRNF"
                                         [matAutocomplete]="auto25" required>
                                     <mat-autocomplete #auto25="matAutocomplete">
@@ -882,8 +896,8 @@
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline
+                                        matTooltip="Responsable de revisión de la acción de personal..">
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -894,7 +908,7 @@
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRRC">
                                 </mat-form-field>
                                 <mat-form-field style="width: 80%;">
-                                    <mat-label>Responsable de Registro y Control*</mat-label>
+                                    <mat-label>Responsable de Registro y Control</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRRC"
                                         [matAutocomplete]="auto26" required>
                                     <mat-autocomplete #auto26="matAutocomplete">
@@ -903,15 +917,15 @@
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline
+                                        matTooltip="Responsable del registro y control de la acción de personal.">
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
 
                             </div>
                         </div>
                     </div>
-                    
+
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-between">
@@ -922,8 +936,9 @@
             <!-- ****************************** SEXTO FORMULARIO ******************************************* -->
             <mat-step [stepControl]="sixthFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 6:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 6: Exclusivo para Talento Humano">
+                        group
                     </mat-icon>
                 </ng-template>
                 <form [formGroup]="sixthFormGroup">
@@ -939,7 +954,8 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="declaracion-radio-group ml-3">
                                     <mat-label class="letra">COMUNICACIÓN ELECTRÓNICA:</mat-label>
-                                    <mat-checkbox class="example-margin" formControlName="ComunicacionElectForm"> </mat-checkbox>
+                                    <mat-checkbox class="example-margin" formControlName="ComunicacionElectForm">
+                                    </mat-checkbox>
                                 </div>
                             </div>
                         </div>
@@ -949,8 +965,7 @@
                                     <mat-form-field class="inputDate">
                                         <mat-label>Fecha</mat-label>
                                         <input matInput [matDatepicker]="pickerFecha_" placeholder="dd/mm/aaaa"
-                                            formControlName="fechaComunicadoForm" min="1950-01-31" max="2050-01-31"
-                                            required>
+                                            formControlName="fechaComunicadoForm" min="1950-01-31" max="2050-01-31">
                                         <mat-datepicker-toggle matSuffix [for]="pickerFecha_" id="i-cursor"
                                             matTooltipPosition="right" matTooltip="Ingrese la fecha.">
                                         </mat-datepicker-toggle>
@@ -963,8 +978,7 @@
                                     <mat-form-field class="inputDate">
                                         <mat-label>Hora</mat-label>
                                         <input matInput [matTimepicker]="pickerHora" placeholder="hh:mm:00"
-                                            formControlName="horaComunicadoForm" min="1950-01-31" max="2050-01-31"
-                                            required>
+                                            formControlName="horaComunicadoForm" min="1950-01-31" max="2050-01-31">
                                         <mat-timepicker-toggle matSuffix [for]="pickerHora" id="i-cursor"
                                             matTooltipPosition="right" matTooltip="Ingrese la hora.">
                                         </mat-timepicker-toggle>
@@ -978,13 +992,12 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label>**MEDIO</mat-label>
+                                        <mat-label>MEDIO</mat-label>
                                         <textarea matInput #acta maxlength="200"
                                             placeholder="Ingresar número del acta final del concurso"
                                             formControlName="medioComunicacionForm"></textarea>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Ingresar el número del acta final del consurso.">
-                                            help_outline
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="">
+                                            article
                                         </mat-icon>
                                         <mat-hint align="start"><strong>Ingresar hasta 200
                                                 caracteres</strong></mat-hint>
@@ -1003,19 +1016,21 @@
                                     <mat-form-field style="width: 80%;">
                                         <mat-label>Responsable de notificar</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoC"
-                                            [matAutocomplete]="auto27" required>
+                                            [matAutocomplete]="auto27">
                                         <mat-autocomplete #auto27="matAutocomplete">
                                             <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
                                                 {{g.empleado.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
                                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Colaboradores registrados en el sistema.">
-                                            help_outline
+                                            matTooltip="Responsable de notificar al servidor.">
+                                            person
                                         </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
+                            <div><label class="ml-3">**Si la comunicación fue electrónica se deberá colocar el medio por
+                                    el cual se notificó al servidor: así como, el número del documento</label></div>
                         </div>
                     </div>
 
