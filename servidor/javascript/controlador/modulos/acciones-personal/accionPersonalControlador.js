@@ -510,7 +510,7 @@ class AccionPersonalControlador {
                 ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 
                 ap.posesion_notificacion, ap.descripcion_posesion_notificacion, tap.base_legal, tap.id_tipo_accion_personal, 
                 ta.descripcion AS tipo 
-            FROM map_documento_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, map_tipo_accion_personal AS ta 
+            FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, map_tipo_accion_personal AS ta 
             WHERE ap.id_detalle_tipo_accion_personal = tap.id AND ap.id = $1 AND ta.id = tap.id_tipo_accion_personal
             `, [id]);
             if (ACCION.rowCount != 0) {
@@ -524,17 +524,47 @@ class AccionPersonalControlador {
     ListarPedidoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ACCION = yield database_1.default.query(`
-            SELECT ap.id, ap.id_empleado, ap.fecha_creacion, ap.fecha_rige_desde,
-                ap.fecha_rige_hasta, ap.identificacion_accion_personal, ap.numero_partida_empresa, ap.id_contexto_legal, 
-                ap.titulo_empleado_uno, ap.firma_empleado_uno, ap.titulo_empleado_dos, ap.firma_empleado_dos, 
-                ap.adicion_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
-                ap.numero_partida_propuesta, ap.salario_propuesto, ap.id_ciudad, ap.id_empleado_responsable, 
-                ap.numero_partida_individual, ap.acta_final_concurso, ap.fecha_acta_final_concurso, ap.nombre_reemplazo, 
-                ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 
-                ap.posesion_notificacion, ap.descripcion_posesion_notificacion, tap.base_legal, tap.id_tipo_accion_personal,
-                e.codigo, e.identificacion, e.nombre, e.apellido 
-            FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, eu_empleados AS e 
-            WHERE ap.id_detalle_tipo_accion_personal = tap.id AND e.id = ap.id_empleado
+            SELECT 
+	ap.id, ap.numero_accion_personal, ap.fecha_elaboracion, CONCAT(inf.nombre,' ',inf.apellido) AS nombres, ap.fecha_rige_desde,
+    ap.fecha_rige_hasta, ap.id_tipo_accion_personal, tp.descripcion, ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
+	ap.especificacion, ap.declaracion_jurada, adicion_base_legal, ap.observacion, id_proceso_actual, ps.nombre,
+	ap.id_nivel_gestion_actual, 
+	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_nivel_gestion_actual) AS nivel_gestion_actual,
+	ap.id_unidad_administrativa,
+	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_unidad_administrativa) AS unidad_administrativa,
+	ap.id_sucursal_actual, 
+	(SELECT nombre FROM e_sucursales AS su WHERE su.id = ap.id_sucursal_actual) AS sucursal_actual,
+	ap.id_lugar_trabajo_actual,
+	(SELECT descripcion FROM e_ciudades AS ciud WHERE ciud.id = ap.id_lugar_trabajo_actual) AS lugar_trabajo_actual,
+	ap.id_tipo_cargo_actual, inf.name_cargo AS cargo_actual, ap.id_grupo_ocupacional_actual,
+	(SELECT grup.descripcion FROM map_cat_grupo_ocupacional AS grup WHERE grup.id = ap.id_grupo_ocupacional_actual) AS grupo_ocupacional_actual,
+	ap.id_grado_actual, 
+	(SELECT grad.descripcion FROM map_cat_grado AS grad WHERE grad.id = ap.id_grado_actual) AS grado_actual,
+	remuneracion_actual, partida_individual_actual, 
+	ap.id_proceso_propuesto, 
+	(SELECT ps.nombre FROM map_cat_procesos AS prs WHERE prs.id = ap.id_sucursal_propuesta) AS proceso_propuesto,
+	ap.id_nivel_gestion_propuesto, 
+	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_nivel_gestion_propuesto) AS nivel_gestion_propuesto,
+	ap.id_unidad_adminsitrativa_propuesta,
+	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_unidad_adminsitrativa_propuesta) AS unidad_administrativa_propuesta,
+	ap.id_sucursal_propuesta, 
+	(SELECT nombre FROM e_sucursales AS su WHERE su.id = ap.id_sucursal_propuesta) AS sucursal_propuesto,
+	ap.id_lugar_trabajo_propuesto,
+	(SELECT descripcion FROM e_ciudades AS ciud WHERE ciud.id = ap.id_lugar_trabajo_propuesto) AS lugar_trabajo_propuesto,
+	ap.id_tipo_cargo_propuesto, 
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_propuesto) AS cargo_propuesto, 
+	ap.id_grupo_ocupacional_propuesto,
+	(SELECT grup.descripcion FROM map_cat_grupo_ocupacional AS grup WHERE grup.id = ap.id_grupo_ocupacional_propuesto) AS grupo_ocupacional_propuesto,
+	ap.id_grado_propuesto, 
+	(SELECT grad.descripcion FROM map_cat_grado AS grad WHERE grad.id = ap.id_grado_propuesto) AS grado_propuesto,
+	remuneracion_propuesta, partida_individual_propuesta
+FROM 
+	map_documento_accion_personal AS ap, informacion_general AS inf,
+	map_tipo_accion_personal AS tp, map_detalle_tipo_accion_personal AS dtp,
+	map_cat_procesos AS ps, ed_departamentos AS dp
+WHERE
+	inf.id = ap.id_empleado_personal AND tp.id = ap.id_tipo_accion_personal AND
+	dtp.id = ap.id_detalle_tipo_accion AND ps.id = ap.id_proceso_actual
             `);
             if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
@@ -868,7 +898,8 @@ class AccionPersonalControlador {
                 if (count > 1) {
                     meCount = "registros eliminados";
                 }
-                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.',
+                res.status(200).jsonp({
+                    message: count.toString() + ' ' + meCount + ' con éxito.',
                     ms2: 'Existen datos relacionados con ',
                     codigo: 200,
                     eliminados: count,
@@ -883,12 +914,16 @@ class AccionPersonalControlador {
                 if (error) {
                     if (err.table == 'map_empleado_grupo_ocupacional') {
                         if (count == 1) {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_TipoAccion });
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_TipoAccion
+                            });
                         }
                         else {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_TipoAccion });
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_TipoAccion
+                            });
                         }
                     }
                     else {

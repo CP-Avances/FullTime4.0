@@ -55,6 +55,10 @@ mat-form-field {
     margin-left: 20px;
 }
 
+.inputCedula{
+    width: 30%;
+}
+
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
     .nota{
@@ -79,6 +83,10 @@ mat-form-field {
     mat-step{
         margin: 0px;
         padding: 0px;
+    }
+
+    .inputCedula{
+        width: 90%;
     }
 }
 
