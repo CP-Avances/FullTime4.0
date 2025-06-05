@@ -1792,7 +1792,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   expansion: boolean = true;
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, index: any): void {
     let fecha = `${anio}-${mes}-${dia}`;
-    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy/MM/dd');
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy/MM/dd');
     let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid;
     // VERIFICAR QUE EL DIA SEA VALIDO (30-31)
     if (verificar === true) {

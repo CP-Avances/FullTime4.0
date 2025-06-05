@@ -225,6 +225,7 @@ class AlimentacionControlador {
 
     // METODO PARA BUSCAR DATOS DE ALIMENTACION   **USADO
     public async ReporteTimbresAlimentacion(req: Request, res: Response) {
+        console.log("LLEGA HASTA AQUI EN EL BACKEND")
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -241,7 +242,7 @@ class AlimentacionControlador {
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de timbres de alimentación.' })
 
         return res.status(200).jsonp(nuevo)
     }

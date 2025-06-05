@@ -27,7 +27,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistroPlanHorarioComponent implements OnInit {
-  
+
   ips_locales: any = '';
 
   @Input() datoEmpleado: any;
@@ -69,10 +69,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.BuscarHorarios();
     this.BuscarHora();
@@ -193,7 +193,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
       else {
         let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
-        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/M/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
@@ -214,8 +214,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
     const lastDayOfMonth = fec_fin.endOf('month').day;
     const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
     let final = formattedDate;
-    let feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
-    let fecf = DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    let feci = DateTime.fromFormat(inicio, 'dd/M/yyyy').toFormat('yyyy/MM/dd')
+    let fecf = DateTime.fromFormat(final, 'dd/M/yyyy').toFormat('yyyy/MM/dd')
     console.log("ver feci", feci)
     console.log("ver fecf", fecf)
 
@@ -231,10 +231,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
           (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(fecf))) {
           // REGISTRO DE LA FECHA EN EL FORMULARIO
           if (opcion === 1) {
-            formulario.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+            formulario.setValue(DateTime.fromFormat(inicio, 'dd/M/yyyy').toJSDate());
           }
           else {
-            formulario.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
+            formulario.setValue(DateTime.fromFormat(final, 'dd/M/yyyy').toJSDate());
           }
         }
         else {
@@ -507,6 +507,16 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA INGRESAR HORARIO
   lista_eliminar: any = [];
   IngresarHorario(index: number) {
+    if (
+      this.fechas_mes[index].horarios_existentes === '***' ||
+      this.fechas_mes[index].horarios.length > 0
+    ) {
+      this.toastr.warning('Ya existe un horario registrado en esta fecha. No se permite modificar desde aquí.', 'Ups! VERIFICAR.', {
+        timeOut: 6000,
+      });
+      return;
+    }
+
     let verificador = 0;
     let procesar = 0;
     this.ControlarBotones(true, false);
@@ -530,17 +540,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     // PROCESAMIENTO DE LOS DATOS AL CUMPLIR LAS CONDICIONES
     if (procesar === 0) {
-      // EXISTEN HORARIOS REGISTRADOS
-      if (this.fechas_mes[index].registrados.length === 1) {
-        if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
-          let eliminar = {
-            fecha: this.fechas_mes[index].fecha,
-            id_horarios: this.fechas_mes[index].registrados[0].id_horario,
-          }
-          this.lista_eliminar = this.lista_eliminar.concat(eliminar);
-          this.fechas_mes[index].registrados = [];
-        }
-      }
 
       // DIA REGISTRADO COMO LIBRE
       if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
@@ -1210,6 +1209,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         });
         this.cargar = true;
         this.ver_guardar = false;
+        this.CerrarVentana();
       }
       else {
         this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
