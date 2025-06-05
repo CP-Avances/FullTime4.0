@@ -326,10 +326,6 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
-    console.log('✅ Paso 6: Datos enviados al backend:');
-    console.log('Seleccionados:', seleccionados);
-    console.log('Fecha inicio:', this.rangoFechas.fec_inico);
-    console.log('Fecha fin:', this.rangoFechas.fec_final);
     this.data_pdf = []
     this.reportesTiempoLaborado.ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;

@@ -106,10 +106,10 @@ export class PlanificacionMultipleComponent implements OnInit {
     let final = `${ctrlValue.daysInMonth}${ctrlValue.toFormat('/MM/yyyy')}`;
     console.log("final luxon", final)
 
-    this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+    this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/M/yyyy').toJSDate());
     console.log("fechaInicialF", this.fechaInicialF.value)
 
-    this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
+    this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/M/yyyy').toJSDate());
 
     datepicker.close();
     this.ver_horario = false;
@@ -131,8 +131,8 @@ export class PlanificacionMultipleComponent implements OnInit {
       // Obtener el número de días en el mes y formatear la fecha final
       let final = `${now.daysInMonth}${now.toFormat('/MM/yyyy')}`;
       // Establecer los valores de fecha inicial y final usando Luxon
-      this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
-      this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
+      this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/M/yyyy').toJSDate());
+      this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/M/yyyy').toJSDate());
       console.log("fechaInicialF sin seleccionar", this.fechaInicialF.value)
       console.log("fechaFinalF sin seleccionar", this.fechaFinalF.value)
     }
@@ -385,7 +385,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     let data = [{
       dia: dia,
       rango: '',
-      fecha: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+      fecha: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
       horario: this.horarioF.value,
       detalles: datoHorario.detalles,
       id_horario: datoHorario.id,
@@ -495,8 +495,8 @@ export class PlanificacionMultipleComponent implements OnInit {
 
 
     let fechas = {
-      fechaInicio: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
-      fechaFinal: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd')
+      fechaInicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
+      fechaFinal: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd')
     };
 
     this.horario.VerificarHorariosExistentes(id_empleado, fechas).subscribe(existe => {
@@ -517,8 +517,8 @@ export class PlanificacionMultipleComponent implements OnInit {
           // PREPARAR DATA PARA ELIMINAR HORARIO
           let plan_fecha = {
             codigo: this.datosSeleccionados.usuarios[index].codigo,
-            fec_final: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
-            fec_inicio: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+            fec_final: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
+            fec_inicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
             id_horario: existe[i].id_horario,
           };
           this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
@@ -655,7 +655,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     let data = [{
       dia: dia,
       rango: '',
-      fecha: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+      fecha: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
       horario: datoHorario.codigo,
       detalles: datoHorario.detalles,
       id_horario: datoHorario.id,
@@ -738,8 +738,8 @@ export class PlanificacionMultipleComponent implements OnInit {
             // PREPARAR DATA PARA ELIMINAR HORARIO
             let plan_fecha = {
               codigo: this.datosSeleccionados.usuarios[index].codigo,
-              fec_final: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
-              fec_inicio: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+              fec_final: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
+              fec_inicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
               id_horario: existe.id_horario,
             };
             this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
@@ -774,8 +774,8 @@ export class PlanificacionMultipleComponent implements OnInit {
     let mes = DateTime.fromJSDate(this.fechaInicialF.value).toFormat('MM-yyyy');;
     let fecha = dia + '-' + mes
     let fechas = {
-      fechaInicio: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
-      fechaFinal: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+      fechaInicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
+      fechaFinal: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
     };
 
     let id_empleado = this.datosSeleccionados.usuarios[index].id;
@@ -791,8 +791,8 @@ export class PlanificacionMultipleComponent implements OnInit {
           // PREPARAR DATA PARA ELIMINAR HORARIO
           let plan_fecha = {
             codigo: this.datosSeleccionados.usuarios[index].codigo,
-            fec_final: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
-            fec_inicio: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+            fec_final: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
+            fec_inicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
             id_horario: existe[i].id_horario,
           };
           this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
@@ -870,7 +870,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       let fecha = dia + '-' + mes;
       let data = [{
         dia: parseInt(dia),
-        fecha: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+        fecha: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
         horario: datoHorario.codigo,
         detalles: datoHorario.detalles,
         id_horario: datoHorario.id,
@@ -883,8 +883,8 @@ export class PlanificacionMultipleComponent implements OnInit {
       // PREPARAR DATA PARA ELIMINAR HORARIO
       let plan_fecha = {
         id_empleado: usuario.id,
-        fec_final: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
-        fec_inicio: DateTime.fromFormat(fecha, 'd-MM-yyyy').toFormat('yyyy-MM-dd'),
+        fec_final: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
+        fec_inicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
         id_horario: datoHorario.id,
       };
 
@@ -1241,6 +1241,7 @@ enviarParte(partes: any[], parteIndex: number, totalPartes: number) {
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
+        this.CerrarVentana();
       }
     } else {
       // Si hay un error, lo mostramos en consola

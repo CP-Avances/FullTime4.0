@@ -53,10 +53,12 @@ const BuscarTiempoLaborado = function (fec_inicio, fec_final, id_empleado) {
         SELECT CAST(ag.fecha_horario AS VARCHAR), CAST(ag.fecha_hora_horario AS VARCHAR), CAST(ag.fecha_hora_timbre AS VARCHAR),
             ag.id_empleado, ag.estado_timbre, ag.tipo_accion AS accion, ag.minutos_alimentacion, ag.tipo_dia, ag.id_horario, ec.controlar_asistencia,
             ag.estado_origen, ag.tolerancia 
-        FROM eu_asistencia_general AS ag, eu_empleado_contratos AS ec
+        FROM eu_asistencia_general AS ag, eu_empleado_contratos AS ec, cargos_empleado as car
         WHERE CAST(ag.fecha_hora_horario AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%' AND ag.id_empleado = $3  AND ag.id_empleado = $3 AND ec.id_empleado = ag.id_empleado 
+            AND ($2::timestamp + '1 DAY') || '%' AND ag.id_empleado = $3  AND ag.id_empleado = $3
             AND ag.tipo_accion IN ('E','I/A', 'F/A', 'S') 
+            AND car.id_cargo = ag.id_empleado_cargo
+            AND ec.id = car.id_contrato
         ORDER BY ag.id_empleado, ag.fecha_hora_horario ASC
         `, [fec_inicio, fec_final, id_empleado])
             .then(res => {
