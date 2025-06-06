@@ -37,7 +37,7 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/acciones/insertar', TokenValidation, ROLPERMISOSCONTROLADOR.AsignarAccionesRol);
 
         // METODO PARA ELIMINAR REGISTRO  **USADO
-        this.router.post('/menu/paginas/eliminar', TokenValidation, ROLPERMISOSCONTROLADOR.EliminarPaginaRol);
+        this.router.post('/menu/paginas/eliminar', TokenValidation, ROLPERMISOSCONTROLADOR.EliminarPaginasRol);
 
         // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA  **USADO
         this.router.post('/menu/paginas/acciones', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerAccionesPaginas);

@@ -503,9 +503,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     }
   }
 
-  // METODO PARA ASIGNAR PAGINAS A ESTE ROL
-  contador: number = 0;
-  ingresar: boolean = false;
   //INSERTAR PAGINA
   InsertarPaginasRol() {
     const arrayAccionesSeleccionadas: any[] = [];
@@ -727,38 +724,43 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
   // ELIMINAR PAGINAS SELECCIONADAS POR EL ROL
-  EliminarPaginaRol() {
-    this.ingresar = false;
-    this.contador = 0;
+  EliminarPaginasRol() {
     this.paginasEliminar = this.selectionPaginas.selected;
-    this.paginasEliminar.forEach((datos: any) => {
-      this.paginas = this.paginas.filter((item: any) => item.id !== datos.id);
-      var buscarPagina = {
-        id: datos.id,
-        user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
-      };
-      this.contador = this.contador + 1;
-      this.rest.EliminarPaginasRol(buscarPagina).subscribe(
-        res => {
-          if (res.message === 'error') {
-            this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
-              timeOut: 6000,
-            });
-          } else {
-            if (!this.ingresar) {
-              this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-                timeOut: 6000,
-              });
-              this.ObtenerRoles();
-              this.ingresar = true;
-            }
-            this.MostrarPaginasRol();
-          }
-        }
-      )
+
+    // VALIDAR SI SE HA SELECCIONADO PAGINAS
+    if (this.paginasEliminar.length === 0) {
+      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
+        timeOut: 6000,
+      });
+      return;
     }
-    )
+
+    const idPaginasEliminar = this.paginasEliminar.map((pagina: any) => pagina.id);
+    this.paginas = this.paginas.filter((pagina: any) => !idPaginasEliminar.includes(pagina.id));
+
+    const data = {
+      ids: idPaginasEliminar,
+      user_name: this.user_name,
+      ip: this.ip,
+      ip_local: this.ips_locales,
+    }
+
+    this.rest.EliminarPaginasRol(data).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Se han eliminado las páginas seleccionadas.', 'Operación exitosa.', {
+          timeOut: 6000,
+        });
+        this.ObtenerRoles();
+        this.MostrarPaginasRol();
+        this.selectionPaginas.clear();
+      },
+      error: (error: any) => {
+        console.error('Error al eliminar páginas:', error);
+        this.toastr.error('Error al eliminar páginas.', 'VERIFICAR.', {
+          timeOut: 6000,
+        });
+      }
+    })
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
@@ -767,7 +769,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           if (this.paginasEliminar.length != 0) {
-            this.EliminarPaginaRol();
+            this.EliminarPaginasRol();
             this.activar_seleccion = true;
             this.plan_multiple = false;
             this.plan_multiple_ = false;

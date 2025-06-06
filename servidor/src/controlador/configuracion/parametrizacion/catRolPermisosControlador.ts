@@ -188,19 +188,22 @@ class RolPermisosControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO  **USADO
-  public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
+  public async EliminarPaginasRol(req: Request, res: Response): Promise<any> {
     try {
-      const { id, user_name, ip, ip_local } = req.body
+      const { ids, user_name, ip, ip_local } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).jsonp({ message: 'No se proporcionaron IDs para eliminar.' });
+      }
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
-      const rol = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = $1', [id]);
-      const [datosOriginales] = rol.rows;
+      // CONSULTAR DATOS ORIGINALES
+      const roles = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
+      const datosOriginales = roles.rows;
 
-
-      if (!datosOriginales) {
+      if (datosOriginales.length === 0) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'ero_rol_permisos',
@@ -210,35 +213,51 @@ class RolPermisosControlador {
           datosNuevos: '',
           ip: ip,
           ip_local: ip_local,
-          observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
+          observacion: `Error al eliminar los permisos. Registros no encontrados.`
         });
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+        return res.status(404).jsonp({ message: 'Error al eliminar los registros.' });
       }
 
-      await pool.query(
-        `
-      DELETE FROM ero_rol_permisos WHERE id = $1
-      `
-        , [id]);
+      // ELIMINAR REGISTROS
+      await pool.query('DELETE FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ero_rol_permisos',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
+      // AUDITORÍA MASIVA
+      const valuesAuditoria: string[] = [];
+      const paramsAuditoria: any[] = [];
+      let i = 1;
+      for (const original of datosOriginales) {
+        valuesAuditoria.push(
+          `($${i++}, $${i++}, $${i++}, now(), $${i++}, $${i++}, $${i++}, $${i++}, $${i++}, $${i++})`
+        );
+        paramsAuditoria.push(
+          "APLICACION WEB",
+          'ero_rol_permisos',
+          user_name,
+          'D',
+          JSON.stringify(original),
+          '',
+          ip,
+          null,
+          ip_local
+        );
+      }
+
+      const queryAuditoria = `
+        INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+          action, original_data, new_data, ip_address, observacion, ip_address_local)
+        VALUES ${valuesAuditoria.join(', ')}
+      `;
+
+      await pool.query(queryAuditoria, paramsAuditoria);
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      res.jsonp({ message: 'Registro eliminado.' });
+      res.jsonp({ message: 'Registros eliminados.' });
     } catch (error) {
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
   }

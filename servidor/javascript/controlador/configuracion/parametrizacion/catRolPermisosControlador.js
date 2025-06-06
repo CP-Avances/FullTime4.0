@@ -185,16 +185,19 @@ class RolPermisosControlador {
         });
     }
     // METODO PARA ELIMINAR REGISTRO  **USADO
-    EliminarPaginaRol(req, res) {
+    EliminarPaginasRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, user_name, ip, ip_local } = req.body;
+                const { ids, user_name, ip, ip_local } = req.body;
+                if (!Array.isArray(ids) || ids.length === 0) {
+                    return res.status(400).jsonp({ message: 'No se proporcionaron IDs para eliminar.' });
+                }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const rol = yield database_1.default.query('SELECT * FROM ero_rol_permisos WHERE id = $1', [id]);
-                const [datosOriginales] = rol.rows;
-                if (!datosOriginales) {
+                // CONSULTAR DATOS ORIGINALES
+                const roles = yield database_1.default.query('SELECT * FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
+                const datosOriginales = roles.rows;
+                if (datosOriginales.length === 0) {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ero_rol_permisos',
@@ -204,30 +207,34 @@ class RolPermisosControlador {
                         datosNuevos: '',
                         ip: ip,
                         ip_local: ip_local,
-                        observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
+                        observacion: `Error al eliminar los permisos. Registros no encontrados.`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+                    return res.status(404).jsonp({ message: 'Error al eliminar los registros.' });
                 }
-                yield database_1.default.query(`
-      DELETE FROM ero_rol_permisos WHERE id = $1
-      `, [id]);
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ero_rol_permisos',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
+                // ELIMINAR REGISTROS
+                yield database_1.default.query('DELETE FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
+                // AUDITORÍA MASIVA
+                const valuesAuditoria = [];
+                const paramsAuditoria = [];
+                let i = 1;
+                for (const original of datosOriginales) {
+                    valuesAuditoria.push(`($${i++}, $${i++}, $${i++}, now(), $${i++}, $${i++}, $${i++}, $${i++}, $${i++}, $${i++})`);
+                    paramsAuditoria.push("APLICACION WEB", 'ero_rol_permisos', user_name, 'D', JSON.stringify(original), '', ip, null, ip_local);
+                }
+                const queryAuditoria = `
+        INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+          action, original_data, new_data, ip_address, observacion, ip_address_local)
+        VALUES ${valuesAuditoria.join(', ')}
+      `;
+                yield database_1.default.query(queryAuditoria, paramsAuditoria);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registros eliminados.' });
             }
             catch (error) {
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
