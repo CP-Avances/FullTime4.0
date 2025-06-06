@@ -163,6 +163,32 @@ class RolPermisosControlador {
             }
         });
     }
+    // METODO PARA ASIGNAR ACCIONES AL ROL
+    AsignarAccionesRol(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const arrayAccionesSeleccionadas = req.body.acciones;
+            console.log('asignar acciones rol ', arrayAccionesSeleccionadas);
+            if (!Array.isArray(arrayAccionesSeleccionadas) || arrayAccionesSeleccionadas.length === 0) {
+                return res.status(400).jsonp({ message: 'No se proporcionaron acciones para asignar.' });
+            }
+            try {
+                // Filtrar las acciones seleccionadas que no existen en la base de datos
+                const accionesNoExistentes = yield filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas);
+                if (accionesNoExistentes.length === 0) {
+                    console.log('Todas las acciones ya existen.');
+                    return res.status(200).jsonp({ message: 'Todas las acciones ya existen.' });
+                }
+                console.log('Acciones no existentes:', accionesNoExistentes);
+                // Insertar las acciones seleccionadas que no existen
+                yield insertarAccionesSeleccionadas(accionesNoExistentes);
+                return res.status(200).jsonp({ message: 'Acciones asignadas correctamente.' });
+            }
+            catch (error) {
+                console.error('Error al asignar acciones:', error);
+                return res.status(500).jsonp({ message: 'Error al asignar acciones.' });
+            }
+        });
+    }
     // METODO PARA ELIMINAR REGISTRO  **USADO
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -294,6 +320,106 @@ class RolPermisosControlador {
             }
         });
     }
+}
+function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (arrayAccionesSeleccionadas.length === 0)
+            return [];
+        // Construimos filtros dinámicos
+        const conditions = [];
+        const values = [];
+        let i = 1;
+        for (const accion of arrayAccionesSeleccionadas) {
+            const { id_rol, id_accion, funcion } = accion;
+            if (id_accion) {
+                conditions.push(`(pagina = $${i++} AND id_rol = $${i++} AND id_accion = $${i++})`);
+                values.push(funcion, id_rol, id_accion);
+            }
+            else {
+                conditions.push(`(pagina = $${i++} AND id_rol = $${i++})`);
+                values.push(funcion, id_rol);
+            }
+        }
+        const query = `
+    SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
+    WHERE ${conditions.join(' OR ')}
+  `;
+        const result = yield database_1.default.query(query, values);
+        // Convertimos los registros existentes a un set de claves para comparar rápido
+        const clavesExistentes = new Set(result.rows.map(r => { var _a; return `${r.pagina}|${r.id_rol}|${(_a = r.id_accion) !== null && _a !== void 0 ? _a : 'null'}`; }));
+        // Filtramos solo los que NO existen
+        return arrayAccionesSeleccionadas.filter(({ funcion, id_rol, id_accion }) => {
+            const clave = `${funcion}|${id_rol}|${id_accion !== null && id_accion !== void 0 ? id_accion : 'null'}`;
+            return !clavesExistentes.has(clave);
+        });
+    });
+}
+function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (arrayAccionesSeleccionadas.length === 0)
+            return;
+        // Construimos la consulta de inserción
+        const values = [];
+        const params = [];
+        let i = 1;
+        const valuesAuditoria = [];
+        const paramsAuditoria = [];
+        let j = 1;
+        for (const accion of arrayAccionesSeleccionadas) {
+            const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = accion;
+            if (id_accion) {
+                values.push(`($${i++}, $${i++}, $${i++}, $${i++}, $${i++})`);
+                params.push(funcion, link, id_rol, id_accion, movil);
+            }
+            else {
+                values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
+                params.push(funcion, link, id_rol, movil);
+            }
+            // Preparar datos para auditoría
+            valuesAuditoria.push(`($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`);
+            paramsAuditoria.push("APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB",
+            'ero_rol_permisos', user_name, 'now()', // Fecha y hora actual
+            'I', // Acción de inserción
+            '', // Datos originales vacíos  
+            JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), // Datos nuevos
+            ip, null, // Observación puede ser nulo o un mensaje específico
+            ip_local);
+        }
+        const query = `
+    INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
+    VALUES ${values.join(', ')}
+  `;
+        const queryAuditoria = `
+    INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+        action, original_data, new_data, ip_address, observacion, ip_address_local)
+    VALUES ${valuesAuditoria.join(', ')}
+  `;
+        // añadir transacción
+        yield database_1.default.query('BEGIN');
+        yield database_1.default
+            .query(query, params)
+            .catch(error => {
+            console.error('Error al insertar acciones seleccionadas:', error);
+            // Revertir transacción en caso de error
+            return database_1.default.query('ROLLBACK')
+                .then(() => {
+                throw new Error('Error al insertar acciones seleccionadas: ' + error.message);
+            });
+        });
+        yield database_1.default
+            .query(queryAuditoria, paramsAuditoria)
+            .catch(error => {
+            console.error('Error al insertar auditoría de acciones seleccionadas:', error);
+            // Revertir transacción en caso de error
+            return database_1.default.query('ROLLBACK')
+                .then(() => {
+                throw new Error('Error al insertar auditoría de acciones seleccionadas: ' + error.message);
+            });
+        });
+        // Finalizar transacción
+        yield database_1.default.query('COMMIT');
+        console.log('Acciones seleccionadas insertadas correctamente.');
+    });
 }
 exports.rolPermisosControlador = new RolPermisosControlador();
 exports.default = exports.rolPermisosControlador;

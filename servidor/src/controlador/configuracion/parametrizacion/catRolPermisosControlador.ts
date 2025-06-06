@@ -164,6 +164,35 @@ class RolPermisosControlador {
     }
   }
 
+  // METODO PARA ASIGNAR ACCIONES AL ROL
+  public async AsignarAccionesRol(req: Request, res: Response) {
+    const arrayAccionesSeleccionadas: any[] = req.body.acciones;
+    console.log('asignar acciones rol ', arrayAccionesSeleccionadas);
+
+    if (!Array.isArray(arrayAccionesSeleccionadas) || arrayAccionesSeleccionadas.length === 0) {
+      return res.status(400).jsonp({ message: 'No se proporcionaron acciones para asignar.' });
+    }
+
+    try {
+      // Filtrar las acciones seleccionadas que no existen en la base de datos
+      const accionesNoExistentes = await filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas);
+      if (accionesNoExistentes.length === 0) {
+        console.log('Todas las acciones ya existen.');
+        return res.status(200).jsonp({ message: 'Todas las acciones ya existen.' });
+      }
+
+      console.log('Acciones no existentes:', accionesNoExistentes);
+
+      // Insertar las acciones seleccionadas que no existen
+      await insertarAccionesSeleccionadas(accionesNoExistentes);
+
+      return res.status(200).jsonp({ message: 'Acciones asignadas correctamente.' });
+    } catch (error) {
+      console.error('Error al asignar acciones:', error);
+      return res.status(500).jsonp({ message: 'Error al asignar acciones.' });
+    }
+  }
+
   // METODO PARA ELIMINAR REGISTRO  **USADO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
     try {
@@ -314,6 +343,127 @@ class RolPermisosControlador {
     }
   }
 }
+
+async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas: any[]): Promise<any[]> {
+  if (arrayAccionesSeleccionadas.length === 0) return [];
+  // Construimos filtros dinámicos
+  const conditions: string[] = [];
+  const values: any[] = [];
+  let i = 1;
+
+  for (const accion of arrayAccionesSeleccionadas) {
+    const { id_rol, id_accion, funcion } = accion;
+    if (id_accion) {
+      conditions.push(`(pagina = $${i++} AND id_rol = $${i++} AND id_accion = $${i++})`);
+      values.push(funcion, id_rol, id_accion);
+    } else {
+      conditions.push(`(pagina = $${i++} AND id_rol = $${i++})`);
+      values.push(funcion, id_rol);
+    }
+  }
+
+  const query = `
+    SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
+    WHERE ${conditions.join(' OR ')}
+  `;
+
+  const result = await pool.query(query, values);
+
+  // Convertimos los registros existentes a un set de claves para comparar rápido
+  const clavesExistentes = new Set(
+    result.rows.map(r =>
+      `${r.pagina}|${r.id_rol}|${r.id_accion ?? 'null'}`
+    )
+  );
+  // Filtramos solo los que NO existen
+  return arrayAccionesSeleccionadas.filter(({ funcion, id_rol, id_accion }) => {
+    const clave = `${funcion}|${id_rol}|${id_accion ?? 'null'}`;
+    return !clavesExistentes.has(clave);
+  });
+}
+
+async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) {
+  if (arrayAccionesSeleccionadas.length === 0) return;
+  // Construimos la consulta de inserción
+  const values: string[] = [];
+  const params: any[] = [];
+  let i = 1;  
+
+  const valuesAuditoria: string[] = [];
+  const paramsAuditoria: any[] = [];
+  let j = 1;
+
+  for (const accion of arrayAccionesSeleccionadas) {
+    const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = accion;
+    if (id_accion) {
+      values.push(`($${i++}, $${i++}, $${i++}, $${i++}, $${i++})`);
+      params.push(funcion, link, id_rol, id_accion, movil);
+    } else {
+      values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
+      params.push(funcion, link, id_rol, movil);
+    }
+    // Preparar datos para auditoría
+    valuesAuditoria.push(
+      `($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`
+    );
+    paramsAuditoria.push(
+      "APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB",
+      'ero_rol_permisos',
+      user_name,
+      'now()', // Fecha y hora actual
+      'I', // Acción de inserción
+      '', // Datos originales vacíos  
+      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), // Datos nuevos
+      ip,
+      null, // Observación puede ser nulo o un mensaje específico
+      ip_local
+    );
+  }
+
+
+  const query = `
+    INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
+    VALUES ${values.join(', ')}
+  `;
+
+  const queryAuditoria = `
+    INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+        action, original_data, new_data, ip_address, observacion, ip_address_local)
+    VALUES ${valuesAuditoria.join(', ')}
+  `;
+
+  // añadir transacción
+  await pool.query('BEGIN');
+
+  await pool 
+    .query(query, params)
+    .catch(error => {
+      console.error('Error al insertar acciones seleccionadas:', error);
+      // Revertir transacción en caso de error
+      return pool.query('ROLLBACK')
+        .then(() => {
+          throw new Error('Error al insertar acciones seleccionadas: ' + error.message);
+        });
+    });
+
+  await pool
+    .query(queryAuditoria, paramsAuditoria)
+    .catch(error => {
+      console.error('Error al insertar auditoría de acciones seleccionadas:', error);
+      // Revertir transacción en caso de error
+      return pool.query('ROLLBACK')
+        .then(() => { 
+          throw new Error('Error al insertar auditoría de acciones seleccionadas: ' + error.message);
+        });
+
+  });
+
+  // Finalizar transacción
+  await pool.query('COMMIT');
+  console.log('Acciones seleccionadas insertadas correctamente.');
+}
+
+
 
 export const rolPermisosControlador = new RolPermisosControlador();
 export default rolPermisosControlador;
