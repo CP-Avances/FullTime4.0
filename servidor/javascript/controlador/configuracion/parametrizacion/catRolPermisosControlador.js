@@ -163,23 +163,18 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA ASIGNAR ACCIONES AL ROL
+    // METODO PARA ASIGNAR PAGINAS/ACCIONES AL ROL
     AsignarAccionesRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const arrayAccionesSeleccionadas = req.body.acciones;
-            console.log('asignar acciones rol ', arrayAccionesSeleccionadas);
             if (!Array.isArray(arrayAccionesSeleccionadas) || arrayAccionesSeleccionadas.length === 0) {
                 return res.status(400).jsonp({ message: 'No se proporcionaron acciones para asignar.' });
             }
             try {
-                // Filtrar las acciones seleccionadas que no existen en la base de datos
                 const accionesNoExistentes = yield filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas);
                 if (accionesNoExistentes.length === 0) {
-                    console.log('Todas las acciones ya existen.');
                     return res.status(200).jsonp({ message: 'Todas las acciones ya existen.' });
                 }
-                console.log('Acciones no existentes:', accionesNoExistentes);
-                // Insertar las acciones seleccionadas que no existen
                 yield insertarAccionesSeleccionadas(accionesNoExistentes);
                 return res.status(200).jsonp({ message: 'Acciones asignadas correctamente.' });
             }
@@ -325,7 +320,7 @@ function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas) {
     return __awaiter(this, void 0, void 0, function* () {
         if (arrayAccionesSeleccionadas.length === 0)
             return [];
-        // Construimos filtros dinámicos
+        // FILTROS DINAMICOS PARA COMPROBAR EXISTENCIA
         const conditions = [];
         const values = [];
         let i = 1;
@@ -345,9 +340,9 @@ function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas) {
     WHERE ${conditions.join(' OR ')}
   `;
         const result = yield database_1.default.query(query, values);
-        // Convertimos los registros existentes a un set de claves para comparar rápido
+        // CONVERTIMOS LOS REGISTROS EXISTENTES A UN SET DE CLAVES PARA COMPARAR RÁPIDO
         const clavesExistentes = new Set(result.rows.map(r => { var _a; return `${r.pagina}|${r.id_rol}|${(_a = r.id_accion) !== null && _a !== void 0 ? _a : 'null'}`; }));
-        // Filtramos solo los que NO existen
+        // FILTRAMOS LOS QUE NO EXISTEN
         return arrayAccionesSeleccionadas.filter(({ funcion, id_rol, id_accion }) => {
             const clave = `${funcion}|${id_rol}|${id_accion !== null && id_accion !== void 0 ? id_accion : 'null'}`;
             return !clavesExistentes.has(clave);
@@ -358,7 +353,7 @@ function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas) {
     return __awaiter(this, void 0, void 0, function* () {
         if (arrayAccionesSeleccionadas.length === 0)
             return;
-        // Construimos la consulta de inserción
+        // CONSTRUIMOS LA CONSULTA DE INSERCIÓN
         const values = [];
         const params = [];
         let i = 1;
@@ -375,15 +370,9 @@ function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas) {
                 values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
                 params.push(funcion, link, id_rol, movil);
             }
-            // Preparar datos para auditoría
+            // PREPARAR DATOS PARA AUDITORÍA
             valuesAuditoria.push(`($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`);
-            paramsAuditoria.push("APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB",
-            'ero_rol_permisos', user_name, 'now()', // Fecha y hora actual
-            'I', // Acción de inserción
-            '', // Datos originales vacíos  
-            JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), // Datos nuevos
-            ip, null, // Observación puede ser nulo o un mensaje específico
-            ip_local);
+            paramsAuditoria.push("APLICACION WEB", 'ero_rol_permisos', user_name, 'now()', 'I', '', JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), ip, null, ip_local);
         }
         const query = `
     INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)

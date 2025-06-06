@@ -164,26 +164,20 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ASIGNAR ACCIONES AL ROL
+  // METODO PARA ASIGNAR PAGINAS/ACCIONES AL ROL
   public async AsignarAccionesRol(req: Request, res: Response) {
     const arrayAccionesSeleccionadas: any[] = req.body.acciones;
-    console.log('asignar acciones rol ', arrayAccionesSeleccionadas);
 
     if (!Array.isArray(arrayAccionesSeleccionadas) || arrayAccionesSeleccionadas.length === 0) {
       return res.status(400).jsonp({ message: 'No se proporcionaron acciones para asignar.' });
     }
 
     try {
-      // Filtrar las acciones seleccionadas que no existen en la base de datos
       const accionesNoExistentes = await filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas);
       if (accionesNoExistentes.length === 0) {
-        console.log('Todas las acciones ya existen.');
         return res.status(200).jsonp({ message: 'Todas las acciones ya existen.' });
       }
 
-      console.log('Acciones no existentes:', accionesNoExistentes);
-
-      // Insertar las acciones seleccionadas que no existen
       await insertarAccionesSeleccionadas(accionesNoExistentes);
 
       return res.status(200).jsonp({ message: 'Acciones asignadas correctamente.' });
@@ -346,7 +340,8 @@ class RolPermisosControlador {
 
 async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas: any[]): Promise<any[]> {
   if (arrayAccionesSeleccionadas.length === 0) return [];
-  // Construimos filtros dinámicos
+
+  // FILTROS DINAMICOS PARA COMPROBAR EXISTENCIA
   const conditions: string[] = [];
   const values: any[] = [];
   let i = 1;
@@ -369,13 +364,14 @@ async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionad
 
   const result = await pool.query(query, values);
 
-  // Convertimos los registros existentes a un set de claves para comparar rápido
+  // CONVERTIMOS LOS REGISTROS EXISTENTES A UN SET DE CLAVES PARA COMPARAR RÁPIDO
   const clavesExistentes = new Set(
     result.rows.map(r =>
       `${r.pagina}|${r.id_rol}|${r.id_accion ?? 'null'}`
     )
   );
-  // Filtramos solo los que NO existen
+
+  // FILTRAMOS LOS QUE NO EXISTEN
   return arrayAccionesSeleccionadas.filter(({ funcion, id_rol, id_accion }) => {
     const clave = `${funcion}|${id_rol}|${id_accion ?? 'null'}`;
     return !clavesExistentes.has(clave);
@@ -384,7 +380,7 @@ async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionad
 
 async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) {
   if (arrayAccionesSeleccionadas.length === 0) return;
-  // Construimos la consulta de inserción
+  // CONSTRUIMOS LA CONSULTA DE INSERCIÓN
   const values: string[] = [];
   const params: any[] = [];
   let i = 1;  
@@ -402,20 +398,20 @@ async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) 
       values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
       params.push(funcion, link, id_rol, movil);
     }
-    // Preparar datos para auditoría
+    // PREPARAR DATOS PARA AUDITORÍA
     valuesAuditoria.push(
       `($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`
     );
     paramsAuditoria.push(
-      "APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB",
+      "APLICACION WEB", 
       'ero_rol_permisos',
       user_name,
-      'now()', // Fecha y hora actual
-      'I', // Acción de inserción
-      '', // Datos originales vacíos  
-      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), // Datos nuevos
+      'now()',
+      'I',
+      '',
+      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), 
       ip,
-      null, // Observación puede ser nulo o un mensaje específico
+      null,
       ip_local
     );
   }
