@@ -559,8 +559,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       }
     }
 
-    console.log('Acciones seleccionadas:', arrayAccionesSeleccionadas);
-
     if (arrayAccionesSeleccionadas.length > 0) {
       const data = {acciones: arrayAccionesSeleccionadas}
       this.rest.CrearAccionesRol(data).subscribe({
