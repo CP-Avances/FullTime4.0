@@ -24,6 +24,12 @@ td {
   vertical-align: middle;
 }
 
+td.td_ob {
+  white-space: normal !important;
+  word-break: break-word;
+}
+
+
 table {
   width: 100%;
   font-size: 12px;

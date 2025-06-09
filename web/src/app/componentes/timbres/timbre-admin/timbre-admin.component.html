@@ -53,23 +53,26 @@
                         <td>{{t.latitud}}</td>
                         <td>{{t.longitud}}</td>
                         <td>
-                            <mat-icon  id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
-                                matSuffix matTooltipPosition="right"
-                                matTooltip="Direccionar al mapa con ubicación del timbre.">
-                                location_on
-                            </mat-icon>
+                            <ng-container *ngIf="t.latitud && t.longitud; else sinUbicacion">
+                                <mat-icon id="accion" (click)="AbrirMapa(t.latitud, t.longitud)" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Direccionar al mapa con ubicación del timbre.">
+                                    location_on
+                                </mat-icon>
+                            </ng-container>
+                            <ng-template #sinUbicacion>
+                                <mat-icon color="warn" matTooltip="No hay ubicación registrada.">location_off</mat-icon>
+                            </ng-template>
                         </td>
                         <td class="justify-content-center">
-                            <mat-icon  id="ver" matSuffix matTooltipPosition="right"
-                                matTooltip="Ver fotografía." *ngIf="t.imagen" (click)="VerImagen(t.imagen)"
-                                fontSet="material-icons-outlined">
+                            <mat-icon id="ver" matSuffix matTooltipPosition="right" matTooltip="Ver fotografía."
+                                *ngIf="t.imagen" (click)="VerImagen(t.imagen)" fontSet="material-icons-outlined">
                                 insert_emoticon
                             </mat-icon>
                         </td>
                         <td class="justify-content-center">
-                            <mat-icon  id="t-editar" matSuffix matTooltipPosition="right"
-                                matTooltip="Ver justificación." *ngIf="t.documento" (click)="VerImagen(t.documento)"
-                                fontSet="material-icons-outlined">
+                            <mat-icon id="t-editar" matSuffix matTooltipPosition="right" matTooltip="Ver justificación."
+                                *ngIf="t.documento" (click)="VerImagen(t.documento)" fontSet="material-icons-outlined">
                                 photo
                             </mat-icon>
                         </td>
@@ -113,7 +116,7 @@
                         </td>
                         <td>
                             <mat-form-field class="input-tables codigo">
-                                <input matInput  placeholder="Buscar" [formControl]="codigo"
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
@@ -146,7 +149,8 @@
                         <td>{{d.name_cargo}}</td>
                         <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de timbres del empleado."
-                                class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)" *ngIf="getVerTimbres()">
+                                class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)"
+                                *ngIf="getVerTimbres()">
                                 <p>Ver</p>
                             </i>
                         </td>

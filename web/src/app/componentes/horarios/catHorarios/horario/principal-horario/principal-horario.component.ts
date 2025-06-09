@@ -397,6 +397,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.rest.VerificarDatosHorario(formData).subscribe({
       next: (res) => {
         this.dataHorarios = res;
+        console.log("DETALLE DE HORARIO", this.dataHorarios)
         this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
           if (obj.OBSERVACION == 'Ok') {
             this.listaHorariosCorrectos.push(obj);
