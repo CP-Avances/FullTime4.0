@@ -29,37 +29,40 @@ label {
 }
 
 .estado-card {
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s ease;
-    border-radius: 10px;
-    height: 80px;
-    width: 70%;
-    margin: auto;
-    padding: 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  border-radius: 10px;
+  aspect-ratio: 1 / 1;
+  width: 100px;
+  max-width: 100%;
+  margin: 10px auto;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .estado-card.redondo {
-    border-radius: 50%;
-    width: 66%;
-    height: 83px;
-    aspect-ratio: 1 / 1;
-    padding: 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    overflow: hidden;
-    white-space: normal;
-    word-wrap: break-word;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  width: 110px;             
+  max-width: 100%;
+  padding: 10px;
+  margin: 10px auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
 }
+
 .estado-card.inactivo {
     background-color: #b8b8b8;
     color: white;
@@ -151,6 +154,7 @@ label {
 }
 
 .estado-card:hover {
+    cursor: pointer;
     transform: scale(1.03);
 }
 
@@ -180,13 +184,16 @@ label {
     overflow: visible;
 }
 
-@media (max-width: 530px) {
-    .estado-card {
-        width: 100%;
-        height: auto;
-    }
+@media (max-width: 520px) {
+  .estado-card,
+  .estado-card.redondo {
+    width: 50%;               
+    aspect-ratio: 1 / 1;      
+    margin: 10px auto;        
+    padding: 10px;
+  }
 
-    p {
-        margin-left: 10px;
-    }
+  p {
+    margin-left: 10px;
+  }
 }
