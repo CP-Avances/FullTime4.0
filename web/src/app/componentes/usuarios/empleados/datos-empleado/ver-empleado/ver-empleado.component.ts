@@ -901,6 +901,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION
   MostrarVentanaVacuna() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(CrearVacunaComponent, {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
     }).afterClosed().subscribe(result => {

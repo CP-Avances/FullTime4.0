@@ -30,7 +30,7 @@
                         <mat-label>Descripción</mat-label>
                         <input matInput placeholder="Primera dosis" [formControl]="nombreF" required>
                         <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar una descripción.">
-                            help_outline
+                            article
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field>
@@ -46,7 +46,7 @@
                         <mat-label>Vacuna</mat-label>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Seleccionar tipo de vacuna.">
-                            help_outline
+                            vaccines
                         </mat-icon>
                         <mat-select [formControl]="vacunaF" required>
                             <mat-option *ngFor="let tv of tipoVacuna" [value]="tv.id"

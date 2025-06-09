@@ -751,7 +751,6 @@ export class CatModalidaLaboralComponent implements OnInit {
           this.plan_multiple_ = false;
           this.modalidadesEliminar = [];
           this.selectionModalidad.clear();
-          this.ngOnInit();
         }
       });
   }
@@ -812,7 +811,6 @@ export class CatModalidaLaboralComponent implements OnInit {
             this.plan_multiple_ = false;
             this.modalidadesEliminar = [];
             this.selectionModalidad.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado MODALIDAD LABORAL.', 'Ups! algo salio mal.', {
               timeOut: 6000,

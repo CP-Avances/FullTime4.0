@@ -243,7 +243,6 @@ export class CatTipoCargosComponent {
           this.plan_multiple_ = false;
           this.tiposCargoEliminar = [];
           this.selectionTipoCargo.clear();
-          this.ngOnInit();
         }
       });
   }
@@ -824,7 +823,6 @@ export class CatTipoCargosComponent {
             this.plan_multiple_ = false;
             this.tiposCargoEliminar = [];
             this.selectionTipoCargo.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado TIPO CARGO.', 'Ups! algo salio mal.', {
               timeOut: 6000,
