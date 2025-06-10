@@ -97,4 +97,11 @@ export class AccionPersonalService {
   RegistrarPlantilla(data: any) {
       return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/cargar_plantilla', data);
   }
+
+  // METODO PARA ELIMINAR DE MANERA MULTIPLE EL REGISTR DE DETALLE DE TIPO ACCION PERSONAL
+  EliminarDetalleTipoAccionMult(data: any) {
+    console.log('data: ',data);
+      return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/eliminarProcesoMult', data);
+  }
+  
 }

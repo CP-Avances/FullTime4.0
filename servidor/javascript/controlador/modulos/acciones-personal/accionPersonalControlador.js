@@ -450,6 +450,106 @@ class AccionPersonalControlador {
             }
         });
     }
+    EliminarTipoAccionMultipleMult(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            var count = 0;
+            var count_no = 0;
+            var list_tipoAccionPersonal = [];
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const resultado = yield database_1.default.query(`
+                        SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
+                    `, [item.id]);
+                    const [existe_datos] = resultado.rows;
+                    if (!existe_datos) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_detalle_tipo_accion_personal',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
+                        });
+                    }
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (existe_datos) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const resultado = yield database_1.default.query(`
+                        SELECT id FROM map_documento_accion_personal WHERE id_detalle_tipo_accion = $1
+           `, [item.id]);
+                        const [existe_detalle] = resultado.rows;
+                        console.log('existe_detalle: ', existe_detalle);
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        if (!existe_detalle) {
+                            console.log('existe_detalle entro: ', existe_detalle);
+                            console.log('item 11: ', item.id);
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const res = yield database_1.default.query(`
+                                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                            `, [item.id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_detalle_tipo_accion_personal',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(existe_datos),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            console.log('res: ', res);
+                            count += 1;
+                        }
+                        else {
+                            console.log('existe_detalle afuera: ', existe_detalle);
+                            console.log('item: ', item);
+                            list_tipoAccionPersonal.push(item.nombre);
+                            count_no += 1;
+                        }
+                    }
+                }
+                var meCount = "registro eliminado";
+                if (count > 1) {
+                    meCount = "registros eliminados";
+                }
+                return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
+                        if (count <= 1) {
+                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+                        }
+                        else if (count > 1) {
+                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+                        }
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+                    }
+                }
+            }
+        });
+    }
     verLogoMinisterio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = 'ministerio_trabajo.png';
@@ -526,7 +626,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT 
 	ap.id, ap.numero_accion_personal, ap.fecha_elaboracion, CONCAT(inf.nombre,' ',inf.apellido) AS nombres, ap.fecha_rige_desde,
-    ap.fecha_rige_hasta, ap.id_tipo_accion_personal, tp.descripcion, ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
+    ap.fecha_rige_hasta, ap.id_tipo_accion_personal, tp.descripcion AS accion_personal, ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
 	ap.especificacion, ap.declaracion_jurada, adicion_base_legal, ap.observacion, id_proceso_actual, ps.nombre,
 	ap.id_nivel_gestion_actual, 
 	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_nivel_gestion_actual) AS nivel_gestion_actual,
@@ -557,7 +657,37 @@ class AccionPersonalControlador {
 	(SELECT grup.descripcion FROM map_cat_grupo_ocupacional AS grup WHERE grup.id = ap.id_grupo_ocupacional_propuesto) AS grupo_ocupacional_propuesto,
 	ap.id_grado_propuesto, 
 	(SELECT grad.descripcion FROM map_cat_grado AS grad WHERE grad.id = ap.id_grado_propuesto) AS grado_propuesto,
-	remuneracion_propuesta, partida_individual_propuesta
+	ap.remuneracion_propuesta, ap.partida_individual_propuesta, ap.lugar_posesion,
+	(SELECT descripcion FROM e_ciudades AS ciud WHERE ciud.id = ap.lugar_posesion) AS descripcion_lugar_posesion,
+	ap.fecha_posesion, ap.numero_acta_final,ap.fecha_acta_final, 
+	ap.id_empleado_director,
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_director) AS empleado_director,
+	ap.id_tipo_cargo_director,
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_director) AS cargo_director,
+	ap.id_empleado_autoridad_delegado,
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_autoridad_delegado) AS empleado_autoridad_delegado,
+	ap.id_tipo_cargo_autoridad_delegado,
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_autoridad_delegado) AS cargo_autoridad_delegado,
+	ap.id_empleado_testigo,
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_testigo) AS empleado_testigo,
+	ap.fecha_testigo, ap.id_empleado_elaboracion, 
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_elaboracion) AS empleado_elaboracion,
+	ap.id_tipo_cargo_elaboracion,
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_elaboracion) AS tipo_cargo_elaboracion,
+	ap.id_empleado_revision,
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_revision) AS empleado_revision,
+	ap.id_tipo_cargo_revision,
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_revision) AS tipo_cargo_revision,
+	ap.id_empleado_control,
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_control) AS empleado_control,
+	ap.id_tipo_cargo_control,
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_control) AS tipo_cargo_control,
+	ap.comunicacion_electronica, ap.fecha_comunicacion, ap.hora_comunicacion, ap.medio_comunicacion, ap.id_empleado_comunicacion,
+	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_comunicacion) AS empleado_comunicacion,
+	ap.id_tipo_cargo_comunicacion,
+	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_comunicacion) AS cargo_comunicacion,
+	ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion
+	
 FROM 
 	map_documento_accion_personal AS ap, informacion_general AS inf,
 	map_tipo_accion_personal AS tp, map_detalle_tipo_accion_personal AS dtp,

@@ -32,6 +32,9 @@ class DepartamentoRutas {
         this.router.delete('/eliminar/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EliminarTipoAccionPersonal);
         this.router.get('/editar/accion/tipo/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarTipoAccionEdicion);
 
+        // METODO PARA ELIMINAR LOS TIPOS DE ACCION PERSONAL DE MANERA MULTIPLE   **USADO
+        this.router.post('/eliminarProcesoMult', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EliminarTipoAccionMultipleMult);
+
         /** TABLA TIPO_ACCION */
         this.router.get('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarTipoAccion);
         this.router.post('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearTipoAccion);

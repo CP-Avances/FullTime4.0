@@ -254,6 +254,42 @@ export class ListarTipoAccionComponent implements OnInit {
       });
   }
   EliminarMultiple() {
+    const data = {
+      listaEliminar: this.tipoAccionEliminar,
+      user_name: this.user_name,
+      ip: this.ip, ip_local: this.ips_locales
+    }
+
+     this.rest.EliminarDetalleTipoAccionMult(data).subscribe({
+      next: (response) => {
+        this.toastr.error(response.message, 'Operación exitosa.', {
+          timeOut: 5000,
+        });
+        if (response.relacionados > 0) {
+          if (response.relacionados > 0) {
+            response.listaNoEliminados.forEach((item: any) => {
+              this.toastr.warning(response.ms2 + ' ' + item.trim() + '.', 'No fue posible eliminar.', {
+                timeOut: 5000,
+              });
+            });
+          }
+        }
+        this.ngOnInit();
+      }, error: (err) => {
+        if (err.status == 300) {
+          this.toastr.error(err.error.message, '', {
+            timeOut: 4500,
+          });
+          this.toastr.warning(err.error.ms2, 'No fue posible eliminar.', {
+            timeOut: 5000,
+          });
+        } else {
+          this.toastr.error(err.error.message, 'Ups !!! algo salio mal.', {
+            timeOut: 4000,
+          });
+        }
+      }
+    })
 
   }
 

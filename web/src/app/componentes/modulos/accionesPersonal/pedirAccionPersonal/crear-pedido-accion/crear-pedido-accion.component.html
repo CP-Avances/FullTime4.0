@@ -169,7 +169,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md">
+                        <div class="col-md" [hidden]="activarOtro">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Otro</mat-label>
@@ -187,7 +187,7 @@
                                 <mat-form-field style="width: 85%;">
                                     <mat-label>En caso de requerir especificación:</mat-label>
                                     <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
-                                        [formControl]="otroEspecificacion" [readonly]="activarOtro"></textarea>
+                                        [formControl]="otroEspecificacion"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese una explicación o detalle de otro.">
                                         notes
@@ -201,7 +201,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="declaracion-radio-group ml-3">
                                     <mat-label class="letra">Presentó la declaración jurada:</mat-label>
-                                    <mat-radio-group [formControl]="declaracionJuradaF">
+                                    <mat-radio-group [formControl]="declaracionJuradaF" class="radio-group-estilo">
                                         <mat-radio-button [value]="true">
                                             SI
                                         </mat-radio-button>
