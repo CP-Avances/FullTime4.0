@@ -10,6 +10,9 @@ class AuditoriaRutas {
     }
     configuracion(): void {
         this.router.post('/auditarportablaempaquetados', TokenValidation, AUDITORIA_CONTROLADOR.BuscarDatosAuditoriaporTablasEmpaquetados);
+
+        // METODO DE CONSULTA DE AUDITORIA DE INICIO DE SESION
+        this.router.post('/auditarAccesos', TokenValidation, AUDITORIA_CONTROLADOR.BuscarDatosAuditoriaAcceso);
     }
 }
 

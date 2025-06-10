@@ -1,0 +1,105 @@
+<div class="container" style="margin-bottom: 5px; padding-bottom: 5px; padding-top: 15px;" [hidden]="verDetalle">
+    <div id="titulo">
+        <span>REPORTE DE AUDITORIA DE ACCESOS AL SISTEMA</span>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-5" style="padding-bottom: 10px;">
+            <app-rango-fechas [limitarFecha]="true"></app-rango-fechas>
+        </div>
+        <div class="col-lg-7">
+            <div id="resultados">
+                <span>OPCIONES DE DESCARGA</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <button mat-icon-button (click)="ValidarReporte('ver')" matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador.">
+                        <mat-icon class="ver">visibility</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ValidarReporte('open')" matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
+                        <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ValidarReporte('print')" matTooltipPosition="right"
+                        matTooltip="Imprimir reporte en formato PDF.">
+                        <mat-icon class="i-print">local_printshop</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ValidarReporte('download')" matTooltipPosition="right"
+                        matTooltip="Descargar reporte en formato PDF.">
+                        <mat-icon class="i-download">cloud_download</mat-icon>
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-top: 15px" *ngIf="verDetalle">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>DETALLES DE AUDITORIA</span>
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+                matTooltip="Regresar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm" id="detalle">
+                        <thead class="thead-light">
+                            <tr style="text-align: center">
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">PLATAFORMA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">USUARIO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">IP</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ACCESO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACIONES</th>
+                            </tr>
+                            <tr style="text-align: center">
+                                <th class="t_horarios" scope="col" rowspan="1">PUBLICA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">LOCAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container
+                                *ngFor="let e of datosPdF | paginate: tamanio_pagina : numero_pagina, let i = index">
+
+                                <tr>
+                                    <td class="t_horarios">{{ (numero_pagina * tamanio_pagina) + i -tamanio_pagina +1 }}
+                                    </td>
+                                    <td class="t_horarios">{{ e.plataforma }}</td>
+                                    <td class="t_horarios">{{ e.user_name }}</td>
+                                    <td class="t_horarios">{{ e.ip_addres }}</td>
+                                    <td class="t_horarios">{{ e.ip_addres_local }}</td>
+                                    <td class="t_horarios">{{ e.acceso }}</td>
+                                    <td class="t_horarios">
+                                        {{e.fecha_}}
+                                    </td>
+                                    <td class="t_horarios">
+                                        {{e.hora_}}
+                                    </td>
+                                    <td class="t_horarios">{{ e.observaciones }}</td>
+                                </tr>
+                            </ng-container>
+
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" #paginatorDetalle [length]="datosPdF.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPaginaDet($event)" showFirstLastButtons
+                    aria-label="Seleccionar pagina">
+                </mat-paginator>
+            </div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+                <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar reporte en formato PDF." (click)="ValidarReporte('download')">
+                    <p>PDF</p>
+                </i>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,19 +1,19 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from '../../../servicios/generales/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { AuditoriaService } from 'src/app/servicios/reportes/auditoria/auditoria.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { FormControl } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
+import { FormControl } from '@angular/forms';
 
 interface Tablas {
     nombre: string;
@@ -47,11 +47,11 @@ export class ReporteAuditoriaComponent implements OnInit {
     tabla_ = new FormControl('');
     modulo_ = new FormControl('');
 
-     // VARIABLES PROGRESS SPINNER
-     habilitarprogress: boolean = false;
-     mode: ProgressSpinnerMode = 'indeterminate';
-     color: ThemePalette = 'primary';
-     value = 10;
+    // VARIABLES PROGRESS SPINNER
+    habilitarprogress: boolean = false;
+    mode: ProgressSpinnerMode = 'indeterminate';
+    color: ThemePalette = 'primary';
+    value = 10;
 
     // VARIABLES  
     formato_fecha: string = 'dd/MM/yyyy';
@@ -90,9 +90,9 @@ export class ReporteAuditoriaComponent implements OnInit {
     constructor(
         private varificarFunciones: MainNavService,
         private reporteService: ReportesService,
-        private toastr: ToastrService,
         private restAuditoria: AuditoriaService,
         private restEmpre: EmpresaService,
+        private toastr: ToastrService,
         public validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
         public parametro: ParametrosService,
     ) {
@@ -235,12 +235,12 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
-        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' ) return this.toastr.error('Ingresar fechas de búsqueda.');
+        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
         if (this.accionesSeleccionadas.length == 0) return this.toastr.error('Ingresar acciones.');
-        if (this.tablasSolicitadas.length == 0)  return this.toastr.error(
+        if (this.tablasSolicitadas.length == 0) return this.toastr.error(
             'No a seleccionado ninguna.',
             'Seleccione tablas.'
-          );
+        );
 
         this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
     }
@@ -322,7 +322,7 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
-        
+
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
         // ARRAY PARA ALMACENAR TODAS LAS PROMESAS DE CONSULTA
@@ -372,14 +372,14 @@ export class ReporteAuditoriaComponent implements OnInit {
             this.data_pdf.forEach(d => {
                 d.action = this.transformAction(d.action);
                 d.fecha_hora_format = this.validar.FormatearFechaAuditoria(d.fecha_hora,
-                this.formato_fecha,this.validar.dia_abreviado, this.idioma_fechas);
+                    this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 d.solo_hora = this.validar.FormatearHoraAuditoria(d.fecha_hora.split(' ')[1],
-                this.formato_hora);
+                    this.formato_hora);
             })
             console.log("quiero ver los datos", this.data_pdf);
             this.datosPdF = this.data_pdf;
-            
-            if( this.datosPdF.length != 0){
+
+            if (this.datosPdF.length != 0) {
                 switch (accion) {
                     case 'ver':
                         this.VerDatos();
@@ -388,11 +388,11 @@ export class ReporteAuditoriaComponent implements OnInit {
                         this.GenerarPDF(this.datosPdF, accion);
                         break;
                 }
-            }else{
+            } else {
                 this.toastr.error("No existen registros de auditoría.")
             }
             // REALIZAR LA ACCIÓN CORRESPONDIENTE
-         
+
         } finally {
             this.habilitarprogress = false
         }
@@ -639,6 +639,14 @@ export class ReporteAuditoriaComponent implements OnInit {
     //ENVIAR DATOS A LA VENTANA DE DETALLE
     VerDatos() {
         this.verDetalle = true;
+    }
+
+    // METODO PARA LIMPIAR DATOS
+    LimpiarDatos() {
+        this.selectionAuditoria.clear();
+        this.verDetalle = false;
+        this.tabla_.setValue('');
+        this.modulo_.setValue('');
     }
 
 }

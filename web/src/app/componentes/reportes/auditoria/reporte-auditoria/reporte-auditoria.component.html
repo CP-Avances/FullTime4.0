@@ -1,6 +1,6 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="verDetalle">
+<div class="container" style="margin-bottom: 5px; padding-bottom: 5px; padding-top: 15px;" [hidden]="verDetalle">
     <div id="titulo">
-        <span>REPORTE DE AUDITORIA</span>
+        <span>REPORTE DE AUDITORIA GENERAL</span>
     </div>
     <br>
     <div class="row">
@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 30px;" [hidden]="verDetalle">
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 5px;" [hidden]="verDetalle">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <div class="w-100 bd-highlight">
@@ -135,9 +135,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <ng-container *ngFor="let e of data_pdf | paginate: tamanio_pagina : numero_pagina, let i = index">
+                            <ng-container
+                                *ngFor="let e of data_pdf | paginate: tamanio_pagina : numero_pagina, let i = index">
 
-                                <tr >
+                                <tr>
                                     <td class="t_horarios">{{ (numero_pagina * tamanio_pagina) + i -tamanio_pagina +1 }}
                                     </td>
                                     <td class="t_horarios">{{ e.plataforma }}</td>
@@ -156,7 +157,7 @@
                                     <td class="t_horarios">{{ e.original_data }}</td>
                                     <td class="t_horarios">{{ e.new_data }}</td>
                                 </tr>
-                                
+
                             </ng-container>
 
                         </tbody>
