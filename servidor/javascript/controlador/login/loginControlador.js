@@ -14,13 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTAR LIBRERIAS
 const settingsMail_1 = require("../../libs/settingsMail");
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
+const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const ipaddr_js_1 = __importDefault(require("ipaddr.js"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
 class LoginControlador {
     // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
     ValidarCredenciales(req, res) {
@@ -337,6 +337,28 @@ class LoginControlador {
                     expiro: 'si',
                     message: "Tiempo para cambiar contraseña ha expirado. Vuelva a solicitar cambio de contraseña."
                 });
+            }
+        });
+    }
+    // AUDITORIA DE INICIO DE SESION
+    RegistrarAuditoriaLogin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plataforma, user_name, ip_addres, ip_addres_local, acceso } = req.body;
+            console.log('acceso ', req.body);
+            const ahora = new Date();
+            const fecha = ahora.toISOString().split('T')[0]; // YYYY-MM-DD
+            const hora = ahora.toTimeString().split(' ')[0]; // HH:mm:ss
+            try {
+                yield database_1.default.query(`
+        INSERT INTO audit.acceso_sistema 
+          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local)   
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local]);
+                return res.jsonp({ message: 'ok' });
+            }
+            catch (err) {
+                console.error('Error al registrar auditoría de login:', err);
+                res.jsonp({ message: 'Ups! algo salio mal.' });
             }
         });
     }

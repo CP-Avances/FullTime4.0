@@ -3,17 +3,14 @@ import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
   FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail';
-import { ObtenerRutaLicencia, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
+import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
-import { Licencias } from '../../class/Licencia';
 import ipaddr from 'ipaddr.js';
 import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
-import * as os from 'os';
-import fs from 'fs';
-import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
   _id: number,
@@ -23,18 +20,14 @@ interface IPayload {
 
 class LoginControlador {
 
-
-
-
-
   // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
   public async ValidarCredenciales(req: Request, res: Response) {
     console.log('ValidarCredenciales');
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
     let caducidad_licencia: Date = new Date();
 
-     // OBTENCIÓN DE DIRECCIÓN IP
-     const getClientIp = (req: Request): string | null => {
+    // OBTENCIÓN DE DIRECCIÓN IP
+    const getClientIp = (req: Request): string | null => {
       // Obtiene la IP del encabezado o del socket
       const rawIp = req.headers['x-forwarded-for']
         ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
@@ -105,20 +98,20 @@ class LoginControlador {
         const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         //console.log('llave ', public_key)
-        const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
-        {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({public_key: public_key})
-        });
+        const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`,
+          {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ public_key: public_key })
+          });
 
-        
-        if(!licenciaData.ok){
+
+        if (!licenciaData.ok) {
           return res.status(404).jsonp({ message: 'licencia_no_existe' });
         }
-        
+
         const dataLic = await licenciaData.json();
 
         const fec_activacion = new Date(dataLic[0].fecha_activacion);
@@ -315,7 +308,7 @@ class LoginControlador {
     let { token, contrasena, user_name, ip, ip_local } = req.body;
 
     var contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
-    console.log(contrasena,'_',contrasena_encriptada);
+    console.log(contrasena, '_', contrasena_encriptada);
 
     try {
       let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
@@ -391,10 +384,37 @@ class LoginControlador {
     }
   }
 
+  // AUDITORIA DE INICIO DE SESION
+  public async RegistrarAuditoriaLogin(req: Request, res: Response) {
+
+    const { plataforma, user_name, ip_addres, ip_addres_local, acceso } = req.body;
+
+    console.log('acceso ', req.body)
+
+    const ahora = new Date();
+    const fecha = ahora.toISOString().split('T')[0];       // YYYY-MM-DD
+    const hora = ahora.toTimeString().split(' ')[0];       // HH:mm:ss
+
+    try {
+      await pool.query(
+        `
+        INSERT INTO audit.acceso_sistema 
+          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local)   
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `
+        , [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local]);
+
+      return res.jsonp({ message: 'ok' });
+
+    } catch (err) {
+      console.error('Error al registrar auditoría de login:', err);
+      res.jsonp({ message: 'Ups! algo salio mal.' });
+    }
+  }
+
 }
 
 const LOGIN_CONTROLADOR = new LoginControlador();
 export default LOGIN_CONTROLADOR;
-
 
 

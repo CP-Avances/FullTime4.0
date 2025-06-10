@@ -36,6 +36,11 @@ export class LoginService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/cambiar-contrasenia`, data)
   }
 
+  // AUDITAR INICIO DE SESION
+  AuditarInicio(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/registrar_acceso`, data)
+  }
+
   // VERIFICAR EXISTENCIA DE INICIO DE SESION
   loggedIn() {
     return !!localStorage.getItem('token');
@@ -70,7 +75,7 @@ export class LoginService {
   }
 
   //SELECTOR DE EMPRESAS
-  getEmpresa(data: any){
+  getEmpresa(data: any) {
     return this.http.post<any>(`${environment.url}/fulltime`, data);
   }
 

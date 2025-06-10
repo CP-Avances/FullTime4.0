@@ -1,319 +1,334 @@
-<div id="titulo">
-    <span>
-        HABILITAR NOTIFICACIONES
-    </span>
-</div>
-<mat-card class="example-card mat-elevation-z9">
-    <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
-        <br>
-        <div class="row">
-            <div class="col-12 col-md-6 m-auto mt-md-2">
-                <div>
-                    <div>
-                        <p>COMUNICADOS</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'correo', true)">
-                                <mat-card [ngClass]="cominicadoCorreo === true ? 'activo-comunicado' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'correo', false)">
-                                <mat-card [ngClass]="cominicadoCorreo === false ? 'activo-comunicado' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'notificacion', true)">
-                                <mat-card [ngClass]="cominicadoNotificacion === true ? 'activo-comunicado' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'notificacion', false)">
-                                <mat-card [ngClass]="cominicadoNotificacion === false ? 'activo-comunicado' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div>
-                        <p>ATRASOS</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'correo', true)">
-                                <mat-card [ngClass]="atrasosCorreo === true ? 'activo-atrasos' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'correo', false)">
-                                <mat-card [ngClass]="atrasosCorreo === false ? 'activo-atrasos' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'notificacion', true)">
-                                <mat-card [ngClass]="atrasosNotificacion === true ? 'activo-atrasos' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'notificacion', false)">
-                                <mat-card [ngClass]="atrasosNotificacion === false ? 'activo-atrasos' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p>FALTAS</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'correo', true)">
-                                <mat-card [ngClass]="faltasCorreo === true ? 'activo-faltas' : 'inactivo'" class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'correo', false)">
-                                <mat-card [ngClass]="faltasCorreo === false ? 'activo-faltas' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'notificacion', true)">
-                                <mat-card [ngClass]="faltasNotificacion === true ? 'activo-faltas' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'notificacion', false)">
-                                <mat-card [ngClass]="faltasNotificacion === false ? 'activo-faltas' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p>SALIDAS ANTICIPADAS</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'correo', true)">
-                                <mat-card [ngClass]="salidaCorreo === true ? 'activo-salida' : 'inactivo'" class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'correo', false)">
-                                <mat-card [ngClass]="salidaCorreo === false ? 'activo-salida' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'notificacion', true)">
-                                <mat-card [ngClass]="salidaNotificacion === true ? 'activo-salida' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'notificacion', false)">
-                                <mat-card [ngClass]="salidaNotificacion === false ? 'activo-salida' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-md-6 m-auto mt-4 mt-md-2" *ngIf="ver_modulos">
-                <div>
-                    <div *ngIf="habilitarPermisos">
-                        <p>PERMISOS</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'correo', true)">
-                                <mat-card [ngClass]="permisosCorreo === true ? 'activo-permisos' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'correo', false)">
-                                <mat-card [ngClass]="permisosCorreo === false ? 'activo-permisos' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'notificacion', true)">
-                                <mat-card [ngClass]="permisosNotificacion === true ? 'activo-permisos' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'notificacion', false)">
-                                <mat-card [ngClass]="permisosNotificacion === false ? 'activo-permisos' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div *ngIf="habilitarVacaciones">
-                        <p>VACACIONES</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'correo', true)">
-                                <mat-card [ngClass]="vacaCorreo === true ? 'activo-vacaciones' : 'inactivo'" class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'correo', false)">
-                                <mat-card [ngClass]="vacaCorreo === false ? 'activo-vacaciones' : 'inactivo'" class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'notificacion', true)">
-                                <mat-card [ngClass]="vacaNotificacion === true ? 'activo-vacaciones' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'notificacion', false)">
-                                <mat-card [ngClass]="vacaNotificacion === false ? 'activo-vacaciones' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div *ngIf="habilitarHorasExtras">
-                        <p>HORAS EXTRAS</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'correo', true)">
-                                <mat-card [ngClass]="horaExtraCorreo === true ? 'activo-horaExtra' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'correo', false)">
-                                <mat-card [ngClass]="horaExtraCorreo === false ? 'activo-horaExtra' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'notificacion', true)">
-                                <mat-card [ngClass]="horaExtraNotificacion === true ? 'activo-horaExtra' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'notificacion', false)">
-                                <mat-card [ngClass]="horaExtraNotificacion === false ? 'activo-horaExtra' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div *ngIf="habilitarAlimentacion">
-                        <p>ALIMENTACIÓN</p>
-                        <div class="row w-100 caja" style="text-align: justify;">
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'correo', true)">
-                                <mat-card [ngClass]="comidaCorreo === true ? 'activo-comida' : 'inactivo'" class="estado-card">
-                                    <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'correo', false)">
-                                <mat-card [ngClass]="comidaCorreo === false ? 'activo-comida' : 'inactivo'"
-                                    class="estado-card">
-                                    <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar Correo</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'notificacion', true)">
-                                <mat-card [ngClass]="comidaNotificacion === true ? 'activo-comida' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Activar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-
-                            <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'notificacion', false)">
-                                <mat-card [ngClass]="comidaNotificacion === false ? 'activo-comida' : 'inactivo'"
-                                    class="estado-card redondo">
-                                    <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
-                                    <mat-card-content><label>Desactivar</label></mat-card-content>
-                                </mat-card>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-    <br />
-    <div class="d-flex justify-content-around">
-        <button id="btn-raised" class="btn btn-sm" cdkFocusInitial (click)="ActualizarConfiguracion(formGroup.value)">
-            Guardar
-        </button>
-        <button id="btn-raised" class="btn btn-sm" (click)="CerrarVentana(false)">Cancelar</button>
+<div class="container" style="padding-bottom: 25px;">
+    <div id="titulo">
+        <span>
+            HABILITAR NOTIFICACIONES
+        </span>
     </div>
-    <br>
-</mat-card>
+    <mat-card class="example-card mat-elevation-z9">
+        <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
+            <br>
+            <div class="row">
+                <div class="col-12 col-md-6 m-auto mt-md-2">
+                    <div>
+                        <div>
+                            <p>COMUNICADOS</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'correo', true)">
+                                    <mat-card [ngClass]="cominicadoCorreo === true ? 'activo-comunicado' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'correo', false)">
+                                    <mat-card [ngClass]="cominicadoCorreo === false ? 'activo-comunicado' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comunicado', 'notificacion', true)">
+                                    <mat-card
+                                        [ngClass]="cominicadoNotificacion === true ? 'activo-comunicado' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3"
+                                    (click)="cambiarEstado('comunicado', 'notificacion', false)">
+                                    <mat-card
+                                        [ngClass]="cominicadoNotificacion === false ? 'activo-comunicado' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <p>ATRASOS</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'correo', true)">
+                                    <mat-card [ngClass]="atrasosCorreo === true ? 'activo-atrasos' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'correo', false)">
+                                    <mat-card [ngClass]="atrasosCorreo === false ? 'activo-atrasos' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'notificacion', true)">
+                                    <mat-card [ngClass]="atrasosNotificacion === true ? 'activo-atrasos' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('atrasos', 'notificacion', false)">
+                                    <mat-card [ngClass]="atrasosNotificacion === false ? 'activo-atrasos' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p>FALTAS</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'correo', true)">
+                                    <mat-card [ngClass]="faltasCorreo === true ? 'activo-faltas' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'correo', false)">
+                                    <mat-card [ngClass]="faltasCorreo === false ? 'activo-faltas' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'notificacion', true)">
+                                    <mat-card [ngClass]="faltasNotificacion === true ? 'activo-faltas' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('faltas', 'notificacion', false)">
+                                    <mat-card [ngClass]="faltasNotificacion === false ? 'activo-faltas' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p>SALIDAS ANTICIPADAS</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'correo', true)">
+                                    <mat-card [ngClass]="salidaCorreo === true ? 'activo-salida' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'correo', false)">
+                                    <mat-card [ngClass]="salidaCorreo === false ? 'activo-salida' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'notificacion', true)">
+                                    <mat-card [ngClass]="salidaNotificacion === true ? 'activo-salida' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('salida', 'notificacion', false)">
+                                    <mat-card [ngClass]="salidaNotificacion === false ? 'activo-salida' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 m-auto mt-4 mt-md-2" *ngIf="ver_modulos">
+                    <div>
+                        <div *ngIf="habilitarPermisos">
+                            <p>PERMISOS</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'correo', true)">
+                                    <mat-card [ngClass]="permisosCorreo === true ? 'activo-permisos' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'correo', false)">
+                                    <mat-card [ngClass]="permisosCorreo === false ? 'activo-permisos' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'notificacion', true)">
+                                    <mat-card [ngClass]="permisosNotificacion === true ? 'activo-permisos' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('permisos', 'notificacion', false)">
+                                    <mat-card
+                                        [ngClass]="permisosNotificacion === false ? 'activo-permisos' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="habilitarVacaciones">
+                            <p>VACACIONES</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'correo', true)">
+                                    <mat-card [ngClass]="vacaCorreo === true ? 'activo-vacaciones' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'correo', false)">
+                                    <mat-card [ngClass]="vacaCorreo === false ? 'activo-vacaciones' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('vacaciones', 'notificacion', true)">
+                                    <mat-card [ngClass]="vacaNotificacion === true ? 'activo-vacaciones' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3"
+                                    (click)="cambiarEstado('vacaciones', 'notificacion', false)">
+                                    <mat-card [ngClass]="vacaNotificacion === false ? 'activo-vacaciones' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="habilitarHorasExtras">
+                            <p>HORAS EXTRAS</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'correo', true)">
+                                    <mat-card [ngClass]="horaExtraCorreo === true ? 'activo-horaExtra' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'correo', false)">
+                                    <mat-card [ngClass]="horaExtraCorreo === false ? 'activo-horaExtra' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'notificacion', true)">
+                                    <mat-card
+                                        [ngClass]="horaExtraNotificacion === true ? 'activo-horaExtra' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('horaExtra', 'notificacion', false)">
+                                    <mat-card
+                                        [ngClass]="horaExtraNotificacion === false ? 'activo-horaExtra' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="habilitarAlimentacion">
+                            <p>ALIMENTACIÓN</p>
+                            <div class="row w-100 caja" style="text-align: justify;">
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'correo', true)">
+                                    <mat-card [ngClass]="comidaCorreo === true ? 'activo-comida' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>email</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'correo', false)">
+                                    <mat-card [ngClass]="comidaCorreo === false ? 'activo-comida' : 'inactivo'"
+                                        class="estado-card">
+                                        <mat-card-title><mat-icon>unsubscribe</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar Correo</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'notificacion', true)">
+                                    <mat-card [ngClass]="comidaNotificacion === true ? 'activo-comida' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_active</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Activar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+
+                                <div class="col-6 col-md-3" (click)="cambiarEstado('comida', 'notificacion', false)">
+                                    <mat-card [ngClass]="comidaNotificacion === false ? 'activo-comida' : 'inactivo'"
+                                        class="estado-card redondo">
+                                        <mat-card-title><mat-icon>notifications_off</mat-icon></mat-card-title>
+                                        <mat-card-content><label>Desactivar</label></mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <br />
+        <div class="d-flex justify-content-around">
+            <button id="btn-raised" class="btn btn-sm" cdkFocusInitial
+                (click)="ActualizarConfiguracion(formGroup.value)">
+                Guardar
+            </button>
+            <button id="btn-raised" class="btn btn-sm" (click)="CerrarVentana(false)">Cancelar</button>
+        </div>
+        <br>
+    </mat-card>
+</div>

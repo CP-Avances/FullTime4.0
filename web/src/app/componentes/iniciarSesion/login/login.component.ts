@@ -223,7 +223,10 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
 
         this.asignacionesService.ObtenerAsignacionesUsuario(datos.empleado);
-        this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
+
+        this.RegistrarAuditoriaInicio(datos.ip_adress, this.ips_locales, datos.usuario, 'Acceso éxitoso', 'PLATAFORMA WEB');
+
+        this.toastr.success('Ingreso Exitoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
         });
 
@@ -240,6 +243,21 @@ export class LoginComponent implements OnInit {
     } catch (error: any) {
       this.toastr.error(error.error.message)
     }
+  }
+
+
+  // METODO DE AUDITAR INICIO DE SESION
+  RegistrarAuditoriaInicio(ip_general: any, ip_local: any, usuario: any, acceso: any, plataforma: any) {
+    //console.log(' entra ')
+    let informacion = {
+      ip_addres: ip_general,
+      ip_addres_local: ip_local,
+      acceso: acceso,
+      plataforma: plataforma,
+      user_name: usuario
+    }
+    this.rest.AuditarInicio(informacion).subscribe(
+      res => { });
   }
 
 }
