@@ -204,7 +204,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       });
       datos.sort((a: any, b: any) => a.id - b.id);
       this.data_general = datos.filter((item: any) => item.id === this.id_rol);
-      console.log('funciones ', this.data_general);
     });
   }
 
@@ -416,7 +415,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   // METODO PARA VERIFICAR SELECCION DE OPCION "Todas"
   isChecked: boolean = false;
   SeleccionarTodas(event: any) {
-    //console.log(event)
     if (event === true) {
       this.AgregarTodos();
     }
