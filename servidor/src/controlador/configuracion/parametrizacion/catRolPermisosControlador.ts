@@ -164,20 +164,46 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTRO  **USADO
-  public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
+  // METODO PARA ASIGNAR PAGINAS/ACCIONES AL ROL
+  public async AsignarAccionesRol(req: Request, res: Response) {
+    const arrayAccionesSeleccionadas: any[] = req.body.acciones;
+
+    if (!Array.isArray(arrayAccionesSeleccionadas) || arrayAccionesSeleccionadas.length === 0) {
+      return res.status(400).jsonp({ message: 'No se proporcionaron acciones para asignar.' });
+    }
+
     try {
-      const { id, user_name, ip, ip_local } = req.body
+      const accionesNoExistentes = await filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas);
+      if (accionesNoExistentes.length === 0) {
+        return res.status(200).jsonp({ message: 'Todas las acciones ya existen.' });
+      }
+
+      await insertarAccionesSeleccionadas(accionesNoExistentes);
+
+      return res.status(200).jsonp({ message: 'Acciones asignadas correctamente.' });
+    } catch (error) {
+      console.error('Error al asignar acciones:', error);
+      return res.status(500).jsonp({ message: 'Error al asignar acciones.' });
+    }
+  }
+
+  // METODO PARA ELIMINAR REGISTRO  **USADO
+  public async EliminarPaginasRol(req: Request, res: Response): Promise<any> {
+    try {
+      const { ids, user_name, ip, ip_local } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).jsonp({ message: 'No se proporcionaron IDs para eliminar.' });
+      }
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
-      const rol = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = $1', [id]);
-      const [datosOriginales] = rol.rows;
+      // CONSULTAR DATOS ORIGINALES
+      const roles = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
+      const datosOriginales = roles.rows;
 
-
-      if (!datosOriginales) {
+      if (datosOriginales.length === 0) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'ero_rol_permisos',
@@ -187,35 +213,51 @@ class RolPermisosControlador {
           datosNuevos: '',
           ip: ip,
           ip_local: ip_local,
-          observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
+          observacion: `Error al eliminar los permisos. Registros no encontrados.`
         });
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+        return res.status(404).jsonp({ message: 'Error al eliminar los registros.' });
       }
 
-      await pool.query(
-        `
-      DELETE FROM ero_rol_permisos WHERE id = $1
-      `
-        , [id]);
+      // ELIMINAR REGISTROS
+      await pool.query('DELETE FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ero_rol_permisos',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
+      // AUDITORÍA MASIVA
+      const valuesAuditoria: string[] = [];
+      const paramsAuditoria: any[] = [];
+      let i = 1;
+      for (const original of datosOriginales) {
+        valuesAuditoria.push(
+          `($${i++}, $${i++}, $${i++}, now(), $${i++}, $${i++}, $${i++}, $${i++}, $${i++}, $${i++})`
+        );
+        paramsAuditoria.push(
+          "APLICACION WEB",
+          'ero_rol_permisos',
+          user_name,
+          'D',
+          JSON.stringify(original),
+          '',
+          ip,
+          null,
+          ip_local
+        );
+      }
+
+      const queryAuditoria = `
+        INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+          action, original_data, new_data, ip_address, observacion, ip_address_local)
+        VALUES ${valuesAuditoria.join(', ')}
+      `;
+
+      await pool.query(queryAuditoria, paramsAuditoria);
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      res.jsonp({ message: 'Registro eliminado.' });
+      res.jsonp({ message: 'Registros eliminados.' });
     } catch (error) {
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
   }
@@ -314,6 +356,129 @@ class RolPermisosControlador {
     }
   }
 }
+
+async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas: any[]): Promise<any[]> {
+  if (arrayAccionesSeleccionadas.length === 0) return [];
+
+  // FILTROS DINAMICOS PARA COMPROBAR EXISTENCIA
+  const conditions: string[] = [];
+  const values: any[] = [];
+  let i = 1;
+
+  for (const accion of arrayAccionesSeleccionadas) {
+    const { id_rol, id_accion, funcion } = accion;
+    if (id_accion) {
+      conditions.push(`(pagina = $${i++} AND id_rol = $${i++} AND id_accion = $${i++})`);
+      values.push(funcion, id_rol, id_accion);
+    } else {
+      conditions.push(`(pagina = $${i++} AND id_rol = $${i++})`);
+      values.push(funcion, id_rol);
+    }
+  }
+
+  const query = `
+    SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
+    WHERE ${conditions.join(' OR ')}
+  `;
+
+  const result = await pool.query(query, values);
+
+  // CONVERTIMOS LOS REGISTROS EXISTENTES A UN SET DE CLAVES PARA COMPARAR RÁPIDO
+  const clavesExistentes = new Set(
+    result.rows.map(r =>
+      `${r.pagina}|${r.id_rol}|${r.id_accion ?? 'null'}`
+    )
+  );
+
+  // FILTRAMOS LOS QUE NO EXISTEN
+  return arrayAccionesSeleccionadas.filter(({ funcion, id_rol, id_accion }) => {
+    const clave = `${funcion}|${id_rol}|${id_accion ?? 'null'}`;
+    return !clavesExistentes.has(clave);
+  });
+}
+
+async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) {
+  if (arrayAccionesSeleccionadas.length === 0) return;
+  // CONSTRUIMOS LA CONSULTA DE INSERCIÓN
+  const values: string[] = [];
+  const params: any[] = [];
+  let i = 1;  
+
+  const valuesAuditoria: string[] = [];
+  const paramsAuditoria: any[] = [];
+  let j = 1;
+
+  for (const accion of arrayAccionesSeleccionadas) {
+    const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = accion;
+    if (id_accion) {
+      values.push(`($${i++}, $${i++}, $${i++}, $${i++}, $${i++})`);
+      params.push(funcion, link, id_rol, id_accion, movil);
+    } else {
+      values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
+      params.push(funcion, link, id_rol, movil);
+    }
+    // PREPARAR DATOS PARA AUDITORÍA
+    valuesAuditoria.push(
+      `($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`
+    );
+    paramsAuditoria.push(
+      "APLICACION WEB", 
+      'ero_rol_permisos',
+      user_name,
+      'now()',
+      'I',
+      '',
+      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), 
+      ip,
+      null,
+      ip_local
+    );
+  }
+
+
+  const query = `
+    INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
+    VALUES ${values.join(', ')}
+  `;
+
+  const queryAuditoria = `
+    INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+        action, original_data, new_data, ip_address, observacion, ip_address_local)
+    VALUES ${valuesAuditoria.join(', ')}
+  `;
+
+  // añadir transacción
+  await pool.query('BEGIN');
+
+  await pool 
+    .query(query, params)
+    .catch(error => {
+      console.error('Error al insertar acciones seleccionadas:', error);
+      // Revertir transacción en caso de error
+      return pool.query('ROLLBACK')
+        .then(() => {
+          throw new Error('Error al insertar acciones seleccionadas: ' + error.message);
+        });
+    });
+
+  await pool
+    .query(queryAuditoria, paramsAuditoria)
+    .catch(error => {
+      console.error('Error al insertar auditoría de acciones seleccionadas:', error);
+      // Revertir transacción en caso de error
+      return pool.query('ROLLBACK')
+        .then(() => { 
+          throw new Error('Error al insertar auditoría de acciones seleccionadas: ' + error.message);
+        });
+
+  });
+
+  // Finalizar transacción
+  await pool.query('COMMIT');
+  console.log('Acciones seleccionadas insertadas correctamente.');
+}
+
+
 
 export const rolPermisosControlador = new RolPermisosControlador();
 export default rolPermisosControlador;
