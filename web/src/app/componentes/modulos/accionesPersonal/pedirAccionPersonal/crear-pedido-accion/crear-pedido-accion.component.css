@@ -59,6 +59,32 @@ mat-form-field {
     width: 30%;
 }
 
+.radio-group-estilo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* Ajusta la alineación del contenido dentro de cada radio button */
+.radio-group-estilo mat-radio-button {
+  display: flex;
+  align-items: center;
+  height: 40px; /* Asegura altura consistente */
+  line-height: 1;
+  margin: 0; /* Evita que Angular Material agregue espaciado extra */
+}
+
+/* Alinea el texto con el círculo */
+::ng-deep mat-radio-button .mat-radio-label-content {
+  display: flex;
+  align-items: center;
+  padding-left: 8px; /* Espacio entre círculo y texto */
+  font-size: 16px;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
     .nota{
