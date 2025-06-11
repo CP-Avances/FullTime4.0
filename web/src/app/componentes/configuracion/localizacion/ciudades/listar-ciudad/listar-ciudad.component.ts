@@ -5,11 +5,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+import ExcelJS, { FillPattern } from "exceljs";
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import ExcelJS, { FillPattern } from "exceljs";
+
 import { RegistrarCiudadComponent } from 'src/app/componentes/configuracion/localizacion/ciudades/registrar-ciudad/registrar-ciudad.component'
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
@@ -75,45 +77,24 @@ export class ListarCiudadComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
-    
+
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-  
+    });
+
     this.ListarCiudades();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
-    this.bordeCompleto = {
-      top: { style: "thin" as ExcelJS.BorderStyle },
-      left: { style: "thin" as ExcelJS.BorderStyle },
-      bottom: { style: "thin" as ExcelJS.BorderStyle },
-      right: { style: "thin" as ExcelJS.BorderStyle },
-    };
+    this.ManejarEstilos();
 
-    this.bordeGrueso = {
-      top: { style: "medium" as ExcelJS.BorderStyle },
-      left: { style: "medium" as ExcelJS.BorderStyle },
-      bottom: { style: "medium" as ExcelJS.BorderStyle },
-      right: { style: "medium" as ExcelJS.BorderStyle },
-    };
-
-    this.fillAzul = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
-    };
-
-    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
-
-    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -142,6 +123,33 @@ export class ListarCiudadComponent implements OnInit {
       this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
+  }
+
+  // METODO DE ESTILOS DEL ARCHIVO DE DESCARGA
+  ManejarEstilos() {
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO QUE MANEJA PAGINACION
@@ -321,9 +329,7 @@ export class ListarCiudadComponent implements OnInit {
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
   async generarExcelCiudades() {
-
     const ciudadeslista: any[] = [];
-
     this.datosCiudades.forEach((ciudades: any, index: number) => {
       ciudadeslista.push([
         index + 1,
@@ -333,17 +339,12 @@ export class ListarCiudadComponent implements OnInit {
         ciudades.id_prov,
       ]);
     });
-
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Ciudades");
-
-
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
     });
-
     worksheet.addImage(this.imagen, {
       tl: { col: 0, row: 0 },
       ext: { width: 220, height: 105 },
@@ -367,8 +368,6 @@ export class ListarCiudadComponent implements OnInit {
       };
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
-
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "id", width: 20 },
@@ -377,8 +376,6 @@ export class ListarCiudadComponent implements OnInit {
       { key: "id_provincia", width: 20 },
 
     ];
-
-
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "ID", totalsRowLabel: "Total:", filterButton: true },
@@ -386,7 +383,6 @@ export class ListarCiudadComponent implements OnInit {
       { name: "PROVINCIA", totalsRowLabel: "", filterButton: true },
       { name: "ID_PROVINCIA", totalsRowLabel: "", filterButton: true },
     ];
-
     worksheet.addTable({
       name: "CiudadesTabla",
       ref: "A6",
@@ -399,8 +395,6 @@ export class ListarCiudadComponent implements OnInit {
       columns: columnas,
       rows: ciudadeslista,
     });
-
-
     const numeroFilas = ciudadeslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 5; j++) {
@@ -417,7 +411,6 @@ export class ListarCiudadComponent implements OnInit {
       }
     }
     worksheet.getRow(6).font = this.fontTitulo;
-
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/octet-stream" });
@@ -426,7 +419,6 @@ export class ListarCiudadComponent implements OnInit {
       console.error("Error al generar el archivo Excel:", error);
     }
   }
-
   private obtenerAlineacionHorizontalEmpleados(
     j: number
   ): "left" | "center" | "right" {
@@ -444,14 +436,13 @@ export class ListarCiudadComponent implements OnInit {
   ExportToCSV() {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('CiudadesCSV');
-    //  Agregar encabezados dinámicos basados en las claves del primer objeto
-    const keys = Object.keys(this.datosCiudades[0] || {}); // Obtener las claves
+    //  AGREGAR ENCABEZADOS DINÁMICOS BASADOS EN LAS CLAVES DEL PRIMER OBJETO
+    const keys = Object.keys(this.datosCiudades[0] || {}); // OBTENER LAS CLAVES
     worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
-    // Llenar las filas con los datos
+    // LLENAR LAS FILAS CON LOS DATOS
     this.datosCiudades.forEach((obj: any) => {
       worksheet.addRow(obj);
     });
-  
     workbook.csv.writeBuffer().then((buffer) => {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "CiudadesCSV.csv");
@@ -599,17 +590,17 @@ export class ListarCiudadComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectiondatosCiudades.selected.length;
-  
+
     this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
-  
+
     this.datosCiudadesEliminar.forEach((datos: any) => {
       this.rest.EliminarCiudad(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -618,14 +609,14 @@ export class ListarCiudadComponent implements OnInit {
           eliminados++;
           this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
           }
-  
+
           this.selectiondatosCiudades.clear();
           this.datosCiudadesEliminar = [];
           this.ListarCiudades();
@@ -633,7 +624,7 @@ export class ListarCiudadComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
@@ -671,20 +662,20 @@ export class ListarCiudadComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
-  getCrearCiudad(){
+  getCrearCiudad() {
     return this.tienePermiso('Crear Ciudad');
   }
 
-  getEliminarCiudad(){
+  getEliminarCiudad() {
     return this.tienePermiso('Eliminar Ciudad');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Ciudades');
   }
 

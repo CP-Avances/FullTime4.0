@@ -60,13 +60,6 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/${id}`);
   }
 
-  // BUSCAR LISTA DE EMPLEADOS
-  BuscarListaEmpleados() {
-    //Verificacion inicial de url por defecto y actualizacion del mismo, depende de empresaURL
-    this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
-    return this.http.get<any>(`${( this.url as string)}/empleado/buscador/empleado`);
-  }
-
   // REGISTRAR EMPLEADOS    **USADO
   RegistrarEmpleados(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado`, data).pipe(
@@ -155,6 +148,11 @@ export class EmpleadoService {
     );
   }
 
+  // BUSCAR LISTA DE EMPLEADOS QUE SE MUESTRAN EN LA BUSQUEDA   ** USADO
+  BuscarListaEmpleados() {
+    this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
+    return this.http.get<any>(`${(this.url as string)}/empleado/buscador/empleado`);
+  }
 
   /** *********************************************************************** **
    ** **       METODOS PARA MANEJO DE DATOS DE TITULO PROFESIONAL             **

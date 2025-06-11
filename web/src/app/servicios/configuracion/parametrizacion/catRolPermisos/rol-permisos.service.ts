@@ -42,7 +42,7 @@ export class RolPermisosService {
       catchError(data));;
   }
 
-  // METODO PARA ASIGNAR ACCIONES AL ROL
+  // METODO PARA ASIGNAR ACCIONES AL ROL   ** USADO
   CrearAccionesRol(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones/insertar`, data).pipe(
       catchError(data));;

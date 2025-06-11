@@ -2,8 +2,9 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dial
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
 interface Nivel {
@@ -114,7 +115,8 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
         id_establecimiento: parseInt(this.datos.id_sucursal),
         id_suc_dep_nivel: parseInt(form.idSucursalForm),
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       };
       this.GuardarDatos(departamento);
     });

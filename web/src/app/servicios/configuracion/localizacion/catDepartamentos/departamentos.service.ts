@@ -100,11 +100,13 @@ export class DepartamentosService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);
   }
 
-  RevisarFormato(formData) {
-    console.log('formDataDepartamentos: ',formData);
+  // METODO PARA REVISAR DATOS DE PLANTILLA DE DEPARTAMENTOS   **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/departamento/upload/revision', formData);
   }
-  subirArchivoExcel(formData) {
+
+  // METODO PARA SUBIR EL ARCHIVO DE DEPARTAMENTOS AL SISTEMA   **USADO
+  subirArchivoExcel(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/departamento/cargar_plantilla/`, formData);
   }
 

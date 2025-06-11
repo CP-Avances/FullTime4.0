@@ -7,9 +7,9 @@ import { ScriptService } from 'src/app/servicios/usuarios/empleado/script.servic
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+import ExcelJS, { FillPattern } from "exceljs";
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import ExcelJS, { FillPattern } from "exceljs";
 
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
@@ -123,6 +123,27 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.ListaDepartamentos();
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  ObtenerEmpleados(idemploy: any) {
+    this.empleado = [];
+    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.empleado = data;
+    })
+  }
+
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
+  logo: any = String;
+  ObtenerLogo() {
+    this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
+      this.logo = 'data:image/jpeg;base64,' + res.imagen;
+    });
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -140,28 +161,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
 
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
-  }
-
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO
-  ObtenerEmpleados(idemploy: any) {
-    this.empleado = [];
-    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
-      this.empleado = data;
-    })
-  }
-
-  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
-  logo: any = String;
-  ObtenerLogo() {
-    this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
-      this.logo = 'data:image/jpeg;base64,' + res.imagen;
-    });
   }
 
   // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
@@ -326,7 +331,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataDepartamentos = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla1 departamentos', this.DataDepartamentos);
+      //console.log('probando plantilla1 departamentos', this.DataDepartamentos);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -358,7 +363,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.departamentosCorrectos = this.listDepartamentosCorrectos.length;
       }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -369,7 +374,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     (document.activeElement as HTMLElement)?.blur();
-    console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
+    //console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -378,6 +383,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
   }
 
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA
   registrarDepartamentos() {
     if (this.listDepartamentosCorrectos.length > 0) {
       const data = {
@@ -396,7 +402,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          ;
           this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
             timeOut: 4000,
           });
@@ -429,6 +434,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       return 'white'
     }
   }
+
   colorTexto: string = '';
   stiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
@@ -443,7 +449,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                       METODO PARA EXPORTAR A PDF                             ** **
    ** ************************************************************************************************** **/
-
 
   // GENERACION DE REPORTE DE PDF
   async GenerarPdf(action = 'open') {
@@ -545,9 +550,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   async generarExcelDepartamento() {
-
     const departamentoslista: any[] = [];
-
     this.departamentos.forEach((departamento: any, index: number) => {
       departamentoslista.push([
         index + 1,
@@ -559,12 +562,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
         departamento.departamento_padre
       ]);
     });
-
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Departamentos");
-
-
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -594,7 +593,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "id_sucursal", width: 20 },
@@ -605,7 +603,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { key: "departamento_padre", width: 30 },
     ];
 
-
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "ID_SUCURSALES", totalsRowLabel: "Total:", filterButton: true },
@@ -614,7 +611,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "NIVEL", totalsRowLabel: "", filterButton: true },
       { name: "DEPARTAMENTO SUPERIOR", totalsRowLabel: "", filterButton: true },
-
     ];
 
     worksheet.addTable({
@@ -629,7 +625,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
       columns: columnas,
       rows: departamentoslista,
     });
-
 
     const numeroFilas = departamentoslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -682,7 +677,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { header: 'nivel', key: 'nivel', width: 10 },
       { header: 'departamento_superior', key: 'departamento_padre', width: 30 },
     ];
-    // Llenar las filas con los datos
+    // LLENAR LAS FILAS CON LOS DATOS
     this.departamentos.forEach((obj: any) => {
       worksheet.addRow(obj);
     });
@@ -804,7 +799,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
         if (nivel != 0) {
           this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
-            this.departamentosNiveles.filter(item => {
+            this.departamentosNiveles.filter((item: any) => {
               this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
                 (res: any) => {
                   if (res.message === 'error') {
@@ -852,38 +847,32 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
   }
 
+  // METODO DE ELIMINACION MULTIPLE DE REGISTROS
   EliminarMultiple() {
     const datosGenerales = {
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales
     };
-
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionDepartamentos.selected.length;
-
     this.departamentosEliminar = this.selectionDepartamentos.selected;
-
     this.departamentosEliminar.forEach((datos: any) => {
       this.rest.EliminarRegistro(datos.id, datosGenerales).subscribe((res: any) => {
         totalProcesados++;
-
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
         } else {
           eliminados++;
-          this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-
+          this.departamentos = this.departamentos.filter((item: any) => item.id !== datos.id);
           const id_departamento = datos.id;
           const id_establecimiento = datos.id_sucursal;
-
           if (datos.nivel != 0) {
             this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(niveles => {
               const nivelesArray = Array.isArray(niveles) ? niveles : [];
-
               nivelesArray.forEach((item: any) => {
                 this.rest.EliminarRegistroNivelDepa(item.id, datosGenerales).subscribe((res: any) => {
                   if (res.message === 'error') {
@@ -907,7 +896,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
               timeOut: 6000,
             });
           }
-
           this.selectionDepartamentos.clear();
           this.departamentosEliminar = [];
           this.ListaDepartamentos();
@@ -916,6 +904,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE DE REGISTROS
   ConfirmarDeleteMultiple() {
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
@@ -951,7 +940,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }

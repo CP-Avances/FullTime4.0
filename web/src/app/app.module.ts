@@ -164,8 +164,8 @@ import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/pl
 import { VisualizarObservacionComponent } from './componentes/horarios/planificar-horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion.component';
 // MODULO  --PERMISOS
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
-import { AutorizacionesComponent } from './componentes/autorizaciones/autorizaciones/autorizaciones.component';
-import { EditarEstadoAutorizaccionComponent } from './componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
+import { AutorizacionesComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-permisos/autorizaciones/autorizaciones.component';
+import { EditarEstadoAutorizaccionComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-permisos/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
 import { RegistroEmpleadoPermisoComponent } from './componentes/modulos/permisos/gestionar-permisos/registro-empleado-permiso/registro-empleado-permiso.component';
 import { CancelarPermisoComponent } from './componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
 import { VerEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/ver-empleado-permiso/ver-empleado-permiso.component';
@@ -177,8 +177,8 @@ import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/conf
 import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 // MODULO  --VACACIONES
-import { VacacionAutorizacionesComponent } from './componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
-import { EditarEstadoVacacionAutoriacionComponent } from './componentes/autorizaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
+import { VacacionAutorizacionesComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-vacaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
+import { EditarEstadoVacacionAutoriacionComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-vacaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
 import { EstadoVacacionesComponent } from './componentes/modulos/vacaciones/estado-vacaciones/estado-vacaciones.component';
 import { EditarVacacionesEmpleadoComponent } from './componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { CancelarVacacionesComponent } from './componentes/modulos/vacaciones/cancelar-vacaciones/cancelar-vacaciones.component';
@@ -195,8 +195,8 @@ import { VerHorasExtrasComponent } from './componentes/modulos/horasExtras/catHo
 import { ListaEmplePlanHoraEComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/empleados-planificar/lista-emple-plan-hora-e.component';
 import { ListaPlanificacionesComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/lista-planificaciones/lista-planificaciones.component';
 import { ListaPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/lista-pedido-hora-extra/lista-pedido-hora-extra.component';
-import { HoraExtraAutorizacionesComponent } from './componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
-import { EditarEstadoHoraExtraAutorizacionComponent } from './componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
+import { HoraExtraAutorizacionesComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
+import { EditarEstadoHoraExtraAutorizacionComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { VerPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/ver-pedido-hora-extra/ver-pedido-hora-extra.component';
 import { CancelarHoraExtraComponent } from './componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
 import { EditarHoraExtraEmpleadoComponent } from './componentes/modulos/horasExtras/editar-hora-extra-empleado/editar-hora-extra-empleado.component';
@@ -208,7 +208,7 @@ import { HoraExtraRealComponent } from './componentes/modulos/horasExtras/calcul
 import { TiempoAutorizadoComponent } from './componentes/modulos/horasExtras/tiempo-autorizado/tiempo-autorizado.component';
 import { CalculoHoraExtraComponent } from './componentes/modulos/horasExtras/calculos/calculo-hora-extra/calculo-hora-extra.component';
 import { EstadoHoraExtraComponent } from './componentes/modulos/horasExtras/estado-hora-extra/estado-hora-extra.component';
-import { PlanHoraExtraAutorizaComponent } from './componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
+import { PlanHoraExtraAutorizaComponent } from './componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
 // MODULO  --ALIMENTACION
 import { ListarTipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
 import { TipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/tipo-comidas/tipo-comidas.component';

@@ -70,10 +70,10 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.VerEmpresa();
     this.ListarDetalles(this.data.detalle.id_horario);
@@ -198,7 +198,8 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       min_despues: this.data.detalle.min_despues,
       id: this.data.detalle.id,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);
@@ -220,7 +221,8 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     const datos = {
       hora_trabajo: horasT,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     this.restH.ActualizarHorasTrabaja(this.data.horario.id, datos).subscribe(res => {

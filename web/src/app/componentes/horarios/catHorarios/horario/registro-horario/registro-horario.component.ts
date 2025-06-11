@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DateTime, Duration } from 'luxon';
+import { Duration } from 'luxon';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
@@ -79,7 +79,8 @@ export class RegistroHorarioComponent implements OnInit {
       codigo: form.codigoForm,
       default_: form.tipoHForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
 
     // FORMATEAR HORAS

@@ -84,7 +84,8 @@ export class EditarFeriadosComponent implements OnInit {
       descripcion: form.descripcionForm,
       fec_recuperacion: form.fechaRecuperacionForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     };
     // VALIDAR INGRESO DE FECHAS
     if (feriado.fec_recuperacion === '' || feriado.fec_recuperacion === null) {

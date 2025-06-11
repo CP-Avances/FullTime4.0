@@ -1,11 +1,11 @@
 // IMPORTAR LIBRERIAS
+import { DateTime } from 'luxon';
 import { PageEvent } from '@angular/material/paginator';
+import { Validators } from '@angular/forms';
 import { FormControl } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Component, Input } from '@angular/core';
-import { DateTime } from 'luxon';
-import { Validators } from '@angular/forms';
 
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
@@ -81,25 +81,18 @@ export class BuscarPlanificacionComponent {
   fecHorario: boolean = true;
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>, opcion: number) {
-    console.log()
     const ctrlValue = fecha;
     if (opcion === 1) {
-      console.log("opcion 1")
       if (this.fechaFinalF.value) {
-        console.log("existente fecha final")
-
         this.ValidarFechas(ctrlValue, DateTime.fromJSDate(this.fechaFinalF.value), this.fechaInicialF, opcion);
       }
       else {
         let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
-        console.log("ver inicio opcion 1: ", inicio)
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
     else {
-      console.log("NO opcion 1")
-
       this.ValidarFechas(DateTime.fromJSDate(this.fechaInicialF.value), ctrlValue, this.fechaFinalF, opcion);
     }
     datepicker.close();
@@ -108,26 +101,14 @@ export class BuscarPlanificacionComponent {
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
     // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-
     let inicio = fec_inicio.set({ day: 1 }).toFormat('dd/MM/yyyy');
-    console.log("ver fec_inicio: ", fec_inicio)
-    console.log("ver fecha_fin: ", fec_fin)
-    console.log("ver formulario: ", formulario)
-    console.log("ver opcion: ", opcion)
-
     const lastDayOfMonth = fec_fin.endOf('month').day;
     const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
-
     let final = formattedDate;
-    console.log("ver inicio: ", inicio)
-    console.log("ver final: ", final)
-
     let feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
     let fecf = DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
 
     // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
-
-    console.log("ver Date.parse(feci) ", Date.parse(feci))
     if (Date.parse(feci) <= Date.parse(fecf)) {
       if (opcion === 1) {
         formulario.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
@@ -141,7 +122,6 @@ export class BuscarPlanificacionComponent {
         timeOut: 6000,
       });
     }
-    console.log("ver fecha final: ", this.fechaFinalF.value)
   }
 
   // METODO PARA VER PLANIFICACION
@@ -166,7 +146,6 @@ export class BuscarPlanificacionComponent {
     }
     else {
       const ahora = DateTime.now();
-
       let inicio = ahora.toFormat('yyyy/MM/01');
       let final = `${ahora.toFormat('yyyy/MM/')}${ahora.daysInMonth}`;
       this.ObtenerHorariosEmpleado(inicio, final, 2, id_empleado);
@@ -535,15 +514,11 @@ export class BuscarPlanificacionComponent {
   datos_editar: any = [];
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, id_empleado: any, codigo: any, id_cargo: any, hora_trabaja: any, index: any): void {
     let fecha = anio + '-' + mes + '-' + dia;
-    console.log("fecha en AbrirEditarHorario", fecha);
     let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy/MM/dd');
-    console.log("Ver fecha_", fecha_)
     let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid;
-    console.log("Ver verificar", verificar)
 
     // VERIFICAR QUE EL DIA SEA VALIDO
     if (verificar === true) {
-      console.log("entra a valido")
       this.horariosEmpleado[index].color = 'ok';
       this.horariosEmpleado[index].seleccionado = dia;
       this.datos_editar = {

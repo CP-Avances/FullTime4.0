@@ -5,6 +5,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service'
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-departamento/registro-departamento.component';
@@ -16,7 +17,6 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-ver-sucursal',
@@ -51,11 +51,11 @@ export class VerSucursalComponent implements OnInit {
     public componentes: ListaSucursalesComponent,
     public componentee: VerEmpresaComponent,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
     public router: Router,
     public restD: DepartamentosService,
     public rest: SucursalService,
     private toastr: ToastrService,
-    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -68,7 +68,6 @@ export class VerSucursalComponent implements OnInit {
 
     this.CargarDatosSucursal();
     this.ListaDepartamentos();
-    console.log('pagina_', this.pagina_);
   }
 
   // METODO PARA MANEJAR PAGINACION
@@ -304,11 +303,8 @@ export class VerSucursalComponent implements OnInit {
     this.departamentosEliminar.forEach((datos: any) => {
       this.restD.EliminarRegistro(datos.id, data).subscribe({
         next: (res: any) => {
-          console.log(`Respuesta de eliminación para ${datos.nombre}:`, res);
-  
           totalProcesados++;
-  
-          // Validación robusta (evita que cualquier otra cosa pase como éxito)
+          // VALIDACION ROBUSTA (EVITA QUE CUALQUIER OTRA COSA PASE COMO EXITO)
           if (res?.message?.toLowerCase() === 'error') {
             this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
               timeOut: 6000,

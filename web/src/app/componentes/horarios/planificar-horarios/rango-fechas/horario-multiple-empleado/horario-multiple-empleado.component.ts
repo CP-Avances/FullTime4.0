@@ -4,11 +4,13 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
-
+import { Observable, map, startWith } from 'rxjs';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
+
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
+
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -18,7 +20,6 @@ import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
-import { Observable, map, startWith  } from 'rxjs';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 @Component({
@@ -148,17 +149,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.BuscarInformacionGeneral();
 
-this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
+    this.roleS.BuscarRoles().subscribe((respuesta: any) => {
       this.roles = respuesta
-      console.log('this.listaRoles: ', this.roles)
     });
 
-        this.filteredRoles = this.nombre_rol.valueChanges.pipe(
-          startWith(''),
-          map(value => this.filtrarRoles(value || ''))
-        );
-
-
+    this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
 
     this.nombre_rol.valueChanges.subscribe(valor => {
       this.Filtrar(valor, 8);
@@ -194,7 +192,6 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
       this.toastr.error(err.error.message)
     })
   }
-
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
@@ -248,7 +245,6 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
   activar_boton: boolean = false;
   activar_seleccion: boolean = true;
   BuscarPorTipo(e: MatRadioChange) {
-    console.log('ver opcion ', e.value)
     this.opcion = e.value;
     this.activar_boton = true;
     this.MostrarLista();
@@ -559,14 +555,12 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
     }
     else if (this.opcion === 'd') {
       usuarios = this.validar.ModelarDepartamento_(this.empleados, this.selectionDep, valor.id, valor.id_suc)
-      console.log("ver usuarios", usuarios)
     }
     else if (this.opcion === 'r') {
       usuarios = this.validar.ModelarRegimen_(this.empleados, this.selectionReg, valor.id, valor.id_suc)
     }
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
-      console.log("ver usuarios: ", usuarios)
     }
     this.SeleccionarProceso(tipo, usuarios);
   }
@@ -758,18 +752,11 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
 
   // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
   CargarTimbres(data: any, timbre: any) {
-
-    console.log("ver timbre", timbre)
     this.fechaInicioFormluxon = timbre.fechaInicioForm;
-    console.log("fechaInicioFormluxon: ", this.fechaInicioFormluxon)
     this.fechaFinFormluxon = timbre.fechaFinalForm;
-    console.log("ver data: ", data);
     if (data.length > 0) {
       var inicio = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
       var fin = this.fechaFinFormluxon.toFormat('yyyy-MM-dd');
-
-      console.log(" ver inicio: ", inicio)
-
       // VERIFICAR FECHAS INGRESADAS
       if (Date.parse(inicio) <= Date.parse(fin)) {
 
@@ -783,10 +770,6 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
             codigos = codigos + ', \'' + obj.codigo + '\''
           }
         })
-
-        console.log("ver fin en metodo:", this.fechaFinFormluxon.plus({ days: 2 }).toFormat('yyyy-MM-dd'))
-        console.log("ver inicio metodo ", this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'))
-
 
         let usuarios = {
           codigo: codigos,
@@ -853,27 +836,27 @@ this, this.roleS.BuscarRoles().subscribe((respuesta: any) => {
     }
   }
 
-  getAsignarTimbres(){
+  getAsignarTimbres() {
     return this.tienePermiso('Asignar Timbres');
   }
 
-  getEliminarPlanificaciones(){
+  getEliminarPlanificaciones() {
     return this.tienePermiso('Eliminar Planificación Horaria');
   }
 
-  getBuscarPlanificaciones(){
+  getBuscarPlanificaciones() {
     return this.tienePermiso('Buscar Planificación Horaria');
   }
 
-  getPlanificacionMultiple(){
+  getPlanificacionMultiple() {
     return this.tienePermiso('Planificación Múltiple');
   }
 
-  getPlanificacionFija(){
+  getPlanificacionFija() {
     return this.tienePermiso('Planificación fija');
   }
 
-  getCargarPlantilla(){
+  getCargarPlantilla() {
     return this.tienePermiso('Cargar Plantilla Planificación Horaria');
   }
 

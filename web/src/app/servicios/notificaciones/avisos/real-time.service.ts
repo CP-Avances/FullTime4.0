@@ -24,7 +24,7 @@ export class RealTimeService {
     this.socket.emit('nuevo_aviso', data);
   }
 
-  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
+  // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES - MODULOS    **USADO
   ObtenerConfiguracionEmpleado(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/${id_empleado}`);
   }
@@ -39,6 +39,7 @@ export class RealTimeService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time`, datos);
   }
 
+  // METODO PARA OBTENER UNA NOTIFICACION - MODULOS   ** USADO
   ObtenerUnaNotificacion(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/one/${id}`);
   }
@@ -48,6 +49,7 @@ export class RealTimeService {
   }
 
 
+  // METODO PARA ACTUALIZAR ESTADO DE LAS NOTIFICACIONES - MODULOS
   ActualizarVistaNotificacion(id_realtime: number, data: any) {
     data.append('visto', true);
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/vista/${id_realtime}`, data);
@@ -82,7 +84,7 @@ export class RealTimeService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/config/noti-put-multiple`, datos);
   }
 
-  // METODO PARA BUSCAR NOTIFICACIONES RECIBIDAS POR UN USUARIO
+  // METODO PARA BUSCAR NOTIFICACIONES - MODULOS RECIBIDAS POR UN USUARIO    **USADO
   ObtenerNotasUsuario(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/receives/${id_empleado}`);
   }

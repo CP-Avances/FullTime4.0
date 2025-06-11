@@ -11,7 +11,7 @@ import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-ext
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { TiempoAutorizadoComponent } from '../../tiempo-autorizado/tiempo-autorizado.component';
-import { PlanHoraExtraAutorizaComponent } from 'src/app/componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
+import { PlanHoraExtraAutorizaComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
 
 export interface HoraExtraPlanElemento {
   apellido: string;

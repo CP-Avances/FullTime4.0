@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import * as FileSaver from 'file-saver';
 import * as xml2js from 'xml2js';
@@ -17,7 +18,6 @@ import { ProvinciaService } from '../../../../../servicios/configuracion/localiz
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service';
-import ExcelJS, { FillPattern } from "exceljs";
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableProvincias } from 'src/app/model/reportes.model';
@@ -77,16 +77,16 @@ export class PrincipalProvinciaComponent implements OnInit {
     public rest: ProvinciaService,
     public restc: CiudadService,
     public restE: EmpleadoService,
+    public restEmpre: EmpresaService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
-    public restEmpre: EmpresaService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
@@ -94,6 +94,27 @@ export class PrincipalProvinciaComponent implements OnInit {
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
+    this.ManejarEstios();
+  }
+
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  ObtenerEmpleados(idemploy: any) {
+    this.empleado = [];
+    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.empleado = data;
+    })
+  }
+
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
+  logo: any = String;
+  ObtenerLogo() {
+    this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
+      this.logo = 'data:image/jpeg;base64,' + res.imagen;
+    });
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstios() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -111,28 +132,12 @@ export class PrincipalProvinciaComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
 
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
-  }
-
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO
-  ObtenerEmpleados(idemploy: any) {
-    this.empleado = [];
-    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
-      this.empleado = data;
-    })
-  }
-
-  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
-  logo: any = String;
-  ObtenerLogo() {
-    this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
-      this.logo = 'data:image/jpeg;base64,' + res.imagen;
-    });
   }
 
   // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
@@ -326,11 +331,8 @@ export class PrincipalProvinciaComponent implements OnInit {
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
 
-
   async generarExcelProvincias() {
-
     const provinciaslista: any[] = [];
-
     this.provincias.forEach((provincia: any, index: number) => {
       provinciaslista.push([
         index + 1,
@@ -340,18 +342,12 @@ export class PrincipalProvinciaComponent implements OnInit {
         provincia.pais,
       ]);
     });
-
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Provincias");
-
-
-    
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
     });
-
     worksheet.addImage(this.imagen, {
       tl: { col: 0, row: 0 },
       ext: { width: 220, height: 105 },
@@ -376,16 +372,13 @@ export class PrincipalProvinciaComponent implements OnInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "id", width: 20 },
       { key: "nombre", width: 20 },
       { key: "id_pais", width: 20 },
       { key: "PAIS", width: 20 },
-
     ];
-
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
@@ -407,7 +400,6 @@ export class PrincipalProvinciaComponent implements OnInit {
       columns: columnas,
       rows: provinciaslista,
     });
-
 
     const numeroFilas = provinciaslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -450,7 +442,6 @@ export class PrincipalProvinciaComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   ExportToCSV() {
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('ProvinciasCSV');
     //  Agregar encabezados dinámicos basados en las claves del primer objeto
@@ -600,17 +591,17 @@ export class PrincipalProvinciaComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionProvincias.selected.length;
-  
+
     this.provinciasEliminar = this.selectionProvincias.selected;
-  
+
     this.provinciasEliminar.forEach((datos: any) => {
       this.rest.EliminarProvincia(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -619,7 +610,7 @@ export class PrincipalProvinciaComponent implements OnInit {
           eliminados++;
           this.provincias = this.provincias.filter((item: any) => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
@@ -633,7 +624,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO PARA CONFIRMAR ELIMINAR MULTIPLE
   ConfirmarDeleteMultiple() {
@@ -676,15 +667,15 @@ export class PrincipalProvinciaComponent implements OnInit {
     }
   }
 
-  getCrearProvincia(){
+  getCrearProvincia() {
     return this.tienePermiso('Crear Provincia');
   }
 
-  getEliminarProvincia(){
+  getEliminarProvincia() {
     return this.tienePermiso('Eliminar Provincia');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Provincias');
   }
 
