@@ -111,7 +111,6 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
 
-
   //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 

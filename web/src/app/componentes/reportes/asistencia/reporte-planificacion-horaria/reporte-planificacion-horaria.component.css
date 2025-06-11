@@ -175,3 +175,14 @@ p {
 #horarios{
     padding: 0 0 25px;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 80px;
+    padding-left: 20px;
+    padding-top: 15px;
+}

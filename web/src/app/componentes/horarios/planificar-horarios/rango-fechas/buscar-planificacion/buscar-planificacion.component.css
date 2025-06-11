@@ -162,3 +162,13 @@ p {
 .table tbody tr:nth-child(2n) .sticky-5{
     background-color: #e6f3ff;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 80px;
+    padding-top: 14px;
+}
