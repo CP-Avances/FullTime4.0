@@ -5,6 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { Validators, FormControl } from '@angular/forms';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -74,6 +75,11 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   tamanio_pagina_car: number = 5;
   pageSizeOptions_car = [5, 10, 20, 50];
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
   // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
   numero_pagina_dep: number = 1;
   tamanio_pagina_dep: number = 5;
@@ -102,7 +108,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
 
   constructor(
@@ -282,7 +288,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = []
     console.log("Seleccionado modulos", seleccionados.modulos)
-    
+
     this.restAlimentacion.BuscarTimbresAlimentacion(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       console.log('Respuesta del backend:', res);  // Imprime la respuesta para verificar
       this.data_pdf = res;
@@ -323,7 +329,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-   async GenerarPDF(action: any) {
+  async GenerarPDF(action: any) {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
@@ -743,6 +749,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             n: n,
             identificacion: usu.identificacion,
             codigo: usu.codigo,
+            nombre: usu.nombre,
+            apellido: usu.apellido,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,

@@ -2,6 +2,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
+import { Validators, FormControl } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
@@ -87,6 +88,11 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   tamanio_pagina_reg: number = 5;
   pageSizeOptions_reg = [5, 10, 20, 50];
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
   // ITEMS DE PAGINACION DE LA TABLA CARGO
   numero_pagina_car: number = 1;
   tamanio_pagina_car: number = 5;
@@ -138,7 +144,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() {
     return this.reporteService.filtroNombreEmp;
   }
-  get filtroRolEmp() { 
+  get filtroRolEmp() {
     return this.reporteService.filtroRolEmp;
   }
 
@@ -165,7 +171,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
-    
+
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -557,7 +563,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           ],
         },
       });
-      
 
       // PRESENTACION DE LA INFORMACION
       selec.empleados.forEach((empl: any) => {
@@ -673,19 +678,19 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-   generos: any=[];
-   ObtenerGeneros(){
-     this.restGenero.ListarGeneros().subscribe(datos => {
-       this.generos = datos;
-     })
-   }
+  generos: any = [];
+  ObtenerGeneros() {
+    this.restGenero.ListarGeneros().subscribe(datos => {
+      this.generos = datos;
+    })
+  }
 
-   nacionalidades: any=[];
-   ObtenerNacionalidades(){
+  nacionalidades: any = [];
+  ObtenerNacionalidades() {
     this.restNacionalidades.ListarNacionalidad().subscribe(datos => {
       this.nacionalidades = datos;
     })
-   }
+  }
 
   async generarExcel() {
     let datos: any[] = [];
@@ -864,6 +869,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             id_empleado: vac.id,
             identificacion: vac.identificacion,
             codigo: vac.codigo,
+            nombre: vac.nombre,
+            apellido: vac.apellido,
             empleado: vac.apellido + ' ' + vac.nombre,
             genero: nombreGenero,
             ciudad: vac.ciudad,
