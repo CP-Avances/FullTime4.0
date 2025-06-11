@@ -17,6 +17,11 @@ require('dotenv').config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
+const http_1 = require("http");
+const socket_io_1 = require("socket.io");
+// IMPORTACION DE METODOS PARA ENVIO DE NOTIFICACIONES
+const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
+const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 // RUTAS IMPORTADAS
 const indexRutas_1 = __importDefault(require("./rutas/indexRutas"));
 // EMPRESA
@@ -104,9 +109,6 @@ const reportesNotificacionRutas_1 = __importDefault(require("./rutas/reportes/re
 const auditoriaRutas_1 = __importDefault(require("./rutas/reportes/auditoriaRutas"));
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const reporteHoraExtraRutas_1 = __importDefault(require("./rutas/reportes/reporteHoraExtraRutas"));
-const http_1 = require("http");
-const socket_io_1 = require("socket.io");
-//var io: any;
 class Servidor {
     constructor() {
         this.app = (0, express_1.default)();
@@ -114,17 +116,9 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = (0, http_1.createServer)(this.app);
-        /*
-        this.io = require('socket.io')(this.server, {
-            cors: {
-                origin: '*',
-                methods: ['GET', 'POST'],
-            }
-        });
-*/
         this.io = new socket_io_1.Server(this.server, {
             cors: {
-                origin: '*', // Permitir todas las conexiones (ajustar según necesidades)
+                origin: '*', // PERMITIR TODAS LAS CONEXIONES (AJUSTAR SEGÚN NECESIDADES)
                 methods: ['GET', 'POST'],
             },
         });
@@ -133,7 +127,7 @@ class Servidor {
             socket.on("connect_error", (err) => {
                 console.log("Error de conexión:", err.message);
             });
-            // Verifica la conexión
+            // VERIFICA LA CONEXION
             socket.on('disconnect', () => {
                 console.log('Cliente desconectado:', socket.id);
             });
@@ -269,12 +263,10 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
             socket.on("nuevo_aviso", (data) => {
-                console.log('Datos recibidos en "nuevo_aviso":', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -295,22 +287,14 @@ class Servidor {
 }
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
-const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
-const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
+exports.io = SERVIDOR.io;
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-exports.io = SERVIDOR.io;
 // INICIO DE TAREAS AUTOMATICAS
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield tareasAutomaticas_1.tareasAutomaticas.IniciarTarea();
 }))();
-//beforeFiveDays();
-//beforeTwoDays();
-// LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
-//Peri_Vacacion_Automatico();
-//RegistrarAsistenciaByTimbres();
-// ----------// conteoPermisos();
 //generarTimbres('1', '2023-11-01', '2023-11-02');//
