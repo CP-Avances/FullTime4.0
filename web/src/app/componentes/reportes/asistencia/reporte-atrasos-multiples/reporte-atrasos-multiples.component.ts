@@ -5,6 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { Validators, FormControl } from '@angular/forms';
 
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
@@ -105,6 +106,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
+
   //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
@@ -118,7 +125,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
 
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
 
   constructor(
@@ -934,6 +941,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             n: n,
             identificacion: empl.identificacion,
             codigo: empl.codigo,
+            nombre: empl.nombre,
+            apellido: empl.apellido,
             empleado: empl.apellido + ' ' + empl.nombre,
             ciudad: empl.ciudad,
             sucursal: empl.sucursal,
