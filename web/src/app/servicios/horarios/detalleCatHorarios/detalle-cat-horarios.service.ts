@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
 export class DetalleCatHorariosService {
 
   constructor(
@@ -19,7 +20,6 @@ export class DetalleCatHorariosService {
   ConsultarUnDetalleHorarioMultiple(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/todos_horario`, datos);
   }
-
 
   // METODO PARA ELIMINAR REGISTRO    **USADO
   EliminarRegistro(id: number, datos: any) {

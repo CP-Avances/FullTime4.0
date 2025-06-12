@@ -10,38 +10,34 @@ export class ProcesoService {
     private http: HttpClient,
   ) { }
 
-  // catalogo de Procesos
 
+  // METODO DE CONSULTA DE PROCESOS    **USADO
   ConsultarProcesos() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso`);
   }
 
-  getOneProcesoRest(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso/${id}`);
-  }
-
-  postProcesoRest(data: any) {
+  // METODO PARA REGISTRAR UN PROCESO   **USADO
+  RegistrarProceso(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/proceso`, data);
   }
 
-  EliminarProceso(id: number, data: any){
-    const url= `${(localStorage.getItem('empresaURL') as string)}/proceso/eliminar/${id}`;
+  // METODO DE ELIMINACION DE REGISTROS DE PROCESOS   **USADO
+  EliminarProceso(id: number, data: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/proceso/eliminar/${id}`;
     const httpOtions = {
       body: data
     };
-    return this.http.request('delete',url,httpOtions);
-}
+    return this.http.request('delete', url, httpOtions);
+  }
 
-  getIdProcesoPadre(procesoPadre: string) {
+  // METODO PARA OBTENER EL ID DEL PROCESO SUPERIOR   **USADO
+  ObtenerIDProcesoSuperior(procesoPadre: string) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso/busqueda/${procesoPadre}`);
   }
 
+  // METODO PARA ACTUALIZAR UN PROCESO    **USADO
   ActualizarUnProceso(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/proceso`, datos);
-  }
-
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/proceso/xmlDownload`, data);
   }
 
   // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
@@ -54,7 +50,8 @@ export class ProcesoService {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/cargar_plantilla', data);
   }
 
-  RegistroProcesos(data: any){
+  // METODO DE REGISTRO DE EMPLEADO - PROCESOS    **USADO
+  RegistroProcesos(data: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/registrarProcesos', data)
   }
 
@@ -63,8 +60,8 @@ export class ProcesoService {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/upload/revision_epleadoProceso', formData);
   }
 
-  RegistrarPlantillaEmpleProce(data: any){
-    console.log('data a enviar: ',data)
+  // METODO DE REGISTRO DE PLANTILLA DE PROCESOS    **USADO
+  RegistrarPlantillaEmpleProceso(data: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/cargar_plantilla/registro_epleadoProceso', data)
   }
 
@@ -73,9 +70,22 @@ export class ProcesoService {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/actualizacionProceso', formData);
   }
 
-  // METODO PARA ELIMINAR GRUPOS OCUPACIONALES MULTIPLES
-  EliminarProcesoMult(data: any) {
+  // METODO PARA ELIMINAR GRUPOS OCUPACIONALES MULTIPLES    **USADO
+  EliminarProcesoMultiple(data: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/proceso/eliminarProcesoMult', data);
   }
+
+
+
+
+
+
+
+
   
+
+  getOneProcesoRest(id: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso/${id}`);
+  }
+
 }

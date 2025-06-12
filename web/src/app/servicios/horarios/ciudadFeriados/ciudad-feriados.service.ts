@@ -46,6 +46,16 @@ export class CiudadFeriadosService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/ciudadFeriados`, data);
   }
 
+
+
+
+
+
+
+
+
+
+  
   BuscarFeriados(id_ciudad: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudadFeriados/ciudad/${id_ciudad}`);
   }

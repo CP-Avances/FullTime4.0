@@ -1,22 +1,22 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component } from '@angular/core';
+import { checkOptions, FormCriteriosBusqueda, ITableEmpleados } from 'src/app/model/reportes.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { Observable, map, startWith } from 'rxjs';
+import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, map, startWith } from 'rxjs';
-import { checkOptions, FormCriteriosBusqueda, ITableEmpleados } from 'src/app/model/reportes.model';
-import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
-import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
+import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
+
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
-import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
-import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
+import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
+import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 
 @Component({
   selector: 'app-registro-interfaz-grupo',
@@ -153,7 +153,6 @@ export class RegistroInterfazGrupoComponent {
     private asignaciones: AsignacionesService,
     private resGrupo: CatGrupoOcupacionalService,
     private restSuc: SucursalService,//SERVICIO DE DATOS PARA OBTENER EL LISTADO DE LAS SUCURSALES
-    private restDep: DepartamentosService,//SERVICIO DE DATOS PARA OBTENER EL DEPA POR EL ID DE LA SUCURSAL
     private restRol: RolesService, //SERVICIO DE DATOS PARA OBTENER EL ROL DEL USUARIO
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
@@ -180,9 +179,8 @@ export class RegistroInterfazGrupoComponent {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this, this.restRol.BuscarRoles().subscribe((respuesta: any) => {
+    this.restRol.BuscarRoles().subscribe((respuesta: any) => {
       this.listaRoles = respuesta
-      console.log('this.listaRoles: ', this.listaRoles)
     })
 
     this.BuscarInformacionGeneral();
@@ -197,6 +195,7 @@ export class RegistroInterfazGrupoComponent {
       this.Lsucursales = datos;
     });
   }
+
   Ldepatamentos: any;
   selecctGrupo(id: any) {
     this.Ldepatamentos = []
@@ -223,17 +222,6 @@ export class RegistroInterfazGrupoComponent {
           map((value: any) => this._filter(value))
         );
     });
-  }
-  // QUITAR TODOS LOS DATOS SELECCIONADOS DE LA PROVINCIA INDICADA
-  limpiarData: any = [];
-  QuitarTodos() {
-
-  }
-
-  // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
-  Listdepartamentos: any = [];
-  ObtenerDepartamentos() {
-    this.QuitarTodos();
   }
 
   BuscarInformacionGeneral() {
@@ -308,18 +296,14 @@ export class RegistroInterfazGrupoComponent {
     this.empleadosDep = this.validar.ProcesarDatosEmpleados(informacion);
     this.sucursalesDep = this.validar.ProcesarDatosSucursales(informacion);
     this.departamentosDep = this.validar.ProcesarDatosDepartamentos(informacion);
-    //console.log('regimen ---', this.regimenDep)
-
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
     // SI ES SUPERADMINISTRADOR NO FILTRAR
-    //console.log('id rol ', this.rolEmpleado)
     if (this.rolEmpleado !== 1) {
       //console.log('ingresa')
       this.empleadosDep = this.empleadosDep.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
       this.departamentosDep = this.departamentosDep.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
       this.sucursalesDep = this.sucursalesDep.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
       this.regimenDep = this.regimenDep.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
-
       this.empleadosDep.forEach((empleado: any) => {
         this.idCargosAcceso.add(empleado.id_cargo_);
       });
@@ -329,7 +313,6 @@ export class RegistroInterfazGrupoComponent {
       );
     }
     this.mostrarTablas = true;
-    console.log('regimen ', this.regimenDep)
   }
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
@@ -519,11 +502,13 @@ export class RegistroInterfazGrupoComponent {
     const numSelected = this.selectionRolDep.selected.length;
     return numSelected === this.listaUsuariosRol.length
   }
+
   masterToggleRolDep() {
     this.isAllSelectedRolDep() ?
       this.selectionRolDep.clear() :
       this.listaUsuariosRol.forEach((row: any) => this.selectionRolDep.select(row));
   }
+
   checkboxLabelRolDep(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedRolDep() ? 'select' : 'deselect'} all`;
@@ -536,12 +521,14 @@ export class RegistroInterfazGrupoComponent {
     const numSelected = this.selectionRegDep.selected.length;
     return numSelected === this.regimenDep.length
   }
+
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleRegDep() {
     this.isAllSelectedRegDep() ?
       this.selectionRegDep.clear() :
       this.regimenDep.forEach((row: any) => this.selectionRegDep.select(row));
   }
+
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelRegDep(row?: ITableEmpleados): string {
     if (!row) {
@@ -555,12 +542,14 @@ export class RegistroInterfazGrupoComponent {
     const numSelected = this.selectionCargDep.selected.length;
     return numSelected === this.cargosDep.length
   }
+
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCargDep() {
     this.isAllSelectedCargDep() ?
       this.selectionCargDep.clear() :
       this.cargosDep.forEach((row: any) => this.selectionCargDep.select(row));
   }
+
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelCargDep(row?: ITableEmpleados): string {
     if (!row) {
@@ -574,12 +563,14 @@ export class RegistroInterfazGrupoComponent {
     const numSelected = this.selectionDepDep.selected.length;
     return numSelected === this.departamentosDep.length
   }
+
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDepDep() {
     this.isAllSelectedDepDep() ?
       this.selectionDepDep.clear() :
       this.departamentosDep.forEach((row: any) => this.selectionDepDep.select(row));
   }
+
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelDepDep(row?: ITableEmpleados): string {
     if (!row) {
@@ -593,12 +584,14 @@ export class RegistroInterfazGrupoComponent {
     const numSelected = this.selectionEmpDep.selected.length;
     return numSelected === this.empleadosDep.length
   }
+
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmpDep() {
     this.isAllSelectedEmpDep() ?
       this.selectionEmpDep.clear() :
       this.empleadosDep.forEach((row: any) => this.selectionEmpDep.select(row));
   }
+
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelEmpDep(row?: ITableEmpleados): string {
     if (!row) {
@@ -682,7 +675,6 @@ export class RegistroInterfazGrupoComponent {
 
 
   AbrirEditarDepaUser(datos: any) {
-    console.log('datos: ', datos)
     if (datos.length > 0) {
       const data = {
         id_grupo: this.formularioDep.get('sucursal')?.value,

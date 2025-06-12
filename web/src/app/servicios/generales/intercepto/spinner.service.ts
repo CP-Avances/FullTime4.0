@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+
 export class SpinnerService {
   private requestCount = 0;
   private _isLoading = new BehaviorSubject<boolean>(false);

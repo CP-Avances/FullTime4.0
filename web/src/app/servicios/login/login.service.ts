@@ -1,22 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
-//Servicios
+// SERVICIOS EN TIEMPO REAL
 import { SocketService } from '../socket/socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class LoginService {
 
   constructor(
+    private socket: SocketService,
     private route: ActivatedRoute,
     private http: HttpClient,
     public router: Router,
-    private socket: SocketService,
   ) { }
 
 
@@ -36,7 +37,7 @@ export class LoginService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/cambiar-contrasenia`, data)
   }
 
-  // AUDITAR INICIO DE SESION
+  // AUDITAR INICIO DE SESION    **USADO
   AuditarInicio(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/registrar_acceso`, data)
   }
@@ -61,11 +62,6 @@ export class LoginService {
     return !!localStorage.getItem('rol');
   }
 
-  // ACCEDER AL MENU -- PRUEBAS
-  getRolMenu() {
-    return true;
-  }
-
   // METODO PARA SALIR DEL SISTEMA
   logout() {
     localStorage.clear();
@@ -74,7 +70,7 @@ export class LoginService {
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
 
-  //SELECTOR DE EMPRESAS
+  // SELECTOR DE EMPRESAS
   getEmpresa(data: any) {
     return this.http.post<any>(`${environment.url}/fulltime`, data);
   }

@@ -285,7 +285,7 @@ export class EmpleadoService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/buscarFechaUsuarios`, datos);
   }
 
-  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO
+  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO     **USADO
   BuscarEmpleadoNombre(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/buscar/informacion`, data);
   }

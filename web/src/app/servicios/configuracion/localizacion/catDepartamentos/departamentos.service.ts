@@ -95,11 +95,6 @@ export class DepartamentosService {
     );
   }
   
-  // catalogo de departamentos
-  ConsultarDepartamentoPorContrato(id_cargo: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);
-  }
-
   // METODO PARA REVISAR DATOS DE PLANTILLA DE DEPARTAMENTOS   **USADO
   RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/departamento/upload/revision', formData);
@@ -128,5 +123,23 @@ export class DepartamentosService {
   ActualizarUserDepa(Data: any){
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/departamento/actualizarUserDepa`, Data);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // catalogo de departamentos --------------------------------------------------------
+    ConsultarDepartamentoPorContrato(id_cargo: number) {
+      return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);
+    }
 
 }

@@ -1,11 +1,13 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { ToastrService } from 'ngx-toastr';
+
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro-multiple-grado',
@@ -125,9 +127,6 @@ export class RegistroMultipleGradoComponent {
     this.rest.RevisarFormatoEmpleGrado(formData).subscribe(res => {
         this.Datos_grado = res.data;
         this.messajeExcel = res.message;
-
-        console.log('res: ',res)
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -181,7 +180,6 @@ export class RegistroMultipleGradoComponent {
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
@@ -209,7 +207,6 @@ export class RegistroMultipleGradoComponent {
   }
 
   RegistrarGrado(){
-    console.log('listaGradoCorrectas: ',this.listaGradoCorrectas.length)
      if (this.listaGradoCorrectas?.length > 0) {
        const data = {
          plantilla: this.listaGradoCorrectas,
@@ -244,7 +241,6 @@ export class RegistroMultipleGradoComponent {
  
      this.archivoSubido = [];
      this.nameFile = '';
- 
    }
 
 

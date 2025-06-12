@@ -46,7 +46,7 @@ export class ProvinciaService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/provincia`, data);
   }
 
-  // METODO PARA BUSCAR DATOS DE UNA PROVINCIA
+  // METODO PARA BUSCAR DATOS DE UNA PROVINCIA   **USADO
   BuscarUnaProvinciaId(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/buscar/${id}`);
   }

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
 export class RolesService {
 
   constructor(private http: HttpClient) { }
@@ -45,7 +46,7 @@ export class RolesService {
   }
 
 
-  // METODO PARA ACTUALIZAR ROLES  DE FORMA MASIVA **USADO
+  // METODO PARA ACTUALIZAR ROLES DE FORMA MASIVA     **USADO
   ActualizarRoles(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol/updateUsers`, data);
   }
