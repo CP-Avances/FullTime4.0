@@ -219,10 +219,46 @@ export class ListarRegimenComponent implements OnInit {
 
 
   // METODO PARA GENERAR ARCHIVO PDF
-  async GenerarPdf(action = "open") {
-    this.OrdenarDatos(this.regimen);
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
+async GenerarPdf(action = "open") {
+  this.OrdenarDatos(this.regimen);
+  const pdfMake = await this.validar.ImportarPDF();
+  const documentDefinition = this.DefinirInformacionPDF();
+
+  if (action === "download") {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      regimen: this.regimen.map((r: any) => ({
+        id: r.id,
+        descripcion: r.descripcion,
+        pais: r.pais,
+        mes_periodo: r.mes_periodo,
+        dias_mes: r.dias_mes,
+        vacacion_dias_laboral: r.vacacion_dias_laboral,
+        vacacion_dias_libre: r.vacacion_dias_libre,
+        vacacion_dias_calendario: r.vacacion_dias_calendario,
+        dias_maximo_acumulacion: r.dias_maximo_acumulacion,
+        anio_antiguedad: r.anio_antiguedad,
+        dias_antiguedad: r.dias_antiguedad
+      }))
+    };
+
+    this.validar.generarReporteRegimenLaboral(data).subscribe((pdf: Blob) => {
+      const blob = new Blob([pdf], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'Regimen_laboral.pdf';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    }, error => {
+      console.error("Error al generar PDF desde el microservicio:", error);
+    });
+  } else {
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -230,15 +266,14 @@ export class ListarRegimenComponent implements OnInit {
       case "print":
         pdfMake.createPdf(documentDefinition).print();
         break;
-      case "download":
-        pdfMake.createPdf(documentDefinition).download('Regimen_laboral' + '.pdf');
-        break;
       default:
         pdfMake.createPdf(documentDefinition).open();
         break;
     }
-    this.ObtenerRegimen();
   }
+
+  this.ObtenerRegimen();
+}
 
   DefinirInformacionPDF() {
 
