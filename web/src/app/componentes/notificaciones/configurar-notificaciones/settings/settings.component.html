@@ -1,91 +1,271 @@
 <div class="container" style="padding-top: 20px; padding-bottom: 25px;">
     <div id="titulo">
         <span>
-            HABILITAR NOTIFICACIONES
+            HABILITAR CORREO - NOTIFICACIONES
         </span>
     </div>
     <mat-card class="example-card mat-elevation-z9">
-        <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
-            <br>
-            <div class="row">
-                <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
-                    <div class="d-flex flex-wrap justify-content-center" style="margin-left: 4%;">
-                        <div class="caja">
-                            <p>COMUNICADOS</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="comunicadoMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="comunicadoNoti">Notificaciones</mat-slide-toggle>
+        <div class="row">
+            <div class="col-12 col-md-6 m-auto mt-md-2">
+                <div>
+                    <div>
+                        <p>COMUNICADOS</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('comunicado', 'correo')">
+                                <mat-card [ngClass]="cominicadoCorreo ? 'activo' : 'inactivo'" class="estado-card"
+                                    style="color: antiquewhite;">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3 zumbido">{{ cominicadoCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ cominicadoCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
-                        </div>
-                        <div class="caja">
-                            <p>ATRASOS</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="atrasosMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="atrasosNoti">Notificaciones</mat-slide-toggle>
-                            </div>
-                        </div>
-                        <div class="caja">
-                            <p>FALTAS</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="faltasMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="faltasNoti">Notificaciones</mat-slide-toggle>
-                            </div>
-                        </div>
-                        <div class="caja">
-                            <p>SALIDAS ANTICIPADAS</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="salidasAnticipadasMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle
-                                    formControlName="salidasAnticipadasNoti">Notificaciones</mat-slide-toggle>
+                            <div class="col-6" (click)="toggleEstado('comunicado', 'notificacion')">
+                                <mat-card [ngClass]="cominicadoNotificacion ? 'activo' : 'inactivo'" class="estado-card"
+                                    style="color: antiquewhite;">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3 zumbido">{{ cominicadoNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ cominicadoNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-md-6 m-auto mt-4" *ngIf="ver_modulos">
-                    <div class="d-flex flex-wrap justify-content-center" style="margin-left: 4%;">
-                        <div class="caja" *ngIf="habilitarPermisos">
-                            <p>PERMISOS</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="permisoMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="permisoNoti">Notificaciones</mat-slide-toggle>
+
+                    <div>
+                        <p>ATRASOS</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('atrasos', 'correo')">
+                                <mat-card [ngClass]="atrasosCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                    class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ atrasosCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ atrasosCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                            <div class="col-6 caja" (click)="toggleEstado('atrasos', 'notificacion')">
+                                <mat-card [ngClass]="atrasosNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ atrasosNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ atrasosNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
                         </div>
-                        <div class="caja" *ngIf="habilitarVacaciones">
-                            <p>VACACIONES</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="vacaMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="vacaNoti">Notificaciones</mat-slide-toggle>
+                    </div>
+
+                    <div>
+                        <p>FALTAS</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('faltas', 'correo')">
+                                <mat-card [ngClass]="faltasCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                    class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ faltasCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ faltasCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                            <div class="col-6" (click)="toggleEstado('faltas', 'notificacion')">
+                                <mat-card [ngClass]="faltasNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ faltasNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ faltasNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
                         </div>
-                        <div class="caja" *ngIf="habilitarHorasExtras">
-                            <p>HORAS EXTRAS</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="horaExtraMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="horaExtraNoti">Notificaciones</mat-slide-toggle>
+                    </div>
+
+                    <div>
+                        <p>SALIDAS ANTICIPADAS</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('salida', 'correo')">
+                                <mat-card [ngClass]="salidaCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                    class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ salidaCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ salidaCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
-                        </div>
-                        <div class="caja" *ngIf="habilitarAlimentacion">
-                            <p>ALIMENTACIÓN</p>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-slide-toggle formControlName="comidaMail">Correo</mat-slide-toggle>
-                                <mat-slide-toggle formControlName="comidaNoti">Notificaciones</mat-slide-toggle>
+                            <div class="col-6" (click)="toggleEstado('salida', 'notificacion')">
+                                <mat-card [ngClass]="salidaNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ salidaNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>                                       
+                                        <label>{{ salidaNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>                                       
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-wrap justify-content-center">
-                <button *ngIf="btnActualizar" id="btn-raised" class="btn btn-sm"
-                    (click)="ActualizarConfiguracion(formGroup.value)">
-                    Guardar
-                </button>
-                <button *ngIf="btnCrear" id="btn-raised" class="btn btn-sm"
-                    (click)="CrearConfiguracion(formGroup.value)">
-                    Guardar
-                </button>
-                <button id="btn-raised" class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
+
+            <div class="col-12 col-md-6 m-auto mt-4 mt-md-2" *ngIf="ver_modulos">
+                <div>
+                    <div *ngIf="habilitarPermisos">
+                        <p>PERMISOS</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('permisos', 'correo')">
+                                <mat-card [ngClass]="permisosCorreo ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ permisosCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>                                      
+                                        <label>{{ permisosCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>                               
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                            <div class="col-6" (click)="toggleEstado('permisos', 'notificacion')">
+                                <mat-card [ngClass]="permisosNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ permisosNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ permisosNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="habilitarVacaciones">
+                        <p>VACACIONES</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('vacaciones', 'correo')">
+                                <mat-card [ngClass]="vacaCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                    class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ vacaCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ vacaCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                            <div class="col-6" (click)="toggleEstado('vacaciones', 'notificacion')">
+                                <mat-card [ngClass]="vacaNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ vacaNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ vacaNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="habilitarHorasExtras">
+                        <p>HORAS EXTRAS</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('horaExtra', 'correo')">
+                                <mat-card [ngClass]="horaExtraCorreo ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ horaExtraCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ horaExtraCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                            <div class="col-6" (click)="toggleEstado('horaExtra', 'notificacion')">
+                                <mat-card [ngClass]="horaExtraNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ horaExtraNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ horaExtraNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="habilitarAlimentacion">
+                        <p>ALIMENTACIÓN</p>
+                        <div class="row w-100 caja" style="text-align:justify;">
+                            <div class="col-6" (click)="toggleEstado('comida', 'correo')">
+                                <mat-card [ngClass]="comidaCorreo ? 'activo' : 'inactivo'" style="color: antiquewhite;"
+                                    class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ comidaCorreo ? 'email' :
+                                            'unsubscribe' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ comidaCorreo ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                            <div class="col-6" (click)="toggleEstado('comida', 'notificacion')">
+                                <mat-card [ngClass]="comidaNotificacion ? 'activo' : 'inactivo'"
+                                    style="color: antiquewhite;" class="estado-card">
+                                    <mat-card-title>
+                                        <mat-icon class="icon-menu-correo mt-3">{{ comidaNotificacion ?
+                                            'notifications_active' : 'notifications_off' }}</mat-icon>
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <label>{{ comidaNotificacion ? 'ACTIVADO' : 'DESACTIVADO' }}</label>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
+
         <br>
+        <div class="d-flex flex-wrap justify-content-center">
+            <button *ngIf="btnActualizar" id="btn-raised" class="btn btn-sm" (click)="ActualizarConfiguracion()">
+                Guardar
+            </button>
+            <button *ngIf="btnCrear" id="btn-raised" class="btn btn-sm" (click)="CrearConfiguracion()">
+                Guardar
+            </button>
+            <button id="btn-raised" class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
+        </div>
+        <br>
+
     </mat-card>
 </div>

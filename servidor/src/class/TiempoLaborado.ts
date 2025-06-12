@@ -14,7 +14,7 @@ interface depa_tiempo {
 interface emp_tiempo {
     id: number,
     cargo?: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     timbres?:  Array<any>

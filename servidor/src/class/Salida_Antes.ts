@@ -14,7 +14,7 @@ interface depa_sal {
 interface emp_sal {
     id: number,
     cargo?: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     timbres?: Array<timbre> | Array<tim_tabulado>,

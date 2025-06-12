@@ -469,7 +469,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleadoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_notificacion, permiso_mail, permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_notificacion, user_name, ip, ip_local } = req.body;
+                const { id_empleado, vaca_mail, vaca_notificacion, permiso_mail, permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, faltas_notificacion, salidas_anticipadas_mail, salidas_anticipadas_notificacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ORIGINALES
@@ -490,7 +490,7 @@ class NotificacionTiempoRealControlador {
                     atrasos_mail: atrasos_mail,
                     atrasos_notificacion: atrasos_notificacion,
                     faltas_mail: faltas_mail,
-                    faltas_notificacion: faltas_noti,
+                    faltas_notificacion: faltas_notificacion,
                     salidas_anticipadas_mail: salidas_anticipadas_mail,
                     salidas_anticipadas_notificacion: salidas_anticipadas_notificacion
                 };
@@ -608,7 +608,7 @@ class NotificacionTiempoRealControlador {
             const { id_envia, correo, mensaje, asunto } = req.body;
             if (datos === 'ok') {
                 const USUARIO_ENVIA = yield database_1.default.query(`
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1
@@ -671,7 +671,7 @@ class NotificacionTiempoRealControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -815,7 +815,7 @@ class NotificacionTiempoRealControlador {
             }
             if (datos === 'ok') {
                 const USUARIO_ENVIA = yield database_1.default.query(`
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1 
@@ -882,7 +882,7 @@ class NotificacionTiempoRealControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -893,7 +893,7 @@ class NotificacionTiempoRealControlador {
             try {
                 const { codigo } = req.query;
                 const query = `
-            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.identificacion,
             da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
             (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
             (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal

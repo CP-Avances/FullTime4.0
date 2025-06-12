@@ -3,7 +3,7 @@ import pool from '../database'
 async function EmpleadoDepartamentos(id_empleado: number) {
     return await pool.query(
         `
-        SELECT CONCAT(e.nombre, \' \', e.apellido) name_empleado, e.cedula, e.codigo, co.id_regimen, ca.id_tipo_cargo,
+        SELECT CONCAT(e.nombre, \' \', e.apellido) name_empleado, e.identificacion, e.codigo, co.id_regimen, ca.id_tipo_cargo,
             d.nombre AS nom_depa 
         FROM eu_empleados AS e, eu_empleado_contratos AS co, eu_empleado_cargos AS ca, ed_departamentos AS d 
         WHERE e.id = $1 AND e.estado = 1 AND e.id = co.id_empleado AND ca.id_contrato = co.id 
@@ -16,7 +16,7 @@ async function EmpleadoDepartamentos(id_empleado: number) {
         }).then(async (obj) => {
 
             let data = {
-                cedula: obj.cedula,
+                identificacion: obj.identificacion,
                 codigo: obj.codigo,
                 nom_completo: obj.name_empleado,
                 departamento: obj.nom_depa,

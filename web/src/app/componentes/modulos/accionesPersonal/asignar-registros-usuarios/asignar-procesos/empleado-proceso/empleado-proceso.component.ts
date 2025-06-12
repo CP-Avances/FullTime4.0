@@ -218,6 +218,7 @@ export class EmpleadoProcesoComponent {
 
   ConfirmarDelete(pro){
     const mensaje = 'eliminar';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -225,9 +226,14 @@ export class EmpleadoProcesoComponent {
         }
       });
   }
-  EliminarRegistro(data: any){
-    console.log('data: ',data)
-    this.rest.EliminarRegistro(data.id, data).subscribe({
+  EliminarRegistro(pro: any){
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+      ip_local: this.ips_locales,
+      id_empleado: this.idEmpleadoSelec
+    }
+    this.rest.EliminarRegistro(pro.id, data).subscribe({
       next: (respuesta: any) => {
         this.toastr.error(respuesta.message, 'Correcto.', {
           timeOut: 4500,

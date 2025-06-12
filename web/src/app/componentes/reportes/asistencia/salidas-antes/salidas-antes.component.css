@@ -70,3 +70,14 @@ mat-icon {
 .timbre {
     background-color: #dadeec !important;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 80px;
+    padding-top: 14px;
+    padding-left: 30px;
+}

@@ -134,7 +134,7 @@ class TimbresControlador {
                     });
                 });
                 if (timbres.length === 0)
-                    return res.status(400).jsonp({ message: 'Ups!!! no existen registros.' });
+                    return res.status(400).jsonp({ message: 'Ups! no existen registros.' });
                 let estado_cuenta = [{
                         timbres_PES: yield database_1.default.query(`
                     SELECT count(*) 
@@ -182,25 +182,25 @@ class TimbresControlador {
     ObtenertimbreFechaEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { codigo, cedula, fecha } = req.query;
+                let { codigo, identificacion, fecha } = req.query;
                 fecha = fecha + '%';
                 if (codigo === '') {
                     let usuario = yield database_1.default.query(`
                     SELECT * FROM informacion_general    
-                    WHERE cedula = $1
-                    `, [cedula]).then((result) => {
+                    WHERE identificacion = $1
+                    `, [identificacion]).then((result) => {
                         return result.rows.map((obj) => {
                             codigo = obj.codigo;
                         });
                     });
                 }
-                else if (cedula === '') {
+                else if (identificacion === '') {
                     let usuario = yield database_1.default.query(`
                     SELECT * FROM informacion_general 
                     WHERE codigo = $1
                     `, [codigo]).then((result) => {
                         return result.rows.map((obj) => {
-                            cedula = obj.cedula;
+                            identificacion = obj.identificacion;
                         });
                     });
                 }
@@ -215,8 +215,8 @@ class TimbresControlador {
                 WHERE t.codigo = $1 
                     AND CAST(t.fecha_hora_timbre_validado AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
-                    AND da.cedula = $3
-                `, [codigo, fecha, cedula]).then((result) => {
+                    AND da.identificacion = $3
+                `, [codigo, fecha, identificacion]).then((result) => {
                     timbresRows = result.rowCount;
                     if (result.rowCount != 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
@@ -227,7 +227,7 @@ class TimbresControlador {
                 }
             }
             catch (err) {
-                const message = 'Ups!!! problemas con la petición al servidor.';
+                const message = 'Ups! problemas con la petición al servidor.';
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });
@@ -301,7 +301,7 @@ class TimbresControlador {
             }
             catch (err) {
                 console.log('timbre error ', err);
-                const message = 'Ups!!! algo salio mal con la peticion al servidor.';
+                const message = 'Ups! algo salio mal con la peticion al servidor.';
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });
@@ -312,7 +312,7 @@ class TimbresControlador {
             try {
                 // DOCUMENTO ES NULL YA QUE ESTE USUARIO NO JUSTIFICA UN TIMBRE
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip, imagen, zona_dispositivo, gmt_dispositivo, capturar_segundos, ip_local } = req.body;
-                console.log('datos del timbre ', req.body);
+                // console.log('datos del timbre ', req.body)
                 const id_empleado = req.userIdEmpleado;
                 var hora_diferente = false;
                 var fecha_validada;
@@ -373,15 +373,19 @@ class TimbresControlador {
                 var codigo = parseInt(code[0].codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
+                // CONVERTIR FECHAS A FORMATO ACEPTADO POR POSTGRESQL
+                const fec_hora_timbre_sql = luxon_1.DateTime.fromFormat(fec_hora_timbre, 'dd/MM/yyyy h:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
+                const fecha_servidor_sql = luxon_1.DateTime.fromFormat(fecha_servidor_final, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
+                const fecha_validada_sql = luxon_1.DateTime.fromFormat(fecha_validada_final, 'dd/MM/yyyy, hh:mm:ss a').toFormat('yyyy-MM-dd HH:mm:ss');
+                database_1.default.query(`
                 SELECT * FROM public.timbres_web ($1, $2, 
-                    to_timestamp($3, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
-                    to_timestamp($5, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, 
+                    $3::timestamp without time zone, 
+                    $4::timestamp without time zone, 
+                    $5::timestamp without time zone, 
                     $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-                `, [codigo, id_reloj, fec_hora_timbre, fecha_servidor_final, fecha_validada_final, tecl_funcion, accion,
-                    observacion, latitud, longitud, ubicacion, 'APP_WEB', imagen, true, zona_servidor, gmt_servidor,
-                    zona_dispositivo, gmt_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                `, [codigo, id_reloj, fec_hora_timbre_sql, fecha_servidor_sql, fecha_validada_sql,
+                    tecl_funcion, accion, observacion, latitud, longitud, ubicacion, 'APP_WEB',
+                    imagen, true, zona_servidor, gmt_servidor, zona_dispositivo, gmt_dispositivo, hora_diferente], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     console.log('error ', error);
                     console.log('result ', results.rows[0].timbres_web);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(hora_timbre);
@@ -411,7 +415,7 @@ class TimbresControlador {
                         }
                     }
                     else {
-                        res.status(200).jsonp({ message: 'Ups!!! algo salio mal.' });
+                        res.status(200).jsonp({ message: 'Ups! algo salio mal.' });
                     }
                 }));
             }
@@ -444,6 +448,7 @@ class TimbresControlador {
                 const code_empleados = code.rows.map((empl) => empl.codigo);
                 // Iniciar transacción
                 yield client.query('BEGIN');
+                // FIXME: timbres_verificar NO EXISTE LA FUNCION EN LA BASE DE DATOS
                 const timbrePromises = code_empleados.map((codigo) => __awaiter(this, void 0, void 0, function* () {
                     const res = yield client.query(`SELECT   public.timbres_verificar ($1, to_timestamp($2, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)  AS resultado`, [codigo, hora_fecha_timbre]);
                     return { codigo, resultado: res.rows[0].resultado }; // Retorna el código y el resultado
@@ -533,106 +538,6 @@ class TimbresControlador {
                 else {
                     return res.status(404).jsonp({ message: 'error' });
                 }
-            }
-        });
-    }
-    // METODO DE BUSQUEDA DE AVISOS GENERALES POR EMPLEADO
-    ObtenerAvisosColaborador(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const TIMBRES_NOTIFICACION = yield database_1.default.query(`
-            SELECT id, to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, id_empleado_envia, visto, 
-                descripcion, mensaje, id_timbre, tipo, id_empleado_recibe
-            FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
-            ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
-            `, [id_empleado])
-                .then((result) => __awaiter(this, void 0, void 0, function* () {
-                if (result.rowCount != 0) {
-                    return yield Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                        let nombre = yield database_1.default.query(`
-                            SELECT nombre, apellido FROM eu_empleados WHERE id = $1
-                            `, [obj.id_empleado_envia]).then((ele) => {
-                            if (ele.rows.length > 0) {
-                                return ele.rows[0].nombre + ' ' + ele.rows[0].apellido;
-                            }
-                            else {
-                                return 'Sistema'; // Valor predeterminado si no se encuentra el registro
-                            }
-                        });
-                        return {
-                            id_receives_empl: obj.id_empleado_recibe,
-                            descripcion: obj.descripcion,
-                            create_at: obj.fecha_hora,
-                            id_timbre: obj.id_timbre,
-                            empleado: nombre,
-                            mensaje: obj.mensaje,
-                            visto: obj.visto,
-                            tipo: obj.tipo,
-                            id: obj.id,
-                        };
-                    })));
-                }
-                return [];
-            }));
-            if (TIMBRES_NOTIFICACION.length != 0) {
-                return res.jsonp(TIMBRES_NOTIFICACION);
-            }
-            else {
-                return res.status(404).jsonp({ message: 'No se encuentran registros.' });
-            }
-        });
-    }
-    // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
-    ObtenerUnAviso(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const AVISOS = yield database_1.default.query(`
-            SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.fecha_hora, r.tipo, r.visto, 
-                r.id_timbre, r.descripcion, (e.nombre || ' ' || e.apellido) AS empleado 
-            FROM ecm_realtime_timbres AS r, eu_empleados AS e 
-            WHERE r.id = $1 AND e.id = r.id_empleado_envia
-            `, [id]);
-            if (AVISOS.rowCount != 0) {
-                return res.jsonp(AVISOS.rows[0]);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    ObtenerAvisosTimbresEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            console.log(id_empleado);
-            const TIMBRES_NOTIFICACION = yield database_1.default.query(`
-            SELECT * FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
-            ORDER BY fecha_hora DESC
-            `, [id_empleado])
-                .then((result) => { return result.rows; });
-            if (TIMBRES_NOTIFICACION.length === 0)
-                return res.status(404).jsonp({ message: 'No se encuentran registros.' });
-            console.log(TIMBRES_NOTIFICACION);
-            const tim = yield Promise.all(TIMBRES_NOTIFICACION.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                let [empleado] = yield database_1.default.query(`
-                SELECT  (nombre || \' \' || apellido) AS fullname FROM eu_empleados WHERE id = $1
-                `, [obj.id_empleado_envia]).then((ele) => {
-                    console.log('¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨', ele.rows);
-                    return ele.rows;
-                });
-                const fullname = (empleado === undefined) ? '' : empleado.fullname;
-                return {
-                    create_at: obj.fecha_hora,
-                    descripcion: obj.descripcion,
-                    visto: obj.visto,
-                    id_timbre: obj.id_timbre,
-                    empleado: fullname,
-                    id: obj.id,
-                    mensaje: obj.mensaje
-                };
-            })));
-            console.log(tim);
-            if (tim.length > 0) {
-                return res.jsonp(tim);
             }
         });
     }
@@ -793,7 +698,7 @@ class TimbresControlador {
                 VALUES ${valores}`);
                 }
                 const auditoria = id_empleado.map((id_empleado) => ({
-                    tabla: 'mtv_opciones_marcacion',
+                    tabla: 'mrv_opciones_marcacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -820,50 +725,63 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
-                console.log(req.body);
-                var opciones;
+                let { id_empleado, timbre_internet, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // Crear un objeto con los valores a actualizar
+                // CREAR UN OBJETO CON LOS VALORES A ACTUALIZAR
                 const updateValues = {};
-                // Agregar los parámetros al objeto si no son nulos
+                // AGREGAR LOS PARÁMETROS AL OBJETO SI NO SON NULOS
                 if (timbre_internet != null)
                     updateValues.timbre_internet = timbre_internet;
-                if (timbre_foto != null)
+                if (timbre_foto != null) {
                     updateValues.timbre_foto = timbre_foto;
+                    if (!timbre_foto)
+                        timbre_foto_obligatoria = false;
+                }
                 if (timbre_especial != null)
                     updateValues.timbre_especial = timbre_especial;
                 if (timbre_ubicacion_desconocida != null)
                     updateValues.timbre_ubicacion_desconocida = timbre_ubicacion_desconocida;
                 if (timbre_foto_obligatoria != null)
                     updateValues.opcional_obligatorio = timbre_foto_obligatoria;
-                // Si no hay valores para actualizar, retornar
+                // SI NO HAY VALORES PARA ACTUALIZAR, RETORNAR
                 if (Object.keys(updateValues).length === 0) {
                     console.log('No hay parámetros para actualizar');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                // Construir la parte SET de la consulta
+                // CONSTRUIR LA PARTE SET DE LA CONSULTA
                 const setClause = Object.keys(updateValues)
                     .map((key, index) => `${key} = $${index + 2}`)
                     .join(', ');
-                // Crear los valores para la consulta SQL
+                // CREAR LOS VALORES PARA LA CONSULTA SQL
                 const queryValues = [id_empleado, ...Object.values(updateValues)];
-                // Ejecutar la consulta
+                // EJECUTAR LA CONSULTA
                 const response = yield database_1.default.query(`UPDATE mrv_opciones_marcacion SET ${setClause} WHERE id_empleado = ANY($1::int[])`, queryValues);
-                // Obtener las filas afectadas
+                // OBTENER LAS FILAS AFECTADAS
                 let rowsAffected = (_a = response.rowCount) !== null && _a !== void 0 ? _a : 0;
-                const auditoria = id_empleado.map((id_empleado) => ({
-                    tabla: 'mrv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `id_empleado: ${id_empleado}, timbre_internet: ${timbre_internet}, timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
-                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}, opcional_obligatorio: ${timbre_foto_obligatoria} `,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                }));
+                const auditoria = id_empleado.map((id) => {
+                    const nuevosDatos = [`id_empleado: ${id}`];
+                    if (timbre_internet !== null && timbre_internet !== undefined)
+                        nuevosDatos.push(`timbre_internet: ${timbre_internet}`);
+                    if (timbre_foto !== null && timbre_foto !== undefined)
+                        nuevosDatos.push(`timbre_foto: ${timbre_foto}`);
+                    if (timbre_especial !== null && timbre_especial !== undefined)
+                        nuevosDatos.push(`timbre_especial: ${timbre_especial}`);
+                    if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined)
+                        nuevosDatos.push(`timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`);
+                    if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined)
+                        nuevosDatos.push(`opcional_obligatorio: ${timbre_foto_obligatoria}`);
+                    return {
+                        tabla: 'mrv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: nuevosDatos.join(', '),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    };
+                });
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -907,7 +825,7 @@ class TimbresControlador {
     BuscarMultipleOpcionesTimbre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
-            const OPCIONES = yield database_1.default.query("SELECT e.nombre, e.apellido, e.cedula, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
+            const OPCIONES = yield database_1.default.query("SELECT e.nombre, e.apellido, e.identificacion, e.codigo, om.id, om.id_empleado, om.timbre_internet, " +
                 "   om.timbre_foto, om.timbre_especial, om.timbre_ubicacion_desconocida, om.opcional_obligatorio " +
                 "FROM mrv_opciones_marcacion AS om, eu_empleados AS e " +
                 "WHERE e.id = om.id_empleado AND om.id_empleado IN (" + id_empleado + ") ");
@@ -1039,161 +957,67 @@ class TimbresControlador {
     ActualizarOpcionTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
-                console.log(req.body);
+                let { id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, user_name, ip, ip_local, timbre_foto_obligatoria } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                let rowsAffected = 0;
-                // Combinaciones de 4 parámetros (todos no nulos)
-                if (timbre_foto !== null && timbre_especial !== null && timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4, opcional_obligatorio = $5
+                let fields = [];
+                let values = [];
+                let index = 2; // $1 es id_empleado
+                if (timbre_foto !== null && timbre_foto !== undefined) {
+                    fields.push(`timbre_foto = $${index++}`);
+                    values.push(timbre_foto);
+                    if (!timbre_foto)
+                        timbre_foto_obligatoria = false;
+                }
+                if (timbre_especial !== null && timbre_especial !== undefined) {
+                    fields.push(`timbre_especial = $${index++}`);
+                    values.push(timbre_especial);
+                }
+                if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined) {
+                    fields.push(`timbre_ubicacion_desconocida = $${index++}`);
+                    values.push(timbre_ubicacion_desconocida);
+                }
+                if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined) {
+                    fields.push(`opcional_obligatorio = $${index++}`);
+                    values.push(timbre_foto_obligatoria);
+                }
+                if (fields.length === 0) {
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(400).json({ message: 'No hay campos válidos para actualizar.' });
+                }
+                // AGREGA EL ARREGLO DE ID DE EMPLEADOS AL PRINCIPIO DE LOS VALORES
+                values.unshift(id_empleado);
+                const updateQuery = `
+            UPDATE mtv_opciones_marcacion
+            SET ${fields.join(', ')}
             WHERE id_empleado = ANY($1::int[])
-            `, [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // Combinaciones de 3 parámetros
-                else if (timbre_foto !== null && timbre_especial !== null && timbre_ubicacion_desconocida !== null) {
-                    const response = yield database_1.default.query(`
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_especial = $3, timbre_ubicacion_desconocida = $4
-            WHERE id_empleado = ANY($1::int[])
-            `, [id_empleado, timbre_foto, timbre_especial, timbre_ubicacion_desconocida]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                else if (timbre_foto !== null && timbre_especial !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_especial = $3, opcional_obligatorio = $4
-            WHERE id_empleado = ANY($1::int[])
-            `, [id_empleado, timbre_foto, timbre_especial, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                else if (timbre_foto !== null && timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_foto = $2, timbre_ubicacion_desconocida = $3, opcional_obligatorio = $4
-            WHERE id_empleado = ANY($1::int[])
-            `, [id_empleado, timbre_foto, timbre_ubicacion_desconocida, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                else if (timbre_especial !== null && timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-            UPDATE mtv_opciones_marcacion 
-            SET timbre_especial = $2, timbre_ubicacion_desconocida = $3, opcional_obligatorio = $4
-            WHERE id_empleado = ANY($1::int[])
-            `, [id_empleado, timbre_especial, timbre_ubicacion_desconocida, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // Combinaciones de 2 parámetros
-                else if (timbre_foto !== null && timbre_especial !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2, timbre_especial = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_foto, timbre_especial]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // timbre_foto y timbre_ubicacion_desconocida
-                else if (timbre_foto !== null && timbre_ubicacion_desconocida !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_foto, timbre_ubicacion_desconocida]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // timbre_foto y timbre_foto_obligatoria
-                else if (timbre_foto !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2, timbre_foto_obligatoria = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_foto, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // timbre_especial y timbre_ubicacion_desconocida
-                else if (timbre_especial !== null && timbre_ubicacion_desconocida !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_especial = $2, timbre_ubicacion_desconocida = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_especial, timbre_ubicacion_desconocida]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // timbre_especial y timbre_foto_obligatoria
-                else if (timbre_especial !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_especial = $2, timbre_foto_obligatoria = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_especial, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // timbre_ubicacion_desconocida y timbre_foto_obligatoria
-                else if (timbre_ubicacion_desconocida !== null && timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_ubicacion_desconocida = $2, timbre_foto_obligatoria = $3
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_ubicacion_desconocida, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                // Combinaciones de 1 parámetro
-                else if (timbre_foto !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_foto = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_foto]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                else if (timbre_especial !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_especial = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_especial]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                else if (timbre_ubicacion_desconocida !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET timbre_ubicacion_desconocida = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_ubicacion_desconocida]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                else if (timbre_foto_obligatoria !== null) {
-                    const response = yield database_1.default.query(`
-                    UPDATE mtv_opciones_marcacion 
-                    SET opcional_obligatorio = $2
-                    WHERE id_empleado = ANY($1::int[])
-                    `, [id_empleado, timbre_foto_obligatoria]);
-                    rowsAffected = response.rowCount || 0;
-                }
-                const auditoria = id_empleado.map((id_empleado) => ({
-                    tabla: 'mtv_opciones_marcacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `id_empleado: ${id_empleado}, , timbre_foto: ${timbre_foto}, timbre_especial: ${timbre_especial}, 
-                    timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida} , opcional_obligatorio: ${timbre_foto_obligatoria}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                }));
+            `;
+                yield database_1.default.query(updateQuery, values);
+                const auditoria = id_empleado.map((id) => {
+                    const nuevosDatos = [`id_empleado: ${id}`];
+                    if (timbre_foto !== null && timbre_foto !== undefined)
+                        nuevosDatos.push(`timbre_foto: ${timbre_foto}`);
+                    if (timbre_especial !== null && timbre_especial !== undefined)
+                        nuevosDatos.push(`timbre_especial: ${timbre_especial}`);
+                    if (timbre_ubicacion_desconocida !== null && timbre_ubicacion_desconocida !== undefined)
+                        nuevosDatos.push(`timbre_ubicacion_desconocida: ${timbre_ubicacion_desconocida}`);
+                    if (timbre_foto_obligatoria !== null && timbre_foto_obligatoria !== undefined)
+                        nuevosDatos.push(`opcional_obligatorio: ${timbre_foto_obligatoria}`);
+                    return {
+                        tabla: 'mtv_opciones_marcacion',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: nuevosDatos.join(', '),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    };
+                });
                 yield auditoriaControlador_1.default.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                //console.log('opciones ', opciones)
-                if (rowsAffected > 0) {
-                    return res.status(200).jsonp({ message: 'Actualización exitosa', rowsAffected });
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
+                return res.status(200).json({ message: 'Actualización exitosa' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -1370,7 +1194,7 @@ class TimbresControlador {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 res.jsonp({
-                    message: 'Timbre creado con éxito',
+                    message: 'Timbre creado con éxito.',
                     respuestaBDD: response
                 });
             }
@@ -1421,7 +1245,7 @@ class TimbresControlador {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 res.jsonp({
-                    message: 'Timbre creado con éxito',
+                    message: 'Timbre creado con éxito.',
                     respuestaBDD: response
                 });
             }
@@ -1527,6 +1351,110 @@ class TimbresControlador {
         });
     }
     ;
+    /** ************************************************************************************************** **
+     ** **                      NOTIFICACIONES DE AVISOS GENERALES DEL SISTEMA                          ** **
+     ** ************************************************************************************************** **/
+    // METODO PARA LEER AVISOS QUE RECIBE EL EMPLEADO
+    ObtenerAvisosTimbresEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            try {
+                const { rows: avisos } = yield database_1.default.query(`
+                SELECT id, id_empleado_envia, id_empleado_recibe, 
+                   to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, tipo, visto, 
+                   id_timbre, descripcion, mensaje
+                FROM ecm_realtime_timbres
+                WHERE id_empleado_recibe = $1
+                ORDER BY fecha_hora DESC
+                `, [id_empleado]);
+                if (avisos.length === 0) {
+                    return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+                }
+                const tim = yield Promise.all(avisos.map((a) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    // NOMBRE EMPLEADO QUE ENVIA
+                    const { rows } = yield database_1.default.query(`
+                    SELECT (nombre || ' ' || apellido) AS fullname
+                    FROM eu_empleados
+                    WHERE id = $1
+                    `, [a.id_empleado_envia]);
+                    const fullname = ((_a = rows[0]) === null || _a === void 0 ? void 0 : _a.fullname) || 'Sistema Fulltime Web';
+                    return {
+                        create_at: a.fecha_hora,
+                        descripcion: a.descripcion,
+                        visto: a.visto,
+                        id_timbre: a.id_timbre,
+                        empleado_envia: fullname,
+                        id: a.id,
+                        mensaje: a.mensaje,
+                        tipo: a.tipo || null
+                    };
+                })));
+                return res.jsonp(tim);
+            }
+            catch (error) {
+                console.error('Error al obtener avisos:', error);
+                return res.status(500).jsonp({ message: 'Error interno del servidor.' });
+            }
+        });
+    }
+    // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA SOCKET
+    ObtenerUnAviso(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            const AVISOS = yield database_1.default.query(`
+            SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, 
+                   to_char(r.fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS create_at, r.tipo, r.visto, 
+                   r.id_timbre, r.descripcion, r.mensaje,
+                   CASE 
+                       WHEN r.id_empleado_envia = 0 THEN 'Sistema Fulltime Web'
+                       ELSE COALESCE(e.nombre || ' ' || e.apellido, 'Empleado desconocido')
+                   END AS empleado
+            FROM ecm_realtime_timbres AS r
+            LEFT JOIN eu_empleados AS e ON e.id = r.id_empleado_envia
+            WHERE r.id = $1
+            `, [id]);
+            if (AVISOS.rowCount !== 0) {
+                return res.jsonp(AVISOS.rows[0]);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    // METODO DE BUSQUEDA DE AVISOS GENERALES POR EMPLEADO
+    ObtenerAvisosColaborador(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const result = yield database_1.default.query(`
+            SELECT 
+                r.id,
+                to_char(r.fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS create_at,
+                r.id_empleado_envia,
+                r.id_empleado_recibe AS id_receives_empl,
+                r.visto,
+                r.descripcion,
+                r.mensaje,
+                r.id_timbre,
+                r.tipo,
+                CASE 
+                    WHEN r.id_empleado_envia = 0 THEN 'Sistema Fulltime Web'
+                    ELSE COALESCE(e.nombre || ' ' || e.apellido, 'Empleado desconocido')
+                END AS empleado
+            FROM ecm_realtime_timbres r
+            LEFT JOIN eu_empleados e ON e.id = r.id_empleado_envia
+            WHERE r.id_empleado_recibe = $1 
+            ORDER BY (r.visto IS FALSE) DESC, r.id DESC 
+            LIMIT 20
+            `, [id_empleado]);
+            if (result.rowCount !== 0) {
+                return res.jsonp(result.rows);
+            }
+            else {
+                return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+            }
+        });
+    }
 }
 exports.timbresControlador = new TimbresControlador;
 exports.default = exports.timbresControlador;

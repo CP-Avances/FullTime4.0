@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Component, Input } from '@angular/core';
 import { DateTime } from 'luxon';
+import { Validators } from '@angular/forms';
 
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
@@ -37,6 +38,11 @@ export class BuscarPlanificacionComponent {
 
   idEmpleadoLogueado: any;
   columnAccion: boolean = true;
+  horariosAdaptados: any[] = [];
+
+  // CAMPOS DEL FORMULARIO
+  filtroCodigoHorario = new FormControl('');
+  filtroNombreHorario = new FormControl('', [Validators.minLength(2)]);
 
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
@@ -82,7 +88,7 @@ export class BuscarPlanificacionComponent {
       if (this.fechaFinalF.value) {
         console.log("existente fecha final")
 
-        this.ValidarFechas(ctrlValue, DateTime.fromJSDate(this.fechaFinalF.value) , this.fechaInicialF, opcion);
+        this.ValidarFechas(ctrlValue, DateTime.fromJSDate(this.fechaFinalF.value), this.fechaInicialF, opcion);
       }
       else {
         let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
@@ -207,6 +213,13 @@ export class BuscarPlanificacionComponent {
             }
           })
         })
+
+        this.horariosAdaptados = this.horariosEmpleado.map(e => ({
+          ...e,
+          codigo: e.codigo_e,
+          nombre: e.nombre_e
+        }));
+
         if (this.asignar_multiple === true || this.ventana_horario_individual === true) {
           this.multiple = false;
           // EDITAR HORARIO
@@ -239,6 +252,16 @@ export class BuscarPlanificacionComponent {
   ManejarPaginaResultados(e: PageEvent) {
     this.tamanio_pagina_emp = e.pageSize;
     this.numero_pagina_emp = e.pageIndex + 1;
+  }
+
+  // METODO PARA VALIDAR INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
+  }
+
+  //  METODO PARA VALIDAR INGRESO DE NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   /** ************************************************************************************** **
@@ -543,7 +566,7 @@ export class BuscarPlanificacionComponent {
       this.columnAccion = false;
     }
     else {
-      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+      this.toastr.warning('Ups! Fecha no es válida.', '', {
         timeOut: 6000,
       });
     }
@@ -575,15 +598,15 @@ export class BuscarPlanificacionComponent {
     }
   }
 
-  getPlanificacionFija(){
+  getPlanificacionFija() {
     return this.tienePermiso('Planificación fija');
   }
 
-  getPlanificacionMultiple(){
+  getPlanificacionMultiple() {
     return this.tienePermiso('Planificación Múltiple');
   }
 
-  getBuscarPlanificaciones(){
+  getBuscarPlanificaciones() {
     return this.tienePermiso('Buscar Planificación Horaria');
   }
 

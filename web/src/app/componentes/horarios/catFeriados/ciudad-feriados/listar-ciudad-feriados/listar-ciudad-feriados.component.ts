@@ -179,6 +179,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any, opcion: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -197,7 +198,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
         this.ConfirmarDelete(datos, opcion);
       }
       else {
-        this.toastr.warning('Ups!!! algo ha salido mal.', 'No ha seleccionado registros.', {
+        this.toastr.warning('Ups! algo ha salido mal.', 'No ha seleccionado registros.', {
           timeOut: 6000,
         });
       }

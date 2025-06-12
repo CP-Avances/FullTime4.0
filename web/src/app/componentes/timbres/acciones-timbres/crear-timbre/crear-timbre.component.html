@@ -31,7 +31,7 @@
             <mat-form-field>
                 <mat-label>Acción timbre</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Acciónes de la marcación.">
-                    help_outline
+                    touch_app
                 </mat-icon>
                 <mat-select [formControl]="accionF">
                     <mat-option *ngFor="let a of accion" [value]="a.value">
@@ -43,7 +43,7 @@
                 <mat-label>Observación</mat-label>
                 <textarea matInput #message maxlength="100" placeholder="Ingresar una descripción."
                     [formControl]="observacionF">
-                        </textarea>
+                </textarea>
                 <mat-hint align="start" id="letras">
                     <strong>Ingresar hasta 100 caracteres</strong>
                 </mat-hint>
@@ -54,8 +54,8 @@
     <div class="d-flex flex-wrap justify-content-evenly" id="contenedorBotones">
         <div class="bd-highlight d-flex align-items-center">
             <form method="post">
-                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                    accept="image/png, image/jpeg">
+                <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file"
+                    [formControl]="archivoForm" id="file" accept="image/png, image/jpeg">
                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
                     Subir justificación
                 </label>

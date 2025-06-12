@@ -18,10 +18,10 @@
                                 </mat-form-field>
                                 <br>
                                 <mat-form-field>
-                                    <mat-label>Ingrese cédula</mat-label>
+                                    <mat-label>Ingrese identificación</mat-label>
                                     <input matInput [formControl]="cedula" maxlength="10" required>
                                     <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresa cédula.">
+                                        matTooltip="Ingresar un número de identificación.">
                                         help_outline</mat-icon>
                                     <mat-error *ngIf="cedula.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
                                 </mat-form-field>

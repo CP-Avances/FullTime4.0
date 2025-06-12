@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { SocketService } from 'src/app/servicios/socket/socket.service';
 import { Socket } from 'ngx-socket-io';
 
 @Injectable({
@@ -8,14 +9,18 @@ import { Socket } from 'ngx-socket-io';
 
 export class RealTimeService {
 
+  socket: Socket | null = null;
+
   constructor(
     private http: HttpClient,
-    private socket: Socket
+    private socketService: SocketService,
   ) {
+    this.socket = this.socketService.getSocket();
   }
 
   // METODO PARA RECIBIR NOTIFICACION DE AVISOS EN TIEMPO REAL    **USADO
   RecibirNuevosAvisos(data: any) {
+    if (!this.socket) return;
     this.socket.emit('nuevo_aviso', data);
   }
 
@@ -103,7 +108,7 @@ export class RealTimeService {
 
   // METODO PARA ENVIO DE NOTIFICACION DE COMUNICADOS   **USADO
   EnviarMensajeGeneralMultiple(data: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}noti-real-time/noti-comunicado-multiplador/`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/noti-comunicado-multiplador/`, data);
   }
 
 }

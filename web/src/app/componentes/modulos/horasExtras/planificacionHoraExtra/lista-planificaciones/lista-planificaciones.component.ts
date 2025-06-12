@@ -33,7 +33,7 @@ export interface PlanificacionHE {
   codigo: number;
   id: number;
   correo: string;
-  cedula: string;
+  identificacion: string;
 }
 
 @Component({
@@ -101,7 +101,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     if (this.habilitarHorasE === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -304,7 +304,8 @@ export class ListaPlanificacionesComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
-    console.log('ver data seleccionada... ', datos)
+    console.log('ver data seleccionada... ', datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -323,7 +324,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -369,7 +370,8 @@ export class ListaPlanificacionesComponent implements OnInit {
   contar: number = 0;
   contar_eliminados: number = 0;
   ConfirmarDeletePlanMultiple(datos: any) {
-    console.log('ver data seleccionada... ', datos)
+    console.log('ver data seleccionada... ', datos);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -394,7 +396,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       console.log('ver datos seleccionados', obj)
 
       // LECTURA DE NOMBRES DE USUARIOS
-      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
+      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.identificacion + '</th></tr>';
 
       // LECTURA DE DATOS DE LA PLANIFICACION
       const desde_ = DateTime.fromISO(obj.fecha_desde).setLocale('es').toFormat('cccc');

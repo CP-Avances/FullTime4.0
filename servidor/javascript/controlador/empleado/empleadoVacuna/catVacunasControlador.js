@@ -137,7 +137,7 @@ class VacunaControlador {
                         return res.status(200).jsonp({ message: 'Registro editado.', status: '200' });
                     }
                     else {
-                        return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' });
+                        return res.status(404).jsonp({ message: 'Ups! algo salio mal.', status: '400' });
                     }
                 }
                 else {

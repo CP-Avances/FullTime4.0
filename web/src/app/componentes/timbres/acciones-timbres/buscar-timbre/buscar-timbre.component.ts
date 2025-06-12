@@ -132,14 +132,14 @@ export class BuscarTimbreComponent implements OnInit {
     this.existenTimbres = false;
 
     if (form.codigoForm === "" && form.cedulaForm === "") {
-      return this.toastr.error('Ingrese código o cédula del usuario.', 'Llenar los campos.', {
+      return this.toastr.error('Ingrese código o identificación del usuario.', 'Llenar los campos.', {
         timeOut: 6000,
       })
 
     } else {
       var datos: any = {
         codigo: form.codigoForm,
-        cedula: form.cedulaForm,
+        identificacion: form.cedulaForm,
         fecha: this.validar.DarFormatoFecha(form.fechaForm, 'yyyy-MM-dd')
       }
       this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(async timbres => {

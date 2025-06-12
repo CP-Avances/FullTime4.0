@@ -87,7 +87,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Notificaciones</th>
@@ -95,7 +95,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let u of usuarios_permisos | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{u.cedula}}</td>
+                        <td>{{u.identificacion}}</td>
                         <td>{{u.apellido}}</td>
                         <td>{{u.nombre}}</td>
                         <td class="d-flex justify-content-center">
@@ -143,7 +143,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Notificaciones</th>
@@ -151,7 +151,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let u of usuarios_vacaciones | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{u.cedula}}</td>
+                        <td>{{u.identificacion}}</td>
                         <td>{{u.apellido}}</td>
                         <td>{{u.nombre}}</td>
                         <td class="d-flex justify-content-center">
@@ -199,7 +199,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Notificaciones</th>
@@ -207,7 +207,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let u of usuarios_extras | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{u.cedula}}</td>
+                        <td>{{u.identificacion}}</td>
                         <td>{{u.apellido}}</td>
                         <td>{{u.nombre}}</td>
                         <td class="d-flex justify-content-center">
@@ -256,7 +256,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Apellido</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Notificaciones</th>
@@ -264,7 +264,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let u of usuarios_comidas | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{u.cedula}}</td>
+                        <td>{{u.identificacion}}</td>
                         <td>{{u.apellido}}</td>
                         <td>{{u.nombre}}</td>
                         <td class="d-flex justify-content-center">

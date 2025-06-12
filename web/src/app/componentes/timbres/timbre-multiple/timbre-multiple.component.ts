@@ -592,6 +592,7 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA REGISTRAR VARIOS TIMBRES
   TimbrarVarios(seleccionados: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(CrearTimbreComponent, { width: '500px', data: seleccionados })
       .afterClosed().subscribe(dataT => {
         this.auto_individual = true;

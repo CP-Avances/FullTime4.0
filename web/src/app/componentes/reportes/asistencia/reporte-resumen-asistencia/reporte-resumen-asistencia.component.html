@@ -232,7 +232,7 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Sucursal</th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Código</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Rol</th>
@@ -248,7 +248,7 @@
                             </mat-checkbox>
                         </td>
                         <td>{{e.sucursal}}</td>
-                        <td>{{e.cedula}}</td>
+                        <td>{{e.identificacion}}</td>
                         <td>{{e.codigo}}</td>
                         <td>{{e.apellido}} {{e.nombre}}</td>
                         <td>{{e.rol}}</td>
@@ -293,14 +293,27 @@
                         </tr>
                     </table>
                 </div>
+
+                <div class="d-flex flex-wrap">
+                    <mat-form-field class="input-tables codigo" style="width: 140px;">
+                        <input matInput placeholder="Buscar código" [formControl]="codigo"
+                            (keypress)="IngresarSoloNumeros($event)">
+                    </mat-form-field>
+
+                    <mat-form-field class="input-tables cedula" style="width: 200px;">
+                        <input matInput placeholder="Buscar empleado" [formControl]="nombre" type="text"
+                            (keypress)="IngresarSoloLetras($event)">
+                    </mat-form-field>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
                             <tr style="text-align: center">
-                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
-                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
-                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
-                                <th class="t_horarios" scope="col" rowspan="2">FECHA</th>
+                                <th class="sticky col_n t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="sticky-2 col_codigo t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="sticky-3 colum_1 t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="sticky-4 colum_1 t_horarios" scope="col" rowspan="2">FECHA</th>
                                 <th class="t_horarios" scope="col" rowspan="1" colspan="2">ENTRADA</th>
                                 <th class="t_horarios" scope="col" rowspan="1" colspan="2">INICIO ALIMENTACIÓN</th>
                                 <th class="t_horarios" scope="col" rowspan="1" colspan="2">FIN ALIMENTACIÓN</th>
@@ -325,11 +338,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
-                                <td>{{ t.n }}</td>
-                                <td>{{ t.codigo }}</td>
-                                <td>{{ t.empleado }}</td>
-                                <td>{{ t.fecha }}</td>
+                            <tr
+                                *ngFor="let t of timbres | filtroCodigo: codigo.value | nombreCompleto: nombre.value | paginate : tamanio_pagina : numero_pagina">
+                                <td class="sticky col_n">{{ t.n }}</td>
+                                <td class="sticky-2 col_codigo">{{ t.codigo }}</td>
+                                <td class="sticky-3 colum_1">{{ t.empleado }}</td>
+                                <td class="sticky-4 colum_1">{{ t.fecha }}</td>
                                 <td>{{ t.entradaHorario }}</td>
                                 <td [ngClass]="ObtenerClaseTimbre(t.entrada)">{{ t.entrada }}</td>
                                 <td>{{ t.inicioAlimentacionHorario }}</td>

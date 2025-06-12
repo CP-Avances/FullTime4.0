@@ -219,7 +219,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         }
       }
       else {
-        this.toastr.warning('Las fechas ingresadas no estan dentro del contrato vigente del empleado.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Las fechas ingresadas no estan dentro del contrato vigente del empleado.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
         this.formulario.patchValue({
@@ -330,7 +330,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         this.sumHoras = this.SumarHoras(this.suma, hora_trabajo);
         let verificador = this.VerificarHorarioRangos(obj_res);
         if (verificador === 2) {
-          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
             timeOut: 6000,
           });
           this.ControlarBotones(false, false, true, true, false);
@@ -516,14 +516,14 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         this.cargar = true;
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+        this.toastr.error('Ups! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.ControlarBotones(false, true, false, false, false);
         this.cargar = false;
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+      this.toastr.error('Ups! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
       this.ControlarBotones(false, true, false, false, false);
@@ -550,7 +550,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       }
       else if (datos.message === 'error') {
         this.toastr.info(
-          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          'Ups! algo salio mal', 'No se cargaron todos los registros.', {
           timeOut: 6000,
         })
       }
@@ -870,7 +870,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
                 });
               }
               else {
-                this.toastr.warning('Ups!!! algo salio mal. Intentar eliminar los registros nuevamente.', '', {
+                this.toastr.warning('Ups! algo salio mal. Intentar eliminar los registros nuevamente.', '', {
                   timeOut: 6000,
                 });
               }
@@ -900,7 +900,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
             });
           }
           else {
-            this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+            this.toastr.error('Ups! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
               timeOut: 6000,
             });
           }
@@ -913,7 +913,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   EmitirMensajeNovedad(verificador: any, guardar: boolean, eliminar: boolean, cerrar: boolean, resetear: boolean, nuevo: boolean) {
     if (verificador === this.eliminar_horarios.length) {
       this.ControlarBotones(guardar, eliminar, cerrar, resetear, nuevo);
-      this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+      this.toastr.error('Ups! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
         timeOut: 6000,
       });
     }

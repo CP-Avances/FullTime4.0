@@ -76,7 +76,7 @@ export class EditarTipoComidasComponent implements OnInit {
       })
       this.Salir(2);
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'No se guardo el registro.', {
+      this.toastr.error('Ups! algo salio mal.', 'No se guardo el registro.', {
         timeOut: 6000,
       })
     });
@@ -162,7 +162,7 @@ export class EditarTipoComidasComponent implements OnInit {
       });
     }
     else {
-      this.toastr.info('Ingresar el tipo de servicio.', 'Ups!!! algo salio mal.', {
+      this.toastr.info('Ingresar el tipo de servicio.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }

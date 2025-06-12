@@ -76,10 +76,10 @@ export class PlanHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     var f = DateTime.now();
     this.FechaActual = f.toFormat('yyyy-MM-dd');
@@ -170,7 +170,7 @@ export class PlanHoraExtraComponent implements OnInit {
 
         // LECTURA DE DATOS DE USUARIO
         let usuario = '<tr><th>' + this.data.planifica.nombre +
-          '</th><th>' + this.data.planifica.cedula + '</th></tr>';
+          '</th><th>' + this.data.planifica.identificacion + '</th></tr>';
         let cuenta_correo = this.data.planifica.correo;
 
         // LECTURA DE DATOS DE LA PLANIFICACION
@@ -217,7 +217,7 @@ export class PlanHoraExtraComponent implements OnInit {
     this.data.planifica.map((obj: any) => {
 
       // LECTURA DE NOMBRES DE USUARIOS
-      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
+      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.identificacion + '</th></tr>';
 
       // LECTURA DE DATOS DE TODOS LOS USUARIOS SELECCIONADOS
       planEmpleado.id_empl_contrato = obj.id_contrato;
@@ -348,7 +348,7 @@ export class PlanHoraExtraComponent implements OnInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
       fin: h_fin,
     }
 

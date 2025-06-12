@@ -36,7 +36,7 @@
                                 [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de sucursales por nombre.">
-                                help_outline
+                                location_city
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -52,7 +52,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -83,7 +83,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -96,7 +96,7 @@
                                         [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
-                                        help_outline
+                                        group
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -114,7 +114,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -127,7 +127,7 @@
                                         [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
-                                        help_outline
+                                        account_balance
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -144,7 +144,8 @@
                             <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
                               [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de sucursales por nombre.">
+                                    location_city</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -156,7 +157,7 @@
                             <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 11)"
                               [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por nombre.">person</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -168,7 +169,7 @@
                             <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 9)"
                               [formControl]="codigo">
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por código.">code</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -178,12 +179,12 @@
                       <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                           <mat-form-field>
-                            <mat-label>Cédula</mat-label>
+                            <mat-label>Identificación</mat-label>
                             <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 10)"
                               oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                               [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)" >
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por número de identificación.">badge</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -205,7 +206,7 @@
                                   </mat-option>
                                 </mat-autocomplete>
                                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                                  help_outline
+                                        admin_panel_settings
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -528,7 +529,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -545,7 +546,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>
@@ -609,7 +610,7 @@
                             </mat-error>
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de sucursales por nombre.">
-                                help_outline
+                                location_city
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -629,7 +630,7 @@
                                     </mat-error>
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -646,7 +647,7 @@
                                     </mat-error>
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de régimen laboral por nombre.">
-                                        help_outline
+                                        article
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -668,7 +669,7 @@
                                     </mat-error>
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -682,7 +683,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
-                                        help_outline
+                                        group
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -701,7 +702,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -715,7 +716,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
-                                        help_outline
+                                        account_balance
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -732,7 +733,8 @@
                             <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
                               [formControl]="nombre_suc_dh" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de sucursales por nombre.">
+                                    location_city</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -744,7 +746,7 @@
                             <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_emp_dh.value, 6)"
                               [formControl]="nombre_emp_dh" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por nombre.">person</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -756,7 +758,7 @@
                             <input matInput placeholder="Buscar" (input)="Filtrar_DH(codigo_dh.value, 4)"
                               [formControl]="codigo_dh">
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por código.">code</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -766,12 +768,12 @@
                       <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                           <mat-form-field>
-                            <mat-label>Cédula</mat-label>
+                            <mat-label>Identificación</mat-label>
                             <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar_DH(cedula_dh.value, 5)"
                               oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                               [formControl]="cedula_dh" type="tel" (keypress)="IngresarSoloNumeros($event)" >
                             <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
+                              matTooltip="Búsqueda de datos de empleado por número de identificación.">badge</mat-icon>
                           </mat-form-field>
                         </div>
                       </div>
@@ -793,7 +795,7 @@
                                   </mat-option>
                                 </mat-autocomplete>
                                 <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                                  help_outline
+                                        admin_panel_settings
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -1139,7 +1141,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -1157,7 +1159,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>

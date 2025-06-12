@@ -23,14 +23,12 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   grupo = new FormControl('', Validators.required);
-  numero_partida = new FormControl('');
 
   procesos: any = [];
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     grupoForm: this.grupo,
-    numero_partidaForm: this.numero_partida
   });
 
   constructor(
@@ -49,9 +47,13 @@ export class RegistrarGrupoOcupacionalComponent implements OnInit {
   }
 
   InsertarGrupo(form: any) {
+    //FORMATEA EL NOMBRE DEL GRUPO OCUPACIONAL PARA QUE SE REGISTRE CON LA PRIMERA LETRA EN MAYUSCULA
+    const formatearTexto = (texto: string) => {
+      texto = texto.trim().toLowerCase();
+      return texto.charAt(0).toUpperCase() + texto.slice(1);
+    };
     let dataGrupo = {
-      grupo: form.grupoForm,
-      numero_partida: form.numero_partidaForm,
+      grupo: formatearTexto(form.grupoForm),
       user_name: this.user_name,
       ip: this.ip,
       ip_local: this.ips_locales

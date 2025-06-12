@@ -1,60 +1,107 @@
 #verticalLine {
-    border-left: 1px solid rgb(52, 65, 84);
+  border-left: 1px solid rgb(52, 65, 84);
 }
 
 .btn {
-    background-color: rgb(80, 87, 97);
-    color: white;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 #datosF {
-    padding-right: 5px;
-    font-weight: bold;
-    font-size: 15px;
+  padding-right: 5px;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 #logo {
-    font-size: 50px;
-    position: relative;
-    cursor: pointer;
-    color: rgb(255, 255, 255);
-    top: 5px;
+  font-size: 50px;
+  position: relative;
+  cursor: pointer;
+  color: rgb(255, 255, 255);
+  top: 5px;
 }
 
 .btn-contenedor {
-    justify-content: center;
-    align-items: center;
-    display: flex;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 figure {
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    cursor: pointer;
-    width: 100%;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  cursor: pointer;
+  width: 100%;
 }
 
 a {
-    background-color: #6d6c6cb3;
-    transition: all 500ms ease-out;
-    visibility: hidden;
-    text-align: center;
-    position: absolute;
-    opacity: 0;
-    height: 100%;
-    width: 100%;
-    left: 0px;
-    top: 0px;
+  background-color: #6d6c6cb3;
+  transition: all 500ms ease-out;
+  visibility: hidden;
+  text-align: center;
+  position: absolute;
+  opacity: 0;
+  height: 100%;
+  width: 100%;
+  left: 0px;
+  top: 0px;
 }
 
-figure:hover>a {
-    visibility: visible;
-    opacity: 1;
-    cursor: pointer;
+figure:hover > a {
+  visibility: visible;
+  opacity: 1;
+  cursor: pointer;
 }
 
-.imagenCorreo{
-    max-width: 400px;
-    max-height: 400px;
+.imagenCorreo {
+  max-width: 400px;
+  max-height: 400px;
+}
+
+.cabecera-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 400px; /* antes 600px */
+  margin: auto;
+}
+
+.img-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.cabecera-img {
+  max-width: 50%;
+  max-height: 150px; /* Limita la altura */
+  height: auto;
+}
+
+.btn-cabecera-editar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s;
+}
+
+.btn-cabecera-editar:hover,
+.btn-cabecera-editar:focus {
+  background: rgba(255, 255, 255, 1);
+}
+
+.icono-editar {
+  font-size: 26px;
+  color: #059529;
 }

@@ -120,7 +120,7 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleado_id } = req.params;
             const DATOS = yield database_1.default.query(`
-            SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, da.name_cargo AS cargo, 
+            SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.identificacion, da.name_cargo AS cargo, 
                 da.name_dep AS departamento
             FROM informacion_general AS da
             WHERE da.id = $1
@@ -137,7 +137,7 @@ class DatosGeneralesControlador {
     ListarDatosActualesEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DATOS = yield database_1.default.query(`
-                SELECT e_datos.id, e_datos.cedula, e_datos.apellido, e_datos.nombre, e_datos.estado_civil, 
+                SELECT e_datos.id, e_datos.identificacion, e_datos.apellido, e_datos.nombre, e_datos.estado_civil, 
                     e_datos.genero, e_datos.correo, e_datos.fecha_nacimiento, e_datos.estado, 
                     e_datos.domicilio, e_datos.telefono, e_datos.id_nacionalidad, e_datos.imagen, 
                     e_datos.codigo, e_datos.id_contrato, e_datos.id_regimen, e_datos.name_regimen AS regimen,
@@ -165,7 +165,7 @@ class DatosGeneralesControlador {
                 console.log('***************', id_empleado);
                 const response = yield database_1.default.query(`
                 SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
-                    da.cedula, da.correo, da.codigo, da.estado, da.id_suc, 
+                    da.identificacion, da.correo, da.codigo, da.estado, da.id_suc, 
                     da.id_contrato, 
                     da.name_dep AS ndepartamento,
                     da.name_suc AS nsucursal
@@ -194,7 +194,7 @@ class DatosGeneralesControlador {
             SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_departamento_nivel, n.departamento_nombre_nivel, 
                 n.nivel, n.id_sucursal AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empleado_cargo as cargo, 
                 dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, 
+                dae.identificacion, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, 
                 c.hora_extra_mail, c.hora_extra_notificacion, c.comida_mail, c.comida_notificacion 
             FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae,
                 eu_configurar_alertas AS c, ed_departamentos AS cg, e_sucursales AS s
@@ -220,7 +220,7 @@ class DatosGeneralesControlador {
                     SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre,
                         cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal,
                         ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado,
-                        (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail,
+                        (e.nombre || ' ' || e.apellido) as fullname, e.identificacion, e.correo, c.permiso_mail,
                         c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail,
                         c.hora_extra_noti, c.comida_mail, c.comida_noti
                     FROM ed_autoriza_departamento AS da, eu_empleado_cargos AS ecr, ed_departamentos AS cg,

@@ -17,8 +17,9 @@
                             <mat-form-field>
                                 <mat-label>Nombre</mat-label>
                                 <input matInput [formControl]="nombre">
-                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el nombre del usuario.">
-                                    help_outline
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Ingresar el nombre del usuario.">
+                                    person
                                 </mat-icon>
                             </mat-form-field>
                             <mat-form-field>
@@ -26,25 +27,28 @@
                                 <input matInput [formControl]="apellido">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar el apellido del usuario.">
-                                    help_outline
+                                    person
                                 </mat-icon>
                             </mat-form-field>
-                        </div> 
+                        </div>
                     </div>
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Código</mat-label>
                                 <input matInput [formControl]="codigo">
-                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el código de usuario.">
-                                    help_outline
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Ingresar el código de usuario.">
+                                    code
                                 </mat-icon>
                             </mat-form-field>
                             <mat-form-field>
-                                <mat-label>Cédula</mat-label>
-                                <input matInput type="tel" [formControl]="cedula" (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cédula del usuario.">
-                                    help_outline
+                                <mat-label>Identificación</mat-label>
+                                <input matInput type="tel" [formControl]="cedula"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Ingresar la identificación del usuario.">
+                                    badge
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -118,7 +122,8 @@
                                 <td>{{a.tipo_}}</td>
                                 <td class="justify-content-center">
                                     <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)" *ngIf="getRevisarRegistro()">
+                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)"
+                                        *ngIf="getRevisarRegistro()">
                                         <p>Revisar</p>
                                     </i>
                                 </td>
@@ -130,10 +135,10 @@
                     [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
             </div>
-            <br/>
+            <br />
         </div>
     </mat-card>
-    <br/>
+    <br />
 </div>
 
 <!--  ***************************  PANTALLA REVISION DE ASISTENCIA  ********************************  -->

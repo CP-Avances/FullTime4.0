@@ -1,156 +1,189 @@
 p {
-    font-size: x-small;
-    text-align: center;
+  font-size: x-small;
+  text-align: center;
 }
 
 .btn {
-    background-color: rgb(80, 87, 97);
-    color: white;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 #editarF {
-    color: green;
-    cursor: pointer;
-    text-align: center;
-    margin-left: 15px;
+  color: green;
+  cursor: pointer;
+  text-align: center;
+  margin-left: 15px;
 }
 
 #datosF {
-    font-weight: bold;
-    font-size: 15px;
-    padding-right: 5px;
+  font-weight: bold;
+  font-size: 15px;
+  padding-right: 5px;
 }
 
 #num {
-    padding-right: 5px;
-    font-size: 15px;
+  padding-right: 5px;
+  font-size: 15px;
 }
 
 #verticalLine {
-    border-left: 1px solid rgb(52, 65, 84);
+  border-left: 1px solid rgb(52, 65, 84);
 }
 
 #ver {
-    color: rgb(78, 20, 238);
-    cursor: pointer;
+  color: rgb(78, 20, 238);
+  cursor: pointer;
 }
 
 /* Estilo para las celdas de la tabla */
-th, td {
-    padding: 8px;
-    text-align: left;
-    white-space: nowrap; /* Evita el ajuste de texto en las celdas */
-    border-bottom: 1px solid #dee2e6;
+th,
+td {
+  padding: 8px;
+  text-align: left;
+  white-space: nowrap; /* Evita el ajuste de texto en las celdas */
+  border-bottom: 1px solid #dee2e6;
 }
 
 th {
-    background-color: #f8f9fa;
-    text-align: center;
-    position:sticky;
+  background-color: #f8f9fa;
+  text-align: center;
+  position: sticky;
 }
 
-
-
 .caja1 {
-    padding: 0px 15px 0px 15px;
-    width: 300px;
+  padding: 0px 15px 0px 15px;
+  width: 100%;
 }
 
 .caja2 {
-    padding: 0px 15px 0px 15px;
-}
-
-#logo {
-    color: rgb(255, 255, 255);
-    font-size: 50px;
-    position: relative;
-    top: 10px;
-    cursor: pointer;
+  padding: 0px 15px 0px 15px;
 }
 
 .btn-contenedor {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 figure {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    cursor: pointer;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 a {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background-color: #6d6c6cb3;
-    transition: all 500ms ease-out;
-    opacity: 0;
-    visibility: hidden;
-    text-align: center;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: #6d6c6cb3;
+  transition: all 500ms ease-out;
+  opacity: 0;
+  visibility: hidden;
+  text-align: center;
 }
 
-figure:hover>a {
-    opacity: 1;
-    visibility: visible;
-    cursor: pointer;
+figure:hover > a {
+  opacity: 1;
+  visibility: visible;
+  cursor: pointer;
 }
 
-.mat-radio-button~.mat-radio-button {
-    margin-left: 50px;
+.mat-radio-button ~ .mat-radio-button {
+  margin-left: 50px;
 }
 
 mat-radio-group {
-    padding: 20px 20px 20px 20x;
-    margin-bottom: 10px;
+  padding: 20px 20px 20px 20x;
+  margin-bottom: 10px;
 }
 
 .subtitulo {
-    font-size: 15px;
-    font-weight: bold;
-    color: rgb(0, 0, 0);
+  font-size: 15px;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
 }
 
 #icono {
-    color: rgba(8, 10, 124, 0.828);
+  color: rgba(8, 10, 124, 0.828);
 }
 
 table {
-    width: 100%;
-    font-size: 14px;
-    border-collapse: collapse;
-
+  width: 100%;
+  font-size: 14px;
+  border-collapse: collapse;
 }
 
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
-    .Tabla_titulo h5{
-        font-size: medium;
-    }
+  .Tabla_titulo h5 {
+    font-size: medium;
+  }
 
-    #num {
-        font-size: 16px;
-    }
+  #num {
+    font-size: 16px;
+  }
 }
 
 a.matTooltip.tooltip {
-    font-size: 11px;
-    color: red !important;
-    background-color:yellow;
-    border: 1px solid black;
+  font-size: 11px;
+  color: red !important;
+  background-color: yellow;
+  border: 1px solid black;
 }
 
 .table_horario {
-    max-height: 400px; /* Ajusta según sea necesario */
+  max-height: 400px; /* Ajusta según sea necesario */
 }
 
 /* Contenedor para manejar el scroll horizontal */
 .table-wrapper {
-    overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
-    display: block;
+  overflow-x: auto; /* Permite el scroll horizontal si la tabla excede el ancho del contenedor */
+  display: block;
+}
+
+.logo-container {
+  position: relative;
+  display: inline-block;
+}
+
+.logo-img {
+  max-width: 250px;
+  max-height: 250px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-logo-editar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-logo-editar:hover,
+.btn-logo-editar:focus {
+  background: rgba(255, 255, 255, 0.9);
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.icon-logo {
+  font-size: 24px;
+  color: #2fa305;
 }

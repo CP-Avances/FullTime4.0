@@ -816,7 +816,7 @@ class HorasExtrasPedidasControlador {
       `
       SELECT h.id_empleado_cargo, h.id_empleado_solicita, h.fecha_inicio, h.fecha_final, h.fecha_solicita, 
         h.descripcion, h.estado, h.tipo_funcion, h.horas_solicitud, h.id, h.tiempo_autorizado,
-        (e.nombre || ' ' || e.apellido) AS fullname, e.cedula     
+        (e.nombre || ' ' || e.apellido) AS fullname, e.identificacion     
       FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
       WHERE h.id = $1 AND e.id = h.id_empleado_solicita
       `
@@ -1011,7 +1011,7 @@ class HorasExtrasPedidasControlador {
 
       const correoInfoPideHoraExtra = await pool.query(
         `
-        SELECT e.correo, e.nombre, e.apellido, e.cedula, 
+        SELECT e.correo, e.nombre, e.apellido, e.identificacion, 
           ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
           d.nombre AS departamento 
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
@@ -1046,7 +1046,7 @@ class HorasExtrasPedidasControlador {
               <b>Empresa:</b> ${nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
-              <b>Número de Cédula:</b> ${correoInfoPideHoraExtra.rows[0].cedula} <br>
+              <b>Número de identificación:</b> ${correoInfoPideHoraExtra.rows[0].identificacion} <br>
               <b>Cargo:</b> ${correoInfoPideHoraExtra.rows[0].tipo_cargo} <br>
               <b>Departamento:</b> ${correoInfoPideHoraExtra.rows[0].departamento} <br>
               <b>Generado mediante:</b> Aplicación Web <br>
@@ -1101,7 +1101,7 @@ class HorasExtrasPedidasControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
 
   }
@@ -1126,7 +1126,7 @@ class HorasExtrasPedidasControlador {
 
       const correoInfoPideHoraExtra = await pool.query(
         `
-        SELECT e.correo, e.nombre, e.apellido, e.cedula, 
+        SELECT e.correo, e.nombre, e.apellido, e.identificacion, 
           ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
           d.nombre AS departamento 
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
@@ -1159,7 +1159,7 @@ class HorasExtrasPedidasControlador {
               <b>Empresa:</b> ${nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
-              <b>Número de Cédula:</b> ${correoInfoPideHoraExtra.rows[0].cedula} <br>
+              <b>Número de identificación:</b> ${correoInfoPideHoraExtra.rows[0].identificacion} <br>
               <b>Cargo:</b> ${correoInfoPideHoraExtra.rows[0].tipo_cargo} <br>
               <b>Departamento:</b> ${correoInfoPideHoraExtra.rows[0].departamento} <br>
               <b>Generado mediante:</b> Aplicación Móvil <br>
@@ -1212,7 +1212,7 @@ class HorasExtrasPedidasControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 

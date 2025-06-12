@@ -93,10 +93,10 @@ export class VerEmpresaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.asignaciones.ObtenerEstado();
@@ -202,6 +202,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // VENTANA DE REGISTRO DE ESTABLECIMIENTO
   AbrirVentanaRegistrarSucursal() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: this.idEmpresa })
       .afterClosed().subscribe((items: any) => {
         if (items) {
@@ -220,7 +221,11 @@ export class VerEmpresaComponent implements OnInit {
 
   // VENTANA PARA REVISAR FORMATO DE REPORTES COLORES
   AbrirVentanaReportes(datos_empresa: any, ventana: any) {
-    this.ventana.open(ColoresEmpresaComponent, { width: '340px', data: { datos: datos_empresa, ventana: ventana } })
+    (document.activeElement as HTMLElement)?.blur();
+    this.ventana.open(ColoresEmpresaComponent, {
+      width: '340px',
+      data: { datos: datos_empresa, ventana: ventana }
+    })
       .afterClosed().subscribe((items: any) => {
         if (items) {
           if (items.actualizar === true) {
@@ -234,6 +239,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA EDITAR LOGO DE EMPRESA
   EditarLogo() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(LogosComponent, {
       width: '500px', data: { empresa: this.idEmpresa, pagina: 'empresa' }
     }).afterClosed()
@@ -244,6 +250,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // VENTANA DE REGISTRO DE FRASE DE SEGURIDAD
   AbrirVentanaSeguridad(datosSeleccionados: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(TipoSeguridadComponent, { width: '340px', data: datosSeleccionados })
       .afterClosed().subscribe((items: any) => {
         this.ObtenerSucursal();
@@ -473,6 +480,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -521,6 +529,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -533,7 +542,7 @@ export class VerEmpresaComponent implements OnInit {
             this.selectionSucursales.clear();
             this.ObtenerSucursal();
           } else {
-            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -591,5 +600,5 @@ export class VerEmpresaComponent implements OnInit {
   getVerDepartamento() {
     return this.tienePermiso('Editar Información General', 1);
   }
-  
+
 }

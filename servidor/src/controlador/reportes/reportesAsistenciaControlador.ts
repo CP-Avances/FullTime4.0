@@ -55,7 +55,7 @@ class ReportesAsistenciaControlador {
                         //empl-contratos esta el id_regimen
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                            e.cedula, e.correo, ca.id AS id_cargo, tc.cargo,
+                            e.identificacion, e.correo, ca.id AS id_cargo, tc.cargo,
                             co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                             s.nombre AS sucursal, ca.hora_trabaja, r.id AS id_regimen, r.descripcion AS regimen, 
                             c.descripcion AS ciudad, 
@@ -85,7 +85,7 @@ class ReportesAsistenciaControlador {
                     ele.empleado = await pool.query(
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                            e.cedula, e.correo, ca.id AS id_cargo, tc.cargo,
+                            e.identificacion, e.correo, ca.id AS id_cargo, tc.cargo,
                             co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                             s.nombre AS sucursal, ca.hora_trabaja, e.estado AS estado, r.id AS id_regimen, r.descripcion AS regimen,
                             c.descripcion AS ciudad, 

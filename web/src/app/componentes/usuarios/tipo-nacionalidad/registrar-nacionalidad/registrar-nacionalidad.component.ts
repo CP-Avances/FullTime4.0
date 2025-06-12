@@ -60,7 +60,7 @@ export class RegistrarNacionalidadComponent {
       const existe = lista.some(n => n.nombre.toUpperCase() === nombre_nacionalidad);
   
       if (existe) {
-        this.toastr.warning('La nacionalidad ingresada ya existe en el sistema.', 'Ups!!! algo salió mal.', {
+        this.toastr.warning('La nacionalidad ingresada ya existe en el sistema.', 'Ups! algo salió mal.', {
           timeOut: 3000,
         });
       } else {

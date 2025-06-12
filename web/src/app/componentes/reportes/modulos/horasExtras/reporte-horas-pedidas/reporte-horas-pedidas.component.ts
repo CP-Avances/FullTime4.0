@@ -623,13 +623,13 @@ export class ReporteHorasPedidasComponent implements OnInit {
   // DATOS GENERALES DEL PDF
   DatosSolicitudEmpleado(id_seleccionado) {
     // INICIALIZACIÓN DE VARIBLES
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.id === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -653,7 +653,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -748,7 +748,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
         datosGenerales = [{
           NOMBRE: obj.nombre,
           APELLIDO: obj.apellido,
-          CEDULA: obj.cedula,
+          IDENTIFICACION: obj.identificacion,
           CODIGO: obj.codigo,
           SUCURSAL: obj.sucursal,
           DEPARTAMENTO: obj.departamento,
@@ -790,7 +790,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     xlsx.utils.book_append_sheet(wb, wse, 'Empleado');
     xlsx.utils.book_append_sheet(wb, wsa, 'Solicitud Horas Extras');
     var f = DateTime.now();
-    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toformat('yyyy-MM-dd') + '.xlsx');
+    xlsx.writeFile(wb, "SolicitudesHorasExtras - " + f.toFormat('yyyy-MM-dd') + '.xlsx');
     */
   }
 
@@ -857,13 +857,13 @@ export class ReporteHorasPedidasComponent implements OnInit {
   // DATOS GENERALES DEL PDF
   DatosSolicitudAutorizaEmpleado(id_seleccionado) {
     // INICIALIZACIÓN DE VARIABLES
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.id === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -887,7 +887,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -978,7 +978,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
         datosGenerales = [{
           NOMBRE: obj.nombre,
           APELLIDO: obj.apellido,
-          CEDULA: obj.cedula,
+          IDENTIFICACION: obj.identificacion,
           CODIGO: obj.codigo,
           SUCURSAL: obj.sucursal,
           DEPARTAMENTO: obj.departamento,

@@ -149,7 +149,7 @@ export class RegistrarCiudadComponent implements OnInit {
       }
     });
     if (idPais === 0) {
-      this.toastr.info('Verificar selección de país.', 'Ups!!! algo salio mal.', {
+      this.toastr.info('Verificar selección de país.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.provincias = [];
@@ -184,7 +184,7 @@ export class RegistrarCiudadComponent implements OnInit {
     });
     // VERIFICAR SI PROVINCIA EXISTE
     if (provinciaId === 0) {
-      this.toastr.warning('Verificar selección de provincia.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Verificar selección de provincia.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }
@@ -211,7 +211,7 @@ export class RegistrarCiudadComponent implements OnInit {
           this.GuardarDatos(ciudad)
         }
         else {
-          this.toastr.error('Ciudad ya se encuentra registrada.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Ciudad ya se encuentra registrada.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           })
         }
@@ -227,7 +227,7 @@ export class RegistrarCiudadComponent implements OnInit {
       });
       this.CerrarVentana();
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups! algo salio mal..', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     });

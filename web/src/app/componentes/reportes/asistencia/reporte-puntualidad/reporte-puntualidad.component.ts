@@ -95,7 +95,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
-              cedula: r.cedula
+              identificacion: r.identificacion
             })
           })
         })
@@ -357,7 +357,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         obj1.empleado.forEach((obj2: any) => {
           let e = {
             cargo: obj2.cargo,
-            cedula: obj2.cedula,
+            identificacion: obj2.identificacion,
             ciudad: obj.ciudad,
             codigo: obj2.codigo,
             color: obj2.color,
@@ -389,7 +389,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
           [
             { text: 'N°', style: 'tableHeader' },
             { text: 'Empleado', style: 'tableHeader' },
-            { text: 'Cédula', style: 'tableHeader' },
+            { text: 'Identificación', style: 'tableHeader' },
             { text: 'Código', style: 'tableHeader' },
             { text: 'Ciudad', style: 'tableHeader' },
             { text: 'Departamento', style: 'tableHeader' },
@@ -403,7 +403,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
             return [
               { style: 'itemsTableCentrado', text: c },
               { style: 'itemsTable', text: obj.name_empleado },
-              { style: 'itemsTableCentrado', text: obj.cedula },
+              { style: 'itemsTableCentrado', text: obj.identificacion },
               { style: 'itemsTableCentrado', text: obj.codigo },
               { style: 'itemsTableCentrado', text: obj.ciudad },
               { style: 'itemsTable', text: obj.name_dep },
@@ -515,7 +515,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
           let ele = {
             'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-            'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+            'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Identificación': obj3.identificacion, 'Código': obj3.codigo,
             'Género': obj3.genero, 'Contrato': obj3.contrato, 'Cargo': obj3.cargo, 'Puntualidad': obj3.puntualidad
           }
           nuevo.push(ele)

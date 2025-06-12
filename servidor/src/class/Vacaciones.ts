@@ -14,7 +14,7 @@ interface depa_vac {
 interface emp_vac {
     id: number,
     cargo?: string,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     genero?: string | number,
     contrato?: string,

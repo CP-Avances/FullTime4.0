@@ -84,7 +84,7 @@ export class ListarCoordenadasComponent implements OnInit {
     if (this.habilitarGeolocalizacion === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Geolocalización. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Geolocalización. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -179,6 +179,7 @@ export class ListarCoordenadasComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA CREACIÓN DE REGISTRO
   CrearParametro(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(CrearCoordenadasComponent,
       { width: '400px' }).afterClosed().subscribe(item => {
         if (item) {
@@ -220,6 +221,7 @@ export class ListarCoordenadasComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

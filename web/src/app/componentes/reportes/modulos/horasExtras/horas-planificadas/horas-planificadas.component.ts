@@ -117,7 +117,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
-              cedula: r.cedula
+              identificacion: r.identificacion
             }
             this.empleados.push(elemento)
           })
@@ -404,7 +404,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
                   },
                   {
                     border: [false, true, false, false],
-                    text: 'C.C.: ' + obj2.cedula,
+                    text: 'C.C.: ' + obj2.identificacion,
                     style: 'itemsTableInfoBlanco'
                   },
                   {
@@ -490,7 +490,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
             /* let ele = {
                'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-               'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+               'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Identificación': obj3.identificacion, 'Código': obj3.codigo,
                'Descripcion': 'Vacaciones', 'fec_inicio': obj4.fec_inicio.split('T')[0], 'fec_final': obj4.fec_final.split('T')[0],
                'fec_ingreso': obj4.fec_ingreso.split('T')[0], 'Aprobacion': 'Jose Luis Altamirano Taco',
                'Estado': 'Autorizado'

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { DateTime } from 'luxon';
+import { DateTime, WeekdayNumbers } from 'luxon';
 
 
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
@@ -160,7 +160,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
         // Lógica para obtener el nombre de cada uno de los día del periodo indicado
         while (start <= end) {
-          this.fechasPeriodo.push(DateTime.fromISO(start).toFormat('dddd dd/MM/yyyy'));
+          this.fechasPeriodo.push(DateTime.fromISO(start.toISOString()).toFormat('dddd dd/MM/yyyy'));
           var newDate = start.setDate(start.getDate() + 1);
           start = new Date(newDate);
         }
@@ -308,7 +308,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
          console.log('plan', this.empleadoPlan);
          // Llamado a ver archivos
          this.VerArchivos(codigo, archivo, form, fechasTotales);
- 
+
        }, error => {
          // Llamado a ver archivos cuando no existe horarios de planifiación del empleado
          this.VerArchivos(codigo, archivo, form, fechasTotales);
@@ -445,12 +445,12 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
   // Estructura de los datos generales del empleado
   presentarDatosGenerales(id_seleccionado, form, fechasTotales) {
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -459,8 +459,8 @@ export class ReporteEntradaSalidaComponent implements OnInit {
         regimen = obj.regimen;
       }
     })
-    var diaI = DateTime.fromISO(form.inicioForm).weekday;
-    var diaF = DateTime.fromISO(form.finalForm).weekday;
+    let diaI = DateTime.fromISO(form.inicioForm).weekday;
+    let diaF = DateTime.fromISO(form.finalForm).weekday;
     return {
       table: {
         widths: ['*'],
@@ -477,7 +477,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -496,10 +496,10 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           }],
           [{
             text: 'LISTA DE ENTRADAS - SALIDAS PERIODO DEL ' +
-              DateTime.fromObject({ weekday: diaI }).toFormat('cccc').toUpperCase() + ' ' +
+              DateTime.fromObject({ weekday: diaI as WeekdayNumbers }).toFormat('cccc').toUpperCase() + ' ' +
               DateTime.fromFormat(form.inicioForm, "yyyy/MM/dd").toFormat("dd/MM/yyyy") +
               ' AL ' +
-              DateTime.fromObject({ weekday: diaF }).toFormat('cccc').toUpperCase() + ' ' +
+              DateTime.fromObject({ weekday: diaF as WeekdayNumbers }).toFormat('cccc').toUpperCase() + ' ' +
               DateTime.fromFormat(form.finalForm, "yyyy/MM/dd").toFormat("dd/MM/yyyy"),
             style: 'tableHeader'
           },],]
@@ -861,13 +861,13 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   // Datos generales del PDF y sumatoria total de calculos realizados
   presentarDatosEmpleado(id_seleccionado, form) {
     // Inicialización de varibles
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA de los datos del empleado del cual se obtiene el reporte
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -885,14 +885,14 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           [{ text: 'INFORMACIÓN GENERAL EMPLEADO', style: 'tableHeader' },],
           [{
             columns: [
-              { text: [{ text: 'PERIODO DEL: ' + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').format('dd/MM/yyyy'), style: 'itemsTableP' }] },
+              { text: [{ text: 'PERIODO DEL: ' + DateTime.fromFormat(form.inicioForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy') + ' AL ' + DateTime.fromFormat(form.finalForm, 'yyyy/MM/dd').toFormat('dd/MM/yyyy'), style: 'itemsTableP' }] },
             ]
           }],
           [{
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -938,7 +938,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           CODIGO: this.datosEmpleado[i].codigo,
           NOMBRE: this.datosEmpleado[i].nombre,
           APELLIDO: this.datosEmpleado[i].apellido,
-          CEDULA: this.datosEmpleado[i].cedula,
+          IDENTIFICACION: this.datosEmpleado[i].cedula,
           SUCURSAL: this.datosEmpleado[i].sucursal,
           DEPARTAMENTO: this.datosEmpleado[i].departamento,
           CIUDAD: this.datosEmpleado[i].ciudad,

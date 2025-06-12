@@ -201,7 +201,7 @@ export class ReporteKardexComponent implements OnInit {
                   { text: 'ACUM: ', bold: true, border: [false, false, false, false], style: ['quote', 'small'] },
                   { text: 'Dias acumulados hasta el final del periodo.', border: [false, false, false, false], style: ['quote', 'small'] },
                   { text: 'C.I: ', bold: true, border: [false, false, false, false], style: ['quote', 'small'] },
-                  { text: 'Cédula de identidad o pasaporte.', border: [false, false, false, false], style: ['quote', 'small'] },
+                  { text: 'Número de identificación.', border: [false, false, false, false], style: ['quote', 'small'] },
                   { text: 'COD: ', bold: true, border: [false, false, false, false], style: ['quote', 'small'] },
                   { text: 'Código de empleado en el sistema.', border: [false, false, false, false], style: ['quote', 'small'] }
                 ]
@@ -307,7 +307,7 @@ export class ReporteKardexComponent implements OnInit {
             },
             {
               border: [false, true, false, true],
-              text: 'C.C.: ' + e.cedula,
+              text: 'C.C.: ' + e.identificacion,
               style: 'itemsTableInfo'
             },
             {

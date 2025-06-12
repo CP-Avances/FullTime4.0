@@ -52,7 +52,7 @@ export class EmpleadoUbicacionService {
 
   // METODO PARA ACTUALIZAR COORDENADAS DE UBICACION    **USADO
   ActualizarCoordenadas(data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/ubicacion`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion`, data);
   }
 
   // METODO PARA LISTAR COORDENADAS   **USADO

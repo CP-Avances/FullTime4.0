@@ -281,7 +281,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     } else {
       if (this.datosHorario[0].hora_trabajo >= '24:00') {
         this.toastr.warning('Horarios de horas superiores o iguales a 24:00 horas deben ser configurados como horarios nocturnos.',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000
         });
       }
@@ -561,6 +561,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any, opcion: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -571,7 +572,7 @@ export class VerHorarioDetalleComponent implements OnInit {
             if (this.detallesEliminar.length != 0) {
               this.EliminarMultiple();
             } else {
-              this.toastr.warning('No ha seleccionado DETALLES.', 'Ups!!! algo salio mal.', {
+              this.toastr.warning('No ha seleccionado DETALLES.', 'Ups! algo salio mal.', {
                 timeOut: 6000,
               })
             }

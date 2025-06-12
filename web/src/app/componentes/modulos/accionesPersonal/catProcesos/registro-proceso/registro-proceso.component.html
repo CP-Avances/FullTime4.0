@@ -1,7 +1,8 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR PROCESOS</span>
+        REGISTRAR PROCESOS
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <div style="text-align: center">
@@ -16,18 +17,19 @@
                 </div>
                 <mat-form-field>
                     <mat-label>Nombre de proceso</mat-label>
-                    <input matInput placeholder="Ej: Emergencia" [formControl]="nombre"
-                        required>
+                    <input matInput placeholder="Ej: Emergencia" [formControl]="nombre" required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar nombre con el que se va a identificar el nuevo proceso">
-                        help_outline</mat-icon>
+                        settings
+                    </mat-icon>
                 </mat-form-field>
                 <br>
                 <mat-form-field>
-                    <mat-label>Proceso Padre</mat-label>
+                    <mat-label>Proceso Superior</mat-label>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Seleccionar uno de los procesos listados, el mismo que figurar como proceso superior al nuevo proceso creado">
-                        help_outline</mat-icon>
+                        workspace_premium
+                    </mat-icon>
                     <mat-select [formControl]="procesoPadre" required>
                         <mat-option [value]="0">Ninguno proceso</mat-option>
                         <mat-option *ngFor="let p of procesos" [value]="p.nombre">
@@ -39,7 +41,7 @@
         </mat-card-content>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-        <button id="btn-raised"  class="btn btn-sm" (click)="InsertarProceso(formulario.value)"
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarProceso(formulario.value)"
             [disabled]="!formulario.valid">Guardar</button>
     </div>
 </div>

@@ -192,6 +192,22 @@ td{
     box-shadow: 0px 2px 2px rgba(43, 93, 133, 0.575);
 }
 
+/* ESTILO PARA BOTONES DE TIPO "MAT-RAISED-BUTTON" */
+#btn-raised-guardar {
+    background-color: rgb(80, 87, 97);
+    margin: 5px 10px 5px 10px;
+    color: white;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    word-wrap: break-word;
+}
+
+#btn-raised-guardar:hover {
+    background-color: rgb(80, 87, 97);
+    box-shadow: 0px 2px 2px rgba(43, 93, 133, 0.575);
+}
+
 /** ESTILO BARRA TÍTULO DE RESULTADOS DE BUSQUEDAS **/
 #resultados {
     color: white;

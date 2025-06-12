@@ -5,7 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { FormControl } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 import { DateTime } from 'luxon';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
@@ -57,7 +57,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -139,6 +139,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   pageSizeOptions_res = [5, 10, 20, 50];
   tamanio_pagina_res: number = 5;
   numero_pagina_res: number = 1;
+
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
 
   // ARREGLO DE DATOS DE HORARIOS
   nomenclatura = [
@@ -333,7 +339,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -397,7 +403,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         this.ObtenerDetallesPlanificacion();
       }
       else {
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe planificación.', {
           timeOut: 6000,
         });
       }
@@ -491,7 +497,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       }
       else {
         this.EjecutarAccion();
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -726,7 +732,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
               },
               {
                 border: [false, true, false, false],
-                text: 'C.C.: ' + e.cedula,
+                text: 'C.C.: ' + e.identificacion,
                 style: 'itemsTableInfoEmpleado'
               },
               {
@@ -890,7 +896,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
           n,
           empleado.codigo,
           empleado.apellido + ' ' + empleado.nombre,
-          empleado.cedula,
+          empleado.identificacion,
           empleado.sucursal,
           empleado.ciudad,
           empleado.regimen,
@@ -949,7 +955,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 30 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "sucursal", width: 20 },
       { key: "ciudad", width: 20 },
       { key: "regimen", width: 20 },
@@ -994,7 +1000,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE EMPLEADO", totalsRowLabel: "", filterButton: true },
-      { name: "CÉDULA", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
       { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
       { name: "REGIMEN", totalsRowLabel: "", filterButton: true },
@@ -1280,8 +1286,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         n++;
         const horario = {
           n,
-          cedula: empleado.cedula,
+          identificacion: empleado.identificacion,
           codigo: empleado.codigo,
+          nombre: empleado.nombre,
+          apellido: empleado.apellido,
           empleado: empleado.apellido + ' ' + empleado.nombre,
           ciudad: empleado.ciudad,
           sucursal: empleado.sucursal,
@@ -1492,12 +1500,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
-        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
+        let inicio = ctrlValue.set({ day: 1 });
+        this.fechaInicialF.setValue(inicio.toISODate());
+        console.log('fecha final: ', this.fechaFinalF.value);
       }
       this.fecHorario = false;
-    }
-    else {
+    } else {
       this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
     }
     datepicker.close();
@@ -1529,7 +1537,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         formulario.setValue(fecf.toISODate());
       }
     } else {
-      this.toastr.warning('La fecha no se registró. Ups!!!, la fecha no es correcta.', 'VERIFICAR', {
+      this.toastr.warning('La fecha no se registró. Ups!, la fecha no es correcta.', 'VERIFICAR', {
         timeOut: 6000,
       });
     }

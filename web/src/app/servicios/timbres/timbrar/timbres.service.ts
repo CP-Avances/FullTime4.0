@@ -30,7 +30,7 @@ export class TimbresService {
   ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
-      .set('cedula', datos.cedula)
+      .set('identificacion', datos.identificacion)
       .set('fecha', datos.fecha)
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/timbresfechaemple`, { params });
   }
@@ -56,7 +56,7 @@ export class TimbresService {
   }
 
   /** ********************************************************************************** **
-   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **
    ** ********************************************************************************** **/
 
   // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
@@ -90,7 +90,7 @@ export class TimbresService {
 
 
   /** ********************************************************************************** **
-   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **                
+   ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **
    ** ********************************************************************************** **/
 
   // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
@@ -141,14 +141,13 @@ export class TimbresService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
-  AvisosTimbresRealtime(id_empleado: number) {
+  // LISTA DE AVISOS
+  ListarAvisos(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/avisos/${id_empleado}`);
   }
 
   EliminarAvisos(Seleccionados: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
-
-
 
 }

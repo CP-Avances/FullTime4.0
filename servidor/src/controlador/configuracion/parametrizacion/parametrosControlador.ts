@@ -1,7 +1,9 @@
+import { reiniciarTareasAutomaticas } from '../../../libs/reiniciraTareasAutomaticas';
 import { BuscarFecha, BuscarHora } from '../../../libs/settingsMail';
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
+
 
 class ParametrosControlador {
 
@@ -92,6 +94,7 @@ class ParametrosControlador {
         try {
             const { user_name, ip, ip_local } = req.body;
             const id = req.params.id;
+            console.log("id eliminar detalle parametro: ", id);
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -137,6 +140,13 @@ class ParametrosControlador {
 
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+
+            console.log("datos originales: ", datosOriginales);
+
+
+            // REINICIAR TAREAS AUTOMATICAS
+            await reiniciarTareasAutomaticas(datosOriginales.id_parametro);
+
             return res.jsonp({ message: 'Registro eliminado.' });
         }
         catch {
@@ -175,7 +185,11 @@ class ParametrosControlador {
 
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            res.jsonp({ message: 'Registro exitoso.' });
+
+            // REINICIAR TAREAS AUTOMATICAS
+            reiniciarTareasAutomaticas(id_tipo);
+
+            return res.jsonp({ message: 'Registro exitoso.' });
 
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -237,6 +251,10 @@ class ParametrosControlador {
 
             //FINALIZAR TRANSACCION
             await pool.query('COMMIT');
+
+            // REINICIAR TAREAS AUTOMATICAS
+            reiniciarTareasAutomaticas(datosOriginales.id_parametro);
+
             return res.jsonp({ message: 'Registro exitoso.' });
 
         } catch (error) {
@@ -298,7 +316,6 @@ class ParametrosControlador {
             return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
         }
     };
-
 
 }
 

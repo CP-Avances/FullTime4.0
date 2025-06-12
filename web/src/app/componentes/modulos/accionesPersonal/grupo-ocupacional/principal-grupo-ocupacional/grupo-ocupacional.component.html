@@ -6,7 +6,8 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGrupo()" *ngIf="getCrearGrupoOcupacional()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarGrupo()"
+                        *ngIf="getCrearGrupoOcupacional()">
                         Crear grupo ocupacional
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -83,8 +84,8 @@
                     </span>
                 </div>
                 <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;" *ngIf="getEliminarGrupoOcupacional()"
-                        (click)="ConfirmarDeleteMultiple()">
+                    <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
+                        *ngIf="getEliminarGrupoOcupacional()" (click)="ConfirmarDeleteMultiple()">
                         Eliminar
                     </button>
                 </div>
@@ -102,7 +103,6 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Grupo Ocupacional</th>
-                        <th scope="col">Número partida</th>
                         <th scope="col">Acción</th>
                     </tr>
                 </thead>
@@ -115,7 +115,6 @@
                                     [formControl]="buscarGrupo">
                             </mat-form-field>
                         </td>
-                        <td></td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda del grupo ocupacional de acuerdo a las columnas de la tabla.">
@@ -132,14 +131,15 @@
                             </mat-checkbox>
                         </td>
                         <td>{{grupo.descripcion}}</td>
-                        <td>{{grupo.numero_partida}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(grupo)" id="accion" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro." *ngIf="getEditarGrupoOcupacional()">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro."
+                                *ngIf="getEditarGrupoOcupacional()">
                                 <p>Editar</p>
                             </i>
-                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(grupo)" id="t-eliminar" matSuffix *ngIf="getEliminarGrupoOcupacional()"
-                                matTooltipPosition="right" matTooltip="Eliminar registro.">
+                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(grupo)" id="t-eliminar" matSuffix
+                                *ngIf="getEliminarGrupoOcupacional()" matTooltipPosition="right"
+                                matTooltip="Eliminar registro.">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -150,7 +150,8 @@
         <mat-paginator id="pagina" [length]="ListGrupoOcupacional.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportesGrupoOcupacional()">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px"
+            *ngIf="getDescargarReportesGrupoOcupacional()">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Grupo Ocupacional en formato PDF.">
                 <p>PDF</p>
@@ -193,7 +194,6 @@
                         <th scope="col">Item</th>
                         <th scope="col">Observación</th>
                         <th scope="col">Grupo Ocupacional</th>
-                        <th scope="col">Número de partida</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -210,9 +210,6 @@
                         </td>
                         <td [style.color]="EstiloTextoCelda(gra.descripcion)" style="font-size: 12px;">
                             {{gra.descripcion}}
-                        </td>
-                        <td [style.color]="EstiloTextoCelda(gra.numero_partida)" style="font-size: 12px;">
-                            {{gra.numero_partida}}
                         </td>
                     </tr>
                 </tbody>

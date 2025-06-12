@@ -1477,7 +1477,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       this.CerrarVentana(2);
 
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', '', {
+      this.toastr.error('Ups! algo salio mal.', '', {
         timeOut: 6000,
       })
     });
@@ -1592,7 +1592,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     periodo.dias_vacacion = parseFloat(form2);
     this.rest.CrearNuevoPeriodo(periodo).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en periodo de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en periodo de vacaciones.', '', {
         timeOut: 6000,
       })
     });
@@ -1605,7 +1605,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     periodo.dias_vacacion = parseFloat(form2);
     this.rest.ActualizarPeriodo(periodo).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en periodo de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en periodo de vacaciones.', '', {
         timeOut: 6000,
       })
     });
@@ -1620,7 +1620,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
     this.rest.EliminarPeriodo(id, datos).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en periodo de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en periodo de vacaciones.', '', {
         timeOut: 6000,
       })
     });
@@ -1780,7 +1780,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     antiguedad.dias_antiguedad = parseFloat(vacacion);
     this.rest.CrearNuevaAntiguedad(antiguedad).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en antiguedad de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en antiguedad de vacaciones.', '', {
         timeOut: 6000,
       })
     });
@@ -1794,7 +1794,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     antiguedad.dias_antiguedad = parseFloat(vacacion);
     this.rest.ActualizarAntiguedad(antiguedad).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en antiguedad de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en antiguedad de vacaciones.', '', {
         timeOut: 6000,
       })
     });
@@ -1809,7 +1809,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
     this.rest.EliminarAntiguedad(id, datos).subscribe(registro => {
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal en antiguedad de vacaciones.', '', {
+      this.toastr.error('Ups! algo salio mal en antiguedad de vacaciones.', '', {
         timeOut: 6000,
       })
     });

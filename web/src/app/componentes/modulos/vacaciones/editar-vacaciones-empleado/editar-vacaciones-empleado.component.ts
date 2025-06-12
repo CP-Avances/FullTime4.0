@@ -311,7 +311,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       this.EnviarNotificacion(vacaciones);
       this.CerrarVentana(2);
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Registro Inválido', {
+      this.toastr.error('Ups! algo salio mal.', 'Registro Inválido', {
         timeOut: 6000,
       })
     });

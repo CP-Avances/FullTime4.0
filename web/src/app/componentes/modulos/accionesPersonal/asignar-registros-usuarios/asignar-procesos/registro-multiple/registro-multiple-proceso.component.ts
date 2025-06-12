@@ -173,6 +173,7 @@ export class RegistroMultipleProcesoComponent {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() { 
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -190,7 +191,7 @@ export class RegistroMultipleProcesoComponent {
        return 'rgb(159, 221, 154)';
      } else if (observacion == 'Ya existe un registro activo con este Proceso.') {
        return 'rgb(239, 203, 106)';
-     } else if (observacion  == 'La cédula ingresada no esta registrada en el sistema' ||
+     } else if (observacion  == 'La identificación ingresada no esta registrada en el sistema' ||
        observacion == 'Proceso ingresado no esta registrado en el sistema'
      ) {
        return 'rgb(255, 192, 203)';

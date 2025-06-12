@@ -244,9 +244,13 @@
                         add_circle
                     </mat-icon>
 
-                    <mat-icon class="center" *ngIf="d.tipo_dia_origen != 'DFD'" id="libre" (click)="IngresarLibre(i)">
+                    <mat-icon class="center" *ngIf="d.tipo_dia_origen != 'DFD'" id="libre" (click)="IngresarLibre(i)"
+                        matTooltip="Día libre">
                         work_off
+                        
                     </mat-icon>
+
+
 
                     <mat-icon *ngIf="ver_icono === true && d.tipo_dia_origen != 'DL'" class="float-right"
                         id="seleccionar" (click)="EliminarHorario(i)">

@@ -70,8 +70,6 @@ class EmpleadoRutas {
         this.router.put('/desactivar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.DesactivarMultiplesEmpleados);
         // METODO PARA ACTIVAR EMPLEADOS   **USADO
         this.router.put('/activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ActivarMultiplesEmpleados);
-        // METODO PARA REACTIVAR EMPLEADOS   **USADO VERIFICAR FUNCIONAMIENTO
-        this.router.put('/re-activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ReactivarMultiplesEmpleados);
         // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
         this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload_plantilla.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO

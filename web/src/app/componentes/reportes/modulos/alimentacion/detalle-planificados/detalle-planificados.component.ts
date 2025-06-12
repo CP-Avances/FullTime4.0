@@ -521,7 +521,7 @@ export class DetallePlanificadosComponent implements OnInit {
           [
             { text: 'TICKET', style: 'centrado' },
             { text: 'EMPLEADO', style: 'centrado' },
-            { text: 'CÉDULA', style: 'centrado' },
+            { text: 'IDENTIFICACIÓN', style: 'centrado' },
             { text: 'TIPO COMIDA', style: 'centrado' },
             { text: 'MENÚ', style: 'centrado' },
             { text: 'PLATO', style: 'centrado' },
@@ -534,7 +534,7 @@ export class DetallePlanificadosComponent implements OnInit {
             return [
               { text: '', style: 'itemsTableD' },
               { text: obj.apellido + ' ' + obj.nombre, style: 'itemsTableD' },
-              { text: obj.cedula, style: 'itemsTableD' },
+              { text: obj.identificacion, style: 'itemsTableD' },
               { text: obj.comida_tipo, style: 'itemsTableD' },
               { text: obj.menu, style: 'itemsTableD' },
               { text: obj.plato, style: 'itemsTableD' },
@@ -615,7 +615,7 @@ export class DetallePlanificadosComponent implements OnInit {
       return {
         N_REGISTROS: j = j + 1,
         TICKET: '',
-        CEDULA: obj.cedula,
+        IDENTIFICACION: obj.identificacion,
         EMPLEADO: obj.apellido + ' ' + obj.nombre,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,
@@ -640,7 +640,7 @@ export class DetallePlanificadosComponent implements OnInit {
       return {
         N_REGISTROS: i = i + 1,
         TICKET: '',
-        CEDULA: obj.cedula,
+        IDENTIFICACION: obj.identificacion,
         EMPLEADO: obj.apellido + ' ' + obj.nombre,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,
@@ -665,7 +665,7 @@ export class DetallePlanificadosComponent implements OnInit {
       return {
         N_REGISTROS: k = k + 1,
         TICKET: '',
-        CEDULA: obj.cedula,
+        IDENTIFICACION: obj.identificacion,
         EMPLEADO: obj.apellido + ' ' + obj.nombre,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,

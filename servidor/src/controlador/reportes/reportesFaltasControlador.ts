@@ -31,13 +31,26 @@ class FaltasControlador {
 export const BuscarFaltas = async function (fec_inicio: string, fec_final: string, id_empleado: string | number) {
     return await pool.query(
         `
-        SELECT ag.id_empleado, CAST(ag.fecha_horario AS VARCHAR)
-        FROM eu_asistencia_general AS ag, eu_empleado_contratos AS ec 
-        WHERE ag.fecha_horario BETWEEN $1 AND $2 AND ag.id_empleado = $3 AND ec.id_empleado = ag.id_empleado AND ec.controlar_asistencia = true
-            AND ag.tipo_dia NOT IN (\'L\', \'FD\')
-        GROUP BY ag.id_empleado, ag.fecha_horario
-        HAVING COUNT(ag.fecha_hora_timbre) = 0 
-        ORDER BY ag.fecha_horario ASC
+            SELECT 
+                ag.id_empleado,
+                CAST(ag.fecha_horario AS VARCHAR) AS fecha
+            FROM 
+                eu_asistencia_general ag
+            JOIN 
+                cargos_empleado AS car ON car.id_cargo = ag.id_empleado_cargo
+            JOIN 
+                eu_empleado_contratos AS ec ON car.id_contrato = ec.id
+            WHERE 
+                ag.fecha_horario BETWEEN $1 AND $2
+                AND ag.id_empleado = $3
+                AND ec.controlar_asistencia = true
+                AND ag.tipo_dia NOT IN ('L', 'FD')
+            GROUP BY 
+                ag.id_empleado, ag.fecha_horario
+            HAVING 
+                COUNT(ag.fecha_hora_timbre) = 0
+            ORDER BY 
+                ag.fecha_horario ASC;
         `
         , [fec_inicio, fec_final, id_empleado])
         .then(res => {

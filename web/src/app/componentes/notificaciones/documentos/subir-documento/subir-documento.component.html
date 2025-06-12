@@ -9,7 +9,7 @@
 <div class="d-flex flex-wrap justify-content-center" style="text-align: center;">
     <form method="post" enctype="multipart/form-data">
         <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
-        <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor" matSuffix matTooltipPosition="right"
+        <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()"  matSuffix matTooltipPosition="right"
             matTooltip="Subir documentos. Tamaño máximo permitido 2MB.">
             Subir archivo
         </label>

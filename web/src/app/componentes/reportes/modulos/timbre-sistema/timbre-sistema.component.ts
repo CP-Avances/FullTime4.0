@@ -4,6 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { Validators, FormControl } from '@angular/forms';
 
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
@@ -108,6 +109,11 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
   get filtroNombreDep() { return this.reporteService.filtroNombreDep };
@@ -119,7 +125,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
 
   constructor(
@@ -301,7 +307,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -496,7 +502,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -635,7 +641,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
- 
+
 
 
   async generarExcel() {
@@ -646,7 +652,6 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
-          n++;
           let servidor_fecha: any = '';
           let servidor_hora = '';
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
@@ -670,7 +675,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           if (this.timbreDispositivo) {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.ciudad,
@@ -691,7 +696,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           } else {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.ciudad,
@@ -725,7 +730,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       ext: { width: 220, height: 105 },
     });
     // COMBINAR CELDAS
- 
+
 
 
     if (this.timbreDispositivo) {
@@ -735,7 +740,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       worksheet.mergeCells("B3:R3");
       worksheet.mergeCells("B4:R4");
       worksheet.mergeCells("B5:R5");
-  
+
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
       worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
       worksheet.getCell("B2").value = 'Lista de Timbres Virtuales'.toUpperCase();
@@ -752,7 +757,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "ciudad", width: 20 },
@@ -773,7 +778,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -828,7 +833,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       worksheet.mergeCells("B3:P3");
       worksheet.mergeCells("B4:P4");
       worksheet.mergeCells("B5:P5");
-  
+
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
       worksheet.getCell("B1").value = localStorage.getItem('name_empresa')?.toUpperCase();
       worksheet.getCell("B2").value = 'Lista de Timbres Virtuales'.toUpperCase();
@@ -845,7 +850,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "ciudad", width: 20 },
@@ -864,7 +869,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -973,7 +978,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           let ele = {
             n: n,
             codigo: usu.codigo,
-            cedula: usu.cedula,
+            nombre: usu.nombre,
+            apellido: usu.apellido,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,

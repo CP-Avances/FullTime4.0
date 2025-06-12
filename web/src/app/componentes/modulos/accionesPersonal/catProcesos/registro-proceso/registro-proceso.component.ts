@@ -68,7 +68,6 @@ export class RegistroProcesoComponent implements OnInit {
   InsertarProceso(form: any) {
     var procesoPadreId: any;
     var procesoPadreNombre = form.procesoProcesoPadreForm;
-    console.log('procesoPadreNombre: ',procesoPadreNombre);
     if (procesoPadreNombre == 0) {
       let dataProceso = {
         nombre: form.procesoNombreForm,
@@ -81,7 +80,7 @@ export class RegistroProcesoComponent implements OnInit {
           this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
-          this.LimpiarCampos();
+          this.CerrarVentana();
         }, error => { 
           this.toastr.error(error.error.message, 'Registro.', {
             timeOut: 6000,
@@ -102,7 +101,7 @@ export class RegistroProcesoComponent implements OnInit {
           this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
-          this.LimpiarCampos();
+          this.CerrarVentana();
         }, error => { 
           console.log('error.message: ',error.error.message)
           this.toastr.error(error.error.message, 'Registro.', {

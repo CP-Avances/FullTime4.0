@@ -5,6 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { Validators, FormControl } from '@angular/forms';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
@@ -14,6 +15,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { error } from 'console';
 
 @Component({
   selector: 'app-reporte-tiempo-alimentacion',
@@ -73,6 +75,11 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   tamanio_pagina_car: number = 5;
   pageSizeOptions_car = [5, 10, 20, 50];
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
   // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
   numero_pagina_dep: number = 1;
   tamanio_pagina_dep: number = 5;
@@ -101,7 +108,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
 
   constructor(
@@ -265,7 +272,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -280,7 +287,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = []
+    console.log("Seleccionado modulos", seleccionados.modulos)
+
     this.restAlimentacion.BuscarTimbresAlimentacion(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      console.log('Respuesta del backend:', res);  // Imprime la respuesta para verificar
       this.data_pdf = res;
       switch (accion) {
         case 'excel': this.ExportarExcel(); break;
@@ -319,7 +329,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-   async GenerarPDF(action: any) {
+  async GenerarPDF(action: any) {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
@@ -515,7 +525,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -691,7 +701,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
             'N°': n,
-            'Cédula': usu.cedula,
+            'Identificación': usu.identificacion,
             'Código': usu.codigo,
             'Nombre Empleado': usu.apellido + ' ' + usu.nombre,
             'Ciudad': usu.ciudad,
@@ -737,8 +747,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           n = n + 1;
           const ele = {
             n: n,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             codigo: usu.codigo,
+            nombre: usu.nombre,
+            apellido: usu.apellido,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,

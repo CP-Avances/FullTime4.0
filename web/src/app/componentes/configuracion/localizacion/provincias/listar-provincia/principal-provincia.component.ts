@@ -164,6 +164,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // METODO PARA REGISTRAR PROVINCIAS
   AbrirVentanaRegistrarProvincia() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroProvinciaComponent, { width: '550px' }).afterClosed().subscribe(item => {
       this.ListarProvincias();
     });
@@ -345,7 +346,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Provincias");
 
 
-    console.log("ver logo. ", this.logo)
+    
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -573,6 +574,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -635,6 +637,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINAR MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -647,7 +650,7 @@ export class PrincipalProvinciaComponent implements OnInit {
             this.selectionProvincias.clear();
             this.ListarProvincias();
           } else {
-            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

@@ -469,7 +469,7 @@ class EmpleadoCargosControlador {
       const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
       let data: any = {
         fila: '',
-        cedula: '',
+        identificacion: '',
         departamento: '',
         fecha_desde: '',
         fecha_hasta: '',
@@ -494,7 +494,7 @@ class EmpleadoCargosControlador {
           headers[cell.value.toString().toUpperCase()] = colNumber;
         });
         // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-        if (!headers['ITEM'] || !headers['CEDULA'] || !headers['DEPARTAMENTO'] ||
+        if (!headers['ITEM'] || !headers['IDENTIFICACION'] || !headers['DEPARTAMENTO'] ||
           !headers['FECHA_DESDE'] || !headers['FECHA_HASTA'] || !headers['SUCURSAL'] ||
           !headers['SUELDO'] || !headers['CARGO'] || !headers['HORA_TRABAJA'] || !headers['JEFE']
         ) {
@@ -506,7 +506,7 @@ class EmpleadoCargosControlador {
           if (rowNumber === 1) return;
           // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
           const ITEM = row.getCell(headers['ITEM']).value;
-          const CEDULA = row.getCell(headers['CEDULA']).value?.toString();
+          const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString();
           const DEPARTAMENTO = row.getCell(headers['DEPARTAMENTO']).value?.toString();
           const FECHA_DESDE = row.getCell(headers['FECHA_DESDE']).value?.toString();
           const FECHA_HASTA = row.getCell(headers['FECHA_HASTA']).value?.toString();
@@ -516,14 +516,14 @@ class EmpleadoCargosControlador {
           const HORA_TRABAJA = row.getCell(headers['HORA_TRABAJA']).value?.toString();
           const JEFE = row.getCell(headers['JEFE']).value?.toString();
           // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-          if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
+          if ((ITEM != undefined && ITEM != '') && (IDENTIFICACION != undefined) && (DEPARTAMENTO != undefined) &&
             (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
             (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) &&
             (JEFE != undefined)) {
 
             data.fila = ITEM;
             data.cargo = CARGO?.trim();
-            data.cedula = CEDULA?.trim();
+            data.identificacion = IDENTIFICACION?.trim();
             data.sueldo = SUELDO?.trim();
             data.sucursal = SUCURSAL?.trim();
             data.fecha_desde = FECHA_DESDE?.trim();
@@ -535,9 +535,9 @@ class EmpleadoCargosControlador {
 
             // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
             const rege = /^[0-9]+$/;
-            if (rege.test(data.cedula)) {
-              if (data.cedula.toString().length != 10) {
-                data.observacion = 'La cédula ingresada no es válida';
+            if (rege.test(data.identificacion)) {
+              if (data.identificacion.toString().length != 10) {
+                data.observacion = 'La identificación ingresada no es válida';
               } else {
                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
                 if (DateTime.fromFormat(data.fecha_desde, 'yyyy-MM-dd').isValid) {
@@ -570,7 +570,7 @@ class EmpleadoCargosControlador {
               }
             }
             else {
-              data.observacion = 'La cédula ingresada no es válida';
+              data.observacion = 'La identificación ingresada no es válida';
             }
 
             listCargos.push(data);
@@ -578,7 +578,7 @@ class EmpleadoCargosControlador {
           else {
             data.fila = ITEM;
             data.cargo = CARGO?.trim();
-            data.cedula = CEDULA?.trim();
+            data.identificacion = IDENTIFICACION?.trim();
             data.sueldo = SUELDO?.trim();
             data.sucursal = SUCURSAL?.trim();
             data.fecha_desde = FECHA_DESDE?.trim();
@@ -625,17 +625,17 @@ class EmpleadoCargosControlador {
               data.observacion = 'Jefe no registrado';
             }
 
-            if (CEDULA == undefined) {
-              data.cedula = 'No registrado'
-              data.observacion = 'Cédula no registrado';
+            if (IDENTIFICACION == undefined) {
+              data.identificacion = 'No registrado'
+              data.observacion = 'Identificación no registrado';
             }
             else {
 
               // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
               const rege = /^[0-9]+$/;
-              if (rege.test(data.cedula)) {
-                if (data.cedula.toString().length != 10) {
-                  data.observacion = 'La cédula ingresada no es válida';
+              if (rege.test(data.identificacion)) {
+                if (data.identificacion.toString().length != 10) {
+                  data.observacion = 'La identificación ingresada no es válida';
                 }
                 else {
                   // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO
@@ -679,7 +679,7 @@ class EmpleadoCargosControlador {
                 }
               }
               else {
-                data.observacion = 'La cédula ingresada no es válida';
+                data.observacion = 'La identificación ingresada no es válida';
               }
             }
 
@@ -702,17 +702,17 @@ class EmpleadoCargosControlador {
         if (valor.observacion == 'no registrado') {
           var VERIFICAR_CEDULA = await pool.query(
             `
-            SELECT * FROM eu_empleados WHERE cedula = $1
+            SELECT * FROM eu_empleados WHERE identificacion = $1
             `
-            , [valor.cedula]);
+            , [valor.identificacion]);
 
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
             const ID_CONTRATO: any = await pool.query(
               `
               SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
-              WHERE e.id = uc.id_empleado AND e.cedula = $1
+              WHERE e.id = uc.id_empleado AND e.identificacion = $1
               `
-              , [valor.cedula]);
+              , [valor.identificacion]);
 
             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
               ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != ''
@@ -777,7 +777,7 @@ class EmpleadoCargosControlador {
                           }
                           else {
                             // DISCRIMINACION DE ELEMENTOS IGUALES
-                            if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                            if (duplicados.find((p: any) => p.identificacion === valor.identificacion) == undefined) {
                               duplicados.push(valor);
                             }
                             else {
@@ -808,11 +808,11 @@ class EmpleadoCargosControlador {
 
             }
             else {
-              valor.observacion = 'Cédula no tiene registrado un contrato'
+              valor.observacion = 'Identificación no tiene registrado un contrato'
             }
           }
           else {
-            valor.observacion = 'Cédula no existe en el sistema'
+            valor.observacion = 'Identificación no existe en el sistema'
           }
         }
 
@@ -887,7 +887,7 @@ class EmpleadoCargosControlador {
 
     for (const data of plantilla) {
       try {
-        const { cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
+        const {identificacion, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
           cargo, hora_trabaja, admini_depa } = data;
 
         // INICIAR TRANSACCION
@@ -895,15 +895,15 @@ class EmpleadoCargosControlador {
 
         const ID_EMPLEADO: any = await pool.query(
           `
-          SELECT id FROM eu_empleados WHERE cedula = $1
+          SELECT id FROM eu_empleados WHERE identificacion = $1
           `
-          , [cedula]);
+          , [identificacion]);
         const ID_CONTRATO: any = await pool.query(
           `
           SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
-          WHERE e.id = uc.id_empleado AND e.cedula = $1
+          WHERE e.id = uc.id_empleado AND e.identificacion = $1
           `
-          , [cedula]);
+          , [identificacion]);
         const ID_SUCURSAL: any = await pool.query(
           `
           SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1

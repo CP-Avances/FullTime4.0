@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { Validators, FormControl } from '@angular/forms';
 
 // IMPORTAR MODELOS
 import { ITableEmpleados, TimbreMrl } from 'src/app/model/reportes.model';
@@ -91,6 +92,9 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // CAMPOS DEL FORMULARIO
+  cedula = new FormControl('', [Validators.minLength(2)]);
+
   //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
@@ -103,7 +107,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
   constructor(
     private reporteService: ReportesService,
@@ -259,7 +263,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -335,11 +339,12 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
             default: accionT = '9'; break;
           }
           let ele = {
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             accion: accionT,
             fecha_hora: `${servidor_fecha} ${servidor_hora}`,
           }
           this.timbres.push(ele);
+          console.log("INFOMRACION", ele)
         })
       })
     });
@@ -355,7 +360,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   ExportarDatos() {
     const txt = this.timbres.map((timbre: TimbreMrl) => {
       return [
-        timbre.cedula,
+        timbre.identificacion,
         timbre.accion,
         timbre.fecha_hora,
       ].join(";");

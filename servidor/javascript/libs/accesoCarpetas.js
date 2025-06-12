@@ -16,12 +16,12 @@ exports.ObtenerIndicePlantilla = exports.ObtenerRutaLicencia = exports.ObtenerRu
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA OBTENER RUTAS ORIGINALES
-const ObtenerRuta = function (codigo, cedula, directorio) {
+const ObtenerRuta = function (codigo, identificacion, directorio) {
     return __awaiter(this, void 0, void 0, function* () {
         let ruta = '';
         let separador = path_1.default.sep;
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return `${ruta}${separador}${directorio}${separador}${codigo}_${cedula}`;
+        return `${ruta}${separador}${directorio}${separador}${codigo}_${identificacion}`;
     });
 };
 exports.ObtenerRuta = ObtenerRuta;
@@ -31,10 +31,10 @@ const ObtenerRutaUsuario = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+        return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
     });
 };
 exports.ObtenerRutaUsuario = ObtenerRutaUsuario;
@@ -44,10 +44,10 @@ const ObtenerRutaVacuna = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+        return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
     });
 };
 exports.ObtenerRutaVacuna = ObtenerRutaVacuna;
@@ -57,10 +57,10 @@ const ObtenerRutaPermisos = function (codigo) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT cedula FROM eu_empleados WHERE codigo = $1
+        SELECT identificacion FROM eu_empleados WHERE codigo = $1
         `, [codigo]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
+        return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].identificacion;
     });
 };
 exports.ObtenerRutaPermisos = ObtenerRutaPermisos;
@@ -69,11 +69,11 @@ const ObtenerRutaPermisosIdEmpleado = function (id_empleado) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `, [id_empleado]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         const codigo = usuario.rows[0].codigo;
-        const carpetaPermisos = `${ruta}${separador}permisos${separador}${codigo}_${usuario.rows[0].cedula}`;
+        const carpetaPermisos = `${ruta}${separador}permisos${separador}${codigo}_${usuario.rows[0].identificacion}`;
         return { carpetaPermisos, codigo };
     });
 };
@@ -94,11 +94,11 @@ const ObtenerRutaHorasExtraIdEmpleado = function (id_empleado) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `, [id_empleado]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         const codigo = usuario.rows[0].codigo;
-        const carpetaHorasExtra = `${ruta}${separador}horasExtra${separador}${codigo}_${usuario.rows[0].cedula}`;
+        const carpetaHorasExtra = `${ruta}${separador}horasExtra${separador}${codigo}_${usuario.rows[0].identificacion}`;
         return { carpetaHorasExtra, codigo };
     });
 };
@@ -118,10 +118,10 @@ const ObtenerRutaHorasExtra = function (codigo) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT cedula FROM eu_empleados WHERE codigo = $1
+        SELECT identificacion FROM eu_empleados WHERE codigo = $1
         `, [codigo]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'horasExtras' + separador + codigo + '_' + usuario.rows[0].cedula;
+        return ruta + separador + 'horasExtras' + separador + codigo + '_' + usuario.rows[0].identificacion;
     });
 };
 exports.ObtenerRutaHorasExtra = ObtenerRutaHorasExtra;
@@ -131,10 +131,10 @@ const ObtenerRutaContrato = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+        return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
     });
 };
 exports.ObtenerRutaContrato = ObtenerRutaContrato;

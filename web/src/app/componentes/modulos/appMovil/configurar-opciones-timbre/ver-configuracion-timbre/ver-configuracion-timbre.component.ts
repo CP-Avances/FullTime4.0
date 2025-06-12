@@ -315,7 +315,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
           }
         });
     } else {
-      this.toastr.warning('No ha seleccionado Usuarios.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado Usuarios.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.HabilitarSeleccion();
@@ -416,7 +416,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
             body: [
               [
                 { rowSpan: 2, text: 'N°', style: 'cabeceras' },
-                { rowSpan: 2, text: 'CÉDULA', style: 'cabeceras' },
+                { rowSpan: 2, text: 'IDENTIFICACIÓN', style: 'cabeceras' },
                 { rowSpan: 2, text: 'CÓDIGO', style: 'cabeceras' },
                 { rowSpan: 2, text: 'EMPLEADO', style: 'cabeceras' },
                 { rowSpan: 2, text: 'GÉNERO', style: 'cabeceras' },
@@ -456,7 +456,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
 
                 return [
                   { style: 'itemsTableCentrado', text: obj.n },
-                  { style: 'itemsTable', text: obj.cedula },
+                  { style: 'itemsTable', text: obj.identificacion },
                   { style: 'itemsTableCentrado', text: obj.codigo },
                   { style: 'itemsTable', text: obj.apellido + ' ' + obj.nombre },
                   { style: 'itemsTableCentrado', text: genero },
@@ -510,7 +510,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
 
       datos.push([
         n++,
-        usu.cedula,
+        usu.identificacion,
         usu.codigo,
         usu.apellido,
         usu.nombre,
@@ -560,7 +560,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apellido", width: 20 },
       { key: "nombre", width: 20 },
@@ -578,7 +578,7 @@ export class VerConfiguracionTimbreComponent implements OnInit {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CEDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "Total:", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },

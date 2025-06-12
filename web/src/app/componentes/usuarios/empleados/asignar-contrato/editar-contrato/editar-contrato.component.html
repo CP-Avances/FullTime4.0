@@ -58,17 +58,17 @@
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
+
                         <mat-form-field *ngIf="habilitarSeleccion">
                             <mat-label>Modalidad Laboral</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
                                 help_outline
                             </mat-icon>
-                            <mat-select [formControl]="tipoF" required>
-                                <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id"
-                                    (click)="IngresarOtro(ContratoForm.value)">
-                                    {{tc.descripcion}}
-                                </mat-option>
+                            <mat-select [formControl]="tipoF" required (selectionChange)="IngresarOtro($event.value)">
+                              <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id">
+                                {{tc.descripcion}}
+                              </mat-option>
                             </mat-select>
                         </mat-form-field>
                         <mat-form-field *ngIf="habilitarContrato">
@@ -194,11 +194,11 @@
                     <div style="text-align: center;">
                         <section class="d-flex flex-column bd-highlight" style="padding-top: 10px; margin: auto 0;"
                             *ngIf="activar">
-                            <div class="separar">
+                            <div class="separar"> 
                                 <form method="post" enctype="multipart/form-data">
-                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
+                                    <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" [formControl]="archivoForm"
                                         id="file">
-                                    <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor" matSuffix
+                                    <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Actualizar el documento contrato del empleado">
                                         Subir Contrato

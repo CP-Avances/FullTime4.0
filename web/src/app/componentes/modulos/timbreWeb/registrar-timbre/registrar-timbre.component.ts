@@ -16,6 +16,7 @@ import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.servic
 
 import { TimbreWebComponent } from '../timbre-empleado/timbre-web.component';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -47,6 +48,8 @@ export class RegistrarTimbreComponent implements OnInit {
   public get triggerObservable(): Observable<void> {
     return this.trigger.asObservable();
   }
+
+  get permisos(): boolean { return this.funcionesMain.permisos; }
 
   // CAMPOS DEL FORMULARIO Y VALIDACIONES
   observacionF = new FormControl('');
@@ -94,6 +97,7 @@ export class RegistrarTimbreComponent implements OnInit {
     public restF: FuncionesService,
     private toastr: ToastrService, // VARIABLE DE USO EN NOTIFICACIONES
     public validar: ValidacionesService,
+    private funcionesMain: MainNavService,
   ) {
     this.id_empl = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -272,7 +276,7 @@ export class RegistrarTimbreComponent implements OnInit {
         this.convertida = canvas.toDataURL('image/jpeg', quality);
       } else {
         this.toastr.warning(
-          'Ups!!! algo salio mal.', 'Intente nuevamente.', {
+          'Ups! algo salio mal.', 'Intente nuevamente.', {
           timeOut: 6000,
         })
       }
@@ -390,7 +394,7 @@ export class RegistrarTimbreComponent implements OnInit {
               break;
             default:
               this.toastr.warning(
-                'Ups!!! algo salio mal.', 'Volver a intentar.', {
+                'Ups! algo salio mal.', 'Volver a intentar.', {
                 timeOut: 6000,
               })
           }
@@ -398,7 +402,7 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     else {
       this.toastr.warning(
-        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
+        'Ups! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
         timeOut: 6000,
       })
     }
@@ -521,7 +525,7 @@ export class RegistrarTimbreComponent implements OnInit {
     });
   }
 
-  // METODO PARA TOMAR DATOS DE MARCACION 
+  // METODO PARA TOMAR DATOS DE MARCACION
   informacion_timbre: any;
   dataTimbre: any;
   RegistrarDatosTimbre(ubicacion: any) {
@@ -561,7 +565,7 @@ export class RegistrarTimbreComponent implements OnInit {
       else if (res.message === 'Registro duplicado.') {
         this.toastr.info(res.message);
       }
-      else if (res.message === 'Ups!!! algo salio mal.') {
+      else if (res.message === 'Ups! algo salio mal.') {
         this.toastr.warning(res.message);
       }
       else {
@@ -575,10 +579,21 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA GUARDAR TIMBRE CON IMAGEN
   GuardarImagen(form: any): void {
-    //console.log('observacion ', form.observacionForm)
+
+
+    if(this.foto_obligatorio && !this.imagenCamara){
+      this.toastr.info(
+        '', 'La foto es obligatoria.', {
+        timeOut: 6000,
+      });
+
+      return;
+    }
+
     if (this.imagenCamara) {
       this.informacion_timbre.imagen = this.convertida;
     }
+
     this.informacion_timbre.observacion = form.observacionForm;
     if (this.boton_abierto === true) {
       if (form.observacionForm != '' && form.observacionForm != undefined) {
@@ -727,7 +742,7 @@ export class RegistrarTimbreComponent implements OnInit {
       })
     }
     else {
-      this.toastr.warning('No tiene permitido timbrar en perímetros desconocidos.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No tiene permitido timbrar en perímetros desconocidos.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
       this.CerrarProcesos();
@@ -774,5 +789,18 @@ export class RegistrarTimbreComponent implements OnInit {
     console.log('Cámara cerrada y variable imagenCamara reiniciada');
   }
 
+  // METODO PARA ACTUALIZAR EL ESTADO DE LOS BOTONES
+  toggleEstado(item: string, tipo: string) {
+    this.ver_camara = !this.ver_camara;
+    if(this.ver_camara){
+      this.reproducirSonido()
+    }
+  }
+  reproducirSonido() {
+    const audio = new Audio();
+    audio.src = 'assets/sounds/click_confirmed.mp3'; // Ruta del sonido
+    audio.load();
+    audio.play();
+  }
 
 }

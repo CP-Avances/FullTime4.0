@@ -15,7 +15,7 @@ export class EmplCedulaPipe implements PipeTransform {
 
     for (const empleado of value) {
 
-      if (empleado.cedula.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
+      if (empleado.identificacion.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
         resultadoEmpleado.push(empleado);
       };
 

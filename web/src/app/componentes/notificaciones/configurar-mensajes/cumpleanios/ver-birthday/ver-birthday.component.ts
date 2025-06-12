@@ -54,6 +54,7 @@ export class VerBirthdayComponent implements OnInit {
 
   // METODO PARA EDITAR MENSAJE DE CUMPELAÑOS
   EditarMensaje(dataSelect: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(EditarBirthdayComponent, { width: '500px', data: dataSelect })
       .afterClosed().subscribe(items => {
         this.ObtenerMensajeCumple();

@@ -22,6 +22,9 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 
+
+import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+
 @Component({
   selector: 'app-main-nav',
   standalone: false,
@@ -55,6 +58,9 @@ export class MainNavComponent implements OnInit {
   menuGeneralUsuarios: any = [];//Menu General
   menuGeneralAdministrador: any = [];//Menu Administrador
   paginasMG: any = []; //Variable para guardar los permisos de acceso a botones que tiene asignado
+
+  // BOTON DE ALERTAS MODULOS
+  boton_notificaciones: boolean = false;
 
   itemConfiguracion: boolean = false;
   subItemConfiguracionParametrizacion: boolean = false;
@@ -206,6 +212,16 @@ export class MainNavComponent implements OnInit {
   vistaReportesAuditoria: boolean = false;
   datosPaginaRol: any = [];
 
+  // CONTROL DE FUNCIONES DEL SISTEMA
+  get HabilitarGeolocalizacion(): boolean { return this.funciones.geolocalizacion; }
+  get HabilitarAlimentacion(): boolean { return this.funciones.alimentacion; }
+  get HabilitarVacaciones(): boolean { return this.funciones.vacaciones; }
+  get HabilitarHoraExtra(): boolean { return this.funciones.horasExtras; }
+  get HabilitarTimbreWeb(): boolean { return this.funciones.timbre_web; }
+  get HabilitarPermisos(): boolean { return this.funciones.permisos; }
+  get HabilitarAccion(): boolean { return this.funciones.accionesPersonal; }
+  get HabilitarMovil(): boolean { return this.funciones.app_movil; }
+
   constructor(
     private restRolPermiso: RolPermisosService,
     public restF: FuncionesService,
@@ -221,7 +237,9 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
-  ) { }
+    private restTimbres: TimbresService,
+  ) {
+  }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
 
@@ -247,13 +265,14 @@ export class MainNavComponent implements OnInit {
   showMessageLicencia: Boolean = false;
   FuncionLicencia() {
     const licencia = localStorage.getItem('fec_caducidad_licencia');
-    console.log(licencia);
+    //console.log(licencia);
     if (licencia !== null) {
-      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd');
-      this.fec_caducidad_licencia = fec_caducidad;
+      var fec_caducidad = this.validar.DarFormatoFecha(licencia.split('.')[0], 'yyyy-MM-dd') ?? '';
+      this.fec_caducidad_licencia = fec_caducidad ? new Date(fec_caducidad) : new Date();
       // CONVERTIMOS LA FECHA ACTUAL Y LA FECHA DE CADUCIDAD A OBJETOS LUXON
       const fecha = DateTime.now();
-      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd');
+      var fechaActual = this.validar.DarFormatoFecha(fecha, 'yyyy-MM-dd') ?? '';
+      //console.log('fechaActual 2121 ', fechaActual);
       const fechaInicio = DateTime.fromISO(fechaActual);
       const fechaFin = DateTime.fromISO(fec_caducidad);
       // CALCULAMOS LA DIFERENCIA EN DIAS ENTRE LAS DOS FECHAS
@@ -279,10 +298,9 @@ export class MainNavComponent implements OnInit {
       this.breakpointObserver.observe('(max-width: 800px)').subscribe((result: BreakpointState) => {
         this.barraInicial = result.matches;
       });
-
-      //Inicio Consulta de menu
+      // INICIO CONSULTA DE MENU
       this.MenuGeneral();
-      //Fin Consulta de menu
+      // FIN CONSULTA DE MENU
     }
   }
 
@@ -324,16 +342,6 @@ export class MainNavComponent implements OnInit {
     this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
   }
 
-  // CONTROL DE FUNCIONES DEL SISTEMA
-  get HabilitarGeolocalizacion(): boolean { return this.funciones.geolocalizacion; }
-  get HabilitarAlimentacion(): boolean { return this.funciones.alimentacion; }
-  get HabilitarVacaciones(): boolean { return this.funciones.vacaciones; }
-  get HabilitarHoraExtra(): boolean { return this.funciones.horasExtras; }
-  get HabilitarTimbreWeb(): boolean { return this.funciones.timbre_web; }
-  get HabilitarPermisos(): boolean { return this.funciones.permisos; }
-  get HabilitarAccion(): boolean { return this.funciones.accionesPersonal; }
-  get HabilitarMovil(): boolean { return this.funciones.app_movil; }
-
   // CONTROL DE MENU PRINCIPAL
   nombreSelect: string = '';
   manejarEstadoActivo(name: any) {
@@ -363,11 +371,14 @@ export class MainNavComponent implements OnInit {
     if (this.menuGeneralUsuarios.length < 1) {
       this.restRolPermiso.BuscarPaginasMenuRol(buscarPagina).subscribe(
         {
+
           next: (v) => {
             this.paginasMG = v;
+            this.boton_notificaciones = this.HabilitarPermisos || this.HabilitarVacaciones || this.HabilitarHoraExtra || this.HabilitarAlimentacion;
           },
           error: (e) => {
-            //Armado de json con elementos de menu ERROR
+            this.boton_notificaciones = this.HabilitarPermisos || this.HabilitarVacaciones || this.HabilitarHoraExtra || this.HabilitarAlimentacion;
+            // ARMADO DE JSON CON ELEMENTOS DE MENU ERROR
             this.menuGeneralUsuarios = [
               {
                 name: 'Módulos',
@@ -570,7 +581,7 @@ export class MainNavComponent implements OnInit {
           complete: () => {
             //Control de vistas activas
             this.paginasMG.forEach((row: any) => {
-              console.log('id: ' , row.id, ' funcion ', row.funcion, ' link: ' , row.link, ' id_rol: ' , row.id_rol, ' accion: ' , row.id_accion);
+              // console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
               switch (row.link) {
                 case 'vistaEmpresa':
                   this.itemConfiguracion = true;
@@ -792,17 +803,6 @@ export class MainNavComponent implements OnInit {
                     this.childrenUsuarios.push({ name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true });
                   }
                   break;
-                case 'actualizarInformacion':
-                  this.itemUsuarios = true;
-                  for (const parametrizacion of this.childrenUsuarios) {
-                    if (parametrizacion.url === '/actualizarInformacion') {
-                      this.vistaActualizarInformacion = true;
-                    }
-                  }
-                  if (!this.vistaActualizarInformacion) {
-                    this.childrenUsuarios.push({ name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true });
-                  }
-                  break;
                 case 'empleado':
                   this.itemUsuarios = true;
                   for (const parametrizacion of this.childrenUsuarios) {
@@ -812,6 +812,17 @@ export class MainNavComponent implements OnInit {
                   }
                   if (!this.vistaEmpleados) {
                     this.childrenUsuarios.push({ name: 'Empleados', url: '/empleado', color: true, ver: true });
+                  }
+                  break;
+                case 'actualizarInformacion':
+                  this.itemUsuarios = true;
+                  for (const parametrizacion of this.childrenUsuarios) {
+                    if (parametrizacion.url === '/actualizarInformacion') {
+                      this.vistaActualizarInformacion = true;
+                    }
+                  }
+                  if (!this.vistaActualizarInformacion) {
+                    this.childrenUsuarios.push({ name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true });
                   }
                   break;
                 case 'administrarInformacion':
@@ -1129,7 +1140,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosTimbreVirtualTimbresWeb) {
-                    this.childrenTimbreVirtual.push({ name: 'Timbre Virtual', url: '/timbresWeb', color: true, ver: true });
+                    this.childrenTimbreVirtual.push({ name: 'Habilitar Timbre Virtual', url: '/timbresWeb', color: true, ver: true });
                   }
                   break;
                 case 'configurar-timbre-web':
@@ -1141,7 +1152,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosTimbreVirtualConfigurarTimbreVirtual) {
-                    this.childrenTimbreVirtual.push({ name: 'Configurar Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true });
+                    this.childrenTimbreVirtual.push({ name: 'Opciones Timbre Virtual', url: '/configurar-timbre-web', color: true, ver: true });
                   }
                   break;
                 case 'timbres-personal':
@@ -1165,7 +1176,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilAppMovil) {
-                    this.childrenAplicacionMovil.push({ name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Habilitar Reloj Virtual', url: '/app-movil', color: true, ver: true });
                   }
                   break;
                 case 'configurar-timbre':
@@ -1177,7 +1188,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilConfigurarTimbre) {
-                    this.childrenAplicacionMovil.push({ name: 'Configurar Timbre', url: '/configurar-timbre', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Opciones Reloj Virtual', url: '/configurar-timbre', color: true, ver: true });
                   }
                   break;
                 case 'registro-dispositivos':
@@ -1189,7 +1200,7 @@ export class MainNavComponent implements OnInit {
                     }
                   }
                   if (!this.vistaModulosAplicacionMovilRegistroDispositivos) {
-                    this.childrenAplicacionMovil.push({ name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true, ver: true });
+                    this.childrenAplicacionMovil.push({ name: 'Dispositivos Registrados', url: '/registro-dispositivos', color: true, ver: true });
                   }
                   break;
                 case 'listarRelojes':
@@ -1258,15 +1269,15 @@ export class MainNavComponent implements OnInit {
                     this.childrenNotificaciones.push({ name: 'Documentos', url: '/archivos', color: true, ver: true });
                   }
                   break;
-                case 'cumpleanios':
+                case 'mensaje_notificaciones':
                   this.itemNotificaciones = true;
                   for (const parametrizacion of this.childrenNotificaciones) {
-                    if (parametrizacion.url === '/cumpleanios') {
+                    if (parametrizacion.url === '/mensaje_notificaciones') {
                       this.vistaModulosNotificacionesCumpleanios = true;
                     }
                   }
                   if (!this.vistaModulosNotificacionesCumpleanios) {
-                    this.childrenNotificaciones.push({ name: 'Cumpleaños', url: '/cumpleanios', color: true, ver: true });
+                    this.childrenNotificaciones.push({ name: 'Felicitaciones', url: '/mensaje_notificaciones', color: true, ver: true });
                   }
                   break;
                 case 'comunicados':
@@ -2095,7 +2106,7 @@ export class MainNavComponent implements OnInit {
                 this.menuGeneralUsuarios.splice(indexNotificaciones, 1);
               }
             }
-            //Modulos-Permisos              
+            //Modulos-Permisos
             if (!this.HabilitarPermisos || !this.subItemModulosPermisos) {
               const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
               if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {

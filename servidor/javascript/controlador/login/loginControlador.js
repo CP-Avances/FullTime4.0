@@ -57,13 +57,13 @@ class LoginControlador {
                     let ACTIVO = yield database_1.default.query(
                     //FIXME
                     `
-          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
+          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.identificacion, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `, [USUARIO.rows[0].id])
                         .then((result) => {
                         return result.rows;
                     });
-                    const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
+                    const { empleado, usuario, codigo, web_access, nombre, apellido, identificacion, imagen, app_habilita } = ACTIVO[0];
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     console.log('verificar activo ', empleado, ' usu ', usuario);
                     if (empleado === 2 && usuario === false) {
@@ -78,10 +78,6 @@ class LoginControlador {
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
                     if (!app_habilita && movil == true)
                         return res.jsonp({ message: "sin_permiso_acces_movil" });
-                    // BUSQUEDA DE MODULOS DEL SISTEMA
-                    const [modulos] = yield database_1.default.query(`
-          SELECT * FROM e_funciones LIMIT 1
-          `).then((result) => { return result.rows; });
                     // BUSQUEDA DE CLAVE DE LICENCIA
                     //FIXME
                     const EMPRESA = yield database_1.default.query(`
@@ -90,6 +86,7 @@ class LoginControlador {
                     //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
                     const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
+                    //console.log('llave ', public_key)
                     const licenciaData = yield fetch(`${process.env.DIRECCIONAMIENTO}/licencia`, {
                         method: "POST",
                         headers: {
@@ -134,7 +131,6 @@ class LoginControlador {
                             _empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
-                            modulos: modulos,
                             id_contrato: id_contrato
                         }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
                         return res.status(200).jsonp({
@@ -149,11 +145,10 @@ class LoginControlador {
                             empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
-                            modulos: modulos,
                             id_contrato: id_contrato,
                             nombre: nombre,
                             apellido: apellido,
-                            cedula: cedula,
+                            identificacion: identificacion,
                             imagen: imagen,
                             codigo: codigo,
                             ruc: ruc,
@@ -165,12 +160,11 @@ class LoginControlador {
                         if (id_rol === 1) {
                             const token = jsonwebtoken_1.default.sign({
                                 _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-                                _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente,
-                                modulos: modulos
+                                _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente
                             }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
                             return res.status(200).jsonp({
                                 caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-                                empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos //, modulos: modulos
+                                empresa: id_empresa, ip_adress: ip_cliente
                             });
                         }
                         else {
@@ -193,7 +187,7 @@ class LoginControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const correo = req.body.correo;
             const url_page = req.body.url_page;
-            const cedula = req.body.cedula;
+            const identificacion = req.body.identificacion;
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
@@ -203,10 +197,10 @@ class LoginControlador {
             const correoValido = yield database_1.default.query(`
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2 
-      `, [correo, cedula]);
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2 
+      `, [correo, identificacion]);
             if (correoValido.rows[0] == undefined)
-                return res.status(401).send('Correo o cédula de usuario no válido.');
+                return res.status(401).send('Correo o identificación de usuario no válido.');
             var datos = yield (0, settingsMail_1.Credenciales)(1);
             if (datos === 'ok') {
                 const token = jsonwebtoken_1.default.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail', { expiresIn: 60 * 5, algorithm: 'HS512' });
@@ -273,7 +267,7 @@ class LoginControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }

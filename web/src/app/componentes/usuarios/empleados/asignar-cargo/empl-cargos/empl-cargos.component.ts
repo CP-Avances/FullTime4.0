@@ -127,7 +127,7 @@ export class EmplCargosComponent implements OnInit {
     this.tipoCargo = [];
     this.cargos.ObtenerTipoCargos().subscribe(datos => {
       this.tipoCargo = datos;
-      this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+      this.tipoCargo[this.tipoCargo.length] = { id: 'OTRO', cargo: "OTRO" };
     })
   }
 
@@ -168,16 +168,30 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO PARA ACTIVAR INGRESO DE CARGO
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined) {
+  IngresarOtro(valor: any) {
+    if (valor === 'OTRO') {
       this.formulario.patchValue({
         cargoForm: '',
       });
       this.habilitarCargo = true;
+      this.habilitarSeleccion = false;
+      this.cargoF.setValidators([Validators.required, Validators.minLength(3)]);
+      this.cargoF.updateValueAndValidity();
+      this.tipoF.clearValidators();
+      this.tipoF.setValue(null);
+      this.tipoF.updateValueAndValidity();
       this.toastr.info('Ingresar nombre del nuevo cargo.', 'Etiqueta Cargo a desempeñar activa.', {
         timeOut: 4000,
-      })
-      this.habilitarSeleccion = false;
+      });
+    } else {
+      this.habilitarCargo = false;
+      this.habilitarSeleccion = true;
+      this.cargoF.clearValidators();
+      this.cargoF.setValue('');
+      this.cargoF.updateValueAndValidity();
+
+      this.tipoF.setValidators(Validators.required);
+      this.tipoF.updateValueAndValidity();
     }
   }
 
@@ -189,20 +203,18 @@ export class EmplCargosComponent implements OnInit {
     });
     this.habilitarCargo = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
     //console.log('fechas ', form.fecInicioForm, ' ----  ', form.fecFinalForm)
     // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
-    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd');
-    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd');
-    let contrato_inicio = DateTime.fromISO(this.contrato_actual.fecha_ingreso).toFormat('yyyy-MM-dd');
-    let contrato_fin = DateTime.fromISO(this.contrato_actual.fecha_salida).toFormat('yyyy-MM-dd');
-    //console.log('inicio ', registro_inicio)
-    //console.log('fin ', registro_fin)
-    //console.log('inicio ', contrato_inicio)
-    //console.log('fin ', contrato_fin)
+    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd')!;
+    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd')!;
+    let contrato_inicio = DateTime.fromISO(this.contrato_actual.fecha_ingreso).toFormat('yyyy-MM-dd')!;
+    let contrato_fin = DateTime.fromISO(this.contrato_actual.fecha_salida).toFormat('yyyy-MM-dd')!;
+
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
     if ((contrato_inicio <= registro_inicio) &&
       (contrato_fin >= registro_fin)) {
@@ -266,11 +278,11 @@ export class EmplCargosComponent implements OnInit {
       fecha_verificar: datos.fec_inicio
     }
     this.cargos.BuscarCargoFecha(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
-      if (form.tipoForm === undefined) {
+      if (!form.tipoForm || form.tipoForm === 'OTRO') {
         this.VerificarTipoCargo(form, datos);
       }
       else {
@@ -317,7 +329,7 @@ export class EmplCargosComponent implements OnInit {
       nombre: (form.cargoForm).toUpperCase()
     }
     this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
-      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

@@ -7,8 +7,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
-import ExcelJS, { FillPattern } from "exceljs";
 import { Router } from '@angular/router';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -139,7 +139,6 @@ export class ListaEmpleadosComponent implements OnInit {
 
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
-    this.ValidarCedula('1727193848');
 
     this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
@@ -273,7 +272,7 @@ export class ListaEmpleadosComponent implements OnInit {
       id: obj.id,
       codigo: obj.codigo,
       empleado: `${obj.nombre} ${obj.apellido}`,
-      cedula: obj.cedula,
+      identificacion: obj.identificacion,
     }));
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
@@ -307,7 +306,7 @@ export class ListaEmpleadosComponent implements OnInit {
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })
-    } else if (opcion === 2 || opcion === 3) {
+    } else if (opcion === 2) {
       EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
@@ -340,10 +339,6 @@ export class ListaEmpleadosComponent implements OnInit {
             // ACTIVAR EMPLEADOS
             else if (opcion === 2) {
               res = await this.rest.ActivarVariosUsuarios(datos);
-            }
-            // REACTIVAR EMPLEADOS
-            else if (opcion === 3) {
-              res = await this.rest.ReActivarVariosUsuarios(datos);
             }
             this.toastr.success(res.message, '', {
               timeOut: 6000,
@@ -531,7 +526,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (this.datosCodigo[0].automatico === true) {
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
@@ -547,20 +542,20 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-     
-          if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
-            this.numero_paginaMul = 1;
-            this.tamanio_paginaMul = 5;
-            this.VerificarPlantillaManual();
-          } else {
-            this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
-              timeOut: 6000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-            this.LimpiarCampos();
-            this.mostrarbtnsubir = false;
-          }
+
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
+          this.numero_paginaMul = 1;
+          this.tamanio_paginaMul = 5;
+          this.VerificarPlantillaManual();
+        } else {
+          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
+            timeOut: 6000,
+          });
+          this.archivoForm.reset();
+          this.nameFile = '';
+          this.LimpiarCampos();
+          this.mostrarbtnsubir = false;
+        }
       }
     } else {
       this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
@@ -573,29 +568,21 @@ export class ListaEmpleadosComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
-  // METODO PARA VERIFICAR PLANTILLA MODO CODIGO AUTOMATICO
+  // METODO PARA VERIFICAR PLANTILLA MODO CODIGO AUTOMATICO Y IDENTIFICACION
   DataEmpleados: any;
   listUsuariosCorrectas: any = [];
   messajeExcel: string = '';
   VerificarPlantillaAutomatico() {
+    this.datosManuales = false;
     this.listUsuariosCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append("modoCodigo", this.datosCodigo[0].cedula ? 'cedula' : 'automatico');
     this.rest.VerificarArchivoExcel_Automatico(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
-
-      this.DataEmpleados.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -603,6 +590,15 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
+        this.DataEmpleados.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.DataEmpleados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok' || item.observacion.toLowerCase() == 'ok (verificar ubicación)') {
             this.listUsuariosCorrectas.push(item);
@@ -630,15 +626,6 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.VerificarArchivoExcel_Manual(formData).subscribe(res => {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
-      this.DataEmpleados.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -646,6 +633,15 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
+        this.DataEmpleados.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.DataEmpleados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok' || item.observacion.toLowerCase() == 'ok (verificar ubicación)') {
             this.listUsuariosCorrectas.push(item);
@@ -665,6 +661,7 @@ export class ListaEmpleadosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -720,12 +717,12 @@ export class ListaEmpleadosComponent implements OnInit {
     else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     }
-    else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
+    else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Identificación ya' ||
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Usuario ya' ||
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Código ya') {
       return 'rgb(239, 203, 106)';
     }
-    else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
+    else if (arrayObservacion[0] == 'Identificación' || arrayObservacion[0] == 'Usuario') {
       return 'rgb(251, 73, 18)';
     }
     else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Registro duplicado') {
@@ -733,14 +730,18 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     else if ((observacion == 'Código ingresado no válido') ||
       (observacion == 'El teléfono ingresado no es válido') ||
-      (observacion == 'La cédula ingresada no es válida') ||
+      (observacion == 'La identificación ingresada no es válida') ||
       (observacion == 'Género no es válido') ||
       (observacion == 'Estado civil no es válido') ||
-      (observacion == 'Verificar ubicación')) {
+      (observacion == 'Verificar ubicación') ||
+      (observacion == 'Verificar correo')) {
       return 'rgb(222, 162, 73)';
     }
     else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema')) {
+      (observacion == 'Nacionalidad no existe en el sistema') ||
+      (observacion == 'Estado civil no existe en el sistema') ||
+      (observacion == 'Género no existe en el sistema')
+    ) {
       return 'rgb(255, 192, 203)';
     }
     else if ((observacion == 'La contraseña debe tener máximo 10 caracteres') || (observacion == 'El código debe tener máximo 10 caracteres')) {
@@ -861,7 +862,7 @@ export class ListaEmpleadosComponent implements OnInit {
               [
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Cedula', style: 'tableHeader' },
+                { text: 'Identificación', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
                 { text: 'Género', style: 'tableHeader' },
@@ -879,7 +880,7 @@ export class ListaEmpleadosComponent implements OnInit {
                     nacionalidad = element.nombre;
                   }
                 });
-                
+
                 let genero: any;
                 this.generos.forEach((element: any) => {
                   if (obj.genero == element.id) {
@@ -887,7 +888,7 @@ export class ListaEmpleadosComponent implements OnInit {
                   }
                 });
 
-                let estadoCivil:any;
+                let estadoCivil: any;
                 this.estadosCiviles.forEach((element: any) => {
                   if (obj.estado_civil == element.id) {
                     estadoCivil = element.estado_civil;
@@ -897,8 +898,8 @@ export class ListaEmpleadosComponent implements OnInit {
 
                 return [
                   { text: obj.codigo, style: 'itemsTableD' },
-                  { text: `${obj.apellido} ${obj.nombre}`, style: 'itemsTableD'  },
-                  { text: obj.cedula, style: 'itemsTableD' },
+                  { text: `${obj.apellido} ${obj.nombre}`, style: 'itemsTableD' },
+                  { text: obj.identificacion, style: 'itemsTableD' },
                   { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },
@@ -931,22 +932,22 @@ export class ListaEmpleadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
-  
-   generos: any=[];
-   ObtenerGeneros(){
-     this.restGenero.ListarGeneros().subscribe(datos => {
-       this.generos = datos;
-     })
-   }
 
-   estadosCiviles: any=[];
-   ObtenerEstadosCiviles(){
-     this.restEstadosCiviles.ListarEstadoCivil().subscribe(datos => {
-       this.estadosCiviles = datos;
-     })
-   }
-  
-   async generarExcelEmpleados(numero: any) {
+  generos: any = [];
+  ObtenerGeneros() {
+    this.restGenero.ListarGeneros().subscribe(datos => {
+      this.generos = datos;
+    })
+  }
+
+  estadosCiviles: any = [];
+  ObtenerEstadosCiviles() {
+    this.restEstadosCiviles.ListarEstadoCivil().subscribe(datos => {
+      this.estadosCiviles = datos;
+    })
+  }
+
+  async generarExcelEmpleados(numero: any) {
 
     //const { usuarios, empresa, id_empresa } = datos;
     if (numero === 1) {
@@ -976,7 +977,7 @@ export class ListaEmpleadosComponent implements OnInit {
           genero = element.genero;
         }
       });
-      let estadoCivil:any;
+      let estadoCivil: any;
       this.estadosCiviles.forEach((element: any) => {
         if (usuario.estado_civil == element.id) {
           estadoCivil = element.estado_civil;
@@ -985,7 +986,7 @@ export class ListaEmpleadosComponent implements OnInit {
       empleados.push([
         index + 1,
         usuario.codigo,
-        usuario.cedula,
+        usuario.identificacion,
         usuario.apellido,
         usuario.nombre,
         usuario.fecha_nacimiento.split("T")[0],
@@ -1003,7 +1004,7 @@ export class ListaEmpleadosComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Empleados");
 
 
-    console.log("ver logo. ", this.logo)
+
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -1038,7 +1039,7 @@ export class ListaEmpleadosComponent implements OnInit {
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "apellido", width: 20 },
       { key: "nombre", width: 20 },
       { key: "fecha_nacimiento", width: 20 },
@@ -1055,7 +1056,7 @@ export class ListaEmpleadosComponent implements OnInit {
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
-      { name: "CEDULA", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACION", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "FECHA_NACIMIENTO", totalsRowLabel: "", filterButton: true },
@@ -1154,7 +1155,7 @@ export class ListaEmpleadosComponent implements OnInit {
           genero = element.genero;
         }
       });
-      let estadoCivil:any;
+      let estadoCivil: any;
       this.estadosCiviles.forEach((element: any) => {
         if (obj.estado_civil == element.id) {
           estadoCivil = element.estado_civil;
@@ -1163,7 +1164,7 @@ export class ListaEmpleadosComponent implements OnInit {
       objeto = {
         "empleado": {
           "$": { "codigo": obj.codigo },
-          "cedula": obj.cedula,
+          "identificacion": obj.identificacion,
           "apellido": obj.apellido,
           "nombre": obj.nombre,
           "estadoCivil": estadoCivil,
@@ -1225,7 +1226,7 @@ export class ListaEmpleadosComponent implements OnInit {
     // 3. Agregar encabezados de las columnas
     worksheet.columns = [
       { header: 'CODIGO', key: 'codigo', width: 10 },
-      { header: 'CEDULA', key: 'cedula', width: 30 },
+      { header: 'IDENTIFICACION', key: 'identificacion', width: 30 },
       { header: 'APELLIDO', key: 'apellido', width: 15 },
       { header: 'NOMBRE', key: 'nombre', width: 15 },
       { header: 'FECHA_NACIMIENTO', key: 'fecha_nacimiento', width: 15 },
@@ -1253,7 +1254,7 @@ export class ListaEmpleadosComponent implements OnInit {
           genero = element.genero;
         }
       });
-      let estadoCivil:any;
+      let estadoCivil: any;
       this.estadosCiviles.forEach((element: any) => {
         if (obj.estado_civil == element.id) {
           estadoCivil = element.estado_civil;
@@ -1262,7 +1263,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
       worksheet.addRow({
         codigo: obj.codigo,
-        cedula: obj.cedula,
+        identificacion: obj.identificacion,
         apellido: obj.apellido,
         nombre: obj.nombre,
         fecha_nacimiento: obj.fecha_nacimiento.split("T")[0],
@@ -1296,10 +1297,12 @@ export class ListaEmpleadosComponent implements OnInit {
     const datos = {
       empleados: empleadosSeleccionados,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
+    (document.activeElement as HTMLElement)?.blur();
     empleadosSeleccionados.length > 0 ? this.ventana.open(MetodosComponent, { width: '450px' })
       .afterClosed().subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -1307,7 +1310,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.rest.EliminarEmpleados(datos).subscribe((res: any) => {
             if (res.error) {
               const metodo = res.status === 500 ? 'error' : 'warning';
-              const titulo = res.status === 500 ? 'Ups!!! algo salio mal.' : '';
+              const titulo = res.status === 500 ? 'Ups! algo salio mal.' : '';
               this.toastr[metodo](res.message, titulo, { timeOut: 6000 });
             } else {
               this.toastr.success(res.message, '', { timeOut: 6000 });
@@ -1323,38 +1326,6 @@ export class ListaEmpleadosComponent implements OnInit {
       }) : this.toastr.info('No ha seleccionado usuarios.', '', {
         timeOut: 6000,
       });
-  }
-
-
-  ValidarCedula(cedula: string) {
-    console.log("entra a validar Cedula")
-    const inputElement = cedula
-
-    const cad: string = inputElement;
-    let total: number = 0;
-    const longitud: number = cad.length;
-    const longcheck: number = longitud - 1;
-
-    if (cad !== "" && longitud === 10) {
-      for (let i = 0; i < longcheck; i++) {
-        let num = parseInt(cad.charAt(i), 10);
-        if (isNaN(num)) return;
-
-        if (i % 2 === 0) {
-          num *= 2;
-          if (num > 9) num -= 9;
-        }
-        total += num;
-      }
-
-      total = total % 10 ? 10 - (total % 10) : 0;
-
-      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
-        console.log("Cédula Válida")
-      } else {
-        console.log("Cédula Inválida")
-      }
-    }
   }
 
   //CONTROL BOTONES
@@ -1374,23 +1345,23 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
-  getCrearUsuarios(){
+  getCrearUsuarios() {
     return this.tienePermiso('Crear Usuarios');
   }
 
-  getActivarDesactivarUsuarios(){
+  getActivarDesactivarUsuarios() {
     return this.tienePermiso('Activar o Desactivar Usuarios');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Usuarios');
   }
 
-  getVerUsuario(){
+  getVerUsuario() {
     return this.tienePermiso('Ver Datos');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Usuarios');
   }
 

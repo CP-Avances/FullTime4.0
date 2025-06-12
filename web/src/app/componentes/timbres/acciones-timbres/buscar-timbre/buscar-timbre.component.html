@@ -20,11 +20,12 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <mat-form-field>
-                                        <mat-label>Cédula</mat-label>
-                                        <input matInput type="tel" [formControl]="cedula" (keypress)="IngresarSoloNumeros($event)">
+                                        <mat-label>Identificación</mat-label>
+                                        <input matInput type="tel" [formControl]="cedula"
+                                            (keypress)="IngresarSoloNumeros($event)">
                                         <mat-icon matSuffix matTooltipPosition="right"
-                                            matTooltip="Ingresar número de cédula.">
-                                            help_outline
+                                            matTooltip="Ingresar número de identificación.">
+                                            badge
                                         </mat-icon>
                                     </mat-form-field>
                                     <mat-form-field>
@@ -32,7 +33,7 @@
                                         <input matInput [formControl]="codigo">
                                         <mat-icon matSuffix matTooltipPosition="right"
                                             matTooltip="Ingresar el código de usuario.">
-                                            help_outline
+                                            code
                                         </mat-icon>
                                     </mat-form-field>
                                     <mat-form-field id="formulario">

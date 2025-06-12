@@ -573,7 +573,7 @@ class NotificacionTiempoRealControlador {
         atrasos_mail,
         atrasos_notificacion,
         faltas_mail,
-        faltas_noti,
+        faltas_notificacion,
         salidas_anticipadas_mail,
         salidas_anticipadas_notificacion,
         user_name,
@@ -606,7 +606,7 @@ class NotificacionTiempoRealControlador {
         atrasos_mail: atrasos_mail,
         atrasos_notificacion: atrasos_notificacion,
         faltas_mail: faltas_mail,
-        faltas_notificacion: faltas_noti,
+        faltas_notificacion: faltas_notificacion,
         salidas_anticipadas_mail: salidas_anticipadas_mail,
         salidas_anticipadas_notificacion: salidas_anticipadas_notificacion
       };
@@ -749,7 +749,7 @@ class NotificacionTiempoRealControlador {
 
       const USUARIO_ENVIA = await pool.query(
         `
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1
@@ -815,7 +815,7 @@ class NotificacionTiempoRealControlador {
       });
 
     } else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -889,7 +889,6 @@ class NotificacionTiempoRealControlador {
 
     try {
       let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion, ip_local } = req.body;
-
 
       const id_empleados = Array.isArray(id_empl_recive) ? id_empl_recive : [id_empl_recive];
       const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
@@ -998,7 +997,7 @@ class NotificacionTiempoRealControlador {
 
       const USUARIO_ENVIA = await pool.query(
         `
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1 
@@ -1068,7 +1067,7 @@ class NotificacionTiempoRealControlador {
       });
 
     } else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -1082,7 +1081,7 @@ class NotificacionTiempoRealControlador {
 
       const query =
         `
-            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.identificacion,
             da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
             (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
             (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal

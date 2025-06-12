@@ -27,7 +27,7 @@
                 <mat-label>Seleccionar título</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Seleccionar título profesional que disponga el usuario.">
-                    help_outline
+                    school
                 </mat-icon>
                 <mat-select [formControl]="idTitulo" required>
                     <mat-option *ngFor="let ct of cgTitulos" [value]="ct.id">
@@ -42,7 +42,7 @@
                     required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Ingresar una descripción corta.">
-                    help_outline
+                    notes
                 </mat-icon>
             </mat-form-field>
         </div>

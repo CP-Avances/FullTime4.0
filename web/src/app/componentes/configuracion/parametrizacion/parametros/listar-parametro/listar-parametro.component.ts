@@ -249,11 +249,21 @@ export class ListarParametroComponent implements OnInit {
       n.push({
         style: 'tableMarginCabecera',
         table: {
-          widths: ['*'],
+          widths: ['*', '*'],
           headerRows: 1,
           body: [
             [
-              { text: `PARÁMETRO: ${obj.descripcion}`, style: 'itemsTableInfo', border: [true, true, true, true] },
+              { 
+                text: `PARÁMETRO: ${obj.descripcion}`, 
+                style: 'itemsTableInfo', 
+                border: [true, true, false, true] 
+              },
+              { 
+                text: `CÓDIGO PARÁMETRO: ${obj.id}`, 
+                style: 'itemsTableInfo', 
+                alignment: 'right', 
+                border: [false, true, true, true] 
+              }
             ],
           ]
         },
@@ -262,11 +272,11 @@ export class ListarParametroComponent implements OnInit {
         n.push({
           style: 'tableMargin',
           table: {
-            widths: ['auto', '*', '*'],
+            widths: ['15%', '*', '*'],
             headerRows: 1,
             body: [
               [
-                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'CÓDIGO DETALLE', style: 'tableHeader' },
                 { text: 'DETALLE', style: 'tableHeader' },
                 { text: 'DESCRIPCIÓN', style: 'tableHeader' },
               ],
@@ -300,21 +310,30 @@ export class ListarParametroComponent implements OnInit {
     let n: number = 1;
 
     this.parametros.forEach((obj: any) => {
-      obj.detalles.forEach((det: any) => {
+      if (obj.detalles && obj.detalles.length > 0) {
+        obj.detalles.forEach((det: any) => {
+          parametroslista.push([
+            n++,
+            obj.id,
+            obj.descripcion,
+            det.descripcion,
+            det.observacion
+          ]);
+        });
+      } else {
         parametroslista.push([
           n++,
+          obj.id,
           obj.descripcion,
-          det.descripcion,
-          det.observacion
+          "", 
+          ""  
         ]);
-      });
+      }
     });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Parametros");
 
-
-    console.log("ver logo. ", this.logo)
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -347,7 +366,8 @@ export class ListarParametroComponent implements OnInit {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "parametro", width: 20 },
+      { key: "codigo", width: 25 },
+      { key: "parametro", width: 50 },
       { key: "detalle", width: 20 },
       { key: "descripcion", width: 160 },
     ];
@@ -355,6 +375,7 @@ export class ListarParametroComponent implements OnInit {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CÓDIGO PARAMETRO", totalsRowLabel: "Total:", filterButton: false },
       { name: "PARÁMETRO", totalsRowLabel: "Total:", filterButton: true },
       { name: "DETALLE", totalsRowLabel: "", filterButton: true },
       { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
@@ -376,7 +397,7 @@ export class ListarParametroComponent implements OnInit {
 
     const numeroFilas = parametroslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 4; j++) {
+      for (let j = 1; j <= 5; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -403,7 +424,7 @@ export class ListarParametroComponent implements OnInit {
   private obtenerAlineacionHorizontalEmpleados(
     j: number
   ): "left" | "center" | "right" {
-    if (j === 1 || j === 9 || j === 10 || j === 11) {
+    if (j === 1 || j === 2 || j === 9 || j === 10 || j === 11) {
       return "center";
     } else {
       return "left";
@@ -424,20 +445,32 @@ export class ListarParametroComponent implements OnInit {
     // 3. Agregar encabezados de las columnas
     worksheet.columns = [
       { header: 'n', key: 'n', width: 10 },
+      { header: 'codigoParametro', key: 'codigo', width: 10 },
       { header: 'parametro', key: 'parametro', width: 30 },
       { header: 'detalle', key: 'detalle', width: 15 },
       { header: 'descripcion', key: 'descripcion', width: 15 }
     ];
     // 4. Llenar las filas con los datos
     this.parametros.forEach((obj: any) => {
-      obj.detalles.forEach((det: any) => {
+      if (obj.detalles && obj.detalles.length > 0) {
+        obj.detalles.forEach((det: any) => {
+          worksheet.addRow({
+            n: n++,
+            codigo: obj.id,
+            parametro: obj.descripcion,
+            detalle: det.descripcion,
+            descripcion: det.observacion
+          }).commit();
+        });
+      } else {
         worksheet.addRow({
           n: n++,
+          codigo: obj.id,
           parametro: obj.descripcion,
-          detalle: det.descripcion,
-          descripcion: det.observacion
+          detalle: "",       
+          descripcion: ""     
         }).commit();
-      })
+      }
     });
     // 5. Escribir el CSV en un buffer
     workbook.csv.writeBuffer().then((buffer) => {
@@ -460,7 +493,7 @@ export class ListarParametroComponent implements OnInit {
       let detalles: any = [];
       obj.detalles.forEach((det: any) => {
         detalles.push({
-          "$": { "id": det.id },
+          "$": { "codigo": det.id },
           "detalle": det.descripcion,
           "descripcion": det.observacion
         });

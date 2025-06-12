@@ -35,7 +35,8 @@ class MensajesNotificacionesControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO e_message_notificaciones (id_empresa, asunto, mensaje, link, tipo_notificacion) VALUES ($1, $2, $3, $4, $5) RETURNING *
+                    INSERT INTO e_message_notificaciones (id_empresa, asunto, mensaje, link, tipo_notificacion) 
+                        VALUES ($1, $2, $3, $4, $5) RETURNING *
                 `
                 , [id_empresa, titulo, mensaje, link, tipo]);
 
@@ -61,6 +62,7 @@ class MensajesNotificacionesControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
+            console.log('error ', error)
             return res.status(500).jsonp({ text: 'Error al guardar el registro.' });
         }
     }

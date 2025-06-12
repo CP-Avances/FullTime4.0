@@ -168,6 +168,7 @@ export class VistaRolesComponent implements OnInit {
 
   // METODO PARA REGISTRAR ROL
   AbrirVentanaRegistrarRol() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroRolComponent, { width: '400px' }).afterClosed().subscribe(items => {
       if (items == true) {
         this.ObtenerRoles();
@@ -360,7 +361,7 @@ async GenerarPdf(action = "open", id: number) {
             widths: ['*'],
             headerRows: 1,
             body: [
-              [{ rowSpan: 1, text: 'FUNCIONES DEL SISTEMA ASIGNADAS', style: 'tableHeader', border: [true, true, true, false] }],
+              [{ rowSpan: 1, text: 'FUNCIONES DEL SISTEMA ASIGNADAS', style: 'tableHeader', border: [true, true, true, true] }],
             ]
           }
         });
@@ -764,6 +765,7 @@ async GenerarPdf(action = "open", id: number) {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -824,6 +826,7 @@ async GenerarPdf(action = "open", id: number) {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO LOS REGISTROS
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -836,7 +839,7 @@ async GenerarPdf(action = "open", id: number) {
             this.selectionRoles.clear();
             this.ObtenerRoles();
           } else {
-            this.toastr.warning('No ha seleccionado ROLES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ROLES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

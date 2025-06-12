@@ -53,6 +53,20 @@ export class RegistroMultipleGradoComponent {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');  
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    }); 
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   /** ************************************************************************************************************* **
 ** **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
 ** ************************************************************************************************************* **/
@@ -92,12 +106,6 @@ export class RegistroMultipleGradoComponent {
     }
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
-  }
-
-  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-  ManejarPaginaMulti(e: PageEvent) {
-    this.tamanio_paginaMul = e.pageSize;
-    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
@@ -161,6 +169,7 @@ export class RegistroMultipleGradoComponent {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() { 
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -179,7 +188,7 @@ export class RegistroMultipleGradoComponent {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe un registro activo con este Grado.') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion  == 'La cédula ingresada no esta registrada en el sistema' ||
+    } else if (observacion  == 'La identificación ingresada no esta registrada en el sistema' ||
       observacion == 'Grado ingresado no esta registrado en el sistema'
     ) {
       return 'rgb(255, 192, 203)';

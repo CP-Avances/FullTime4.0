@@ -27,7 +27,7 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
 })
 
 export class RegistroPlanHorarioComponent implements OnInit {
-  
+
   ips_locales: any = '';
 
   @Input() datoEmpleado: any;
@@ -69,10 +69,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.BuscarHorarios();
     this.BuscarHora();
@@ -193,7 +193,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
       else {
         let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
-        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+        this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/M/yyyy').toJSDate());
       }
       this.fecHorario = false;
     }
@@ -214,8 +214,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
     const lastDayOfMonth = fec_fin.endOf('month').day;
     const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
     let final = formattedDate;
-    let feci = DateTime.fromFormat(inicio, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
-    let fecf = DateTime.fromFormat(final, 'dd/MM/yyyy').toFormat('yyyy/MM/dd')
+    let feci = DateTime.fromFormat(inicio, 'dd/M/yyyy').toFormat('yyyy/MM/dd')
+    let fecf = DateTime.fromFormat(final, 'dd/M/yyyy').toFormat('yyyy/MM/dd')
     console.log("ver feci", feci)
     console.log("ver fecf", fecf)
 
@@ -231,14 +231,14 @@ export class RegistroPlanHorarioComponent implements OnInit {
           (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(fecf))) {
           // REGISTRO DE LA FECHA EN EL FORMULARIO
           if (opcion === 1) {
-            formulario.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
+            formulario.setValue(DateTime.fromFormat(inicio, 'dd/M/yyyy').toJSDate());
           }
           else {
-            formulario.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
+            formulario.setValue(DateTime.fromFormat(final, 'dd/M/yyyy').toJSDate());
           }
         }
         else {
-          this.toastr.warning('Las fechas ingresadas no estan dentro del contrato vigente del empleado.', 'Ups!!! algo salio mal.', {
+          this.toastr.warning('Las fechas ingresadas no estan dentro del contrato vigente del empleado.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }
@@ -246,7 +246,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     else {
       // METODO PARA VERIFICAR SI EL EMPLEADO INGRESO CORRECTAMENTE LAS FECHAS
-      this.toastr.warning('La fecha no se registro. Ups!!! la fecha no es correcta.', 'VERIFICAR', {
+      this.toastr.warning('La fecha no se registro. Ups! la fecha no es correcta.', 'VERIFICAR', {
         timeOut: 6000,
       });
     }
@@ -507,6 +507,16 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA INGRESAR HORARIO
   lista_eliminar: any = [];
   IngresarHorario(index: number) {
+    if (
+      this.fechas_mes[index].horarios_existentes === '***' ||
+      this.fechas_mes[index].horarios.length > 0
+    ) {
+      this.toastr.warning('Ya existe un horario registrado en esta fecha. No se permite modificar desde aquí.', 'Ups! VERIFICAR.', {
+        timeOut: 6000,
+      });
+      return;
+    }
+
     let verificador = 0;
     let procesar = 0;
     this.ControlarBotones(true, false);
@@ -530,17 +540,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     // PROCESAMIENTO DE LOS DATOS AL CUMPLIR LAS CONDICIONES
     if (procesar === 0) {
-      // EXISTEN HORARIOS REGISTRADOS
-      if (this.fechas_mes[index].registrados.length === 1) {
-        if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
-          let eliminar = {
-            fecha: this.fechas_mes[index].fecha,
-            id_horarios: this.fechas_mes[index].registrados[0].id_horario,
-          }
-          this.lista_eliminar = this.lista_eliminar.concat(eliminar);
-          this.fechas_mes[index].registrados = [];
-        }
-      }
 
       // DIA REGISTRADO COMO LIBRE
       if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
@@ -606,18 +605,18 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
       }
       else if (verificador === 1) {
-        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else if (verificador === 2) {
-        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
     }
     else {
-      this.toastr.warning('Día configurado como FERIADO dentro del sistema.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Día configurado como FERIADO dentro del sistema.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -640,18 +639,18 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }]
     if (this.fechas_mes[index].registrados.length === 1) {
       if (this.fechas_mes[index].registrados[0].default_ === 'DL') {
-        this.toastr.info('Ya se encuentra registrado como día de descanso.', 'Ups!!! VERIFICAR.', {
+        this.toastr.info('Ya se encuentra registrado como día de descanso.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else {
-        this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
     }
     else if (this.fechas_mes[index].registrados.length > 1) {
-      this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Ya se encuentra registrada una planificación horaria.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -721,7 +720,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.VerificarDuplicidad(opcion);
     }
     else {
-      this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('No ha registrado horarios.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -871,7 +870,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
     })
     if (datos.length === 0) {
-      this.toastr.warning('', 'Ups!!! verificar calendario.', {
+      this.toastr.warning('', 'Ups! verificar calendario.', {
         timeOut: 6000,
       });
       this.ControlarBotones(true, false);
@@ -1053,7 +1052,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
     })
     if (datos.length === 0) {
-      this.toastr.warning('No se han encontrado datos para registrar.', 'Ups!!! verificar calendario.', {
+      this.toastr.warning('No se han encontrado datos para registrar.', 'Ups! verificar calendario.', {
         timeOut: 6000,
       });
       this.ControlarBotones(true, false);
@@ -1210,15 +1209,16 @@ export class RegistroPlanHorarioComponent implements OnInit {
         });
         this.cargar = true;
         this.ver_guardar = false;
+        this.CerrarVentana();
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+        this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+      this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
       this.CerrarVentana();
@@ -1245,7 +1245,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
       else if (datos.message === 'error') {
         this.toastr.info(
-          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          'Ups! algo salio mal', 'No se cargaron todos los registros.', {
           timeOut: 6000,
         })
       }

@@ -29,29 +29,44 @@
                     </div>
                   </ng-template>
                 </div>
-                <br>
-                <label>
-                  <mat-icon class="icon-menu">assignment_ind</mat-icon>
-                  <mat-label class="icon-menu">{{datosEmpleado.cedula}}</mat-label>
-                </label><br>
-                <label>
-                  <mat-icon class="icon-menu">location_on</mat-icon>
-                  <mat-label class="icon-menu">{{datosEmpleado.domicilio}}</mat-label>
-                </label><br>
-                <label>
-                  <mat-icon class="icon-menu">phone</mat-icon>
-                  <mat-label class="icon-menu">{{datosEmpleado.telefono}}</mat-label>
-                </label><br>
-                <label>
-                  <mat-icon class="icon-menu">cake</mat-icon>
-                  <mat-label class="icon-menu">{{datosEmpleado.fec_nacimiento_}}</mat-label>
-                </label><br>
-                <label>
-                  <mat-icon class="icon-menu"> contact_mail</mat-icon>
-                  <mat-label class="icon-menu">{{datosEmpleado.correo}}</mat-label>
-                </label>
+              </div>
+             </div>
+             
+            <div class="row m-auto justify-content-between">
+              <div class="col-12 mt-4">
+                <mat-icon class="icon-menu">assignment_ind</mat-icon>
+                <mat-label class="icon-menu">{{datosEmpleado.identificacion}}</mat-label>
               </div>
             </div>
+
+            <div class="row m-auto justify-content-between">
+              <div class="col-12 mt-2">
+                  <mat-icon class="icon-menu">location_on</mat-icon>
+                  <mat-label class="icon-menu">{{datosEmpleado.domicilio}}</mat-label>
+              </div>
+            </div>
+
+            <div class="row m-auto justify-content-between">
+              <div class="col-12 mt-2">
+                  <mat-icon class="icon-menu">phone</mat-icon>
+                  <mat-label class="icon-menu">{{datosEmpleado.telefono}}</mat-label>
+              </div>
+            </div>
+
+            <div class="row m-auto justify-content-between">
+              <div class="col-12 mt-2">
+                <mat-icon class="icon-menu">cake</mat-icon>
+                <mat-label class="icon-menu p-0">{{datosEmpleado.fec_nacimiento_}}</mat-label>
+              </div>
+            </div>
+
+            <div class="row m-auto">
+              <div class="col-12 mt-2 d-flex justify-content-start flex-wrap">
+                  <mat-icon class="icon-menu-correo"> contact_mail</mat-icon>
+                  <mat-label class="text-truncate d-block text-menu p-0">{{datosEmpleado.correo}}</mat-label>
+              </div>
+            </div>
+
           </mat-card-content>
         </mat-card>
       </div>

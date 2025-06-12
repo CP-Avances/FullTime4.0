@@ -149,10 +149,10 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   public datosEmple: any = []
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.datos = this.solicita_permiso[0];
     var f = DateTime.now();
@@ -377,7 +377,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       }
     }
     else {
-      this.toastr.warning('Ups!!! no ha seleccionado ningún tipo de permiso.', '', {
+      this.toastr.warning('Ups! no ha seleccionado ningún tipo de permiso.', '', {
         timeOut: 4000,
       });
       this.fechaInicioF.setValue('');
@@ -403,7 +403,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       if (DateTime.fromISO(inicio) >= restar) {
       }
       else {
-        this.toastr.warning('Ups!!! ha superado el limite de días permitidos para cargar solicitudes.', '', {
+        this.toastr.warning('Ups! ha superado el limite de días permitidos para cargar solicitudes.', '', {
           timeOut: 4000,
         });
         this.fechaInicioF.setValue('');
@@ -433,7 +433,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       if (DateTime.fromISO(fechaActual) <= DateTime.fromISO(fechaRestada)) {
         // SI LA FECHA ACTUAL ES MENOR O IGUAL A LA FECHA RESTADA
       } else {
-        this.toastr.warning(`Ups!!! el permiso debio ser solicitado con ${diasAnticipar} días previos.`, '', {
+        this.toastr.warning(`Ups! el permiso debio ser solicitado con ${diasAnticipar} días previos.`, '', {
           timeOut: 4000,
         });
         this.fechaInicioF.setValue('');
@@ -510,7 +510,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     }
     // MENSAJE NO HA SELECCIONADO TIPO DE PERMISO O NO HA INGRESADO FECHA
     else {
-      this.toastr.warning('Seleccione un tipo de permiso e ingrese fecha de inicio de permiso.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Seleccione un tipo de permiso e ingrese fecha de inicio de permiso.', 'Ups! algo salio mal.', {
         timeOut: 4000,
       });
       this.LimpiarInformacion('');
@@ -573,13 +573,13 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       // FORMATO DE FECHAS
       fecha_inicio = DateTime.fromFormat(this.dSalida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
       fecha_final = DateTime.fromFormat(form.fechaFinalForm, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-      hora_inicio_ = DateTime.fromFormat(form.horaSalidaForm, "HH:mm:ss").format('HH:mm:ss');
-      hora_final_ = DateTime.fromFormat(form.horasIngresoForm, "HH:mm:ss").format('HH:mm:ss');
+      hora_inicio_ = DateTime.fromFormat(form.horaSalidaForm, "HH:mm:ss").toFormat('HH:mm:ss');
+      hora_final_ = DateTime.fromFormat(form.horasIngresoForm, "HH:mm:ss").toFormat('HH:mm:ss');
 
       if (hora_inicio_ === '00:00:00' && hora_final_ === '00:00:00') {
         this.toastr.warning(
           `No es posible registrar un permiso de 0 horas.`,
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -746,9 +746,9 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         // RECORRER TODOS LOS DATOS DE HORARIOS EXISTENTES
         for (let i = 0; i < datos.length; i++) {
           // FORMATEAR FECHAS
-          var entrada = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-          var intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').add(1, 'days').toFormat('yyyy-MM-dd');
-          var salida = DateTime.fromFormat(datos[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+          let entrada = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+          let intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').plus({ days: 1 }).toFormat('yyyy-MM-dd');
+          let salida = DateTime.fromFormat(datos[i].fecha_salida, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
 
           // CONDICION UNO: FECHA INGRESADA = A LA FECHA DE INGRESO DEL USUARIO
           if (entrada === fecha_inicio) {
@@ -869,7 +869,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         for (let i = 0; i < datos.length; i++) {
           // FORMATEAR FECHAS
           var entrada = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-          var intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').add(1, 'days').toFormat('yyyy-MM-dd');
+          var intermedio = DateTime.fromFormat(datos[i].fecha_entrada, 'yyyy/MM/dd').plus({ days: 1 }).toFormat('yyyy-MM-dd');
 
           if (entrada === fecha_inicio) {
             if (hora_inicio_ >= datos[i].hora_inicio) {
@@ -1053,8 +1053,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
             var inicio_dia = Duration.fromISOTime('00:00:00');
 
             // RESTAR HORAS
-            var entrada = media_noche.subtract(inicio);
-            var salida = fin.subtract(inicio_dia);
+            var entrada = media_noche.minus(inicio);
+            var salida = fin.minus(inicio_dia);
 
             resta = entrada.plus(salida);
           }
@@ -1081,7 +1081,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         }
       }
       else {
-        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -1107,17 +1107,17 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       this.horasF.setValue('');
     }
     else {
-      var total = tiempo_solicitado.subtract(descuento_comida);
+      var total = tiempo_solicitado.minus(descuento_comida);
 
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
-      var horast = String(total.hours());
-      var minutost = String(total.minutes());
+      var horast = String(total.hours);
+      var minutost = String(total.minutes);
 
-      if (total.hours() < 10) {
-        horast = '0' + total.hours();
+      if (total.hours < 10) {
+        horast = '0' + total.hours;
       }
-      if (total.minutes() < 10) {
-        minutost = '0' + total.minutes();
+      if (total.minutes < 10) {
+        minutost = '0' + total.minutes;
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       var valorTotal: string = horast + ':' + minutost;
@@ -1130,7 +1130,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // MENSAJE PARA MOSTRAR QUE NO SE ENCUENTRA PLANIFICACION
   EmitirMensajeError() {
-    this.toastr.warning('No tiene asignada una planificación horaria en las horas ingresadas.', 'Ups!!! algo salio mal.', {
+    this.toastr.warning('No tiene asignada una planificación horaria en las horas ingresadas.', 'Ups! algo salio mal.', {
       timeOut: 6000,
     });
     this.fechaInicioF.setValue('');
@@ -1139,7 +1139,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // MENSAJE PARA MOSTRAR QUE EL DIA SELECCIONADO ES LIBRE
   EmitirMensajeErrorLibre() {
-    this.toastr.warning('El día registrado esta configurado como día libre.', 'Ups!!! algo salio mal.', {
+    this.toastr.warning('El día registrado esta configurado como día libre.', 'Ups! algo salio mal.', {
       timeOut: 6000,
     });
     this.fechaInicioF.setValue('');
@@ -1151,7 +1151,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     if (valor === '00:00:00') {
       this.toastr.warning(
         `Ha solicitado ${valor} horas de permiso.`,
-        `Ups!!! algo salio mal.`, {
+        `Ups! algo salio mal.`, {
         timeOut: 6000,
       });
       this.LimpiarInformacion('');
@@ -1246,7 +1246,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         if (form.especialForm === false) {
           this.toastr.warning(
             `No es posible registrar una solicitud de permiso en un día configurado como feriado.`,
-            `Ups!!!`, {
+            `Ups!`, {
             timeOut: 6000,
           });
           this.LimpiarInformacion('');
@@ -1324,14 +1324,14 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         })
       }
       else {
-        this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
         this.fechaInicioF.setValue('');
         this.LimpiarInformacion('00:00');
       }
     }, error => {
-      this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
       this.fechaInicioF.setValue('');
@@ -1575,7 +1575,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         this.CerrarVentana();
       },
       error: (error) => {
-        this.toastr.error('No se pudo registrar la solicitud de permiso', 'Ups!!! algo salio mal.', {
+        this.toastr.error('No se pudo registrar la solicitud de permiso', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -1801,7 +1801,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
                 });
               }
               else {
-                this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
+                this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
                   timeOut: 6000,
                 });
               }

@@ -106,7 +106,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
@@ -201,6 +201,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA REGISTRAR SUCURSAL
   AbrirVentanaRegistrar() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarSucursalesComponent, { width: '650px' })
       .afterClosed().subscribe(items => {
         if (items) {
@@ -381,7 +382,6 @@ export class ListaSucursalesComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Sucursales");
 
 
-    console.log("ver logo. ", this.logo)
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -612,16 +612,6 @@ export class ListaSucursalesComponent implements OnInit {
       this.Datasucursales = res.data;
       this.messajeExcel = res.message;
 
-      this.Datasucursales.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -635,6 +625,15 @@ export class ListaSucursalesComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.Datasucursales.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         // SEPARA LLAS FILAS QUE ESTAN CON LA OBSERVACION OK PARA LUEGO REGISTRAR EN LA BASE.
         this.Datasucursales.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
@@ -682,6 +681,7 @@ export class ListaSucursalesComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -821,6 +821,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -846,18 +847,18 @@ export class ListaSucursalesComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     this.contador = 0;
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionSucursales.selected.length;
-  
+
     this.sucursalesEliminar = this.selectionSucursales.selected;
-  
+
     this.sucursalesEliminar.forEach((datos: any) => {
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -866,7 +867,7 @@ export class ListaSucursalesComponent implements OnInit {
           eliminados++;
           this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
@@ -880,11 +881,12 @@ export class ListaSucursalesComponent implements OnInit {
       });
     });
   }
-  
-  
+
+
 
   // METOOD DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -897,7 +899,7 @@ export class ListaSucursalesComponent implements OnInit {
             this.selectionSucursales.clear();
             this.ObtenerSucursal();
           } else {
-            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -924,23 +926,23 @@ export class ListaSucursalesComponent implements OnInit {
     }
   }
 
-  getCrearEstablecimiento(){
+  getCrearEstablecimiento() {
     return this.tienePermiso('Crear Establecimiento');
   }
 
-  getEditarEstablecimiento(){
+  getEditarEstablecimiento() {
     return this.tienePermiso('Editar Establecimiento');
   }
 
-  getEliminarEstablecimiento(){
+  getEliminarEstablecimiento() {
     return this.tienePermiso('Eliminar Establecimiento');
   }
 
-  getPlantillaEstablecimiento(){
+  getPlantillaEstablecimiento() {
     return this.tienePermiso('Cargar Plantilla Establecimientos');
   }
 
-  getVerDepartamento(){
+  getVerDepartamento() {
     return this.tienePermiso('Ver Departamento', 10);
   }
 

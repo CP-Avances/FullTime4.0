@@ -28,7 +28,7 @@ export class HoraExtraRealComponent implements OnInit {
   // Arreglo datos cargo actual
   datosTotales: any = [];
 
-  displayedColumns: string[] = ['id', 'nombre', 'apellido', 'cedula'];
+  displayedColumns: string[] = ['id', 'nombre', 'apellido', 'identificacion'];
 
   buscador !: FormGroup;
 
@@ -427,7 +427,7 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Id', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
                 { text: 'Apellido', style: 'tableHeader' },
-                { text: 'Cedula', style: 'tableHeader' },
+                { text: 'Identificación', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
                 { text: 'Género', style: 'tableHeader' },
@@ -451,7 +451,7 @@ export class HoraExtraRealComponent implements OnInit {
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.apellido, style: 'itemsTable' },
-                  { text: obj.cedula, style: 'itemsTableD' },
+                  { text: obj.identificacion, style: 'itemsTableD' },
                   { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },
@@ -505,7 +505,7 @@ export class HoraExtraRealComponent implements OnInit {
       objeto = {
         "empleado": {
           '@id': obj.id,
-          "cedula": obj.cedula,
+          "identificacion": obj.identificacion,
           "apellido": obj.apellido,
           "nombre": obj.nombre,
           "estadoCivil": estadoCivil,
@@ -668,7 +668,7 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Id', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
                 { text: 'Apellido', style: 'tableHeader' },
-                { text: 'Cedula', style: 'tableHeader' },
+                { text: 'Identificación', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
                 { text: 'Género', style: 'tableHeader' },
@@ -692,7 +692,7 @@ export class HoraExtraRealComponent implements OnInit {
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.apellido, style: 'itemsTable' },
-                  { text: obj.cedula, style: 'itemsTableD' },
+                  { text: obj.identificacion, style: 'itemsTableD' },
                   { text: obj.fehac_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },

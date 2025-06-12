@@ -132,7 +132,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     if (this.habilitarHorasE === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }

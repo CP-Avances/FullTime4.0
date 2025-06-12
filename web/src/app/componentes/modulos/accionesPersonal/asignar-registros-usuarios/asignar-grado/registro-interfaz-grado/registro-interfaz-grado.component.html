@@ -21,8 +21,9 @@
                         <mat-label>Sucursal</mat-label>
                         <input matInput placeholder="Buscar" (input)="FiltrarDep(nombre_sucDep.value, 1)"
                             [formControl]="nombre_sucDep" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
-                            help_outline
+                        <mat-icon matSuffix matTooltipPosition="right" matTooltipPosition="right"
+                            matTooltip="Búsqueda de sucursales por nombre.">
+                            location_city
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -38,7 +39,7 @@
                                     [formControl]="nombre_sucDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -51,7 +52,7 @@
                                     [formControl]="nombre_regDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de régimen laboral por nombre.">
-                                    help_outline
+                                    article
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -69,7 +70,7 @@
                                     [formControl]="nombre_sucDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -82,7 +83,7 @@
                                     [formControl]="nombre_cargDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de cargos por su descripción.">
-                                    help_outline
+                                    group
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -100,7 +101,7 @@
                                     [formControl]="nombre_sucDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -113,7 +114,7 @@
                                     [formControl]="nombre_depDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de departamentos por nombre.">
-                                    help_outline
+                                    account_balance
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -131,7 +132,7 @@
                                     [formControl]="nombre_sucDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -144,7 +145,7 @@
                                     [formControl]="codigoDep">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por código.">
-                                    help_outline
+                                    code
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -159,7 +160,7 @@
                                     [formControl]="nombre_empDep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por nombre.">
-                                    help_outline
+                                    person
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -167,14 +168,14 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>Cédula</mat-label>
+                                <mat-label>Identificación</mat-label>
                                 <input matInput placeholder="Buscar" maxlength="10"
                                     (input)="FiltrarDep(cedulaDep.value, 4)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedulaDep" type="tel" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
-                                    help_outline
+                                    matTooltip="Búsqueda de datos de empleado por número de identificación.">
+                                    badge
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -184,23 +185,21 @@
 
             <!--  **************************  BOTON PARA ACTUALIZAR  ***************************  -->
             <br />
-            <div class="row">
-                <div class="col-12 col-md-6">
-                    <div class="container d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Seleccionar el grado</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de grados.">
-                                help_outline</mat-icon>
-                            <mat-select [formControl]="idsucursal" required
-                                (selectionChange)="selecctGrado($event.value);">
-                                <mat-option *ngFor="let gra of Lgrados" [value]="gra.id">
-                                    {{gra.descripcion}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                </div>
+
+            <div class="container d-flex flex-wrap justify-content-center">
+                <mat-form-field>
+                    <mat-label>Seleccionar el grado</mat-label>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de grados.">
+                        leaderboard
+                    </mat-icon>
+                    <mat-select [formControl]="idsucursal" required (selectionChange)="selecctGrado($event.value);">
+                        <mat-option *ngFor="let gra of Lgrados" [value]="gra.id">
+                            {{gra.descripcion}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
+
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
                 <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltroDep(0, 'e')">
                     Registrar Grado
@@ -497,7 +496,7 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Cédula</th>
+                                <th scope="col">Identificación</th>
                                 <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Departamento</th>
@@ -513,7 +512,7 @@
                                     </mat-checkbox>
                                 </td>
                                 <td>{{e.sucursal}}</td>
-                                <td>{{e.cedula}}</td>
+                                <td>{{e.identificacion}}</td>
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td>{{e.departamento}}</td>
