@@ -28,6 +28,9 @@ import { ListarNivelTitulosComponent } from './componentes/usuarios/nivel-titulo
 import { ListarTitulosComponent } from './componentes/usuarios/titulo-profesional/listar-titulos/listar-titulos.component';
 import { CatDiscapacidadComponent } from './componentes/usuarios/tipo-discapacidad/listar-discapacidad/cat-discapacidad.component';
 import { CatVacunasComponent } from './componentes/usuarios/tipo-vacunas/listar-vacuna/cat-vacunas.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
 import { ListaEmpleadosComponent } from './componentes/usuarios/empleados/datos-empleado/lista-empleados/lista-empleados.component';
 import { VerEmpleadoComponent } from './componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
 import { RegistroComponent } from './componentes/usuarios/empleados/datos-empleado/registro/registro.component';
@@ -133,7 +136,7 @@ import { AlimentosInvitadosComponent } from './componentes/reportes/modulos/alim
 // REPORTE  --ANALISIS DATOS
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 // REPORTE  --AUDITORIA
-import { ReporteAuditoriaComponent } from './componentes/reportes/reporte-auditoria/reporte-auditoria.component';
+import { AuditoriaSistemaComponent } from './componentes/reportes/auditoria/auditoria-sistema/auditoria-sistema.component';
 // VERIFICAR SU USO
 import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
 import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
@@ -148,9 +151,6 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
-import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
-import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
-import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
 
 const routes: Routes = [
 
@@ -188,9 +188,7 @@ const routes: Routes = [
   { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard] },
   { path: 'genero', component: ListarGeneroComponent, canActivate: [AuthGuard] },
   { path: 'nacionalidad', component: ListarNacionalidadComponent, canActivate: [AuthGuard] },
-  
   { path: 'estado-civil', component: ListarEstadoCivilComponent, canActivate: [AuthGuard] },
-
   { path: 'nivelTitulos', component: ListarNivelTitulosComponent, canActivate: [AuthGuard] },
   { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard] },
   { path: 'discapacidades', component: CatDiscapacidadComponent, canActivate: [AuthGuard] },
@@ -237,7 +235,6 @@ const routes: Routes = [
   { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard]},
   { path: 'IngresarRegistros', component: IngresarRegistrosComponent, canActivate: [AuthGuard] },
   
-
   // MODULO  --GEOLOCALIZACION
   { path: 'coordenadas', component: ListarCoordenadasComponent, canActivate: [AuthGuard] },
 
@@ -320,7 +317,7 @@ const routes: Routes = [
   { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard] },
 
   // REPORTE  --AUDITORIA
-  { path: 'reporte-auditoria', component: ReporteAuditoriaComponent, canActivate: [AuthGuard] },
+  { path: 'reporte-auditoria', component: AuditoriaSistemaComponent, canActivate: [AuthGuard] },
 
   // VERIFICAR SU USO
   { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },

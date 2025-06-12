@@ -62,7 +62,7 @@ class AuditoriaControlador {
 
     }
 
-   
+
     // INSERTAR REGISTRO DE AUDITORIA
     public async InsertarAuditoria(data: Auditoria) {
         try {
@@ -99,7 +99,7 @@ class AuditoriaControlador {
                     "APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
                     auditoria.tabla,
                     user_name,
-                    new Date(),                    
+                    new Date(),
                     auditoria.accion,
                     auditoria.datosOriginales,
                     auditoria.datosNuevos,
@@ -146,6 +146,31 @@ class AuditoriaControlador {
         }
     };
 
+
+    // METODO DE CONSULTA DE AUDITORIA DE INICIOS DE SESION
+    public async BuscarDatosAuditoriaAcceso(req: Request, res: Response): Promise<any> {
+        const { desde, hasta } = req.body;
+        const AUDITORIA = await pool.query(
+            `
+                SELECT 
+                    a.plataforma, a.user_name, CAST(a.fecha AS VARCHAR), a.hora, a.acceso, a.ip_addres, 
+                    a.observaciones, a.ip_addres_local               
+                FROM 
+                    audit.acceso_sistema AS a
+                WHERE 
+                    a.fecha BETWEEN $1 AND $2
+                ORDER BY 
+                    a.fecha DESC;
+            `, [desde, hasta]
+        );
+
+        if (AUDITORIA.rowCount != 0) {
+            return res.jsonp({ message: 'ok', datos: AUDITORIA.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'No se han encontrado registro.' })
+        }
+    }
 
 }
 

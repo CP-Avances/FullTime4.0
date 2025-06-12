@@ -67,17 +67,17 @@ class LoginControlador {
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     console.log('verificar activo ', empleado, ' usu ', usuario);
                     if (empleado === 2 && usuario === false) {
-                        return res.jsonp({ message: 'inactivo' });
+                        return res.jsonp({ message: 'inactivo', text: ip_cliente });
                     }
                     console.log('web_access: ', web_access);
                     console.log('app_habilita: ', app_habilita);
                     console.log('movil: ', movil);
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
                     if (!web_access)
-                        return res.status(404).jsonp({ message: "sin_permiso_acceso" });
+                        return res.status(404).jsonp({ message: "sin_permiso_acceso", text: ip_cliente });
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
                     if (!app_habilita && movil == true)
-                        return res.jsonp({ message: "sin_permiso_acces_movil" });
+                        return res.jsonp({ message: "sin_permiso_acces_movil", text: ip_cliente });
                     // BUSQUEDA DE CLAVE DE LICENCIA
                     //FIXME
                     const EMPRESA = yield database_1.default.query(`
@@ -95,16 +95,16 @@ class LoginControlador {
                         body: JSON.stringify({ public_key: public_key })
                     });
                     if (!licenciaData.ok) {
-                        return res.status(404).jsonp({ message: 'licencia_no_existe' });
+                        return res.status(404).jsonp({ message: 'licencia_no_existe', text: ip_cliente });
                     }
                     const dataLic = yield licenciaData.json();
                     const fec_activacion = new Date(dataLic[0].fecha_activacion);
                     const fec_desactivacion = new Date(dataLic[0].fecha_desactivacion);
                     const hoy = new Date();
                     if (hoy > fec_desactivacion)
-                        return res.status(404).jsonp({ message: 'licencia_expirada' });
+                        return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
                     if (hoy < fec_activacion)
-                        return res.status(404).jsonp({ message: 'licencia_expirada' });
+                        return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
                     caducidad_licencia = fec_desactivacion;
                     // BUSQUEDA DE INFORMACION
                     const INFORMACION = yield database_1.default.query(`
@@ -168,12 +168,12 @@ class LoginControlador {
                             });
                         }
                         else {
-                            return res.jsonp({ message: 'error_' });
+                            return res.jsonp({ message: 'error_', text: ip_cliente });
                         }
                     }
                 }
                 else {
-                    return res.jsonp({ message: 'error' });
+                    return res.jsonp({ message: 'error', text: ip_cliente });
                 }
             }
             catch (error) {
@@ -343,7 +343,7 @@ class LoginControlador {
     // AUDITORIA DE INICIO DE SESION
     RegistrarAuditoriaLogin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { plataforma, user_name, ip_addres, ip_addres_local, acceso } = req.body;
+            const { plataforma, user_name, ip_addres, ip_addres_local, acceso, observaciones } = req.body;
             console.log('acceso ', req.body);
             const ahora = new Date();
             const fecha = ahora.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -351,9 +351,9 @@ class LoginControlador {
             try {
                 yield database_1.default.query(`
         INSERT INTO audit.acceso_sistema 
-          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local)   
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `, [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local]);
+          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones)   
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones]);
                 return res.jsonp({ message: 'ok' });
             }
             catch (err) {

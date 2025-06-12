@@ -511,23 +511,23 @@ class AccionPersonalControlador {
         }
     }
 
-    public async EliminarTipoAccionMultipleMult(req: Request, res: Response): Promise<any>{
-        
+    public async EliminarTipoAccionMultipleMult(req: Request, res: Response): Promise<any> {
+
         const { listaEliminar, user_name, ip, ip_local } = req.body;
         let error: boolean = false;
         var count = 0;
         var count_no = 0;
         var list_tipoAccionPersonal: any = [];
 
-        try{
-           
+        try {
+
             for (const item of listaEliminar) {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
                 const resultado = await pool.query(
                     `
                         SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
-                    `, 
+                    `,
                     [item.id]);
                 const [existe_datos] = resultado.rows;
                 if (!existe_datos) {
@@ -556,14 +556,14 @@ class AccionPersonalControlador {
                         , [item.id]);
 
                     const [existe_detalle] = resultado.rows
-                    console.log('existe_detalle: ',existe_detalle)
+                    console.log('existe_detalle: ', existe_detalle)
 
                     // FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
 
                     if (!existe_detalle) {
-                        console.log('existe_detalle entro: ',existe_detalle)
-                        console.log('item 11: ',item.id)
+                        console.log('existe_detalle entro: ', existe_detalle)
+                        console.log('item 11: ', item.id)
                         // INICIAR TRANSACCION
                         await pool.query('BEGIN');
                         const res = await pool.query(
@@ -584,12 +584,12 @@ class AccionPersonalControlador {
                         });
                         // FINALIZAR TRANSACCION
                         await pool.query('COMMIT');
-                        console.log('res: ',res)
+                        console.log('res: ', res)
                         count += 1;
-                    }else {
+                    } else {
 
-                        console.log('existe_detalle afuera: ',existe_detalle)
-                        console.log('item: ',item)
+                        console.log('existe_detalle afuera: ', existe_detalle)
+                        console.log('item: ', item)
                         list_tipoAccionPersonal.push(item.nombre)
                         count_no += 1;
                     }
@@ -599,11 +599,11 @@ class AccionPersonalControlador {
             }
 
             var meCount = "registro eliminado"
-            if(count > 1){
+            if (count > 1) {
                 meCount = "registros eliminados"
             }
 
-            return res.status(200).jsonp({ message: count.toString()+' '+ meCount +' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal});
+            return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
 
         } catch (err) {
             // REVERTIR TRANSACCION
@@ -612,11 +612,15 @@ class AccionPersonalControlador {
             if (error) {
                 if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
                     if (count <= 1) {
-                        return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ',eliminados: count, 
-                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+                        return res.status(300).jsonp({
+                            message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                        });
                     } else if (count > 1) {
-                        return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count, 
-                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+                        return res.status(300).jsonp({
+                            message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                        });
                     }
                 } else {
                     return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
@@ -696,80 +700,112 @@ class AccionPersonalControlador {
         }
     }
 
+    // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
     public async ListarPedidoAccion(req: Request, res: Response) {
         const ACCION = await pool.query(
             `
-            SELECT 
-	ap.id, ap.numero_accion_personal, ap.fecha_elaboracion, CONCAT(inf.nombre,' ',inf.apellido) AS nombres, ap.fecha_rige_desde,
-    ap.fecha_rige_hasta, ap.id_tipo_accion_personal, tp.descripcion AS accion_personal, ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
-	ap.especificacion, ap.declaracion_jurada, adicion_base_legal, ap.observacion, id_proceso_actual, ps.nombre,
-	ap.id_nivel_gestion_actual, 
-	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_nivel_gestion_actual) AS nivel_gestion_actual,
-	ap.id_unidad_administrativa,
-	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_unidad_administrativa) AS unidad_administrativa,
-	ap.id_sucursal_actual, 
-	(SELECT nombre FROM e_sucursales AS su WHERE su.id = ap.id_sucursal_actual) AS sucursal_actual,
-	ap.id_lugar_trabajo_actual,
-	(SELECT descripcion FROM e_ciudades AS ciud WHERE ciud.id = ap.id_lugar_trabajo_actual) AS lugar_trabajo_actual,
-	ap.id_tipo_cargo_actual, inf.name_cargo AS cargo_actual, ap.id_grupo_ocupacional_actual,
-	(SELECT grup.descripcion FROM map_cat_grupo_ocupacional AS grup WHERE grup.id = ap.id_grupo_ocupacional_actual) AS grupo_ocupacional_actual,
-	ap.id_grado_actual, 
-	(SELECT grad.descripcion FROM map_cat_grado AS grad WHERE grad.id = ap.id_grado_actual) AS grado_actual,
-	remuneracion_actual, partida_individual_actual, 
-	ap.id_proceso_propuesto, 
-	(SELECT ps.nombre FROM map_cat_procesos AS prs WHERE prs.id = ap.id_sucursal_propuesta) AS proceso_propuesto,
-	ap.id_nivel_gestion_propuesto, 
-	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_nivel_gestion_propuesto) AS nivel_gestion_propuesto,
-	ap.id_unidad_adminsitrativa_propuesta,
-	(SELECT nombre FROM ed_departamentos AS dp WHERE dp.id = ap.id_unidad_adminsitrativa_propuesta) AS unidad_administrativa_propuesta,
-	ap.id_sucursal_propuesta, 
-	(SELECT nombre FROM e_sucursales AS su WHERE su.id = ap.id_sucursal_propuesta) AS sucursal_propuesto,
-	ap.id_lugar_trabajo_propuesto,
-	(SELECT descripcion FROM e_ciudades AS ciud WHERE ciud.id = ap.id_lugar_trabajo_propuesto) AS lugar_trabajo_propuesto,
-	ap.id_tipo_cargo_propuesto, 
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_propuesto) AS cargo_propuesto, 
-	ap.id_grupo_ocupacional_propuesto,
-	(SELECT grup.descripcion FROM map_cat_grupo_ocupacional AS grup WHERE grup.id = ap.id_grupo_ocupacional_propuesto) AS grupo_ocupacional_propuesto,
-	ap.id_grado_propuesto, 
-	(SELECT grad.descripcion FROM map_cat_grado AS grad WHERE grad.id = ap.id_grado_propuesto) AS grado_propuesto,
-	ap.remuneracion_propuesta, ap.partida_individual_propuesta, ap.lugar_posesion,
-	(SELECT descripcion FROM e_ciudades AS ciud WHERE ciud.id = ap.lugar_posesion) AS descripcion_lugar_posesion,
-	ap.fecha_posesion, ap.numero_acta_final,ap.fecha_acta_final, 
-	ap.id_empleado_director,
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_director) AS empleado_director,
-	ap.id_tipo_cargo_director,
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_director) AS cargo_director,
-	ap.id_empleado_autoridad_delegado,
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_autoridad_delegado) AS empleado_autoridad_delegado,
-	ap.id_tipo_cargo_autoridad_delegado,
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_autoridad_delegado) AS cargo_autoridad_delegado,
-	ap.id_empleado_testigo,
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_testigo) AS empleado_testigo,
-	ap.fecha_testigo, ap.id_empleado_elaboracion, 
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_elaboracion) AS empleado_elaboracion,
-	ap.id_tipo_cargo_elaboracion,
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_elaboracion) AS tipo_cargo_elaboracion,
-	ap.id_empleado_revision,
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_revision) AS empleado_revision,
-	ap.id_tipo_cargo_revision,
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_revision) AS tipo_cargo_revision,
-	ap.id_empleado_control,
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_control) AS empleado_control,
-	ap.id_tipo_cargo_control,
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_control) AS tipo_cargo_control,
-	ap.comunicacion_electronica, ap.fecha_comunicacion, ap.hora_comunicacion, ap.medio_comunicacion, ap.id_empleado_comunicacion,
-	(SELECT CONCAT(infoE.nombre,' ',infoE.apellido) FROM informacion_general AS infoE WHERE infoE.id = ap.id_empleado_comunicacion) AS empleado_comunicacion,
-	ap.id_tipo_cargo_comunicacion,
-	(SELECT cag.cargo FROM e_cat_tipo_cargo AS cag WHERE cag.id = ap.id_tipo_cargo_comunicacion) AS cargo_comunicacion,
-	ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion
-	
-FROM 
-	map_documento_accion_personal AS ap, informacion_general AS inf,
-	map_tipo_accion_personal AS tp, map_detalle_tipo_accion_personal AS dtp,
-	map_cat_procesos AS ps, ed_departamentos AS dp
-WHERE
-	inf.id = ap.id_empleado_personal AND tp.id = ap.id_tipo_accion_personal AND
-	dtp.id = ap.id_detalle_tipo_accion AND ps.id = ap.id_proceso_actual
+                SELECT 
+                    ap.id, ap.numero_accion_personal, ap.fecha_elaboracion, 
+                    CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
+                    ap.fecha_rige_desde, ap.fecha_rige_hasta, 
+                    ap.id_tipo_accion_personal, tp.descripcion AS accion_personal, 
+                    ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
+                    ap.especificacion, ap.declaracion_jurada, ap.adicion_base_legal, 
+                    ap.observacion, ap.id_proceso_actual, ps.nombre AS proceso_actual,
+                    -- NIVEL DE GESTION ACTUAL
+                    ap.id_nivel_gestion_actual,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_nivel_gestion_actual) AS nivel_gestion_actual,
+                    -- UNIDAD ADMINISTRATIVA ACTUAL
+                    ap.id_unidad_administrativa,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_unidad_administrativa) AS unidad_administrativa,
+                    -- SUCURSAL ACTUAL
+                    ap.id_sucursal_actual,
+                    (SELECT nombre FROM e_sucursales WHERE id = ap.id_sucursal_actual) AS sucursal_actual,
+                    -- TRABAJO ACTUAL
+                    ap.id_lugar_trabajo_actual,
+                    (SELECT descripcion FROM e_ciudades WHERE id = ap.id_lugar_trabajo_actual) AS lugar_trabajo_actual,
+
+                    ap.id_tipo_cargo_actual, inf.name_cargo AS cargo_actual,
+                    -- GRUPO OCUPACIONAL ACTUAL
+                    ap.id_grupo_ocupacional_actual,
+                    (SELECT descripcion FROM map_cat_grupo_ocupacional WHERE id = ap.id_grupo_ocupacional_actual) AS grupo_ocupacional_actual,
+                    -- GRADO ACTUAL
+                    ap.id_grado_actual,
+                    (SELECT descripcion FROM map_cat_grado WHERE id = ap.id_grado_actual) AS grado_actual,
+                    ap.remuneracion_actual, ap.partida_individual_actual,
+                    -- PROCESO PROPUESTO
+                    ap.id_proceso_propuesto,
+                    (SELECT nombre FROM map_cat_procesos WHERE id = ap.id_proceso_propuesto) AS proceso_propuesto,
+                    -- NIVEL DE GESTIO PROPUESTA
+                    ap.id_nivel_gestion_propuesto,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_nivel_gestion_propuesto) AS nivel_gestion_propuesto,
+                    -- UNIDAD ADMINISTRATIVA PROPUESTA
+                    ap.id_unidad_adminsitrativa_propuesta,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_unidad_adminsitrativa_propuesta) AS unidad_administrativa_propuesta,
+                    -- SUCURSAL PROPUESTA
+                    ap.id_sucursal_propuesta,
+                    (SELECT nombre FROM e_sucursales WHERE id = ap.id_sucursal_propuesta) AS sucursal_propuesto,
+                    -- LUGAR DE TRABAJO PROPUESTA
+                    ap.id_lugar_trabajo_propuesto,
+                    (SELECT descripcion FROM e_ciudades WHERE id = ap.id_lugar_trabajo_propuesto) AS lugar_trabajo_propuesto,
+                    -- CARGO PROPUESTO
+                    ap.id_tipo_cargo_propuesto,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_propuesto) AS cargo_propuesto,
+                    -- GRUPO OCUPACIONAL PROPUESTO
+                    ap.id_grupo_ocupacional_propuesto,
+                    (SELECT descripcion FROM map_cat_grupo_ocupacional WHERE id = ap.id_grupo_ocupacional_propuesto) AS grupo_ocupacional_propuesto,
+                    -- GRADO PROPUESTO
+                    ap.id_grado_propuesto,
+                    (SELECT descripcion FROM map_cat_grado WHERE id = ap.id_grado_propuesto) AS grado_propuesto,
+                
+                    ap.remuneracion_propuesta, ap.partida_individual_propuesta,
+                    -- POSESION DEL PUESTO
+                    ap.lugar_posesion,
+                    (SELECT descripcion FROM e_ciudades WHERE id = ap.lugar_posesion) AS descripcion_lugar_posesion,
+                    ap.fecha_posesion, ap.numero_acta_final, ap.fecha_acta_final,
+
+                    ap.id_empleado_director,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_director) AS empleado_director,
+                    ap.id_tipo_cargo_director,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_director) AS cargo_director,
+
+                    ap.id_empleado_autoridad_delegado,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_autoridad_delegado) AS empleado_autoridad_delegado,
+                    ap.id_tipo_cargo_autoridad_delegado,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_autoridad_delegado) AS cargo_autoridad_delegado,
+
+                    ap.id_empleado_testigo,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_testigo) AS empleado_testigo,
+                    ap.fecha_testigo,
+
+                    ap.id_empleado_elaboracion,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_elaboracion) AS empleado_elaboracion,
+                    ap.id_tipo_cargo_elaboracion,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_elaboracion) AS tipo_cargo_elaboracion,
+
+                    ap.id_empleado_revision,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_revision) AS empleado_revision,
+                    ap.id_tipo_cargo_revision,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_revision) AS tipo_cargo_revision,
+
+                    ap.id_empleado_control,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_control) AS empleado_control,
+                    ap.id_tipo_cargo_control,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_control) AS tipo_cargo_control,
+
+                    ap.comunicacion_electronica, ap.fecha_comunicacion, ap.hora_comunicacion, 
+                    ap.medio_comunicacion, ap.id_empleado_comunicacion,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_comunicacion) AS empleado_comunicacion,
+                    ap.id_tipo_cargo_comunicacion,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_comunicacion) AS cargo_comunicacion,
+
+                    ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion
+
+                FROM map_documento_accion_personal AS ap
+                INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
+                INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
+                INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
+                INNER JOIN map_cat_procesos AS ps ON ps.id = ap.id_proceso_actual;
             `
         );
         if (ACCION.rowCount != 0) {

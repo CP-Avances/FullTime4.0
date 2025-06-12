@@ -180,12 +180,15 @@ export class LoginComponent implements OnInit {
         if (this.intentos === 200) {
           const verificar = f.plus({ minutes: 1 }).toFormat('HH:mm:ss');
           localStorage.setItem('time_wait', verificar);
-
+          // AUDITORIA DE INICIO DE SESION
+          this.RegistrarAuditoriaInicio(datos.text, this.ips_locales, form.usuarioF, 'Acceso fallido', 'PLATAFORMA WEB', 'Ha exedido el número de intentos.');
           this.toastr.error('Intentelo más tarde.', 'Ha exedido el número de intentos.', {
             timeOut: 3000,
           });
 
         } else {
+          // AUDITORIA DE INICIO DE SESION
+          this.RegistrarAuditoriaInicio(datos.text, this.ips_locales, form.usuarioF, 'Acceso fallido', 'PLATAFORMA WEB', 'Usuario o contraseña incorrectas.');
           this.toastr.error('Usuario o contraseña no son correctos.', 'Ups! algo ha salido mal.', {
             timeOut: 6000,
           });
@@ -204,6 +207,8 @@ export class LoginComponent implements OnInit {
         };
 
         if (mensajesError[datos.message]) {
+          // AUDITORIA DE INICIO DE SESION
+          this.RegistrarAuditoriaInicio(datos.text, this.ips_locales, form.usuarioF, 'Acceso fallido', 'PLATAFORMA WEB', mensajesError[datos.message]);
           return this.toastr.error(mensajesError[datos.message], 'Oops!', {
             timeOut: 6000,
           });
@@ -223,8 +228,8 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
 
         this.asignacionesService.ObtenerAsignacionesUsuario(datos.empleado);
-
-        this.RegistrarAuditoriaInicio(datos.ip_adress, this.ips_locales, datos.usuario, 'Acceso éxitoso', 'PLATAFORMA WEB');
+        // AUDITORIA DE INICIO DE SESION
+        this.RegistrarAuditoriaInicio(datos.ip_adress, this.ips_locales, datos.usuario, 'Acceso exitoso', 'PLATAFORMA WEB', '');
 
         this.toastr.success('Ingreso Exitoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
@@ -247,14 +252,14 @@ export class LoginComponent implements OnInit {
 
 
   // METODO DE AUDITAR INICIO DE SESION
-  RegistrarAuditoriaInicio(ip_general: any, ip_local: any, usuario: any, acceso: any, plataforma: any) {
-    //console.log(' entra ')
+  RegistrarAuditoriaInicio(ip_general: any, ip_local: any, usuario: any, acceso: any, plataforma: any, razon: any) {
     let informacion = {
-      ip_addres: ip_general,
       ip_addres_local: ip_local,
-      acceso: acceso,
+      observaciones: razon,
       plataforma: plataforma,
-      user_name: usuario
+      user_name: usuario,
+      ip_addres: ip_general,
+      acceso: acceso,
     }
     this.rest.AuditarInicio(informacion).subscribe(
       res => { });

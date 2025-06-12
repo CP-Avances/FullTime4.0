@@ -10,8 +10,8 @@ import { saveAs } from 'file-saver';
 
 //IMPORTAR SERVICIOS
 import { PlanificacionHorariaService } from 'src/app/servicios/horarios/catPlanificacionHoraria/planificacionHoraria.service';
-import { ToastrService } from 'ngx-toastr';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ToastrService } from 'ngx-toastr';
 
 //IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
@@ -61,7 +61,6 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   planificacionesHorarias: any;
   planificacionesCorrectas: any;
   numeroPlanificacionesCorrectas: number = 0;
-
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -120,7 +119,6 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     let fechaLuxonFin = DateTime.fromFormat(dia_fin, 'dd/MM/yyyy').setLocale('es');
 
     this.mes = fechaLuxonInicio.setLocale('es').toFormat('MMMM').toUpperCase();
-    console.log("ver mes: ", this.mes);
 
     while (fechaLuxonInicio <= fechaLuxonFin) {
 
@@ -131,7 +129,6 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
       this.dias_mes.push(dia);
       fechaLuxonInicio = fechaLuxonInicio.plus({ days: 1 });
     }
-    console.log("ver dias_mes", this.dias_mes)
 
   }
 
@@ -328,8 +325,6 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
   // METODO PARA GENERAR EXCEL  ** CORREGI
   GenerarExcel(fechaInicial: Date, fechaFinal: Date, usuarios: any[]) {
-    console.log('fecha Inicia: ', fechaInicial);
-    console.log('fecha Final: ', fechaFinal);
 
     if (!fechaInicial || !fechaFinal) {
       this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
@@ -344,7 +339,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     const filas: any[] = [];
     const encabezados = ['IDENTIFICACION', 'EMPLEADO'];
 
-    // Crear rango de fechas
+    // CREAR RANGO DE FECHAS
     let fecha = fechaInicio.startOf('day');
     fechaFin = fechaFin.startOf('day');
 
@@ -356,17 +351,17 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
     filas.push(encabezados);
 
-    // Agregar filas de usuarios
+    // AGREGAR FILAS DE USUARIOS
     for (const usuario of usuarios) {
       const fila = [usuario.identificacion, usuario.nombre];
       filas.push(fila);
     }
 
-    // Crear libro y hoja con ExcelJS
+    // CREAR LIBRO Y HOJA CON EXCELJS
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Planificacion');
 
-    // Definir la tabla como objeto
+    // DEFINIR LA TABLA COMO OBJETO
     worksheet.addTable({
       name: 'PlanificacionTable',
       ref: 'A1',
@@ -379,32 +374,31 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
       columns: encabezados.map(titulo => ({ name: titulo })),
       rows: usuarios.map(usuario => {
         const fila = [usuario.identificacion, usuario.nombre];
-        // Agregar columnas vacías para cada día
+        // AGREGAR COLUMNAS VACIAS PARA CADA DIA
         for (let i = 2; i < encabezados.length; i++) {
-          fila.push(''); // puedes rellenar con datos si los tienes
+          fila.push(''); // PUEDES RELLENAR CON DATOS SI LOS TIENES
         }
         return fila;
       }),
     });
 
-    // Definir anchos de columnas
+    // DEFINIR ANCHOS DE COLUMNAS
     worksheet.columns = encabezados.map((_, index) => ({
       width: index === 1 ? 40 : 20
     }));
 
-    // Definir ancho de columnas
+    // DEFINIR ANCHO DE COLUMNAS
     worksheet.columns = encabezados.map((_, index) => {
       return {
-        width: index === 1 ? 40 : 20 // Segunda columna más ancha
+        width: index === 1 ? 40 : 20 // SEGUNDA COLUMNA MAS ANCHA
       };
     });
 
-    // Guardar el archivo
+    // GUARDAR EL ARCHIVO
     workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       saveAs(blob, 'plantillaPlanificacionMultiple.xlsx');
     }).catch((error) => {
-      console.error('Error al generar el archivo Excel', error);
       this.toastr.error('Hubo un error al generar el archivo Excel', 'Error', { timeOut: 6000 });
     });
   }

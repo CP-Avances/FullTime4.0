@@ -1,12 +1,12 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Component, ViewChild } from '@angular/core';
+import { map, catchError } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { forkJoin, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
-import { forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -108,6 +108,11 @@ export class CatTipoCargosComponent {
     this.listaTipoCargos = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
+    this.ManejarEstilos();
+  }
+
+  // MANEJO DE ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -125,7 +130,7 @@ export class CatTipoCargosComponent {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
@@ -437,7 +442,6 @@ export class CatTipoCargosComponent {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-
   async GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaTipoCargos);
     const pdfMake = await this.validar.ImportarPDF();
@@ -529,7 +533,6 @@ export class CatTipoCargosComponent {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-
   async generarExcelModalidad() {
     let datos: any[] = [];
     let n: number = 1;
@@ -598,7 +601,6 @@ export class CatTipoCargosComponent {
       columns: columnas,
       rows: datos,
     });
-
 
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -689,8 +691,6 @@ export class CatTipoCargosComponent {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-
-
   ExportToCSV() {
     this.OrdenarDatos(this.listaTipoCargos);
     const workbook = new ExcelJS.Workbook();
@@ -713,7 +713,6 @@ export class CatTipoCargosComponent {
     });
     this.BuscarParametro();
   }
-
 
 
   /** ************************************************************************************************* **

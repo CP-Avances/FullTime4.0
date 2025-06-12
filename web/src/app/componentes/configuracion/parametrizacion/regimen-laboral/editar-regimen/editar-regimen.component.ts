@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
+
 import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 

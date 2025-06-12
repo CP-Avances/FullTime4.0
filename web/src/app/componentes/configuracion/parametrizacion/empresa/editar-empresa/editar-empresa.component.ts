@@ -16,6 +16,7 @@ import { VerEmpresaComponent } from '../ver-empresa/ver-empresa.component';
   templateUrl: './editar-empresa.component.html',
   styleUrls: ['./editar-empresa.component.css']
 })
+
 export class EditarEmpresaComponent implements OnInit {
   ips_locales: any = '';
 
@@ -63,10 +64,10 @@ export class EditarEmpresaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.CargarDatosEmpresa();
     this.ValidarFormulario();
@@ -173,7 +174,8 @@ export class EditarEmpresaComponent implements OnInit {
       dias_cambio: form2.dias_cambioForm,
       cambios: true,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     if (form2.tipoForm === 'Otro') {

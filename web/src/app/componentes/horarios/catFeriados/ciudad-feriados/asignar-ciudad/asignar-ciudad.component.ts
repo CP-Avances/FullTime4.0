@@ -5,12 +5,12 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 
 import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProvinciaService } from 'src/app/servicios/configuracion/localizacion/catProvincias/provincia.service';
 import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 
 import { ListarCiudadFeriadosComponent } from '../listar-ciudad-feriados/listar-ciudad-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-asignar-ciudad',

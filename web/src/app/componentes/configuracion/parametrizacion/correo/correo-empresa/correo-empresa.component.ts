@@ -76,7 +76,8 @@ export class CorreoEmpresaComponent implements OnInit {
       servidor: form.servidorF || this.data.servidor,
       puerto: form.puertoF || this.data.puerto,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
     this.restE.EditarCredenciales(this.data.id, data).subscribe(res => {
       this.toastr.success(res.message)
@@ -84,14 +85,14 @@ export class CorreoEmpresaComponent implements OnInit {
     })
   }
 
-
+  // METODO PARA COMPARAR LAS CONTRASEÑAS
   CompararContrasenia() {
     const password = this.passwordF.value;
     const confirm = this.password_confirmF.value;
 
     if (password === confirm && password && confirm) {
       this.btnDisableGuardar = false;
-      this.password_confirmF.setErrors(null); // limpia errores
+      this.password_confirmF.setErrors(null); // LIMPIA ERRORES
     } else {
       this.btnDisableGuardar = true;
       this.password_confirmF.setErrors({ mismatch: true });

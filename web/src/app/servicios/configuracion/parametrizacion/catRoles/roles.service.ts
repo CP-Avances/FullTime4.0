@@ -23,9 +23,8 @@ export class RolesService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // METODO PARA REGISTRAR ROL
+  // METODO PARA REGISTRAR ROL     ** USADO
   RegistraRol(data: any) {
-    console.log(data);
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 

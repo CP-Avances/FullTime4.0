@@ -127,16 +127,17 @@ export class TimbresService {
    * @param id_empleado Id DEL EMPLEADO QUE INICIA SESION
    */
 
-  // METODO DE CONSULTA DE AVISOS GENERALES
+  // METODO DE CONSULTA DE AVISOS GENERALES   ** USADO
   BuscarAvisosGenerales(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/avisos-generales/${id_empleado}`);
   }
 
-  // METODO DE CONSULTA DE AVISOS ESPECIFICOS
+  // METODO DE CONSULTA DE AVISOS ESPECIFICOS    ** USADO
   ObtenerUnAviso(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/aviso-individual/${id}`);
   }
 
+  // METODO UTILIZADO PARA ACTUALIZAR ESTADO DE LA NOTIFICACION   ** USADO
   ActualizarVistaAvisos(id_noti_timbre: number, datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }

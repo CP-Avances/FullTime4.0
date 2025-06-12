@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Socket } from 'ngx-socket-io';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { SocketService } from 'src/app/servicios/socket/socket.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { SocketService } from 'src/app/servicios/socket/socket.service';
-import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-button-notificacion',
@@ -199,12 +199,9 @@ export class ButtonNotificacionComponent implements OnInit {
     data.append('user_name', this.user_name);
     data.append('ip', this.ip);
     data.append('ip_local', this.ips_locales);
-
     this.realTime.ActualizarVistaNotificacion(data.id, data).subscribe(res => {
       this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
     });
-
-
 
     // REVISAR NAVEGABILIDAD
     const rol = parseInt(localStorage.getItem('rol') as string);

@@ -13,6 +13,8 @@ class AuditoriaRutas {
     }
     configuracion() {
         this.router.post('/auditarportablaempaquetados', verificarToken_1.TokenValidation, auditoriaControlador_1.default.BuscarDatosAuditoriaporTablasEmpaquetados);
+        // METODO DE CONSULTA DE AUDITORIA DE INICIO DE SESION
+        this.router.post('/auditarAccesos', verificarToken_1.TokenValidation, auditoriaControlador_1.default.BuscarDatosAuditoriaAcceso);
     }
 }
 const AUDITORIA_RUTAS = new AuditoriaRutas();

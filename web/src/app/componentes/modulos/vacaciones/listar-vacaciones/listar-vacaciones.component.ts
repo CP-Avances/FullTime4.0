@@ -10,7 +10,7 @@ import * as FileSaver from "file-saver";
 //import * as xlsx from "xlsx";
 
 // IMPORTACION DE COMPONENTES
-import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
+import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-vacaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
 
 // IMPORTACION DE SERVICIOS
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';

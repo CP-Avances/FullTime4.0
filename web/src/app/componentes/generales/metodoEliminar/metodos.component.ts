@@ -8,13 +8,12 @@ import { Component, OnInit, Inject } from '@angular/core';
   styleUrls: ['./metodos.component.css']
 })
 
-
 export class MetodosComponent implements OnInit {
 
   constructor(
     public ventana: MatDialogRef<MetodosComponent>,
     @Inject(MAT_DIALOG_DATA) public mensaje: string
-  ){}
+  ) { }
 
   eliminar: boolean = true;
 

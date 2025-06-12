@@ -75,16 +75,16 @@ class LoginControlador {
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         console.log('verificar activo ', empleado, ' usu ', usuario)
         if (empleado === 2 && usuario === false) {
-          return res.jsonp({ message: 'inactivo' });
+          return res.jsonp({ message: 'inactivo', text: ip_cliente });
         }
         console.log('web_access: ', web_access);
         console.log('app_habilita: ', app_habilita);
         console.log('movil: ', movil);
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
-        if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso" })
+        if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso", text: ip_cliente })
 
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
-        if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil" })
+        if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil", text: ip_cliente })
 
         // BUSQUEDA DE CLAVE DE LICENCIA
         //FIXME
@@ -109,7 +109,7 @@ class LoginControlador {
 
 
         if (!licenciaData.ok) {
-          return res.status(404).jsonp({ message: 'licencia_no_existe' });
+          return res.status(404).jsonp({ message: 'licencia_no_existe', text: ip_cliente });
         }
 
         const dataLic = await licenciaData.json();
@@ -118,8 +118,8 @@ class LoginControlador {
         const fec_desactivacion = new Date(dataLic[0].fecha_desactivacion);
 
         const hoy = new Date();
-        if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
-        if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
+        if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
+        if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
         caducidad_licencia = fec_desactivacion
 
         // BUSQUEDA DE INFORMACION
@@ -189,12 +189,12 @@ class LoginControlador {
             });
           }
           else {
-            return res.jsonp({ message: 'error_' });
+            return res.jsonp({ message: 'error_', text: ip_cliente });
           }
         }
       }
       else {
-        return res.jsonp({ message: 'error' });
+        return res.jsonp({ message: 'error', text: ip_cliente });
       }
     } catch (error) {
       console.log('error', error)
@@ -387,7 +387,7 @@ class LoginControlador {
   // AUDITORIA DE INICIO DE SESION
   public async RegistrarAuditoriaLogin(req: Request, res: Response) {
 
-    const { plataforma, user_name, ip_addres, ip_addres_local, acceso } = req.body;
+    const { plataforma, user_name, ip_addres, ip_addres_local, acceso, observaciones } = req.body;
 
     console.log('acceso ', req.body)
 
@@ -399,10 +399,10 @@ class LoginControlador {
       await pool.query(
         `
         INSERT INTO audit.acceso_sistema 
-          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local)   
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones)   
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         `
-        , [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local]);
+        , [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones]);
 
       return res.jsonp({ message: 'ok' });
 

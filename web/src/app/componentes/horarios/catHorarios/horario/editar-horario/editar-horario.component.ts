@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-import { DateTime, Duration } from 'luxon';
+import { Duration } from 'luxon';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
@@ -21,7 +21,6 @@ import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.s
 
 export class EditarHorarioComponent implements OnInit {
   ips_locales: any = '';
-
 
   // VALIDACIONES PARA EL FORMULARIO
   horaTrabajo = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
@@ -206,7 +205,8 @@ export class EditarHorarioComponent implements OnInit {
         documento: this.data.horario.documento,
         id: parseInt(this.data.horario.id),
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales,
+        ip: this.ip, 
+        ip_local: this.ips_locales,
       }
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
       });

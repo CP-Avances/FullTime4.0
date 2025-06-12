@@ -70,3 +70,14 @@ mat-icon {
 #detalle tbody tr:nth-child(2n) {
     background-color: #e6f3ff;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 80px;
+    padding-left: 20px;
+    padding-top: 14px;
+}

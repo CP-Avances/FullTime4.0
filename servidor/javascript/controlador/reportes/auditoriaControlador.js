@@ -126,6 +126,29 @@ class AuditoriaControlador {
             }
         });
     }
+    // METODO DE CONSULTA DE AUDITORIA DE INICIOS DE SESION
+    BuscarDatosAuditoriaAcceso(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { desde, hasta } = req.body;
+            const AUDITORIA = yield database_1.default.query(`
+                SELECT 
+                    a.plataforma, a.user_name, CAST(a.fecha AS VARCHAR), a.hora, a.acceso, a.ip_addres, 
+                    a.observaciones, a.ip_addres_local               
+                FROM 
+                    audit.acceso_sistema AS a
+                WHERE 
+                    a.fecha BETWEEN $1 AND $2
+                ORDER BY 
+                    a.fecha DESC;
+            `, [desde, hasta]);
+            if (AUDITORIA.rowCount != 0) {
+                return res.jsonp({ message: 'ok', datos: AUDITORIA.rows });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'No se han encontrado registro.' });
+            }
+        });
+    }
 }
 exports.AUDITORIA_CONTROLADOR = new AuditoriaControlador();
 exports.default = exports.AUDITORIA_CONTROLADOR;

@@ -41,7 +41,7 @@ export class HorarioService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/eliminar_horario/servidor`, datos)
   }
 
-  // BUSCAR LISTA DE CATALOGO DE HORARIOS        **USADO
+  // BUSCAR LISTA DE CATALOGO DE HORARIOS   **USADO
   BuscarListaHorarios() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horario`);
   }

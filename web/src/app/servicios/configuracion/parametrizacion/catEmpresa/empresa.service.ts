@@ -15,7 +15,7 @@ export class EmpresaService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/navegar`);
   }
 
-  // CONSULTAR DATOS DE EMPRESA             **USADO
+  // CONSULTAR DATOS DE EMPRESA    **USADO
   ConsultarDatosEmpresa(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/buscar/datos/${id}`);
   }
@@ -46,7 +46,7 @@ export class EmpresaService {
    * @param id_empresa ID DE LA EMPRESA
    */
 
-  // METODO PARA OBTENER LOGO DE EMPRESA              **USADO
+  // METODO PARA OBTENER LOGO DE EMPRESA    **USADO
   LogoEmpresaImagenBase64(id_empresa: string) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/logo/codificado/${parseInt(id_empresa)}`)
   }
@@ -56,12 +56,12 @@ export class EmpresaService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/logo/${id_empresa}/uploadImage`, formData);
   }
 
-  // METODO PARA BUSCAR IMAGEN DE CABECERA DE CORREO **USADO
+  // METODO PARA BUSCAR IMAGEN DE CABECERA DE CORREO   **USADO
   EditarCabeceraCorreo(id_empresa: number, formData: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/cabecera/${id_empresa}/uploadImage`, formData);
   }
 
-  // METODO PARA BUSCAR LOGO CABECERA DE CORREO  **USADO
+  // METODO PARA BUSCAR LOGO CABECERA DE CORREO     **USADO
   ObtenerCabeceraCorreo(id_empresa: string) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/cabecera/codificado/${parseInt(id_empresa)}`)
   }

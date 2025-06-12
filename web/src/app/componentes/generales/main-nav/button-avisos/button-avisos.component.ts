@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-const { DateTime } = require("luxon");
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';

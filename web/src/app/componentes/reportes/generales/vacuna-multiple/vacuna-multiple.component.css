@@ -64,3 +64,11 @@ width: 1.625rem;
   background-color: #e6f3ff;
 }
 
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 80px;
+}
