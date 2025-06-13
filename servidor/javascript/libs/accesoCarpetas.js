@@ -182,7 +182,7 @@ const ObtenerRutaLeerPlantillas = function () {
     let ruta = '';
     let separador = path_1.default.sep;
     ruta = path_1.default.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'leerPlantillas';
+    return ruta + separador + 'plantillasRegistro';
 };
 exports.ObtenerRutaLeerPlantillas = ObtenerRutaLeerPlantillas;
 // METODO PARA OBTENER POSICION DE PLANTILLA

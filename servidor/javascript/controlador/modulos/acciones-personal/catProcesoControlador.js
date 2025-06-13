@@ -279,7 +279,7 @@ class ProcesoControlador {
                         proceso: '',
                         proceso_padre: '',
                         observacion: '',
-                        existe: 'no'
+                        existe_pro_supe: ''
                     };
                     var listaProcesos = [];
                     var duplicados = [];
@@ -366,16 +366,15 @@ class ProcesoControlador {
                                     var existe_proceso_padre = false;
                                     if (VERIFICAR_PROCESO_PADRE.rowCount != null && VERIFICAR_PROCESO_PADRE.rowCount > 0) {
                                         existe_proceso_padre = true;
-                                        item.existe = 'si';
+                                        item.existe_pro_supe = 'si';
                                         const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre;
                                         if (procesoPadre == item.proceso) {
                                             item.observacion = 'Procesos mal definidos';
                                         }
                                     }
                                     else {
-                                        item.existe = 'no';
                                         existe_proceso_padre = false;
-                                        item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
+                                        item.existe_pro_supe = 'no';
                                     }
                                     if (item.observacion == 'no registrado') {
                                         // DISCRIMINACION DE ELEMENTOS IGUALES
@@ -396,7 +395,7 @@ class ProcesoControlador {
                                             }
                                             else {
                                                 if (existe_proceso_padre == false) {
-                                                    item.existe = 'no';
+                                                    item.existe_proceso_padre = 'no';
                                                 }
                                             }
                                         }
@@ -426,10 +425,10 @@ class ProcesoControlador {
                         listaProcesos.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
                             if (item.observacion == 'no registrado') {
                                 if (item.proceso_padre != 'No registrado') {
-                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok') //|| obj.observacion == 'Ya existe en el sistema'
+                                    const hayCoincidencia = listaProcesos.some((obj, otroIndex) => otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe en el sistema') //
                                     );
-                                    if (!hayCoincidencia) {
-                                        //item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
+                                    if (!hayCoincidencia && item.existe_proceso_padre == 'no') {
+                                        item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
                                     }
                                 }
                             }

@@ -156,8 +156,8 @@
                                     <mat-autocomplete #auto2="matAutocomplete"
                                         (optionSelected)="onTipoAccionSeleccionado($event)">
                                         <mat-option *ngFor="let option of filtroTipoAccion | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
+                                            [value]="option.descripcion">
+                                            {{option.descripcion.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"

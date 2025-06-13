@@ -534,7 +534,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-      console.log('tipos_accion', this.tipos_accion)
       this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarTipoAccion(value))
@@ -548,7 +547,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (value != null) {
       const filterValue = value.toUpperCase();
       return this.tipos_accion.filter((info: any) =>
-        info.nombre.toUpperCase().includes(filterValue)
+        info.descripcion.toUpperCase().includes(filterValue)
       );
     }
   }
@@ -689,7 +688,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
 
-      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+      this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarEmpleado(value))
       );
@@ -863,28 +862,28 @@ export class CrearPedidoAccionComponent implements OnInit {
         console.log('empl2: ',empl2);
 
         var idEmpl_firmaTH = empl2[0].id;
-        var Empl_firmaTH_cargo = empl2[0].id_cargo
+        var Empl_firmaTH_cargo = empl2[0].id_cargo_
 
         // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA SEGUNDA FIRMA
         this.restE.BuscarEmpleadoNombre(datos3).subscribe((empl3) => {
           var idEmpl_firmaG = empl3[0].id;
-          var Empl_firmaG_cargo = empl3[0].id_cargo
+          var Empl_firmaG_cargo = empl3[0].id_cargo_
 
           this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
             var idEmpl_firmaS = empl4[0].id;
-            var Empl_firmaS_cargo = empl4[0].id_cargo
+            var Empl_firmaS_cargo = empl4[0].id_cargo_
 
             this.restE.BuscarEmpleadoNombre(datos6).subscribe((empl5) => {
               var idEmpl_firmaRE = empl5[0].id;
-              var Empl_firmaRE_cargo = empl5[0].id_cargo
+              var Empl_firmaRE_cargo = empl5[0].id_cargo_
 
               this.restE.BuscarEmpleadoNombre(datos7).subscribe((empl6) => {
                 var idEmpl_firmaRR = empl6[0].id;
-                var Empl_firmaRR_cargo = empl6[0].id_cargo
+                var Empl_firmaRR_cargo = empl6[0].id_cargo_
 
                 this.restE.BuscarEmpleadoNombre(datos8).subscribe((empl7) => {
                   var idEmpl_firmaRC = empl7[0].id;
-                  var Empl_firmaRC_cargo = empl7[0].id_cargo
+                  var Empl_firmaRC_cargo = empl7[0].id_cargo_
 
                   
                     let id_tipo_accion_personal = this.tipos_accion.find(item => item.nombre === form2.idTipoAccionFom)
