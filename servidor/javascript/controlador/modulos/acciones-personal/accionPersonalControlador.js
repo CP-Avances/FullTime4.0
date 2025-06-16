@@ -23,10 +23,18 @@ const path_1 = __importDefault(require("path"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const fs_1 = __importDefault(require("fs"));
 class AccionPersonalControlador {
-    ListarTipoAccion(req, res) {
+    // METODO PARA LISTAR DETALLES TIPOS DE ACCION DE PERSONAL   **USADO
+    ListarTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ACCION = yield database_1.default.query(`
-            SELECT * FROM map_tipo_accion_personal
+                SELECT 
+                    dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, 
+                    tap.descripcion AS nombre 
+                FROM 
+                    map_detalle_tipo_accion_personal AS dtap, 
+                    map_tipo_accion_personal AS tap 
+                WHERE 
+                    tap.id = dtap.id_tipo_accion_personal
             `);
             if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
@@ -36,6 +44,120 @@ class AccionPersonalControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR DETALLE DE TIPOS DE ACCIONES DE PERSONAL   **USADO
+    CrearTipoAccionPersonal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+                    INSERT INTO map_detalle_tipo_accion_personal 
+                        (id_tipo_accion_personal, descripcion, base_legal) 
+                        VALUES($1, $2, $3) RETURNING*
+                `, [id_tipo, descripcion, base_legal]);
+                const [datos] = response.rows;
+                if (datos) {
+                    // INSERTAR REGISTRO DE AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_detalle_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `
+                            {
+                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
+                            }
+                        `,
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(200).jsonp(datos);
+                }
+                else {
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'error' });
+                }
+            }
+            catch (error) {
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR REGISTROS DE DETALLES DE TIPO DE ACCION DE PERSONAL  *USADO
+    EliminarTipoAccionPersonal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = req.params.id;
+                const { user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
+                const response = yield database_1.default.query(`
+                    SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
+                const [datos] = response.rows;
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_detalle_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar el registro con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+                    DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
+                // INSERTAR REGISTRO DE AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'map_detalle_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    /**  *************************************************************************************** **
+     **  **                      TABLA DE TIPOS DE ACCION DE PERSONAL                         ** **
+     ** **************************************************************************************** **/
+    // METODO PARA CONSULTAR TIPOS DE ACCION PERSONAL   **USADO
+    ListarTipoAccion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ACCION = yield database_1.default.query(`
+                SELECT * FROM map_tipo_accion_personal
+            `);
+            if (ACCION.rowCount != 0) {
+                return res.jsonp(ACCION.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO PARA REGISTRAR UNA ACCION DE PERSONAL   **USADO
     CrearTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -43,7 +165,7 @@ class AccionPersonalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
+                    INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
                 `, [descripcion]);
                 const [datos] = response.rows;
                 if (datos) {
@@ -70,63 +192,6 @@ class AccionPersonalControlador {
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: error });
-            }
-        });
-    }
-    CrearTipoAccionPersonal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES($1, $2, $3) RETURNING*
-                `, [id_tipo, descripcion, base_legal]);
-                const [datos] = response.rows;
-                if (datos) {
-                    // INSERTAR REGISTRO DE AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_detalle_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: `
-                        {
-                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
-                        }
-                        `,
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(200).jsonp(datos);
-                }
-                else {
-                    yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'error' });
-                }
-            }
-            catch (error) {
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // TABLA TIPO_ACCION_PERSONAL 
-    ListarTipoAccionPersonal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
-            FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
-            WHERE tap.id = dtap.id_tipo_accion_personal
-            `);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -208,57 +273,6 @@ class AccionPersonalControlador {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 return res.status(200).jsonp({ message: 'Registro actualizado.' });
-            }
-            catch (error) {
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    EliminarTipoAccionPersonal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = req.params.id;
-                const { user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
-                const response = yield database_1.default.query(`
-                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-                `, [id]);
-                const [datos] = response.rows;
-                if (!datos) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_detalle_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar el registro con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'error' });
-                }
-                yield database_1.default.query(`
-                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-                `, [id]);
-                // INSERTAR REGISTRO DE AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_detalle_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datos),
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');

@@ -24,18 +24,23 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
-        /** TABLA TIPO_ACCION_PERSONAL */
+        // *********************  TABLA TIPO DE ACCION DE PERSONAL  ************************
+        // METODO PARA LISTAR DETALLES TIPOS DE ACCION DE PERSONAL   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccionPersonal);
+        // METODO PARA REGISTRAR DETALLE DE TIPOS DE ACCIONES DE PERSONAL   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearTipoAccionPersonal);
+        // METODO PARA ELIMINAR REGISTROS DE DETALLES DE TIPO DE ACCION DE PERSONAL  *USADO
+        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EliminarTipoAccionPersonal);
+        // *********************  TABLA TIPOS DE ACCION DE PERSONAL  **************************
+        // METODO PARA CONSULTAR TIPOS DE ACCION PERSONAL   **USADO
+        this.router.get('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccion);
+        // METODO PARA REGISTRAR UNA ACCION DE PERSONAL   **USADO
+        this.router.post('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearTipoAccion);
         this.router.get('/tipo/accion/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarTipoAccionPersonalId);
         this.router.put('/', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ActualizarTipoAccionPersonal);
-        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EliminarTipoAccionPersonal);
         this.router.get('/editar/accion/tipo/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccionEdicion);
         // METODO PARA ELIMINAR LOS TIPOS DE ACCION PERSONAL DE MANERA MULTIPLE   **USADO
         this.router.post('/eliminarProcesoMult', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EliminarTipoAccionMultipleMult);
-        /** TABLA TIPO_ACCION */
-        this.router.get('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccion);
-        this.router.post('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearTipoAccion);
         /** TABLA PEDIDO_ACCION_EMPLEADO */
         this.router.post('/pedido/accion', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearPedidoAccionPersonal);
         this.router.put('/pedido/accion/editar', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ActualizarPedidoAccionPersonal);

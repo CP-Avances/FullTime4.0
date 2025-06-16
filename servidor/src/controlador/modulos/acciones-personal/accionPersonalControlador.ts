@@ -12,10 +12,18 @@ import fs from 'fs';
 
 class AccionPersonalControlador {
 
-    public async ListarTipoAccion(req: Request, res: Response) {
+    // METODO PARA LISTAR DETALLES TIPOS DE ACCION DE PERSONAL   **USADO
+    public async ListarTipoAccionPersonal(req: Request, res: Response) {
         const ACCION = await pool.query(
             `
-            SELECT * FROM map_tipo_accion_personal
+                SELECT 
+                    dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, 
+                    tap.descripcion AS nombre 
+                FROM 
+                    map_detalle_tipo_accion_personal AS dtap, 
+                    map_tipo_accion_personal AS tap 
+                WHERE 
+                    tap.id = dtap.id_tipo_accion_personal
             `
         );
         if (ACCION.rowCount != 0) {
@@ -26,6 +34,138 @@ class AccionPersonalControlador {
         }
     }
 
+    // METODO PARA REGISTRAR DETALLE DE TIPOS DE ACCIONES DE PERSONAL   **USADO
+    public async CrearTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            const response: QueryResult = await pool.query(
+                `
+                    INSERT INTO map_detalle_tipo_accion_personal 
+                        (id_tipo_accion_personal, descripcion, base_legal) 
+                        VALUES($1, $2, $3) RETURNING*
+                `
+                , [id_tipo, descripcion, base_legal]);
+
+            const [datos] = response.rows;
+
+            if (datos) {
+                // INSERTAR REGISTRO DE AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'map_detalle_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos:
+                        `
+                            {
+                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
+                            }
+                        `,
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(200).jsonp(datos)
+            }
+            else {
+                await pool.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' })
+        }
+    }
+
+    // METODO PARA ELIMINAR REGISTROS DE DETALLES DE TIPO DE ACCION DE PERSONAL  *USADO
+    public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = req.params.id;
+            const { user_name, ip, ip_local } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
+            const response = await pool.query(
+                `
+                    SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `
+                , [id]);
+            const [datos] = response.rows;
+
+            if (!datos) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'map_detalle_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: `Error al eliminar el registro con id: ${id}`
+                });
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'error' });
+            }
+
+            await pool.query(
+                `
+                    DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `
+                , [id]);
+
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'map_detalle_tipo_accion_personal',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datos),
+                datosNuevos: '',
+                ip: ip,
+                ip_local: ip_local,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(200).jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+
+        }
+    }
+
+    /**  *************************************************************************************** **
+     **  **                      TABLA DE TIPOS DE ACCION DE PERSONAL                         ** **                     
+     ** **************************************************************************************** **/
+
+    // METODO PARA CONSULTAR TIPOS DE ACCION PERSONAL   **USADO
+    public async ListarTipoAccion(req: Request, res: Response) {
+        const ACCION = await pool.query(
+            `
+                SELECT * FROM map_tipo_accion_personal
+            `
+        );
+        if (ACCION.rowCount != 0) {
+            return res.jsonp(ACCION.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+    // METODO PARA REGISTRAR UNA ACCION DE PERSONAL   **USADO
     public async CrearTipoAccion(req: Request, res: Response) {
         try {
             const { descripcion, user_name, ip, ip_local } = req.body;
@@ -34,7 +174,7 @@ class AccionPersonalControlador {
             await pool.query('BEGIN');
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
+                    INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
                 `
                 , [descripcion]);
 
@@ -68,71 +208,8 @@ class AccionPersonalControlador {
     }
 
 
-    public async CrearTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
 
-        try {
-            const { id_tipo, descripcion, base_legal, user_name, ip, ip_local } = req.body;
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            const response: QueryResult = await pool.query(
-                `
-                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES($1, $2, $3) RETURNING*
-                `
-                , [id_tipo, descripcion, base_legal]);
-
-            const [datos] = response.rows;
-
-            if (datos) {
-                // INSERTAR REGISTRO DE AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'map_detalle_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos:
-                        `
-                        {
-                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
-                        }
-                        `
-                    ,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(200).jsonp(datos)
-            }
-            else {
-                await pool.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' })
-            }
-        } catch (error) {
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' })
-        }
-    }
-
-    // TABLA TIPO_ACCION_PERSONAL 
-    public async ListarTipoAccionPersonal(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
-            FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
-            WHERE tap.id = dtap.id_tipo_accion_personal
-            `
-        );
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
 
     public async ListarTipoAccionEdicion(req: Request, res: Response) {
         const { id } = req.params;
@@ -232,65 +309,7 @@ class AccionPersonalControlador {
         }
     }
 
-    public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
-        try {
-            const id = req.params.id;
-            const { user_name, ip, ip_local } = req.body;
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
-            const response = await pool.query(
-                `
-                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-                `
-                , [id]);
-            const [datos] = response.rows;
-
-            if (!datos) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'map_detalle_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: `Error al eliminar el registro con id: ${id}`
-                });
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'error' });
-            }
-
-            await pool.query(
-                `
-                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-                `
-                , [id]);
-
-            // INSERTAR REGISTRO DE AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'map_detalle_tipo_accion_personal',
-                usuario: user_name,
-                accion: 'D',
-                datosOriginales: JSON.stringify(datos),
-                datosNuevos: '',
-                ip: ip,
-                ip_local: ip_local,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.status(200).jsonp({ message: 'Registro eliminado.' });
-        } catch (error) {
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
-
-        }
-    }
 
     // TABLA SOLICITUD ACCION PERSONAL
     public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
