@@ -1,11 +1,12 @@
 // CONEXION CON LA BASE DE DATOS POSTGRESQL
 import Pool from 'pg-pool';
 const pool = new Pool({
-  user: 'postgres',
-  host: '192.168.0.148',
+user: 'postgres',
+  host: '192.168.0.145',
   port: 5432,
   database: 'empresa_verificar',
   password: 'fu11tim3'
+
 })
 
 pool.query('SELECT NOW()', (err, res) => {

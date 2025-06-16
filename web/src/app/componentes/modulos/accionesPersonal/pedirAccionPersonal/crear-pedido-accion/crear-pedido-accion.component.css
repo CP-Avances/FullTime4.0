@@ -85,6 +85,16 @@ mat-form-field {
   transform: translateY(1px);
 }
 
+.componente-superpuesto {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  color: white;
+  padding: 15px;
+}
+
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
     .nota{
@@ -113,6 +123,10 @@ mat-form-field {
 
     .inputCedula{
         width: 90%;
+    }
+
+    .componente-superpuesto {
+        top: 97%;
     }
 }
 

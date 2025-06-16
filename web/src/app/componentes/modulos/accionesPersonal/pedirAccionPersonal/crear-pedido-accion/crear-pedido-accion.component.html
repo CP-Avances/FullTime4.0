@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="contenedor-completo">
+                                <mat-form-field class="inputText">
                                     <mat-label>Seleccionar el empleado</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="funcionarioF"
                                         [matAutocomplete]="auto1" required autocomplete="off">
@@ -156,8 +156,8 @@
                                     <mat-autocomplete #auto2="matAutocomplete"
                                         (optionSelected)="onTipoAccionSeleccionado($event)">
                                         <mat-option *ngFor="let option of filtroTipoAccion | async"
-                                            [value]="option.nombre">
-                                            {{option.nombre.toUpperCase()}}
+                                            [value]="option.descripcion">
+                                            {{option.descripcion.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -239,7 +239,8 @@
                                 <mat-form-field style="width: 90%;">
                                     <mat-label>Adición a base legal:</mat-label>
                                     <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
-                                        [formControl]="baseLegalForm" readonly></textarea>
+                                        [formControl]="baseLegalForm" (input)="onInputChange($event)"
+                                        (keydown)="onKeyDown($event)"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Regresar a la lista de opciones existentes.">
                                         gavel
@@ -414,7 +415,7 @@
                                         <mat-label>Partida Presupuestaria Individual</mat-label>
                                         <textarea matInput #acta maxlength="200"
                                             placeholder="Ingresar número del acta final del concurso"
-                                            formControlName="actaForm"></textarea>
+                                            formControlName="actaForm" readonly></textarea>
                                         <mat-hint align="start"><strong>Ingresar hasta 200
                                                 caracteres</strong></mat-hint>
                                         <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
@@ -451,7 +452,7 @@
                                             [formControl]="idSucursalPropues" [matAutocomplete]="auto12">
                                         <mat-autocomplete #auto12="matAutocomplete">
                                             <mat-option *ngFor="let option of filtroSucursalPropuesta | async"
-                                                [value]="option.nombre">
+                                                [value]="option.nombre" (click)="onSucursal(option)">
                                                 {{option.nombre.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
@@ -665,7 +666,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Número acta final</mat-label>
-                                    <input matInput placeholder="0001" formControlName="actaFinalForm" required
+                                    <input matInput placeholder="0001" formControlName="actaFinalForm"
                                         autocomplete="off">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el número de acta final.">
@@ -687,24 +688,7 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field style="width: 20%;">
-                                    <input type="text" placeholder="ING." matInput [formControl]="abrevServidorPubli">
-                                </mat-form-field>
-                                <mat-form-field style="width: 80%;">
-                                    <mat-label>Servidor Publico</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoSP"
-                                        [matAutocomplete]="auto20">
-                                    <mat-autocomplete #auto20="matAutocomplete">
-                                        <mat-option *ngFor="let option of filtroNombreR | async"
-                                            [value]="option.empleado">
-                                            {{option.empleado.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-autocomplete>
-                                </mat-form-field>
-                            </div>
-                        </div>
+                        <div class="col-12 col-md-6"></div>
                     </div>
                 </form>
                 <br>
@@ -727,6 +711,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md">
+                            <mat-label>Director(a) o responsable de Talento Humano</mat-label>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevHA">
@@ -737,7 +722,7 @@
                                         [matAutocomplete]="auto20" required>
                                     <mat-autocomplete #auto20="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombreR | async"
-                                            [value]="option.empleado">
+                                            [value]="option.empleado" (click)="onCargo(option)">
                                             {{option.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -747,6 +732,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
+                            <mat-label>Cargo <b>{{cargoFirma1?.cargo}}</b></mat-label>
                         </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
@@ -1042,7 +1028,7 @@
             </mat-step>
 
         </mat-horizontal-stepper>
-        <div style="text-align: center; margin-bottom: 3%;">
+        <div class="componente-superpuesto" style="text-align: center; margin-bottom: 3%;">
             <button id="btn-raised" class="btn btn-sm"
                 (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value, fivethFormGroup.value, sixthFormGroup.value)"
                 [disabled]="!firstFormGroup.valid || !secondFormGroup.valid || !thirdFormGroup.valid || !fourthFormGroup.valid"
