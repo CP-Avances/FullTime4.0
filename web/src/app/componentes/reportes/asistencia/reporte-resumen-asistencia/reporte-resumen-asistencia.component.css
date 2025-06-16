@@ -111,3 +111,83 @@ mat-icon {
 .timbre {
     background-color: #dadeec !important;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 80px;
+    padding-left: 1px;
+}
+
+.col_n {
+    min-width: 50px !important;
+    text-align: center;
+}
+
+.col_codigo {
+    min-width: 75px !important;
+    text-align: center;
+}
+
+.colum_1 {
+    min-width: 120px !important;
+    text-align: center;
+}
+
+#detalle th,
+#detalle td {
+    padding-left: 2px;
+    padding-right: 2px;
+    border-left: none;
+    border-right: none;
+}
+
+#detalle td:not(.sticky-4)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    border-right: 1px solid #ccc;
+}
+
+#detalle .sticky {
+    position: sticky;
+    left: 0px;
+    z-index: 2;
+}
+
+#detalle .sticky-2 {
+    position: sticky;
+    left: 50px;
+    z-index: 2;
+}
+
+#detalle .sticky-3 {
+    position: sticky;
+    left: 125px;
+    z-index: 2;
+}
+
+#detalle .sticky-4 {
+    position: sticky;
+    left: 245px;
+    z-index: 2;
+}
+
+#detalle tbody tr:nth-child(even) td.sticky,
+#detalle tbody tr:nth-child(even) td.sticky-2,
+#detalle tbody tr:nth-child(even) td.sticky-3,
+#detalle tbody tr:nth-child(even) td.sticky-4 {
+    background-color: #e6f3ff;
+}
+
+#detalle tbody tr:nth-child(odd) td.sticky,
+#detalle tbody tr:nth-child(odd) td.sticky-2,
+#detalle tbody tr:nth-child(odd) td.sticky-3,
+#detalle tbody tr:nth-child(odd) td.sticky-4 {
+    background-color: #fbfbfb;
+}
