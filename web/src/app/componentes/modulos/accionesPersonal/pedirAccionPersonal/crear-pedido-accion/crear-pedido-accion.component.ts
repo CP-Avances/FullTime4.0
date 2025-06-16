@@ -23,6 +23,7 @@ import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-perso
 import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
+import { number } from "echarts/core";
 
 
 
@@ -151,8 +152,6 @@ export class CrearPedidoAccionComponent implements OnInit {
   fechaPosesionFor = new FormControl("");
   actaFinalForm = new FormControl("");
   fechaActaFinalForm = new FormControl("");
-  abrevServidorPubli = new FormControl("");
-  idEmpleadoSP = new FormControl("");
 
   //Formulario 5 responsables aprovacion
   abrevHA = new FormControl("");
@@ -237,8 +236,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     fechaPosesionForm: this.fechaPosesionFor,
     actaFinalForm: this.actaFinalForm,
     fechaActaFinalForm: this.fechaActaFinalForm,
-    abrevServidorPubliForm: this.abrevServidorPubli,
-    idEmpleadoSPForm: this.idEmpleadoSP
   });
   public fivethFormGroup = new FormGroup({
 
@@ -282,6 +279,8 @@ export class CrearPedidoAccionComponent implements OnInit {
   ciudades: any = [];
   departamento: any;
   departamentos: any = [];
+  departamentosact: any = [];
+  departamentosPro: any = [];
   FechaActual: any;
 
   get habilitarAccion(): boolean {
@@ -360,7 +359,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (value != null) {
       const filterValue = value.toUpperCase();
       return this.empleados.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
+        info.empleado.toUpperCase().includes(filterValue)  
       );
     }
   }
@@ -379,10 +378,19 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarDeparta(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.departamentos.filter((info: any) =>
+      return this.departamentosact.filter((info: any) =>
         info.nombre.toUpperCase().includes(filterValue)
       );
     }
+  }
+
+  private _filtrarDepaPro(value: string): any {
+      if (value != null) {
+        const filterValue = value.toUpperCase();
+        return this.departamentosPro.filter((info: any) =>
+          info.nombre.toUpperCase().includes(filterValue)
+        );
+      }
   }
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
@@ -570,11 +578,16 @@ export class CrearPedidoAccionComponent implements OnInit {
     }
   }
   activarOtro = true;
+  textoFijo: string = '';
   onTipoAccionSeleccionado(e: MatAutocompleteSelectedEvent) {
     if (e.option.value != undefined && e.option.value != null) {
       this.tipos_accion.forEach(item => {
-        if (item.nombre == e.option.value) {
+        console.log('SI: ',item)
+        console.log('SI: ',item.descripcion,' - ',e.option.value)
+        if (item.descripcion == e.option.value) {
+          console.log('entro aqui: ',item.decripcion,' - ',e.option.value)
           this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
+          this.textoFijo = item.base_legal;
         }
       });
 
@@ -589,19 +602,42 @@ export class CrearPedidoAccionComponent implements OnInit {
 
     }
   }
+  onInputChange(event: any) {
+    const inputValue = event.target.value;
+
+    // Si borraron parte del valor fijo, restáuralo
+    if (!inputValue.startsWith(this.textoFijo)) {
+      event.target.value = this.textoFijo
+      return;
+    }
+
+    this.secondFormGroup.controls['baseLegalForm'].setValue(inputValue);
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    const input = event.target as HTMLInputElement;
+    // Si el cursor está dentro del texto fijo, no permitir Backspace ni escritura
+    if (input.selectionStart! <= this.textoFijo.length) {
+      const teclasBloqueadas = ['Backspace', 'Delete', 'ArrowLeft'];
+
+      if (teclasBloqueadas.includes(event.key)) {
+        event.preventDefault();
+      }
+    }
+  }
 
   InfoUser: any = {}
+  idUserSelect: any = 0;
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
-    console.log('eeee: ', e)
     if (e.id != undefined && e.id != null) {
       this.restUsu.BuscarInfoUsuarioAcci(e.id).subscribe((datos) => {
         this.InfoUser = datos
-        console.log('informacion usuario: ', this.InfoUser)
-        
+      
         this.InfoUser.forEach(valor => {
 
-          this.firstFormGroup.controls['funcionarioForm'].setValue(e.id);
+          //this.firstFormGroup.controls['funcionarioForm'].setValue(this.idUserSelect);
+          this.idUserSelect = e.id
           this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
           this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
@@ -618,6 +654,13 @@ export class CrearPedidoAccionComponent implements OnInit {
             this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
           } else {
             this.thirdFormGroup.controls['sucursalForm'].setValue(sucursal.nombre)
+            this.departamentos.forEach(item => {
+              if(item.id_sucursal == sucursal.id){
+                this.departamentosact.push(item);
+              }
+            });
+
+            this.FiltrarDepaActua();
           }
           //Departamento
           const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
@@ -658,6 +701,7 @@ export class CrearPedidoAccionComponent implements OnInit {
           }
           //Remuneracion
           this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
+          this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
 
           this.btnForm1 = false
 
@@ -668,6 +712,18 @@ export class CrearPedidoAccionComponent implements OnInit {
       ))
     }else{
       this.btnForm1 = true
+    }
+  }
+
+  onSucursal(e: any){
+    if (e.id != undefined && e.id != null) {
+      this.departamentosPro = [];
+      const filtrados = this.departamentos.filter(item => item.id_sucursal == e.id);
+      this.departamentosPro = filtrados;
+
+      this.idDepaPropues.setValue("");
+      this.idDepaAdminPropuesta.setValue("");
+      this.FiltrarDepaPro();
     }
   }
 
@@ -687,7 +743,6 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
 
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-
       this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarEmpleado(value))
@@ -739,25 +794,27 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.departamentos = [];
     this.restDe.ConsultarDepartamentos().subscribe((data) => {
       this.departamentos = data;
-
       console.log('departamentos: ', this.departamentos)
+    });
+  }
 
+  FiltrarDepaActua(){
       this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarDeparta(value))
       );
+  }
 
-      this.filtroDepartamentosProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
+  FiltrarDepaPro(){
+      this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
         startWith(""),
-        map((value: any) => this._filtrarDeparta(value))
+        map((value: any) => this._filtrarDepaPro(value))
       );
 
       this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
         startWith(""),
-        map((value: any) => this._filtrarDeparta(value))
+        map((value: any) => this._filtrarDepaPro(value))
       );
-
-    });
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES
@@ -807,6 +864,27 @@ export class CrearPedidoAccionComponent implements OnInit {
       NombreCapitalizado = NombreCapitalizado = name1;
     }
     return NombreCapitalizado;
+  }
+
+  cargoFirma1: any;
+  onCargo(datos: any){
+    this.cargoFirma1 = {};
+    let datos2 = {
+       informacion: datos.empleado.toUpperCase(),
+    };
+
+    // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
+    this.restE.BuscarEmpleadoNombre(datos2).subscribe((empl2) => {
+      console.log('empl2: ', empl2[0])
+      const x = {
+        id_cargo: empl2[0].id_cargo_,
+        cargo: empl2[0].name_cargo
+      }
+      this.cargoFirma1 = x
+      console.log('cargoFirma1: ', this.cargoFirma1)
+    })
+
+
   }
 
   // METODO PARA REALIZAR EL REGISTRO DE ACCION DE PERSONAL
@@ -975,8 +1053,6 @@ export class CrearPedidoAccionComponent implements OnInit {
                         fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
                         actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
                         fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
-                        abreviaSP: form3.habilitarForm4 ? form4.abrevServidorPubliForm : null,
-                        firma_servidorPublico: form3.habilitarForm4 ? form4.idEmpleadoSPForm : null,
                       },
 
                       //parte formulario 5
@@ -1114,8 +1190,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   habilitarformPosesion: boolean = false
   validarForm(formValue: any, stepper: any) {
-
-    if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado'
+    console.log('formValue: ',formValue);
+    if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado' || formValue.NivelDepaForm == 'No registrado'
       || formValue.DepartamentoForm == 'No registrado' || formValue.grupoOcupacionalForm == 'No registrado' || formValue.gradoForm == 'No registrado'
       || formValue.tipoCargoForm == 'No registrado'
     ) {

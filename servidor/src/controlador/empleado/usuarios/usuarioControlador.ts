@@ -79,18 +79,20 @@ class UsuarioControlador {
     const { id_empleado } = req.params;
     const USUARIO = await pool.query(
       `
-      SELECT 
-	      tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
-	      tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
-	      tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
-	      COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
-	      COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
-	      COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional	
-      FROM 
-	      informacion_general AS tb1, eu_empleado_cargos AS tb2
-      WHERE 
-  	    tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
-	      tb2.estado = 'true'
+        SELECT 
+	        tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
+	        tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
+	        tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
+	        COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
+	        COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
+	        COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional,
+		      tb3.numero_partida_individual
+        FROM 
+	        informacion_general AS tb1, eu_empleado_cargos AS tb2, eu_empleados AS tb3
+        WHERE 
+  	      tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
+		      tb3.id = tb1.id AND
+	        tb2.estado = 'true'
       `
       , [id_empleado]);
     if (USUARIO.rowCount != 0) {
