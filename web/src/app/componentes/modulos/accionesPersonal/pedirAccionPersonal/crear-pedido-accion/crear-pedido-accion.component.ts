@@ -616,13 +616,18 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   onKeyDown(event: KeyboardEvent) {
     const input = event.target as HTMLInputElement;
-    // Si el cursor está dentro del texto fijo, no permitir Backspace ni escritura
     if (input.selectionStart! <= this.textoFijo.length) {
       const teclasBloqueadas = ['Backspace', 'Delete', 'ArrowLeft'];
 
       if (teclasBloqueadas.includes(event.key)) {
         event.preventDefault();
       }
+    }
+  }
+
+  onFocus() {
+    if (this.baseLegalForm.value === this.textoFijo) {
+      this.baseLegalForm.setValue('\n');
     }
   }
 
@@ -702,6 +707,11 @@ export class CrearPedidoAccionComponent implements OnInit {
           //Remuneracion
           this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
           this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
+
+          //this.fivethFormGroup.controls['idEmpleadoHF'].setValue(e.empleado);
+          this.fivethFormGroup.patchValue({
+            fechaServidorForm: this.FechaActual,
+          });
 
           this.btnForm1 = false
 
@@ -867,21 +877,58 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   cargoFirma1: any;
-  onCargo(datos: any){
-    this.cargoFirma1 = {};
-    let datos2 = {
-       informacion: datos.empleado.toUpperCase(),
-    };
+  cargoFirma2: any;
+  cargoFirma3: any;
+  cargoFirma4: any;
+  cargoFirma5: any;
+  onCargo(datos: any, firma: number){
+    let info = {}
+    if(firma == 1){
+      this.cargoFirma1 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else if(firma == 2){
+      this.cargoFirma2 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else if(firma == 3){
+      this.cargoFirma3 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else if(firma == 4){
+      this.cargoFirma4 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else{
+      this.cargoFirma5 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }
 
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
-    this.restE.BuscarEmpleadoNombre(datos2).subscribe((empl2) => {
-      console.log('empl2: ', empl2[0])
+    this.restE.BuscarEmpleadoNombre(info).subscribe((empl) => {
       const x = {
-        id_cargo: empl2[0].id_cargo_,
-        cargo: empl2[0].name_cargo
+        id_cargo: empl[0].id_cargo_,
+        cargo: empl[0].name_cargo
       }
-      this.cargoFirma1 = x
-      console.log('cargoFirma1: ', this.cargoFirma1)
+
+      if(firma == 1){
+        this.cargoFirma1 = x
+      }else if(firma == 2){
+        this.cargoFirma2 = x
+      }else if(firma == 3){
+        this.cargoFirma3 = x
+      }else if(firma == 4){
+        this.cargoFirma4 = x
+      }else if(firma == 5){
+        this.cargoFirma5 = x
+      }
+      
     })
 
 
