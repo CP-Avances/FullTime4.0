@@ -1,8 +1,137 @@
-import { IReporteTimbres } from '../../class/Asistencia';
 import { Request, Response } from 'express';
 import pool from '../../database';
 
 class ReportesAsistenciaControlador {
+
+    // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO     
+    public async ReporteTimbresMultiple(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+                o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
+                return o;
+            }));
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
+
+        return res.status(200).jsonp(nuevo)
+
+    }
+
+    // METODO DE BUSQUEDA DE TIMBRES DE TIMBRE VIRTUAL      **USADO        
+    public async ReporteTimbreSistema(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+                o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
+                return o;
+            }));
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e;
+        }).filter(e => { return e.empleados.length > 0 });
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+
+        return res.status(200).jsonp(nuevo);
+    }
+
+    // METODO DE BUSQUEDA DE TIMBRES DEL RELOJ VIRTUAL    **USADO    
+    public async ReporteTimbreRelojVirtual(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+                o.timbres = await BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
+                return o;
+            }));
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 });
+            return e;
+        }).filter(e => { return e.empleados.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+
+        return res.status(200).jsonp(nuevo);
+    }
+
+    // METODO DE BUSQUEDA DE TIMBRES HORARIO ABIERTO    **USADO    
+    public async ReporteTimbreHorarioAbierto(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+                o.timbres = await BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
+                return o;
+            }));
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 });
+            return e;
+        }).filter(e => { return e.empleados.length > 0 });
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+
+        return res.status(200).jsonp(nuevo);
+    }
+
+    // METODO DE BUSQUEDA DE TIMBRES INCOMPLETOS      **USADO   
+    public async ReporteTimbresIncompletos(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+                o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.id);
+                return o;
+            }));
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
+
+        return res.status(200).jsonp(nuevo);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * REALIZA UN ARRAY DE SUCURSALES CON DEPARTAMENTOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL EMPLEADO
@@ -25,8 +154,6 @@ class ReportesAsistenciaControlador {
         ).then((result: any) => { return result.rows });
 
         if (suc.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-
 
         let departamentos = await Promise.all(suc.map(async (dep: any) => {
             dep.departamentos = await pool.query(
@@ -52,7 +179,6 @@ class ReportesAsistenciaControlador {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele: any) => {
                 if (estado === '1') {
                     ele.empleado = await pool.query(
-                        //empl-contratos esta el id_regimen
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
                             e.identificacion, e.correo, ca.id AS id_cargo, tc.cargo,
@@ -134,120 +260,6 @@ class ReportesAsistenciaControlador {
         return res.status(200).jsonp(respuesta)
     }
 
-    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO   
-    public async ReporteTimbresMultiple(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-
-        console.log("ver req.body", req.body)
-        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
-            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
-                return o;
-            }));
-            return obj;
-        }));
-
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e
-        }).filter(e => { return e.empleados.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
-
-        return res.status(200).jsonp(nuevo)
-
-    }
-
-    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS   
-    public async ReporteTimbresIncompletos(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
-            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.id);
-                return o;
-            }));
-            return obj;
-        }));
-
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e
-        }).filter(e => { return e.empleados.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
-
-        return res.status(200).jsonp(nuevo);
-    }
-
-    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA      
-    public async ReporteTimbreSistema(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        console.log("ver req.body",req.body )
-        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
-            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
-                return o;
-            }));
-            return obj;
-        }));
-
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e;
-        }).filter(e => { return e.empleados.length > 0 });
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-
-        return res.status(200).jsonp(nuevo);
-    }
-
-    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL    
-    public async ReporteTimbreRelojVirtual(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
-            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
-                return o;
-            }));
-            return obj;
-        }));
-
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 });
-            return e;
-        }).filter(e => { return e.empleados.length > 0 })
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-
-        return res.status(200).jsonp(nuevo);
-    }
-
-    // REPORTE DE TIMBRES HORARIO ABIERTO   
-    public async ReporteTimbreHorarioAbierto(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
-            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
-                return o;
-            }));
-            return obj;
-        }));
-
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 });
-            return e;
-        }).filter(e => { return e.empleados.length > 0 });
-
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-
-        return res.status(200).jsonp(nuevo);
-    }
-
 }
 
 const REPORTE_A_CONTROLADOR = new ReportesAsistenciaControlador();
@@ -306,7 +318,7 @@ const BuscarTimbreSistemas = async function (fec_inicio: string, fec_final: stri
         })
 }
 
-// CONSULTA TIMBRES REALIZADOS EN EL RELOJ VIRTUAL CODIGO 97
+// CONSULTA TIMBRES REALIZADOS EN EL RELOJ VIRTUAL CODIGO 97   **USADO
 const BuscarTimbreRelojVirtual = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `

@@ -1,16 +1,15 @@
-import { Request, Response } from 'express';
-import pool from '../../../database';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import pool from '../../../database';
 
 class GeneroControlador {
 
-  // LISTA DE GENEROS
-
+  // METODO PARA LISTAR GENEROS   ** USADO
   public async ListarGeneros(req: Request, res: Response) {
     const GENEROS = await pool.query(
       `
-      SELECT * FROM e_genero  ORDER BY genero ASC
+      SELECT * FROM e_genero ORDER BY genero ASC
       `
     );
 
@@ -22,7 +21,7 @@ class GeneroControlador {
     }
   }
 
-  // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
+  // METODO PARA BUSCAR GENEROS POR SU NOMBRE   **USADO
   public async ObtenerGenero(req: Request, res: Response): Promise<any> {
     const { genero } = req.params;
     const unGenero = await pool.query(
@@ -40,7 +39,7 @@ class GeneroControlador {
   }
 
 
-  // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
+  // METODO PARA CREAR GENERO   **USADO
   public async CrearGenero(req: Request, res: Response): Promise<Response> {
     try {
       const { genero, user_name, ip, ip_local } = req.body;
@@ -81,11 +80,12 @@ class GeneroControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
+      console.log('error genero ', error)
       return res.status(500).jsonp({ message: 'Error al registrar el genero.' });
     }
   }
 
-
+  // METODO PARA ACTUALIZAR REGISTRO DE GENERO   **USADO
   public async ActualizarGenero(req: Request, res: Response): Promise<Response> {
     try {
       const { genero, id, user_name, ip, ip_local } = req.body;
@@ -145,8 +145,6 @@ class GeneroControlador {
     }
   }
 
-
-
   // METODO PARA ELIMINAR REGISTROS   **USADO
   public async EliminarGenero(req: Request, res: Response): Promise<Response> {
     try {
@@ -204,6 +202,7 @@ class GeneroControlador {
       return res.jsonp({ message: 'error' });
     }
   }
+
 }
 
 export const GENERO_CONTROLADOR = new GeneroControlador();

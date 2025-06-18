@@ -13,14 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GENERO_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../../database"));
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const database_1 = __importDefault(require("../../../database"));
 class GeneroControlador {
-    // LISTA DE GENEROS
+    // METODO PARA LISTAR GENEROS   ** USADO
     ListarGeneros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const GENEROS = yield database_1.default.query(`
-      SELECT * FROM e_genero  ORDER BY genero ASC
+      SELECT * FROM e_genero ORDER BY genero ASC
       `);
             if (GENEROS.rowCount != 0) {
                 return res.jsonp(GENEROS.rows);
@@ -30,7 +30,7 @@ class GeneroControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
+    // METODO PARA BUSCAR GENEROS POR SU NOMBRE   **USADO
     ObtenerGenero(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { genero } = req.params;
@@ -45,7 +45,7 @@ class GeneroControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
+    // METODO PARA CREAR GENERO   **USADO
     CrearGenero(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -79,10 +79,12 @@ class GeneroControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
+                console.log('error genero ', error);
                 return res.status(500).jsonp({ message: 'Error al registrar el genero.' });
             }
         });
     }
+    // METODO PARA ACTUALIZAR REGISTRO DE GENERO   **USADO
     ActualizarGenero(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

@@ -4,9 +4,10 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { RegistrarNivelDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
 import { PrincipalDepartamentoComponent } from '../listar-departamento/principal-departamento.component';
@@ -80,11 +81,11 @@ export class VerDepartamentoComponent implements OnInit {
     public componented: PrincipalDepartamentoComponent,
     public componentes: VerSucursalComponent,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
     public router: Router,
     public auto: AutorizaDepartamentoService,
     public rest: DepartamentosService,
     private toastr: ToastrService,
-    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -101,7 +102,6 @@ export class VerDepartamentoComponent implements OnInit {
         this.CargarDatos(this.info);
       })
     }
-    console.log('pagina', this.pagina);
   }
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO

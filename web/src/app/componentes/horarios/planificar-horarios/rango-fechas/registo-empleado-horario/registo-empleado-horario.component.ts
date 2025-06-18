@@ -1,9 +1,9 @@
 // IMPORTAR LIBRERIAS
 import { Router } from '@angular/router';
+import { DateTime } from 'luxon';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { DateTime } from 'luxon';
 
 // IMPORTACION DE SERVICIOS
 import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
@@ -535,8 +535,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   // METODO PARA CARGAR TIMBRES
   cargar: boolean = false;
-  CargarTimbres(form: any) {
-    console.log("ver fechaFinFormluxon: ", this.fechaFinFormluxon)
+  CargarTimbres() {
     var codigos = '\'' + this.data_horario.codigo + '\'';
     let usuarios = {
       codigo: codigos,

@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ESTADO_CIVIL_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../../database"));
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const database_1 = __importDefault(require("../../../database"));
 class EstadoCivilControlador {
-    // LISTA DE GENEROS
+    // METODO PARA LISTAR ESTADO CIVIL   **USADO
     ListarEstadosCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ESTADOS = yield database_1.default.query(`
@@ -30,7 +30,7 @@ class EstadoCivilControlador {
             }
         });
     }
-    // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
+    // METODO PARA BUSCAR ESTADO CIVIL POR SU NOMBRE   **USADO
     ObtenerEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { estado } = req.params;
@@ -45,7 +45,7 @@ class EstadoCivilControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
+    // METODO PARA REGISTRAR ESTADO CIVIL   **USADO
     CrearEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -83,6 +83,7 @@ class EstadoCivilControlador {
             }
         });
     }
+    // METODO PARA ACTUALIZAR REGISTRO DE ESTADO CIVIL   **USADO
     ActualizarEstadoCivil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

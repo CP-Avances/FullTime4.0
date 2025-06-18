@@ -103,17 +103,24 @@ class RolPermisosControlador {
     }
   }
 
-  //FIXME SQL
-  // METODO PARA BUSCAR ID DE PAGINAS Y MENU LATERAL
+  // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL   **USADO
   public async ObtenerPaginasMenuRol(req: Request, res: Response): Promise<any> {
     const { id_rol } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-        SELECT ero_rol_permisos.id, ero_rol_permisos.pagina as funcion, ero_rol_permisos.link, ero_rol_permisos.id_rol, ero_rol_permisos.id_accion, es_acciones_paginas.id_pagina as id_funcion, es_acciones_paginas.accion  
-        FROM ero_rol_permisos ero_rol_permisos 
-        LEFT JOIN es_acciones_paginas es_acciones_paginas ON es_acciones_paginas.id = ero_rol_permisos.id_accion 
-        WHERE ero_rol_permisos.id_rol = $1 
-        ORDER BY 6, 5
+        SELECT 
+          rp.id, 
+          rp.pagina AS funcion, 
+          rp.link, 
+          rp.id_rol, 
+          rp.id_accion, 
+          ap.id_pagina AS id_funcion, 
+          ap.accion  
+        FROM ero_rol_permisos rp
+        LEFT JOIN es_acciones_paginas ap 
+          ON ap.id = rp.id_accion 
+        WHERE rp.id_rol = $1
+        ORDER BY ap.id_pagina, rp.id_accion;
       `
       , [id_rol]);
     if (PAGINA_ROL.rowCount != 0) {
@@ -124,7 +131,7 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ASIGNAR FUNCIONES AL ROL
+  // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
       const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = req.body;
@@ -133,7 +140,7 @@ class RolPermisosControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
+          INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
         `
         , [funcion, link, id_rol, id_accion, movil]);
       const [datosOriginales] = response.rows;
@@ -164,20 +171,46 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTRO  **USADO
-  public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
+  // METODO PARA ASIGNAR ACCIONES AL ROL   **USADO
+  public async AsignarAccionesRol(req: Request, res: Response) {
+    const arrayAccionesSeleccionadas: any[] = req.body.acciones;
+
+    if (!Array.isArray(arrayAccionesSeleccionadas) || arrayAccionesSeleccionadas.length === 0) {
+      return res.status(400).jsonp({ message: 'No se proporcionaron acciones para asignar.' });
+    }
+
     try {
-      const { id, user_name, ip, ip_local } = req.body
+      const accionesNoExistentes = await filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas);
+      if (accionesNoExistentes.length === 0) {
+        return res.status(200).jsonp({ message: 'Todas las acciones ya existen.' });
+      }
+
+      await insertarAccionesSeleccionadas(accionesNoExistentes);
+
+      return res.status(200).jsonp({ message: 'Acciones asignadas correctamente.' });
+    } catch (error) {
+      console.error('Error al asignar acciones:', error);
+      return res.status(500).jsonp({ message: 'Error al asignar acciones.' });
+    }
+  }
+
+  // METODO PARA ELIMINAR REGISTRO  **USADO
+  public async EliminarPaginasRol(req: Request, res: Response): Promise<any> {
+    try {
+      const { ids, user_name, ip, ip_local } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).jsonp({ message: 'No se proporcionaron IDs para eliminar.' });
+      }
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
-      const rol = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = $1', [id]);
-      const [datosOriginales] = rol.rows;
+      // CONSULTAR DATOS ORIGINALES
+      const roles = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
+      const datosOriginales = roles.rows;
 
-
-      if (!datosOriginales) {
+      if (datosOriginales.length === 0) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'ero_rol_permisos',
@@ -187,35 +220,52 @@ class RolPermisosControlador {
           datosNuevos: '',
           ip: ip,
           ip_local: ip_local,
-          observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
+          observacion: `Error al eliminar los permisos. Registros no encontrados.`
         });
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+        return res.status(404).jsonp({ message: 'Error al eliminar los registros.' });
       }
 
-      await pool.query(
-        `
-      DELETE FROM ero_rol_permisos WHERE id = $1
-      `
-        , [id]);
+      // ELIMINAR REGISTROS
+      await pool.query('DELETE FROM ero_rol_permisos WHERE id = ANY($1)', [ids]);
 
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ero_rol_permisos',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
+      // AUDITORÍA MASIVA
+      const valuesAuditoria: string[] = [];
+      const paramsAuditoria: any[] = [];
+      let i = 1;
+      for (const original of datosOriginales) {
+        valuesAuditoria.push(
+          `($${i++}, $${i++}, $${i++}, now(), $${i++}, $${i++}, $${i++}, $${i++}, $${i++}, $${i++})`
+        );
+        paramsAuditoria.push(
+          "APLICACION WEB",
+          'ero_rol_permisos',
+          user_name,
+          'D',
+          JSON.stringify(original),
+          '',
+          ip,
+          null,
+          ip_local
+        );
+      }
+
+      const queryAuditoria =
+        `
+          INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+            action, original_data, new_data, ip_address, observacion, ip_address_local)
+          VALUES ${valuesAuditoria.join(', ')}
+        `;
+
+      await pool.query(queryAuditoria, paramsAuditoria);
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      res.jsonp({ message: 'Registro eliminado.' });
+      res.jsonp({ message: 'Registros eliminados.' });
     } catch (error) {
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
   }
@@ -242,8 +292,8 @@ class RolPermisosControlador {
     const { id_funcion } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-          SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
-          `
+        SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+      `
       , [id_funcion]);
     if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
@@ -304,9 +354,6 @@ class RolPermisosControlador {
     else if (SIN_ACCIONES.rowCount != 0) {
       respuesta = SIN_ACCIONES.rows;
     }
-
-    console.log('respuesta ', respuesta.length)
-
     if (respuesta.length != 0) {
       return res.jsonp(respuesta)
     } else {
@@ -314,6 +361,133 @@ class RolPermisosControlador {
     }
   }
 }
+
+// FUNCION UTIL PARA FILTRAR LAS ACCIONES SELECCIONADAS  **USADO
+async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas: any[]): Promise<any[]> {
+  if (arrayAccionesSeleccionadas.length === 0) return [];
+
+  // FILTROS DINAMICOS PARA COMPROBAR EXISTENCIA
+  const conditions: string[] = [];
+  const values: any[] = [];
+  let i = 1;
+
+  for (const accion of arrayAccionesSeleccionadas) {
+    const { id_rol, id_accion, funcion } = accion;
+    if (id_accion) {
+      conditions.push(`(pagina = $${i++} AND id_rol = $${i++} AND id_accion = $${i++})`);
+      values.push(funcion, id_rol, id_accion);
+    } else {
+      conditions.push(`(pagina = $${i++} AND id_rol = $${i++})`);
+      values.push(funcion, id_rol);
+    }
+  }
+
+  const query =
+    `
+      SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
+      WHERE ${conditions.join(' OR ')}
+    `;
+
+  const result = await pool.query(query, values);
+
+  // CONVERTIMOS LOS REGISTROS EXISTENTES A UN SET DE CLAVES PARA COMPARAR RÁPIDO
+  const clavesExistentes = new Set(
+    result.rows.map(r =>
+      `${r.pagina}|${r.id_rol}|${r.id_accion ?? 'null'}`
+    )
+  );
+
+  // FILTRAMOS LOS QUE NO EXISTEN
+  return arrayAccionesSeleccionadas.filter(({ funcion, id_rol, id_accion }) => {
+    const clave = `${funcion}|${id_rol}|${id_accion ?? 'null'}`;
+    return !clavesExistentes.has(clave);
+  });
+}
+
+// FUNCION PARA INSERTAR EN LA BASE DE DATOS LAS ACCIONES SELECCIONADAS   **USADO
+async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) {
+  if (arrayAccionesSeleccionadas.length === 0) return;
+  // CONSTRUIMOS LA CONSULTA DE INSERCION
+  const values: string[] = [];
+  const params: any[] = [];
+  let i = 1;
+
+  const valuesAuditoria: string[] = [];
+  const paramsAuditoria: any[] = [];
+  let j = 1;
+
+  for (const accion of arrayAccionesSeleccionadas) {
+    const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = accion;
+    if (id_accion) {
+      values.push(`($${i++}, $${i++}, $${i++}, $${i++}, $${i++})`);
+      params.push(funcion, link, id_rol, id_accion, movil);
+    } else {
+      values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
+      params.push(funcion, link, id_rol, movil);
+    }
+    // PREPARAR DATOS PARA AUDITORIA
+    valuesAuditoria.push(
+      `($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`
+    );
+    paramsAuditoria.push(
+      "APLICACION WEB",
+      'ero_rol_permisos',
+      user_name,
+      'now()',
+      'I',
+      '',
+      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }),
+      ip,
+      null,
+      ip_local
+    );
+  }
+
+  const query =
+    `
+      INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
+      VALUES ${values.join(', ')}
+    `;
+
+  const queryAuditoria =
+    `
+      INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+        action, original_data, new_data, ip_address, observacion, ip_address_local)
+      VALUES ${valuesAuditoria.join(', ')}
+    `;
+
+  // AÑADIR TRANSACCION
+  await pool.query('BEGIN');
+
+  await pool
+    .query(query, params)
+    .catch((error): any => {
+      console.error('Error al insertar acciones seleccionadas:', error);
+      // REVERTIR TRANSACCIÓN EN CASO DE ERROR
+      return pool.query('ROLLBACK')
+        .then(() => {
+          throw new Error('Error al insertar acciones seleccionadas: ' + error.message);
+        });
+    });
+
+  await pool
+    .query(queryAuditoria, paramsAuditoria)
+    .catch((error): any => {
+      console.error('Error al insertar auditoría de acciones seleccionadas:', error);
+      // REVERTIR TRANSACCIÓN EN CASO DE ERROR
+      return pool.query('ROLLBACK')
+        .then(() => {
+          throw new Error('Error al insertar auditoría de acciones seleccionadas: ' + error.message);
+        });
+
+    });
+
+  // FINALIZAR TRANSACCION
+  await pool.query('COMMIT');
+  console.log('Acciones seleccionadas insertadas correctamente.');
+}
+
+
 
 export const rolPermisosControlador = new RolPermisosControlador();
 export default rolPermisosControlador;

@@ -1,6 +1,6 @@
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
-import { Query, QueryResult } from 'pg';
+import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
@@ -9,7 +9,7 @@ import Excel from 'exceljs';
 
 class ProcesoControlador {
 
-  // METODO PARA BUSCAR LISTA DE PROCESOS
+  // METODO DE CONSULTA DE PROCESOS    **USADO
   public async ListarProcesos(req: Request, res: Response) {
 
     const SIN_PROCESO_SUPERIOR = await pool.query(
@@ -36,32 +36,17 @@ class ProcesoControlador {
     res.jsonp(CON_PROCESO_SUPERIOR.rows);
   }
 
-
-  public async getOne(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const unaProvincia = await pool.query(
-      `
-      SELECT * FROM map_cat_procesos WHERE id = $1
-      `
-      , [id]);
-    if (unaProvincia.rowCount != 0) {
-      return res.jsonp(unaProvincia.rows)
-    }
-    res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });
-  }
-
-  public async create(req: Request, res: Response): Promise<void> {
+  // METODO PARA REGISTRAR UN PROCESO   **USADO
+  public async RegistrarProceso(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
-
-      console.log('nombre: ', nombre)
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN')
       const response: QueryResult = await pool.query(
         `
           SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
-         `
+        `
         , [nombre]
       )
 
@@ -71,9 +56,9 @@ class ProcesoControlador {
       await pool.query('COMMIT');
 
       if (procesos != undefined || procesos != null) {
-
         res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre' });
-      } else {
+      }
+      else {
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -109,7 +94,73 @@ class ProcesoControlador {
     }
   }
 
-  public async getIdByNombre(req: Request, res: Response): Promise<any> {
+  // METODO PARA ELIMINA PROCESOS   **USADO
+  public async EliminarProceso(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id;
+      const { user_name, ip, ip_local } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const proceso = await pool.query(
+        `
+          SELECT * FROM map_cat_procesos WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = proceso.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'map_cat_procesos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+          DELETE FROM map_cat_procesos WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'map_cat_procesos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      return res.jsonp({ message: 'Registro eliminado.' })
+
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.jsonp({ message: 'error' });
+    };
+  }
+
+  // METODO PARA OBTENER EL ID DEL PROCESO SUPERIOR   **USADO
+  public async ObtenerIdByNombre(req: Request, res: Response): Promise<any> {
     const { nombre } = req.params;
     const unIdProceso = await pool.query(
       `
@@ -122,6 +173,7 @@ class ProcesoControlador {
     res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
+  // METODO PARA ACTUALIZAR UN PROCESO    **USADO
   public async ActualizarProceso(req: Request, res: Response): Promise<Response> {
     try {
       var { nombre, proc_padre, id, user_name, ip, ip_local } = req.body;
@@ -133,11 +185,10 @@ class ProcesoControlador {
         const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE id = $1', [proc_padre]);
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-
-
         if (proce.rows[0].nombre == nombre) {
           return res.status(300).jsonp({ message: 'Un proceso no puede ser su propio proceso superior. Verifique la selección e intente nuevamente.' });
-        } else {
+        }
+        else {
           return res.status(300).jsonp({ message: 'No se puede actualizar si el proceso superior es el mismo proceso anterior' });
         }
       }
@@ -178,15 +229,15 @@ class ProcesoControlador {
 
         if (proce.rowCount! > 0) {
           return res.status(300).jsonp({ message: 'Ya existe un proceso con ese nombre.' });
-        } else {
-
+        }
+        else {
           if (proc_padre != "") {
             // INICIAR TRANSACCION
             await pool.query('BEGIN')
             const response: QueryResult = await pool.query(
               `
-            SELECT * FROM map_cat_procesos WHERE id = $1
-           `
+                SELECT * FROM map_cat_procesos WHERE id = $1
+              `
               , [proc_padre]
             )
             const [procesos] = response.rows;
@@ -197,7 +248,8 @@ class ProcesoControlador {
               return res.status(300).jsonp({ message: 'Un proceso no puede ser proceso superior de otro si este último ya es su proceso superior. \nVerifique proceso ' + procesos.nombre });
             }
 
-          } else {
+          }
+          else {
             proc_padre = null
           }
 
@@ -234,71 +286,6 @@ class ProcesoControlador {
     }
   }
 
-  // METODO PARA ELIMINA PROCESOS   **USADO
-  public async EliminarProceso(req: Request, res: Response): Promise<Response> {
-    try {
-      const id = req.params.id;
-      const { user_name, ip, ip_local } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const proceso = await pool.query(
-        `
-        SELECT * FROM map_cat_procesos WHERE id = $1
-        `
-        , [id]);
-      const [datosOriginales] = proceso.rows;
-
-      if (!datosOriginales) {
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_procesos',
-          usuario: user_name,
-          accion: 'D',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-      }
-
-      await pool.query(
-        `
-        DELETE FROM map_cat_procesos WHERE id = $1
-        `
-        , [id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'map_cat_procesos',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-
-      return res.jsonp({ message: 'Registro eliminado.' })
-
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
-    };
-  }
-
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     try {
@@ -319,7 +306,8 @@ class ProcesoControlador {
           fila: '',
           proceso: '',
           proceso_padre: '',
-          observacion: ''
+          observacion: '',
+          existe_pro_supe: ''
         };
         var listaProcesos: any = [];
         var duplicados: any = [];
@@ -409,29 +397,31 @@ class ProcesoControlador {
           if (item.observacion == 'no registrado') {
             const VERIFICAR_PROCESO = await pool.query(
               `
-                    SELECT * FROM map_cat_procesos 
-                    WHERE UPPER(nombre) = UPPER($1)
-                    `
+                SELECT * FROM map_cat_procesos 
+                WHERE UPPER(nombre) = UPPER($1)
+              `
               , [item.proceso]);
 
             if (VERIFICAR_PROCESO.rowCount === 0) {
               if (item.proceso.toUpperCase() !== item.proceso_padre.toUpperCase()) {
                 const VERIFICAR_PROCESO_PADRE = await pool.query(
                   `
-                        SELECT * FROM map_cat_procesos 
-                        WHERE UPPER(nombre) = UPPER($1)
-                        `
+                    SELECT * FROM map_cat_procesos 
+                    WHERE UPPER(nombre) = UPPER($1)
+                  `
                   , [item.proceso_padre]);
 
                 var existe_proceso_padre: boolean = false
-                if (VERIFICAR_PROCESO_PADRE.rowCount !== 0) {
+                if (VERIFICAR_PROCESO_PADRE.rowCount != null && VERIFICAR_PROCESO_PADRE.rowCount > 0) {
                   existe_proceso_padre = true
+                  item.existe_pro_supe = 'si'
                   const procesoPadre = VERIFICAR_PROCESO_PADRE.rows[0].proceso_padre
                   if (procesoPadre == item.proceso) {
                     item.observacion = 'Procesos mal definidos'
                   }
                 } else {
                   existe_proceso_padre = false
+                  item.existe_pro_supe = 'no'
                 }
 
                 if (item.observacion == 'no registrado') {
@@ -459,7 +449,7 @@ class ProcesoControlador {
                     } else {
 
                       if (existe_proceso_padre == false) {
-
+                        item.existe_proceso_padre = 'no'
                       }
 
                     }
@@ -497,22 +487,20 @@ class ProcesoControlador {
             if (item.observacion == 'no registrado') {
               if (item.proceso_padre != 'No registrado') {
                 const hayCoincidencia = listaProcesos.some((obj: any, otroIndex: any) =>
-                  otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe en el sistema')
+                  otroIndex !== index && item.proceso_padre.toLowerCase() === obj.proceso.toLowerCase() && (obj.observacion == 'ok' || obj.observacion == 'Ya existe en el sistema') //
                 );
 
-                if (!hayCoincidencia) {
+                if (!hayCoincidencia && item.existe_proceso_padre == 'no') {
+
                   item.observacion = 'Proceso superior no existe en el sistema como un proceso.';
+
                 }
               }
-
-
             }
-
-
-
             if (item.observacion == '1') {
               item.observacion = 'Registro duplicado'
-            } else if (item.observacion == 'no registrado') {
+            }
+            else if (item.observacion == 'no registrado') {
               item.observacion = 'ok'
             }
 
@@ -523,7 +511,8 @@ class ProcesoControlador {
               if (item.fila == filaDuplicada) {
                 mensaje = 'error';
               }
-            } else {
+            }
+            else {
               return mensaje = 'error';
             }
 
@@ -621,13 +610,12 @@ class ProcesoControlador {
             observacion: null
           });
 
-        } else {
-
-
+        }
+        else {
           const respo: QueryResult = await pool.query(
             `
               INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
-              `
+            `
             , [proceso_padre, null]);
           const [proce] = respo.rows;
 
@@ -646,7 +634,7 @@ class ProcesoControlador {
           const response: QueryResult = await pool.query(
             `
               UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
-              `
+            `
             , [respo.rows[0].id, proceso]);
 
           const [procesos] = response.rows;
@@ -688,7 +676,7 @@ class ProcesoControlador {
     return res.status(200).jsonp({ message: 'ok' });
   }
 
-  // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+  // METODO DE REGISTRO DE EMPLEADO - PROCESOS    **USADO
   public async RegistrarProcesos(req: Request, res: Response) {
     const { id_proceso, listaUsuarios, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
@@ -703,7 +691,7 @@ class ProcesoControlador {
         const response: QueryResult = await pool.query(
           `
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
-           `
+          `
           , [id_proceso, id]);
 
         const [procesos] = response.rows;
@@ -727,8 +715,8 @@ class ProcesoControlador {
           await pool.query('BEGIN');
           const response: QueryResult = await pool.query(
             `
-            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
-           `
+              SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+            `
             , [id]);
 
           const [proceso_activo] = response.rows;
@@ -771,11 +759,8 @@ class ProcesoControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
-
-
-          } else {
-
+          }
+          else {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const proceso_update: QueryResult = await pool.query(
@@ -823,8 +808,8 @@ class ProcesoControlador {
             await pool.query('COMMIT');
           }
 
-        } else {
-          console.log('proceso: ', procesos.estado)
+        }
+        else {
           if (procesos.estado == false) {
 
             // INICIAR TRANSACCION
@@ -855,8 +840,8 @@ class ProcesoControlador {
               await pool.query('BEGIN');
               const proceso_update: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
-              `
+                  UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+                `
                 , [procesos.id]);
 
               const [proceso_UPD] = proceso_update.rows;
@@ -874,13 +859,12 @@ class ProcesoControlador {
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
 
-
               // INICIAR TRANSACCION
               await pool.query('BEGIN');
               const proceso_update1: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
-              `
+                  UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                `
                 , [proceso_activo1.id]);
 
               const [proceso_UPD1] = proceso_update.rows;
@@ -895,15 +879,18 @@ class ProcesoControlador {
                 ip_local: ip_local,
                 observacion: null
               });
+
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
-            } else {
+
+            }
+            else {
               // INICIAR TRANSACCION
               await pool.query('BEGIN');
               const proceso_update: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
-              `
+                  UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+                `
                 , [procesos.id]);
 
               const [proceso_UPD] = proceso_update.rows;
@@ -925,9 +912,7 @@ class ProcesoControlador {
           }
         }
       }
-
       return res.status(200).jsonp({ message: 'Registro de proceso' });
-
     } catch {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -936,13 +921,54 @@ class ProcesoControlador {
         return res.status(500).jsonp({ message: 'error' });
       }
     }
+  }
 
+  // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+  public async EditarRegistroProcesoEmple(req: Request, res: Response): Promise<any> {
+    try {
 
+      const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+
+      if (estado == true) {
+        // CONSULTAR DATOSORIGINALES
+        const proceso = await pool.query(
+          `
+            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true
+          `
+          , [id_empleado]);
+        const [proceso_] = proceso.rows;
+
+        if (proceso_ != undefined || proceso_ != null) {
+          await pool.query(
+            `
+              UPDATE map_empleado_procesos SET estado = $1 WHERE id = $2
+            `
+            , [false, proceso_.id]);
+        }
+
+        await pool.query(
+          `
+            UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
+          `
+          , [id_accion, estado, id]);
+
+      } else {
+        await pool.query(
+          `
+            UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
+          `
+          , [id_accion, estado, id]);
+      }
+
+      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+
+    } catch (error) {
+      return res.status(500).jsonp({ message: error });
+    }
   }
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DE EMPLEADOS PROCESOS DENTRO DEL SISTEMA - MENSAJE DE CADA ERROR **USADO
   public async RevisarPantillaEmpleadoProce(req: Request, res: Response): Promise<any> {
-
     try {
       const documento = req.file?.originalname;
       let separador = path.sep;
@@ -1090,7 +1116,6 @@ class ProcesoControlador {
                   , [id_proceso, id_empleado]);
 
                 const [procesos_emple] = response.rows;
-                console.log('procesos_emple: ', procesos_emple);
 
                 if (procesos_emple != undefined && procesos_emple != '' && procesos_emple != null) {
                   item.observacion = 'Ya existe un registro activo con este Proceso.'
@@ -1134,7 +1159,8 @@ class ProcesoControlador {
           listaProcesos.forEach(async (item: any) => {
             if (item.observacion == '1') {
               item.observacion = 'Registro duplicado'
-            } else if (item.observacion == 'no registrado') {
+            }
+            else if (item.observacion == 'no registrado') {
               item.observacion = 'ok'
             }
 
@@ -1145,7 +1171,8 @@ class ProcesoControlador {
               if (item.fila == filaDuplicada) {
                 mensaje = 'error';
               }
-            } else {
+            }
+            else {
               return mensaje = 'error';
             }
 
@@ -1168,13 +1195,10 @@ class ProcesoControlador {
 
   }
 
-  // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA
+  // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA     **USADO
   public async RegistrarEmpleadoProceso(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
-
-    console.log('id_empleado: ', plantilla)
-
     try {
       for (const item of plantilla) {
 
@@ -1183,10 +1207,9 @@ class ProcesoControlador {
         await pool.query('BEGIN');
         const VERIFICAR_IDPROCESO = await pool.query(
           `
-          SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
+            SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
           `
           , [proceso]);
-        console.log('VERIFICAR_IDPROCESO.rows[0].id: ', VERIFICAR_IDPROCESO.rows[0].id)
 
         const id_proceso = VERIFICAR_IDPROCESO.rows[0].id;
         // FINALIZAR TRANSACCION
@@ -1195,7 +1218,7 @@ class ProcesoControlador {
         await pool.query('BEGIN');
         const VERIFICAR_IDEMPLEADO = await pool.query(
           `
-          SELECT id FROM eu_empleados WHERE identificacion = $1
+            SELECT id FROM eu_empleados WHERE identificacion = $1
           `
           , [identificacion.trim()]);
 
@@ -1203,13 +1226,12 @@ class ProcesoControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
         const response: QueryResult = await pool.query(
           `
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
-           `
+          `
           , [id_proceso, id_empleado]);
 
         const [procesos] = response.rows;
@@ -1233,8 +1255,8 @@ class ProcesoControlador {
           await pool.query('BEGIN');
           const response: QueryResult = await pool.query(
             `
-            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
-           `
+              SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+            `
             , [id_empleado]);
 
           const [proceso_activo] = response.rows;
@@ -1258,7 +1280,7 @@ class ProcesoControlador {
             await pool.query('BEGIN');
             const responsee: QueryResult = await pool.query(
               `
-              INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `
               , [id_proceso, id_empleado, true]);
 
@@ -1277,16 +1299,13 @@ class ProcesoControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
-
-
-          } else {
-
+          }
+          else {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const proceso_update: QueryResult = await pool.query(
               `
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = false WHERE id = $1
               `
               , [proceso_activo.id]);
 
@@ -1309,7 +1328,7 @@ class ProcesoControlador {
             await pool.query('BEGIN');
             const response: QueryResult = await pool.query(
               `
-               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `
               , [id_proceso, id_empleado, true]);
 
@@ -1328,9 +1347,8 @@ class ProcesoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
           }
-
-        } else {
-          console.log('proceso: ', procesos.estado)
+        }
+        else {
           if (procesos.estado == false) {
 
             // INICIAR TRANSACCION
@@ -1360,7 +1378,7 @@ class ProcesoControlador {
             await pool.query('BEGIN');
             const proceso_update: QueryResult = await pool.query(
               `
-              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = true WHERE id = $1
               `
               , [procesos.id]);
 
@@ -1383,7 +1401,7 @@ class ProcesoControlador {
             await pool.query('BEGIN');
             const proceso_update1: QueryResult = await pool.query(
               `
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = false WHERE id = $1
               `
               , [proceso_activo1.id]);
 
@@ -1401,13 +1419,10 @@ class ProcesoControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
           }
         }
       }
-
       return res.status(200).jsonp({ message: 'Registro de proceso' });
-
     } catch {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1416,54 +1431,9 @@ class ProcesoControlador {
         return res.status(500).jsonp({ message: 'error' });
       }
     }
-
   }
 
-  // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
-  public async EditarRegistroProcesoEmple(req: Request, res: Response): Promise<any> {
-    try {
-
-      const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
-
-      if (estado == true) {
-        // CONSULTAR DATOSORIGINALES
-        const proceso = await pool.query(
-          `
-        SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true
-        `
-          , [id_empleado]);
-        const [proceso_] = proceso.rows;
-
-        if (proceso_ != undefined || proceso_ != null) {
-          await pool.query(
-            `
-            UPDATE map_empleado_procesos SET estado = $1 WHERE id = $2
-            `
-            , [false, proceso_.id]);
-        }
-
-        await pool.query(
-          `
-          UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
-          `
-          , [id_accion, estado, id]);
-
-      } else {
-        await pool.query(
-          `
-          UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
-          `
-          , [id_accion, estado, id]);
-      }
-
-      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
-
-    } catch (error) {
-      return res.status(500).jsonp({ message: error });
-    }
-  }
-
-  // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+  // METODO PARA ELIMINAR PROCESOS DE MANERA MULTIPLE   **USADO
   public async EliminarProcesoMultiple(req: Request, res: Response): Promise<any> {
     const { listaEliminar, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
@@ -1478,8 +1448,8 @@ class ProcesoControlador {
         await pool.query('BEGIN');
         const resultado = await pool.query(
           `
-             SELECT * FROM map_cat_procesos WHERE id = $1
-           `
+            SELECT * FROM map_cat_procesos WHERE id = $1
+          `
           , [item.id]);
         const [existe_proceso] = resultado.rows;
 
@@ -1504,8 +1474,8 @@ class ProcesoControlador {
           await pool.query('BEGIN');
           const resultado = await pool.query(
             `
-             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1
-           `
+              SELECT * FROM map_empleado_procesos WHERE id_proceso = $1
+            `
             , [item.id]);
 
           const [existe_proceso_emple] = resultado.rows
@@ -1518,7 +1488,7 @@ class ProcesoControlador {
             const res = await pool.query(
               `
                 DELETE FROM map_cat_procesos WHERE id = $1
-                `
+              `
               , [item.id]);
 
             // AUDITORIA
@@ -1537,28 +1507,26 @@ class ProcesoControlador {
             await pool.query('COMMIT');
             count += 1;
 
-          } else {
+          }
+          else {
             list_Procesos.push(item.nombre)
             count_no += 1;
           }
-
         }
-
       }
-
       var meCount = "registro eliminado"
-      if(count > 1){
+      if (count > 1) {
         meCount = "registros eliminados"
       }
 
-      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' con éxito.', 
-                              ms2: 'Existen datos relacionados con ', 
-                              codigo: 200, 
-                              eliminados: count, 
-                              relacionados: count_no,
-                              listaNoEliminados: list_Procesos
-                            });
-
+      res.status(200).jsonp({
+        message: count.toString() + ' ' + meCount + ' con éxito.',
+        ms2: 'Existen datos relacionados con ',
+        codigo: 200,
+        eliminados: count,
+        relacionados: count_no,
+        listaNoEliminados: list_Procesos
+      });
 
     } catch (err) {
       // REVERTIR TRANSACCION
@@ -1567,18 +1535,53 @@ class ProcesoControlador {
       if (error) {
         if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
           if (count <= 1) {
-            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ',eliminados: count, 
-              relacionados: count_no, listaNoEliminados: list_Procesos });
-          } else if (count > 1) {
-            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count, 
-              relacionados: count_no, listaNoEliminados: list_Procesos });
+            return res.status(300).jsonp({
+              message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+              relacionados: count_no, listaNoEliminados: list_Procesos
+            });
           }
-        } else {
+          else if (count > 1) {
+            return res.status(300).jsonp({
+              message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+              relacionados: count_no, listaNoEliminados: list_Procesos
+            });
+          }
+        }
+        else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
         }
       }
     }
 
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  public async getOne(req: Request, res: Response): Promise<any> {
+    const { id } = req.params;
+    const unaProvincia = await pool.query(
+      `
+      SELECT * FROM map_cat_procesos WHERE id = $1
+      `
+      , [id]);
+    if (unaProvincia.rowCount != 0) {
+      return res.jsonp(unaProvincia.rows)
+    }
+    res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });
   }
 
 }

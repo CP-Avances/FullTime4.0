@@ -5,6 +5,7 @@ import { catchError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+
 export class RolPermisosService {
 
   constructor(
@@ -42,11 +43,18 @@ export class RolPermisosService {
       catchError(data));;
   }
 
+  // METODO PARA ASIGNAR ACCIONES AL ROL   ** USADO
+  CrearAccionesRol(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones/insertar`, data).pipe(
+      catchError(data));;
+  }
+
   // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
   BuscarPaginasRol(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/todaspaginasrol`, datos);
   }
 
+  // METODO PARA BUSCAR LAS PAGINAS DEL SISTEMA   **USADO
   BuscarPaginasMenuRol(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/todaspaginasmenurol`, datos);
   }
@@ -70,7 +78,6 @@ export class RolPermisosService {
   ObtenerAcciones() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones/todas`);
   }
-
 
   // METODO PARA LISTAR FUNIONES DE ROLES DEL SISTEMA  **USADO
   BuscarFuncionesRoles() {

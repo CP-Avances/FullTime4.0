@@ -18,8 +18,8 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
-import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
-import { EditarEstadoHoraExtraAutorizacionComponent } from 'src/app/componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
+import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
+import { EditarEstadoHoraExtraAutorizacionComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 
 @Component({
   selector: 'app-ver-pedido-hora-extra',

@@ -23,7 +23,7 @@ class ProvinciaRutas {
         this.router.delete('/eliminar/:id', TokenValidation, PROVINCIA_CONTROLADOR.EliminarProvincia);
         // METODO PARA REGISTRAR PROVINCIA  **USADO
         this.router.post('/', TokenValidation, PROVINCIA_CONTROLADOR.CrearProvincia);
-        // METODO PARA BUSCAR DATOS DE UNA PROVINCIA
+        // METODO PARA BUSCAR DATOS DE UNA PROVINCIA   **USADO
         this.router.get('/buscar/:id', TokenValidation, PROVINCIA_CONTROLADOR.ObtenerProvincia);
         // METODO PARA BUSCAR DATOS DE UN PAIS     *USADO
         this.router.get('/buscar/pais/:id', TokenValidation, PROVINCIA_CONTROLADOR.ObtenerPais);

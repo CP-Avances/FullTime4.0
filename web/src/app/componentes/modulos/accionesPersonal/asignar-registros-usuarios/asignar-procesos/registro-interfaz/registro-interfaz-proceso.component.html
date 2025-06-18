@@ -188,7 +188,7 @@
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de procesos.">
                         settings
                     </mat-icon>
-                    <mat-select [formControl]="idproceso" required (selectionChange)="selecctPro($event.value);">
+                    <mat-select [formControl]="idproceso" required (selectionChange)="selecctPro();">
                         <mat-option *ngFor="let pro of Lprocesos" [value]="pro.id">
                             {{pro.nombre}}
                         </mat-option>

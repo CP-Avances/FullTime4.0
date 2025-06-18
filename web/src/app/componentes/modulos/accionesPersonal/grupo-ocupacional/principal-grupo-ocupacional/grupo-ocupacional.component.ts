@@ -17,11 +17,9 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
 
-
-import ExcelJS, { FillPattern } from "exceljs";
+import ExcelJS from "exceljs";
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import { FillPatterns } from 'exceljs';
 
 @Component({
   selector: 'app-grupo-ocupacional',
@@ -38,8 +36,6 @@ export class GrupoOcupacionalComponent implements OnInit {
   ListGrupoOcupacional: any
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
-  private bordeGrueso!: Partial<ExcelJS.Borders>;
-  private fillAzul!: FillPatterns;
   private fontTitulo!: Partial<ExcelJS.Font>;
   private imagen: any;
 
@@ -219,7 +215,6 @@ export class GrupoOcupacionalComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA EDITAR GRUPO OCUPACIONAL
   AbrirVentanaEditar(datosSeleccionados: any): void {
-    //console.log(datosSeleccionados);
     this.ventana.open(EditarGrupoOcupacionalComponent,
       {
         width: '450px', data: datosSeleccionados
@@ -230,7 +225,6 @@ export class GrupoOcupacionalComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
-    //console.log(datos);
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -246,7 +240,8 @@ export class GrupoOcupacionalComponent implements OnInit {
     let dataGrupo = {
       id_grupo: id_grupo,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     this._GrupoOp.ElminarGrupoOcupacion(dataGrupo).subscribe((res: any) => {
@@ -290,12 +285,11 @@ export class GrupoOcupacionalComponent implements OnInit {
     const data = {
       listaEliminar: this.grupoOcupacionalEliminar,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
-
-    this._GrupoOp.EliminarGrupoMult(data).subscribe({
+    this._GrupoOp.EliminarGrupoMultiple(data).subscribe({
       next: (response: any) => {
-        console.log('response: ', response)
         this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 4500,
         });
@@ -386,7 +380,6 @@ export class GrupoOcupacionalComponent implements OnInit {
   VerificarPlantilla() {
     this.listaGrupoOcupacionalCorrectas = [];
     let formData = new FormData();
-
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
@@ -395,7 +388,6 @@ export class GrupoOcupacionalComponent implements OnInit {
     this._GrupoOp.RevisarFormato(formData).subscribe(res => {
       this.Datos_gruposOcupacional = res.data;
       this.messajeExcel = res.message;
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -409,7 +401,6 @@ export class GrupoOcupacionalComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
-
         this.Datos_gruposOcupacional.sort((a: any, b: any) => {
           if (a.observacion !== 'ok' && b.observacion === 'ok') {
             return -1;
@@ -419,7 +410,6 @@ export class GrupoOcupacionalComponent implements OnInit {
           }
           return 0;
         });
-
         this.Datos_gruposOcupacional.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaGrupoOcupacionalCorrectas.push(item);
@@ -437,7 +427,6 @@ export class GrupoOcupacionalComponent implements OnInit {
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
@@ -474,7 +463,6 @@ export class GrupoOcupacionalComponent implements OnInit {
   }
 
   RegistrarGrupoOcupacional() {
-    console.log('listaGrupoOcupacionalCorrectas: ', this.listaGrupoOcupacionalCorrectas.length)
     if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaGrupoOcupacionalCorrectas,
@@ -516,9 +504,8 @@ export class GrupoOcupacionalComponent implements OnInit {
 
 
   /** ************************************************************************************************** **
-       ** **                               METODO PARA EXPORTAR A PDF                                     ** **
-       ** ************************************************************************************************** **/
-
+   ** **                               METODO PARA EXPORTAR A PDF                                     ** **
+   ** ************************************************************************************************** **/
 
   async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
@@ -532,9 +519,7 @@ export class GrupoOcupacionalComponent implements OnInit {
   }
 
   DefinirInformacionPDF() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -586,13 +571,11 @@ export class GrupoOcupacionalComponent implements OnInit {
               [
                 { text: 'CÓDIGO', style: 'tableHeader' },
                 { text: 'GRUPO OCUPACIONAL', style: 'tableHeader' },
-                //{ text: 'NÚMERO DE PARTIDA', style: 'tableHeader' },
               ],
               ...this.ListGrupoOcupacional.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.descripcion, style: 'itemsTable' },
-                  //{ text: obj.numero_partida, style: 'itemsTable' }
                 ];
               })
             ]
@@ -613,32 +596,20 @@ export class GrupoOcupacionalComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   async exportToExcel() {
-
-    var f = DateTime.now();
-    let fecha = f.toFormat('yyyy-MM-dd');
-    let hora = f.toFormat('HH:mm:ss');
-    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
     const grupoOcupacional: any[] = [];
-
-    console.log('this.grupoOcupacional: ', this.ListGrupoOcupacional);
     this.ListGrupoOcupacional.forEach((accion: any, index: number) => {
-
-    grupoOcupacional.push([
+      grupoOcupacional.push([
         index + 1,
         accion.id,
         accion.descripcion,
-        //accion.numero_partida
       ]);
     });
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Grupo Ocupacional");
-
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
     });
-
     worksheet.addImage(this.imagen, {
       tl: { col: 0, row: 0 },
       ext: { width: 220, height: 105 },
@@ -668,17 +639,13 @@ export class GrupoOcupacionalComponent implements OnInit {
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
       { key: "grupo_ocupacional", width: 20 },
-      //{ key: "numero_partida", width: 20 },
     ];
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
       { name: "GRUPO OCUPACIONAL", totalsRowLabel: "", filterButton: true },
-      //{ name: "NUMERO PARTIDA", totalsRowLabel: "", filterButton: true },
     ];
-    console.log("ver Grupo Ocupacional", grupoOcupacional);
-    console.log("Columnas:", columnas);
 
     worksheet.addTable({
       name: "GrupoOcupacional",
@@ -693,9 +660,7 @@ export class GrupoOcupacionalComponent implements OnInit {
       rows: grupoOcupacional,
     });
 
-
     worksheet.getRow(6).font = this.fontTitulo;
-
     const numeroFilas = grupoOcupacional.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 3; j++) {
@@ -733,31 +698,27 @@ export class GrupoOcupacionalComponent implements OnInit {
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 
- exportToCVS() {
+  exportToCVS() {
     var arreglo = this.ListGrupoOcupacional;
-    // 1. Crear un nuevo workbook
+    // 1. CREAR UN NUEVO WORKBOOK
     const workbook = new ExcelJS.Workbook();
-    // 2. Crear una hoja en el workbook
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
     const worksheet = workbook.addWorksheet('GrupoOcupacionalCSV');
-    // 3. Agregar encabezados de las columnas
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
     worksheet.columns = [
       { header: 'ID', key: 'id', width: 30 },
       { header: 'DESCRIPCION', key: 'descripcion', width: 15 },
-      //{ header: 'NUMERO_PARTIDA', key: 'numero_partida', width: 15 },
     ];
-
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     arreglo.map((obj: any) => {
       worksheet.addRow({
         id: obj.id,
         descripcion: obj.descripcion,
-        //numero_partida: obj.numero_partida,
       }).commit();
     });
-
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "GrupoOcupacionalCSV.csv");
     });
@@ -767,49 +728,46 @@ export class GrupoOcupacionalComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
    ** ************************************************************************************************* **/
 
-   urlxml: string;
-   data: any = [];
-   exportToXML() {
-     
+  urlxml: string;
+  data: any = [];
+  exportToXML() {
     var objeto: any;
     var arregloGrupoOcupaciona: any = [];
-    console.log('this.GrupoOcupaciona: ',this.ListGrupoOcupacional)
     this.ListGrupoOcupacional.forEach((obj: any) => {
       objeto = {
         "grupo_ocupacional": {
           "$": { "id": obj.id },
           "descripcion": obj.descripcion,
-          //"numero_partida": obj.numero_partida,
         }
       }
       arregloGrupoOcupaciona.push(objeto)
-     });
-     const xmlBuilder = new xml2js.Builder({ rootName: 'GrupoOcupacional' });
-     const xml = xmlBuilder.buildObject(arregloGrupoOcupaciona);
- 
-     if (xml === undefined) {
-       return;
-     }
- 
-     const blob = new Blob([xml], { type: 'application/xml' });
-     const xmlUrl = URL.createObjectURL(blob);
- 
-     // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
-     const newTab = window.open(xmlUrl, '_blank');
-     if (newTab) {
-       newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
-       newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
-     } else {
-       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
-     }
-     const a = document.createElement('a');
-     a.href = xmlUrl;
-     a.download = 'GrupoOcupacional.xml';
-     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
-     a.click();
-   }
+    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'GrupoOcupacional' });
+    const xml = xmlBuilder.buildObject(arregloGrupoOcupaciona);
 
-   //CONTROL BOTONES
+    if (xml === undefined) {
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'GrupoOcupacional.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
+  }
+
+  //CONTROL BOTONES
   private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
@@ -820,11 +778,11 @@ export class GrupoOcupacionalComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
-  
+
   getCrearGrupoOcupacional(): boolean {
     return this.tienePermiso('Crear Grupo Ocupacional');
   }

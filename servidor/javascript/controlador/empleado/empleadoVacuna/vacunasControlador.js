@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VACUNAS_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const luxon_1 = require("luxon");
 const settingsMail_1 = require("../../../libs/settingsMail");
+const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -460,23 +460,6 @@ class VacunasControlador {
                     res.sendFile(path_1.default.resolve(ruta));
                 }
             });
-        });
-    }
-    // LISTAR TODOS LOS REGISTROS DE VACUNACIÓN
-    ListarRegistro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const VACUNA = yield database_1.default.query(`
-            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
-            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
-            WHERE ev.id_vacuna = tv.id
-            ORDER BY ev.id DESC
-            `);
-            if (VACUNA.rowCount != 0) {
-                return res.jsonp(VACUNA.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
         });
     }
 }

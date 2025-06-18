@@ -97,7 +97,6 @@ export class VerHorarioDetalleComponent implements OnInit {
     this.datosHorario = [];
     this.rest.BuscarUnHorario(id_horario).subscribe(data => {
       this.datosHorario = data;
-      console.log('horarios ', data)
       this.ColocarTipo();
     })
   }
@@ -539,7 +538,8 @@ export class VerHorarioDetalleComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     }
     this.restD.EliminarRegistro(id_detalle, datos).subscribe((res: any) => {
       if (res.message === 'error') {

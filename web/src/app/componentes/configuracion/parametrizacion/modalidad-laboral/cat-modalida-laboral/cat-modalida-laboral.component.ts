@@ -1,16 +1,15 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { map, catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { forkJoin, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
-import { forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-
+import ExcelJS, { FillPattern } from "exceljs";
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import ExcelJS, { FillPattern } from "exceljs";
 
 import { CatModalidadLaboralService } from 'src/app/servicios/configuracion/parametrizacion/catModalidadLaboral/cat-modalidad-laboral.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
@@ -111,6 +110,12 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
+    this.ManejarEstilos();
+
+  }
+
+  // MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -134,7 +139,6 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
 
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
-
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -159,6 +163,7 @@ export class CatModalidaLaboralComponent implements OnInit {
       });
   }
 
+  // METODO PARA OBTENER REGISTROS DE MODALIDAD LABORAL
   ObtenerModalidaLaboral() {
     this._ModalidaLaboral.listaModalidad_laboral().subscribe(res => {
       this.listaModalida_Laboral = res
@@ -346,7 +351,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.SubirDatosPlantilla()
+          this.SubirDatosPlantilla();
         }
       });
   }
@@ -496,7 +501,6 @@ export class CatModalidaLaboralComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-
   async generarExcelModalidad() {
     let datos: any[] = [];
     let n: number = 1;
@@ -540,7 +544,6 @@ export class CatModalidaLaboralComponent implements OnInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
       { key: "n", width: 20 },
       { key: "codigo", width: 30 },
@@ -565,7 +568,6 @@ export class CatModalidaLaboralComponent implements OnInit {
       columns: columnas,
       rows: datos,
     });
-
 
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -629,7 +631,6 @@ export class CatModalidaLaboralComponent implements OnInit {
     if (xml === undefined) {
       return;
     }
-
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
@@ -654,7 +655,6 @@ export class CatModalidaLaboralComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
-
 
   ExportToCSV() {
     this.OrdenarDatos(this.listaModalida_Laboral);
@@ -751,7 +751,6 @@ export class CatModalidaLaboralComponent implements OnInit {
           this.plan_multiple_ = false;
           this.modalidadesEliminar = [];
           this.selectionModalidad.clear();
-          this.ngOnInit();
         }
       });
   }
@@ -812,7 +811,6 @@ export class CatModalidaLaboralComponent implements OnInit {
             this.plan_multiple_ = false;
             this.modalidadesEliminar = [];
             this.selectionModalidad.clear();
-            this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado MODALIDAD LABORAL.', 'Ups! algo salio mal.', {
               timeOut: 6000,

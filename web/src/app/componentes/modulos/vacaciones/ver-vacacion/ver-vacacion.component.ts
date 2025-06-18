@@ -15,8 +15,8 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
-import { EditarEstadoVacacionAutoriacionComponent } from 'src/app/componentes/autorizaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
-import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
+import { EditarEstadoVacacionAutoriacionComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-vacaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
+import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-vacaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
 
 @Component({
   selector: 'app-ver-vacacion',

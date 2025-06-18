@@ -28,7 +28,7 @@ class DepartamentoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-        INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
+          INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
         `, [nombre, id_sucursal]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -50,6 +50,47 @@ class DepartamentoControlador {
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
+        });
+    }
+    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL  **USADO
+    ObtenerDepartamentosSucursal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_sucursal } = req.params;
+            const DEPARTAMENTO = yield database_1.default.query(`
+        SELECT * FROM ed_departamentos WHERE id_sucursal = $1
+      `, [id_sucursal]);
+            if (DEPARTAMENTO.rowCount != 0) {
+                return res.jsonp(DEPARTAMENTO.rows);
+            }
+            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+        });
+    }
+    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO   **USADO
+    ObtenerDepartamentosSucursal_(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_sucursal, id } = req.params;
+            const DEPARTAMENTO = yield database_1.default.query(`
+        SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
+      `, [id_sucursal, id]);
+            if (DEPARTAMENTO.rowCount != 0) {
+                return res.jsonp(DEPARTAMENTO.rows);
+            }
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        });
+    }
+    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL   **USADO
+    ObtenerDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const DEPARTAMENTO = yield database_1.default.query(`
+      SELECT d.*, s.nombre AS sucursal
+      FROM ed_departamentos AS d, e_sucursales AS s 
+      WHERE d.id = $1 AND s.id = d.id_sucursal
+      `, [id]);
+            if (DEPARTAMENTO.rowCount != 0) {
+                return res.jsonp(DEPARTAMENTO.rows);
+            }
+            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
         });
     }
     // ACTUALIZAR REGISTRO DE DEPARTAMENTO   **USADO
@@ -79,8 +120,8 @@ class DepartamentoControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
-        WHERE id = $3 RETURNING *
+          UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
+          WHERE id = $3 RETURNING *
         `, [nombre, id_sucursal, id]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -104,103 +145,26 @@ class DepartamentoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL   **USADO
-    ObtenerDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT d.*, s.nombre AS sucursal
-      FROM ed_departamentos AS d, e_sucursales AS s 
-      WHERE d.id = $1 AND s.id = d.id_sucursal
-      `, [id]);
-            if (DEPARTAMENTO.rowCount != 0) {
-                return res.jsonp(DEPARTAMENTO.rows);
-            }
-            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
-        });
-    }
-    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL  **USADO
-    ObtenerDepartamentosSucursal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_sucursal } = req.params;
-            const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT * FROM ed_departamentos WHERE id_sucursal = $1
-      `, [id_sucursal]);
-            if (DEPARTAMENTO.rowCount != 0) {
-                return res.jsonp(DEPARTAMENTO.rows);
-            }
-            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
-        });
-    }
-    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO   **USADO
-    ObtenerDepartamentosSucursal_(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_sucursal, id } = req.params;
-            const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
-      `, [id_sucursal, id]);
-            if (DEPARTAMENTO.rowCount != 0) {
-                return res.jsonp(DEPARTAMENTO.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        });
-    }
-    // METODO DE BUSQUEDA DE DEPARTAMENTOS   USADO
-    ListarDepartamentos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const NIVELES = yield database_1.default.query(`
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
-        n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
-      FROM ed_niveles_departamento AS n, e_sucursales AS s
-      WHERE n.id_sucursal = s.id AND 
-        n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
-      ORDER BY s.nombre, n.departamento ASC
-      `);
-            const DEPARTAMENTOS = yield database_1.default.query(`
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
-        0 AS NIVEL, null AS departamento_padre
-      FROM ed_departamentos AS cd, e_sucursales AS s
-      WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
-        s.id = cd.id_sucursal
-      ORDER BY s.nombre, cd.nombre ASC;
-      `);
-            if (DEPARTAMENTOS.rowCount != 0 && NIVELES.rowCount != 0) {
-                NIVELES.rows.forEach((obj) => {
-                    DEPARTAMENTOS.rows.push(obj);
-                });
-                return res.jsonp(DEPARTAMENTOS.rows);
-            }
-            else if (DEPARTAMENTOS.rowCount != 0) {
-                return res.jsonp(DEPARTAMENTOS.rows);
-            }
-            else if (NIVELES.rowCount != 0) {
-                return res.jsonp(NIVELES.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   **USADO
     ListarDepartamentosSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_sucursal;
             const NIVEL = yield database_1.default.query(`
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
-        n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
-      FROM ed_niveles_departamento AS n, e_sucursales AS s
-      WHERE n.id_sucursal = s.id AND 
-        n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
-        AND s.id = $1
-      ORDER BY s.nombre, n.departamento ASC
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
+          n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
+        FROM ed_niveles_departamento AS n, e_sucursales AS s
+        WHERE n.id_sucursal = s.id AND 
+          n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
+          AND s.id = $1
+        ORDER BY s.nombre, n.departamento ASC
       `, [id]);
             const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
-        0 AS NIVEL, null AS departamento_padre
-      FROM ed_departamentos AS cd, e_sucursales AS s
-      WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
-        s.id = cd.id_sucursal AND s.id = $1
-      ORDER BY s.nombre, cd.nombre ASC
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
+          0 AS NIVEL, null AS departamento_padre
+        FROM ed_departamentos AS cd, e_sucursales AS s
+        WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
+          s.id = cd.id_sucursal AND s.id = $1
+         ORDER BY s.nombre, cd.nombre ASC
       `, [id]);
             if (DEPARTAMENTO.rowCount != 0 && NIVEL.rowCount != 0) {
                 DEPARTAMENTO.rows.forEach((obj) => {
@@ -213,6 +177,42 @@ class DepartamentoControlador {
             }
             else if (NIVEL.rowCount != 0) {
                 return res.jsonp(NIVEL.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO DE BUSQUEDA DE DEPARTAMENTOS   **USADO
+    ListarDepartamentos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const NIVELES = yield database_1.default.query(`
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
+          n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
+        FROM ed_niveles_departamento AS n, e_sucursales AS s
+        WHERE n.id_sucursal = s.id AND 
+          n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
+        ORDER BY s.nombre, n.departamento ASC
+      `);
+            const DEPARTAMENTOS = yield database_1.default.query(`
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
+          0 AS NIVEL, null AS departamento_padre
+        FROM ed_departamentos AS cd, e_sucursales AS s
+        WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
+          s.id = cd.id_sucursal
+        ORDER BY s.nombre, cd.nombre ASC;
+      `);
+            if (DEPARTAMENTOS.rowCount != 0 && NIVELES.rowCount != 0) {
+                NIVELES.rows.forEach((obj) => {
+                    DEPARTAMENTOS.rows.push(obj);
+                });
+                return res.jsonp(DEPARTAMENTOS.rows);
+            }
+            else if (DEPARTAMENTOS.rowCount != 0) {
+                return res.jsonp(DEPARTAMENTOS.rows);
+            }
+            else if (NIVELES.rowCount != 0) {
+                return res.jsonp(NIVELES.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -246,7 +246,7 @@ class DepartamentoControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 yield database_1.default.query(`
-        DELETE FROM ed_departamentos WHERE id = $1
+          DELETE FROM ed_departamentos WHERE id = $1
         `, [id]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -278,9 +278,9 @@ class DepartamentoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-        INSERT INTO ed_niveles_departamento (departamento, id_departamento, nivel, departamento_nombre_nivel, 
-          id_departamento_nivel, id_sucursal, id_sucursal_departamento_nivel ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+          INSERT INTO ed_niveles_departamento (departamento, id_departamento, nivel, departamento_nombre_nivel, 
+            id_departamento_nivel, id_sucursal, id_sucursal_departamento_nivel ) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
         `, [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -309,11 +309,11 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_departamento, id_establecimiento } = req.params;
             const NIVELESDEP = yield database_1.default.query(`
-      SELECT n.*, s.nombre AS suc_nivel
-      FROM ed_niveles_departamento AS n, e_sucursales AS s
-      WHERE id_departamento = $1 AND id_sucursal = $2 
-        AND s.id = n.id_sucursal_departamento_nivel
-      ORDER BY nivel DESC 
+        SELECT n.*, s.nombre AS suc_nivel
+        FROM ed_niveles_departamento AS n, e_sucursales AS s
+        WHERE id_departamento = $1 AND id_sucursal = $2 
+          AND s.id = n.id_sucursal_departamento_nivel
+        ORDER BY nivel DESC 
       `, [id_departamento, id_establecimiento]);
             if (NIVELESDEP.rowCount != 0) {
                 return res.jsonp(NIVELESDEP.rows);
@@ -348,8 +348,8 @@ class DepartamentoControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado' });
                 }
                 yield database_1.default.query(`
-        UPDATE ed_niveles_departamento set nivel = $1 
-        WHERE id = $2
+          UPDATE ed_niveles_departamento set nivel = $1 
+          WHERE id = $2
         `, [nivel, id]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -400,7 +400,7 @@ class DepartamentoControlador {
                     return res.status(404).jsonp({ message: 'error' });
                 }
                 yield database_1.default.query(`
-        DELETE FROM ed_niveles_departamento WHERE id = $1
+          DELETE FROM ed_niveles_departamento WHERE id = $1
         `, [id]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -454,8 +454,8 @@ class DepartamentoControlador {
                     }
                     else {
                         yield database_1.default.query(`
-            UPDATE ed_niveles_departamento SET departamento = $1
-            WHERE id_departamento = $2
+              UPDATE ed_niveles_departamento SET departamento = $1
+              WHERE id_departamento = $2
             `, [departamento, id_departamento]);
                         // INSERTAR AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -488,8 +488,8 @@ class DepartamentoControlador {
                     }
                     else {
                         yield database_1.default.query(`
-            UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
-            WHERE id_departamento_nivel = $2
+              UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
+              WHERE id_departamento_nivel = $2
             `, [departamento, id_departamento]);
                         // INSERTAR AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -515,7 +515,7 @@ class DepartamentoControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -610,11 +610,11 @@ class DepartamentoControlador {
                 listDepartamentos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     if (item.observacion == 'no registrado') {
                         var VERIFICAR_SUCURSAL = yield database_1.default.query(`
-            SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+              SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
             `, [item.sucursal.toUpperCase()]);
                         if (VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != '') {
                             var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
-              SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
+                SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
               `, [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()]);
                             if (VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == '') {
                                 item.observacion = 'ok';
@@ -670,7 +670,7 @@ class DepartamentoControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
+    // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS    **USADO
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
@@ -680,9 +680,9 @@ class DepartamentoControlador {
                     const { nombre, sucursal } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    const id_sucursal = yield database_1.default.query(` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal.toUpperCase()]);
+                    const id_sucursal = yield database_1.default.query(` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1 `, [sucursal.toUpperCase()]);
                     const id = id_sucursal.rows[0].id;
-                    const response = yield database_1.default.query(`INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *`, [nombre.toUpperCase(), id]);
+                    const response = yield database_1.default.query(` INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING * `, [nombre.toUpperCase(), id]);
                     const [departamento] = response.rows;
                     // INSERTAR AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -832,42 +832,42 @@ class DepartamentoControlador {
                     listNivelesDep.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrada') {
                             var validSucursal = yield database_1.default.query(`
-              SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
               `, [item.sucursal.toUpperCase()]);
                             if (validSucursal.rows[0] != undefined && validSucursal.rows[0] != '') {
                                 var validDeparta = yield database_1.default.query(`
-                SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                  SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                 `, [item.departamento.toUpperCase()]);
                                 if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
                                     var validDepaSucu = yield database_1.default.query(`
-                  SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                   `, [validSucursal.rows[0].id, item.departamento.toUpperCase()]);
                                     if (validDepaSucu.rows[0] != undefined && validDepaSucu.rows[0] != '') {
                                         if (regex.test(item.nivel)) {
                                             if (item.nivel > 0 && item.nivel <= 5) {
                                                 var validDepSuperior = yield database_1.default.query(`
-                        SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                          SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                         `, [item.depa_superior.toUpperCase()]);
                                                 if (validDepSuperior.rows[0] != undefined && validDepSuperior.rows[0] != '') {
                                                     var validSucSuperior = yield database_1.default.query(`
-                          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
                           `, [item.sucursal_depa_superior.toUpperCase()]);
                                                     if (validSucSuperior.rows[0] != undefined && validSucSuperior.rows[0] != '') {
                                                         var validDepaSucuSuper = yield database_1.default.query(`
-                            SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                              SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                             `, [validSucSuperior.rows[0].id, item.depa_superior.toUpperCase()]);
                                                         if (validDepaSucuSuper.rows[0] != undefined && validDepaSucuSuper.rows[0] != '') {
                                                             var validNivelExiste = yield database_1.default.query(`
-                              SELECT * FROM ed_niveles_departamento 
-                              WHERE UPPER(departamento) = $1 AND nivel = $2
+                                SELECT * FROM ed_niveles_departamento 
+                                WHERE UPPER(departamento) = $1 AND nivel = $2
                               `, [item.departamento.toUpperCase(), item.nivel]);
                                                             if (validNivelExiste.rows[0] != undefined && validNivelExiste.rows[0] != '') {
                                                                 item.observacion = 'Ya existe en el sistema';
                                                             }
                                                             else {
                                                                 var validaDepaSuperiorNivel = yield database_1.default.query(`
-                                SELECT id FROM ed_niveles_departamento 
-                                WHERE UPPER(departamento) = $1 AND UPPER(departamento_nombre_nivel) = $2
+                                  SELECT id FROM ed_niveles_departamento 
+                                  WHERE UPPER(departamento) = $1 AND UPPER(departamento_nombre_nivel) = $2
                                 `, [item.departamento.toUpperCase(), item.depa_superior.toUpperCase()]);
                                                                 if (validaDepaSuperiorNivel.rows[0] != undefined && validaDepaSuperiorNivel.rows[0] != '') {
                                                                     item.observacion = 'Departamento superior ya se encuentra configurado';
@@ -998,10 +998,10 @@ class DepartamentoControlador {
                         }
                         uniqueDepartments.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                             let ValidNiveles = yield database_1.default.query(`
-              SELECT nivel, departamento_nombre_nivel 
-              FROM ed_niveles_departamento 
-              WHERE UPPER(departamento) = $1 
-              ORDER BY nivel DESC
+                SELECT nivel, departamento_nombre_nivel 
+                FROM ed_niveles_departamento 
+                WHERE UPPER(departamento) = $1 
+                ORDER BY nivel DESC
               `, [item.departamento.toUpperCase()]);
                             let objauxiliar = {
                                 depa_superior: '',
@@ -1070,16 +1070,16 @@ class DepartamentoControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     var validSucursal = yield database_1.default.query(`
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
           `, [sucursal.toUpperCase()]);
                     var validDeparta = yield database_1.default.query(`
-          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+            SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
           `, [departamento.toUpperCase()]);
                     var validDepSuperior = yield database_1.default.query(`
-          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+            SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
           `, [depa_superior.toUpperCase()]);
                     var validSucSuperior = yield database_1.default.query(`
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
           `, [sucursal_depa_superior.toUpperCase()]);
                     // VARIABLES DE ID DE ALMACENAMIENTO
                     var id_sucursal = validSucursal.rows[0].id;
@@ -1087,7 +1087,8 @@ class DepartamentoControlador {
                     var id_sucuDepSuperior = validDepSuperior.rows[0].id;
                     var id_depaDepSuperior = validSucSuperior.rows[0].id;
                     // REGISTRO DE LOS DATOS DE CONTRATOS
-                    const response = yield database_1.default.query(`INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
+                    const response = yield database_1.default.query(` 
+            INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
           `, [id_sucursal, id_departamento, departamento, nivel, id_sucuDepSuperior, depa_superior, id_depaDepSuperior]);
                     const [depaNivel] = response.rows;
@@ -1125,14 +1126,14 @@ class DepartamentoControlador {
                 var cont = 0;
                 listaUsuarios.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     let res = yield database_1.default.query(`
-          UPDATE eu_usuario_departamento
-          SET id_departamento = $1 
-          WHERE id_empleado = $2
+            UPDATE eu_usuario_departamento
+            SET id_departamento = $1 
+            WHERE id_empleado = $2
           `, [idDepartamento, item.id]);
                     yield database_1.default.query(`
-          UPDATE eu_empleado_cargos
-          SET id_departamento = $1 
-          WHERE id_contrato = $2
+            UPDATE eu_empleado_cargos
+            SET id_departamento = $1 
+            WHERE id_contrato = $2
           `, [idDepartamento, item.id_contrato]);
                     if (res.rowCount != 0) {
                         cont = cont + 1;
@@ -1154,6 +1155,7 @@ class DepartamentoControlador {
             }
         });
     }
+    // VERIFICAR
     BuscarDepartamentoPorCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_cargo;

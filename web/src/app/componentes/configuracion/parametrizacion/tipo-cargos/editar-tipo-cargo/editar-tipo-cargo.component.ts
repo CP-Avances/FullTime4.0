@@ -61,7 +61,8 @@ export class EditarTipoCargoComponent implements OnInit {
       id: this.data.id,
       cargo: form.cargo,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     this.cargos_.ActualizarCargo(tipoCargo).subscribe(response => {
       if (response.status == '200') {

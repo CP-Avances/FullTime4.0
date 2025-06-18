@@ -1,5 +1,5 @@
-import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import fs from 'fs';

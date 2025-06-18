@@ -12,6 +12,10 @@ import fs from 'fs';
 
 class ContratoEmpleadoControlador {
 
+    /** ******************************************************************************************** **
+     ** **                      MANEJO DE DATOS DE CONTRATO DEL USUARIO                           ** ** 
+     ** ******************************************************************************************** **/
+
     // REGISTRAR CONTRATOS    **USADO
     public async CrearContrato(req: Request, res: Response): Promise<Response> {
 
@@ -186,7 +190,6 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-
 
     // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO   **USADO
     public async BuscarContratoEmpleado(req: Request, res: Response): Promise<any> {
@@ -510,85 +513,67 @@ class ContratoEmpleadoControlador {
 
     }
 
-
-
-    /** **************************************************************************** ** 
-     ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
-     ** **************************************************************************** **/
-
-    // LISTAR TIPOS DE MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
-    public async ListarTiposContratos(req: Request, res: Response) {
-        const CONTRATOS = await pool.query(
-            `
-            SELECT * FROM e_cat_modalidad_trabajo
-            `
-        );
-        if (CONTRATOS.rowCount != 0) {
-            return res.jsonp(CONTRATOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    // REGISTRAR MODALIDAD DE TRABAJO    **USADO
-    public async CrearTipoContrato(req: Request, res: Response): Promise<Response> {
+    //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
+    public async EliminarContrato(req: Request, res: Response): Promise<any> {
         try {
-            const { descripcion, user_name, ip, ip_local } = req.body;
-
+            const { id, user_name, ip, ip_local } = req.body;
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            const response: QueryResult = await pool.query(
+            // CONSULTA DATOS ORIGINALES
+            const consulta = await pool.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+            const ELIMINAR = await pool.query(
                 `
-                INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
-                `,
-                [descripcion]);
+                DELETE FROM eu_empleado_contratos WHERE id = $1 RETURNING *
+                `
+                , [id]);
 
-
-            const [contrato] = response.rows;
+            const [datosEliminados] = ELIMINAR.rows;
+            var fechaIngresoE = await FormatearFecha2(datosEliminados.fecha_ingreso, 'ddd');
+            var fechaSalidaE = await FormatearFecha2(datosEliminados.fecha_salida, 'ddd');
+            datosEliminados.fecha_ingreso = fechaIngresoE;
+            datosEliminados.fecha_salida = fechaSalidaE;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_cat_modalidad_trabajo',
+                tabla: 'eu_empleado_contratos',
                 usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: JSON.stringify(contrato),
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosEliminados),
+                datosNuevos: '',
                 ip: ip,
                 ip_local: ip_local,
                 observacion: null
             });
 
-            if (contrato) {
-                return res.status(200).jsonp(contrato)
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
-            }
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
 
         } catch (error) {
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
-        }
-
-    }
-
-    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE   **USADO
-    public async BuscarModalidadLaboralNombre(req: Request, res: Response) {
-        const { nombre } = req.body;
-        const CONTRATOS = await pool.query(
-            `
-            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-            `
-            , [nombre]
-        );
-        if (CONTRATOS.rowCount != 0) {
-            return res.jsonp(CONTRATOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
         }
     }
 
@@ -597,8 +582,8 @@ class ContratoEmpleadoControlador {
         const { id_contrato } = req.body;
         const FECHA = await pool.query(
             `
-            SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
-            WHERE con.id = $1    
+                SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
+                WHERE con.id = $1    
             `
             , [id_contrato]);
         if (FECHA.rowCount != 0) {
@@ -617,7 +602,6 @@ class ContratoEmpleadoControlador {
         const workbook = new Excel.Workbook();
         await workbook.xlsx.readFile(ruta);
         let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS_CONTRATOS');
-        console.log('ingresa ', verificador)
         if (verificador === false) {
             return res.jsonp({ message: 'no_existe', data: undefined });
         }
@@ -640,7 +624,6 @@ class ContratoEmpleadoControlador {
             var listContratos: any = [];
             var duplicados: any = [];
             var mensaje: string = 'correcto';
-            console.log('plantilla ', plantilla)
             if (plantilla) {
                 // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
                 const headerRow = plantilla.getRow(1);
@@ -655,7 +638,6 @@ class ContratoEmpleadoControlador {
                     !headers['REGIMEN_LABORAL'] || !headers['MODALIDAD_LABORAL'] || !headers['FECHA_DESDE'] ||
                     !headers['FECHA_HASTA'] || !headers['CONTROLAR_ASISTENCIA'] || !headers['CONTROLAR_VACACIONES']
                 ) {
-                    console.log('ingresa a cabeceras')
                     return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                 }
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
@@ -687,7 +669,6 @@ class ContratoEmpleadoControlador {
                         data.control_asis = CONTROLAR_ASISTENCIA?.trim();
                         data.control_vaca = CONTROLAR_VACACIONES?.trim();
                         data.observacion = 'no registrado';
-
 
                         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
@@ -808,7 +789,6 @@ class ContratoEmpleadoControlador {
                     data = {}
                 });
             }
-            //console.log('contratos ', listContratos)
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs.access(ruta, fs.constants.F_OK, (err) => {
                 if (err) {
@@ -822,7 +802,7 @@ class ContratoEmpleadoControlador {
                 if (valor.observacion == 'no registrado') {
                     var VERIFICAR_CEDULA = await pool.query(
                         `
-                        SELECT * FROM eu_empleados WHERE identificacion = $1
+                            SELECT * FROM eu_empleados WHERE identificacion = $1
                         `
                         , [valor.identificacion]);
                     if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
@@ -830,10 +810,10 @@ class ContratoEmpleadoControlador {
                         if (valor.identificacion != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                             const fechaRango: any = await pool.query(
                                 `
-                                SELECT * FROM eu_empleado_contratos 
-                                WHERE id_empleado = $1 AND 
-                                    ($2 BETWEEN fecha_ingreso AND fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
-                                    fecha_ingreso BETWEEN $2 AND $3)
+                                    SELECT * FROM eu_empleado_contratos 
+                                    WHERE id_empleado = $1 AND 
+                                        ($2 BETWEEN fecha_ingreso AND fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
+                                        fecha_ingreso BETWEEN $2 AND $3)
                                 `
                                 , [VERIFICAR_CEDULA.rows[0].id, valor.fecha_desde, valor.fecha_hasta])
 
@@ -843,7 +823,7 @@ class ContratoEmpleadoControlador {
                             else {
                                 var VERIFICAR_PAISES = await pool.query(
                                     `
-                                    SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                                        SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
                                     `
                                     , [valor.pais.toUpperCase()]);
                                 if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
@@ -851,7 +831,7 @@ class ContratoEmpleadoControlador {
                                     if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
                                         var VERIFICAR_REGIMENES = await pool.query(
                                             `
-                                            SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                                                SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
                                             `
                                             , [valor.regimen_la.toUpperCase()])
                                         if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
@@ -859,7 +839,7 @@ class ContratoEmpleadoControlador {
                                                 if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
                                                     var VERIFICAR_MODALIDAD = await pool.query(
                                                         `
-                                                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                                                            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                                                         `
                                                         , [valor.modalida_la.toUpperCase()])
                                                     if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
@@ -958,7 +938,6 @@ class ContratoEmpleadoControlador {
                 return res.jsonp({ message: mensaje, data: listContratos });
             }, tiempo)
         }
-
     }
 
     // METODO PARA REGISTRAR DATOS DE CONTRATOS   **USADO
@@ -977,17 +956,17 @@ class ContratoEmpleadoControlador {
 
                 const ID_EMPLEADO: any = await pool.query(
                     `
-                    SELECT id FROM eu_empleados WHERE UPPER(identificacion) = $1
+                        SELECT id FROM eu_empleados WHERE UPPER(identificacion) = $1
                     `
                     , [identificacion]);
                 const ID_REGIMEN: any = await pool.query(
                     `
-                    SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                        SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
                     `
                     , [regimen_la.toUpperCase()]);
                 const ID_TIPO_CONTRATO: any = await pool.query(
                     `
-                    SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                        SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                     `
                     , [modalida_la.toUpperCase()]);
 
@@ -1014,9 +993,9 @@ class ContratoEmpleadoControlador {
 
                 const response: QueryResult = await pool.query(
                     `
-                    INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-                        controlar_asistencia, id_regimen, id_modalidad_laboral) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                        INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                            controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
                     `
                     , [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
                         id_tipo_contrato]);
@@ -1052,75 +1031,90 @@ class ContratoEmpleadoControlador {
         if (error) {
             return res.status(500).jsonp({ message: 'error' });
         }
-
         return res.status(200).jsonp({ message: 'ok' });
     }
 
-    //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
-    public async EliminarContrato(req: Request, res: Response): Promise<any> {
+
+    /** **************************************************************************** ** 
+     ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
+     ** **************************************************************************** **/
+
+    // LISTAR TIPOS DE MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
+    public async ListarTiposContratos(req: Request, res: Response) {
+        const CONTRATOS = await pool.query(
+            `
+            SELECT * FROM e_cat_modalidad_trabajo
+            `
+        );
+        if (CONTRATOS.rowCount != 0) {
+            return res.jsonp(CONTRATOS.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+    // REGISTRAR MODALIDAD DE TRABAJO    **USADO
+    public async CrearTipoContrato(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, user_name, ip, ip_local } = req.body;
-            //console.log('query ', req.body)
+            const { descripcion, user_name, ip, ip_local } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTA DATOS ORIGINALES
-            const consulta = await pool.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
-            const [datosOriginales] = consulta.rows;
-
-            if (!datosOriginales) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'eu_empleado_contratos',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-            }
-
-            const ELIMINAR = await pool.query(
+            const response: QueryResult = await pool.query(
                 `
-                DELETE FROM eu_empleado_contratos WHERE id = $1 RETURNING *
-                `
-                , [id]);
+                INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
+                `,
+                [descripcion]);
 
-            const [datosEliminados] = ELIMINAR.rows;
-            var fechaIngresoE = await FormatearFecha2(datosEliminados.fecha_ingreso, 'ddd');
-            var fechaSalidaE = await FormatearFecha2(datosEliminados.fecha_salida, 'ddd');
-            datosEliminados.fecha_ingreso = fechaIngresoE;
-            datosEliminados.fecha_salida = fechaSalidaE;
+
+            const [contrato] = response.rows;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_empleado_contratos',
+                tabla: 'e_cat_modalidad_trabajo',
                 usuario: user_name,
-                accion: 'D',
-                datosOriginales: JSON.stringify(datosEliminados),
-                datosNuevos: '',
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(contrato),
                 ip: ip,
                 ip_local: ip_local,
                 observacion: null
             });
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
+            if (contrato) {
+                return res.status(200).jsonp(contrato)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
 
         } catch (error) {
-            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
+            return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+        }
+
+    }
+
+    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE   **USADO
+    public async BuscarModalidadLaboralNombre(req: Request, res: Response) {
+        const { nombre } = req.body;
+        const CONTRATOS = await pool.query(
+            `
+            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+            `
+            , [nombre]
+        );
+        if (CONTRATOS.rowCount != 0) {
+            return res.jsonp(CONTRATOS.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
+
 }
 
 const CONTRATO_EMPLEADO_CONTROLADOR = new ContratoEmpleadoControlador();

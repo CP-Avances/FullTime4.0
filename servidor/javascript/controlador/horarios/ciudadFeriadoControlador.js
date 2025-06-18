@@ -208,20 +208,6 @@ class CiudadFeriadoControlador {
             }
         });
     }
-    ObtenerFeriadosCiudad(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id_ciudad = req.params.id_ciudad;
-            const CIUDAD_FERIADO = yield database_1.default.query(`
-            SELECT * FROM ef_ciudad_feriado WHERE id_ciudad = $1
-            `, [id_ciudad]);
-            if (CIUDAD_FERIADO.rowCount != 0) {
-                return res.jsonp(CIUDAD_FERIADO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-        });
-    }
 }
 exports.CIUDAD_FERIADO_CONTROLADOR = new CiudadFeriadoControlador();
 exports.default = exports.CIUDAD_FERIADO_CONTROLADOR;

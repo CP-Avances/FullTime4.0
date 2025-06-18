@@ -44,10 +44,8 @@ class SucursalRutas {
         this.router.delete('/eliminar/:id', TokenValidation, SUCURSAL_CONTROLADOR.EliminarRegistros);
         // METODO PARA BUSCAR DATOS DE UNA SUCURSAL  **USADO
         this.router.get('/unaSucursal/:id', TokenValidation, SUCURSAL_CONTROLADOR.ObtenerUnaSucursal);
-
         // METODO PARA VERIIFCAR DATOS DE LA PLANTILLA  **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], SUCURSAL_CONTROLADOR.RevisarDatos);
-
         // METODO PARA REGISTRAR SUCURSALES DE PLANTILLA   **USADO
         this.router.post('/registraSucursales', TokenValidation, SUCURSAL_CONTROLADOR.RegistrarSucursales);
     }

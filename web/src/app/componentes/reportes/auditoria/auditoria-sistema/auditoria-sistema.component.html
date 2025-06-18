@@ -1,0 +1,24 @@
+<br>
+<mat-tab-group>
+
+    <!-- PANTALLA REPORTE DE AUDITORIA GENERAL -->
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">fact_check</mat-icon>
+            <h6 id="items" (click)="LimpiarAccesoSistema()">&nbsp; Auditoría General</h6>
+        </ng-template>
+        <!--  **********************************  REPORTE DE AUDITORIA DEL SISTEMA ***************************************** -->
+        <app-reporte-auditoria></app-reporte-auditoria>
+    </mat-tab>
+
+    <!-- PANTALLA REPORTE DE INICIOS DE SESION -->
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">verified</mat-icon>
+            <h6 id="items" (click)="LimpiarAuditoriaSistema()">&nbsp; Auditoría Accesos al Sistema</h6>
+        </ng-template>
+        <!--  **********************************  REPORTE DE INICIOS DE SESION ***************************************** -->
+        <app-auditoria-accesos></app-auditoria-accesos>
+    </mat-tab>
+
+</mat-tab-group>

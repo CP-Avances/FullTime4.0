@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DETALLE_CATALOGO_HORARIO_CONTROLADOR = void 0;
-const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
+const settingsMail_1 = require("../../libs/settingsMail");
 const database_1 = __importDefault(require("../../database"));
 class DetalleCatalogoHorarioControlador {
     // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO

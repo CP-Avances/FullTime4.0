@@ -161,15 +161,7 @@ export const ObtenerRutaLeerPlantillas = function () {
     let ruta = '';
     let separador = path.sep;
     ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'leerPlantillas';
-}
-
-// METODO DE BUSQUEDA DE ARCHIVO LICENCIA
-export const ObtenerRutaLicencia = function () {
-    let ruta = '';
-    let separador = path.sep;
-    ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'licencia.conf.json';
+    return ruta + separador + 'plantillasRegistro';
 }
 
 // METODO PARA OBTENER POSICION DE PLANTILLA

@@ -9,11 +9,11 @@ import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
+
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { EditarCiudadComponent } from '../editar-ciudad/editar-ciudad.component';
 import { EditarFeriadosComponent } from '../../feriados/editar-feriados/editar-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
-
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 export interface Feriado {
   idciudad_asignada: number
@@ -166,7 +166,8 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   Eliminar(id_ciudad_asignada: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
 
     this.restF.EliminarRegistro(id_ciudad_asignada, data).subscribe(res => {

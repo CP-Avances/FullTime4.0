@@ -4,6 +4,7 @@ import AUDITORIA_CONTROLADOR from "../../reportes/auditoriaControlador";
 import pool from "../../../database";
 
 class RegimenControlador {
+  
   /** ** ************************************************************************************************ **
    ** **                                  CONSULTAS REGIMEN LABORAL                                    ** **
    ** ** ************************************************************************************************ **/

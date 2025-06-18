@@ -201,10 +201,7 @@ export class EditarPlanificacionComponent implements OnInit {
     this.lista_libres = [];
     let total = this.datos_horarios.datosPlan.split(',').length;
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    console.log("ListarHorariosSeleccionados fecha", fecha);
-
     let fecha_ = DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd');
-    console.log("ver fecha_", fecha_)
     this.dia_fecha = DateTime.fromFormat(fecha_, 'yyyy-MM-dd').setLocale('es')
       .toFormat('MMMM, EEE. dd, yyyy')
       .toUpperCase();
@@ -296,7 +293,6 @@ export class EditarPlanificacionComponent implements OnInit {
     var restar = DateTime.fromFormat(formato, "yyyy-M-d")
       .minus({ days: 1 })
       .toFormat("yyyy-MM-dd");
-    console.log("ver restar: ", restar)
     var fecha = restar;
     let busqueda = {
       fecha_inicio: fecha,
@@ -304,7 +300,6 @@ export class EditarPlanificacionComponent implements OnInit {
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      console.log("ver datos: ", datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -341,7 +336,6 @@ export class EditarPlanificacionComponent implements OnInit {
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      console.log("ver datos BuscarPlanificacionDespues: ", datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -775,7 +769,8 @@ export class EditarPlanificacionComponent implements OnInit {
     let datos = {
       id_plan: [],
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
@@ -786,7 +781,7 @@ export class EditarPlanificacionComponent implements OnInit {
         id_horario: horario.horarios.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
-        const ids = res.map(item => item.id);
+        const ids = res.map((item: any) => item.id);
         datos.id_plan = ids;
 
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
@@ -965,7 +960,8 @@ export class EditarPlanificacionComponent implements OnInit {
     const datos = {
       plan_general: this.plan_general,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
@@ -996,7 +992,7 @@ export class EditarPlanificacionComponent implements OnInit {
   asignado_feriados: any = [];
   RegistrarFeriado() {
     const [obj_res] = this.horarios.filter((o: any) => {
-      return o.default_ === 'FD'
+      return o.default_ === 'FD';
     })
     this.asignado_feriados = [];
     let data = {

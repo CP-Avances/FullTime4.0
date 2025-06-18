@@ -36,25 +36,21 @@
                              <th scope="col">Empleado</th>
                             <th scope="col">Rige desde</th>
                             <th scope="col">Rige hasta</th>
-                           <th scope="col">Vacacion</th>
+                           <th scope="col">Vacación</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
-                                <mat-form-field id="t-inputs" style="width: 125px;">
-                                    <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
-                                </mat-form-field>
-                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                             <td>
                                 <mat-form-field id="t-inputs" style="width: 125px;">
                                     <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
-                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -67,12 +63,13 @@
                         </tr>
                         <tr
                             *ngFor="let a of listaPedidos  | filtrosNombres: nombre.value | nombreCompleto: apellido.value  | paginate:tamanio_pagina:numero_pagina">
-                            <td>{{a.apellido}}</td>
-                            <td>{{a.nombre}}</td>
-                            <td>{{a.fecCreacion_}}</td>
+                            <td>{{a.id}}</td>
+                            <td>{{a.numero_accion_personal}}</td>
+                            <td>{{a.accion_personal}}</td>
+                            <td>{{a.nombres}}</td>
                             <td>{{a.fecDesde_}}</td>
                             <td>{{a.fecHasta_}}</td>
-                            <td>{{a.numero_partida_empresa}}</td>
+                            <td>{{a.id_vacacion}}</td>
                             <td class="justify-content-center" style="margin-right: 1rem;">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"

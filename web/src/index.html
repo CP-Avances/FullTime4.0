@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <!-- fonst de google -->
-  <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet" >
+  <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet">
   <!-- icons de google material -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -40,7 +40,6 @@
   <script>
     var app = angular.module('myModule', []);
     app.run(function ($rootScope, $timeout, $document) {
-      // console.log('starting run');
 
       // Timeout timer value
       var TimeOutTimerValue = (30 * 60 * 1000);
@@ -77,8 +76,6 @@
       }
 
       function TimeOut_Resetter(e) {
-        // console.log('' + e);
-
         /// Stop the pending timeout
         $timeout.cancel(TimeOut_Thread);
 

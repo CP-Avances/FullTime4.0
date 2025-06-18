@@ -1,9 +1,9 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-import pool from '../../../database';
 import fs from 'fs';
+import pool from '../../../database';
 import path from 'path';
 import Excel from 'exceljs';
 
@@ -15,11 +15,10 @@ class GrupoOcupacionalControlador {
     try {
       const GRUPO_OCUPACIONAL = await pool.query(
         `
-        SELECT gp.id, gp.descripcion FROM map_cat_grupo_ocupacional AS gp 
-        ORDER BY gp.id ASC
+          SELECT gp.id, gp.descripcion FROM map_cat_grupo_ocupacional AS gp 
+          ORDER BY gp.id ASC
         `
       );
-
       res.jsonp(GRUPO_OCUPACIONAL.rows);
     } catch (error) {
       // REVERTIR TRANSACCION
@@ -29,7 +28,7 @@ class GrupoOcupacionalControlador {
 
   }
 
-  // METODO PARA BUSCAR EL GRUPO OCUPACIONAL POR EMPLEADO **USADO
+  // METODO PARA BUSCAR EL GRUPO OCUPACIONAL POR EMPLEADO    **USADO
   public async GrupoOcupacionalByEmple(req: Request, res: Response) {
     const { id_empleado } = req.params;
 
@@ -78,7 +77,7 @@ class GrupoOcupacionalControlador {
         const response: QueryResult = await pool.query(
           `
             INSERT INTO map_cat_grupo_ocupacional (descripcion) VALUES ($1) RETURNING * 
-            `
+          `
           , [grupo]);
 
         const [grupo_ocupacional] = response.rows;
@@ -111,11 +110,8 @@ class GrupoOcupacionalControlador {
 
   // METODO PARA EDITAR EL GRUPO OCUPACIONAL  **USADO
   public async EditarGrupoOcupacional(req: Request, res: Response) {
-
     const { id_grupo, grupo, user_name, ip, ip_local } = req.body;
-
     try {
-
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
       const DataGrupoOcu = await pool.query(
@@ -129,11 +125,13 @@ class GrupoOcupacionalControlador {
       if (DataGrupoOcu.rows[0] != undefined && DataGrupoOcu.rows[0] != null && DataGrupoOcu.rows[0] != "") {
         if (DataGrupoOcu.rows[0].descripcion.toLowerCase() == grupo.toLowerCase()) {
           res.status(300).jsonp({ message: 'Ya existe un grupo ocupacional registrado.', codigo: 300 });
-        } else {
+        }
+        else {
           res.status(300).jsonp({ message: 'Ups! se ha producido un error.', codigo: 300 });
         }
 
-      } else {
+      }
+      else {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
@@ -181,8 +179,8 @@ class GrupoOcupacionalControlador {
 
       await pool.query(
         `
-            DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
-          `
+          DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+        `
         , [id_grupo]);
 
       // AUDITORIA
@@ -216,13 +214,12 @@ class GrupoOcupacionalControlador {
       const { user_name, ip, ip_local } = req.body;
       const id = req.params.id;
 
-      console.log('id: ', id);
-
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
       const proceso = await pool.query('SELECT * FROM map_empleado_grupo_ocupacional WHERE id = $1', [id]);
+
       const [datosOriginales] = proceso.rows;
 
       if (!datosOriginales) {
@@ -245,7 +242,7 @@ class GrupoOcupacionalControlador {
       await pool.query(
         `
           DELETE FROM map_empleado_grupo_ocupacional WHERE id = $1
-          `, [id]);
+        `, [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -320,8 +317,6 @@ class GrupoOcupacionalControlador {
             const ITEM = row.getCell(headers['ITEM']).value;
             const DESCRIPCION = row.getCell(headers['DESCRIPCION']).value?.toString().trim();
 
-            console.log('DESCRIPCION: ', DESCRIPCION)
-
             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
             if ((ITEM != undefined && ITEM != '') &&
               (DESCRIPCION != undefined && DESCRIPCION != '')) {
@@ -370,7 +365,7 @@ class GrupoOcupacionalControlador {
               `
                 SELECT gp.id, gp.descripcion FROM map_cat_grupo_ocupacional gp
                 WHERE UPPER(gp.descripcion) = UPPER($1)
-             `
+              `
               , [item.descripcion]);
 
             if (VERIFICAR_GRUPO.rowCount === 0) {
@@ -397,7 +392,8 @@ class GrupoOcupacionalControlador {
           listaGrupoOcupacional.forEach(async (item: any) => {
             if (item.observacion == '1') {
               item.observacion = 'Registro duplicado'
-            } else if (item.observacion == 'no registrado') {
+            }
+            else if (item.observacion == 'no registrado') {
               item.observacion = 'ok'
             }
 
@@ -408,7 +404,8 @@ class GrupoOcupacionalControlador {
               if (item.fila == filaDuplicada) {
                 mensaje = 'error';
               }
-            } else {
+            }
+            else {
               return mensaje = 'error';
             }
 
@@ -444,7 +441,7 @@ class GrupoOcupacionalControlador {
         const response: QueryResult = await pool.query(
           `
             INSERT INTO map_cat_grupo_ocupacional (descripcion) VALUES ($1) RETURNING *
-            `
+          `
           , [descripcion]);
 
         const [grupoOcu] = response.rows;
@@ -478,7 +475,7 @@ class GrupoOcupacionalControlador {
     return res.status(200).jsonp({ message: 'ok' });
   }
 
-  // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+  // METODO PARA REGISTRAR EMPLEADO - GRUPO OCUPACIONAL   **USADO
   public async RegistrarGrupo(req: Request, res: Response) {
     const { id_grupo, listaUsuarios, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
@@ -492,7 +489,7 @@ class GrupoOcupacionalControlador {
         await pool.query('BEGIN');
         const response: QueryResult = await pool.query(
           `
-          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
           `
           , [id_grupo, id]);
 
@@ -506,8 +503,8 @@ class GrupoOcupacionalControlador {
           await pool.query('BEGIN');
           const response: QueryResult = await pool.query(
             `
-            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
-           `
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+            `
             , [id]);
 
           const [grupo_activo] = response.rows;
@@ -521,7 +518,7 @@ class GrupoOcupacionalControlador {
 
             const responsee: QueryResult = await pool.query(
               `
-              INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
               `
               , [id, id_grupo, true]);
 
@@ -590,10 +587,10 @@ class GrupoOcupacionalControlador {
             await pool.query('COMMIT');
           }
 
-        } else {
+        }
+        else {
 
           if (grupo.estado == false) {
-            //actualizao a true
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -653,13 +650,14 @@ class GrupoOcupacionalControlador {
               });
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
-            } else {
+            }
+            else {
               // INICIAR TRANSACCION
               await pool.query('BEGIN');
               const grupo_update: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
-              `
+                  UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+                `
                 , [grupo.id]);
 
               const [grup_UPD] = grupo_update.rows;
@@ -690,14 +688,11 @@ class GrupoOcupacionalControlador {
         return res.status(500).jsonp({ message: 'error' });
       }
     }
-
-
   }
 
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DE EMPLEADOS PROCESOS DENTRO DEL SISTEMA - MENSAJE DE CADA ERROR **USADO
   public async RevisarPantillaEmpleadoGrupoOcu(req: Request, res: Response): Promise<any> {
-
     try {
       const documento = req.file?.originalname;
       let separador = path.sep;
@@ -708,7 +703,8 @@ class GrupoOcupacionalControlador {
 
       if (verificador === false) {
         return res.jsonp({ message: 'no_existe', data: undefined });
-      } else {
+      }
+      else {
         const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
         const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
         let data: any = {
@@ -820,7 +816,7 @@ class GrupoOcupacionalControlador {
           if (item.observacion == 'no registrado') {
             const VERIFICAR_IDEMPLEADO = await pool.query(
               `
-              SELECT id FROM eu_empleados WHERE identificacion = $1
+                SELECT id FROM eu_empleados WHERE identificacion = $1
               `
               , [item.identificacion.trim()]);
 
@@ -830,7 +826,7 @@ class GrupoOcupacionalControlador {
 
               const VERIFICAR_IDGRUPOOCU = await pool.query(
                 `
-                SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
+                  SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
                 `
                 , [item.grupo_ocupacional.trim()]);
 
@@ -840,7 +836,7 @@ class GrupoOcupacionalControlador {
 
                 const response: QueryResult = await pool.query(
                   `
-                   SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2 and estado = true
+                    SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2 and estado = true
                   `
                   , [id_grupoOcupa, id_empleado]);
 
@@ -848,23 +844,27 @@ class GrupoOcupacionalControlador {
 
                 if (gupoOcu_emple != undefined && gupoOcu_emple != '' && gupoOcu_emple != null) {
                   item.observacion = 'Ya existe un registro activo con este Grupo Ocupacional.'
-                } else {
+                }
+                else {
                   if (item.observacion == 'no registrado') {
                     // DISCRIMINACION DE ELEMENTOS IGUALES
                     if (duplicados.find((p: any) => (p.identificacion.trim() === item.identificacion.trim())
                     ) == undefined) {
                       duplicados.push(item);
-                    } else {
+                    }
+                    else {
                       item.observacion = '1';
                     }
                   }
                 }
 
-              } else {
+              }
+              else {
                 item.observacion = 'Grupo Ocupacional no esta registrado en el sistema'
               }
 
-            } else {
+            }
+            else {
               item.observacion = 'La identificación ingresada no esta registrada en el sistema'
             }
 
@@ -922,13 +922,10 @@ class GrupoOcupacionalControlador {
 
   }
 
-  // METODO PARA REGISTRAR EMPLEADOS GRUPO POR MEDIO DE PLANTILLA
+  // METODO PARA REGISTRAR EMPLEADOS GRUPO POR MEDIO DE PLANTILLA     **USADO
   public async RegistrarEmpleadoGrupoOcu(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
-    
-    console.log('datos: ',plantilla, user_name, ip, ip_local )
-
     try {
       for (const item of plantilla) {
 
@@ -956,15 +953,12 @@ class GrupoOcupacionalControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        console.log('id_grupo_ocupacional: ', id_grupo_ocupacional)
-        console.log('id_empleado: ', id_empleado)
-
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
         const response: QueryResult = await pool.query(
           `
             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
-           `
+          `
           , [id_grupo_ocupacional, id_empleado]);
 
         const [Gupo_Ocupacionales] = response.rows;
@@ -977,8 +971,8 @@ class GrupoOcupacionalControlador {
           await pool.query('BEGIN');
           const response: QueryResult = await pool.query(
             `
-            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
-           `
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+            `
             , [id_empleado]);
 
           const [grupo_activo] = response.rows;
@@ -1010,10 +1004,8 @@ class GrupoOcupacionalControlador {
             });
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-
-
-
-          } else {
+          }
+          else {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -1061,9 +1053,8 @@ class GrupoOcupacionalControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
           }
-
-        } else {
-          console.log('Gupo_Ocupacionales: ', Gupo_Ocupacionales.estado)
+        }
+        else {
           if (Gupo_Ocupacionales.estado == false) {
 
             // INICIAR TRANSACCION
@@ -1089,13 +1080,11 @@ class GrupoOcupacionalControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            console.log('grupo_ocupacional: ', Gupo_Ocupacionales.id)
-
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
             const grupo_update: QueryResult = await pool.query(
               `
-              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+                UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
               `
               , [Gupo_Ocupacionales.id]);
 
@@ -1119,8 +1108,8 @@ class GrupoOcupacionalControlador {
               await pool.query('BEGIN');
               const grupo_update1: QueryResult = await pool.query(
                 `
-              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
-              `
+                  UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+                `
                 , [grupo_activo1.id]);
 
               const [grupo_UPD1] = grupo_update1.rows;
@@ -1138,16 +1127,10 @@ class GrupoOcupacionalControlador {
               // FINALIZAR TRANSACCION
               await pool.query('COMMIT');
             }
-
-
-
-
           }
         }
       }
-
       return res.status(200).jsonp({ message: 'Registro de grupo ocuapcional' });
-
     } catch {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1156,10 +1139,9 @@ class GrupoOcupacionalControlador {
         return res.status(500).jsonp({ message: 'error' });
       }
     }
-
   }
 
-  // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+  // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS      **USADO
   public async EditarRegistroGrupoEmple(req: Request, res: Response): Promise<any> {
     try {
 
@@ -1184,16 +1166,14 @@ class GrupoOcupacionalControlador {
         }
       }
 
-      console.log('estado: ', estado)
-
       if (estado == true) {
         // CONSULTAR DATOSORIGINALES
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
         const grupo = await pool.query(
           `
-              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
-              `
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
+          `
           , [id_empleado]);
         const [grupo_] = grupo.rows;
         // FINALIZAR TRANSACCION
@@ -1204,8 +1184,8 @@ class GrupoOcupacionalControlador {
           await pool.query('BEGIN');
           await pool.query(
             `
-                UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
-                `
+              UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
+            `
             , [false, grupo_.id]);
           // FINALIZAR TRANSACCION
           await pool.query('COMMIT');
@@ -1215,8 +1195,8 @@ class GrupoOcupacionalControlador {
         await pool.query('BEGIN');
         await pool.query(
           `
-                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-                `
+            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+          `
           , [id_accion, estado, id]);
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
@@ -1226,23 +1206,21 @@ class GrupoOcupacionalControlador {
         await pool.query('BEGIN');
         await pool.query(
           `
-                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-                `
+            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+          `
           , [id_accion, estado, id]);
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-
       }
 
       return res.jsonp({ message: 'Registro actualizado exitosamente' });
-
 
     } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
   }
 
-  // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+  // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE       **USADO
   public async EliminarGrupoMultiple(req: Request, res: Response): Promise<any> {
     const { listaEliminar, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
@@ -1259,8 +1237,8 @@ class GrupoOcupacionalControlador {
 
         const resultado = await pool.query(
           `
-             SELECT * FROM map_cat_grupo_ocupacional WHERE id = $1
-           `
+            SELECT * FROM map_cat_grupo_ocupacional WHERE id = $1
+          `
           , [item.id]);
         const [existe_grupo] = resultado.rows;
 
@@ -1287,8 +1265,8 @@ class GrupoOcupacionalControlador {
 
           const resultado = await pool.query(
             `
-             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1
-           `
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1
+            `
             , [item.id]);
 
           const [existe_grupo_emple] = resultado.rows;
@@ -1299,8 +1277,8 @@ class GrupoOcupacionalControlador {
 
             const res = await pool.query(
               `
-             DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
-           `
+                DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+              `
               , [item.id]);
 
             // AUDITORIA
@@ -1325,14 +1303,11 @@ class GrupoOcupacionalControlador {
             list_Grupos.push(item.descripcion)
             count_no += 1;
           }
-
         }
-
       }
-
-      var meCount = "registro eliminado"
+      var meCount = "registro eliminado";
       if (count > 1) {
-        meCount = "registros eliminados"
+        meCount = "registros eliminados";
       }
 
       res.status(200).jsonp({
@@ -1356,13 +1331,15 @@ class GrupoOcupacionalControlador {
               message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
               relacionados: count_no, listaNoEliminados: list_Grupos
             });
-          } else {
+          }
+          else {
             return res.status(300).jsonp({
               message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
               relacionados: count_no, listaNoEliminados: list_Grupos
             });
           }
-        } else {
+        }
+        else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
         }
       }

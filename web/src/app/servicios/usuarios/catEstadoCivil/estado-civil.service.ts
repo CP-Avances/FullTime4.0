@@ -13,23 +13,22 @@ export class EstadoCivilService {
 
   ) { }
 
-  // METODO PARA LISTAR TITULOS   **USADO
+  // METODO PARA LISTAR ESTADO CIVIL   **USADO
   ListarEstadoCivil() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/estado-civil/`);
   }
 
-  // METODO PARA BUSCAR NIVEL POR SU NOMBRE   **USADO
-  BuscarEstadoCivil(genero: string) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/estado-civil/buscar/${genero}`);
+  // METODO PARA BUSCAR ESTADO CIVIL POR SU NOMBRE   **USADO
+  BuscarEstadoCivil(estado: string) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/estado-civil/buscar/${estado}`);
   }
 
-  // METODO PARA REGISTRAR GENERO   **USADO
+  // METODO PARA REGISTRAR ESTADO CIVIL   **USADO
   RegistrarEstadoCivil(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/estado-civil`, data);
   }
 
-
-  // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO
+  // METODO PARA ACTUALIZAR REGISTRO DE ESTADO CIVIL   **USADO
   ActualizarUnEstadoCivil(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/estado-civil`, datos);
   }

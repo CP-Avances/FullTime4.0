@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../libs/verificarToken';
 import SALIDAS_ANTICIPADAS_CONTROLADOR from '../../controlador/reportes/salidaAntesControlador';
+import { TokenValidation } from '../../libs/verificarToken';
+import { Router } from 'express';
 
 class SalidasAnticipadasRutas {
     public router: Router = Router();
@@ -10,6 +10,7 @@ class SalidasAnticipadasRutas {
     }
 
     configuracion(): void {
+
         // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS   **USADO
         this.router.post('/timbre-salida-anticipada/:desde/:hasta', TokenValidation, SALIDAS_ANTICIPADAS_CONTROLADOR.ReporteSalidasAnticipadas);
     }

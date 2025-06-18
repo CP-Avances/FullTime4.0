@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../../libs/verificarToken';
 import EMPLEADO_PROCESO_CONTROLADOR from '../../../controlador/modulos/acciones-personal/empleProcesoControlador';
+import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
 
 class DepartamentoRutas {
     public router: Router = Router();
@@ -12,8 +12,7 @@ class DepartamentoRutas {
     configuracion(): void {
         // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
         this.router.get('/infoProceso/:id_empleado', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.BuscarProcesoUsuario);
-        this.router.post('/', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.CrearEmpleProcesos);
-        this.router.put('/', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.ActualizarProcesoEmpleado);
+        // METODO PARA ELIMINAR REGISTRO   **USADO
         this.router.delete('/eliminar/:id', TokenValidation, EMPLEADO_PROCESO_CONTROLADOR.EliminarRegistros);
     }
 }

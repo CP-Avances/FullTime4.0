@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GRUPO_OCUPACIONAL_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const database_1 = __importDefault(require("../../../database"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
+const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const exceljs_1 = __importDefault(require("exceljs"));
 class GrupoOcupacionalControlador {
@@ -25,8 +25,8 @@ class GrupoOcupacionalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const GRUPO_OCUPACIONAL = yield database_1.default.query(`
-        SELECT gp.id, gp.descripcion FROM map_cat_grupo_ocupacional AS gp 
-        ORDER BY gp.id ASC
+          SELECT gp.id, gp.descripcion FROM map_cat_grupo_ocupacional AS gp 
+          ORDER BY gp.id ASC
         `);
                 res.jsonp(GRUPO_OCUPACIONAL.rows);
             }
@@ -37,7 +37,7 @@ class GrupoOcupacionalControlador {
             }
         });
     }
-    // METODO PARA BUSCAR EL GRUPO OCUPACIONAL POR EMPLEADO **USADO
+    // METODO PARA BUSCAR EL GRUPO OCUPACIONAL POR EMPLEADO    **USADO
     GrupoOcupacionalByEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -75,7 +75,7 @@ class GrupoOcupacionalControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             INSERT INTO map_cat_grupo_ocupacional (descripcion) VALUES ($1) RETURNING * 
-            `, [grupo]);
+          `, [grupo]);
                     const [grupo_ocupacional] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -157,8 +157,8 @@ class GrupoOcupacionalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-            DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
-          `, [id_grupo]);
+          DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+        `, [id_grupo]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_cat_grupo_ocupacional',
@@ -187,7 +187,6 @@ class GrupoOcupacionalControlador {
             try {
                 const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
-                console.log('id: ', id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -210,7 +209,7 @@ class GrupoOcupacionalControlador {
                 }
                 yield database_1.default.query(`
           DELETE FROM map_empleado_grupo_ocupacional WHERE id = $1
-          `, [id]);
+        `, [id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_grupo_ocupacional',
@@ -280,7 +279,6 @@ class GrupoOcupacionalControlador {
                             // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
                             const ITEM = row.getCell(headers['ITEM']).value;
                             const DESCRIPCION = (_a = row.getCell(headers['DESCRIPCION']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
-                            console.log('DESCRIPCION: ', DESCRIPCION);
                             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                             if ((ITEM != undefined && ITEM != '') &&
                                 (DESCRIPCION != undefined && DESCRIPCION != '')) {
@@ -323,7 +321,7 @@ class GrupoOcupacionalControlador {
                             const VERIFICAR_GRUPO = yield database_1.default.query(`
                 SELECT gp.id, gp.descripcion FROM map_cat_grupo_ocupacional gp
                 WHERE UPPER(gp.descripcion) = UPPER($1)
-             `, [item.descripcion]);
+              `, [item.descripcion]);
                             if (VERIFICAR_GRUPO.rowCount === 0) {
                             }
                             else {
@@ -386,7 +384,7 @@ class GrupoOcupacionalControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             INSERT INTO map_cat_grupo_ocupacional (descripcion) VALUES ($1) RETURNING *
-            `, [descripcion]);
+          `, [descripcion]);
                     const [grupoOcu] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -414,7 +412,7 @@ class GrupoOcupacionalControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
-    // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+    // METODO PARA REGISTRAR EMPLEADO - GRUPO OCUPACIONAL   **USADO
     RegistrarGrupo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grupo, listaUsuarios, user_name, ip, ip_local } = req.body;
@@ -425,7 +423,7 @@ class GrupoOcupacionalControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
-          SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
           `, [id_grupo, id]);
                     const [grupo] = response.rows;
                     // FINALIZAR TRANSACCION
@@ -434,8 +432,8 @@ class GrupoOcupacionalControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
-           `, [id]);
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+            `, [id]);
                         const [grupo_activo] = response.rows;
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
@@ -443,7 +441,7 @@ class GrupoOcupacionalControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const responsee = yield database_1.default.query(`
-              INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_grupo_ocupacional (id_empleado, id_grupo_ocupacional, estado) VALUES ($1, $2, $3) RETURNING *
               `, [id, id_grupo, true]);
                             const [grupo_insert] = responsee.rows;
                             // AUDITORIA
@@ -503,7 +501,6 @@ class GrupoOcupacionalControlador {
                     }
                     else {
                         if (grupo.estado == false) {
-                            //actualizao a true
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
@@ -556,8 +553,8 @@ class GrupoOcupacionalControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const grupo_update = yield database_1.default.query(`
-              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
-              `, [grupo.id]);
+                  UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+                `, [grupo.id]);
                                 const [grup_UPD] = grupo_update.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -697,17 +694,17 @@ class GrupoOcupacionalControlador {
                     listaGrupoOcupacional.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrado') {
                             const VERIFICAR_IDEMPLEADO = yield database_1.default.query(`
-              SELECT id FROM eu_empleados WHERE identificacion = $1
+                SELECT id FROM eu_empleados WHERE identificacion = $1
               `, [item.identificacion.trim()]);
                             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
                                 let id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
                                 const VERIFICAR_IDGRUPOOCU = yield database_1.default.query(`
-                SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
+                  SELECT id FROM map_cat_grupo_ocupacional WHERE UPPER(descripcion) = UPPER($1)
                 `, [item.grupo_ocupacional.trim()]);
                                 if (VERIFICAR_IDGRUPOOCU.rows[0] != undefined) {
                                     let id_grupoOcupa = VERIFICAR_IDGRUPOOCU.rows[0].id;
                                     const response = yield database_1.default.query(`
-                   SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2 and estado = true
+                    SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2 and estado = true
                   `, [id_grupoOcupa, id_empleado]);
                                     const [gupoOcu_emple] = response.rows;
                                     if (gupoOcu_emple != undefined && gupoOcu_emple != '' && gupoOcu_emple != null) {
@@ -777,12 +774,11 @@ class GrupoOcupacionalControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR EMPLEADOS GRUPO POR MEDIO DE PLANTILLA
+    // METODO PARA REGISTRAR EMPLEADOS GRUPO POR MEDIO DE PLANTILLA     **USADO
     RegistrarEmpleadoGrupoOcu(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
-            console.log('datos: ', plantilla, user_name, ip, ip_local);
             try {
                 for (const item of plantilla) {
                     const { identificacion, grupo_ocupacional } = item;
@@ -800,13 +796,11 @@ class GrupoOcupacionalControlador {
                     const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    console.log('id_grupo_ocupacional: ', id_grupo_ocupacional);
-                    console.log('id_empleado: ', id_empleado);
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1 and id_empleado = $2
-           `, [id_grupo_ocupacional, id_empleado]);
+          `, [id_grupo_ocupacional, id_empleado]);
                     const [Gupo_Ocupacionales] = response.rows;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
@@ -814,8 +808,8 @@ class GrupoOcupacionalControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
-           `, [id_empleado]);
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 and estado = true
+            `, [id_empleado]);
                         const [grupo_activo] = response.rows;
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
@@ -882,7 +876,6 @@ class GrupoOcupacionalControlador {
                         }
                     }
                     else {
-                        console.log('Gupo_Ocupacionales: ', Gupo_Ocupacionales.estado);
                         if (Gupo_Ocupacionales.estado == false) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
@@ -903,11 +896,10 @@ class GrupoOcupacionalControlador {
                             });
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
-                            console.log('grupo_ocupacional: ', Gupo_Ocupacionales.id);
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const grupo_update = yield database_1.default.query(`
-              UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
+                UPDATE map_empleado_grupo_ocupacional SET estado = true WHERE id = $1
               `, [Gupo_Ocupacionales.id]);
                             const [grupoOcu_UPD] = grupo_update.rows;
                             // AUDITORIA
@@ -927,8 +919,8 @@ class GrupoOcupacionalControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const grupo_update1 = yield database_1.default.query(`
-              UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
-              `, [grupo_activo1.id]);
+                  UPDATE map_empleado_grupo_ocupacional SET estado = false WHERE id = $1
+                `, [grupo_activo1.id]);
                                 const [grupo_UPD1] = grupo_update1.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -959,7 +951,7 @@ class GrupoOcupacionalControlador {
             }
         });
     }
-    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS      **USADO
     EditarRegistroGrupoEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -977,14 +969,13 @@ class GrupoOcupacionalControlador {
                         return res.status(500).jsonp({ message: 'Grupo Ocupacional ya asignado' });
                     }
                 }
-                console.log('estado: ', estado);
                 if (estado == true) {
                     // CONSULTAR DATOSORIGINALES
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const grupo = yield database_1.default.query(`
-              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
-              `, [id_empleado]);
+            SELECT * FROM map_empleado_grupo_ocupacional WHERE id_empleado = $1 AND estado = true
+          `, [id_empleado]);
                     const [grupo_] = grupo.rows;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
@@ -992,16 +983,16 @@ class GrupoOcupacionalControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         yield database_1.default.query(`
-                UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
-                `, [false, grupo_.id]);
+              UPDATE map_empleado_grupo_ocupacional SET estado = $1 WHERE id = $2
+            `, [false, grupo_.id]);
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
                     }
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     yield database_1.default.query(`
-                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-                `, [id_accion, estado, id]);
+            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+          `, [id_accion, estado, id]);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                 }
@@ -1009,8 +1000,8 @@ class GrupoOcupacionalControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     yield database_1.default.query(`
-                UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
-                `, [id_accion, estado, id]);
+            UPDATE map_empleado_grupo_ocupacional SET id_grupo_ocupacional = $1, estado = $2 WHERE id = $3
+          `, [id_accion, estado, id]);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                 }
@@ -1021,7 +1012,7 @@ class GrupoOcupacionalControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE       **USADO
     EliminarGrupoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar, user_name, ip, ip_local } = req.body;
@@ -1034,8 +1025,8 @@ class GrupoOcupacionalControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const resultado = yield database_1.default.query(`
-             SELECT * FROM map_cat_grupo_ocupacional WHERE id = $1
-           `, [item.id]);
+            SELECT * FROM map_cat_grupo_ocupacional WHERE id = $1
+          `, [item.id]);
                     const [existe_grupo] = resultado.rows;
                     if (!existe_grupo) {
                         // AUDITORIA
@@ -1056,15 +1047,15 @@ class GrupoOcupacionalControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const resultado = yield database_1.default.query(`
-             SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1
-           `, [item.id]);
+              SELECT * FROM map_empleado_grupo_ocupacional WHERE id_grupo_ocupacional = $1
+            `, [item.id]);
                         const [existe_grupo_emple] = resultado.rows;
                         if (!existe_grupo_emple) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const res = yield database_1.default.query(`
-             DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
-           `, [item.id]);
+                DELETE FROM map_cat_grupo_ocupacional WHERE id = $1
+              `, [item.id]);
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
                                 tabla: 'map_cat_grupo_ocupacional',

@@ -122,42 +122,9 @@ class ReportesControlador {
     }
 
    
-    // METODO PARA OBTENER LOS TIMBRES CON NOVEDADES EN UN FECHA DETERMINADA
-    public async getInfoReporteTimbresNovedad(req: Request, res: Response) {
-        let { desde, hasta } = req.params;
-        let datos: any[] = req.body;
-        console.log("ver req.body", req.body)
-        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
-            obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbresConNovedades(desde, hasta, o.codigo, false);
-                console.log('Timbres: ', o);
-                return o;
-            }));
-            return obj;
-        }));
-        let nuevo = n.map((e: any) => {
-            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
-            return e
-        }).filter(e => { return e.empleados.length > 0 })
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres con novedad en ese periodo.' })
-        return res.status(200).jsonp(nuevo)
-    }
+
 }
 
-// METODO PARA DEFINIR LOS REGISTROS DE TIMBRES CON NOVEDADES
-const BuscarTimbresConNovedades = async function (fec_inicio: string, fec_final: string, codigo: string | number, conexion: any) {
-    return await pool.query(
-        `SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, 
-         ubicacion, latitud, longitud, hora_timbre_diferente, dispositivo_timbre, tipo_autenticacion, 
-         conexion, novedades_conexion, CAST(fecha_hora_timbre_validado AS VARCHAR),
-         CAST(fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  
-         FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%'  AND codigo = $3 AND (conexion = 'false' OR hora_timbre_diferente = 'true')  ORDER BY fecha_hora_timbre_validado ASC`
-        , [fec_inicio, fec_final, codigo])
-        .then(res => {
-            return res.rows;
-        })
-}
 export const REPORTES_CONTROLADOR = new ReportesControlador();
 
 export default REPORTES_CONTROLADOR;

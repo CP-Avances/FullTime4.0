@@ -14,8 +14,10 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
+import { map, Observable, startWith } from 'rxjs';
+import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
 export interface EmpleadoElemento {
   comunicado_mail: boolean;
@@ -45,7 +47,10 @@ export class ComunicadosComponent implements OnInit {
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_rol = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
+  filteredRoles!: Observable<any[]>;
+  roles: any = [];
 
   idEmpleadoLogueado: any;
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
@@ -109,6 +114,9 @@ export class ComunicadosComponent implements OnInit {
   // FILTRO REGIMEN
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
+  //FILTRO ROL
+  get filtroRolEmp() { return this.restR.filtroRolEmp };
+
   // MODELO DE SELECCION DE DATOS
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -143,7 +151,7 @@ export class ComunicadosComponent implements OnInit {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     private restR: ReportesService,
-    private restP: ParametrosService,
+    public roleS: RolesService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -161,6 +169,9 @@ export class ComunicadosComponent implements OnInit {
 
     this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.BuscarInformacionGeneralComunicados();
+
+    this.ManejarFiltroRoles();
+
   }
 
   // METODO PARA CERARR PROCESOS
@@ -168,6 +179,31 @@ export class ComunicadosComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
+  }
+
+  // METODO PARA FILTRAR ROLES
+  filtrarRoles(valor: string): any[] {
+    const filtro = valor.toLowerCase();
+    return this.roles.filter(rol =>
+      rol.nombre.toLowerCase().includes(filtro)
+    );
+  }
+
+  // METODO PARA HACER UNA FILTRO DE ROLES
+  ManejarFiltroRoles() {
+    this.roleS.BuscarRoles().subscribe((respuesta: any) => {
+      this.roles = respuesta
+      console.log('this.listaRoles: ', this.roles)
+    });
+
+    this.filteredRoles = this.nombre_rol.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filtrarRoles(value || ''))
+    );
+
+    this.nombre_rol.valueChanges.subscribe(valor => {
+      this.Filtrar(valor, 8);
+    });
   }
 
   // METODO DE BUSQUEDA DE DATOS DE USUARIOS
@@ -220,6 +256,7 @@ export class ComunicadosComponent implements OnInit {
     }
 
     this.mostrarTablas = true;
+    console.log('empleados ', this.empleados)
   }
 
   // METODO PARA MOSTRAR OPCIONES DE SELECCION
@@ -284,6 +321,7 @@ export class ComunicadosComponent implements OnInit {
       case 5: this.restR.setFiltroCedula(e); break;
       case 6: this.restR.setFiltroNombreEmp(e); break;
       case 7: this.restR.setFiltroNombreReg(e); break;
+      case 8: this.restR.setFiltroRolEmp(e); break;
       default:
         break;
     }
@@ -764,7 +802,7 @@ export class ComunicadosComponent implements OnInit {
     }
   }
 
-  getEnviarComunicado(){
+  getEnviarComunicado() {
     return this.tienePermiso('Enviar Comunicado');
   }
 

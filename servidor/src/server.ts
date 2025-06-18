@@ -2,6 +2,12 @@ require('dotenv').config();
 import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { createServer, Server } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+
+// IMPORTACION DE METODOS PARA ENVIO DE NOTIFICACIONES
+import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
+import { tareasAutomaticas } from './libs/tareasAutomaticas';
 
 // RUTAS IMPORTADAS
 import indexRutas from './rutas/indexRutas';
@@ -32,7 +38,6 @@ import DISCAPACIDADES_RUTAS from './rutas/empleado/empleadoDiscapacidad/catDisca
 import HORARIO_RUTA from './rutas/horarios/catHorarioRutas';
 import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorarioRutas';
 import PLANIFICACION_HORARIA_RUTAS from './rutas/horarios/catPlanificacionHorariaRutas';
-
 //EMPLEADOS
 import LOGIN_RUTA from './rutas/login/loginRuta';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRegistro/empleadoRutas';
@@ -47,7 +52,6 @@ import TIMBRES_RUTAS from './rutas/timbres/timbresRutas';
 import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
-import LICENCIAS_RUTAS from './utils/licencias';
 import GENERO_RUTAS from './rutas/empleado/generos/catGeneroRutas'
 import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
@@ -77,10 +81,7 @@ import GRUPO_OCUPACIONAL_RUTAS from './rutas/modulos/acciones-personal/grupoOcup
 
 // MODULO GEOLOCALIZACION
 import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
-// MODULO RELOJ VIRTUAL
-import RELOJ_VIRTUAL_RUTAS from './utils/reloj_virtual';
 // REPORTES
-import ASISTENCIA_RUTAS from './rutas/reportes/asistenciaRutas';
 import REPORTES_RUTAS from './rutas/reportes/reportesRutas';
 import REPORTES_A_RUTAS from './rutas/reportes/reportesAsistenciaRutas';
 import VACUNAS_REPORTE_RUTAS from './rutas/reportes/reporteVacunasRutas';
@@ -94,10 +95,6 @@ import AUDITORIA_RUTAS from './rutas/reportes/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import REPORTE_HORA_EXTRA_RUTAS from './rutas/reportes/reporteHoraExtraRutas';
 
-import { createServer, Server } from 'http';
-import { Server as SocketIOServer } from 'socket.io';
-
-//var io: any;
 class Servidor {
 
     public app: Application;
@@ -110,17 +107,9 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = createServer(this.app);
-        /*
-        this.io = require('socket.io')(this.server, {
-            cors: {
-                origin: '*',
-                methods: ['GET', 'POST'],
-            }
-        });
-*/
         this.io = new SocketIOServer(this.server, {
             cors: {
-                origin: '*', // Permitir todas las conexiones (ajustar según necesidades)
+                origin: '*', // PERMITIR TODAS LAS CONEXIONES (AJUSTAR SEGÚN NECESIDADES)
                 methods: ['GET', 'POST'],
             },
         });
@@ -131,7 +120,7 @@ class Servidor {
                 console.log("Error de conexión:", err.message);
             });
 
-            // Verifica la conexión
+            // VERIFICA LA CONEXION
             socket.on('disconnect', () => {
                 console.log('Cliente desconectado:', socket.id);
             });
@@ -202,7 +191,6 @@ class Servidor {
         this.app.use(`/${ruta}/metricas`, GRAFICAS_RUTAS);
         this.app.use(`/${ruta}/generos`, GENERO_RUTAS);
         this.app.use(`/${ruta}/estado-civil`, ESTADO_CIVIL_RUTAS);
-
         // CON MODULOS
         this.app.use(`/${ruta}/autorizaciones`, AUTORIZACIONES_RUTAS);
         this.app.use(`/${ruta}/noti-real-time`, NOTIFICACION_TIEMPO_REAL_RUTAS);
@@ -224,15 +212,11 @@ class Servidor {
         this.app.use(`/${ruta}/accionPersonal`, ACCION_PERSONAL_RUTAS);
         this.app.use(`/${ruta}/grado`, GRADO_RUTAS);
         this.app.use(`/${ruta}/grupoOcupacional`, GRUPO_OCUPACIONAL_RUTAS);
-
         // MODULO ALIMENTACION
         this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
         this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);
         this.app.use(`/${ruta}/alimentacion`, ALIMENTACION_RUTAS);
-        // MODULO RELOJ VIRTUAL
-        this.app.use(`/${ruta}/reloj-virtual`, RELOJ_VIRTUAL_RUTAS);
         // REPORTES
-        this.app.use(`/${ruta}/asistencia`, ASISTENCIA_RUTAS);
         this.app.use(`/${ruta}/reportes/vacacion`, KARDEX_VACACION_RUTAS);
         this.app.use(`/${ruta}/reportes/hora-extra`, REPORTE_HORA_EXTRA_RUTAS);
         this.app.use(`/${ruta}/reporte`, REPORTES_RUTAS);
@@ -245,11 +229,7 @@ class Servidor {
         this.app.use(`/${ruta}/reportes-auditoria`, AUDITORIA_RUTAS);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, VACUNAS_REPORTE_RUTAS);
         this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, VACACIONES_REPORTES_RUTAS);
-        // LICENCIAS
-        this.app.use(`/${ruta}/licencias`, LICENCIAS_RUTAS);
     }
-
-
 
     start(): void {
         this.app.set('trust proxy', true);
@@ -260,7 +240,6 @@ class Servidor {
             res.header('Access-Control-Allow-Origin', '*');
             next();
         })
-
 
         this.io.on('connection', (socket: any) => {
             console.log('Conexion con el socket ', this.app.get('puerto'));
@@ -279,14 +258,11 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                //console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
 
             socket.on("nuevo_aviso", (data: any) => {
-                console.log('Datos recibidos en "nuevo_aviso":', data);
-
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -308,21 +284,7 @@ class Servidor {
 
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
-
-import { beforeFiveDays, beforeTwoDays, Peri_Vacacion_Automatico } from './libs/avisoVacaciones';
-
-import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
-
-import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
-
-
-import { atrasosDiarios, atrasosSemanal } from './libs/sendAtraso';
-import { aniversario } from './libs/sendAniversario';
-import { cumpleanios } from './libs/sendBirthday';
-import { faltasDiarios, faltasSemanal } from './libs/sendFaltas';
-import { salidasAnticipadasDiarios, salidasAnticipadasSemanal } from './libs/sendSalidasAnticipadas';
-
-import { tareasAutomaticas } from './libs/tareasAutomaticas';
+export const io = SERVIDOR.io;
 
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **                    
@@ -331,23 +293,10 @@ import { tareasAutomaticas } from './libs/tareasAutomaticas';
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 DesactivarFinContratoEmpleado();
 
-export const io = SERVIDOR.io;
-
 // INICIO DE TAREAS AUTOMATICAS
 (async () => {
     await tareasAutomaticas.IniciarTarea();
 })();
-
-
-//beforeFiveDays();
-//beforeTwoDays();
-
-// LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
-//Peri_Vacacion_Automatico();
-
-//RegistrarAsistenciaByTimbres();
-
-// ----------// conteoPermisos();
 
 
 //generarTimbres('1', '2023-11-01', '2023-11-02');//

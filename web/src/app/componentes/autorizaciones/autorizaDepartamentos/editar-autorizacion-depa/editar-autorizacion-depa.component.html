@@ -1,5 +1,5 @@
 <div id="titulo" class="row w-100 m-auto">
-    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
         <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
@@ -67,26 +67,29 @@
                             style="position: relative; left:15px; font-size: 14px; padding-top: 5px;">
                             <span>Opciones de aprobación*</span>
                         </label>
-                        <mat-radio-group class="w-100" aria-labelledby="example-radio-group-label" [formControl]="autorizarF"
-                            required>
+                        <mat-radio-group class="w-100" aria-labelledby="example-radio-group-label"
+                            [formControl]="autorizarF" required>
                             <div class="row w-100 ml-3">
                                 <div class="col-12 col-md-4 p-0">
-                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec1" value="preautorizar">
+                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec1"
+                                        value="preautorizar">
                                         <label id="textoradiobtn">Pre-autorizar</label>
                                     </mat-radio-button>
                                 </div>
                                 <div class="col-12 col-md-4 p-0">
-                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec2" value="autorizar">
+                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec2"
+                                        value="autorizar">
                                         <label id="textoradiobtn">Autorizar</label>
                                     </mat-radio-button>
-                                </div> 
+                                </div>
                                 <div class="col-12 col-md-4 p-0">
-                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec3" value="noautorizar">
+                                    <mat-radio-button style="float: left;" ngDefaultControl [checked]="selec3"
+                                        value="noautorizar">
                                         <label id="textoradiobtn">Ninguna</label>
                                     </mat-radio-button>
-                                </div>  
-                                    
-                            </div> 
+                                </div>
+
+                            </div>
                         </mat-radio-group>
                     </div>
                 </div>
@@ -96,5 +99,7 @@
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
     <button id="btn-raised" class="btn btn-sm" (click)="InsertarAutorizacion(formulario.value)"
-        [disabled]="!formulario.valid">Guardar</button>
+        [disabled]="!formulario.valid">
+        Guardar
+    </button>
 </div>

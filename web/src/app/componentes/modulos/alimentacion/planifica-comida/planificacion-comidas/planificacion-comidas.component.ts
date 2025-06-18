@@ -247,7 +247,7 @@ export class PlanificacionComidasComponent implements OnInit {
       fechaFinal: form.fechaFinForm
     }
     // METODO PARA BUSCAR PLANIFICACION HORARIA
-    this.restH.BuscarHorarioFechas(parseInt(this.data.codigo), datosHorario).subscribe(plan => {
+    /*this.restH.BuscarHorarioFechas(parseInt(this.data.codigo), datosHorario).subscribe(plan => {
       // REGISTRAR PLANIFICACIÓN
       this.PlanificacionIndividual(form, datosPlanComida);
     }, error => {
@@ -255,7 +255,7 @@ export class PlanificacionComidasComponent implements OnInit {
       this.toastr.info(this.data.nombre + ' no tiene registro de horario laboral (planificación) en las fechas indicadas.', '', {
         timeOut: 6000,
       })
-    });
+    });*/
   }
 
   // METODO PARA GUARDAR DATOS DE PLANIFICACION DE ALIMENTACION
@@ -390,7 +390,7 @@ export class PlanificacionComidasComponent implements OnInit {
     }
     sin_planificacion.map((obj: any) => {
       // METODO PARA BUSCAR EXISTENCIA DE HORARIO
-      this.restH.BuscarHorarioFechas(obj.codigo, datosHorario).subscribe(res => {
+      /*this.restH.BuscarHorarioFechas(obj.codigo, datosHorario).subscribe(res => {
         contar_horario = contar_horario + 1;
         this.empleados_conHorario = this.empleados_conHorario.concat(obj);
         if (contar_horario === sin_planificacion.length) {
@@ -415,7 +415,7 @@ export class PlanificacionComidasComponent implements OnInit {
           this.IndicarMensajePlanificados(con_planificacion);
           this.IndicarMensajeHorarios(this.empleados_sinHorario, sin_planificacion);
         }
-      });
+      });*/
     })
 
   }

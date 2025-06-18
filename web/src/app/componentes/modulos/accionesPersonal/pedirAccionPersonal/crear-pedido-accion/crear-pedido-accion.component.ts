@@ -23,6 +23,7 @@ import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-perso
 import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
+import { number } from "echarts/core";
 
 
 
@@ -151,8 +152,6 @@ export class CrearPedidoAccionComponent implements OnInit {
   fechaPosesionFor = new FormControl("");
   actaFinalForm = new FormControl("");
   fechaActaFinalForm = new FormControl("");
-  abrevServidorPubli = new FormControl("");
-  idEmpleadoSP = new FormControl("");
 
   //Formulario 5 responsables aprovacion
   abrevHA = new FormControl("");
@@ -237,8 +236,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     fechaPosesionForm: this.fechaPosesionFor,
     actaFinalForm: this.actaFinalForm,
     fechaActaFinalForm: this.fechaActaFinalForm,
-    abrevServidorPubliForm: this.abrevServidorPubli,
-    idEmpleadoSPForm: this.idEmpleadoSP
   });
   public fivethFormGroup = new FormGroup({
 
@@ -282,6 +279,8 @@ export class CrearPedidoAccionComponent implements OnInit {
   ciudades: any = [];
   departamento: any;
   departamentos: any = [];
+  departamentosact: any = [];
+  departamentosPro: any = [];
   FechaActual: any;
 
   get habilitarAccion(): boolean {
@@ -360,7 +359,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (value != null) {
       const filterValue = value.toUpperCase();
       return this.empleados.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
+        info.empleado.toUpperCase().includes(filterValue)  
       );
     }
   }
@@ -379,10 +378,19 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarDeparta(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.departamentos.filter((info: any) =>
+      return this.departamentosact.filter((info: any) =>
         info.nombre.toUpperCase().includes(filterValue)
       );
     }
+  }
+
+  private _filtrarDepaPro(value: string): any {
+      if (value != null) {
+        const filterValue = value.toUpperCase();
+        return this.departamentosPro.filter((info: any) =>
+          info.nombre.toUpperCase().includes(filterValue)
+        );
+      }
   }
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
@@ -534,7 +542,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-      console.log('tipos_accion', this.tipos_accion)
       this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarTipoAccion(value))
@@ -548,7 +555,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (value != null) {
       const filterValue = value.toUpperCase();
       return this.tipos_accion.filter((info: any) =>
-        info.nombre.toUpperCase().includes(filterValue)
+        info.descripcion.toUpperCase().includes(filterValue)
       );
     }
   }
@@ -571,11 +578,16 @@ export class CrearPedidoAccionComponent implements OnInit {
     }
   }
   activarOtro = true;
+  textoFijo: string = '';
   onTipoAccionSeleccionado(e: MatAutocompleteSelectedEvent) {
     if (e.option.value != undefined && e.option.value != null) {
       this.tipos_accion.forEach(item => {
-        if (item.nombre == e.option.value) {
+        console.log('SI: ',item)
+        console.log('SI: ',item.descripcion,' - ',e.option.value)
+        if (item.descripcion == e.option.value) {
+          console.log('entro aqui: ',item.decripcion,' - ',e.option.value)
           this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
+          this.textoFijo = item.base_legal;
         }
       });
 
@@ -590,19 +602,47 @@ export class CrearPedidoAccionComponent implements OnInit {
 
     }
   }
+  onInputChange(event: any) {
+    const inputValue = event.target.value;
+
+    // Si borraron parte del valor fijo, restáuralo
+    if (!inputValue.startsWith(this.textoFijo)) {
+      event.target.value = this.textoFijo
+      return;
+    }
+
+    this.secondFormGroup.controls['baseLegalForm'].setValue(inputValue);
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    const input = event.target as HTMLInputElement;
+    if (input.selectionStart! <= this.textoFijo.length) {
+      const teclasBloqueadas = ['Backspace', 'Delete', 'ArrowLeft'];
+
+      if (teclasBloqueadas.includes(event.key)) {
+        event.preventDefault();
+      }
+    }
+  }
+
+  onFocus() {
+    if (this.baseLegalForm.value === this.textoFijo) {
+      this.baseLegalForm.setValue('\n');
+    }
+  }
 
   InfoUser: any = {}
+  idUserSelect: any = 0;
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
-    console.log('eeee: ', e)
     if (e.id != undefined && e.id != null) {
-      this.restUsu.BuscarInfoUsuarioAcci(e.id).subscribe((datos) => {
+      this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
         this.InfoUser = datos
-        console.log('informacion usuario: ', this.InfoUser)
-        
+      
         this.InfoUser.forEach(valor => {
 
-          this.firstFormGroup.controls['funcionarioForm'].setValue(e.id);
+          //this.firstFormGroup.controls['funcionarioForm'].setValue(this.idUserSelect);
+          this.idUserSelect = e.id
           this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
           this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
@@ -619,6 +659,13 @@ export class CrearPedidoAccionComponent implements OnInit {
             this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
           } else {
             this.thirdFormGroup.controls['sucursalForm'].setValue(sucursal.nombre)
+            this.departamentos.forEach(item => {
+              if(item.id_sucursal == sucursal.id){
+                this.departamentosact.push(item);
+              }
+            });
+
+            this.FiltrarDepaActua();
           }
           //Departamento
           const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
@@ -659,6 +706,12 @@ export class CrearPedidoAccionComponent implements OnInit {
           }
           //Remuneracion
           this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
+          this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
+
+          //this.fivethFormGroup.controls['idEmpleadoHF'].setValue(e.empleado);
+          this.fivethFormGroup.patchValue({
+            fechaServidorForm: this.FechaActual,
+          });
 
           this.btnForm1 = false
 
@@ -669,6 +722,18 @@ export class CrearPedidoAccionComponent implements OnInit {
       ))
     }else{
       this.btnForm1 = true
+    }
+  }
+
+  onSucursal(e: any){
+    if (e.id != undefined && e.id != null) {
+      this.departamentosPro = [];
+      const filtrados = this.departamentos.filter(item => item.id_sucursal == e.id);
+      this.departamentosPro = filtrados;
+
+      this.idDepaPropues.setValue("");
+      this.idDepaAdminPropuesta.setValue("");
+      this.FiltrarDepaPro();
     }
   }
 
@@ -688,8 +753,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
 
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-
-      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+      this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarEmpleado(value))
       );
@@ -740,25 +804,27 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.departamentos = [];
     this.restDe.ConsultarDepartamentos().subscribe((data) => {
       this.departamentos = data;
-
       console.log('departamentos: ', this.departamentos)
+    });
+  }
 
+  FiltrarDepaActua(){
       this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarDeparta(value))
       );
+  }
 
-      this.filtroDepartamentosProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
+  FiltrarDepaPro(){
+      this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
         startWith(""),
-        map((value: any) => this._filtrarDeparta(value))
+        map((value: any) => this._filtrarDepaPro(value))
       );
 
       this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
         startWith(""),
-        map((value: any) => this._filtrarDeparta(value))
+        map((value: any) => this._filtrarDepaPro(value))
       );
-
-    });
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES
@@ -808,6 +874,64 @@ export class CrearPedidoAccionComponent implements OnInit {
       NombreCapitalizado = NombreCapitalizado = name1;
     }
     return NombreCapitalizado;
+  }
+
+  cargoFirma1: any;
+  cargoFirma2: any;
+  cargoFirma3: any;
+  cargoFirma4: any;
+  cargoFirma5: any;
+  onCargo(datos: any, firma: number){
+    let info = {}
+    if(firma == 1){
+      this.cargoFirma1 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else if(firma == 2){
+      this.cargoFirma2 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else if(firma == 3){
+      this.cargoFirma3 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else if(firma == 4){
+      this.cargoFirma4 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else{
+      this.cargoFirma5 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }
+
+    // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
+    this.restE.BuscarEmpleadoNombre(info).subscribe((empl) => {
+      const x = {
+        id_cargo: empl[0].id_cargo_,
+        cargo: empl[0].name_cargo
+      }
+
+      if(firma == 1){
+        this.cargoFirma1 = x
+      }else if(firma == 2){
+        this.cargoFirma2 = x
+      }else if(firma == 3){
+        this.cargoFirma3 = x
+      }else if(firma == 4){
+        this.cargoFirma4 = x
+      }else if(firma == 5){
+        this.cargoFirma5 = x
+      }
+      
+    })
+
+
   }
 
   // METODO PARA REALIZAR EL REGISTRO DE ACCION DE PERSONAL
@@ -863,28 +987,28 @@ export class CrearPedidoAccionComponent implements OnInit {
         console.log('empl2: ',empl2);
 
         var idEmpl_firmaTH = empl2[0].id;
-        var Empl_firmaTH_cargo = empl2[0].id_cargo
+        var Empl_firmaTH_cargo = empl2[0].id_cargo_
 
         // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA SEGUNDA FIRMA
         this.restE.BuscarEmpleadoNombre(datos3).subscribe((empl3) => {
           var idEmpl_firmaG = empl3[0].id;
-          var Empl_firmaG_cargo = empl3[0].id_cargo
+          var Empl_firmaG_cargo = empl3[0].id_cargo_
 
           this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
             var idEmpl_firmaS = empl4[0].id;
-            var Empl_firmaS_cargo = empl4[0].id_cargo
+            var Empl_firmaS_cargo = empl4[0].id_cargo_
 
             this.restE.BuscarEmpleadoNombre(datos6).subscribe((empl5) => {
               var idEmpl_firmaRE = empl5[0].id;
-              var Empl_firmaRE_cargo = empl5[0].id_cargo
+              var Empl_firmaRE_cargo = empl5[0].id_cargo_
 
               this.restE.BuscarEmpleadoNombre(datos7).subscribe((empl6) => {
                 var idEmpl_firmaRR = empl6[0].id;
-                var Empl_firmaRR_cargo = empl6[0].id_cargo
+                var Empl_firmaRR_cargo = empl6[0].id_cargo_
 
                 this.restE.BuscarEmpleadoNombre(datos8).subscribe((empl7) => {
                   var idEmpl_firmaRC = empl7[0].id;
-                  var Empl_firmaRC_cargo = empl7[0].id_cargo
+                  var Empl_firmaRC_cargo = empl7[0].id_cargo_
 
                   
                     let id_tipo_accion_personal = this.tipos_accion.find(item => item.nombre === form2.idTipoAccionFom)
@@ -976,8 +1100,6 @@ export class CrearPedidoAccionComponent implements OnInit {
                         fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
                         actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
                         fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
-                        abreviaSP: form3.habilitarForm4 ? form4.abrevServidorPubliForm : null,
-                        firma_servidorPublico: form3.habilitarForm4 ? form4.idEmpleadoSPForm : null,
                       },
 
                       //parte formulario 5
@@ -1115,8 +1237,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   habilitarformPosesion: boolean = false
   validarForm(formValue: any, stepper: any) {
-
-    if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado'
+    console.log('formValue: ',formValue);
+    if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado' || formValue.NivelDepaForm == 'No registrado'
       || formValue.DepartamentoForm == 'No registrado' || formValue.grupoOcupacionalForm == 'No registrado' || formValue.gradoForm == 'No registrado'
       || formValue.tipoCargoForm == 'No registrado'
     ) {

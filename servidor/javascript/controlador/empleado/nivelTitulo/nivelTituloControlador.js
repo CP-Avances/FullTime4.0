@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NIVEL_TITULO_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../../database"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const path_1 = __importDefault(require("path"));
@@ -237,8 +237,8 @@ class NivelTituloControlador {
                             (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
                             // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
                             const existe_nivelProfecional = yield database_1.default.query(`
-            SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
-            `, [data.nombre]);
+              SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+              `, [data.nombre]);
                             if (existe_nivelProfecional.rowCount == 0) {
                                 data.fila = ITEM;
                                 data.nombre = NOMBRE;

@@ -14,6 +14,111 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class ReportesAsistenciaControlador {
+    // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO     
+    ReporteTimbresMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.timbres = yield BuscarTimbres(desde, hasta, o.codigo);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
+    // METODO DE BUSQUEDA DE TIMBRES DE TIMBRE VIRTUAL      **USADO        
+    ReporteTimbreSistema(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.timbres = yield BuscarTimbreSistemas(desde, hasta, o.codigo);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
+    // METODO DE BUSQUEDA DE TIMBRES DEL RELOJ VIRTUAL    **USADO    
+    ReporteTimbreRelojVirtual(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.timbres = yield BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
+    // METODO DE BUSQUEDA DE TIMBRES HORARIO ABIERTO    **USADO    
+    ReporteTimbreHorarioAbierto(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.timbres = yield BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
+    // METODO DE BUSQUEDA DE TIMBRES INCOMPLETOS      **USADO   
+    ReporteTimbresIncompletos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.id);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
     /**
      * REALIZA UN ARRAY DE SUCURSALES CON DEPARTAMENTOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL EMPLEADO
      * SI BUSCA EMPLEADOS ACTIVOS O INACTIVOS.
@@ -51,9 +156,7 @@ class ReportesAsistenciaControlador {
             let lista = yield Promise.all(depa.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     if (estado === '1') {
-                        ele.empleado = yield database_1.default.query(
-                        //empl-contratos esta el id_regimen
-                        `
+                        ele.empleado = yield database_1.default.query(`
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
                             e.identificacion, e.correo, ca.id AS id_cargo, tc.cargo,
                             co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
@@ -129,113 +232,6 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(respuesta);
         });
     }
-    // METODO DE BUSQUEDA DE LISTA DE TIMBRES DEL USUARIO   
-    ReporteTimbresMultiple(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let { desde, hasta } = req.params;
-            let datos = req.body;
-            console.log("ver req.body", req.body);
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbres(desde, hasta, o.codigo);
-                    return o;
-                })));
-                return obj;
-            })));
-            let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
-                return e;
-            }).filter(e => { return e.empleados.length > 0; });
-            if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-            return res.status(200).jsonp(nuevo);
-        });
-    }
-    // METODO DE BUSQUEDA DE TIMBRES INCOMPLENTOS   
-    ReporteTimbresIncompletos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let { desde, hasta } = req.params;
-            let datos = req.body;
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.id);
-                    return o;
-                })));
-                return obj;
-            })));
-            let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
-                return e;
-            }).filter(e => { return e.empleados.length > 0; });
-            if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
-            return res.status(200).jsonp(nuevo);
-        });
-    }
-    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA      
-    ReporteTimbreSistema(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let { desde, hasta } = req.params;
-            let datos = req.body;
-            console.log("ver req.body", req.body);
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbreSistemas(desde, hasta, o.codigo);
-                    return o;
-                })));
-                return obj;
-            })));
-            let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
-                return e;
-            }).filter(e => { return e.empleados.length > 0; });
-            if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-            return res.status(200).jsonp(nuevo);
-        });
-    }
-    // REPORTE DE TIMBRES REALIZADOS EN EL RELOJ VIRTUAL    
-    ReporteTimbreRelojVirtual(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let { desde, hasta } = req.params;
-            let datos = req.body;
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbreRelojVirtual(desde, hasta, o.codigo);
-                    return o;
-                })));
-                return obj;
-            })));
-            let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
-                return e;
-            }).filter(e => { return e.empleados.length > 0; });
-            if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-            return res.status(200).jsonp(nuevo);
-        });
-    }
-    // REPORTE DE TIMBRES HORARIO ABIERTO   
-    ReporteTimbreHorarioAbierto(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let { desde, hasta } = req.params;
-            let datos = req.body;
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
-                    return o;
-                })));
-                return obj;
-            })));
-            let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
-                return e;
-            }).filter(e => { return e.empleados.length > 0; });
-            if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
-            return res.status(200).jsonp(nuevo);
-        });
-    }
 }
 const REPORTE_A_CONTROLADOR = new ReportesAsistenciaControlador();
 exports.default = REPORTE_A_CONTROLADOR;
@@ -288,7 +284,7 @@ const BuscarTimbreSistemas = function (fec_inicio, fec_final, codigo) {
         });
     });
 };
-// CONSULTA TIMBRES REALIZADOS EN EL RELOJ VIRTUAL CODIGO 97
+// CONSULTA TIMBRES REALIZADOS EN EL RELOJ VIRTUAL CODIGO 97   **USADO
 const BuscarTimbreRelojVirtual = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`

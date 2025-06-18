@@ -30,9 +30,8 @@ export class SearchComponent implements OnInit {
     private empleadoService: EmpleadoService,
     private router: Router,
     private route: ActivatedRoute
-  ) { 
+  ) {
     this.rol = localStorage.getItem('rol');
-    //console.log('rolll: ',this.rol)
   }
 
   ngOnInit(): void {
@@ -43,8 +42,9 @@ export class SearchComponent implements OnInit {
     this.BarraBusquedaEmpleados();
   }
 
+  // METODO DE BUSQUEDA DE EMPLEADOS 
   BarraBusquedaEmpleados() {
-    //Verificacion de elementos para saber si esta o no el elemento inicial
+    // VERIFICACION DE ELEMENTOS PARA SABER SI ESTA O NO EL ELEMENTO INICIAL
     let firstElement: string = '';
     if (!!sessionStorage.getItem('lista-empleados')) {
       const jsonString = sessionStorage.getItem('lista-empleados') as string;
@@ -52,8 +52,7 @@ export class SearchComponent implements OnInit {
       firstElement = jsonObject[Object.keys(jsonObject)[0]].id;
     }
 
-    if (!!sessionStorage.getItem('lista-empleados') && firstElement != '0') { //se aumento -> &&
-      // console.log('ya hay lista en la sesion iniciada');
+    if (!!sessionStorage.getItem('lista-empleados') && firstElement != '0') {
       let empleados = JSON.parse(sessionStorage.getItem('lista-empleados') as string);
 
       empleados.forEach((obj: any) => {
@@ -61,7 +60,6 @@ export class SearchComponent implements OnInit {
       });
       this.buscar_empl = empleados
     } else {
-      // console.log('entra aqui solo al iniciar sesion');
       this.empleadoService.BuscarListaEmpleados().subscribe(res => {
         let ObjetoJSON = JSON.stringify(res)
         sessionStorage.setItem('lista-empleados', ObjetoJSON)
@@ -73,6 +71,7 @@ export class SearchComponent implements OnInit {
     }
   };
 
+  // METODO PARA IR A LA VISTA DE PERFIL
   abrirInfoEmpleado(nombre: string) {
     this.buscar_empl.forEach((element: any) => {
       if (element.empleado === nombre) {
@@ -80,7 +79,6 @@ export class SearchComponent implements OnInit {
           { relativeTo: this.route, skipLocationChange: false });
       }
     });
-
   }
 
 }

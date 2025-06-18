@@ -11,6 +11,7 @@ export class CatModalidadLaboralService {
     private http: HttpClient,
   ) { }
 
+  // METODO PARA LISTAR REGISTROS DE MODALIDAD LABORAL   ** USADO
   listaModalidad_laboral(){
     return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/modalidadLaboral');
   }
@@ -28,7 +29,7 @@ export class CatModalidadLaboralService {
     .pipe(catchError(datos));
   }
 
-  // METODO PARA ELIMINAR DATOS
+  // METODO PARA ELIMINAR DATOS DE MODALIDAD LABORAL  ** USADO
   Eliminar(id: any, datos: any){
     const url = `${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/eliminar/${id}`;
     const httpOtions = {

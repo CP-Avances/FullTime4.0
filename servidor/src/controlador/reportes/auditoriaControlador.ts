@@ -1,21 +1,20 @@
 import { Request, Response } from 'express';
-import pool from '../../database';
-
 import { Readable } from 'stream';
+import pool from '../../database';
 
 class AuditoriaControlador {
 
-
+    // METODO PARA CONSULTAR DATOS EMPAQUETADOS - AUDITORIA     **USADO
     public async BuscarDatosAuditoriaporTablasEmpaquetados(req: Request, res: Response): Promise<void> {
         const { tabla, desde, hasta, action } = req.body;
 
-        // Convertir las cadenas de acciones en arrays
+        // CONVERTIR LAS CADENAS DE ACCIONES EN ARRAYS
         const actionsArray = action.split(',').map((a: any) => a.trim().replace(/'/g, ''));
 
-        // Construir cláusula dinámica IN para acciones
+        // CONSTRUIR CLAUSULA DINAMICA IN PARA ACCIONES
         const actionClause = `action IN (${actionsArray.map((_: any, i: any) => `$${i + 2}`).join(', ')})`;
 
-        // Asegúrate de que las fechas sean correctamente formateadas
+        // ASEGURATE DE QUE LAS FECHAS SEAN CORRECTAMENTE FORMATEADAS
         const fechaDesde = new Date(desde).toISOString();
         const fechaHasta = new Date(hasta + 'T23:59:59').toISOString();
 
@@ -49,7 +48,7 @@ class AuditoriaControlador {
                     dataStream.push(JSON.stringify(row));
                 });
 
-                dataStream.push(null); // Fin del stream
+                dataStream.push(null); // FIN DEL STREAM
 
                 res.set('Content-Type', 'application/json');
                 dataStream.pipe(res);
@@ -62,8 +61,33 @@ class AuditoriaControlador {
 
     }
 
-   
-    // INSERTAR REGISTRO DE AUDITORIA
+    // METODO DE CONSULTA DE AUDITORIA DE INICIOS DE SESION    **USADO
+    public async BuscarDatosAuditoriaAcceso(req: Request, res: Response): Promise<any> {
+        const { desde, hasta } = req.body;
+        const AUDITORIA = await pool.query(
+            `
+            SELECT 
+                a.plataforma, a.user_name, CAST(a.fecha AS VARCHAR), a.hora, a.acceso, a.ip_addres, 
+                a.observaciones, a.ip_addres_local               
+            FROM 
+                audit.acceso_sistema AS a
+            WHERE 
+                a.fecha BETWEEN $1 AND $2
+            ORDER BY 
+                a.fecha DESC;
+            `
+            , [desde, hasta]
+        );
+
+        if (AUDITORIA.rowCount != 0) {
+            return res.jsonp({ message: 'ok', datos: AUDITORIA.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'No se han encontrado registro.' })
+        }
+    }
+
+    // INSERTAR REGISTRO DE AUDITORIA    **USADO
     public async InsertarAuditoria(data: Auditoria) {
         try {
             const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion, ip_local } = data;
@@ -82,8 +106,9 @@ class AuditoriaControlador {
         }
     }
 
+    // INSERTAR REGISTRO DE AUDITORIA POR LOTES DE DATOS   **USADO
     public InsertarAuditoriaPorLotes = async (data: Auditoria[], user_name: string, ip: string, ip_local: string): Promise<void> => {
-        const batchSize = 1000; // Tamaño del lote, puedes ajustarlo según tus necesidades
+        const batchSize = 1000; // TAMAÑO DEL LOTE, PUEDES AJUSTARLO SEGUN TUS NECESIDADES
         const totalResults = [];
 
         for (let i = 0; i < data.length; i += batchSize) {
@@ -93,13 +118,13 @@ class AuditoriaControlador {
 
             for (let j = 0; j < batch.length; j++) {
                 const auditoria = batch[j];
-                const index = j * 10; // 9 es el número de campos a insertar
+                const index = j * 10; // 9 ES EL NUMERO DE CAMPOS A INSERTAR
 
                 valores.push(
-                    "APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
+                    "APLICACION WEB", // ASUMIENDO QUE LA PLATAFORMA ES SIEMPRE "APLICACION WEB"
                     auditoria.tabla,
                     user_name,
-                    new Date(),                    
+                    new Date(),
                     auditoria.accion,
                     auditoria.datosOriginales,
                     auditoria.datosNuevos,
@@ -108,18 +133,19 @@ class AuditoriaControlador {
                     ip_local
                 );
 
-                // Crear los placeholders para la consulta de inserción masiva
+                // CREAR LOS PLACEHOLDERS PARA LA CONSULTA DE INSERCION MASIVA
                 placeholders.push(
                     `($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10})`
                 );
             }
 
-            const query = `
+            const query =
+                `
                 INSERT INTO audit.auditoria (
                     plataforma, table_name, user_name, fecha_hora,
                     action, original_data, new_data, ip_address, observacion, ip_address_local
                 ) VALUES ${placeholders.join(', ')}
-            `;
+                `;
 
             try {
                 // INICIAR TRANSACCIÓN
@@ -145,7 +171,6 @@ class AuditoriaControlador {
             }
         }
     };
-
 
 }
 

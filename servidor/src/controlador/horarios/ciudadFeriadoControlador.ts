@@ -1,6 +1,6 @@
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import pool from '../../database';
 
 class CiudadFeriadoControlador {
@@ -220,21 +220,6 @@ class CiudadFeriadoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
-        }
-    }
-
-    public async ObtenerFeriadosCiudad(req: Request, res: Response): Promise<any> {
-        const id_ciudad = req.params.id_ciudad;
-        const CIUDAD_FERIADO = await pool.query(
-            `
-            SELECT * FROM ef_ciudad_feriado WHERE id_ciudad = $1
-            `
-            , [id_ciudad]);
-        if (CIUDAD_FERIADO.rowCount != 0) {
-            return res.jsonp(CIUDAD_FERIADO.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registros no encontrados.' });
         }
     }
 

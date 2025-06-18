@@ -9,6 +9,7 @@ class ReportesTimbresMrlRutas {
     }
 
     configuracion(): void {
+
         // REPORTES DE TIMBRES MRL    **USADO
         this.router.post('/timbres/:desde/:hasta', TokenValidation, REPORTES_TIMBRES_MRL_CONTROLADOR.ReporteTimbresMrl);
 

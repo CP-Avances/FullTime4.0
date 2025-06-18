@@ -8,7 +8,7 @@ import { DateTime } from 'luxon';
 import { PlantillaReportesService } from '../../../plantilla-reportes.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { KardexService } from 'src/app/servicios/reportes/kardex.service';
+import { KardexService } from 'src/app/servicios/reportes/modulos/kardex/kardex.service';
 
 import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
 

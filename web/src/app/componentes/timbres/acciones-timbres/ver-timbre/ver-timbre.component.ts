@@ -3,6 +3,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-ver-timbre',
@@ -31,6 +32,7 @@ export class VerTimbreComponent implements OnInit {
   ]
 
   constructor(
+    public restEmpleado: EmpleadoService,
     public parametro: ParametrosService,
     public ventana: MatDialogRef<VerTimbreComponent>,
     private validar: ValidacionesService,
@@ -41,8 +43,9 @@ export class VerTimbreComponent implements OnInit {
   ngOnInit() {
     this.timbre = [];
     this.accion = '';
-    this.timbre = this.data.timbre
-    this.accion = this.data.timbre.accion
+    this.timbre = this.data.timbre;
+    console.log('ver data ', this.data, '  ---- ', this.data.timbre);
+    this.accion = this.data.timbre.accion;
     this.acciones.filter((elemento: any) => {
       if (elemento.item == this.timbre.accion) {
         this.accion = elemento.text
@@ -50,6 +53,8 @@ export class VerTimbreComponent implements OnInit {
     })
     this.BuscarParametro();
   }
+
+  // METODO PARA FORMATEAR HORA DE TIMBRE
   fecha_timbre: any;
   hora_timbre: any;
   ObtenerTimbre(formato_fecha: string, formato_hora: string) {
@@ -78,9 +83,35 @@ export class VerTimbreComponent implements OnInit {
           }
         })
         this.ObtenerTimbre(this.formato_fecha, this.formato_hora);
+        this.VerEmpleado();
       }, vacio => {
         this.ObtenerTimbre(this.formato_fecha, this.formato_hora);
+        this.VerEmpleado();
       });
+  }
+
+
+  // METODO PARA TENER LA IMAGEN DEL EMPLEADO
+  mostrarImagen: boolean = false;
+  imagenEmpleado: any;
+  urlImagen: any;
+  VerEmpleado() {
+    this.restEmpleado.BuscarUnEmpleado(parseInt(this.data.timbre.id_empleado)).subscribe(data => {
+      if (data[0].imagen != null) {
+        this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        this.restEmpleado.ObtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
+          if (data.imagen === 0) {
+            this.mostrarImagen = false;
+          }
+          else {
+            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          }
+        });
+        this.mostrarImagen = true;
+      } else {
+        this.mostrarImagen = false;
+      }
+    })
   }
 
 }

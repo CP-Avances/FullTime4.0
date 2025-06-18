@@ -39,7 +39,7 @@ export class DiscapacidadService {
    ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** **
    ** *************************************************************************************** **/
 
-  // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD
+  // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD    **USADO
   RegistrarTipo(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo`, data);
   }

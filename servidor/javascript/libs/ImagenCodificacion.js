@@ -20,9 +20,7 @@ const ConvertirImagenBase64 = function (ruta) {
     console.log("Path img: ", ruta);
     try {
         let path_file = path_1.default.resolve(ruta);
-        //console.log('ver si ingresa ', ruta)
         let data = fs_1.default.readFileSync(path_file);
-        //console.log('data img', data)
         return data.toString('base64');
     }
     catch (error) {
@@ -31,7 +29,6 @@ const ConvertirImagenBase64 = function (ruta) {
 };
 exports.ConvertirImagenBase64 = ConvertirImagenBase64;
 const ComprimirImagen = function (ruta_temporal, ruta_guardar) {
-    //console.log(' dos rutas ', ruta_temporal, ' guardar ', ruta_guardar)
     try {
         fs_1.default.access(ruta_temporal, fs_1.default.constants.F_OK, (err) => {
             if (!err) {
@@ -47,7 +44,6 @@ const ComprimirImagen = function (ruta_temporal, ruta_guardar) {
         });
     }
     catch (error) {
-        //console.log('error ', error)
         return false;
     }
 };

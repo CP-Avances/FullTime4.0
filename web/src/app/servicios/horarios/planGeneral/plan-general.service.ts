@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
 export class PlanGeneralService {
 
   constructor(
@@ -31,7 +32,6 @@ export class PlanGeneralService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/buscar_fechas_multiple`, datos);
   }
 
-
   // METODO PARA ELIMINAR REGISTROS    **USADO
   EliminarRegistro(data: any,) {
     console.log(">>> Enviando a eliminar:", data);
@@ -41,11 +41,6 @@ export class PlanGeneralService {
   // METODO PARA ELIMINAR REGISTROS - MULTIPLES   **USADO
   EliminarRegistroMutiple(data: any,) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/eliminar-multiples`, data);
-  }
-
-  // METODO PARA BUSCAR HORARIO DEL USUARIO EN FECHAS ESPECIFICAS
-  BuscarHorarioFechas(datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/horario-general-fechas`, datos);
   }
 
   // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO  **USADO
@@ -72,5 +67,24 @@ export class PlanGeneralService {
   ActualizarAsistenciaManual(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/actualizar-asistencia/manual`, data);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // METODO PARA BUSCAR HORARIO DEL USUARIO EN FECHAS ESPECIFICAS
+    BuscarHorarioFechas(datos: any) {
+      return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/horario-general-fechas`, datos);
+    }
   
 }

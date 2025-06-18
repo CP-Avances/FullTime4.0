@@ -1,118 +1,167 @@
 .btn {
-    margin-left: 15px;
-    background-color: rgb(80, 87, 97);
-    color: white;
+  margin-left: 15px;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 mat-form-field {
-    padding: 10px 0px 0px 10px;
-    width: 350px;
+  padding: 10px 0px 0px 10px;
+  width: 350px;
 }
 
-.inputText{
-    padding: 10px 0px 0px 10px;
-    width: 350px;
+.inputText {
+  padding: 10px 0px 0px 10px;
+  width: 350px;
 }
 
-.inputDate{
-    padding: 10px 0px 0px 10px;
-    width: 200px;
+.inputDate {
+  padding: 10px 0px 0px 10px;
+  width: 200px;
 }
 
 .abrv {
-    padding: 10px 10px 0px 10px;
-    width: 80px;
-    font-size: 14px;
+  padding: 10px 10px 0px 10px;
+  width: 80px;
+  font-size: 14px;
 }
 
 .nombre {
-    padding: 10px 10px 0px 0px;
-    width: 280px;
-    font-size: 14px;
+  padding: 10px 10px 0px 0px;
+  width: 280px;
+  font-size: 14px;
 }
 
 .letra {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .numero {
-    font-size: 11px;
+  font-size: 11px;
 }
 
 .contenedor-medio {
-    width: 9rem;
+  width: 9rem;
 }
 
 .contenedor-completo {
-    width: 18rem;
+  width: 18rem;
 }
 
 .columna {
-    margin-top: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.nota{
-    margin-left: 20px;
+.nota {
+  margin-left: 20px;
 }
 
-.inputCedula{
-    width: 30%;
+.inputCedula {
+  width: 30%;
+}
+
+.radio-group-estilo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* Ajusta la alineación del contenido dentro de cada radio button */
+.radio-group-estilo mat-radio-button {
+  display: flex;
+  align-items: center;
+  height: 40px; /* Asegura altura consistente */
+  line-height: 1;
+  margin: 0; /* Evita que Angular Material agregue espaciado extra */
+}
+
+/* Alinea el texto con el círculo */
+::ng-deep mat-radio-button .mat-radio-label-content {
+  display: flex;
+  align-items: center;
+  padding-left: 8px; /* Espacio entre círculo y texto */
+  font-size: 16px;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
+.componente-superpuesto {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  color: white;
+  padding: 15px;
 }
 
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
-    .nota{
-        margin-left: 0px;
-    }
+  .nota {
+    margin-left: 0px;
+  }
 
-    mat-horizontal-stepper{
-        margin: 0px;
-        padding: 0px;
-    }
+  mat-horizontal-stepper {
+    margin: 0px;
+    padding: 0px;
+  }
 
-    mat-card{
-        margin: 0px;
-        padding: 0px;
-    }
+  mat-card {
+    margin: 0px;
+    padding: 0px;
+  }
 
-    .container{
-        margin: 0px;
-        padding: 0px;
-    }
+  .container {
+    margin: 0px;
+    padding: 0px;
+  }
 
-    mat-step{
-        margin: 0px;
-        padding: 0px;
-    }
+  mat-step {
+    margin: 0px;
+    padding: 0px;
+  }
 
-    .inputCedula{
-        width: 90%;
-    }
+  .inputCedula {
+    width: 90%;
+  }
+
+  .componente-superpuesto {
+    top: 97%;
+  }
 }
 
-.subtitulo{
-    font-size: small;
-    font-weight: 900;
+.subtitulo {
+  font-size: small;
+  font-weight: 900;
 }
 
 .declaracion-radio-group {
-    margin: 1rem 0;
-  }
-  
-  .declaracion-label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    font-size: 16px;
-  }
-  
-  .radio-options {
-    align-items: center;
-  }
-  
-  mat-radio-button {
-    font-size: 15px;
-  }
+  margin: 1rem 0;
+}
 
-  label{
-    font-size: small;
-  }
+.declaracion-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 16px;
+}
+
+.radio-options {
+  align-items: center;
+}
+
+mat-radio-button {
+  font-size: 15px;
+}
+
+label {
+  font-size: small;
+}
+
+#cerrar {
+  font-size: 24px;
+}
+
+button[mat-icon-button] {
+  padding: 0;
+  height: auto;
+}
