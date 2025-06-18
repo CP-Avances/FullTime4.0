@@ -363,34 +363,49 @@ class UsuarioControlador {
                     from: datos.informacion.email,
                     subject: 'FULLTIME CAMBIO FRASE DE SEGURIDAD',
                     html: `
-          <body>
-            <div style="text-align: center;">
-              <img width="100%" height="100%" src="cid:cabeceraf"/>
-            </div>
-            <br>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              El presente correo es para informar que se ha enviado un link para cambiar su frase de seguridad. <br>  
-            </p>
-            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
-              <b>Asunto:</b> CAMBIAR FRASE DE SEGURIDAD <br> 
-              <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
-              <b>Generado mediante:</b> Aplicación Web <br>
-              <b>Fecha de envío:</b> ${fecha} <br> 
-              <b>Hora de envío:</b> ${hora} <br><br> 
-            </p>
-            <h3 style="font-family: Arial; text-align: center;">CAMBIAR FRASE DE SEGURIDAD</h3>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Ingrese al siguiente link y registre una nueva frase de seguridad.</b> <br>   
-              <a href="${url}/${token}">${url}/${token}</a>  
-            </p>
-            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Gracias por la atención</b><br>
-              <b>Saludos cordiales,</b> <br><br>
-            </p>
-            <img src="cid:pief" width="100%" height="100%"/>
-          </body>
+            <body style="font-family: Arial, sans-serif; font-size: 12px; color: rgb(11, 22, 121); line-height: 1.5;">
+
+              <div style="text-align: center; margin: 0; padding: 0;">
+                <img src="cid:cabeceraf" alt="Encabezado"
+                    style="display: block; width: 100%; height: auto; margin: 0; padding: 0; border: 0;" />
+              </div>
+
+              <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
+
+              <p>
+                El presente correo tiene como finalidad informarle que se ha generado un enlace para cambiar su frase de seguridad.
+              </p>
+
+              <h3 style="text-align: center; color: rgb(11, 22, 121);">DATOS DEL SOLICITANTE</h3>
+              
+              <p>
+                <strong>Empresa:</strong> ${datos.informacion.nombre} <br>
+                <strong>Asunto:</strong> CAMBIAR FRASE DE SEGURIDAD <br>
+                <strong>Colaborador que envía:</strong> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
+                <strong>Generado mediante:</strong> Aplicación Web <br>
+                <strong>Fecha de envío:</strong> ${fecha} <br>
+                <strong>Hora de envío:</strong> ${hora} <br>
+              </p>
+
+              <h3 style="text-align: center; color: rgb(11, 22, 121);">CAMBIAR FRASE DE SEGURIDAD</h3>
+              
+              <p>
+                <strong>Por favor, haga clic en el siguiente enlace para registrar una nueva frase de seguridad:</strong><br><br>
+                <a href="${url}/${token}" style="color: #0b1679;">${url}/${token}</a>
+              </p>
+
+              <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
+
+              <p style="color: #555; font-style: italic; font-size: 11px;">
+                <strong>Este correo ha sido generado automáticamente. Por favor, no responda a este mensaje.</strong>
+              </p>
+
+              <div style="text-align: center; margin: 0; padding: 0;">
+                <img src="cid:pief" alt="Pie de página"
+                  style="display: block; width: 100%; height: auto; margin: 0; padding: 0; border: 0;" />
+              </div>
+
+            </body>
           `,
                     attachments: [
                         {
