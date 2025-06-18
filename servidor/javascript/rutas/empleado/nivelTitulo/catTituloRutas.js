@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
 const catTituloControlador_1 = __importDefault(require("../../../controlador/empleado/nivelTitulo/catTituloControlador"));
-const verificarToken_1 = require("../../../libs/verificarToken");
-const multer_1 = __importDefault(require("multer"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const verificarToken_1 = require("../../../libs/verificarToken");
+const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());

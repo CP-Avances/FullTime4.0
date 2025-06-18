@@ -124,43 +124,6 @@ class ReportesControlador {
             }
         });
     }
-    // METODO PARA OBTENER LOS TIMBRES CON NOVEDADES EN UN FECHA DETERMINADA
-    getInfoReporteTimbresNovedad(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let { desde, hasta } = req.params;
-            let datos = req.body;
-            console.log("ver req.body", req.body);
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbresConNovedades(desde, hasta, o.codigo, false);
-                    console.log('Timbres: ', o);
-                    return o;
-                })));
-                return obj;
-            })));
-            let nuevo = n.map((e) => {
-                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
-                return e;
-            }).filter(e => { return e.empleados.length > 0; });
-            if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres con novedad en ese periodo.' });
-            return res.status(200).jsonp(nuevo);
-        });
-    }
 }
-// METODO PARA DEFINIR LOS REGISTROS DE TIMBRES CON NOVEDADES
-const BuscarTimbresConNovedades = function (fec_inicio, fec_final, codigo, conexion) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query(`SELECT id, codigo, id_reloj, accion, tecla_funcion, observacion, 
-         ubicacion, latitud, longitud, hora_timbre_diferente, dispositivo_timbre, tipo_autenticacion, 
-         conexion, novedades_conexion, CAST(fecha_hora_timbre_validado AS VARCHAR),
-         CAST(fecha_subida_servidor AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR)  
-         FROM eu_timbres WHERE CAST(fecha_hora_timbre_validado AS VARCHAR) BETWEEN $1 || '%' 
-            AND ($2::timestamp + '1 DAY') || '%'  AND codigo = $3 AND (conexion = 'false' OR hora_timbre_diferente = 'true')  ORDER BY fecha_hora_timbre_validado ASC`, [fec_inicio, fec_final, codigo])
-            .then(res => {
-            return res.rows;
-        });
-    });
-};
 exports.REPORTES_CONTROLADOR = new ReportesControlador();
 exports.default = exports.REPORTES_CONTROLADOR;

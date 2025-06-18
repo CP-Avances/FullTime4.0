@@ -4,10 +4,10 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
 export class EmpleadoProcesosService {
 
   constructor(private http: HttpClient) { }
-
 
   // METODO PARA OBTENER PROCESOS DEL USUARIO   **USADO
   ObtenerProcesoUsuario(id_empl: number) {

@@ -1,13 +1,12 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
-import { Integer } from 'read-excel-file';
 
 class UbicacionControlador {
 
     /** ************************************************************************************************ **
-     ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cat_ubicaciones)               ** **
+     ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cat_ubicaciones)              ** **
      ** ************************************************************************************************ **/
 
     // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACION    **USADO
@@ -251,7 +250,7 @@ class UbicacionControlador {
     }
 
     /** **************************************************************************************** **
-     ** **        COORDENADAS DE UBICACION ASIGNADAS A UN USUARIO (empleado_ubicacion)            ** **
+     ** **        COORDENADAS DE UBICACION ASIGNADAS A UN USUARIO (empleado_ubicacion)        ** **
      ** **************************************************************************************** **/
 
     // LISTAR REGISTROS DE COORDENADAS GENERALES DE UBICACION DE UN USUARIO    **USADO
@@ -273,73 +272,15 @@ class UbicacionControlador {
         }
     }
 
-    // ASIGNAR COORDENADAS GENERALES DE UBICACION A LOS USUARIOS    **USADO
-    /*
+    // METODO PARA REGISTRAR COORDENADAS DEL USUARIO    **USADO
     public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
         try {
             const { id_empl, id_ubicacion, user_name, ip, ip_local } = req.body;
-            console.log('ubicacion ', req.body)
 
-            const existe = await pool.query(
-                `
-                SELECT * FROM mg_empleado_ubicacion WHERE id_empleado = $1 AND id_ubicacion = $2
-                `
-                , [id_empl, id_ubicacion]);
-
-            console.log(' existe ', existe.rows)
-
-            if (existe.rowCount != 0) {
-                res.jsonp({ message: 'error' });
-            }
-            else {
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                await pool.query(
-                    `
-                    INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                    VALUES ($1, $2)
-                    `
-                    ,
-                    [id_empl, id_ubicacion]);
-
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'mg_empleado_ubicacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
-            }
-
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            res.status(500).jsonp({ message: 'Error al guardar registro.' });
-        }
-    }
-*/
-
-    public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
-        try {
-            const { id_empl, id_ubicacion, user_name, ip, ip_local } = req.body;
-            // `id_empleados` es una lista de IDs de empleados
-            console.log("ver req.body: ", req.body)
-
-            console.log('Empleados y ubicación recibidos:', req.body);
-
-            // Iniciar transacción
+            // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // Filtrar empleados que ya tienen la ubicación registrada
+            // FILTRAR EMPLEADOS QUE YA TIENEN LA UBICACION REGISTRADA
             const resultadoExistente = await pool.query(
                 `
                 SELECT id_empleado FROM mg_empleado_ubicacion 
@@ -348,38 +289,39 @@ class UbicacionControlador {
                 [id_ubicacion, id_empl]
             );
 
-            // Extraer empleados ya registrados
+            // EXTRAER EMPLEADOS YA REGISTRADOS
             const empleadosExistentes = resultadoExistente.rows.map((row: { id_empleado: number }) => row.id_empleado);
 
-            // Filtrar solo los empleados nuevos para insertar
+            // FILTRAR SOLO LOS EMPLEADOS NUEVOS PARA INSERTAR
             const nuevosEmpleados = id_empl.filter(
                 (id_empleado: number) => !empleadosExistentes.includes(id_empleado)
             );
 
-            // Si no hay empleados nuevos, finalizar la transacción
+            // SI NO HAY EMPLEADOS NUEVOS, FINALIZAR LA TRANSACCION
             if (nuevosEmpleados.length === 0) {
                 await pool.query('ROLLBACK');
                 res.jsonp({ message: 'No hay nuevos registros para insertar.' });
-            } else {
-
-                const batchSize = 1000; // Tamaño del lote (ajustable según la capacidad de tu base de datos)
+            }
+            else {
+                const batchSize = 1000; // TAMAÑO DEL LOTE (AJUSTABLE SEGÚN LA CAPACIDAD DE TU BASE DE DATOS)
                 const batches = [];
-                // Dividir los empleados en lotes pequeños
+                // DIVIDIR LOS EMPLEADOS EN LOTES PEQUEÑOS
                 for (let i = 0; i < nuevosEmpleados.length; i += batchSize) {
                     batches.push(nuevosEmpleados.slice(i, i + batchSize));
                 }
 
-                // Insertar los empleados en lotes
+                // INSERTAR LOS EMPLEADOS EN LOTES
                 for (const batch of batches) {
                     const valores = batch
                         .map((id_empleado: number) => `(${id_empleado}, ${id_ubicacion})`)
                         .join(', ');
 
-                    // Ejecutar la inserción en cada lote
+                    // EJECUTAR LA INSERCIÓN EN CADA LOTE
                     await pool.query(
                         `
-                    INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                    VALUES ${valores}`
+                            INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
+                            VALUES ${valores}
+                        `
                     );
                 }
 
@@ -393,6 +335,7 @@ class UbicacionControlador {
                     ip_local: ip_local,
                     observacion: null
                 }));
+
                 await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
@@ -405,13 +348,12 @@ class UbicacionControlador {
 
             }
         } catch (error) {
-            // Revertir la transacción en caso de error
+            // REVERTIR LA TRANSACCION EN CASO DE ERROR
             console.log("ver el error: ", error)
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: 'Error al guardar registros.' });
         }
     }
-
 
     // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACION   **USADO
     public async ListarRegistroUsuarioU(req: Request, res: Response) {
@@ -451,7 +393,7 @@ class UbicacionControlador {
 
             const datosOriginales = ubicacion.rows;
 
-            // Obtener los IDs encontrados
+            // OBTENER LOS IDS ENCONTRADOS
             const idsEncontrados = datosOriginales.map((row: any) => row.id);
             const idsNoEncontrados = ids.filter((id: number) => !idsEncontrados.includes(id));
 
@@ -484,13 +426,11 @@ class UbicacionControlador {
                     }));
                     await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
                 }
-
-
                 await pool.query(
                     `
-                    DELETE FROM mg_empleado_ubicacion WHERE id = ANY($1)`,
+                    DELETE FROM mg_empleado_ubicacion WHERE id = ANY($1)
+                    `,
                     [idsEncontrados]);
-
 
                 const auditoria = datosOriginales.map((item: any) => ({
                     tabla: 'mg_empleado_ubicacion',
@@ -513,6 +453,7 @@ class UbicacionControlador {
             return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
         }
     }
+
 }
 
 export const UBICACION_CONTROLADOR = new UbicacionControlador();

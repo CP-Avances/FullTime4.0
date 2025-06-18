@@ -1,9 +1,9 @@
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
-import { FormatearFecha2 } from '../../../libs/settingsMail';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
@@ -519,23 +519,6 @@ class VacunasControlador {
         });
     }
 
-    // LISTAR TODOS LOS REGISTROS DE VACUNACIÓN
-    public async ListarRegistro(req: Request, res: Response) {
-        const VACUNA = await pool.query(
-            `
-            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
-            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
-            WHERE ev.id_vacuna = tv.id
-            ORDER BY ev.id DESC
-            `
-        );
-        if (VACUNA.rowCount != 0) {
-            return res.jsonp(VACUNA.rows)
-        }
-        else {
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        }
-    }
 
 }
 

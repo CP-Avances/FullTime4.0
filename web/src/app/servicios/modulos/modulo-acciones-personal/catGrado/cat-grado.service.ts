@@ -47,7 +47,7 @@ export class CatGradoService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
+  // METODO PARA VERIFICAR DATOS DE PLANTILLA   **USADO
   RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/upload/revision', formData);
   }
@@ -64,12 +64,12 @@ export class CatGradoService {
 
   // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
   RevisarFormatoEmpleGrado(formData: any) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/upload/revision_epleadoGrado', formData);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/upload/revision_empleadoGrado', formData);
   }
 
   // METODO PARA REGISTRAR PLANTILLA DE EMPLEADO GRADOS   **USADO
   RegistrarPlantillaEmpleGrado(data: any) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/cargar_plantilla/registro_epleadoGrado', data)
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/cargar_plantilla/registro_empleadoGrado', data)
   }
 
   // METODO PARA VERIIFCAR DATOS DE PLANTILLA   **USADO
@@ -79,7 +79,7 @@ export class CatGradoService {
 
   // METODO PARA ELIMINAR GRADO MULTIPLES     **USADO
   EliminarGradoMultiple(data: any) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/eliminarGradoMult', data);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/eliminarGradoMultiple', data);
   }
 
 }

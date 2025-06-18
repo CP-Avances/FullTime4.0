@@ -1,16 +1,12 @@
-import {
-  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
-  FormatearFecha, FormatearHora, dia_completo
-} from '../../../libs/settingsMail'
-import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import FUNCIONES_LLAVES from '../../llaves/rsa-keys.service';
+import { enviarCorreos, Credenciales, fechaHora, FormatearFecha, FormatearHora, dia_completo } from '../../../libs/settingsMail';
+import { Request, Response } from 'express';
+import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
+import { QueryResult } from 'pg';
 import path from 'path';
 import pool from '../../../database';
 import jwt from 'jsonwebtoken';
-import FUNCIONES_LLAVES from '../../llaves/rsa-keys.service';
-//IMPORTACIONES PARA APP MOVIL
-import { QueryResult } from 'pg';
-import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
 
 interface IPayload {
   _id: number,
@@ -74,53 +70,6 @@ class UsuarioControlador {
     }
   }
 
-  // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL **USADO
-  public async ObtenerInformacionUsuario(req: Request, res: Response): Promise<any> {
-    const { id_empleado } = req.params;
-    const USUARIO = await pool.query(
-      `
-        SELECT 
-	        tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
-	        tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
-	        tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
-	        COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
-	        COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
-	        COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional,
-		      tb3.numero_partida_individual
-        FROM 
-	        informacion_general AS tb1, eu_empleado_cargos AS tb2, eu_empleados AS tb3
-        WHERE 
-  	      tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
-		      tb3.id = tb1.id AND
-	        tb2.estado = 'true'
-      `
-      , [id_empleado]);
-    if (USUARIO.rowCount != 0) {
-      return res.jsonp(USUARIO.rows);
-    }
-    else {
-      res.status(404).jsonp({ text: 'Ups los sentimos, el usuario no tiene registrada la información necesaria, por favor revise que cumpla con todos los requisitos.' });
-    }
-  }
-
-  public async ObtenerDepartamentoUsuarios(req: Request, res: Response) {
-    const { id_empleado } = req.params;
-    const EMPLEADO = await pool.query(
-      `
-      SELECT e.id_empleado AS id, e.id_departamento, e.id_contrato, ed_departamentos.nombre 
-      FROM contrato_cargo_vigente AS e 
-      INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
-      WHERE id_contrato = $1
-      `
-      , [id_empleado]);
-    if (EMPLEADO.rowCount != 0) {
-      return res.jsonp(EMPLEADO.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
-  }
-
   // METODO PARA OBTENER EL ID DEL USUARIO MEDIANTE DEPARTAMENTO VIGENTE DEL USUARIO **USADO
   public async ObtenerIdUsuariosDepartamento(req: Request, res: Response) {
     const { id_departamento } = req.body;
@@ -138,7 +87,6 @@ class UsuarioControlador {
       return res.jsonp(null);
     }
   }
-
 
   // METODO PARA ACTUALIZAR DATOS DE USUARIO   **USADO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
@@ -171,8 +119,8 @@ class UsuarioControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
-        WHERE id_empleado = $4 RETURNING *
+          UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
+          WHERE id_empleado = $4 RETURNING *
         `
         , [usuario, id_rol, estado, id_empleado]);
 
@@ -234,15 +182,15 @@ class UsuarioControlador {
 
       let contrasena_encriptado = FUNCIONES_LLAVES.encriptarLogin(contrasenaActual);
       const contrasenaCorrecta = contrasena_encriptado == datosOriginales.contrasena;
-      
+
       if (!contrasenaCorrecta) {
         await pool.query('COMMIT');
         return res.status(403).jsonp({ message: 'La contraseña actual no es correcta.' });
       }
-      
+
       await pool.query(
         `
-        UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
+          UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
         `
         , [contrasena_encriptada, id_empleado]);
 
@@ -271,66 +219,32 @@ class UsuarioControlador {
     }
   }
 
-
-  // ADMINISTRACION DEL MODULO DE ALIMENTACION
-  public async RegistrarAdminComida(req: Request, res: Response): Promise<Response> {
-    try {
-      const { admin_comida, id_empleado, user_name, ip, ip_local } = req.body;
-
-      const adminComida = await admin_comida.toLowerCase() === 'si' ? true : false;
-
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
-      const [datosOriginales] = consulta.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_usuarios',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-      }
-
-      const actualizacion = await pool.query(
-        `
-        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2 RETURNING *
-        `
-        , [adminComida, id_empleado]);
-
-      const [datosNuevos] = actualizacion.rows;
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_usuarios',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: JSON.stringify(datosNuevos),
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Registro guardado.' });
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
+  // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL   **USADO
+  public async ObtenerInformacionUsuario(req: Request, res: Response): Promise<any> {
+    const { id_empleado } = req.params;
+    const USUARIO = await pool.query(
+      `
+        SELECT 
+	        tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
+	        tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
+	        tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
+	        COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
+	        COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
+	        COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional,
+		      tb3.numero_partida_individual
+        FROM 
+	        informacion_general AS tb1, eu_empleado_cargos AS tb2, eu_empleados AS tb3
+        WHERE 
+  	      tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
+		      tb3.id = tb1.id AND
+	        tb2.estado = 'true'
+      `
+      , [id_empleado]);
+    if (USUARIO.rowCount != 0) {
+      return res.jsonp(USUARIO.rows);
+    }
+    else {
+      res.status(404).jsonp({ text: 'Ups los sentimos, el usuario no tiene registrada la información necesaria, por favor revise que cumpla con todos los requisitos.' });
     }
   }
 
@@ -338,7 +252,7 @@ class UsuarioControlador {
    ** **                METODO FRASE DE SEGURIDAD ADMINISTRADOR                          ** **
    ** ************************************************************************************* **/
 
-  // METODO PARA GUARDAR FRASE DE SEGURIDAD
+  // METODO PARA GUARDAR FRASE DE SEGURIDAD      **USADO
   public async ActualizarFrase(req: Request, res: Response): Promise<Response> {
     try {
       const { frase, id_empleado, user_name, ip, ip_local } = req.body;
@@ -395,6 +309,171 @@ class UsuarioControlador {
     }
   }
 
+  // METODO PARA CAMBIAR FRASE DE SEGURIDAD    **USADO
+  public async CambiarFrase(req: Request, res: Response): Promise<Response> {
+    var token = req.body.token;
+    var frase = req.body.frase;
+    const { user_name, ip, ip_local } = req.body;
+    try {
+      const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
+      const id_empleado = payload._id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTA DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+          UPDATE eu_usuarios SET frase = $2 WHERE id_empleado = $1
+        `
+        , [id_empleado, frase]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"frase": "${frase}"}`,
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
+    }
+  }
+
+  /** ******************************************************************************************************************* **
+   ** **                           ENVIAR CORREO PARA CAMBIAR FRASE DE SEGURIDAD                                       ** ** 
+   ** ******************************************************************************************************************* **/
+
+  // METODO PARA RESTABLECER LA CONTRASEÑA   **USADO
+  public async RestablecerFrase(req: Request, res: Response) {
+    const correo = req.body.correo;
+    const url_page = req.body.url_page;
+    const identificacion = req.body.identificacion;
+
+    var tiempo = fechaHora();
+    var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
+    var hora = await FormatearHora(tiempo.hora);
+
+    // OBTENER RUTA DE LOGOS
+    let separador = path.sep;
+    const path_folder = ObtenerRutaLogos();
+
+    const correoValido = await pool.query(
+      `
+      SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
+      FROM eu_empleados AS e, eu_usuarios AS u 
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2  AND u.frase IS NOT NULL 
+      `
+      , [correo, identificacion]);
+
+    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o identificación o frase de usuario no válido.');
+
+    var datos = await Credenciales(1);
+
+    if (datos.message === 'ok') {
+
+      const token = jwt.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail',
+        { expiresIn: 60 * 5, algorithm: 'HS512' });
+
+      var url = url_page + '/recuperar-frase';
+
+      let data = {
+        to: correoValido.rows[0].correo,
+        from: datos.informacion.email,
+        subject: 'FULLTIME CAMBIO FRASE DE SEGURIDAD',
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar que se ha enviado un link para cambiar su frase de seguridad. <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
+              <b>Asunto:</b> CAMBIAR FRASE DE SEGURIDAD <br> 
+              <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">CAMBIAR FRASE DE SEGURIDAD</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Ingrese al siguiente link y registre una nueva frase de seguridad.</b> <br>   
+              <a href="${url}/${token}">${url}/${token}</a>  
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="100%" height="100%"/>
+          </body>
+          `
+        ,
+        attachments: [
+          {
+            filename: 'cabecera_firma.jpg',
+            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
+            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+          },
+          {
+            filename: 'pie_firma.jpg',
+            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
+            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+          }]
+      };
+
+      var corr = enviarCorreos(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
+      corr.sendMail(data, function (error: any, info: any) {
+        if (error) {
+          console.log('Email error: ' + error);
+          corr.close();
+          return res.jsonp({ message: 'error' });
+        } else {
+          console.log('Email sent: ' + info.response);
+          corr.close();
+          return res.jsonp({ message: 'ok' });
+        }
+      });
+    }
+    else {
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
+    }
+  }
+
 
   /** ******************************************************************************************** **
    ** **               METODO PARA MANEJAR DATOS DE USUARIOS TIMBRE WEB                         ** **
@@ -424,10 +503,10 @@ class UsuarioControlador {
       const { array, web_habilita, user_name, ip, ip_local } = req.body;
       console.log("ver req.body", req.body)
       const ids_empleados = array.map((empl: any) => empl.id);
-      console.log("ver ids_empleados", ids_empleados )
+      console.log("ver ids_empleados", ids_empleados)
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = ANY($1::int[])`, [ids_empleados]);
       const datosOriginales = consulta.rows;
-      console.log("ver datos originales: ",  datosOriginales)
+      console.log("ver datos originales: ", datosOriginales)
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
       let rowsAffected: number = 0;
@@ -462,7 +541,7 @@ class UsuarioControlador {
         return res.status(404).jsonp({ message: 'error' })
       }
     } catch (error) {
-      console.log('Ver error:',error)
+      console.log('Ver error:', error)
       return res.status(500).jsonp({ message: error })
     }
   }
@@ -484,25 +563,6 @@ class UsuarioControlador {
       WHERE ig.estado = $1 AND u.id_empleado = ig.id AND u.app_habilita = $2
       `
       , [estado, habilitado]
-    ).then((result: any) => { return result.rows });
-
-    if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(respuesta);
-  }
-
-
-  // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
-  public async accesoMovil(req: Request, res: Response) {
-    let id_empleado = req.params.id_empleado;
-
-    let respuesta = await pool.query(
-      `
-        SELECT u.app_habilita 
-        FROM eu_usuarios AS u 
-        WHERE u.id_empleado = $1
-        `
-      , [id_empleado]
     ).then((result: any) => { return result.rows });
 
     if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
@@ -655,172 +715,6 @@ class UsuarioControlador {
       return res.status(500).jsonp({ message: error });
     }
   }
-
-
-  /** ******************************************************************************************************************* **
-   ** **                           ENVIAR CORREO PARA CAMBIAR FRASE DE SEGURIDAD                                       ** ** 
-   ** ******************************************************************************************************************* **/
-
-  public async RestablecerFrase(req: Request, res: Response) {
-    const correo = req.body.correo;
-    const url_page = req.body.url_page;
-    const identificacion = req.body.identificacion;
-
-    var tiempo = fechaHora();
-    var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
-    var hora = await FormatearHora(tiempo.hora);
-
-    // OBTENER RUTA DE LOGOS
-    let separador = path.sep;
-    const path_folder = ObtenerRutaLogos();
-
-    const correoValido = await pool.query(
-      `
-      SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
-      FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2  AND u.frase IS NOT NULL 
-      `
-      , [correo, identificacion]);
-
-    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o identificación o frase de usuario no válido.');
-
-    var datos = await Credenciales(1);
-
-    if (datos === 'ok') {
-
-      const token = jwt.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail',
-        { expiresIn: 60 * 5, algorithm: 'HS512' });
-
-      var url = url_page + '/recuperar-frase';
-
-      let data = {
-        to: correoValido.rows[0].correo,
-        from: email,
-        subject: 'FULLTIME CAMBIO FRASE DE SEGURIDAD',
-        html:
-          `
-          <body>
-            <div style="text-align: center;">
-              <img width="100%" height="100%" src="cid:cabeceraf"/>
-            </div>
-            <br>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              El presente correo es para informar que se ha enviado un link para cambiar su frase de seguridad. <br>  
-            </p>
-            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${nombre} <br>   
-              <b>Asunto:</b> CAMBIAR FRASE DE SEGURIDAD <br> 
-              <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
-              <b>Generado mediante:</b> Aplicación Web <br>
-              <b>Fecha de envío:</b> ${fecha} <br> 
-              <b>Hora de envío:</b> ${hora} <br><br> 
-            </p>
-            <h3 style="font-family: Arial; text-align: center;">CAMBIAR FRASE DE SEGURIDAD</h3>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Ingrese al siguiente link y registre una nueva frase de seguridad.</b> <br>   
-              <a href="${url}/${token}">${url}/${token}</a>  
-            </p>
-            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Gracias por la atención</b><br>
-              <b>Saludos cordiales,</b> <br><br>
-            </p>
-            <img src="cid:pief" width="100%" height="100%"/>
-          </body>
-          `
-        ,
-        attachments: [
-          {
-            filename: 'cabecera_firma.jpg',
-            path: `${path_folder}${separador}${cabecera_firma}`,
-            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-          },
-          {
-            filename: 'pie_firma.jpg',
-            path: `${path_folder}${separador}${pie_firma}`,
-            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-          }]
-      };
-
-      var corr = enviarMail(servidor, parseInt(puerto));
-      corr.sendMail(data, function (error: any, info: any) {
-        if (error) {
-          console.log('Email error: ' + error);
-          corr.close();
-          return res.jsonp({ message: 'error' });
-        } else {
-          console.log('Email sent: ' + info.response);
-          corr.close();
-          return res.jsonp({ message: 'ok' });
-        }
-      });
-    }
-    else {
-      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
-    }
-  }
-
-  // METODO PARA CAMBIAR FRASE DE SEGURIDAD
-  public async CambiarFrase(req: Request, res: Response): Promise<Response> {
-    var token = req.body.token;
-    var frase = req.body.frase;
-    const { user_name, ip, ip_local } = req.body;
-    try {
-      const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
-      const id_empleado = payload._id;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTA DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
-      const [datosOriginales] = consulta.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_usuarios',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-      }
-
-      await pool.query(
-        `
-        UPDATE eu_usuarios SET frase = $2 WHERE id_empleado = $1
-        `
-        , [id_empleado, frase]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_usuarios',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"frase": "${frase}"}`,
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
-    }
-  }
-
 
 
   /** ************************************************************************************************** **
@@ -1026,17 +920,6 @@ class UsuarioControlador {
     }
   }
 
-  //METODO PARA OBTENER DATO ENCRIPTADO
-  public async ObtenerDatoEncriptado(req: Request, res: Response) {
-    try {
-      const { contrasena } = req.body;
-      res.jsonp({ message: FUNCIONES_LLAVES.encriptarLogin(contrasena) });
-    }
-    catch (error) {
-      return res.jsonp({ message: 'error' });
-    }
-  }
-
   // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO
   public async RegistrarUsuarioDepartamentoMultiple(req: Request, res: Response) {
     const { usuarios_seleccionados, departamentos_seleccionados, isPersonal, user_name, ip } = req.body;
@@ -1062,9 +945,7 @@ class UsuarioControlador {
         }
       }
 
-
       for (const departamento of departamentos_seleccionados) {
-
         datos.id_departamento = departamento.id;
         datos.administra = true;
         datos.principal = false;
@@ -1090,13 +971,17 @@ class UsuarioControlador {
 
   }
 
-  //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
 
+  /** **************************************************************************************************************** **
+   ** **             M E T O D O S    U S A D O S    E N    L A    A P L I C A C I O N    M O V I L                 ** ** 
+   ** **************************************************************************************************************** **/
   // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
   public async getidDispositivo(req: Request, res: Response): Promise<Response> {
     try {
       const id_empleado = req.params.id_empleado;
-      const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_empleado = ${id_empleado} ORDER BY id ASC `);
+      const response: QueryResult = await pool.query(
+        `SELECT * FROM mrv_dispositivos WHERE id_empleado = ${id_empleado} ORDER BY id ASC `
+      );
       const IdDispositivos = response.rows;
       return res.jsonp(IdDispositivos);
     } catch (error) {
@@ -1112,7 +997,9 @@ class UsuarioControlador {
   public async getDispositivoPorIdDispositivo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_dispositivo } = req.body;
-      const response: QueryResult = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = '${id_dispositivo}'`);
+      const response: QueryResult = await pool.query(
+        `SELECT * FROM mrv_dispositivos WHERE id_dispositivo = '${id_dispositivo}'`
+      );
       const idDispositivo = response.rows[0];
       if (response.rows.length === 0) {
         return res.status(404).jsonp({
@@ -1186,11 +1073,11 @@ class UsuarioControlador {
         WHERE e.estado = 1
         ORDER BY fullname
       `;
-      
+
       const response: QueryResult = await pool.query(query);
       const empleados: any[] = response.rows;
       return res.status(200).jsonp(empleados);
-  
+
     } catch (error) {
       console.log(error);
       return res.status(500).jsonp({
@@ -1198,7 +1085,6 @@ class UsuarioControlador {
       });
     }
   }
-  
 
   // METODO PARA OBTENER LA INFORMACION DEL USUARIO
   public async getUserById(req: Request, res: Response): Promise<Response> {
@@ -1216,7 +1102,101 @@ class UsuarioControlador {
     }
   };
 
+
+
+
+
+
+
+
+
+
+
+  public async ObtenerDepartamentoUsuarios(req: Request, res: Response) {
+    const { id_empleado } = req.params;
+    const EMPLEADO = await pool.query(
+      `
+      SELECT e.id_empleado AS id, e.id_departamento, e.id_contrato, ed_departamentos.nombre 
+      FROM contrato_cargo_vigente AS e 
+      INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
+      WHERE id_contrato = $1
+      `
+      , [id_empleado]);
+    if (EMPLEADO.rowCount != 0) {
+      return res.jsonp(EMPLEADO.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+  // ADMINISTRACION DEL MODULO DE ALIMENTACION
+  public async RegistrarAdminComida(req: Request, res: Response): Promise<Response> {
+    try {
+      const { admin_comida, id_empleado, user_name, ip, ip_local } = req.body;
+
+      const adminComida = await admin_comida.toLowerCase() === 'si' ? true : false;
+
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      const actualizacion = await pool.query(
+        `
+        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2 RETURNING *
+        `
+        , [adminComida, id_empleado]);
+
+      const [datosNuevos] = actualizacion.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos),
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
+  }
+
 }
+
+export const USUARIO_CONTROLADOR = new UsuarioControlador();
+
+export default USUARIO_CONTROLADOR;
 
 /* @return
     CASOS DE RETORNO
@@ -1226,7 +1206,7 @@ class UsuarioControlador {
     3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  
 */
 
-// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION
+// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION    **USADO
 async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> {
   const { id_empleado, id_departamento } = datos;
   const consulta = await pool.query(
@@ -1253,7 +1233,7 @@ async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: 
   return 3;
 }
 
-// METODO PARA REGISTRAR UNA ASIGNACION
+// METODO PARA REGISTRAR UNA ASIGNACION   **USADO
 async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
@@ -1290,7 +1270,7 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   }
 }
 
-// METODO PARA EDITAR UNA ASIGNACION
+// METODO PARA EDITAR UNA ASIGNACION    **USADO
 async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
@@ -1362,9 +1342,3 @@ interface Datos {
   user_name: string;
   ip: string;
 }
-
-
-
-export const USUARIO_CONTROLADOR = new UsuarioControlador();
-
-export default USUARIO_CONTROLADOR;

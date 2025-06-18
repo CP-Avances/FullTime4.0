@@ -69,7 +69,6 @@ export class CatGrupoOcupacionalService {
 
   // METODO DE REGISTRO DE PLANTILLA DE REGISTRO DE GRUPO OCUPACIONAL   **USADO
   RegistrarPlantillaEmpleGrupoOcu(data: any) {
-    console.log('data a enviar: ', data)
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grupoOcupacional/cargar_plantilla/registro_empleadoGrupoOcupacional', data)
   }
 
@@ -80,7 +79,7 @@ export class CatGrupoOcupacionalService {
 
   // METODO PARA ELIMINAR GRUPOS OCUPACIONALES MULTIPLES    **USADO
   EliminarGrupoMultiple(data: any) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grupoOcupacional/eliminarGrupoOcuMult', data);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grupoOcupacional/eliminarGrupoMultiple', data);
   }
 
 }

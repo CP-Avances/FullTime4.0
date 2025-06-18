@@ -15,7 +15,7 @@ import { TiempoLaboradoService } from 'src/app/servicios/reportes/tiempoLaborado
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { ReportesService } from '../../../../servicios/reportes/reportes.service';
+import { ReportesService } from '../../../../servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 

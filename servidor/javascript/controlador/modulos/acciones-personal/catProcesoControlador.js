@@ -20,7 +20,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const exceljs_1 = __importDefault(require("exceljs"));
 class ProcesoControlador {
-    // METODO PARA BUSCAR LISTA DE PROCESOS
+    // METODO DE CONSULTA DE PROCESOS    **USADO
     ListarProcesos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const SIN_PROCESO_SUPERIOR = yield database_1.default.query(`
@@ -40,28 +40,16 @@ class ProcesoControlador {
             res.jsonp(CON_PROCESO_SUPERIOR.rows);
         });
     }
-    getOne(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const unaProvincia = yield database_1.default.query(`
-      SELECT * FROM map_cat_procesos WHERE id = $1
-      `, [id]);
-            if (unaProvincia.rowCount != 0) {
-                return res.jsonp(unaProvincia.rows);
-            }
-            res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });
-        });
-    }
-    create(req, res) {
+    // METODO PARA REGISTRAR UN PROCESO   **USADO
+    RegistrarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { nombre, proc_padre, user_name, ip, ip_local } = req.body;
-                console.log('nombre: ', nombre);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
           SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
-         `, [nombre]);
+        `, [nombre]);
                 const [procesos] = response.rows;
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -97,7 +85,63 @@ class ProcesoControlador {
             }
         });
     }
-    getIdByNombre(req, res) {
+    // METODO PARA ELIMINA PROCESOS   **USADO
+    EliminarProceso(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = req.params.id;
+                const { user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const proceso = yield database_1.default.query(`
+          SELECT * FROM map_cat_procesos WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = proceso.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_cat_procesos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+          DELETE FROM map_cat_procesos WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'map_cat_procesos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.jsonp({ message: 'error' });
+            }
+            ;
+        });
+    }
+    // METODO PARA OBTENER EL ID DEL PROCESO SUPERIOR   **USADO
+    ObtenerIdByNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;
             const unIdProceso = yield database_1.default.query(`
@@ -109,6 +153,7 @@ class ProcesoControlador {
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
+    // METODO PARA ACTUALIZAR UN PROCESO    **USADO
     ActualizarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -163,8 +208,8 @@ class ProcesoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
-            SELECT * FROM map_cat_procesos WHERE id = $1
-           `, [proc_padre]);
+                SELECT * FROM map_cat_procesos WHERE id = $1
+              `, [proc_padre]);
                             const [procesos] = response.rows;
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
@@ -200,61 +245,6 @@ class ProcesoControlador {
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: error });
             }
-        });
-    }
-    // METODO PARA ELIMINA PROCESOS   **USADO
-    EliminarProceso(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = req.params.id;
-                const { user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const proceso = yield database_1.default.query(`
-        SELECT * FROM map_cat_procesos WHERE id = $1
-        `, [id]);
-                const [datosOriginales] = proceso.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_cat_procesos',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-        DELETE FROM map_cat_procesos WHERE id = $1
-        `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_cat_procesos',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.jsonp({ message: 'error' });
-            }
-            ;
         });
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
@@ -354,15 +344,15 @@ class ProcesoControlador {
                     listaProcesos.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrado') {
                             const VERIFICAR_PROCESO = yield database_1.default.query(`
-                    SELECT * FROM map_cat_procesos 
-                    WHERE UPPER(nombre) = UPPER($1)
-                    `, [item.proceso]);
+                SELECT * FROM map_cat_procesos 
+                WHERE UPPER(nombre) = UPPER($1)
+              `, [item.proceso]);
                             if (VERIFICAR_PROCESO.rowCount === 0) {
                                 if (item.proceso.toUpperCase() !== item.proceso_padre.toUpperCase()) {
                                     const VERIFICAR_PROCESO_PADRE = yield database_1.default.query(`
-                        SELECT * FROM map_cat_procesos 
-                        WHERE UPPER(nombre) = UPPER($1)
-                        `, [item.proceso_padre]);
+                    SELECT * FROM map_cat_procesos 
+                    WHERE UPPER(nombre) = UPPER($1)
+                  `, [item.proceso_padre]);
                                     var existe_proceso_padre = false;
                                     if (VERIFICAR_PROCESO_PADRE.rowCount != null && VERIFICAR_PROCESO_PADRE.rowCount > 0) {
                                         existe_proceso_padre = true;
@@ -526,7 +516,7 @@ class ProcesoControlador {
                     else {
                         const respo = yield database_1.default.query(`
               INSERT INTO map_cat_procesos (nombre, proceso_padre) VALUES ($1, $2) RETURNING *
-              `, [proceso_padre, null]);
+            `, [proceso_padre, null]);
                         const [proce] = respo.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -541,7 +531,7 @@ class ProcesoControlador {
                         });
                         const response = yield database_1.default.query(`
               UPDATE map_cat_procesos SET proceso_padre = $1 WHERE UPPER(nombre) = UPPER($2)
-              `, [respo.rows[0].id, proceso]);
+            `, [respo.rows[0].id, proceso]);
                         const [procesos] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -576,7 +566,7 @@ class ProcesoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
-    // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+    // METODO DE REGISTRO DE EMPLEADO - PROCESOS    **USADO
     RegistrarProcesos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_proceso, listaUsuarios, user_name, ip, ip_local } = req.body;
@@ -588,7 +578,7 @@ class ProcesoControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
-           `, [id_proceso, id]);
+          `, [id_proceso, id]);
                     const [procesos] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -607,8 +597,8 @@ class ProcesoControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
-           `, [id]);
+              SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+            `, [id]);
                         const [proceso_activo] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -686,7 +676,6 @@ class ProcesoControlador {
                         }
                     }
                     else {
-                        console.log('proceso: ', procesos.estado);
                         if (procesos.estado == false) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
@@ -711,8 +700,8 @@ class ProcesoControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const proceso_update = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
-              `, [procesos.id]);
+                  UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+                `, [procesos.id]);
                                 const [proceso_UPD] = proceso_update.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -730,8 +719,8 @@ class ProcesoControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const proceso_update1 = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
-              `, [proceso_activo1.id]);
+                  UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                `, [proceso_activo1.id]);
                                 const [proceso_UPD1] = proceso_update.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -751,8 +740,8 @@ class ProcesoControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const proceso_update = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
-              `, [procesos.id]);
+                  UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+                `, [procesos.id]);
                                 const [proceso_UPD] = proceso_update.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -780,6 +769,38 @@ class ProcesoControlador {
                 if (error) {
                     return res.status(500).jsonp({ message: 'error' });
                 }
+            }
+        });
+    }
+    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+    EditarRegistroProcesoEmple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
+                if (estado == true) {
+                    // CONSULTAR DATOSORIGINALES
+                    const proceso = yield database_1.default.query(`
+            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true
+          `, [id_empleado]);
+                    const [proceso_] = proceso.rows;
+                    if (proceso_ != undefined || proceso_ != null) {
+                        yield database_1.default.query(`
+              UPDATE map_empleado_procesos SET estado = $1 WHERE id = $2
+            `, [false, proceso_.id]);
+                    }
+                    yield database_1.default.query(`
+            UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
+          `, [id_accion, estado, id]);
+                }
+                else {
+                    yield database_1.default.query(`
+            UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
+          `, [id_accion, estado, id]);
+                }
+                return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -905,7 +926,6 @@ class ProcesoControlador {
                    SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2 and estado = true
                   `, [id_proceso, id_empleado]);
                                     const [procesos_emple] = response.rows;
-                                    console.log('procesos_emple: ', procesos_emple);
                                     if (procesos_emple != undefined && procesos_emple != '' && procesos_emple != null) {
                                         item.observacion = 'Ya existe un registro activo con este Proceso.';
                                     }
@@ -973,26 +993,24 @@ class ProcesoControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA
+    // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA     **USADO
     RegistrarEmpleadoProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
             let error = false;
-            console.log('id_empleado: ', plantilla);
             try {
                 for (const item of plantilla) {
                     const { identificacion, proceso } = item;
                     yield database_1.default.query('BEGIN');
                     const VERIFICAR_IDPROCESO = yield database_1.default.query(`
-          SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
+            SELECT id FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1)
           `, [proceso]);
-                    console.log('VERIFICAR_IDPROCESO.rows[0].id: ', VERIFICAR_IDPROCESO.rows[0].id);
                     const id_proceso = VERIFICAR_IDPROCESO.rows[0].id;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     yield database_1.default.query('BEGIN');
                     const VERIFICAR_IDEMPLEADO = yield database_1.default.query(`
-          SELECT id FROM eu_empleados WHERE identificacion = $1
+            SELECT id FROM eu_empleados WHERE identificacion = $1
           `, [identificacion.trim()]);
                     const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
                     // FINALIZAR TRANSACCION
@@ -1001,7 +1019,7 @@ class ProcesoControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1 and id_empleado = $2
-           `, [id_proceso, id_empleado]);
+          `, [id_proceso, id_empleado]);
                     const [procesos] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1020,8 +1038,8 @@ class ProcesoControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
-           `, [id_empleado]);
+              SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 and estado = true
+            `, [id_empleado]);
                         const [proceso_activo] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1040,7 +1058,7 @@ class ProcesoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const responsee = yield database_1.default.query(`
-              INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `, [id_proceso, id_empleado, true]);
                             const [proceso_insert] = responsee.rows;
                             // AUDITORIA
@@ -1061,7 +1079,7 @@ class ProcesoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const proceso_update = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = false WHERE id = $1
               `, [proceso_activo.id]);
                             const [proceso_UPD] = proceso_update.rows;
                             // AUDITORIA
@@ -1080,7 +1098,7 @@ class ProcesoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
-               INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_procesos (id_proceso, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `, [id_proceso, id_empleado, true]);
                             const [nuevo_proceso] = response.rows;
                             // AUDITORIA
@@ -1099,7 +1117,6 @@ class ProcesoControlador {
                         }
                     }
                     else {
-                        console.log('proceso: ', procesos.estado);
                         if (procesos.estado == false) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
@@ -1123,7 +1140,7 @@ class ProcesoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const proceso_update = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = true WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = true WHERE id = $1
               `, [procesos.id]);
                             const [proceso_UPD] = proceso_update.rows;
                             // AUDITORIA
@@ -1142,7 +1159,7 @@ class ProcesoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const proceso_update1 = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = false WHERE id = $1
               `, [proceso_activo1.id]);
                             const [proceso_UPD1] = proceso_update.rows;
                             // AUDITORIA
@@ -1173,39 +1190,7 @@ class ProcesoControlador {
             }
         });
     }
-    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
-    EditarRegistroProcesoEmple(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
-                if (estado == true) {
-                    // CONSULTAR DATOSORIGINALES
-                    const proceso = yield database_1.default.query(`
-        SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true
-        `, [id_empleado]);
-                    const [proceso_] = proceso.rows;
-                    if (proceso_ != undefined || proceso_ != null) {
-                        yield database_1.default.query(`
-            UPDATE map_empleado_procesos SET estado = $1 WHERE id = $2
-            `, [false, proceso_.id]);
-                    }
-                    yield database_1.default.query(`
-          UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
-          `, [id_accion, estado, id]);
-                }
-                else {
-                    yield database_1.default.query(`
-          UPDATE map_empleado_procesos SET id_proceso = $1, estado = $2 WHERE id = $3
-          `, [id_accion, estado, id]);
-                }
-                return res.jsonp({ message: 'El proceso actualizado exitosamente' });
-            }
-            catch (error) {
-                return res.status(500).jsonp({ message: error });
-            }
-        });
-    }
-    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    // METODO PARA ELIMINAR PROCESOS DE MANERA MULTIPLE   **USADO
     EliminarProcesoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar, user_name, ip, ip_local } = req.body;
@@ -1218,8 +1203,8 @@ class ProcesoControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const resultado = yield database_1.default.query(`
-             SELECT * FROM map_cat_procesos WHERE id = $1
-           `, [item.id]);
+            SELECT * FROM map_cat_procesos WHERE id = $1
+          `, [item.id]);
                     const [existe_proceso] = resultado.rows;
                     if (!existe_proceso) {
                         // AUDITORIA
@@ -1240,8 +1225,8 @@ class ProcesoControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const resultado = yield database_1.default.query(`
-             SELECT * FROM map_empleado_procesos WHERE id_proceso = $1
-           `, [item.id]);
+              SELECT * FROM map_empleado_procesos WHERE id_proceso = $1
+            `, [item.id]);
                         const [existe_proceso_emple] = resultado.rows;
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
@@ -1250,7 +1235,7 @@ class ProcesoControlador {
                             yield database_1.default.query('BEGIN');
                             const res = yield database_1.default.query(`
                 DELETE FROM map_cat_procesos WHERE id = $1
-                `, [item.id]);
+              `, [item.id]);
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
                                 tabla: 'map_cat_procesos',
@@ -1276,7 +1261,8 @@ class ProcesoControlador {
                 if (count > 1) {
                     meCount = "registros eliminados";
                 }
-                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.',
+                res.status(200).jsonp({
+                    message: count.toString() + ' ' + meCount + ' con éxito.',
                     ms2: 'Existen datos relacionados con ',
                     codigo: 200,
                     eliminados: count,
@@ -1291,12 +1277,16 @@ class ProcesoControlador {
                 if (error) {
                     if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
                         if (count <= 1) {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_Procesos });
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Procesos
+                            });
                         }
                         else if (count > 1) {
-                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_Procesos });
+                            return res.status(300).jsonp({
+                                message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Procesos
+                            });
                         }
                     }
                     else {
@@ -1304,6 +1294,18 @@ class ProcesoControlador {
                     }
                 }
             }
+        });
+    }
+    getOne(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const unaProvincia = yield database_1.default.query(`
+      SELECT * FROM map_cat_procesos WHERE id = $1
+      `, [id]);
+            if (unaProvincia.rowCount != 0) {
+                return res.jsonp(unaProvincia.rows);
+            }
+            res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });
         });
     }
 }

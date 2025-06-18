@@ -9,7 +9,7 @@ class ProvinciaControlador {
     const { continente } = req.params;
     const CONTINENTE = await pool.query(
       `
-      SELECT * FROM e_cat_paises WHERE continente = $1 ORDER BY nombre ASC
+        SELECT * FROM e_cat_paises WHERE continente = $1 ORDER BY nombre ASC
       `
       , [continente]);
 
@@ -25,7 +25,7 @@ class ProvinciaControlador {
   public async ListarContinentes(req: Request, res: Response) {
     const CONTINENTE = await pool.query(
       `
-      SELECT continente FROM e_cat_paises GROUP BY continente ORDER BY continente ASC
+        SELECT continente FROM e_cat_paises GROUP BY continente ORDER BY continente ASC
       `
     );
     if (CONTINENTE.rowCount != 0) {
@@ -41,7 +41,7 @@ class ProvinciaControlador {
     const { id_pais } = req.params;
     const UNA_PROVINCIA = await pool.query(
       `
-      SELECT * FROM e_provincias WHERE id_pais = $1
+        SELECT * FROM e_provincias WHERE id_pais = $1
       `
       , [id_pais]);
     if (UNA_PROVINCIA.rowCount != 0) {
@@ -56,9 +56,9 @@ class ProvinciaControlador {
   public async ListarProvincia(req: Request, res: Response) {
     const PROVINCIA = await pool.query(
       `
-      SELECT pro.id, pro.nombre, pro.id_pais, pa.nombre AS pais
-      FROM e_provincias pro, e_cat_paises pa
-      WHERE pro.id_pais = pa.id;
+        SELECT pro.id, pro.nombre, pro.id_pais, pa.nombre AS pais
+        FROM e_provincias pro, e_cat_paises pa
+        WHERE pro.id_pais = pa.id;
       `
     );
     if (PROVINCIA.rowCount != 0) {
@@ -102,7 +102,7 @@ class ProvinciaControlador {
 
       await pool.query(
         `
-        DELETE FROM e_provincias WHERE id = $1
+          DELETE FROM e_provincias WHERE id = $1
         `
         , [id]);
 
@@ -140,7 +140,7 @@ class ProvinciaControlador {
 
       const datosNuevos = await pool.query(
         `
-        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2) RETURNING *
+          INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2) RETURNING *
         `
         , [nombre, id_pais]);
 
@@ -172,7 +172,7 @@ class ProvinciaControlador {
     const { id } = req.params;
     const PAIS = await pool.query(
       `
-      SELECT * FROM e_cat_paises WHERE id = $1
+        SELECT * FROM e_cat_paises WHERE id = $1
       `
       , [id]);
     if (PAIS.rowCount != 0) {
@@ -183,11 +183,12 @@ class ProvinciaControlador {
     }
   }
 
+  // METODO PARA BUSCAR DATOS DE UNA PROVINCIA   **USADO 
   public async ObtenerProvincia(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const UNA_PROVINCIA = await pool.query(
       `
-      SELECT * FROM e_provincias WHERE id = $1
+        SELECT * FROM e_provincias WHERE id = $1
       `
       , [id]);
     if (UNA_PROVINCIA.rowCount != 0) {

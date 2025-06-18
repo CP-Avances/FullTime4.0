@@ -290,13 +290,13 @@ export class EditarPlanComidasComponent implements OnInit {
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinForm
     }
-    this.restH.BuscarHorarioFechas(parseInt(this.empleados[0].codigo), datosHorario).subscribe(plan => {
+   /* this.restH.BuscarHorarioFechas(parseInt(this.empleados[0].codigo), datosHorario).subscribe(plan => {
       this.PlanificacionIndividual(form, datosPlanComida);
     }, error => {
       this.toastr.info(this.empleados[0].nombre + ' ' + this.empleados[0].apellido + ' no tiene registro de horario laboral en las fechas indicadas.', '', {
         timeOut: 6000,
       })
-    });
+    });*/
   }
 
   // METODO PARA ACTUALIZAR UN PLANIFICACIÓN, ELIMINAR LA ANTERIOR Y CREAR UNA NUEVA
@@ -433,7 +433,7 @@ export class EditarPlanComidasComponent implements OnInit {
         fechaInicio: form.fechaInicioForm,
         fechaFinal: form.fechaFinForm
       }
-      this.restH.BuscarHorarioFechas(obj.codigo, datosHorario).subscribe(plan => {
+      /*this.restH.BuscarHorarioFechas(obj.codigo, datosHorario).subscribe(plan => {
         contar_horario = contar_horario + 1;
         this.empleados_conHorario = this.empleados_conHorario.concat(obj);
         if (contar_horario === sin_planificacion.length) {
@@ -449,7 +449,7 @@ export class EditarPlanComidasComponent implements OnInit {
           this.IndicarMensajePlanificados(con_planificacion);
           this.IndicarMensajeHorarios(this.empleados_sinHorario, sin_planificacion);
         }
-      });
+      });*/
     })
   }
 

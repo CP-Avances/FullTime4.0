@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_COMIDAS_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const settingsMail_1 = require("../../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 class PlanComidasControlador {
@@ -885,7 +885,7 @@ class PlanComidasControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_usua_solicita, correo, fec_solicitud, id_comida, inicio, final, observacion, extra, solicitado_por, asunto, tipo_solicitud, proceso, estadoc } = req.body;
                 var tipo_servicio = 'Extra';
                 if (extra === false) {
@@ -909,7 +909,7 @@ class PlanComidasControlador {
                 var url = `${process.env.URL_DOMAIN}/listaSolicitaComida`;
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
           <body>
@@ -922,7 +922,7 @@ class PlanComidasControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${EMPLEADO_SOLICITA.rows[0].nombre} ${EMPLEADO_SOLICITA.rows[0].apellido} <br>
               <b>Número de identificación:</b> ${EMPLEADO_SOLICITA.rows[0].identificacion} <br>
@@ -956,17 +956,17 @@ class PlanComidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();
@@ -995,7 +995,7 @@ class PlanComidasControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_usua_solicita, correo, fec_solicitud, id_comida, inicio, final, observacion, extra, solicitado_por, asunto, tipo_solicitud, proceso, estadoc } = req.body;
                 var tipo_servicio = 'Extra';
                 if (extra === false) {
@@ -1018,7 +1018,7 @@ class PlanComidasControlador {
                 console.log(EMPLEADO_SOLICITA.rows);
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
           <body>
@@ -1031,7 +1031,7 @@ class PlanComidasControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${EMPLEADO_SOLICITA.rows[0].nombre} ${EMPLEADO_SOLICITA.rows[0].apellido} <br>
               <b>Número de identificación:</b> ${EMPLEADO_SOLICITA.rows[0].identificacion} <br>
@@ -1064,17 +1064,17 @@ class PlanComidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();
@@ -1106,7 +1106,7 @@ class PlanComidasControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_envia, desde, hasta, inicio, final, correo, id_comida, observacion, extra, nombres, asunto, tipo_solicitud, proceso } = req.body;
                 var tipo_servicio = 'Extra';
                 if (extra === false) {
@@ -1126,7 +1126,7 @@ class PlanComidasControlador {
         `, [id_comida]);
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
           <body>
@@ -1139,7 +1139,7 @@ class PlanComidasControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL COLABORADOR QUE ${tipo_solicitud} PLANIFICACIÓN DE ALIMENTACIÓN</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${Envia.nombre} ${Envia.apellido} <br>
               <b>Número de identificación:</b> ${Envia.identificacion} <br>
@@ -1183,17 +1183,17 @@ class PlanComidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();

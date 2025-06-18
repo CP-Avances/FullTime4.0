@@ -1,7 +1,6 @@
+import NACIONALIDAD_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/nacionalidadControlador';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
-
-import NACIONALIDAD_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/nacionalidadControlador';
 
 class NacionalidadRutas {
     public router: Router = Router();
@@ -11,18 +10,17 @@ class NacionalidadRutas {
     }
 
     configuracion(): void {
-        // METODO PARA LISTAR NACIONALIDADES   **USADO
+        // METODO PARA LISTAR NACIONALIDAD   **USADO
         this.router.get('/', TokenValidation, NACIONALIDAD_CONTROLADOR.ListarNacionalidades);
-    
-          // METODO PARA BUSCAR GENERO   **USADO
-          this.router.get('/buscar/:nacionalidad', TokenValidation, NACIONALIDAD_CONTROLADOR.ObtenerNacionalidad);
-          // METODO PARA CREAR GENERO   **USADO
-          this.router.post('/', TokenValidation, NACIONALIDAD_CONTROLADOR.CrearNacionalidad);
-          // METODO PARA EDITAR GENERO   **USADO
-          this.router.put('/', TokenValidation, NACIONALIDAD_CONTROLADOR.ActualizarNacionalidad);
-          // METODO PARA ELIMINAR REGISTROS   **USADO
-          this.router.delete('/eliminar/:id', TokenValidation, NACIONALIDAD_CONTROLADOR.EliminarNacionalidad);
-        
+        // METODO PARA BUSCAR NACIONALIDAD POR SU NOMBRE   **USADO
+        this.router.get('/buscar/:nacionalidad', TokenValidation, NACIONALIDAD_CONTROLADOR.ObtenerNacionalidad);
+        // METODO PARA REGISTRAR NACIONALIDAD   **USADO
+        this.router.post('/', TokenValidation, NACIONALIDAD_CONTROLADOR.CrearNacionalidad);
+        // METODO PARA ACTUALIZAR REGISTRO DE NACIONALIDAD   **USADO
+        this.router.put('/', TokenValidation, NACIONALIDAD_CONTROLADOR.ActualizarNacionalidad);
+        // METODO PARA ELIMINAR REGISTROS   **USADO
+        this.router.delete('/eliminar/:id', TokenValidation, NACIONALIDAD_CONTROLADOR.EliminarNacionalidad);
+
     }
 }
 

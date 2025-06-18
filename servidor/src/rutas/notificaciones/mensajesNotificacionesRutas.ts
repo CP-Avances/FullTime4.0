@@ -32,15 +32,15 @@ class MensajesNotificacionesRutas {
 
     configuracion(): void {
 
-        // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS    **USADO
+        // METODO PARA CONSULTAR MENSAJES DE NOTIIFCACIONES    **USADO
         this.router.get('/:id_empresa', TokenValidation, MENSAJES_NOTIFICACIONES_CONTROLADOR.MensajeEmpresa);
-        // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS   **USADO
+        // METODO PARA REGISTRAR MENSAJE DE NOTIFICACIONES   **USADO
         this.router.post('/', TokenValidation, MENSAJES_NOTIFICACIONES_CONTROLADOR.CrearMensajeNotificacion);
-        // METODO PARA SUBIR IMAGEN DE CUMPLEAÑOS   **USADO
+        // METODO PARA SUBIR IMAGEN DE NOTIFICACIONES   **USADO
         this.router.put('/:id_empresa/uploadImage', [TokenValidation, upload.single('uploads')], MENSAJES_NOTIFICACIONES_CONTROLADOR.CrearImagenNotificacion);
-        // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS    **USADO FRONT
+        // METODO PARA DESCARGAR IMAGEN DE NOTIFICACIONES    **USADO FRONT
         this.router.get('/img/:imagen', MENSAJES_NOTIFICACIONES_CONTROLADOR.ObtenerImagen);
-        // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS   **USADO
+        // METODO PARA ACTUALIZAR MENSAJE DE NOTIFICACIONES  **USADO
         this.router.put('/editar/:id', TokenValidation, MENSAJES_NOTIFICACIONES_CONTROLADOR.EditarMensajeBirthday);
     }
 }

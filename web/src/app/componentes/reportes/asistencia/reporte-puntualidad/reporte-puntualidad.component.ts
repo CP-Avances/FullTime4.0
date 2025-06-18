@@ -5,9 +5,9 @@ import { PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 
 import { ITableEmpleados, IReportePuntualidad, model_pdf_puntualidad } from 'src/app/model/reportes.model';
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+import { ReportesAsistenciasService } from 'src/app/servicios/reportes/timbres/reportes-asistencias.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { ReportesService } from '../../../../servicios/reportes/reportes.service';
+import { ReportesService } from '../../../../servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
 
@@ -139,22 +139,22 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
-        this.ModelarSucursal(action);
+        //this.ModelarSucursal(action);
         break;
       case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
-        this.ModelarDepartamento(action);
+        //this.ModelarDepartamento(action);
         break;
       case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
-        this.ModelarEmpleados(action);
+        //this.ModelarEmpleados(action);
         break;
       default:
         this.bool.bool_suc = false; this.bool.bool_dep = false; this.bool.bool_emp = false;
         break;
     }
   }
-
+/* VERIFICAR NO EXISTE METODOS
   ModelarSucursal(accion) {
 
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
@@ -248,7 +248,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     })
   }
 
-
+*/
   /***************************
    *
    * COLORES Y LOGO PARA EL REPORTE

@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 
-
 class ParametrosControlador {
 
     // METODO PARA LISTAR PARAMETROS GENERALES  **USADO
@@ -289,19 +288,19 @@ class ParametrosControlador {
                     END AS verificar
                 `
                 , [lat1, lng1, lat2, lng2, valor]);
-
-            console.log("ver datos body de  CompararCoordenadas: ", req.body);
             return res.jsonp(VALIDACION.rows);
         } catch (error) {
-            console.log('error --> ', error)
             return res.status(500)
                 .jsonp({ message: 'error_500' });
         }
     }
 
 
-    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+ /** ********************************************************************************************************************* **
+  ** **                        M E T O D O S    D E    L A    A P L I C A C I O N    M O V I L                          ** **                       
+  ** ********************************************************************************************************************* */
 
+  // METODO PARA BUSCAR FECHAS Y HORAS DE PARAMETROS DEL SISTEMA   **USADO
     public async BuscarFechasHoras(req: Request, res: Response): Promise<Response> {
         try {
             let formato_fecha = await BuscarFecha();

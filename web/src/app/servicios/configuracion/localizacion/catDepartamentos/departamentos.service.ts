@@ -105,10 +105,6 @@ export class DepartamentosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/departamento/cargar_plantilla/`, formData);
   }
 
-  BuscarDepartamentoRegimen(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/buscar/regimen-departamento/${id}`);
-  }
-
   // METODO PARA VALIDAR DATOS DE PLANTILLA DE NIVELES DE DEPARTAMENTO   **USADO
   RevisarFormatoNivelDep(formData: any){
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/departamento/upload/revisionNivel', formData);

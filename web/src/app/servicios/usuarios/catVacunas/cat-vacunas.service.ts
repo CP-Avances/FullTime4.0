@@ -11,13 +11,13 @@ export class CatVacunasService {
     private http: HttpClient,
   ) { }
 
-// METODO PARA LISTAR TIPO DE VACUNA  **USADO
-  ListaVacuna(){
+  // METODO PARA LISTAR TIPO DE VACUNA  **USADO
+  ListaVacuna() {
     return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/vacunasTipos');
   }
 
   // METODO PARA REGISTRAR UN TIPO DE VACUNA  **USADO
-  CrearVacuna(Vacuna: any){
+  CrearVacuna(Vacuna: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos/crearVacuna`, Vacuna).pipe(
       catchError(Vacuna)
     );
@@ -26,7 +26,7 @@ export class CatVacunasService {
   // METODO PARA ACTUALIZAR REGISTRO TIPO VACUNA  **USADO
   ActualizarVacuna(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos`, datos)
-    .pipe(catchError(datos));
+      .pipe(catchError(datos));
   }
 
   // METODO DE ELIMINACION DE REGISTROS  **USADO
@@ -38,8 +38,8 @@ export class CatVacunasService {
     return this.http.request('delete', url, httpOtions);
   }
 
-   // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL   **USADO
-   RevisarFormato(formData: any) {
+  // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL   **USADO
+  RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/vacunasTipos/upload/revision', formData);
   }
 

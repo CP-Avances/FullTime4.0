@@ -9,7 +9,6 @@ export class RolesService {
 
   constructor(private http: HttpClient) { }
 
-
   // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
   BuscarRoles() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol`);
@@ -29,7 +28,6 @@ export class RolesService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 
-
   // METODO PARA LISTAR INFORMACION DEL ROL **USADO
   BuscarUnRol(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/${id}`);
@@ -44,7 +42,6 @@ export class RolesService {
   ActualizarRol(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
-
 
   // METODO PARA ACTUALIZAR ROLES DE FORMA MASIVA     **USADO
   ActualizarRoles(data: any) {

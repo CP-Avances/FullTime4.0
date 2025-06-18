@@ -11,7 +11,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';

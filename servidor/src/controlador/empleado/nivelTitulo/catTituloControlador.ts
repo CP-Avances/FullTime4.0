@@ -1,6 +1,6 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import Excel from 'exceljs';
 import pool from '../../../database';
 import path from 'path';
@@ -251,12 +251,10 @@ class TituloControlador {
           data.nivel = NIVEL;
           data.observacion = 'no registrado';
 
-
-
           if ((data.fila != undefined && data.fila != '') &&
             (data.titulo != undefined && data.titulo != '') &&
             (data.nivel != undefined && data.nivel != '')) {
-            
+
             listTitulosProfesionales.push(data);
 
           } else {
@@ -317,31 +315,26 @@ class TituloControlador {
               `
               , [item.titulo, id_nivel.id]);
 
-              
+
             if (VERIFICAR_Titulos.rowCount == 0) {
 
               if (duplicados.find((p: any) => p.titulo.toLowerCase() === item.titulo.toLowerCase() &&
                 p.nivel.toLowerCase() === item.nivel.toLowerCase()) == undefined) {
                 item.observacion = 'ok';
                 duplicados.push(item);
-              }else{
-                
-                  item.observacion = '1';
-              }
+              } else {
 
+                item.observacion = '1';
+              }
             } else {
-              
               item.observacion = 'Ya existe en el sistema'
-              
             }
 
           } else {
             item.observacion = 'Nivel no existe en el sistema'
           }
         }
-
       })
-
 
       setTimeout(() => {
         listTitulosProfesionales.sort((a: any, b: any) => {
@@ -426,7 +419,6 @@ class TituloControlador {
     if (error) {
       return res.status(500).jsonp({ message: 'error' });
     }
-
     return res.status(200).jsonp({ message: 'ok' });
   }
 

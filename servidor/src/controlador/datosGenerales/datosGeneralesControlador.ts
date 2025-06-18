@@ -139,6 +139,27 @@ class DatosGeneralesControlador {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
     // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO  
     public async ListarDatosActualesEmpleado(req: Request, res: Response) {
         const DATOS = await pool.query(

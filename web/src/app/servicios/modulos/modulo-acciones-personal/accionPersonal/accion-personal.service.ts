@@ -57,7 +57,7 @@ export class AccionPersonalService {
 
   // METODO PARA ELIMINAR DE MANERA MULTIPLE EL REGISTR DE DETALLE DE TIPO ACCION PERSONAL   **USADO
   EliminarDetalleTipoAccionMult(data: any) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/eliminarProcesoMult', data);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/eliminarMultiple', data);
   }
 
   // METODO DE ACTUALIZACION DEL DETALLE DE LA ACCION DE PERSONAL    **USADO
@@ -75,6 +75,10 @@ export class AccionPersonalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/editar/accion/tipo/${id}`);
   }
 
+  // METODO PARA VER IMAGEN DEL MINISTERIO DE TRABAJO     **USADO
+  LogoImagenBase64() {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/logo/ministerio/codificado`);
+  }
 
 
 
@@ -84,8 +88,6 @@ export class AccionPersonalService {
 
 
 
-
-  
 
 
   Buscarprocesos(id: any) {
@@ -94,10 +96,6 @@ export class AccionPersonalService {
 
   ActualizarPedidoAccion(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion/editar`, datos);
-  }
-
-  LogoImagenBase64() {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/logo/ministerio/codificado`);
   }
 
   BuscarDatosPedido() {
@@ -116,9 +114,4 @@ export class AccionPersonalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/informacion/${id}`);
   }
 
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/xmlDownload`, data);
-  }
 }

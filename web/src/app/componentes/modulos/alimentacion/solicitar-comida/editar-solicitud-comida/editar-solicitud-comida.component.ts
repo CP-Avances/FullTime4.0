@@ -283,6 +283,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
       fechaInicio: form.fechaPlanificacionForm,
       fechaFinal: form.fechaPlanificacionForm
     }
+    /*
     this.restH.BuscarHorarioFechas(this.empleados[0].codigo, datosHorario).subscribe(plan => {
       this.ActualizarSolicitud(form);
     }, error => {
@@ -290,6 +291,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
         timeOut: 6000,
       })
     });
+    */
   }
 
   // METODO PARA ACTUALIZAR LA SOLICITUD SELECCIONADA

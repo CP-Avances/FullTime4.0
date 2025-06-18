@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
 import * as FileSaver from 'file-saver';
-import { FillPatterns } from 'exceljs';
 import ExcelJS from "exceljs";
 
 import { EmpresaService } from '../configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -546,8 +545,8 @@ export class ExcelService {
       fgColor: { argb: "FFFFFF" }, // BLANCO (puedes cambiarlo por otro color)
     };
 
-    const totalFilas = 110; // Empieza en la fila 6 (donde comienza la tabla)
-    const totalColumnas = 16; // Número de columnas en la tabla
+    const totalFilas = 110; // EMPIEZA EN LA FILA 6 (DONDE COMIENZA LA TABLA)
+    const totalColumnas = 16; // NUMERO DE COLUMNAS EN LA TABLA
 
     for (let i = 0; i <= totalFilas; i++) {
       for (let j = 1; j <= totalColumnas; j++) {
@@ -562,7 +561,7 @@ export class ExcelService {
           (i == 18 && j == 12) || (i == 13 && j == 15) || (i == 14 && j == 15) || (i == 20 && (j == 10 || j == 12))
           || (i == 93 && j == 6)
         ) {
-          cell.border = borderStyle; // Aplicar bordes negros
+          cell.border = borderStyle; // APLICAR BORDES NEGROS
         } else if ((i >= 12 && i <= 21 && j == 16) || (i >= 26 && i <= 44) || (i >= 46 && i <= 54 && j == 16) ||
           (i >= 56 && i <= 62 && j == 8) || (i >= 56 && i <= 61 && j == 16) || (i == 62)
         ) {
@@ -656,7 +655,7 @@ export class ExcelService {
           (i == 36) || (i == 38) || (i == 40) || (i == 42) || (i == 45) || (i == 55) ||
           (i == 65) || (i == 67) || (i == 80) || (i == 91)
         ) {
-          cell.fill = backgroundColorStyle; // Aplicar color de fondo
+          cell.fill = backgroundColorStyle; // APLICAR COLOR DE FONDO
         }
 
         if ((i >= 13 && i <= 19) || (i >= 46 && i <= 54) ||
@@ -782,16 +781,6 @@ export class ExcelService {
       console.error("Error al generar el archivo Excel:", error);
     }
 
-  }
-
-  private obtenerAlineacionHorizontalEmpleados(
-    j: number
-  ): "left" | "center" | "right" {
-    if (j === 1 || j === 9 || j === 10 || j === 11) {
-      return "center";
-    } else {
-      return "left";
-    }
   }
 
 }

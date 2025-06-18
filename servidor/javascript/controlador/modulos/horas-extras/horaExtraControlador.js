@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraPedidasControlador = void 0;
-const luxon_1 = require("luxon");
 const settingsMail_1 = require("../../../libs/settingsMail");
+const luxon_1 = require("luxon");
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
@@ -884,7 +884,7 @@ class HorasExtrasPedidasControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_contrato, solicitud, desde, hasta, num_horas, observacion, estado_h, correo, solicitado_por, h_inicio, h_final, id, asunto, proceso, tipo_solicitud } = req.body;
                 const correoInfoPideHoraExtra = yield database_1.default.query(`
         SELECT e.correo, e.nombre, e.apellido, e.identificacion, 
@@ -901,7 +901,7 @@ class HorasExtrasPedidasControlador {
                 var url = `${process.env.URL_DOMAIN}/ver-hora-extra`;
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
           <body>
@@ -914,7 +914,7 @@ class HorasExtrasPedidasControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
               <b>Número de identificación:</b> ${correoInfoPideHoraExtra.rows[0].identificacion} <br>
@@ -947,17 +947,17 @@ class HorasExtrasPedidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();
@@ -986,7 +986,7 @@ class HorasExtrasPedidasControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_contrato, solicitud, desde, hasta, num_horas, observacion, estado_h, correo, solicitado_por, h_inicio, h_final, asunto, proceso, tipo_solicitud } = req.body;
                 const correoInfoPideHoraExtra = yield database_1.default.query(`
         SELECT e.correo, e.nombre, e.apellido, e.identificacion, 
@@ -1002,7 +1002,7 @@ class HorasExtrasPedidasControlador {
                 console.log(correoInfoPideHoraExtra.rows);
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
           <body>
@@ -1015,7 +1015,7 @@ class HorasExtrasPedidasControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
               <b>Número de identificación:</b> ${correoInfoPideHoraExtra.rows[0].identificacion} <br>
@@ -1046,17 +1046,17 @@ class HorasExtrasPedidasControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();

@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
+
 export class UsuarioService {
 
   constructor(
@@ -24,10 +25,6 @@ export class UsuarioService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/datos/${id}`);
   }
 
-  ObtenerDepartamentoUsuarios(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/dato/${id}`);
-  }
-
   // METODO PARA OBTENER IDS USUARIOS MEDIANTE DEPARTAMENTO VIGENTE **USADO
   ObtenerIdUsuariosDepartamento(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-ids-usuarios-departamento`, data);
@@ -44,12 +41,7 @@ export class UsuarioService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios`, data);
   }
 
-  // ADMINISTRACION MODULO DE ALIMENTACION
-  RegistrarAdminComida(data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/admin/comida`, data);
-  }
-
-  // METODO PARA REGISTRAR FRASE DE SEGURIDAD
+  // METODO PARA REGISTRAR FRASE DE SEGURIDAD   **USADO
   ActualizarFrase(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase`, data);
   }
@@ -58,7 +50,6 @@ export class UsuarioService {
   ActualizarEstadoTimbreWeb(data: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web/`, data);
   }
-
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL    **USADO
   ActualizarEstadoTimbreMovil(data: any) {
@@ -79,12 +70,12 @@ export class UsuarioService {
     return this.http.request('delete', url, httpOptions);
   }
 
-  // METODO PARA ENVIAR CORREO CAMBIAR FRASE SEGURIDAD
+  // METODO PARA ENVIAR CORREO CAMBIAR FRASE SEGURIDAD   **USADO
   RecuperarFraseSeguridad(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase/olvido-frase`, data)
   }
 
-  // METODO PARA CAMBIAR LA FRASE DE SEGURIDAD
+  // METODO PARA CAMBIAR LA FRASE DE SEGURIDAD    **USADO
   CambiarFrase(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase/restaurar-frase/nueva`, data)
   }
@@ -109,8 +100,6 @@ export class UsuarioService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-general/${estado}/activo/${habilitado}`);
   }
 
-
-  
 
   /** *********************************************************************************************** **
    ** **                     SERVICIOS DE USUARIO - SUCURSAL - DEPARTAMENTO                        ** **
@@ -154,12 +143,29 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-departamento/multiple`, data);
   }
 
-  //OBTENER TEXTO ENCRIPTADO
-  getTextoEncriptado(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/datos-usuario`, data)
-      .pipe(
-        catchError(data)
-      );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  ObtenerDepartamentoUsuarios(id: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/dato/${id}`);
   }
 
+  // ADMINISTRACION MODULO DE ALIMENTACION
+  RegistrarAdminComida(data: any) {
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/admin/comida`, data);
+  }
 }

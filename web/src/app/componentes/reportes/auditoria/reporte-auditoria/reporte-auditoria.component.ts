@@ -9,7 +9,7 @@ import { DateTime } from 'luxon';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { AuditoriaService } from 'src/app/servicios/reportes/auditoria/auditoria.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { ThemePalette } from '@angular/material/core';

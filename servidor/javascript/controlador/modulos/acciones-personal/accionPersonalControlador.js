@@ -88,6 +88,62 @@ class AccionPersonalControlador {
             }
         });
     }
+    // METODO DE ACTUALIZACION DEL DETALLE DE LA ACCION DE PERSONAL    **USADO
+    ActualizarTipoAccionPersonal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_tipo, descripcion, base_legal, id, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
+                const response = yield database_1.default.query(`
+                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
+                const [datos] = response.rows;
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_detalle_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al actualizar el registro con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+                    UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
+                    WHERE id = $4
+                `, [id_tipo, descripcion, base_legal, id]);
+                // INSERTAR REGISTRO DE AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'map_detalle_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `
+                    {
+                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}"
+                    }
+                    `,
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
     // METODO PARA ELIMINAR REGISTROS DE DETALLES DE TIPO DE ACCION DE PERSONAL  *USADO
     EliminarTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -140,9 +196,319 @@ class AccionPersonalControlador {
             }
         });
     }
+    // METODO PARA ELIMINAR LOS TIPOS DE ACCION PERSONAL DE MANERA MULTIPLE   **USADO
+    EliminarTipoAccionMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            var count = 0;
+            var count_no = 0;
+            var list_tipoAccionPersonal = [];
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const resultado = yield database_1.default.query(`
+                        SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
+                    `, [item.id]);
+                    const [existe_datos] = resultado.rows;
+                    if (!existe_datos) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_detalle_tipo_accion_personal',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
+                        });
+                    }
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (existe_datos) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const resultado = yield database_1.default.query(`
+                            SELECT id FROM map_documento_accion_personal WHERE id_detalle_tipo_accion = $1
+                        `, [item.id]);
+                        const [existe_detalle] = resultado.rows;
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        if (!existe_detalle) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const res = yield database_1.default.query(`
+                                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                            `, [item.id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_detalle_tipo_accion_personal',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(existe_datos),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            count += 1;
+                        }
+                        else {
+                            list_tipoAccionPersonal.push(item.nombre);
+                            count_no += 1;
+                        }
+                    }
+                }
+                var meCount = "registro eliminado";
+                if (count > 1) {
+                    meCount = "registros eliminados";
+                }
+                return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
+                        if (count <= 1) {
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                            });
+                        }
+                        else if (count > 1) {
+                            return res.status(300).jsonp({
+                                message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                            });
+                        }
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+                    }
+                }
+            }
+        });
+    }
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
+    RevisarDatos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+                let separador = path_1.default.sep;
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+                const workbook = new exceljs_1.default.Workbook();
+                yield workbook.xlsx.readFile(ruta);
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
+                if (verificador === false) {
+                    return res.jsonp({ message: 'no_existe', data: undefined });
+                }
+                else {
+                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                    const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+                    let data = {
+                        fila: '',
+                        tipo_accion_personal: '',
+                        descripcion: '',
+                        base_legal: '',
+                        observacion: ''
+                    };
+                    var listaAccionPersonal = [];
+                    var mensaje = 'correcto';
+                    if (plantilla) {
+                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                        const headerRow = plantilla.getRow(1);
+                        const headers = {};
+                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                        headerRow.eachCell((cell, colNumber) => {
+                            headers[cell.value.toString().toUpperCase()] = colNumber;
+                        });
+                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                        if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']) {
+                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                        }
+                        // LECTURA DE LOS DATOS DE LA PLANTILLA
+                        plantilla.eachRow((row, rowNumber) => {
+                            var _a, _b, _c;
+                            // SALTAR LA FILA DE LAS CABECERAS
+                            if (rowNumber === 1)
+                                return;
+                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                            const ITEM = row.getCell(headers['ITEM']).value;
+                            const TIPO_ACCION_PERSONAL = (_a = row.getCell(headers['TIPO_ACCION_PERSONAL']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
+                            const DESCRIPCION = (_b = row.getCell(headers['DESCRIPCION']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
+                            const BASE_LEGAL = (_c = row.getCell(headers['BASE_LEGAL']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
+                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                            if ((ITEM != undefined && ITEM != '') &&
+                                (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
+                                (DESCRIPCION != undefined && DESCRIPCION != '') &&
+                                (BASE_LEGAL != undefined && BASE_LEGAL != '')) {
+                                data.fila = ITEM;
+                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                                data.descripcion = DESCRIPCION;
+                                data.base_legal = BASE_LEGAL;
+                                data.observacion = 'no registrado';
+                                listaAccionPersonal.push(data);
+                            }
+                            else {
+                                data.fila = ITEM;
+                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                                data.descripcion = DESCRIPCION;
+                                data.base_legal = BASE_LEGAL;
+                                data.observacion = 'no registrado';
+                                if (data.fila == '' || data.fila == undefined) {
+                                    data.fila = 'error';
+                                    mensaje = 'error';
+                                }
+                                if (TIPO_ACCION_PERSONAL == undefined) {
+                                    data.tipo_accion_personal = 'No registrado';
+                                    data.observacion = 'Tipo de acción de personal ' + data.observacion;
+                                }
+                                if (DESCRIPCION == undefined) {
+                                    data.descripcion = 'No registrado';
+                                    data.observacion = 'Descripción ' + data.observacion;
+                                }
+                                if (BASE_LEGAL == undefined) {
+                                    data.base_legal = '-';
+                                }
+                                listaAccionPersonal.push(data);
+                            }
+                            data = {};
+                        });
+                    }
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
+                    // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+                    listaAccionPersonal.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == 'no registrado') {
+                            const VERIFICAR_TIPO_ACCION = yield database_1.default.query(`
+                                SELECT * FROM map_tipo_accion_personal 
+                                WHERE UPPER(descripcion) = UPPER($1)
+                            `, [item.tipo_accion_personal]);
+                            if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
+                                item.observacion = 'No existe el tipo de acción de personal en el sistema';
+                            }
+                        }
+                    }));
+                    setTimeout(() => {
+                        listaAccionPersonal.sort((a, b) => {
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
+                            if (a.fila < b.fila) {
+                                return -1;
+                            }
+                            if (a.fila > b.fila) {
+                                return 1;
+                            }
+                            return 0; // SON IGUALES
+                        });
+                        var filaDuplicada = 0;
+                        listaAccionPersonal.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado';
+                            }
+                            else if (item.observacion == 'no registrado') {
+                                item.observacion = 'ok';
+                            }
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                                if (item.fila == filaDuplicada) {
+                                    mensaje = 'error';
+                                }
+                            }
+                            else {
+                                return mensaje = 'error';
+                            }
+                            filaDuplicada = item.fila;
+                        }));
+                        if (mensaje == 'error') {
+                            listaAccionPersonal = undefined;
+                        }
+                        return res.jsonp({ message: mensaje, data: listaAccionPersonal });
+                    }, 1000);
+                }
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+            }
+        });
+    }
+    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
+    CargarPlantilla(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip, ip_local } = req.body;
+            let error = false;
+            for (const item of plantilla) {
+                const { tipo_accion_personal, descripcion, base_legal } = item;
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+                        SELECT * FROM map_tipo_accion_personal 
+                         WHERE UPPER(descripcion) = UPPER($1)
+                    `, [tipo_accion_personal]);
+                    const [tipo_acciones] = response.rows;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response_accion = yield database_1.default.query(`
+                        INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
+                    `, [response.rows[0].id, descripcion, base_legal]);
+                    const [detalleAccion] = response_accion.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_detalle_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(detalleAccion),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'map_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(tipo_acciones),
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
+        });
+    }
     /**  *************************************************************************************** **
      **  **                      TABLA DE TIPOS DE ACCION DE PERSONAL                         ** **
-     ** **************************************************************************************** **/
+     **  *************************************************************************************** **/
     // METODO PARA CONSULTAR TIPOS DE ACCION PERSONAL   **USADO
     ListarTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -195,6 +561,24 @@ class AccionPersonalControlador {
             }
         });
     }
+    // METODO PARA BUSCAR UN DETALLE DE TIPO DE ACCION DE PERSONAL POR ID    **USADO
+    EncontrarTipoAccionPersonalId(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const ACCION = yield database_1.default.query(`
+                SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
+                FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
+                WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
+            `, [id]);
+            if (ACCION.rowCount != 0) {
+                return res.jsonp(ACCION.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR DATOS DEL DETALLE DE ACCION DE PERSONAL PARA EDICION   **USADO
     ListarTipoAccionEdicion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -209,83 +593,29 @@ class AccionPersonalControlador {
             }
         });
     }
-    EncontrarTipoAccionPersonalId(req, res) {
+    // VER LOGO DE MINISTERIO TRABAJO     **USADO
+    verLogoMinisterio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const ACCION = yield database_1.default.query(`
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
-            FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
-            WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
-            `, [id]);
-            if (ACCION.rowCount != 0) {
-                return res.jsonp(ACCION.rows);
+            const file_name = 'ministerio_trabajo.png';
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_2.ObtenerRutaLogos)() + separador + file_name;
+            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+            if (codificado === 0) {
+                res.send({ imagen: 0 });
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                res.send({ imagen: codificado });
             }
         });
     }
-    ActualizarTipoAccionPersonal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_tipo, descripcion, base_legal, id, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
-                const response = yield database_1.default.query(`
-                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-                `, [id]);
-                const [datos] = response.rows;
-                if (!datos) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_detalle_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al actualizar el registro con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'error' });
-                }
-                yield database_1.default.query(`
-                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
-                     WHERE id = $4
-                `, [id_tipo, descripcion, base_legal, id]);
-                // INSERTAR REGISTRO DE AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_detalle_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datos),
-                    datosNuevos: `
-                    {
-                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}"
-                    }
-                    `,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro actualizado.' });
-            }
-            catch (error) {
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
+    /**  *************************************************************************************** **
+     **  **                      TABLA DE DOCUMENTOS DE ACCION DE PERSONAL                    ** **
+     **  *************************************************************************************** **/
     // TABLA SOLICITUD ACCION PERSONAL
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local } = req.body;
-                console.log('req.body: ', req.body);
                 let datosNuevos = req.body;
                 const fechaActual = new Date();
                 let id_empleado_comunicacion = null;
@@ -335,8 +665,6 @@ class AccionPersonalControlador {
                 ]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
-                console.log('response_accion: ', response_accion.rows[0]);
-                const [registroPedido] = response_accion.rows;
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_documento_accion_personal',
@@ -461,125 +789,6 @@ class AccionPersonalControlador {
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    EliminarTipoAccionMultipleMult(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { listaEliminar, user_name, ip, ip_local } = req.body;
-            let error = false;
-            var count = 0;
-            var count_no = 0;
-            var list_tipoAccionPersonal = [];
-            try {
-                for (const item of listaEliminar) {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    const resultado = yield database_1.default.query(`
-                        SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
-                    `, [item.id]);
-                    const [existe_datos] = resultado.rows;
-                    if (!existe_datos) {
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'map_detalle_tipo_accion_personal',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: '',
-                            datosNuevos: '',
-                            ip: ip,
-                            ip_local: ip_local,
-                            observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
-                        });
-                    }
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    if (existe_datos) {
-                        // INICIAR TRANSACCION
-                        yield database_1.default.query('BEGIN');
-                        const resultado = yield database_1.default.query(`
-                        SELECT id FROM map_documento_accion_personal WHERE id_detalle_tipo_accion = $1
-           `, [item.id]);
-                        const [existe_detalle] = resultado.rows;
-                        console.log('existe_detalle: ', existe_detalle);
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        if (!existe_detalle) {
-                            console.log('existe_detalle entro: ', existe_detalle);
-                            console.log('item 11: ', item.id);
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            const res = yield database_1.default.query(`
-                                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-                            `, [item.id]);
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_detalle_tipo_accion_personal',
-                                usuario: user_name,
-                                accion: 'D',
-                                datosOriginales: '',
-                                datosNuevos: JSON.stringify(existe_datos),
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                            console.log('res: ', res);
-                            count += 1;
-                        }
-                        else {
-                            console.log('existe_detalle afuera: ', existe_detalle);
-                            console.log('item: ', item);
-                            list_tipoAccionPersonal.push(item.nombre);
-                            count_no += 1;
-                        }
-                    }
-                }
-                var meCount = "registro eliminado";
-                if (count > 1) {
-                    meCount = "registros eliminados";
-                }
-                return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
-            }
-            catch (err) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                error = true;
-                if (error) {
-                    if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
-                        if (count <= 1) {
-                            return res.status(300).jsonp({
-                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
-                            });
-                        }
-                        else if (count > 1) {
-                            return res.status(300).jsonp({
-                                message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
-                            });
-                        }
-                    }
-                    else {
-                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
-                    }
-                }
-            }
-        });
-    }
-    verLogoMinisterio(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const file_name = 'ministerio_trabajo.png';
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_2.ObtenerRutaLogos)() + separador + file_name;
-            //console.log( 'solo ruta ', ruta)
-            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
-            if (codificado === 0) {
-                res.send({ imagen: 0 });
-            }
-            else {
-                res.send({ imagen: codificado });
             }
         });
     }
@@ -772,344 +981,6 @@ class AccionPersonalControlador {
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros' });
-            }
-        });
-    }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
-    RevisarDatos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a;
-            try {
-                const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-                let separador = path_1.default.sep;
-                let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-                const workbook = new exceljs_1.default.Workbook();
-                yield workbook.xlsx.readFile(ruta);
-                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
-                if (verificador === false) {
-                    return res.jsonp({ message: 'no_existe', data: undefined });
-                }
-                else {
-                    const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
-                    const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
-                    let data = {
-                        fila: '',
-                        tipo_accion_personal: '',
-                        descripcion: '',
-                        base_legal: '',
-                        observacion: ''
-                    };
-                    var listaAccionPersonal = [];
-                    var duplicados = [];
-                    var mensaje = 'correcto';
-                    if (plantilla) {
-                        // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
-                        const headerRow = plantilla.getRow(1);
-                        const headers = {};
-                        // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
-                        headerRow.eachCell((cell, colNumber) => {
-                            headers[cell.value.toString().toUpperCase()] = colNumber;
-                        });
-                        // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                        if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']) {
-                            return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
-                        }
-                        // LECTURA DE LOS DATOS DE LA PLANTILLA
-                        plantilla.eachRow((row, rowNumber) => {
-                            var _a, _b, _c;
-                            // SALTAR LA FILA DE LAS CABECERAS
-                            if (rowNumber === 1)
-                                return;
-                            // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
-                            const ITEM = row.getCell(headers['ITEM']).value;
-                            const TIPO_ACCION_PERSONAL = (_a = row.getCell(headers['TIPO_ACCION_PERSONAL']).value) === null || _a === void 0 ? void 0 : _a.toString().trim();
-                            const DESCRIPCION = (_b = row.getCell(headers['DESCRIPCION']).value) === null || _b === void 0 ? void 0 : _b.toString().trim();
-                            const BASE_LEGAL = (_c = row.getCell(headers['BASE_LEGAL']).value) === null || _c === void 0 ? void 0 : _c.toString().trim();
-                            // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                            if ((ITEM != undefined && ITEM != '') &&
-                                (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
-                                (DESCRIPCION != undefined && DESCRIPCION != '') &&
-                                (BASE_LEGAL != undefined && BASE_LEGAL != '')) {
-                                data.fila = ITEM;
-                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
-                                data.descripcion = DESCRIPCION;
-                                data.base_legal = BASE_LEGAL;
-                                data.observacion = 'no registrado';
-                                listaAccionPersonal.push(data);
-                            }
-                            else {
-                                data.fila = ITEM;
-                                data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
-                                data.descripcion = DESCRIPCION;
-                                data.base_legal = BASE_LEGAL;
-                                data.observacion = 'no registrado';
-                                if (data.fila == '' || data.fila == undefined) {
-                                    data.fila = 'error';
-                                    mensaje = 'error';
-                                }
-                                if (TIPO_ACCION_PERSONAL == undefined) {
-                                    data.tipo_accion_personal = 'No registrado';
-                                    data.observacion = 'Tipo de acción de personal ' + data.observacion;
-                                }
-                                if (DESCRIPCION == undefined) {
-                                    data.descripcion = 'No registrado';
-                                    data.observacion = 'Descripción ' + data.observacion;
-                                }
-                                if (BASE_LEGAL == undefined) {
-                                    data.base_legal = '-';
-                                }
-                                listaAccionPersonal.push(data);
-                            }
-                            data = {};
-                        });
-                    }
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                        if (err) {
-                        }
-                        else {
-                            // ELIMINAR DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
-                        }
-                    });
-                    // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-                    listaAccionPersonal.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
-                        if (item.observacion == 'no registrado') {
-                            const VERIFICAR_TIPO_ACCION = yield database_1.default.query(`
-                    SELECT * FROM map_tipo_accion_personal 
-                    WHERE UPPER(descripcion) = UPPER($1)
-                    `, [item.tipo_accion_personal]);
-                            if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
-                                item.observacion = 'No existe el tipo de acción de personal en el sistema';
-                            }
-                            else {
-                                // const VERIFICAR_ACCION = await pool.query(
-                                //     `
-                                //     SELECT * FROM map_detalle_tipo_accion_personal
-                                //     WHERE id_tipo_accion_personal = $1
-                                //     `
-                                //     , [VERIFICAR_TIPO_ACCION.rows[0].id]);
-                                // if (VERIFICAR_ACCION.rowCount === 0) {
-                                //     // DISCRIMINACION DE ELEMENTOS IGUALES
-                                //     if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
-                                //         duplicados.push(item);
-                                //     } else {
-                                //         item.observacion = '1';
-                                //     }
-                                // }else{
-                                //     item.observacion = 'Ya existe en el sistema'  
-                                // }
-                            }
-                        }
-                    }));
-                    setTimeout(() => {
-                        listaAccionPersonal.sort((a, b) => {
-                            // COMPARA LOS NUMEROS DE LOS OBJETOS
-                            if (a.fila < b.fila) {
-                                return -1;
-                            }
-                            if (a.fila > b.fila) {
-                                return 1;
-                            }
-                            return 0; // SON IGUALES
-                        });
-                        var filaDuplicada = 0;
-                        listaAccionPersonal.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                            if (item.observacion == '1') {
-                                item.observacion = 'Registro duplicado';
-                            }
-                            else if (item.observacion == 'no registrado') {
-                                item.observacion = 'ok';
-                            }
-                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                                if (item.fila == filaDuplicada) {
-                                    mensaje = 'error';
-                                }
-                            }
-                            else {
-                                return mensaje = 'error';
-                            }
-                            filaDuplicada = item.fila;
-                        }));
-                        if (mensaje == 'error') {
-                            listaAccionPersonal = undefined;
-                        }
-                        return res.jsonp({ message: mensaje, data: listaAccionPersonal });
-                    }, 1000);
-                }
-            }
-            catch (error) {
-                return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
-            }
-        });
-    }
-    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
-    CargarPlantilla(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { plantilla, user_name, ip, ip_local } = req.body;
-            let error = false;
-            var listaProcesosInsertados = [];
-            for (const item of plantilla) {
-                const { tipo_accion_personal, descripcion, base_legal } = item;
-                console.log('items: ', item);
-                try {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    const response = yield database_1.default.query(`
-              SELECT * FROM map_tipo_accion_personal 
-                    WHERE UPPER(descripcion) = UPPER($1)
-              `, [tipo_accion_personal]);
-                    const [tipo_acciones] = response.rows;
-                    console.log('response: ', response);
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    const response_accion = yield database_1.default.query(`
-          INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
-          `, [response.rows[0].id, descripcion, base_legal]);
-                    const [detalleAccion] = response_accion.rows;
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_detalle_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(detalleAccion),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'map_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(tipo_acciones),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                    error = true;
-                }
-            }
-            if (error) {
-                return res.status(500).jsonp({ message: 'error' });
-            }
-            return res.status(200).jsonp({ message: 'ok' });
-        });
-    }
-    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
-    EliminarTipoAccionMultiple(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { listaEliminar, user_name, ip, ip_local } = req.body;
-            let error = false;
-            var count = 0;
-            var count_no = 0;
-            var list_TipoAccion = [];
-            try {
-                for (const item of listaEliminar) {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    const resultado = yield database_1.default.query(`
-             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-           `, [item.id]);
-                    const [existe_tipo] = resultado.rows;
-                    if (!existe_tipo) {
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'map_detalle_tipo_accion_personal',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: '',
-                            datosNuevos: '',
-                            ip: ip,
-                            ip_local: ip_local,
-                            observacion: `Error al eliminar el tipo accion personal con id: ${item.id}. Registro no encontrado.`
-                        });
-                    }
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    if (existe_tipo) {
-                        // INICIAR TRANSACCION
-                        yield database_1.default.query('BEGIN');
-                        const resultado = yield database_1.default.query(`
-             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-           `, [item.id]);
-                        const [existe_tipo_emple] = resultado.rows;
-                        if (!existe_tipo_emple) {
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            const res = yield database_1.default.query(`
-             DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-           `, [item.id]);
-                            // AUDITORIA
-                            yield auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'map_detalle_tipo_accion_personal',
-                                usuario: user_name,
-                                accion: 'D',
-                                datosOriginales: JSON.stringify(existe_tipo),
-                                datosNuevos: '',
-                                ip: ip,
-                                ip_local: ip_local,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                            //CONTADOR ELIMINADOS
-                            count += 1;
-                        }
-                        else {
-                            list_TipoAccion.push(item.descripcion);
-                            count_no += 1;
-                        }
-                    }
-                }
-                var meCount = "registro eliminado";
-                if (count > 1) {
-                    meCount = "registros eliminados";
-                }
-                res.status(200).jsonp({
-                    message: count.toString() + ' ' + meCount + ' con éxito.',
-                    ms2: 'Existen datos relacionados con ',
-                    codigo: 200,
-                    eliminados: count,
-                    relacionados: count_no,
-                    listaNoEliminados: list_TipoAccion
-                });
-            }
-            catch (err) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                error = true;
-                if (error) {
-                    if (err.table == 'map_empleado_grupo_ocupacional') {
-                        if (count == 1) {
-                            return res.status(300).jsonp({
-                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_TipoAccion
-                            });
-                        }
-                        else {
-                            return res.status(300).jsonp({
-                                message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_TipoAccion
-                            });
-                        }
-                    }
-                    else {
-                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
-                    }
-                }
             }
         });
     }

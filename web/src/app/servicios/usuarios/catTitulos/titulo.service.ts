@@ -23,14 +23,13 @@ export class TituloService {
   }
 
   // METODO PARA ELIMINAR REGISTRO   **USADO
-  EliminarRegistro(id: any, datos:any) {
+  EliminarRegistro(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/titulo/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
-
 
   // METODO PARA REGISTRAR TITULO    **USADO
   RegistrarTitulo(data: any) {

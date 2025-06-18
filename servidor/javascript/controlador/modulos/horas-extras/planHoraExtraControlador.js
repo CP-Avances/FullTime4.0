@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_HORA_EXTRA_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const settingsMail_1 = require("../../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const settingsMail_1 = require("../../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 class PlanHoraExtraControlador {
@@ -471,7 +471,7 @@ class PlanHoraExtraControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_envia, correos, nombres, observacion, desde, hasta, inicio, fin, horas, asunto, tipo_solicitud, proceso } = req.body;
                 const Envia = yield database_1.default.query(`
         SELECT da.nombre, da.apellido, da.identificacion, da.correo, da.name_cargo AS tipo_cargo, 
@@ -480,7 +480,7 @@ class PlanHoraExtraControlador {
         WHERE da.id = $1
         `, [id_empl_envia]).then((resultado) => { return resultado.rows[0]; });
                 let data = {
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     to: correos,
                     subject: asunto,
                     html: `
@@ -494,7 +494,7 @@ class PlanHoraExtraControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL COLABORADOR QUE ${tipo_solicitud} PLANIFICACIÓN HORAS EXTRAS</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${Envia.nombre} ${Envia.apellido} <br>
               <b>Número de identificación:</b> ${Envia.identificacion} <br>
@@ -533,17 +533,17 @@ class PlanHoraExtraControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();

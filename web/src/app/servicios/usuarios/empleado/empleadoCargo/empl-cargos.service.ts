@@ -43,8 +43,6 @@ export class EmplCargosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/eliminarCargo`, data);
   }
 
-
-
   // METODO PARA REGISTRAR CARGO   **USADO
   RegistrarCargo(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos`, data);
@@ -75,10 +73,6 @@ export class EmplCargosService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/fecha_cargo/editar`, data);
   }
 
-  BuscarIDCargo(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/${id}`);
-  }
-  
   // METODO PARA VERIFICAR DATOS DE PLANTILLA DE CARGOS  **USADO
   RevisarFormato(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/upload/revision`, formData);
@@ -89,4 +83,10 @@ export class EmplCargosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/cargar_plantilla/`, formData);
   }
 
+
+
+
+  BuscarIDCargo(id: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/${id}`);
+  }
 }

@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 // LIBRERIA PARA GENERAR REPORTES EN FORMATO EXCEL
 
 // IMPORTACION DE SERVICIOS
-import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
+import { HorasExtrasRealesService } from 'src/app/servicios/reportes/modulos/horasExtrasReales/horas-extras-reales.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
 import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';

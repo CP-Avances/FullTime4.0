@@ -8,10 +8,10 @@ import { DateTime } from 'luxon';
 // LIBRERIA PARA GENERAR ARCHIVOS EXCEL
 
 // IMPORTACION DE SERVICIOS
-import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
+import { AlimentacionService } from 'src/app/servicios/reportes/modulos/alimentacion/alimentacion.service';
 import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({
