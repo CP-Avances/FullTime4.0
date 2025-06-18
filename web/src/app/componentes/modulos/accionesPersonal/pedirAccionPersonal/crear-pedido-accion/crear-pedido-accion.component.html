@@ -1,15 +1,17 @@
 <div class="container" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo" class="row w-100 m-auto">
+        <div id="titulo" class="row w-100 m-auto align-items-center">
             <div class="col-2 col-md-2 mb-2 mb-md-0">
             </div>
-            <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
-                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo d-flex align-items-center justify-content-center">
+                <span>
                     REGISTRAR PEDIDO ACCIÓN DE PERSONAL
                 </span>
             </div>
-            <div class="col-2 col-md-2 mb-2 mb-md-0">
-                <mat-icon class="float-right" id="cerrar" [routerLink]="['/listaPedidos/']">highlight_off</mat-icon>
+            <div class="col-2 col-md-2 mb-2 mb-md-0 d-flex justify-content-end align-items-center">
+                <button mat-icon-button [routerLink]="['/listaPedidos/']" aria-label="Cerrar formulario">
+                    <mat-icon id="cerrar">highlight_off</mat-icon>
+                </button>
             </div>
         </div>
 
@@ -239,8 +241,8 @@
                                 <mat-form-field style="width: 90%;">
                                     <mat-label>Adición a base legal:</mat-label>
                                     <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
-                                        [formControl]="baseLegalForm" (input)="onInputChange($event)" (focus)="onFocus()"
-                                        (keydown)="onKeyDown($event)"></textarea>
+                                        [formControl]="baseLegalForm" (input)="onInputChange($event)"
+                                        (focus)="onFocus()" (keydown)="onKeyDown($event)"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Regresar a la lista de opciones existentes.">
                                         gavel
@@ -711,9 +713,10 @@
                     </div>
                     <div class="row">
                         <div class="col-md">
-                
+
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Director(a) o responsable de Talento Humano</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Director(a) o
+                                    responsable de Talento Humano</mat-label>
                                 <mat-form-field style="width: 15%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevHA">
                                 </mat-form-field>
@@ -731,14 +734,16 @@
                                         matTooltip="Responsable de Talento Humano.">
                                         person
                                     </mat-icon>
-                                    <label *ngIf="cargoFirma1?.cargo != null && cargoFirma1?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
+                                    <label *ngIf="cargoFirma1?.cargo != null && cargoFirma1?.cargo != ''"
+                                        style="font-size: x-small;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
-                            
+
                         </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Autoridad Nominadora o su delegado</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Autoridad Nominadora
+                                    o su delegado</mat-label>
                                 <mat-form-field style="width: 15%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevGA">
                                 </mat-form-field>
@@ -756,7 +761,8 @@
                                         matTooltip="Autoridad nominadora o su delegado.">
                                         person
                                     </mat-icon>
-                                    <label *ngIf="cargoFirma2?.cargo != null && cargoFirma2?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
+                                    <label *ngIf="cargoFirma2?.cargo != null && cargoFirma2?.cargo != ''"
+                                        style="font-size: x-small;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -768,7 +774,8 @@
                         <div class="col-12 col-md-5">
                             <label>ACEPTACIÓN Y/O RECEPCIÓN DEL SERVIDOR PÚBLICO</label>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Aceptación y/o recepción del servidor público</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Aceptación y/o
+                                    recepción del servidor público</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevHF">
                                 </mat-form-field>
@@ -805,7 +812,8 @@
                         <div class="col-12 col-md-5">
                             <label style="margin-left: 5px;">EN CASO DE NEGATIVA DE LA RECEPCIÓN (TESTIGO)</label>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">En caso de negativa de la recepción</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">En caso de negativa
+                                    de la recepción</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevGF">
                                 </mat-form-field>
@@ -854,7 +862,8 @@
                         <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
                         <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de Elaboración</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
+                                    Elaboración</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRGF">
                                 </mat-form-field>
@@ -872,13 +881,15 @@
                                         matTooltip="Funcionario responsable de la elaboración de la acción de personal.">
                                         person
                                     </mat-icon>
-                                     <label *ngIf="cargoFirma3?.cargo != null && cargoFirma3?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
+                                    <label *ngIf="cargoFirma3?.cargo != null && cargoFirma3?.cargo != ''"
+                                        style="font-size: x-small;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de Revisión</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
+                                    Revisión</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRHF">
                                 </mat-form-field>
@@ -896,13 +907,15 @@
                                         matTooltip="Responsable de revisión de la acción de personal..">
                                         person
                                     </mat-icon>
-                                    <label *ngIf="cargoFirma4?.cargo != null && cargoFirma4?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
+                                    <label *ngIf="cargoFirma4?.cargo != null && cargoFirma4?.cargo != ''"
+                                        style="font-size: x-small;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de Registro y Control</mat-label>
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
+                                    Registro y Control</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRRC">
                                 </mat-form-field>
@@ -920,7 +933,8 @@
                                         matTooltip="Responsable del registro y control de la acción de personal.">
                                         person
                                     </mat-icon>
-                                    <label *ngIf="cargoFirma5?.cargo != null && cargoFirma5?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
+                                    <label *ngIf="cargoFirma5?.cargo != null && cargoFirma5?.cargo != ''"
+                                        style="font-size: x-small;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
                                 </mat-form-field>
 
                             </div>
