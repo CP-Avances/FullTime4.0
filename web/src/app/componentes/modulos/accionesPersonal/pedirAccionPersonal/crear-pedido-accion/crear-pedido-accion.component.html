@@ -239,7 +239,7 @@
                                 <mat-form-field style="width: 90%;">
                                     <mat-label>Adición a base legal:</mat-label>
                                     <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
-                                        [formControl]="baseLegalForm" (input)="onInputChange($event)"
+                                        [formControl]="baseLegalForm" (input)="onInputChange($event)" (focus)="onFocus()"
                                         (keydown)="onKeyDown($event)"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Regresar a la lista de opciones existentes.">
@@ -711,9 +711,10 @@
                     </div>
                     <div class="row">
                         <div class="col-md">
-                            <mat-label>Director(a) o responsable de Talento Humano</mat-label>
+                
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field style="width: 20%;">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Director(a) o responsable de Talento Humano</mat-label>
+                                <mat-form-field style="width: 15%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevHA">
                                 </mat-form-field>
                                 <mat-form-field style="width: 80%;">
@@ -722,7 +723,7 @@
                                         [matAutocomplete]="auto20" required>
                                     <mat-autocomplete #auto20="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombreR | async"
-                                            [value]="option.empleado" (click)="onCargo(option)">
+                                            [value]="option.empleado" (click)="onCargo(option, 1)">
                                             {{option.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -730,13 +731,15 @@
                                         matTooltip="Responsable de Talento Humano.">
                                         person
                                     </mat-icon>
+                                    <label *ngIf="cargoFirma1?.cargo != null && cargoFirma1?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
-                            <mat-label>Cargo <b>{{cargoFirma1?.cargo}}</b></mat-label>
+                            
                         </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field style="width: 20%;">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Autoridad Nominadora o su delegado</mat-label>
+                                <mat-form-field style="width: 15%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevGA">
                                 </mat-form-field>
                                 <mat-form-field style="width: 80%;">
@@ -745,7 +748,7 @@
                                         [matAutocomplete]="auto21" required>
                                     <mat-autocomplete #auto21="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombreH | async"
-                                            [value]="option.empleado">
+                                            [value]="option.empleado" (click)="onCargo(option, 2)">
                                             {{option.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -753,6 +756,7 @@
                                         matTooltip="Autoridad nominadora o su delegado.">
                                         person
                                     </mat-icon>
+                                    <label *ngIf="cargoFirma2?.cargo != null && cargoFirma2?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -764,6 +768,7 @@
                         <div class="col-12 col-md-5">
                             <label>ACEPTACIÓN Y/O RECEPCIÓN DEL SERVIDOR PÚBLICO</label>
                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Aceptación y/o recepción del servidor público</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevHF">
                                 </mat-form-field>
@@ -800,6 +805,7 @@
                         <div class="col-12 col-md-5">
                             <label style="margin-left: 5px;">EN CASO DE NEGATIVA DE LA RECEPCIÓN (TESTIGO)</label>
                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">En caso de negativa de la recepción</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevGF">
                                 </mat-form-field>
@@ -831,7 +837,7 @@
                                 </mat-form-field>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="w-90">
+                                <mat-form-field class="w-100">
                                     <mat-label>Razón</mat-label>
                                     <textarea matInput #acta maxlength="200"
                                         placeholder="Detalle la razón por la negativa"
@@ -848,6 +854,7 @@
                         <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
                         <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de Elaboración</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRGF">
                                 </mat-form-field>
@@ -856,7 +863,8 @@
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRNA"
                                         [matAutocomplete]="auto24" required>
                                     <mat-autocomplete #auto24="matAutocomplete">
-                                        <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
+                                        <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 3)">
                                             {{g.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -864,11 +872,13 @@
                                         matTooltip="Funcionario responsable de la elaboración de la acción de personal.">
                                         person
                                     </mat-icon>
+                                     <label *ngIf="cargoFirma3?.cargo != null && cargoFirma3?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de Revisión</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRHF">
                                 </mat-form-field>
@@ -877,7 +887,8 @@
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRNF"
                                         [matAutocomplete]="auto25" required>
                                     <mat-autocomplete #auto25="matAutocomplete">
-                                        <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
+                                        <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 4)">
                                             {{g.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -885,11 +896,13 @@
                                         matTooltip="Responsable de revisión de la acción de personal..">
                                         person
                                     </mat-icon>
+                                    <label *ngIf="cargoFirma4?.cargo != null && cargoFirma4?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de Registro y Control</mat-label>
                                 <mat-form-field style="width: 20%;">
                                     <input type="text" placeholder="ING." matInput [formControl]="abrevRRC">
                                 </mat-form-field>
@@ -898,7 +911,8 @@
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRRC"
                                         [matAutocomplete]="auto26" required>
                                     <mat-autocomplete #auto26="matAutocomplete">
-                                        <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
+                                        <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 5)">
                                             {{g.empleado.toUpperCase()}}
                                         </mat-option>
                                     </mat-autocomplete>
@@ -906,6 +920,7 @@
                                         matTooltip="Responsable del registro y control de la acción de personal.">
                                         person
                                     </mat-icon>
+                                    <label *ngIf="cargoFirma5?.cargo != null && cargoFirma5?.cargo != ''" style="font-size: x-small;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
                                 </mat-form-field>
 
                             </div>
