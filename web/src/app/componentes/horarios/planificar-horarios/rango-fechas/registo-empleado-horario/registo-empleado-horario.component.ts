@@ -91,10 +91,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.BuscarHorarios();
     this.ObtenerEmpleado(this.data_horario.idEmpleado);
@@ -232,17 +232,19 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   // METODO PARA VERIFICAR DUPLICIDAD DE REGISTROS
   horarioExistentes: any = [];
   VerificarDuplicidad(form: any) {
-    let fechas = {
+    const fechas = {
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinalForm,
-      id_horario: form.horarioForm
+      id_horario: form.horarioForm,
+      ids: [this.data_horario.idEmpleado]
     };
-    this.rest.VerificarDuplicidadHorarios(this.data_horario.idEmpleado, fechas).subscribe(existe => {
+
+    this.rest.VerificarDuplicidadHorarios(fechas).subscribe(existe => {
       this.toastr.warning(
         'Fechas y horario seleccionado ya se encuentran registrados.',
-        'Verificar la planificación.', {
-        timeOut: 6000,
-      });
+        'Verificar la planificación.',
+        { timeOut: 6000 }
+      );
       this.ControlarBotones(false, true, true, true, false);
     }, error => {
       this.BuscarFeriados(form);
@@ -538,8 +540,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     var codigos = '\'' + this.data_horario.codigo + '\'';
     let usuarios = {
       codigo: codigos,
-      fec_final:  DateTime.fromISO(this.fechaFinFormluxon).plus({ days: 2 }).toFormat('yyyy-MM-dd'),
-      fec_inicio: DateTime.fromISO( this.fechaInicioFormluxon).toFormat('yyyy-MM-dd'),
+      fec_final: DateTime.fromISO(this.fechaFinFormluxon).plus({ days: 2 }).toFormat('yyyy-MM-dd'),
+      fec_inicio: DateTime.fromISO(this.fechaInicioFormluxon).toFormat('yyyy-MM-dd'),
     };
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
       if (datos.message === 'vacio') {

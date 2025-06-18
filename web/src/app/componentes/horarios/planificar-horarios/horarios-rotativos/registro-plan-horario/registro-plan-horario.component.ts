@@ -507,16 +507,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA INGRESAR HORARIO
   lista_eliminar: any = [];
   IngresarHorario(index: number) {
-    if (
-      this.fechas_mes[index].horarios_existentes === '***' ||
-      this.fechas_mes[index].horarios.length > 0
-    ) {
-      this.toastr.warning('Ya existe un horario registrado en esta fecha. No se permite modificar desde aquí.', 'Ups! VERIFICAR.', {
-        timeOut: 6000,
-      });
-      return;
-    }
-
     let verificador = 0;
     let procesar = 0;
     this.ControlarBotones(true, false);
@@ -540,7 +530,17 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     // PROCESAMIENTO DE LOS DATOS AL CUMPLIR LAS CONDICIONES
     if (procesar === 0) {
-
+      // EXISTEN HORARIOS REGISTRADOS
+      if (this.fechas_mes[index].registrados.length === 1) {
+        if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
+          let eliminar = {
+            fecha: this.fechas_mes[index].fecha,
+            id_horarios: this.fechas_mes[index].registrados[0].id_horario,
+          }
+          this.lista_eliminar = this.lista_eliminar.concat(eliminar);
+          this.fechas_mes[index].registrados = [];
+        }
+      }
       // DIA REGISTRADO COMO LIBRE
       if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
         this.EliminarLibre(index)
@@ -735,51 +735,53 @@ export class RegistroPlanHorarioComponent implements OnInit {
     this.sin_duplicidad = [];
     let total = 0;
     this.data_horarios.forEach((obj: any) => {
-      total = total + obj.horarios.length
-    })
+      total += obj.horarios.length;
+    });
+
     this.contar_duplicado = 0;
     this.leer_horario = 0;
     this.iterar = 0;
     this.data_horarios.forEach((obj: any) => {
-      this.iterar = this.iterar + 1;
+      this.iterar += 1;
+
       obj.horarios.forEach((h: any) => {
-        const [horario] = this.horarios.filter((o: any) => {
-          return o.codigo === h.horario
-        })
-        let fechas = {
+        const [horario] = this.horarios.filter((o: any) => o.codigo === h.horario);
+
+        const fechas = {
           fechaInicio: obj.fecha,
           fechaFinal: obj.fecha,
-          id_horario: horario.id
+          id_horario: horario.id,
+          ids: [this.datoEmpleado.idEmpleado]
         };
         h.verificar = 'OK';
         obj.supera_jornada = '';
         obj.horas_superadas = '';
-        this.horario.VerificarDuplicidadHorarios(this.datoEmpleado.idEmpleado, fechas).subscribe(existe => {
-          this.leer_horario = this.leer_horario + 1;
+
+        this.horario.VerificarDuplicidadHorarios(fechas).subscribe(existe => {
+          this.leer_horario += 1;
           this.contar_duplicado = 1;
           h.verificar = 'Horario ya existe.';
-          if (this.iterar === this.data_horarios.length) {
-            if (this.leer_horario === total) {
-              this.ValidarHorarioByHorasTrabaja(opcion)
-            }
+
+          if (this.iterar === this.data_horarios.length && this.leer_horario === total) {
+            this.ValidarHorarioByHorasTrabaja(opcion);
           }
         }, error => {
-          this.leer_horario = this.leer_horario + 1;
-          if (this.iterar === this.data_horarios.length) {
-            if (this.leer_horario === total) {
-              this.ValidarHorarioByHorasTrabaja(opcion)
-            }
+          this.leer_horario += 1;
+
+          if (this.iterar === this.data_horarios.length && this.leer_horario === total) {
+            this.ValidarHorarioByHorasTrabaja(opcion);
           }
         });
-      })
-    })
+      });
+    });
+
     this.data_horarios.forEach((obj: any) => {
       this.fechas_mes.forEach((fec: any) => {
         if (obj.fecha === fec.fecha) {
           fec.horarios = obj.horarios;
         }
-      })
-    })
+      });
+    });
   }
 
   // METODO PARA VALIDAR HORAS DE TRABAJO SEGUN ULTIMO CARGO
@@ -1078,6 +1080,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         id_horario: eliminar.id_horarios,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        datos.id_plan = [].concat(...datos.id_plan, ...(res as any[]).map((item: any) => item.id));
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
         this.restP.EliminarRegistro(datos).subscribe(datos => {
           verificador = verificador + 1;

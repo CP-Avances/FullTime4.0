@@ -315,6 +315,7 @@ class PlanGeneralControlador {
     // METODO PARA ELIMINAR REGISTROS    **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("ENTRA AL METODO ELIMINAR AHORITA SIENDO REVISADO");
             var errores = 0;
             let ocurrioError = false;
             let mensajeError = '';

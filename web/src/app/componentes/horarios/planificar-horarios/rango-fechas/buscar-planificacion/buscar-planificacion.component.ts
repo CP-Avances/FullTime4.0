@@ -536,9 +536,9 @@ export class BuscarPlanificacionComponent {
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, id_empleado: any, codigo: any, id_cargo: any, hora_trabaja: any, index: any): void {
     let fecha = anio + '-' + mes + '-' + dia;
     console.log("fecha en AbrirEditarHorario", fecha);
-    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy/MM/dd');
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy/MM/dd');
     console.log("Ver fecha_", fecha_)
-    let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid;
+    let verificar = DateTime.fromFormat(fecha_, 'yyyy/M/dd').isValid;
     console.log("Ver verificar", verificar)
 
     // VERIFICAR QUE EL DIA SEA VALIDO

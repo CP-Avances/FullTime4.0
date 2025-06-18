@@ -337,51 +337,50 @@ export class HorariosMultiplesComponent implements OnInit {
     this.guardar = false;
     this.cargar = false;
     this.observaciones = false;
-    let fechas = {
-      fechaInicio: form.fechaInicioForm,
-      fechaFinal: form.fechaFinalForm,
-      id_horario: form.horarioForm
-    };
     this.contador = 0;
     this.usuarios = [];
-    let correctos = [];
-    let duplicados = [];
     this.usuarios_invalidos = [];
 
-    const ids = this.datos.map((dh: any) => dh.id);
-    this.rest.VerificarDuplicidadHorarios2({ ids, fechas }).subscribe((response: any) => {
-      this.contador = this.datos.length; // Todos los datos se procesan en la misma llamada
-      // Procesar la respuesta para determinar duplicados y correctos
+    let correctos: any[] = [];
+    let duplicados: any[] = [];
+
+    const body = {
+      fechaInicio: form.fechaInicioForm,
+      fechaFinal: form.fechaFinalForm,
+      id_horario: form.horarioForm,
+      ids: this.datos.map((dh: any) => dh.id)
+    };
+
+    this.rest.VerificarDuplicidadHorarios(body).subscribe((response: any) => {
+      this.contador = this.datos.length;
+
       this.datos.forEach((dh: any) => {
         if (response.duplicados && response.duplicados.includes(dh.id)) {
-          // Si el id está en la lista de duplicados
           dh.observacion = 'En las fechas ingresadas ya existe una planificación horaria.';
-          duplicados.concat(dh);
-          this.usuarios = this.usuarios.concat(dh);
-          this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
+          duplicados.push(dh);
+          this.usuarios.push(dh);
+          this.usuarios_invalidos.push(dh);
         } else {
-          // Si el id no es duplicado
           dh.observacion = 'OK';
-          correctos = correctos.concat(dh);
+          correctos.push(dh);
         }
       });
-      console.log("ver datos duplicados: ", duplicados)
-      // Evaluar si todos los datos son duplicados
+
+      console.log("ver datos duplicados:", duplicados);
+
       if (duplicados.length === this.datos.length) {
         this.ControlarBotones(false, true, true, false, true);
         this.observaciones = true;
       } else {
-        // Continuar con los datos correctos
         this.VerificarContrato(form, correctos);
       }
     }, error => {
-      // Caso en que no hay duplicados (manejar como éxito)
       console.log('No hay duplicados, error recibido:', error);
       const correctos = this.datos.map((dh: any) => {
         dh.observacion = 'OK';
         return dh;
       });
-      this.VerificarContrato(form, correctos); // Continuar con los registros correctos
+      this.VerificarContrato(form, correctos);
     });
   }
 
