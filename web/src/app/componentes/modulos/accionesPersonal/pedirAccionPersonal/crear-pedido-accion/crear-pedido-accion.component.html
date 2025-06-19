@@ -775,7 +775,7 @@
                                 <mat-form-field style="width: 80%;">
                                     <mat-label>Aceptación y/o recepción del servidor público</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoHF"
-                                        [matAutocomplete]="auto22" required>
+                                        [matAutocomplete]="auto22" required readonly>
                                     <mat-autocomplete #auto22="matAutocomplete">
                                         <mat-option *ngFor="let th of filtroNombreH | async" [value]="th.empleado">
                                             {{th.empleado.toUpperCase()}}

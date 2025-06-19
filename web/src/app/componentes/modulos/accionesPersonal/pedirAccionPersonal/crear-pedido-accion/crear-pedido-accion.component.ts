@@ -708,7 +708,7 @@ export class CrearPedidoAccionComponent implements OnInit {
           this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
           this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
 
-          //this.fivethFormGroup.controls['idEmpleadoHF'].setValue(e.empleado);
+          this.fivethFormGroup.controls['idEmpleadoHForm'].setValue(e.empleado);
           this.fivethFormGroup.patchValue({
             fechaServidorForm: this.FechaActual,
           });
@@ -716,6 +716,8 @@ export class CrearPedidoAccionComponent implements OnInit {
           this.btnForm1 = false
 
         })
+
+        this.ListaEmpleadosFirmas(e.id)
 
       },error => (
         this.InfoUser = null
@@ -747,32 +749,60 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA OBTENER LISTA DE EMPLEADOS
+  listaAuxiliar: any;
   ObtenerEmpleados() {
     this.empleados = [];
+    this.listaAuxiliar = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
-
+      this.listaAuxiliar = this.empleados;
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-      this.filtroNombre = this.funcionarioF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
+    this.filtroNombre = this.funcionarioF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
 
-      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
+    this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
 
-      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
+    this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
 
-      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
+    this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
     });
+  }
+
+  ListaEmpleadosFirmas(id_empleado: any) {
+
+    this.empleados = this.listaAuxiliar.filter(user => user.id !== id_empleado);
+
+    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+    this.filtroNombre = this.funcionarioF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
+
+    this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
+
+    this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
+
+    this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleado(value))
+    );
   }
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
