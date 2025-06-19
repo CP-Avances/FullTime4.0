@@ -120,7 +120,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   otroEspecificacion = new FormControl("");
   declaracionJuradaF = new FormControl(false);
   observacionForm = new FormControl("");
-  baseLegalForm = new FormControl("", [Validators.minLength(6)]);
+  baseLegalForm = new FormControl("");
 
   //Formulario 3 situacion actual
   tipoProcesoF = new FormControl("", [Validators.required]);
@@ -159,7 +159,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   abrevHF = new FormControl("");
   abrevGF = new FormControl("");
 
-  idEmpleadoRA = new FormControl("");
+  idEmpleadoRA = new FormControl("", [Validators.required]);
   idEmpleadoF = new FormControl("");
   idEmpleadoHF = new FormControl("");
   idEmpleadoGF = new FormControl("");
@@ -356,6 +356,15 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarEmpleado(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.empleados.filter((info: any) =>
+        info.empleado.toUpperCase().includes(filterValue)  
+      );
+    }
+  }
+
+    private _filtrarEmpleadoR(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
       return this.empleados.filter((info: any) =>
@@ -587,7 +596,7 @@ export class CrearPedidoAccionComponent implements OnInit {
         if (item.descripcion == e.option.value) {
           console.log('entro aqui: ',item.decripcion,' - ',e.option.value)
           this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
-          this.textoFijo = item.base_legal;
+          this.textoFijo = item.base_legal+' ';
         }
       });
 
@@ -616,7 +625,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   onKeyDown(event: KeyboardEvent) {
     const input = event.target as HTMLInputElement;
-    if (input.selectionStart! <= this.textoFijo.length) {
+    if (input.selectionStart! <= this.textoFijo.trim().length) {
       const teclasBloqueadas = ['Backspace', 'Delete', 'ArrowLeft'];
 
       if (teclasBloqueadas.includes(event.key)) {
@@ -626,8 +635,8 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   onFocus() {
-    if (this.baseLegalForm.value === this.textoFijo) {
-      this.baseLegalForm.setValue('\n');
+    if (this.baseLegalForm.value === this.textoFijo.trim()) {
+      this.baseLegalForm.setValue(this.textoFijo+' ');
     }
   }
 
@@ -762,9 +771,9 @@ export class CrearPedidoAccionComponent implements OnInit {
       map((value: any) => this._filtrarEmpleado(value))
     );
 
-    this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+    this.filtroNombreR = this.idEmpleadoRA.valueChanges.pipe(
       startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
+      map((value: any) => this._filtrarEmpleadoR(value))
     );
 
     this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
@@ -789,9 +798,9 @@ export class CrearPedidoAccionComponent implements OnInit {
       map((value: any) => this._filtrarEmpleado(value))
     );
 
-    this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+    this.filtroNombreR = this.idEmpleadoRA.valueChanges.pipe(
       startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
+      map((value: any) => this._filtrarEmpleadoR(value))
     );
 
     this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
