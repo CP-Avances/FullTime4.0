@@ -9,12 +9,12 @@ import { Router } from '@angular/router';
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
@@ -256,8 +256,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO DE LLAMADO DE FUNCIONES DE VALIDACION
   ValidarSeleccionados(form: any) {
-    console.log("form.fechaInicioForm", form.fechaInicioForm)
-    console.log("form.fechaFinalForm", form.fechaFinalForm)
     this.fechaInicioFormluxon = form.fechaInicioForm;
     this.fechaFinFormluxon = form.fechaFinalForm;
 
@@ -366,8 +364,6 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       });
 
-      console.log("ver datos duplicados:", duplicados);
-
       if (duplicados.length === this.datos.length) {
         this.ControlarBotones(false, true, true, false, true);
         this.observaciones = true;
@@ -375,7 +371,6 @@ export class HorariosMultiplesComponent implements OnInit {
         this.VerificarContrato(form, correctos);
       }
     }, error => {
-      console.log('No hay duplicados, error recibido:', error);
       const correctos = this.datos.map((dh: any) => {
         dh.observacion = 'OK';
         return dh;
@@ -390,26 +385,20 @@ export class HorariosMultiplesComponent implements OnInit {
     this.cont2 = 0;
     let contrato = [];
     let sin_contrato = [];
-
     const ids = correctos.map((dh: any) => dh.id);
     this.restE.BuscarFechaContratoUsuarios({ ids }).subscribe((response: any) => {
-      console.log("ver BuscarFechaContrato ", response.fechaContrato)
-      response.fechaContrato.forEach(element => {
+      response.fechaContrato.forEach((element: any) => {
         this.cont2 = this.cont2 + 1;
-
         let timestampfechaInicioForm = Date.parse(this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'));
         let timestampfechaFinalForm = Date.parse(this.fechaFinFormluxon.toFormat('yyyy-MM-dd'));
         if ((Date.parse(element.fecha_ingreso.split('T')[0]) <= timestampfechaInicioForm) &&
           (Date.parse(element.fecha_salida.split('T')[0]) >= timestampfechaFinalForm)) {
           const correcto = correctos
-            .filter(item => item.id === element.id_empleado) // Filtra los elementos que cumplen la condición
-            .map(item => ({ ...item, observacion: 'OK' })); // Modifica la propiedad
+            .filter((item: any) => item.id === element.id_empleado) // FILTRA LOS ELEMENTOS QUE CUMPLEN LA CONDICION
+            .map((item: any) => ({ ...item, observacion: 'OK' })); // MODIFICA LA PROPIEDAD
           if (correcto.length > 0) {
             contrato = contrato.concat(correcto);
           }
-
-          console.log("ver correcto en contrato: ", contrato)
-
           if (this.cont2 === correctos.length) {
             this.ValidarHorarioByHorasTrabaja(form, contrato);
           }
@@ -417,12 +406,10 @@ export class HorariosMultiplesComponent implements OnInit {
         else {
           // FECHAS NO CORRESPONDEN AL REGISTRO DE CONTRATO
           const correcto = correctos
-            .filter(item => item.id === element.id_empleado) // Filtra los elementos que cumplen la condición
-            .map(item => ({ ...item, observacion: 'Las fechas ingresadas no corresponde al periodo registrado en su contrato.' })); // Modifica la propiedad
+            .filter((item: any) => item.id === element.id_empleado) // FILTRA LOS ELEMENTOS QUE CUMPLEN LA CONDICION
+            .map((item: any) => ({ ...item, observacion: 'Las fechas ingresadas no corresponde al periodo registrado en su contrato.' })); // Modifica la propiedad
 
-          console.log("ver correcto en contrato: ", contrato)
-
-          // Si hay elementos actualizados, concatenar al contrato
+          // SI HAY ELEMENTOS ACTUALIZADOS, CONCATENAR AL CONTRATO
           if (correcto.length > 0) {
             sin_contrato = sin_contrato.concat(correcto);
             this.usuarios = this.usuarios.concat(correcto);
@@ -442,14 +429,12 @@ export class HorariosMultiplesComponent implements OnInit {
     });
   }
 
-
   // METODO PARA VALIDAR HORAS DE TRABAJO SEGUN CONTRATO
-  sumHoras: any;
-  suma = '00:00:00';
-  horariosEmpleado: any = []
-  cont3: number = 0;
-
   horariosPorEmpleado: { [key: string]: any } = {};
+  horariosEmpleado: any = [];
+  sumHoras: any;
+  cont3: number = 0;
+  suma = '00:00:00';
 
   ValidarHorarioByHorasTrabaja(form: any, correctos: any) {
     let horas_correctas = [];
@@ -463,11 +448,10 @@ export class HorariosMultiplesComponent implements OnInit {
     const { hora_trabajo } = obj_res;
     this.cont3 = 0;
 
-    //correctos.map((dh: any) => {
     // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
     this.horariosEmpleado = [];
     const ids = correctos.map((dh: any) => dh.id);
-    this.rest.VerificarHorariosExistentes2({
+    this.rest.VerificarHorariosExistentesMultiples({
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinalForm,
       ids
@@ -476,9 +460,8 @@ export class HorariosMultiplesComponent implements OnInit {
       this.suma = '00:00:00';
       this.sumHoras = '00:00:00';
       this.horariosEmpleado = existe;
-      console.log("ver si existen horarios: ", this.horariosEmpleado)
 
-      this.horariosEmpleado.forEach(horario => {
+      this.horariosEmpleado.forEach((horario: any) => {
         if (!this.horariosPorEmpleado[horario.id_empleado]) {
           this.horariosPorEmpleado[horario.id_empleado] = [horario]
         } else {
@@ -487,18 +470,16 @@ export class HorariosMultiplesComponent implements OnInit {
       })
 
       let sumaHorasPorEmpleado: { [key: string]: any } = {};
-      // Usar map o forEach para recorrer cada horario
+      // USAR MAP O FOREACH PARA RECORRER CADA HORARIO
       this.horariosEmpleado.forEach((h: any) => {
-        // Verificar la condición para filtrar horarios
+        // VERIFICAR LA CONDICIÓN PARA FILTRAR HORARIOS
         if (h.default_ != 'DL' && h.default_ != 'DFD') {
           const idEmpleado = h.id_empleado;
-          // Si el empleado ya tiene una suma, sumamos las nuevas horas
+          // SI EL EMPLEADO YA TIENE UNA SUMA, SUMAMOS LAS NUEVAS HORAS
           if (sumaHorasPorEmpleado[idEmpleado]) {
-            console.log(" Entra al horario con suma")
             sumaHorasPorEmpleado[idEmpleado] = this.SumarHoras(sumaHorasPorEmpleado[idEmpleado], h.hora_trabajo);
           } else {
-            console.log(" Entra al horario sin suma")
-            // Si no existe aún una suma para este empleado, inicializamos con '00:00:00' y sumamos las horas actuales
+            // SI NO EXISTE AÚN UNA SUMA PARA ESTE EMPLEADO, INICIALIZAMOS CON '00:00:00' Y SUMAMOS LAS HORAS ACTUALES
             sumaHorasPorEmpleado[idEmpleado] = this.SumarHoras('00:00:00', h.hora_trabajo);
           }
         }
@@ -506,8 +487,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
       correctos.forEach(item => {
         this.cont3 = this.cont3 + 1;
-        console.log("Entra a correctos ", sumaHorasPorEmpleado[item.id])
-
         if (!sumaHorasPorEmpleado[item.id]) {
           this.IndicarNotificacionHoras(hora_trabajo, item)
         } else {
@@ -517,12 +496,10 @@ export class HorariosMultiplesComponent implements OnInit {
 
         // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
         let verificador = this.VerificarHorarioRangos(obj_res, this.horariosPorEmpleado[item.id]);
-        console.log("ver verificador", verificador)
 
         // LIMPIAR EXISTENCIAS
         this.horariosEmpleado = [];
         this.horariosPorEmpleado[item.id] = [];
-
         if (verificador === 2) {
           item.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
           item.nota = '';
@@ -558,15 +535,13 @@ export class HorariosMultiplesComponent implements OnInit {
         }
 
       })
-
     }, error => {
-
       correctos.forEach(item => {
         this.cont3 = this.cont3 + 1;
         this.IndicarNotificacionHoras(hora_trabajo, item);
         // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
         let verificador = this.VerificarHorarioRangos(obj_res, this.horariosPorEmpleado[item.id]);
-        console.log("ver verificador", verificador)
+
         // LIMPIAR EXISTENCIAS
         this.horariosEmpleado = [];
 
@@ -606,7 +581,6 @@ export class HorariosMultiplesComponent implements OnInit {
       })
     });
   }
-
 
   // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
   IndicarNotificacionHoras(horas: any, dh: any) {
@@ -696,9 +670,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA SUMAR HORAS
   SumarHoras(suma: string, tiempo: string) {
-    console.log("ver suma ", suma)
-
-    console.log("ver tiempo", tiempo)
     let sumah = parseInt(suma.split(':')[0]) + parseInt(tiempo.split(':')[0]);
     let sumam = parseInt(suma.split(':')[1]) + parseInt(tiempo.split(':')[1]);
     let sumas = parseInt(suma.split(':')[2]) + parseInt(tiempo.split(':')[2]);
@@ -741,22 +712,17 @@ export class HorariosMultiplesComponent implements OnInit {
     }
 
     this.feriado.ListarFeriadosCiudadMultiplesEmpleados(datos).subscribe(data => {
-      console.log("Ver feriados2-----------------------------------: ", data);
-
-      data.forEach(feriado => {
-
+      data.forEach((feriado: any) => {
         if (!this.feriados2[feriado.id]) {
           this.feriados2[feriado.id] = [feriado]
         } else {
           this.feriados2[feriado.id].push(feriado);
         }
       })
-      console.log("Ver feriados2 armado -----------------------------------: ", this.feriados2);
+
       this.BuscarFeriadosRecuperar(form, valor, validos);
     },
       vacio => {
-        console.log("Ver feriados2: ", "vacio");
-
         // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
         this.BuscarFeriadosRecuperar(form, valor, validos);
       });
@@ -773,8 +739,7 @@ export class HorariosMultiplesComponent implements OnInit {
       ids
     }
     this.feriado.ListarFeriadosRecuperarCiudadMultiplesEmpleados(datos).subscribe(data => {
-      console.log("Ver recuperar2: ", data);
-      data.forEach(feriadorec => {
+      data.forEach((feriadorec: any) => {
         if (!this.recuperar2[feriadorec.id]) {
           this.recuperar2[feriadorec.id] = [feriadorec]
         } else {
@@ -782,11 +747,10 @@ export class HorariosMultiplesComponent implements OnInit {
         }
       })
       // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral(form, valor, validos);
+      this.CrearPlanGeneral(form, valor);
     }, vacio => {
-      console.log("Ver recuperar2: ", "vacio");
       // METODO PARA CREAR PLANIFICACION GENERAL
-      this.CrearPlanGeneral(form, valor, validos);
+      this.CrearPlanGeneral(form, valor);
     })
   }
 
@@ -796,17 +760,16 @@ export class HorariosMultiplesComponent implements OnInit {
   inicioDate: any;
   finDate: any;
   plan_general: any = [];
-  CrearPlanGeneral(form: any, valor: any, validos: number) {
+  CrearPlanGeneral(form: any, valor: any) {
     let horariosEliminar: { obj: string; dia: string; tipo: string; tipo_dia: string; origen: string }[] = [];
 
-    valor.forEach(dh => {
+    valor.forEach((dh: any) => {
       const [obj_res] = this.horarios.filter((o: any) => {
         return o.id === parseInt(form.horarioForm)
       })
 
       if (!obj_res) return this.toastr.warning('Horario no válido.');
       const { default_ } = obj_res;
-      console.log("ver default_ ", default_);
 
       this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
       this.inicioDate = this.fechaInicioFormluxon.toFormat('yyyy-MM-dd');
@@ -955,13 +918,13 @@ export class HorariosMultiplesComponent implements OnInit {
     const ids = valor.map((dh: any) => dh.id);
     let horariosEliminarPorUsuario: { [key: number]: any } = {};
 
-    this.rest.VerificarHorariosExistentes2({
+    this.rest.VerificarHorariosExistentesMultiples({
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinalForm,
       ids
     }).subscribe(
       existe => {
-        existe.forEach(horario => {
+        existe.forEach((horario: any) => {
           if (!horariosEliminarPorUsuario[horario.id_empleado]) {
             horariosEliminarPorUsuario[horario.id_empleado] = [horario]
           } else {
@@ -970,17 +933,17 @@ export class HorariosMultiplesComponent implements OnInit {
         })
       },
       (error: any) => {
-        // Manejar el error si el servicio VerificarHorariosExistentes devuelve un error
+        // MANEJAR EL ERROR SI EL SERVICIO VERIFICARHORARIOSEXISTENTES DEVUELVE UN ERROR
         if (error.status === 404) {
           console.error('No se encontraron horarios existentes ');
-          // Aquí puedes realizar alguna acción adicional, como mostrar un mensaje al usuario
+          // AQUÍ PUEDES REALIZAR ALGUNA ACCIÓN ADICIONAL, COMO MOSTRAR UN MENSAJE AL USUARIO
         } else {
           console.error('Otro error ocurrió en VerificarHorariosExistentes:', error);
         }
       }
     );
 
-    valor.forEach(u => {
+    valor.forEach((u: any) => {
       if (horariosEliminarPorUsuario[u.id]) {
 
         horariosEliminar.forEach(horarioDia => {
@@ -1004,11 +967,11 @@ export class HorariosMultiplesComponent implements OnInit {
                   datos.id_plan = res;
                   // METODO PARA ELIMINAR DE LA BASE DE DATOS
                   this.restP.EliminarRegistro(datos).subscribe(datos => {
-                    // Procesar la respuesta de eliminación si es necesario
+                    // PROCESAR LA RESPUESTA DE ELIMINACIÓN SI ES NECESARIO
                   });
                 },
                 (error: any) => {
-                  // Manejar errores en BuscarFechas si es necesario
+                  // MANEJAR ERRORES EN BUSCARFECHAS SI ES NECESARIO
                   if (error.status === 404) {
                     console.error('No se encontraron fechas para el horario:', plan_fecha);
                   } else {
@@ -1027,7 +990,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
-
     this.guardar = true;
     this.btn_eliminar = false;
     this.cargar = false;
@@ -1035,7 +997,6 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
   CrearDataHorario(obj: any, tipo_dia: any, dh: any, origen: any, tipo: any, lista: any) {
-
     if (lista.length != 0) {
       // COLOCAR DETALLE DE DIA SEGUN HORARIO
       lista.map((element: any) => {
@@ -1102,18 +1063,14 @@ export class HorariosMultiplesComponent implements OnInit {
       })
     })
 
-
     let datos = {
       usuarios_validos: this.usuarios_validos,
       eliminar_horarios: this.eliminar_horarios,
       fec_inicio: this.fechaInicioFormluxon.toFormat('yyyy-MM-dd'),
       fec_final: this.fechaFinFormluxon.toFormat('yyyy-MM-dd'),
     };
-    console.log("ver datos BuscarFechasMultiples: ", datos)
 
     this.rest.BuscarFechasMultiples(datos).subscribe(res => {
-
-      console.log("Ver horairos a eliminar: ", res)
       this.eliminar = res;
       if (this.eliminar.length != 0) {
         this.BorrarDescanso();
@@ -1155,33 +1112,32 @@ export class HorariosMultiplesComponent implements OnInit {
   }
 
   GuardarInformacion() {
-    // Dividir el objeto plan_general en partes más pequeñas
-    console.log("ver plan general: ", this.plan_general)
+    // DIVIDIR EL OBJETO PLAN_GENERAL EN PARTES MÁS PEQUEÑAS
     const partes = this.dividirPlanGeneral(this.plan_general);
     const totalPartes = partes.length;
-    // Enviar la primera parte
+    // ENVIAR LA PRIMERA PARTE
     this.enviarParte(partes, 0, totalPartes);
   }
 
-
+  // METODO PARA ENVIAR POR PARTES LOS DATOS
   enviarParte(partes: any[], parteIndex: number, totalPartes: number) {
     const datosParcial = {
       parte: partes[parteIndex],
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
-      parteIndex: parteIndex, // Enviar el índice de la parte actual
-      totalPartes: totalPartes // Enviar el total de partes
+      parteIndex: parteIndex, // ENVIAR EL ÍNDICE DE LA PARTE ACTUAL
+      totalPartes: totalPartes // ENVIAR EL TOTAL DE PARTES
     };
 
-    // Llamada HTTP para enviar la parte actual
+    // LLAMADA HTTP PARA ENVIAR LA PARTE ACTUAL
     this.restP.CrearPlanGeneralPorLotes(datosParcial).subscribe(res => {
-      // Si la respuesta es "OK", continuamos
+      // SI LA RESPUESTA ES "OK", CONTINUAMOS
       if (res.message === 'OK') {
         if ((parteIndex + 1) < totalPartes) {
-          // Si no hemos enviado todas las partes, llamamos recursivamente para enviar la siguiente
+          // SI NO HEMOS ENVIADO TODAS LAS PARTES, LLAMAMOS RECURSIVAMENTE PARA ENVIAR LA SIGUIENTE
           this.enviarParte(partes, parteIndex + 1, totalPartes);
         } else {
-          // Si hemos enviado todas las partes, mostramos el toast de éxito
+          // SI HEMOS ENVIADO TODAS LAS PARTES, MOSTRAMOS EL TOAST DE ÉXITO
           this.cargar = true;
           this.guardar = false;
           this.toastr.success(
@@ -1191,7 +1147,7 @@ export class HorariosMultiplesComponent implements OnInit {
           });
         }
       } else {
-        // Si hay un error, lo mostramos en consola
+        // SI HAY UN ERROR, LO MOSTRAMOS EN CONSOLA
         this.toastr.error('Ups! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
@@ -1200,27 +1156,27 @@ export class HorariosMultiplesComponent implements OnInit {
     });
   }
 
+  // METODO PARA DIVIDIR LOS DATOS
   dividirPlanGeneral(plan_general: any[]): any[][] {
-    const partes: any[][] = []; // Define explícitamente el tipo como un array de arrays
-    const tamañoParte = 80000; // Ajusta el tamaño de cada parte según sea necesario
-    // Verifica si el tamaño total es menor que el tamaño de cada parte
+    const partes: any[][] = []; // DEFINE EXPLÍCITAMENTE EL TIPO COMO UN ARRAY DE ARRAYS
+    const tamañoParte = 80000; // AJUSTA EL TAMAÑO DE CADA PARTE SEGÚN SEA NECESARIO
+    // VERIFICA SI EL TAMAÑO TOTAL ES MENOR QUE EL TAMAÑO DE CADA PARTE
     if (plan_general.length <= tamañoParte) {
-      return [plan_general]; // Devuelve el array original como la única parte
+      return [plan_general]; // DEVUELVE EL ARRAY ORIGINAL COMO LA ÚNICA PARTE
     }
     for (let i = 0; i < plan_general.length; i += tamañoParte) {
-      const parte = plan_general.slice(i, i + tamañoParte); // Obtener una parte del array
+      const parte = plan_general.slice(i, i + tamañoParte); // OBTENER UNA PARTE DEL ARRAY
 
-      // Verifica si la parte es no vacía y la agrega
+      // VERIFICA SI LA PARTE ES NO VACIA Y LA AGREGA
       if (parte.length > 0) {
-        partes.push(parte); // Agregar la parte al array de partes
+        partes.push(parte); // AGREGAR LA PARTE AL ARRAY DE PARTES
       }
     }
-    return partes; // Devuelve el array de partes
+    return partes; // DEVUELVE EL ARRAY DE PARTES
   }
 
-
   // METODO PARA CARGAR TIMBRES
-  CargarTimbres(form: any) {
+  CargarTimbres() {
     this.guardar = false;
     var codigos = '';
     this.usuarios_validos.forEach((obj: any) => {
@@ -1412,15 +1368,13 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
-
     const arrayIds: number[] = this.eliminar.map((obj: any) => obj.id);
-
     let datos = {
       id_plan: arrayIds,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     }
-    console.log("ver datos a eliminar: ", datos)
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
     this.restP.EliminarRegistroMutiple(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
@@ -1443,6 +1397,7 @@ export class HorariosMultiplesComponent implements OnInit {
       });
     })
   }
+
   // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
 

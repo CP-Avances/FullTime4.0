@@ -11,6 +11,7 @@ export class EmpleadoHorariosService {
     private http: HttpClient,
   ) { }
 
+  // METODO PARA BUSCAR PLANIFICACIONES HORARIAS MULTIPLES  ** USADO
   BuscarFechasMultiples(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/buscar-horarios-multiples`, datos);
   }
@@ -25,9 +26,20 @@ export class EmpleadoHorariosService {
   }
 
   // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
-  VerificarHorariosExistentes2(datos: any) {
+  VerificarHorariosExistentesMultiples(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horarios-existentes`, datos);
   }
+
+
+
+
+
+
+
+
+
+
+
 
   // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS MISMO DIA (MD)
   BuscarHorarioHorasMD(datos: any) {
