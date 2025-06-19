@@ -137,7 +137,7 @@ export class VerCoordenadasComponent implements OnInit {
   get filtroNombreReg() { return this.filtros.filtroNombreReg };
 
   //FILTRO ROL
-  get filtroRolEmp() { return this.filtros.filtroRolEmp };  
+  get filtroRolEmp() { return this.filtros.filtroRolEmp };
 
   coordenadas: any = [];
   datosUsuarios: any = [];
@@ -170,7 +170,7 @@ export class VerCoordenadasComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip'); 
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
@@ -252,13 +252,28 @@ export class VerCoordenadasComponent implements OnInit {
   // METODO PARA BUSCAR COORDENADAS DE UBICACION DE USUARIO
   ListarUsuarios(id: number) {
     this.datosUsuarios = [];
-    this.restU.ListarCoordenadasUsuarioU(id).subscribe((datos: any) => {
-      this.datosUsuarios = datos;
-      if (this.rolEmpleado !== 1) {
-        // FILTRAR SOLO LOS USUARIOS QUE TIENEN ACCESO
-        this.datosUsuarios = datos.filter((usuario: any) => this.idUsuariosAcceso.has(usuario.id_empleado));
+
+    this.restU.ListarCoordenadasUsuarioU(id).subscribe({
+      next: (datos: any) => {
+        this.datosUsuarios = datos;
+        if (this.rolEmpleado !== 1) {
+          // FILTRAR SOLO LOS USUARIOS QUE TIENEN ACCESO
+          this.datosUsuarios = datos.filter((usuario: any) => this.idUsuariosAcceso.has(usuario.id_empleado));
+        }
+      },
+      error: (error) => {
+
+        if (error.error?.sin_usuarios) {
+          this.toastr.info('No se encontraron usuarios asignados en esta ubicación.', '', {
+            timeOut: 7000,
+          });
+        } else {
+          this.toastr.error('Error al cargar los datos de los usuarios.', '', {
+            timeOut: 6000,
+          });
+        }
       }
-    })
+    });
   }
 
   // METODO PARA ASIGNAR UBICACION A USUARIOS
@@ -299,6 +314,7 @@ export class VerCoordenadasComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -877,6 +893,7 @@ export class VerCoordenadasComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteVarios() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

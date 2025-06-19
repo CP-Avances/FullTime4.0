@@ -103,13 +103,13 @@ export class BuscarAsistenciaComponent implements OnInit {
     this.existenAsistencias = false;
     let datos = {
       codigo: form.codigoForm,
-      cedula: form.cedulaForm,
+      identificacion: form.cedulaForm,
       nombre: form.nombreForm,
       apellido: form.apellidoForm,
       inicio: form.fechaInicioForm,
       fin: form.fechaFinForm,
     }
-    if (!datos.codigo && !datos.cedula && !datos.nombre && !datos.apellido) {
+    if (!datos.codigo && !datos.identificacion && !datos.nombre && !datos.apellido) {
       return this.toastr.warning('Debe ingresar al menos un criterio de búsqueda.', 'Notificación', {
         timeOut: 6000,
       });

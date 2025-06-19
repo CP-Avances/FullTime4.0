@@ -48,7 +48,7 @@
             </div>
 
         </div>
-        <div class="row m-auto" style="padding-top: 10px;">
+        <div class="row m-auto" style="padding-top: 10px;" *ngIf="permisos">
             <div class="col-6 col-md-6 m-0 p-0">
                 <button id="botonTimbreInicio" style="float: right; margin-right: 2px;" mat-raised-button
                     (click)="AlmacenarDatos(5)">
@@ -78,54 +78,48 @@
     </div>
     <!--  ******************  INFORMACION DEL TIMBRE  ********************  -->
     <div class="row" *ngIf="ver_informacion">
-        <div class="col-12 col-md-6 m-auto p-0" style="align-content: center;">
-
-            <div  *ngIf="opcional && existe_camara && foto" >
-                <mat-slide-toggle [(ngModel)]="ver_camara" color="primary">
-                    Mostrar cámara
-                </mat-slide-toggle>
-            </div>
+        <div class="col-12 col-md-6 m-auto mt-4 p-2" style="align-content: center;">
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-calendar"></i>
                     {{this.fecha_hora}}
                 </label>
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-globe"></i>
                     Zona Horaria:
                 </label>
                 {{timeZone}} ({{gmt_dispositivo}})
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-hand-o-right"></i>
                     Tipo timbre:
                 </label>
                 {{asistencia}}
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-map-marker"></i>
                     Ubicación:
                 </label>
                 {{ubicacion}}
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-location-arrow"></i>
                     Longitud:
                 </label>
                 {{longitud}}
             </span>
-        
+
             <span id="fuente" class="card-span">
                 <label><i id="ver" class="fa fa-location-arrow"></i>
                     Latitud:
                 </label>
                 {{latitud}}
             </span>
-        
+
             <span id="fuente" class="card-span" *ngIf="camaraSeleccionada != ''">
                 <label><i id="ver" class="fa fa-camera"></i>
                     Cámara en uso:
@@ -134,35 +128,56 @@
             </span>
 
         </div>
-        
 
-        <div class="col-12 col-md-6 m-auto mt-4" *ngIf="ver_camara && existe_camara">
-            <div class="camara">
-                <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
-                    <webcam [height]="225" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
-                        (imageCapture)="handleImage($event)">
-                    </webcam>
+        <div class="col-12 col-md-6 m-auto mt-4 p-2 align-content-center">
+
+            <div class="contenedor_btnImg" *ngIf="existe_camara && foto">
+                <mat-card style="color: antiquewhite; margin-top: 2px;" (click)="toggleEstado('comunicado', 'correo')"
+                    [ngClass]="ver_camara ? 'activo' : 'inactivo'" class="estado-card">
+                    <mat-card-title>
+                        <label class="tituloCamara">{{ ver_camara ? 'DESACTIVAR' : 'ACTIVAR' }}</label>
+                    </mat-card-title>
+                    <mat-card-content [ngClass]="ver_camara ? 'ocultar-contenido' : 'mostrar-contenido'">
+                        <mat-icon class="mt-1 icono_camara">{{ ver_camara ? '' : 'photo_camera' }}</mat-icon>
+                    </mat-card-content>
+                    <mat-card-footer [ngClass]="ver_camara ? 'ocultar-contenido' : 'mostrar-contenido'">
+                        <label style="font-size: x-small;">{{ ver_camara ? '' : 'Presione en la cámara para activarla' }}</label>
+                    </mat-card-footer>
+                </mat-card>
+
+                <div class="camara" *ngIf="ver_camara && existe_camara">
+                    <div class="webcam-container" *ngIf="!imagenCamara && mostrarWebcam">
+                        <webcam [height]="225" [width]="300" [trigger]="triggerObservable" [videoOptions]="videoOptions"
+                            (imageCapture)="handleImage($event)">
+                        </webcam>
+                    </div>
+                    <div class="button-container">
+                        <button mat-mini-fab *ngIf="!imagenCamara" (click)="triggerSnapshot()">
+                            <mat-icon>photo_camera</mat-icon>
+                        </button>
+                        <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 1"
+                            (click)="SeleccionarCamara()">
+                            <mat-icon>loop</mat-icon>
+                        </button>
+                    </div>
+                    <div *ngIf="imagenCamara" class="circular-image-container">
+                        <img [src]="imagenCamara" />
+                    </div>
+                    <div class="button-container">
+                        <button class="gray-button" *ngIf="imagenCamara" (click)="CerrarCamara()">
+                            <mat-icon>clear</mat-icon>
+                        </button>
+                    </div>
                 </div>
-                <div class="button-container">
-                    <button mat-mini-fab *ngIf="!imagenCamara" (click)="triggerSnapshot()">
-                        <mat-icon>photo_camera</mat-icon>
-                    </button>
-                    <button class="elegir-button" *ngIf="!imagenCamara && camara_.length > 1"
-                        (click)="SeleccionarCamara()">
-                        <mat-icon>loop</mat-icon>
-                    </button>
-                </div>
-                <div *ngIf="imagenCamara" class="circular-image-container">
-                    <img [src]="imagenCamara" />
-                </div>
-                <div class="button-container">
-                    <button class="gray-button" *ngIf="imagenCamara" (click)="CerrarCamara()">
-                        <mat-icon>clear</mat-icon>
-                    </button>
-                </div>
+
             </div>
+
+
+
+
         </div>
     </div>
+
     <div class="row" *ngIf="ver_informacion">
         <div class="col-12">
             <form [formGroup]="formulario">

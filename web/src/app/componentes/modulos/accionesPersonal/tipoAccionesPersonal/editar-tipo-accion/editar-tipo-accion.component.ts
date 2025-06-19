@@ -28,10 +28,6 @@ export class EditarTipoAccionComponent implements OnInit {
   selec2: boolean = false;
   selec3: boolean = false;
 
-  // EVENTOS RELACIONADOS A SELECCIÓN E INGRESO DE PROCESOS PROPUESTOS
-  ingresoTipo: boolean = false;
-  vistaTipo: boolean = true;
-
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
@@ -103,12 +99,9 @@ export class EditarTipoAccionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     };
-    if (form.tipoAccionForm != undefined && form.tipoAccionForm != 20) {
-      this.GuardarInformacion(datosAccion);
-    }
-    else {
-      this.IngresarNuevoTipo(form, datosAccion);
-    }
+    
+    this.GuardarInformacion(datosAccion);
+    
   }
 
   // METODO PARA GUARDAR DATOS
@@ -122,7 +115,7 @@ export class EditarTipoAccionComponent implements OnInit {
     });
     if (this.contador != 0) {
       this.toastr.error('El tipo de acción personal seleccionado ya se encuentra registrado.',
-        'Ups!!! algo salio mal.', {
+        'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     } else {
@@ -134,7 +127,7 @@ export class EditarTipoAccionComponent implements OnInit {
         this.CerrarVentana(2, this.data.id);
       }, error => {
         this.toastr.error('Revisar los datos',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       });
@@ -208,29 +201,6 @@ export class EditarTipoAccionComponent implements OnInit {
     })
   }
 
-  // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO_ACCION
-  IngresarTipoAccion(form: any, descripcion: string) {
-    if (descripcion.toLocaleLowerCase() === 'otro') {
-      this.formulario.patchValue({
-        otroTipoForm: '',
-      });
-      this.ingresoTipo = true;
-      this.toastr.info('Ingresar nombre de un nuevo tipo de acción personal.', '', {
-        timeOut: 6000,
-      })
-      this.vistaTipo = false;
-    }
-  }
-
-  // METODO PARA VER LA LISTA DE TIPOS_ACCION
-  VerTiposAccion() {
-    this.formulario.patchValue({
-      otroTipoForm: '',
-    });
-    this.ingresoTipo = false;
-    this.vistaTipo = true;
-  }
-
   // METODO PARA INGRESAR NUEVO PROCESO PROPUESTO
   IngresarNuevoTipo(form: any, datos: any) {
     if (form.otroTipoForm != '') {
@@ -266,7 +236,7 @@ export class EditarTipoAccionComponent implements OnInit {
     // });
     // if (this.contar != 0) {
     //   this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-    //     'Ups!!! algo salio mal.', {
+    //     'Ups! algo salio mal.', {
     //     timeOut: 6000,
     //   })
     // } else {

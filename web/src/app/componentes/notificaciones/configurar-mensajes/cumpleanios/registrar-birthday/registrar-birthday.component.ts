@@ -60,7 +60,8 @@ export class RegistrarBirthdayComponent implements OnInit {
       tipo: 'cumpleanios',
       user_name: this.user_name,
       ip: this.ip,
-      ip_local: this.ips_locales
+      ip_local: 
+      this.ips_locales
     }
     this.restB.CrearMensajeNotificaciones(dataMensaje).subscribe(res => {
       this.SubirRespaldo(res[0].id)

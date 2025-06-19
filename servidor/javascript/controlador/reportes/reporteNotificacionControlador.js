@@ -20,7 +20,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
@@ -40,7 +40,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
@@ -60,7 +60,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.identificacion, 
                 h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 AND 
@@ -80,7 +80,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.identificacion, 
                 h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
@@ -100,7 +100,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 AND 
@@ -120,7 +120,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND
@@ -140,7 +140,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.fecha_hora, e.nombre, e.apellido, e.cedula, rn.descripcion 
+                rn.fecha_hora, e.nombre, e.apellido, e.identificacion, rn.descripcion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Alimentación Planificada%\' 
@@ -159,7 +159,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe,
-                rn.fecha_hora, e.nombre, e.apellido, e.cedula, rn.descripcion 
+                rn.fecha_hora, e.nombre, e.apellido, e.identificacion, rn.descripcion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Planificación de Alimentación Eliminada.\' 
@@ -179,7 +179,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_recibe AS id_empleado, rn.id_empleado_envia, 
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
             ORDER BY e.nombre ASC
@@ -197,7 +197,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_envia AS id_empleado, rn.id_empleado_recibe, 
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
             ORDER BY e.nombre ASC
@@ -215,7 +215,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_recibe AS id_empleado, rn.id_empleado_envia, 
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
             ORDER BY e.nombre ASC
@@ -233,7 +233,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_envia AS id_empleado, rn.id_empleado_recibe,
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
             ORDER BY e.nombre ASC
@@ -251,7 +251,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_recibe AS id_empleado, rn.id_empleado_envia, 
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1
             ORDER BY e.nombre ASC
@@ -269,7 +269,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_envia AS id_empleado, rn.id_empleado_recibe,
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
             ORDER BY e.nombre ASC
@@ -287,7 +287,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_recibe AS id_empleado, rn.id_empleado_envia, 
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Alimentación Planificada%\' 
@@ -306,7 +306,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT DISTINCT rn.id_empleado_envia AS id_empleado, rn.id_empleado_recibe, 
-                e.nombre, e.apellido, e.cedula 
+                e.nombre, e.apellido, e.identificacion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
                 AND rn.descripcion like \'Solicitó Alimentación%\' 
@@ -326,7 +326,7 @@ class NotificacionesControlador {
             const { envia, id_empleado } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
@@ -346,7 +346,7 @@ class NotificacionesControlador {
             const { recibe, id_empleado } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
@@ -366,7 +366,7 @@ class NotificacionesControlador {
             const { envia, id_empleado } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.identificacion, 
                 h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
@@ -386,7 +386,7 @@ class NotificacionesControlador {
             const { envia, id_empleado } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 AND 
@@ -406,7 +406,7 @@ class NotificacionesControlador {
             const { recibe, id_empleado } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
@@ -427,7 +427,7 @@ class NotificacionesControlador {
             const { envia, id_empleado } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.fecha_hora, e.nombre, e.apellido, e.cedula, rn.descripcion 
+                rn.fecha_hora, e.nombre, e.apellido, e.identificacion, rn.descripcion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Alimentación Planificada%\' 
@@ -448,7 +448,7 @@ class NotificacionesControlador {
             const { envia, id_empleado, fec_inicio, fec_final } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 AND 
@@ -469,7 +469,7 @@ class NotificacionesControlador {
             const { recibe, id_empleado, fec_inicio, fec_final } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
@@ -490,7 +490,7 @@ class NotificacionesControlador {
             const { envia, id_empleado, fec_inicio, fec_final } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.identificacion, 
                 h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
@@ -511,7 +511,7 @@ class NotificacionesControlador {
             const { envia, id_empleado, fec_inicio, fec_final } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 AND 
@@ -532,7 +532,7 @@ class NotificacionesControlador {
             const { recibe, id_empleado, fec_inicio, fec_final } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
@@ -553,7 +553,7 @@ class NotificacionesControlador {
             const { envia, id_empleado, fec_inicio, fec_final } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.fecha_hora, e.nombre, e.apellido, e.cedula, rn.descripcion 
+                rn.fecha_hora, e.nombre, e.apellido, e.identificacion, rn.descripcion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Alimentación Planificada%\' 
@@ -574,7 +574,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
@@ -594,7 +594,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_permiso, e.nombre, e.apellido, e.identificacion, 
                 ctp.descripcion AS permiso, p.fecha_inicio, p.fecha_final 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS ctp 
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
@@ -614,7 +614,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.identificacion, 
                 h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
@@ -633,7 +633,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.identificacion, 
                 h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
@@ -653,7 +653,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 AND 
@@ -673,7 +673,7 @@ class NotificacionesControlador {
             const { recibe } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.cedula, 
+                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_vacaciones, e.nombre, e.apellido, e.identificacion, 
                 v.fecha_inicio, v.fecha_final, v.fecha_ingreso 
             FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mv_solicitud_vacacion AS v 
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
@@ -692,7 +692,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.fecha_hora, e.nombre, e.apellido, e.cedula, rn.descripcion 
+                rn.fecha_hora, e.nombre, e.apellido, e.identificacion, rn.descripcion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Alimentación Planificada%\' 
@@ -711,7 +711,7 @@ class NotificacionesControlador {
             const { envia } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.fecha_hora, e.nombre, e.apellido, e.cedula, rn.descripcion 
+                rn.fecha_hora, e.nombre, e.apellido, e.identificacion, rn.descripcion 
             FROM ecm_realtime_timbres AS rn, eu_empleados AS e 
             WHERE e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND rn.descripcion like \'Planificación de Alimentación Eliminada.\' 

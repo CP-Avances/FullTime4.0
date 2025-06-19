@@ -340,7 +340,7 @@ export class PermisosMultiplesComponent implements OnInit {
       }
     }
     else {
-      this.toastr.warning('Ups!!! no ha seleccionado ningún tipo de permiso.', '', {
+      this.toastr.warning('Ups! no ha seleccionado ningún tipo de permiso.', '', {
         timeOut: 6000,
       });
       this.fechaInicioF.setValue('');
@@ -371,7 +371,7 @@ export class PermisosMultiplesComponent implements OnInit {
         this.ImprimirFecha(form);
       }
       else {
-        this.toastr.warning('Ups!!! ha superado el limite de días permitido para cargar solicitudes.', '', {
+        this.toastr.warning('Ups! ha superado el limite de días permitido para cargar solicitudes.', '', {
           timeOut: 4000,
         });
         this.fechaInicioF.setValue('');
@@ -395,7 +395,7 @@ export class PermisosMultiplesComponent implements OnInit {
         this.ImprimirFecha(form);
       }
       else {
-        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.dias_anticipar_permiso + ' días previos.',
+        this.toastr.warning('Ups! el permiso debio ser solicitado con ' + this.datosPermiso.dias_anticipar_permiso + ' días previos.',
           '', {
           timeOut: 4000,
         });
@@ -548,10 +548,10 @@ export class PermisosMultiplesComponent implements OnInit {
         var inicio_dia = Duration.fromISOTime('00:00:00');
 
         // SI LAS HORA DESDE ES MAYOR A LA HORA HASTA
-        if (inicio.values.hours > fin.values.hours) {
+        if (inicio.hours > fin.hours) {
 
           // SI LA HORA DESDE ESTA DENTRO DEL RAGO ESTABLECIDO MOSTRAR HORAS
-          if (inicio.values.hours >= 17 && inicio.values.hours <= Duration.fromISOTime('23:59:00').values.hours) {
+          if (inicio.hours >= 17 && inicio.hours <= Duration.fromISOTime('23:59:00').hours) {
             // RESTAR HORAS
             var entrada = media_noche.minus(inicio);
             var salida = fin.minus(inicio_dia);
@@ -565,7 +565,7 @@ export class PermisosMultiplesComponent implements OnInit {
             this.CalcularTiempo(resta);
           }
         }
-        else if (inicio.values.hours < fin.values.hours) {
+        else if (inicio.hours < fin.hours) {
           var entrada = media_noche.minus(inicio);
           resta = entrada.plus(fin);
           this.CalcularTiempo(resta);
@@ -612,7 +612,7 @@ export class PermisosMultiplesComponent implements OnInit {
     else {
       this.toastr.warning(
         `El tiempo solicitado es mayor a 24:00 horas.`,
-        `Ups!!! algo salio mal.`, {
+        `Ups! algo salio mal.`, {
         timeOut: 6000,
       });
     }
@@ -623,7 +623,7 @@ export class PermisosMultiplesComponent implements OnInit {
     if (valor === '00:00') {
       this.toastr.warning(
         `Ha solicitado ${valor} horas de permiso.`,
-        `Ups!!! algo salio mal.`, {
+        `Ups! algo salio mal.`, {
         timeOut: 6000,
       });
       this.LimpiarInformacion('');
@@ -1250,8 +1250,8 @@ export class PermisosMultiplesComponent implements OnInit {
   // METODO PARA VALIDAR EXISTENCIA DE SOLICITUDES DE PERMISOS POR HORAS
   finaliza_ciclo: number = 0;
   ValidarSolictudesPermisosHoras(data_usuarios: any, form: any, inicio: any, final: any) {
-    var hora_inicio = DateTime.fromFormat(form.horaSalidaForm, "HH:mm:ss").format('HH:mm:ss');
-    var hora_final = DateTime.fromFormat(form.horasIngresoForm, "HH:mm:ss").format('HH:mm:ss');
+    var hora_inicio = DateTime.fromFormat(form.horaSalidaForm, "HH:mm:ss").toFormat('HH:mm:ss');
+    var hora_final = DateTime.fromFormat(form.horasIngresoForm, "HH:mm:ss").toFormat('HH:mm:ss');
     let busqueda = {
       id_empleado: '',
       fec_inicio: inicio,
@@ -1680,17 +1680,17 @@ export class PermisosMultiplesComponent implements OnInit {
       this.usuarios = this.usuarios.concat(valor);
     }
     else {
-      var total = tiempo_solicitado.subtract(descuento_comida);
+      var total = tiempo_solicitado.minus(descuento_comida);
 
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
-      var horast = String(total.hours());
-      var minutost = String(total.minutes());
+      var horast = String(total.hours);
+      var minutost = String(total.minutes);
 
-      if (total.hours() < 10) {
-        horast = '0' + total.hours();
+      if (total.hours < 10) {
+        horast = '0' + total.hours;
       }
-      if (total.minutes() < 10) {
-        minutost = '0' + total.minutes();
+      if (total.minutes < 10) {
+        minutost = '0' + total.minutes;
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       var valorTotal: string = horast + ':' + minutost;
@@ -1989,7 +1989,7 @@ export class PermisosMultiplesComponent implements OnInit {
               usuarios = {
                 estado: 'Pendiente',
                 codigo: empleadoValido.codigo,
-                cedula: empleadoValido.cedula,
+                identificacion: empleadoValido.identificacion,
                 empleado: empleadoValido.nombre,
                 dias_libres: empleadoValido.dias_libres,
                 departamento: empleadoValido.name_departamento,
@@ -2014,7 +2014,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
       },
       error: (error: any) => {
-        this.toastr.error('No se pudo registrar las solicitudes de permiso.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('No se pudo registrar las solicitudes de permiso.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -2128,7 +2128,7 @@ export class PermisosMultiplesComponent implements OnInit {
       else {
         //console.log('ver verificador ', this.verificador)
         if (this.verificador === true) {
-          this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
+          this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
             timeOut: 6000,
           });
           this.verificar = false;

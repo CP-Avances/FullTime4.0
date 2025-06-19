@@ -43,7 +43,7 @@ class AccionPersonalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                INSERT INTO map_tipo_accion_personal (descripcion) VALUES($1) RETURNING *
+                INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
                 `, [descripcion]);
                 const [datos] = response.rows;
                 if (datos) {
@@ -64,12 +64,12 @@ class AccionPersonalControlador {
                 }
                 else {
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'error' });
+                    return res.status(300).jsonp({ message: 'error, no se insertaron los datos' });
                 }
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -270,48 +270,80 @@ class AccionPersonalControlador {
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip, ip_local } = req.body;
+                const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local } = req.body;
+                console.log('req.body: ', req.body);
                 let datosNuevos = req.body;
+                const fechaActual = new Date();
+                let id_empleado_comunicacion = null;
+                let id_empleado_comunica_cargo = null;
+                if (formulario6.firma_Resp_Notificacion != '' && formulario6.firma_Resp_Notificacion != null) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+                        SELECT * FROM informacion_general WHERE
+                        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+                    `, [formulario6.firma_Resp_Notificacion.trim().toUpperCase()]);
+                    id_empleado_comunicacion = response.rows[0].id;
+                    id_empleado_comunica_cargo = response.rows[0].id_cargo;
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO map_solicitud_accion_personal (id_empleado, fecha_creacion, fecha_rige_desde, 
-                    fecha_rige_hasta, identificacion_accion_personal, numero_partida_empresa, id_contexto_legal, 
-                    titulo_empleado_uno, firma_empleado_uno, titulo_empleado_dos, firma_empleado_dos, adicion_legal, 
-                    id_detalle_tipo_accion_personal, id_cargo_propuesto, id_proceso_propuesto, numero_partida_propuesta, 
-                    salario_propuesto, id_ciudad, id_empleado_responsable, numero_partida_individual, acta_final_concurso, 
-                    fecha_acta_final_concurso, nombre_reemplazo, puesto_reemplazo, funciones_reemplazo, 
-                    numero_accion_reemplazo,primera_fecha_reemplazo, posesion_notificacion, 
-                    descripcion_posesion_notificacion) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, 
-                    $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
-                `, [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
-                    decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
-                    tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad,
-                    id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp,
-                    puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion,
-                    descripcion_pose_noti]);
+                const response_accion = yield database_1.default.query(`
+                INSERT INTO map_documento_accion_personal (
+                    numero_accion_personal, fecha_elaboracion, hora_elaboracion, id_empleado_personal, fecha_rige_desde, fecha_rige_hasta, id_tipo_accion_personal, id_detalle_tipo_accion, detalle_otro, especificacion, 
+                    declaracion_jurada, adicion_base_legal, observacion, 
+                    id_proceso_actual, id_nivel_gestion_actual, id_unidad_administrativa, id_sucursal_actual, id_lugar_trabajo_actual, id_tipo_cargo_actual, id_grupo_ocupacional_actual, 
+                    id_grado_actual, remuneracion_actual, partida_individual_actual, 
+                    id_proceso_propuesto, id_sucursal_propuesta, id_nivel_gestion_propuesto, id_unidad_adminsitrativa_propuesta, id_lugar_trabajo_propuesto,id_tipo_cargo_propuesto, 
+                    id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, partida_individual_propuesta, 
+                    lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
+                    id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
+                    fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion) 
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
+                    $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
+                    $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
+                    $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, 
+                    $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, 
+                    $51, $52, $53, $54, $55, $56, $57, $58, $59) RETURNING *
+                `, [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion, formulario1.id_empleado_personal, formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta,
+                    formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro, formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
+                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual, formulario3.id_unidad_administrativa, formulario3.id_sucursal_actual, formulario3.id_lugar_trabajo_actual, formulario3.id_tipo_cargo_actual,
+                    formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual, formulario3.partida_individual_actual,
+                    formulario3.id_proceso_propuesto, formulario3.id_sucursal_propuesta, formulario3.id_nivel_gestion_propuesto, formulario3.id_unidad_administrativa_propuesta, formulario3.id_lugar_trabajo_propuesto,
+                    formulario3.id_tipo_cargo_propuesto, formulario3.id_grupo_ocupacional_propuesto, formulario3.id_grado_propuesto, formulario3.remuneracion_propuesta, formulario3.partida_individual_propuesta,
+                    formulario4.lugar_posesion, formulario4.fecha_posesion, formulario4.actaFinal, formulario4.fechaActa,
+                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado, formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
+                    formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control, formulario5.cargo_RespRegistro_control,
+                    formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion,
+                    id_empleado_comunica_cargo, fechaActual, null, null, null
+                ]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
-                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fec_creacion, 'ddd');
-                var fecha_rige_desdeN = yield (0, settingsMail_1.FormatearFecha2)(fec_rige_desde, 'ddd');
-                var fecha_rige_hastaN = yield (0, settingsMail_1.FormatearFecha2)(fec_rige_hasta, 'ddd');
-                var primera_fecha_reemplazoN = yield (0, settingsMail_1.FormatearFecha2)(primera_fecha_reemp, 'ddd');
-                var fecha_acta_final_concurso = yield (0, settingsMail_1.FormatearFecha2)(fec_act_final_concurso, 'ddd');
+                console.log('response_accion: ', response_accion.rows[0]);
+                const [registroPedido] = response_accion.rows;
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'map_solicitud_accion_personal',
+                    tabla: 'map_documento_accion_personal',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, fecha_creacion: ${fechaCreacionN}, fecha_rige_desde: ${fecha_rige_desdeN}, 
-                    fecha_rige_hasta: ${fecha_rige_hastaN}, identificacion_accion_personal: ${identi_accion_p}, numero_partida_empresa: ${num_partida}, id_contexto_legal: ${decre_acue_resol}, 
-                    titulo_empleado_uno: ${abrev_empl_uno}, firma_empleado_uno: ${firma_empl_uno}, titulo_empleado_dos: ${abrev_empl_dos}, firma_empleado_dos: ${firma_empl_dos}, adicion_legal: ${adicion_legal}, 
-                    id_detalle_tipo_accion_personal: ${tipo_accion}, id_cargo_propuesto: ${cargo_propuesto}, id_proceso_propuesto: ${proceso_propuesto}, numero_partida_propuesta: ${num_partida_propuesta}, 
-                    salario_propuesto: ${salario_propuesto}, id_ciudad: ${id_ciudad}, id_empleado_responsable: ${id_empl_responsable}, numero_partida_individual: ${num_partida_individual}, acta_final_concurso: ${act_final_concurso}, 
-                    fecha_acta_final_concurso: ${fecha_acta_final_concurso}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
-                    numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
-                    descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
+                    datosNuevos: `{id: ${response_accion.rows[0].id}, numero_accion_personal: ${response_accion.rows[0].numero_accion_personal}, fecha_elaboracion: ${response_accion.rows[0].fecha_elaboracion}, 
+                    hora_elaboracion: ${response_accion.rows[0].hora_elaboracion}, id_empleado_personal: ${response_accion.rows[0].id_empleado_personal}, fecha_rige_desde: ${response_accion.rows[0].fecha_rige_desde}, 
+                    fecha_rige_hasta: ${response_accion.rows[0].fecha_rige_hasta}, id_tipo_accion_personal: ${response_accion.rows[0].id_tipo_accion_personal}, id_detalle_tipo_accion: ${response_accion.rows[0].id_detalle_tipo_accion}, detalle_otro: ${response_accion.rows[0].detalle_otro}, 
+                    especificacion: ${response_accion.rows[0].especificacion}, declaracion_jurada: ${response_accion.rows[0].declaracion_jurada}, adicion_base_legal: ${response_accion.rows[0].adicion_base_legal}, observacion: ${response_accion.rows[0].observacion}, 
+                    id_proceso_actual: ${response_accion.rows[0].id_proceso_actual}, id_nivel_gestion_actual: ${response_accion.rows[0].id_nivel_gestion_actual}, id_unidad_administrativa: ${response_accion.rows[0].id_unidad_administrativa}, id_sucursal_actual: ${response_accion.rows[0].id_sucursal_actual}, 
+                    id_lugar_trabajo_actual: ${response_accion.rows[0].lugar_trabajo_actual}, id_tipo_cargo_actual: ${response_accion.rows[0].id_tipo_cargo_actual}, id_grupo_ocupacional_actual: ${response_accion.rows[0].id_grupo_ocupacional_actual}, 
+                    id_grado_actual: ${response_accion.rows[0].id_grado_actual}, remuneracion_actual: ${response_accion.rows[0].remuneracion_actual}, partida_individual_actual: ${response_accion.rows[0].partida_individual_actual}, 
+                    id_proceso_propuesto: ${response_accion.rows[0].id_proceso_propuesto}, id_sucursal_propuesta: ${response_accion.rows[0].id_sucursal_propuesta}, id_nivel_gestion_propuesto: ${response_accion.rows[0].id_nivel_gestion_propuesto}, id_unidad_adminsitrativa_propuesta: ${response_accion.rows[0].id_unidad_administrativa_propuesta}, 
+                    id_lugar_trabajo_propuesto: ${response_accion.rows[0].id_lugar_trabajo_propuesto},id_tipo_cargo_propuesto: ${response_accion.rows[0].id_tipo_cargo_propuesto}, id_grupo_ocupacional_propuesto: ${response_accion.rows[0].id_grupo_ocupacional_propuesto}, id_grado_propuesto: ${response_accion.rows[0].id_grado_propuesto}, 
+                    remuneracion_propuesta: ${response_accion.rows[0].remuneracion_propuesta}, partida_individual_propuesta: ${response_accion.rows[0].partida_individual_propuesta}, lugar_posesion: ${response_accion.rows[0].lugar_posesion}, fecha_posesion: ${response_accion.rows[0].fecha_posesion}, numero_acta_final: ${response_accion.rows[0].numero_acta_final}, fecha_acta_final: ${response_accion.rows[0].fecha_acta_final},
+                    id_empleado_director: ${response_accion.rows[0].id_empleado_director}, id_tipo_cargo_director: ${response_accion.rows[0].id_tipo_cargo_director}, id_empleado_autoridad_delegado: ${response_accion.rows[0].id_empleado_autoridad_delegado}, id_tipo_cargo_autoridad_delegado: ${response_accion.rows[0].id_tipo_cargo_autoridad_delegado}, 
+                    id_empleado_testigo: ${response_accion.rows[0].id_empleado_testigo}, fecha_testigo: ${response_accion.rows[0].fecha_testigo}, id_empleado_elaboracion: ${response_accion.rows[0].id_empleado_elaboracion}, id_tipo_cargo_elaboracion: ${response_accion.rows[0].id_tipo_cargo_elaboracion}, id_empleado_revision: ${response_accion.rows[0].id_empleado_revision}, 
+                    id_tipo_cargo_revisio: ${response_accion.rows[0].id_tipo_cargo_revisio}n, id_empleado_control: ${response_accion.rows[0].id_empleado_control}, id_tipo_cargo_control: ${response_accion.rows[0].id_tipo_cargo_control}, comunicacion_electronica: ${response_accion.rows[0].comunicacion_electronica},
+                    fecha_comunicacion: ${response_accion.rows[0].fecha_comunicacion}, hora_comunicacion: ${response_accion.rows[0].hora_comunicacion}, medio_comunicacion: ${response_accion.rows[0].medio_comunicacion}, id_empleado_comunicacion: ${response_accion.rows[0].id_empleado_comunicacion}, id_tipo_cargo_comunicacion: ${response_accion.rows[0].id_tipo_cargo_comunicacion}, 
+                    fecha_registro: ${response_accion.rows[0].fecha_registro}, fecha_actualizacion: ${response_accion.rows[0].fecha_actualizacion}, proceso: ${response_accion.rows[0].proceso}, id_vacacion: ${response_accion.rows[0].id_vacacion}}`,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null
@@ -321,8 +353,9 @@ class AccionPersonalControlador {
                 return res.jsonp({ message: 'Registro realizado con éxito.' });
             }
             catch (error) {
+                console.log('response_accion: ', error);
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -417,6 +450,110 @@ class AccionPersonalControlador {
             }
         });
     }
+    EliminarTipoAccionMultipleMult(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            var count = 0;
+            var count_no = 0;
+            var list_tipoAccionPersonal = [];
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const resultado = yield database_1.default.query(`
+                        SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
+                    `, [item.id]);
+                    const [existe_datos] = resultado.rows;
+                    if (!existe_datos) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_detalle_tipo_accion_personal',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
+                        });
+                    }
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (existe_datos) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const resultado = yield database_1.default.query(`
+                        SELECT id FROM map_documento_accion_personal WHERE id_detalle_tipo_accion = $1
+           `, [item.id]);
+                        const [existe_detalle] = resultado.rows;
+                        console.log('existe_detalle: ', existe_detalle);
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        if (!existe_detalle) {
+                            console.log('existe_detalle entro: ', existe_detalle);
+                            console.log('item 11: ', item.id);
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const res = yield database_1.default.query(`
+                                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                            `, [item.id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_detalle_tipo_accion_personal',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(existe_datos),
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            console.log('res: ', res);
+                            count += 1;
+                        }
+                        else {
+                            console.log('existe_detalle afuera: ', existe_detalle);
+                            console.log('item: ', item);
+                            list_tipoAccionPersonal.push(item.nombre);
+                            count_no += 1;
+                        }
+                    }
+                }
+                var meCount = "registro eliminado";
+                if (count > 1) {
+                    meCount = "registros eliminados";
+                }
+                return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
+                        if (count <= 1) {
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                            });
+                        }
+                        else if (count > 1) {
+                            return res.status(300).jsonp({
+                                message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                            });
+                        }
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+                    }
+                }
+            }
+        });
+    }
     verLogoMinisterio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = 'ministerio_trabajo.png';
@@ -437,7 +574,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const EMPLEADO = yield database_1.default.query(`
-            SELECT d.id, d.nombre, d.apellido, d.cedula, d.codigo, d.id_cargo, 
+            SELECT d.id, d.nombre, d.apellido, d.identificacion, d.codigo, d.id_cargo, 
                 ec.sueldo, d.name_cargo AS cargo, d.name_dep AS departamento 
             FROM informacion_general AS d, eu_empleado_cargos AS ec
             WHERE d.id_cargo = ec.id AND d.id = $1
@@ -468,8 +605,8 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const ACCION = yield database_1.default.query(`
-            SELECT ap.id, ap.id_empleado, ap.fecha_creacion, ap.fecha_rige_desde, 
-                ap.fecha_rige_hasta, ap.identificacion_accion_personal, ap.numero_partida_empresa, ap.id_contexto_legal,
+            SELECT ap.id, ap.id_empleado_personal, ap.fecha_elaboracion, ap.fecha_rige_desde, ap.fecha_rige_hasta, 
+                ap.id_tipo_accion_personal, ap.numero_accion_personal, ap.id_contexto_legal,
                 ap.titulo_empleado_uno, ap.firma_empleado_uno, ap.titulo_empleado_dos, ap.firma_empleado_dos, 
                 ap.adicion_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
                 ap.numero_partida_propuesta, ap.salario_propuesto, ap.id_ciudad, ap.id_empleado_responsable, 
@@ -488,20 +625,112 @@ class AccionPersonalControlador {
             }
         });
     }
+    // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
     ListarPedidoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ACCION = yield database_1.default.query(`
-            SELECT ap.id, ap.id_empleado, ap.fecha_creacion, ap.fecha_rige_desde,
-                ap.fecha_rige_hasta, ap.identificacion_accion_personal, ap.numero_partida_empresa, ap.id_contexto_legal, 
-                ap.titulo_empleado_uno, ap.firma_empleado_uno, ap.titulo_empleado_dos, ap.firma_empleado_dos, 
-                ap.adicion_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
-                ap.numero_partida_propuesta, ap.salario_propuesto, ap.id_ciudad, ap.id_empleado_responsable, 
-                ap.numero_partida_individual, ap.acta_final_concurso, ap.fecha_acta_final_concurso, ap.nombre_reemplazo, 
-                ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 
-                ap.posesion_notificacion, ap.descripcion_posesion_notificacion, tap.base_legal, tap.id_tipo_accion_personal,
-                e.codigo, e.cedula, e.nombre, e.apellido 
-            FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, eu_empleados AS e 
-            WHERE ap.id_detalle_tipo_accion_personal = tap.id AND e.id = ap.id_empleado
+                SELECT 
+                    ap.id, ap.numero_accion_personal, ap.fecha_elaboracion, 
+                    CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
+                    ap.fecha_rige_desde, ap.fecha_rige_hasta, 
+                    ap.id_tipo_accion_personal, tp.descripcion AS accion_personal, 
+                    ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
+                    ap.especificacion, ap.declaracion_jurada, ap.adicion_base_legal, 
+                    ap.observacion, ap.id_proceso_actual, ps.nombre AS proceso_actual,
+                    -- NIVEL DE GESTION ACTUAL
+                    ap.id_nivel_gestion_actual,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_nivel_gestion_actual) AS nivel_gestion_actual,
+                    -- UNIDAD ADMINISTRATIVA ACTUAL
+                    ap.id_unidad_administrativa,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_unidad_administrativa) AS unidad_administrativa,
+                    -- SUCURSAL ACTUAL
+                    ap.id_sucursal_actual,
+                    (SELECT nombre FROM e_sucursales WHERE id = ap.id_sucursal_actual) AS sucursal_actual,
+                    -- TRABAJO ACTUAL
+                    ap.id_lugar_trabajo_actual,
+                    (SELECT descripcion FROM e_ciudades WHERE id = ap.id_lugar_trabajo_actual) AS lugar_trabajo_actual,
+
+                    ap.id_tipo_cargo_actual, inf.name_cargo AS cargo_actual,
+                    -- GRUPO OCUPACIONAL ACTUAL
+                    ap.id_grupo_ocupacional_actual,
+                    (SELECT descripcion FROM map_cat_grupo_ocupacional WHERE id = ap.id_grupo_ocupacional_actual) AS grupo_ocupacional_actual,
+                    -- GRADO ACTUAL
+                    ap.id_grado_actual,
+                    (SELECT descripcion FROM map_cat_grado WHERE id = ap.id_grado_actual) AS grado_actual,
+                    ap.remuneracion_actual, ap.partida_individual_actual,
+                    -- PROCESO PROPUESTO
+                    ap.id_proceso_propuesto,
+                    (SELECT nombre FROM map_cat_procesos WHERE id = ap.id_proceso_propuesto) AS proceso_propuesto,
+                    -- NIVEL DE GESTIO PROPUESTA
+                    ap.id_nivel_gestion_propuesto,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_nivel_gestion_propuesto) AS nivel_gestion_propuesto,
+                    -- UNIDAD ADMINISTRATIVA PROPUESTA
+                    ap.id_unidad_adminsitrativa_propuesta,
+                    (SELECT nombre FROM ed_departamentos WHERE id = ap.id_unidad_adminsitrativa_propuesta) AS unidad_administrativa_propuesta,
+                    -- SUCURSAL PROPUESTA
+                    ap.id_sucursal_propuesta,
+                    (SELECT nombre FROM e_sucursales WHERE id = ap.id_sucursal_propuesta) AS sucursal_propuesto,
+                    -- LUGAR DE TRABAJO PROPUESTA
+                    ap.id_lugar_trabajo_propuesto,
+                    (SELECT descripcion FROM e_ciudades WHERE id = ap.id_lugar_trabajo_propuesto) AS lugar_trabajo_propuesto,
+                    -- CARGO PROPUESTO
+                    ap.id_tipo_cargo_propuesto,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_propuesto) AS cargo_propuesto,
+                    -- GRUPO OCUPACIONAL PROPUESTO
+                    ap.id_grupo_ocupacional_propuesto,
+                    (SELECT descripcion FROM map_cat_grupo_ocupacional WHERE id = ap.id_grupo_ocupacional_propuesto) AS grupo_ocupacional_propuesto,
+                    -- GRADO PROPUESTO
+                    ap.id_grado_propuesto,
+                    (SELECT descripcion FROM map_cat_grado WHERE id = ap.id_grado_propuesto) AS grado_propuesto,
+                
+                    ap.remuneracion_propuesta, ap.partida_individual_propuesta,
+                    -- POSESION DEL PUESTO
+                    ap.lugar_posesion,
+                    (SELECT descripcion FROM e_ciudades WHERE id = ap.lugar_posesion) AS descripcion_lugar_posesion,
+                    ap.fecha_posesion, ap.numero_acta_final, ap.fecha_acta_final,
+
+                    ap.id_empleado_director,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_director) AS empleado_director,
+                    ap.id_tipo_cargo_director,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_director) AS cargo_director,
+
+                    ap.id_empleado_autoridad_delegado,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_autoridad_delegado) AS empleado_autoridad_delegado,
+                    ap.id_tipo_cargo_autoridad_delegado,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_autoridad_delegado) AS cargo_autoridad_delegado,
+
+                    ap.id_empleado_testigo,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_testigo) AS empleado_testigo,
+                    ap.fecha_testigo,
+
+                    ap.id_empleado_elaboracion,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_elaboracion) AS empleado_elaboracion,
+                    ap.id_tipo_cargo_elaboracion,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_elaboracion) AS tipo_cargo_elaboracion,
+
+                    ap.id_empleado_revision,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_revision) AS empleado_revision,
+                    ap.id_tipo_cargo_revision,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_revision) AS tipo_cargo_revision,
+
+                    ap.id_empleado_control,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_control) AS empleado_control,
+                    ap.id_tipo_cargo_control,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_control) AS tipo_cargo_control,
+
+                    ap.comunicacion_electronica, ap.fecha_comunicacion, ap.hora_comunicacion, 
+                    ap.medio_comunicacion, ap.id_empleado_comunicacion,
+                    (SELECT CONCAT(nombre, ' ', apellido) FROM informacion_general WHERE id = ap.id_empleado_comunicacion) AS empleado_comunicacion,
+                    ap.id_tipo_cargo_comunicacion,
+                    (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_comunicacion) AS cargo_comunicacion,
+
+                    ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion
+
+                FROM map_documento_accion_personal AS ap
+                INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
+                INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
+                INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
+                INNER JOIN map_cat_procesos AS ps ON ps.id = ap.id_proceso_actual;
             `);
             if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
@@ -763,6 +992,111 @@ class AccionPersonalControlador {
                 return res.status(500).jsonp({ message: 'error' });
             }
             return res.status(200).jsonp({ message: 'ok' });
+        });
+    }
+    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    EliminarTipoAccionMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { listaEliminar, user_name, ip, ip_local } = req.body;
+            let error = false;
+            var count = 0;
+            var count_no = 0;
+            var list_TipoAccion = [];
+            try {
+                for (const item of listaEliminar) {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const resultado = yield database_1.default.query(`
+             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `, [item.id]);
+                    const [existe_tipo] = resultado.rows;
+                    if (!existe_tipo) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'map_detalle_tipo_accion_personal',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al eliminar el tipo accion personal con id: ${item.id}. Registro no encontrado.`
+                        });
+                    }
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (existe_tipo) {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        const resultado = yield database_1.default.query(`
+             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `, [item.id]);
+                        const [existe_tipo_emple] = resultado.rows;
+                        if (!existe_tipo_emple) {
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            const res = yield database_1.default.query(`
+             DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+           `, [item.id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'map_detalle_tipo_accion_personal',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: JSON.stringify(existe_tipo),
+                                datosNuevos: '',
+                                ip: ip,
+                                ip_local: ip_local,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            //CONTADOR ELIMINADOS
+                            count += 1;
+                        }
+                        else {
+                            list_TipoAccion.push(item.descripcion);
+                            count_no += 1;
+                        }
+                    }
+                }
+                var meCount = "registro eliminado";
+                if (count > 1) {
+                    meCount = "registros eliminados";
+                }
+                res.status(200).jsonp({
+                    message: count.toString() + ' ' + meCount + ' con éxito.',
+                    ms2: 'Existen datos relacionados con ',
+                    codigo: 200,
+                    eliminados: count,
+                    relacionados: count_no,
+                    listaNoEliminados: list_TipoAccion
+                });
+            }
+            catch (err) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                error = true;
+                if (error) {
+                    if (err.table == 'map_empleado_grupo_ocupacional') {
+                        if (count == 1) {
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_TipoAccion
+                            });
+                        }
+                        else {
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_TipoAccion
+                            });
+                        }
+                    }
+                    else {
+                        return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
+                    }
+                }
+            }
         });
     }
 }

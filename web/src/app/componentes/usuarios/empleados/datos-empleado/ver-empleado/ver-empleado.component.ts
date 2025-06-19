@@ -18,8 +18,7 @@ import ExcelJS, { FillPattern } from "exceljs";
 
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
-// ELIMINA LAS URLS POR DEFECTO
-delete L.Icon.Default.prototype._getIconUrl;
+
 // ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -61,8 +60,6 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
-import { RegistrarEmpleProcesoComponent } from 'src/app/componentes/modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
-import { EditarEmpleadoProcesoComponent } from 'src/app/componentes/modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { EditarSolicitudComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
 import { PlanificacionComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
 import { EditarPlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
@@ -73,7 +70,6 @@ import { EditarPlanComidasComponent } from 'src/app/componentes/modulos/alimenta
 import { CambiarContrasenaComponent } from 'src/app/componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
 import { AdministraComidaComponent } from 'src/app/componentes/modulos/alimentacion/administra-comida/administra-comida.component';
 import { CancelarPermisoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
-import { EditarEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/editar-empleado/editar-empleado.component';
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { TituloEmpleadoComponent } from '../../asignar-titulo/titulo-empleado/titulo-empleado.component';
 import { PlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/plan-hora-extra/plan-hora-extra.component';
@@ -147,6 +143,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   get frase_m(): string { return this.plantillaPDF.marca_Agua }
   get logoE(): string { return this.plantillaPDF.logoBase64 }
 
+  // VARIABLES PARA EL MAPA
+  latitud: number;
+  longitud: number;
+  nombreMarcador: string = '';
+
   constructor(
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS EMPLEADO
     public restEmpleHorario: EmpleadoHorariosService, // SERVICIO DATOS HORARIO DE EMPLEADOS
@@ -192,10 +193,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     var a = DateTime.now();
     this.FechaActual = a.toFormat('yyyy-MM-dd');
     this.activatedRoute.params
@@ -245,6 +246,18 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     } else {
       this.SeleccionarPestana(0);
     }
+
+    // VERIFICAR QUE EL MAPA ESTA DEFINIDO
+    if (this.MAP) {
+      this.MAP.invalidateSize();
+    }
+
+    const intervalo = setInterval(() => {
+      if (this.latitud && this.longitud && this.nombreMarcador) {
+        this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
+        clearInterval(intervalo); // DETENER EL INTERVALO DESPUÉS DE EJECUTARLO
+      }
+    }, 200); // REVISA CADA 200MS SI YA ESTÁN DISPONIBLES
   }
 
   // METODO PARA CAMBIAR DE PESTAÑA
@@ -297,8 +310,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.planComidas = [];
     this.solicitaComida = [];
     this.administra_comida = [];
-    // ACCIONES PERSONAL
-    this.empleadoProcesos = [];
     // AUTORIZACIONES SOLICITUDES
     this.autorizacionesTotales = [];
   }
@@ -358,12 +369,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
         this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
         this.alimentacion = 1;
-      }
-    }
-    else if (event.tab.textLabel === 'accion_personal') {
-      if (this.HabilitarAccion === true && this.accion_personal === 0) {
-        this.ObtenerEmpleadoProcesos(this.formato_fecha);
-        this.accion_personal = 1;
       }
     }
     else if (event.tab.textLabel === 'autorizar') {
@@ -492,6 +497,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.datoActual = [];
     this.informacion.ObtenerDatosActuales(parseInt(this.idEmpleado)).subscribe(res => {
       this.datoActual = res[0];
+      console.log('datoActual ', this.datoActual)
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
@@ -538,7 +544,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-      var empleado = data[0].nombre + ' ' + data[0].apellido;
+      this.nombreMarcador = data[0].nombre + ' ' + data[0].apellido;
+      this.latitud = data[0].latitud;
+      this.longitud = data[0].longitud;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         //this.perfil.SetImagen(this.urlImagen);
@@ -562,7 +570,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           (result) => (this.imagenEmpleado = result)
         );
       }
-      this.MapGeolocalizar(data[0].latitud, data[0].longitud, empleado);
+      // this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
 
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
@@ -597,31 +605,31 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       longitud = -78.4875258;
       zoom = 7;
     }
-  
+
     setTimeout(() => {
       if (this.MAP) {
         this.MAP.remove();
         this.MAP = null;
       }
-  
+
       this.MAP = L.map('geolocalizacion', {
         center: [latitud, longitud],
         zoom: zoom
       });
-  
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
       }).addTo(this.MAP);
-  
+
       if (this.MARKER) {
         this.MAP.removeLayer(this.MARKER);
       }
-  
+
       this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
       this.MARKER.bindPopup(empleado).openPopup();
-    }, 100); 
+    }, 500);
   }
-  
+
 
   // METODO INCLUIR EL CROKIS
   AbrirUbicacion(nombre: string, apellido: string) {
@@ -650,37 +658,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
   }
 
-  /*
-  // METODO EDICION DE REGISTRO DE EMPLEADO
-  AbrirVentanaEditarEmpleado(dataEmpley: any) {
-    this.ventana.open(EditarEmpleadoComponent, { data: dataEmpley, width: '800px' })
-      .afterClosed().subscribe(result => {
-        if (result) {
-          this.VerEmpleado(this.formato_fecha)
-        }
-      })
-  }
-      */
-
   editar_empleado: boolean = false;
-  pagina_empleado: any ="";
-  empleado_editar: any=[];
-  ver_empleado: boolean=true;
+  pagina_empleado: any = "";
+  empleado_editar: any = [];
+  ver_empleado: boolean = true;
 
-  AbirVentanaEditarEmpleado(datoEmpleado: any){
-    this.ver_empleado=false;
-    this.editar_empleado=true;
-    this.empleado_editar=datoEmpleado;
-    this.pagina_empleado='ver-empleado';
+  AbirVentanaEditarEmpleado(datoEmpleado: any) {
+    this.ver_empleado = false;
+    this.editar_empleado = true;
+    this.empleado_editar = datoEmpleado;
+    this.pagina_empleado = 'ver-empleado';
   }
-
-
-
-
-
-
-
-  
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
@@ -747,7 +735,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     localStorage.removeItem('fullname');
     localStorage.removeItem('correo');
     localStorage.removeItem('iniciales');
-    // localStorage.removeItem('view_imagen');
   }
 
 
@@ -799,6 +786,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteTitulo(id: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -842,6 +830,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteDiscapacidad(id: number) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -904,18 +893,22 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       data: { idEmpleado: this.idEmpleado, vacuna: datos }, width: '600px'
     })
       .afterClosed().subscribe(result => {
-        this.ObtenerDatosVacunas(this.formato_fecha);
-      })
+        setTimeout(() => {
+          this.ObtenerDatosVacunas(this.formato_fecha);
+        }, 200);
+      });
   }
 
   // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION
   MostrarVentanaVacuna() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(CrearVacunaComponent, {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
-    })
-      .afterClosed().subscribe(result => {
+    }).afterClosed().subscribe(result => {
+      setTimeout(() => {
         this.ObtenerDatosVacunas(this.formato_fecha);
-      })
+      }, 200);
+    });
   }
 
   // ELIMINAR REGISTRO DE VACUNA
@@ -935,6 +928,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminarVacuna(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -982,6 +976,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       })
     });
   }
+
   listaCargosEmple: any = [];
   listaContratosEmple: any = []
   obtenerContratoCargosEmplrado() {
@@ -1040,6 +1035,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
+
   // METODO PARA LIMPIAR REGISTRO DE CONTRATO
   LimpiarContrato() {
     this.contratoSeleccionado = [];
@@ -1054,10 +1050,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   editar_contrato: boolean = false;
   pagina_contrato: any = '';
   contrato_editar: any = [];
-  AbrirVentanaEditarContrato(dataContrato: any) {
+  fecha_seleccionada: string = '';
+  AbrirVentanaEditarContrato(dataContrato: any, form: any) {
     this.ver_contrato_cargo = false;
     this.editar_contrato = true;
     this.contrato_editar = dataContrato;
+    this.fecha_seleccionada = form;
     this.pagina_contrato = 'ver-empleado';
   }
 
@@ -1066,7 +1064,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let eliminar = {
       id: dataContrato.id,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
     this.restEmpleado.EliminarContrato(eliminar).subscribe({
       next: (res: any) => {
@@ -1078,6 +1077,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           this.toastr.success(res.message, 'Correcto.', {
             timeOut: 4500,
           });
+          //console.log('contrato empleado ', this.contratoSeleccionado)
+          this.contratoSeleccionado = this.contratoSeleccionado.filter((obj: any) => obj.id !== dataContrato.id);
           this.VerDatosActuales(this.formato_fecha);
           this.ObtenerContratosEmpleado(this.formato_fecha);
         }
@@ -1092,6 +1093,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS
   ConfirmarEliminacionDatos(data: any, tipo: string, estado: any) {
     const mensaje = 'eliminar';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -1426,7 +1428,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
-        let inicio = DateTime.fromISO(ctrlValue).set({ day: 1 }).toFormat('dd/MM/yyyy');
+        let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
         this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toISODate());
       }
       this.fecHorario = false;
@@ -1636,7 +1638,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         }
       }
       else {
-        this.toastr.info('Ups!!! no se han encontrado registros.', 'No existe detalle de planificación.', {
+        this.toastr.info('Ups! no se han encontrado registros.', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
       }
@@ -1791,7 +1793,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   expansion: boolean = true;
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, index: any): void {
     let fecha = `${anio}-${mes}-${dia}`;
-    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy/MM/dd');
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy/MM/dd');
     let verificar = DateTime.fromFormat(fecha_, 'yyyy/MM/dd').isValid;
     // VERIFICAR QUE EL DIA SEA VALIDO (30-31)
     if (verificar === true) {
@@ -1815,7 +1817,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.ver_activar_editar = false;
     }
     else {
-      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+      this.toastr.warning('Ups! Fecha no es válida.', '', {
         timeOut: 6000,
       });
     }
@@ -2100,7 +2102,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + this.unPermiso.nombre, style: 'itemsTableD' }] },
               { text: [{ text: 'NOMBRES: ' + this.unPermiso.apellido, style: 'itemsTableD' }] },
-              { text: [{ text: 'CÉDULA: ' + this.unPermiso.cedula, style: 'itemsTableD' }] }
+              { text: [{ text: 'IDENTIFICACIÓN: ' + this.unPermiso.identificacion, style: 'itemsTableD' }] }
             ]
           }],
           [{
@@ -2228,7 +2230,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + this.unPermiso.nombre, style: 'itemsTableD' }] },
               { text: [{ text: 'NOMBRES: ' + this.unPermiso.apellido, style: 'itemsTableD' }] },
-              { text: [{ text: 'CÉDULA: ' + this.unPermiso.cedula, style: 'itemsTableD' }] }
+              { text: [{ text: 'IDENTIFICACIÓN: ' + this.unPermiso.identificacion, style: 'itemsTableD' }] }
             ]
           }],
           [{
@@ -2549,7 +2551,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         id_contrato: this.datoActual.id_contrato,
         id_cargo: this.datoActual.id_cargo,
         nombre: this.datoActual.nombre + ' ' + this.datoActual.apellido,
-        cedula: this.datoActual.cedula,
+        identificacion: this.datoActual.identificacion,
         codigo: this.datoActual.codigo,
         correo: this.datoActual.correo,
         id: this.datoActual.id,
@@ -2583,6 +2585,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -2599,7 +2602,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -2650,7 +2653,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       inicio: h_inicio,
       desde: desde,
       hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales, 'HH:mm').toFormat('HH:mm'),
+      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
       fin: h_fin,
     }
 
@@ -2731,7 +2734,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       id_contrato: this.datoActual.id_contrato,
       id_cargo: this.datoActual.id_cargo,
       nombre: this.datoActual.nombre + ' ' + this.datoActual.apellido,
-      cedula: this.datoActual.cedula,
+      identificacion: this.datoActual.identificacion,
       correo: this.datoActual.correo,
       codigo: this.datoActual.codigo,
       id: this.datoActual.id,
@@ -2790,6 +2793,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         timeOut: 6000,
       })
     }, error => {
+      (document.activeElement as HTMLElement)?.blur();
       this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
         .subscribe((confirmado: Boolean) => {
           if (confirmado) {
@@ -2806,7 +2810,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.cedula + '</th></tr>';
+      '</th><th>' + datos.identificacion + '</th></tr>';
     let cuenta_correo = datos.correo;
 
     // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -2907,81 +2911,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         });
       }
       else {
-        this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de planificación.', {
+        this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de planificación.', {
           timeOut: 6000,
         });
       }
     })
   }
 
-  /** ******************************************************************************************* **
-   ** **                   METODO DE PRSENTACION DE DATOS DE PROCESOS                          ** **
-   ** ******************************************************************************************* **/
-
-  // METODO PARA MOSTRAR DATOS DE LOS PROCESOS DEL EMPLEADO
-  empleadoProcesos: any = [];
-  ObtenerEmpleadoProcesos(formato_fecha: string) {
-    this.empleadoProcesos = [];
-    this.restEmpleadoProcesos.ObtenerProcesoUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
-      this.empleadoProcesos = datos;
-      this.empleadoProcesos.forEach((data: any) => {
-        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-        data.fecha_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-      })
-    })
-  }
-
-  // VENTANA PARA INGRESAR PROCESOS DEL EMPLEADO
-  AbrirVentanaProcesos(): void {
-    if (this.datoActual.id_cargo != undefined) {
-      this.ventana.open(RegistrarEmpleProcesoComponent,
-        { width: '600px', data: { idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo } })
-        .afterClosed().subscribe(item => {
-          this.ObtenerEmpleadoProcesos(this.formato_fecha);
-        });
-    }
-    else {
-      this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
-        timeOut: 6000,
-      })
-    }
-  }
-
-  // VENTANA PARA EDITAR PROCESOS DEL EMPLEADO
-  AbrirVentanaEditarProceso(datoSeleccionado: any): void {
-    this.ventana.open(EditarEmpleadoProcesoComponent,
-      { width: '500px', data: { idEmpleado: this.idEmpleado, datosProcesos: datoSeleccionado } })
-      .afterClosed().subscribe(item => {
-        this.ObtenerEmpleadoProcesos(this.formato_fecha);
-      });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PROCESOS
-  EliminarProceso(id_plan: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
-    };
-    this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerEmpleadoProcesos(this.formato_fecha);
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDeleteProceso(datos: any) {
-    console.log(datos);
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarProceso(datos.id);
-        } else {
-          this.router.navigate(['/verEmpleado/', this.idEmpleado]);
-        }
-      });
-  }
 
 
   /** ******************************************************************************************* **
@@ -3039,6 +2975,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteAutorizacion(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -3145,8 +3082,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   DefinirInformacionPDF() {
-    let estadoCivil : any;
-    let genero : any;
+    let estadoCivil: any;
+    let genero: any;
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
     this.nacionalidades.forEach((element: any) => {
@@ -3154,18 +3091,21 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         nacionalidad = element.nombre;
       }
     });
-    this.generos.forEach((element:any)=>{
-      if(this.empleadoUno[0].genero == element.id){
-        genero=element.genero;
+    this.generos.forEach((element: any) => {
+      if (this.empleadoUno[0].genero == element.id) {
+        genero = element.genero;
       }
     });
-    this.estadosCiviles.forEach((element:any)=>{
-      if(this.empleadoUno[0].estado_civil == element.id){
-        estadoCivil=element.estado_civil;
+    this.estadosCiviles.forEach((element: any) => {
+      if (this.empleadoUno[0].estado_civil == element.id) {
+        estadoCivil = element.estado_civil;
       }
     });
 
-    
+    let numeroPartida = this.empleadoUno[0].numero_partida_individual;
+    let textoNumeroPartida = numeroPartida ? 'Numero de partida individual: ' + numeroPartida + '\n' : '';
+    let tipoIdentificacionTexto = this.empleadoUno[0].tipo_identificacion == 1 ? 'Cédula' : 'Pasaporte';
+
     return {
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
@@ -3251,13 +3191,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                           [
                             {
                               text: [
-                                'CI: ' + this.empleadoUno[0].cedula + '\n',
+                                'Tipo identificación: ' + tipoIdentificacionTexto + '\n',
+                                'Num. identificación: ' + this.empleadoUno[0].identificacion + '\n',
                                 'Nacionalidad: ' + nacionalidad + '\n',
-                                'Fecha Nacimiento: ' + '\n' + this.empleadoUno[0].fec_nacimiento_ + '\n',
+                                'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                                 'Estado civil: ' + estadoCivil + '\n',
                                 'Género: ' + genero + '\n'
                               ],
-                              style: 'item'
+                              style: 'item',
+                              alignment: 'left',
+                              valign: 'top',
+                              lineHeight: 1.1
                             },
                             {
                               text: [
@@ -3265,18 +3209,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
                                 'Teléfono: ' + this.empleadoUno[0].telefono + '\n',
                                 'Estado: ' + estado + '\n',
                                 'Domicilio: ' + this.empleadoUno[0].domicilio + '\n',
+                                textoNumeroPartida
                               ],
-                              style: 'item'
+                              style: 'item',
+                              alignment: 'left',
+                              valign: 'top',
+                              lineHeight: 1.1
+                            }
+                          ],
+                          [
+                            {
+                              text: 'Correo: ' + this.empleadoUno[0].correo,
+                              colSpan: 2,
+                              style: 'item',
+                              alignment: 'left',
+                              margin: [0, -4, 0, 0]
                             },
+                            {}
                           ]
                         ]
                       },
-                      layout: 'noBorders', // Esto elimina los bordes de la tabla
-                      alignment: 'left', // Alinea la tabla a la izquierda
+                      layout: 'noBorders',
+                      alignment: 'left'
                     },
-                    {
-                      text: 'Correo: ' + this.empleadoUno[0].correo, style: 'item'
-                    }
                   ]
                 }
 
@@ -3446,25 +3401,25 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     if (this.datosVacuna.length > 0) {
       return {
         table: {
-          widths: ['*'],
+          widths: ['*', '*'],
           body: [
-            ...this.datosVacuna.map((obj: any) => {
+            ...this.datosVacuna.flatMap((obj: any) => {
+              console.log("Datos para vacuna:", obj);
               return [
-                {
-                  text: [
-                    { text: 'Vacuna: ' + obj.nombre + ' ' },
-                    { text: 'descripcion: ' + obj.Descripción + ' ' },
-                    { text: 'fecha: ' + obj.fecha_ + ' ' },
-                    { text: 'carnet: ' + obj.carnet }
-                  ],
-                }
+                [
+                  { text: 'Vacuna: ' + obj.nombre, bold: true },
+                  { text: 'Descripción: ' + obj.descripcion }
+                ],
+                [
+                  { text: 'Fecha: ' + obj.fecha_ },
+                  { text: 'Carnet: ' + obj.carnet }
+                ],
+                [{ text: '', colSpan: 2 }, {}]
               ];
             })
           ]
         },
         layout: 'noBorders',
-        alignment: 'left',
-        margin: [0, 0, 0, 5]
       };
     }
   }
@@ -3565,25 +3520,25 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   DefinirInfoHistoricoPDF() {
     const nombre_usuario = this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido;
-      let estadoCivil : any;
-      let genero : any;
-      let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
-      let nacionalidad: any;
-      this.nacionalidades.forEach((element: any) => {
-        if (this.empleadoUno[0].id_nacionalidad == element.id) {
-          nacionalidad = element.nombre;
-        }
-      });
-      this.generos.forEach((element:any)=>{
-        if(this.empleadoUno[0].genero == element.id){
-          genero=element.genero;
-        }
-      });
-      this.estadosCiviles.forEach((element:any)=>{
-        if(this.empleadoUno[0].estado_civil == element.id){
-          estadoCivil=element.estado_civil;
-        }
-      });
+    let estadoCivil: any;
+    let genero: any;
+    let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
+    let nacionalidad: any;
+    this.nacionalidades.forEach((element: any) => {
+      if (this.empleadoUno[0].id_nacionalidad == element.id) {
+        nacionalidad = element.nombre;
+      }
+    });
+    this.generos.forEach((element: any) => {
+      if (this.empleadoUno[0].genero == element.id) {
+        genero = element.genero;
+      }
+    });
+    this.estadosCiviles.forEach((element: any) => {
+      if (this.empleadoUno[0].estado_civil == element.id) {
+        estadoCivil = element.estado_civil;
+      }
+    });
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -3620,7 +3575,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
               [
                 {
                   text: [
-                    'CI: ' + this.empleadoUno[0].cedula + '\n',
+                    'CI: ' + this.empleadoUno[0].identificacion + '\n',
                     'Nacionalidad: ' + nacionalidad + '\n',
                     'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ + '\n',
                     'Estado civil: ' + estadoCivil + '\n',
@@ -3811,8 +3766,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let arregloContrato: any = [];
     let arregloCargo: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil : any;
-      let genero : any;
+      let estadoCivil: any;
+      let genero: any;
       let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
@@ -3820,14 +3775,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           nacionalidad = element.nombre;
         }
       });
-      this.generos.forEach((element:any)=>{
-        if(this.empleadoUno[0].genero == element.id){
-          genero=element.genero;
+      this.generos.forEach((element: any) => {
+        if (this.empleadoUno[0].genero == element.id) {
+          genero = element.genero;
         }
       });
-      this.estadosCiviles.forEach((element:any)=>{
-        if(this.empleadoUno[0].estado_civil == element.id){
-          estadoCivil=element.estado_civil;
+      this.estadosCiviles.forEach((element: any) => {
+        if (this.empleadoUno[0].estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
         }
       });
 
@@ -3836,24 +3791,29 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         'Codigo': obj.codigo,
         "Apellido": obj.apellido,
         "Nombre": obj.nombre,
-        "Cedula": obj.cedula,
+        "Tipo identificacion": obj.tipo_identificacion == 1 ? "Cédula" : "Pasaporte",
+        "Identificacion": obj.identificacion,
         "Estado Civil": estadoCivil,
         "Genero": genero,
         "Correo": obj.correo,
-        "Fecha de Nacimiento": new Date(obj.fec_nacimiento_.split(" ")[1]),
+        "Fecha de Nacimiento": obj.fec_nacimiento_,
         "Estado": estado,
         "Domicilio": obj.domicilio,
         "Telefono": obj.telefono,
         "Nacionalidad": nacionalidad,
       };
+      if (obj.numero_partida_individual !== null) {
+        objeto.numero_partida_individual = obj.numero_partida_individual;
+      }
       if (obj.longitud !== null) {
-        objeto.empleado.longitud = obj.longitud;
+        objeto.longitud = obj.longitud;
       }
       if (obj.latitud !== null) {
-        objeto.empleado.latitud = obj.latitud;
+        objeto.latitud = obj.latitud;
       }
       arregloEmpleado.push(objeto);
     });
+    console.log("DATOS PARA REPORTE", arregloEmpleado)
 
     if (this.discapacidadUser !== null) {
       this.discapacidadUser.map(discapacidad => {
@@ -3942,6 +3902,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   async generarHojaPerfil(workbook: ExcelJS.Workbook) {
     const datos: any = this.ObtenerDatos();
+    const hayLatitud = datos[0].some((emp: any) => emp.latitud !== null && emp.latitud !== undefined);
+    const hayLongitud = datos[0].some((emp: any) => emp.longitud !== null && emp.longitud !== undefined);
+    const hayPartida = datos[0].some((emp: any) => emp.numero_partida_individual !== null && emp.numero_partida_individual !== undefined && emp.numero_partida_individual !== '');
     let n = 0;
     const horarioslista: any[] = [];
 
@@ -3983,12 +3946,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-    worksheet.columns = [
-
-      { key: "codigo", width: 20 },
+    const columnasExcel: any[] = [
+      { key: "codigo", width: 10 },
       { key: "apellido", width: 30 },
       { key: "nombre", width: 20 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
+      { key: "tipoIdentificacion", width: 25 },
       { key: "estadoCivil", width: 20 },
       { key: "genero", width: 20 },
       { key: "correo", width: 20 },
@@ -3997,14 +3960,19 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { key: "domicilio", width: 20 },
       { key: "telefono", width: 20 },
       { key: "nacionalidad", width: 20 },
-
     ];
+    if (hayPartida) columnasExcel.push({ key: "numero_partida_individual", width: 20 });
+    if (hayLatitud) columnasExcel.push({ key: "latitud", width: 20 });
+    if (hayLongitud) columnasExcel.push({ key: "longitud", width: 20 });
 
-    const columnas = [
+    worksheet.columns = columnasExcel;
+
+    const columnasTabla: any[] = [
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO", totalsRowLabel: "", filterButton: true },
       { name: "NOMBRE", totalsRowLabel: "", filterButton: true },
-      { name: "CÉDULA", totalsRowLabel: "", filterButton: true },
+      { name: "TIPO IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "", filterButton: true },
       { name: "ESTADO CIVIL", totalsRowLabel: "", filterButton: true },
       { name: "GÉNERO", totalsRowLabel: "", filterButton: true },
       { name: "CORREO", totalsRowLabel: "", filterButton: true },
@@ -4014,6 +3982,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       { name: "TELÉFONO", totalsRowLabel: "", filterButton: true },
       { name: "NACIONALIDAD", totalsRowLabel: "", filterButton: true },
     ];
+    if (hayPartida) columnasTabla.push({ name: "NÚMERO DE PARTIDA", totalsRowLabel: "", filterButton: true });
+    if (hayLatitud) columnasTabla.push({ name: "LATITUD", totalsRowLabel: "", filterButton: true });
+    if (hayLongitud) columnasTabla.push({ name: "LONGITUD", totalsRowLabel: "", filterButton: true });
 
     worksheet.addTable({
       name: "Perfil",
@@ -4024,14 +3995,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         theme: "TableStyleMedium16",
         showRowStripes: true,
       },
-      columns: columnas,
+      columns: columnasTabla,
       rows: horarioslista,
     });
 
     const numeroFilas = horarioslista.length;
+    const totalColumnas = worksheet.columns.length;
 
     for (let i = 0; i <= numeroFilas; i++) {
-      for (let j = 1; j <= 12; j++) {
+      for (let j = 1; j <= totalColumnas; j++) {
         const cell = worksheet.getRow(i + 6).getCell(j);
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -4433,13 +4405,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   ExportToCSV() {
     const datos: any = this.ObtenerDatos();
-    console.log("ver datos: ",  datos)
+    console.log("ver datos: ", datos)
 
-    const objeto = {...datos[0][0],
-    ...this.discapacidadUser[0],
-    ...this.tituloEmpleado[0],
-    ...datos[1][0],
-    ...datos[2][0],}
+    const objeto = {
+      ...datos[0][0],
+      ...this.discapacidadUser[0],
+      ...this.tituloEmpleado[0],
+      ...datos[1][0],
+      ...datos[2][0],
+    }
 
     const arregloFinal = [objeto];
     const workbook = new ExcelJS.Workbook();
@@ -4470,15 +4444,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  generos: any=[];
-  ObtenerGeneros(){
+  generos: any = [];
+  ObtenerGeneros() {
     this.restGenero.ListarGeneros().subscribe(datos => {
       this.generos = datos;
     })
   }
 
-  estadosCiviles: any=[];
-  ObtenerEstadosCiviles(){
+  estadosCiviles: any = [];
+  ObtenerEstadosCiviles() {
     this.restEstadoCivil.ListarEstadoCivil().subscribe(datos => {
       this.estadosCiviles = datos;
     })
@@ -4493,8 +4467,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let objeto: any;
     let arregloEmpleado: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil : any;
-      let genero : any;
+      let estadoCivil: any;
+      let genero: any;
       let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach((element: any) => {
@@ -4502,14 +4476,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           nacionalidad = element.nombre;
         }
       });
-      this.generos.forEach((element:any)=>{
-        if(this.empleadoUno[0].genero == element.id){
-          genero=element.genero;
+      this.generos.forEach((element: any) => {
+        if (this.empleadoUno[0].genero == element.id) {
+          genero = element.genero;
         }
       });
-      this.estadosCiviles.forEach((element:any)=>{
-        if(this.empleadoUno[0].estado_civil == element.id){
-          estadoCivil=element.estado_civil;
+      this.estadosCiviles.forEach((element: any) => {
+        if (this.empleadoUno[0].estado_civil == element.id) {
+          estadoCivil = element.estado_civil;
         }
       });
 
@@ -4518,7 +4492,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           "$": { "codigo": obj.codigo },
           "apellido": obj.apellido,
           "nombre": obj.nombre,
-          "cedula": obj.cedula,
+          "identificacion": obj.identificacion,
           "estadoCivil": estadoCivil,
           "genero": genero,
           "correo": obj.correo,
@@ -4623,16 +4597,16 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
-  
-  getCrearDatos(){
+
+  getCrearDatos() {
     return this.tienePermiso('Crear datos');
   }
 
-  getEditarDatos(){
+  getEditarDatos() {
     return this.tienePermiso('Editar datos');
   }
 
-  getEliminarDatos(){
+  getEliminarDatos() {
     return this.tienePermiso('Eliminar datos');
   }
 

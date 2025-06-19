@@ -3,17 +3,14 @@ import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
   FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail';
-import { ObtenerRutaLicencia, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
+import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
-import { Licencias } from '../../class/Licencia';
 import ipaddr from 'ipaddr.js';
 import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
-import * as os from 'os';
-import fs from 'fs';
-import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
   _id: number,
@@ -23,18 +20,14 @@ interface IPayload {
 
 class LoginControlador {
 
-
-
-
-
   // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
   public async ValidarCredenciales(req: Request, res: Response) {
     console.log('ValidarCredenciales');
     // VARIABLE USADO PARA BUSQUEDA DE LICENCIA
     let caducidad_licencia: Date = new Date();
 
-     // OBTENCIÓN DE DIRECCIÓN IP
-     const getClientIp = (req: Request): string | null => {
+    // OBTENCIÓN DE DIRECCIÓN IP
+    const getClientIp = (req: Request): string | null => {
       // Obtiene la IP del encabezado o del socket
       const rawIp = req.headers['x-forwarded-for']
         ? req.headers['x-forwarded-for'].toString().split(',')[0].trim()
@@ -70,7 +63,7 @@ class LoginControlador {
 
           //FIXME
           `
-          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
+          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.identificacion, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `
           , [USUARIO.rows[0].id])
@@ -78,27 +71,20 @@ class LoginControlador {
             return result.rows
           });
 
-        const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
+        const { empleado, usuario, codigo, web_access, nombre, apellido, identificacion, imagen, app_habilita } = ACTIVO[0];
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         console.log('verificar activo ', empleado, ' usu ', usuario)
         if (empleado === 2 && usuario === false) {
-          return res.jsonp({ message: 'inactivo' });
+          return res.jsonp({ message: 'inactivo', text: ip_cliente });
         }
         console.log('web_access: ', web_access);
         console.log('app_habilita: ', app_habilita);
         console.log('movil: ', movil);
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
-        if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso" })
+        if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso", text: ip_cliente })
 
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
-        if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil" })
-
-        // BUSQUEDA DE MODULOS DEL SISTEMA
-        const [modulos] = await pool.query(
-          `
-          SELECT * FROM e_funciones LIMIT 1
-          `
-        ).then((result: any) => { return result.rows; })
+        if (!app_habilita && movil == true) return res.jsonp({ message: "sin_permiso_acces_movil", text: ip_cliente })
 
         // BUSQUEDA DE CLAVE DE LICENCIA
         //FIXME
@@ -111,28 +97,29 @@ class LoginControlador {
         //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
         const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
-        const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
-        {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({public_key: public_key})
-        });
+        //console.log('llave ', public_key)
+        const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`,
+          {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ public_key: public_key })
+          });
 
-        
-        if(!licenciaData.ok){
-          return res.status(404).jsonp({ message: 'licencia_no_existe' });
+
+        if (!licenciaData.ok) {
+          return res.status(404).jsonp({ message: 'licencia_no_existe', text: ip_cliente });
         }
-        
+
         const dataLic = await licenciaData.json();
 
         const fec_activacion = new Date(dataLic[0].fecha_activacion);
         const fec_desactivacion = new Date(dataLic[0].fecha_desactivacion);
 
         const hoy = new Date();
-        if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
-        if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
+        if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
+        if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
         caducidad_licencia = fec_desactivacion
 
         // BUSQUEDA DE INFORMACION
@@ -163,7 +150,6 @@ class LoginControlador {
             _empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            modulos: modulos,
             id_contrato: id_contrato
           }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
 
@@ -179,11 +165,10 @@ class LoginControlador {
             empresa: id_empresa,
             cargo: id_cargo,
             ip_adress: ip_cliente,
-            modulos: modulos,
             id_contrato: id_contrato,
             nombre: nombre,
             apellido: apellido,
-            cedula: cedula,
+            identificacion: identificacion,
             imagen: imagen,
             codigo: codigo,
             ruc: ruc,
@@ -195,22 +180,21 @@ class LoginControlador {
           if (id_rol === 1) {
             const token = jwt.sign({
               _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente,
-              modulos: modulos
+              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente
             },
               process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
             return res.status(200).jsonp({
               caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-              empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos//, modulos: modulos
+              empresa: id_empresa, ip_adress: ip_cliente
             });
           }
           else {
-            return res.jsonp({ message: 'error_' });
+            return res.jsonp({ message: 'error_', text: ip_cliente });
           }
         }
       }
       else {
-        return res.jsonp({ message: 'error' });
+        return res.jsonp({ message: 'error', text: ip_cliente });
       }
     } catch (error) {
       console.log('error', error)
@@ -222,7 +206,7 @@ class LoginControlador {
   public async EnviarCorreoContrasena(req: Request, res: Response) {
     const correo = req.body.correo;
     const url_page = req.body.url_page;
-    const cedula = req.body.cedula;
+    const identificacion = req.body.identificacion;
 
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
@@ -236,11 +220,11 @@ class LoginControlador {
       `
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2 
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2 
       `
-      , [correo, cedula]);
+      , [correo, identificacion]);
 
-    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o cédula de usuario no válido.');
+    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o identificación de usuario no válido.');
 
     var datos = await Credenciales(1);
 
@@ -314,7 +298,7 @@ class LoginControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
 
   }
@@ -324,7 +308,7 @@ class LoginControlador {
     let { token, contrasena, user_name, ip, ip_local } = req.body;
 
     var contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
-    console.log(contrasena,'_',contrasena_encriptada);
+    console.log(contrasena, '_', contrasena_encriptada);
 
     try {
       let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
@@ -400,10 +384,37 @@ class LoginControlador {
     }
   }
 
+  // AUDITORIA DE INICIO DE SESION
+  public async RegistrarAuditoriaLogin(req: Request, res: Response) {
+
+    const { plataforma, user_name, ip_addres, ip_addres_local, acceso, observaciones } = req.body;
+
+    console.log('acceso ', req.body)
+
+    const ahora = new Date();
+    const fecha = ahora.toISOString().split('T')[0];       // YYYY-MM-DD
+    const hora = ahora.toTimeString().split(' ')[0];       // HH:mm:ss
+
+    try {
+      await pool.query(
+        `
+        INSERT INTO audit.acceso_sistema 
+          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones)   
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `
+        , [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones]);
+
+      return res.jsonp({ message: 'ok' });
+
+    } catch (err) {
+      console.error('Error al registrar auditoría de login:', err);
+      res.jsonp({ message: 'Ups! algo salio mal.' });
+    }
+  }
+
 }
 
 const LOGIN_CONTROLADOR = new LoginControlador();
 export default LOGIN_CONTROLADOR;
-
 
 

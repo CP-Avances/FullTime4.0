@@ -102,10 +102,10 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNiveles();
@@ -216,16 +216,6 @@ export class ListarNivelTitulosComponent implements OnInit {
       this.DataNivelesProfesionales = res.data;
       this.messajeExcel = res.message;
 
-      this.DataNivelesProfesionales.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -239,6 +229,15 @@ export class ListarNivelTitulosComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.DataNivelesProfesionales.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
         this.DataNivelesProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
             const nombre = item.nombre.charAt(0).toUpperCase() + item.nombre.slice(1);
@@ -260,6 +259,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -346,6 +346,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   // METODO PARA REGISTRAR NIVEL DE TITULO
   AbrirVentanaNivelTitulo(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistrarNivelTitulosComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ObtenerNiveles();
@@ -495,7 +496,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     const worksheet = workbook.addWorksheet("Niveles Títulos");
 
 
-    console.log("ver logo. ", this.logo)
+
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -643,7 +644,7 @@ export class ListarNivelTitulosComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   ExportToCSV() {
-  
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('NivelesTitulosCSV');
     //  Agregar encabezados dinámicos basados en las claves del primer objeto
@@ -727,6 +728,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -753,17 +755,17 @@ export class ListarNivelTitulosComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionNiveles.selected.length;
-  
+
     this.nivelesEliminar = this.selectionNiveles.selected;
-  
+
     this.nivelesEliminar.forEach((datos: any) => {
       this.nivel.EliminarNivel(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -785,10 +787,11 @@ export class ListarNivelTitulosComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -801,7 +804,7 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.selectionNiveles.clear();
             this.ObtenerNiveles();
           } else {
-            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -828,23 +831,23 @@ export class ListarNivelTitulosComponent implements OnInit {
     }
   }
 
-  getCrearNivelTituloProfesional(){
+  getCrearNivelTituloProfesional() {
     return this.tienePermiso('Crear Nivel Académico');
   }
 
-  getEditarNivelTituloProfesional(){
+  getEditarNivelTituloProfesional() {
     return this.tienePermiso('Editar Nivel Académico');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Niveles Académicos');
   }
 
-  getEliminarNivelTituloProfesional(){
+  getEliminarNivelTituloProfesional() {
     return this.tienePermiso('Eliminar Nivel Académico');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Niveles Académicos');
   }
 

@@ -145,7 +145,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
   }
 
   //FILTRO ROL
-  get filtroRolEmp() { 
+  get filtroRolEmp() {
     return this.restR.filtroRolEmp;
   }
 
@@ -169,10 +169,10 @@ export class OpcionesTimbreWebComponent implements OnInit {
   ngOnInit(): void {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
@@ -378,9 +378,9 @@ export class OpcionesTimbreWebComponent implements OnInit {
       case 7:
         this.restR.setFiltroNombreReg(e);
         break;
-      case 8: 
-        this.restR.setFiltroRolEmp(e); 
-        break;  
+      case 8:
+        this.restR.setFiltroRolEmp(e);
+        break;
       default:
         break;
     }
@@ -703,7 +703,7 @@ export class OpcionesTimbreWebComponent implements OnInit {
   contador: number = 0;
   RegistrarMultiple(data: any) {
     console.log("ver seleccion_foto: ", this.seleccion_foto.value)
-    
+
     this.contador = 0;
     var info = {
       id_empleado: '',
@@ -790,12 +790,12 @@ export class OpcionesTimbreWebComponent implements OnInit {
       informacion.timbre_especial = false;
     }
     if (this.seleccion_foto.value === null) {
-      informacion.timbre_foto_ = false;
+      informacion.timbre_foto = false;
     }
     if (this.seleccion_foto_obligatoria.value === null) {
       informacion.timbre_foto_obligatoria = false;
     }
-    
+
     if (this.seleccion_ubicacion.value === null) {
       informacion.timbre_ubicacion_desconocida = false;
     }
@@ -806,7 +806,6 @@ export class OpcionesTimbreWebComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR OPCION DE MARCACION
   ActualizarOpcionMarcacion(informacion: any, arregloIngreso) {
-    console.log("ver arregloIngreso: ", arregloIngreso)
     this.restTimbres.ActualizarOpcionesMarcacionWeb(informacion).subscribe((a) => {
       if (arregloIngreso.length  == 0) {
         this.MostrarMensaje();

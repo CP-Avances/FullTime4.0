@@ -393,13 +393,13 @@ export class ReportePermisosComponent implements OnInit {
   // DATOS GENERALES DEL EMPLEADO DEL QUE SE OBTIENE EL REPORTE Y SUMATORIA DE CÁLCULOS REALIZADOS
   datosEmpleadoAutoriza: any = [];
   presentarDatosGenerales(codigo) {
-    var ciudad, nombre, apellido, cedula, codigo, regimen, sucursal, departamento, cargo, totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
+    var ciudad, nombre, apellido, identificacion, codigo, regimen, sucursal, departamento, cargo, totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
     var horas_decimal, dias_decimal, horas_horario, minutosHoras, tDias, horasDias, horaT, horaTDecimalH;
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === codigo) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -479,7 +479,7 @@ export class ReportePermisosComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -685,13 +685,13 @@ export class ReportePermisosComponent implements OnInit {
   // DATOS GENERALES DEL PDF Y SUMATORIA TOTAL DE CALCULOS REALIZADOS
   presentarDatosEmpleado(codigo: any, form: any) {
     // INICIALIZACIÓN DE VARIBLES
-    var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
+    var ciudad, nombre, apellido, identificacion, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
     this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === codigo) {
         nombre = obj.nombre;
         apellido = obj.apellido;
-        cedula = obj.cedula;
+        identificacion = obj.identificacion;
         codigo = obj.codigo;
         sucursal = obj.sucursal;
         departamento = obj.departamento;
@@ -722,7 +722,7 @@ export class ReportePermisosComponent implements OnInit {
             columns: [
               { text: [{ text: 'APELLIDOS: ' + apellido, style: 'itemsTableI' }] },
               { text: [{ text: 'NOMBRES: ' + nombre, style: 'itemsTableI' }] },
-              { text: [{ text: 'CÉDULA: ' + cedula, style: 'itemsTableI' }] },
+              { text: [{ text: 'IDENTIFICACIÓN: ' + identificacion, style: 'itemsTableI' }] },
             ]
           }],
           [{
@@ -823,7 +823,7 @@ export class ReportePermisosComponent implements OnInit {
           CODIGO: this.datosEmpleado[i].codigo,
           NOMBRE: this.datosEmpleado[i].nombre,
           APELLIDO: this.datosEmpleado[i].apellido,
-          CEDULA: this.datosEmpleado[i].cedula,
+          IDENTIFICACION: this.datosEmpleado[i].identificacion,
           SUCURSAL: this.datosEmpleado[i].sucursal,
           DEPARTAMENTO: this.datosEmpleado[i].departamento,
           CIUDAD: this.datosEmpleado[i].ciudad,

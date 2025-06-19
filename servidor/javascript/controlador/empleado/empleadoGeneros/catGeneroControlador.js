@@ -79,6 +79,7 @@ class GeneroControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
+                console.log('error genero ', error);
                 return res.status(500).jsonp({ message: 'Error al registrar el genero.' });
             }
         });

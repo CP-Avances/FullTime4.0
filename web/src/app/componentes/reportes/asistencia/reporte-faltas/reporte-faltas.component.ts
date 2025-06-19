@@ -5,6 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { Validators, FormControl } from '@angular/forms';
 
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
@@ -103,6 +104,11 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
   //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
@@ -115,7 +121,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
   constructor(
     private validar: ValidacionesService,
@@ -304,7 +310,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -524,7 +530,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -590,7 +596,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 { text: 'FECHA', style: 'tableHeader' },
               ],
               ...empl.faltas.map((usu: any) => {
-                const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+                const fecha = this.validar.FormatearFecha(usu.fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 totalFaltasEmpleado++;
                 c = c + 1;
                 return [
@@ -669,20 +675,20 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-   
-   generos: any=[];
-   ObtenerGeneros(){
-     this.restGenero.ListarGeneros().subscribe(datos => {
-       this.generos = datos;
-     })
-   }
 
-   nacionalidades: any=[];
-   ObtenerNacionalidades(){
+  generos: any = [];
+  ObtenerGeneros() {
+    this.restGenero.ListarGeneros().subscribe(datos => {
+      this.generos = datos;
+    })
+  }
+
+  nacionalidades: any = [];
+  ObtenerNacionalidades() {
     this.restNacionalidades.ListarNacionalidad().subscribe(datos => {
       this.nacionalidades = datos;
     })
-   }
+  }
 
   async generarExcel() {
     let datos: any[] = [];
@@ -695,13 +701,13 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
         let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
         let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
-       
+
 
         empl.faltas.map((obj3: any) => {
-          const fecha = this.validar.FormatearFecha(obj3.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha = this.validar.FormatearFecha(obj3.fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           datos.push([
             n++,
-            empl.cedula,
+            empl.identificacion,
             empl.codigo,
             empl.apellido + ' ' + empl.nombre,
             nombreGenero,
@@ -752,7 +758,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
       { key: "genero", width: 20 },
@@ -767,7 +773,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "GENERO", totalsRowLabel: "", filterButton: true },
@@ -844,14 +850,16 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
         let nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
         let nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
-       
+
         empl.faltas.forEach((usu: any) => {
-          const fecha = this.validar.FormatearFecha(usu.fecha_horario, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha = this.validar.FormatearFecha(usu.fecha, this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
           n = n + 1;
           let ele = {
             n: n,
-            cedula: empl.cedula,
+            identificacion: empl.identificacion,
             codigo: empl.codigo,
+            nombre: empl.nombre,
+            apellido: empl.apellido,
             empleado: empl.apellido + ' ' + empl.nombre,
             genero: nombreGenero,
             ciudad: empl.ciudad,

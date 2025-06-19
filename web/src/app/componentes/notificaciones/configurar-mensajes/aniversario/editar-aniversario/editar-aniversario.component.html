@@ -20,7 +20,7 @@
                     <input matInput [formControl]="tituloF" required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Indicar asunto de mensaje.">
-                        help_outline
+                        subject
                     </mat-icon>
                 </mat-form-field>
                 <mat-form-field>
@@ -28,7 +28,7 @@
                     <input matInput [formControl]="linkF">
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar un link de acceso a mensaje de cumpleaños.">
-                        help_outline
+                        video_library
                     </mat-icon>
                 </mat-form-field>
                 <mat-form-field>
@@ -38,7 +38,7 @@
                         required></textarea>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingrese mensaje personalizado de cumpleaños.">
-                        help_outline
+                        emoji_events
                     </mat-icon>
                     <mat-hint align="start"><strong>Solo puede ingresar hasta 255 caracteres</strong></mat-hint>
                     <mat-hint align="end">{{message.value.length}} / 255</mat-hint>

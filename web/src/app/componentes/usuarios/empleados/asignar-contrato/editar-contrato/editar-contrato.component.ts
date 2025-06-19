@@ -23,6 +23,7 @@ export class EditarContratoComponent implements OnInit {
   ips_locales: any = '';
 
   @Input() contrato: any;
+  @Input() fecha: any;
   @Input() pagina: any;
 
   idSelectContrato: number;
@@ -80,11 +81,12 @@ export class EditarContratoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('fecha --- ', this.fecha)
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;
@@ -165,7 +167,7 @@ export class EditarContratoComponent implements OnInit {
     this.tipoContrato = [];
     this.rest.BuscarTiposContratos().subscribe(datos => {
       this.tipoContrato = datos;
-      this.tipoContrato[this.tipoContrato.length] = { descripcion: "OTRO" };
+      this.tipoContrato[this.tipoContrato.length] = { id: 'OTRO', descripcion: "OTRO" };
     })
   }
 
@@ -176,19 +178,33 @@ export class EditarContratoComponent implements OnInit {
     });
     this.habilitarContrato = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // INGRESAR MODALIDAD LABORAL
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined) {
+  IngresarOtro(valor: any) {
+    if (valor === undefined || valor === 'OTRO') {
       this.ContratoForm.patchValue({
         contratoForm: '',
       });
       this.habilitarContrato = true;
+      this.habilitarSeleccion = false;
+      this.contratoF.setValidators([Validators.required, Validators.minLength(3)]);
+      this.contratoF.updateValueAndValidity();
+      this.tipoF.clearValidators();
+      this.tipoF.setValue(null);
+      this.tipoF.updateValueAndValidity();
       this.toastr.info('Ingresar modalidad laboral.', '', {
         timeOut: 6000,
-      })
-      this.habilitarSeleccion = false;
+      });
+    } else {
+      this.habilitarContrato = false;
+      this.habilitarSeleccion = true;
+      this.contratoF.clearValidators();
+      this.contratoF.setValue('');
+      this.contratoF.updateValueAndValidity();
+      this.tipoF.setValidators(Validators.required);
+      this.tipoF.updateValueAndValidity();
     }
   }
 
@@ -277,7 +293,7 @@ export class EditarContratoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     };
-    if (form.tipoForm === undefined) {
+    if (!form.tipoForm || form.tipoForm === 'OTRO') {
       this.InsertarModalidad(form, datosContrato);
     }
     else {
@@ -298,17 +314,33 @@ export class EditarContratoComponent implements OnInit {
     }
     this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
-      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd');
+      var ingreso = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd')!;
+      console.log('ingresar ', ingreso)
       // COMPARACION DE CADA REGISTRO
-      for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha_salida = this.validar.DarFormatoFecha(this.revisarFecha[i].fecha_salida, 'yyyy-MM-dd');
-        if (ingreso < fecha_salida) {
+      for (var i = 0; i < this.revisarFecha.length; i++) {
+        const actual = this.revisarFecha[i];
+
+        const ingresoNuevo = this.validar.DarFormatoFecha(datos.fec_ingreso, 'yyyy-MM-dd')!;
+        const salidaNueva = datos.fec_salida
+          ? this.validar.DarFormatoFecha(datos.fec_salida, 'yyyy-MM-dd')!
+          : ingresoNuevo; // Si no hay salida, se considera el mismo día
+
+        const ingresoExistente = this.validar.DarFormatoFecha(actual.fecha_ingreso, 'yyyy-MM-dd')!;
+        const salidaExistente = actual.fecha_salida
+          ? this.validar.DarFormatoFecha(actual.fecha_salida, 'yyyy-MM-dd')!
+          : ingresoExistente;
+
+        // VERIFICA SI LOS RANGOS SE SOBREPONEN
+        const haySobreposicion = ingresoNuevo <= salidaExistente && salidaNueva >= ingresoExistente;
+
+        if (haySobreposicion) {
           this.duplicado = 1;
+          break;
         }
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.duplicado === 1) {
-        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Existe un contrato en las fechas ingresadas.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         })
         this.duplicado = 0;
@@ -325,7 +357,7 @@ export class EditarContratoComponent implements OnInit {
   GuardarDatos(datos: any) {
     this.rest.ActualizarContratoEmpleado(this.idSelectContrato, datos).subscribe(response => {
       if (response.message === 'error') {
-        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -340,7 +372,7 @@ export class EditarContratoComponent implements OnInit {
       }
 
     }, error => {
-      this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups! algo salio mal.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     });
@@ -353,7 +385,8 @@ export class EditarContratoComponent implements OnInit {
         documento: this.contrato.documento,
         id: parseInt(this.contrato.id),
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       }
       this.GuardarDatos(datos);
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
@@ -449,6 +482,11 @@ export class EditarContratoComponent implements OnInit {
     });
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null;
+  }
+
   // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
   opcion: number = 0;
@@ -483,7 +521,12 @@ export class EditarContratoComponent implements OnInit {
     if (this.pagina === 'ver-empleado') {
       this.componentev.editar_contrato = false;
       if (opcion === 2) {
-        this.componentev.VerDatosActuales(this.componentev.formato_fecha);
+        setTimeout(() => {
+          this.componentev.VerDatosActuales(this.componentev.formato_fecha);
+          if (this.fecha.fechaContratoForm) {
+            this.componentev.ObtenerContratoSeleccionado(this.fecha)
+          }
+        }, 300);
       }
     }
   }

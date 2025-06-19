@@ -156,6 +156,7 @@ ObtenerColores() {
 }
 
 AbrirVentanaRegistrarNacionalidad() {
+  (document.activeElement as HTMLElement)?.blur();
   this.ventana.open(RegistrarNacionalidadComponent, { width: '550px' }).afterClosed().subscribe(item => {
     this.ListarNacionalidades();
   });
@@ -183,6 +184,7 @@ LimpiarCampos() {
 }
 
 ConfirmarDeleteMultiple() {
+  (document.activeElement as HTMLElement)?.blur();
   this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
     .subscribe((confirmado: Boolean) => {
       if (confirmado) {
@@ -195,7 +197,7 @@ ConfirmarDeleteMultiple() {
           this.selectionNacionalidades.clear();
           this.ListarNacionalidades();
         } else {
-          this.toastr.warning('No ha seleccionado nacionalidades.', 'Ups!!! algo salio mal.', {
+          this.toastr.warning('No ha seleccionado nacionalidades.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           })
         }
@@ -294,7 +296,7 @@ checkboxLabelPag(row?: any): string {
 
 
 ConfirmarDelete(datos: any) {
-
+  (document.activeElement as HTMLElement)?.blur();
   this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
     .subscribe((confirmado: Boolean) => {
       if (confirmado) {
@@ -455,7 +457,7 @@ async generarExcelNacionalidades() {
   const worksheet = workbook.addWorksheet("Nacionalidad");
 
 
-  console.log("ver logo. ", this.logo)
+  
   this.imagen = workbook.addImage({
     base64: this.logo,
     extension: "png",

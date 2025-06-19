@@ -15,7 +15,7 @@ import { PlanHoraExtraAutorizaComponent } from 'src/app/componentes/autorizacion
 
 export interface HoraExtraPlanElemento {
   apellido: string;
-  cedula: string;
+  identificacion: string;
   codigo: string;
   empl_id: number;
   fecha_desde: string;

@@ -40,10 +40,12 @@ const storage2 = multer_1.default.diskStorage({
     }
 });
 const upload2 = (0, multer_1.default)({ storage: storage2 });
-const multipart = require('connect-multiparty');
+/*const multipart = require('connect-multiparty');
+
 const multipartMiddleware = multipart({
     uploadDir: './horasExtras',
 });
+*/
 class HorasExtrasPedidasRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -81,11 +83,11 @@ class HorasExtrasPedidasRutas {
         // BUSCAR DATOS DE UNA SOLICITUD DE HORA EXTRA POR SU ID
         this.router.get('/:id', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ObtenerUnaSolicitudHE);
         // GUARDAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS
-        this.router.put('/:id/documento/:nombre', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation, multipartMiddleware], horaExtraControlador_1.default.GuardarDocumentoHoras);
+        //      this.router.put('/:id/documento/:nombre', [TokenValidation, ModuloHoraExtraValidation, multipartMiddleware], HorasExtrasPedidasControlador.GuardarDocumentoHoras);
         // BUSQUEDA DE RESPALDOS DE HORAS EXTRAS
         this.router.get('/documentos/:docs', horaExtraControlador_1.default.ObtenerDocumento);
         // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS
-        this.router.put('/eliminar-documento', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation, multipartMiddleware], horaExtraControlador_1.default.EliminarDocumentoHoras);
+        //       this.router.put('/eliminar-documento', [TokenValidation, ModuloHoraExtraValidation, multipartMiddleware], HorasExtrasPedidasControlador.EliminarDocumentoHoras);
         // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS MOVIL
         this.router.delete('/eliminar-documento-movil/:documento', horaExtraControlador_1.default.EliminarArchivoMovil);
         // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS WEB
@@ -101,7 +103,7 @@ class HorasExtrasPedidasRutas {
         // METODO DE ENVIO DE CORREO DESDE APLICACION WEB
         this.router.post('/mail-noti-horas-extras-movil/:id_empresa', horaExtraControlador_1.default.EnviarCorreoHoraExtraMovil);
         // GUARDAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS MOVIL
-        this.router.put('/:id/documento-movil/:nombre', [multipartMiddleware], horaExtraControlador_1.default.GuardarDocumentoHoras);
+        //       this.router.put('/:id/documento-movil/:nombre', [multipartMiddleware], HorasExtrasPedidasControlador.GuardarDocumentoHoras);
     }
 }
 const HORA_EXTRA_PEDIDA_RUTA = new HorasExtrasPedidasRutas();

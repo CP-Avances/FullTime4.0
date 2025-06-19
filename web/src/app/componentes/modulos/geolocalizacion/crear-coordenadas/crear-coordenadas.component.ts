@@ -48,10 +48,10 @@ export class CrearCoordenadasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ConsultarCoordenadas();
     this.BuscarParametro();
@@ -84,25 +84,42 @@ export class CrearCoordenadasComponent implements OnInit {
 
   // METODO PARA REGISTRAR NUEVO PARAMETRO
   GuardarDatos(form: any) {
+    console.log('ingresa a registrar')
     if (form.latitudForm != '' && form.longitudForm != '') {
       let datos = {
         latitud: form.latitudForm,
         longitud: form.longitudForm,
         descripcion: form.descripcionForm,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       }
       this.rest.RegistrarCoordenadas(datos).subscribe(response => {
-        this.toastr.success('Ubicación registrada exitosamente.',
-          '', {
-          timeOut: 2000,
-        })
-        this.ventanap.close(response.respuesta.id);
+        console.log(response);
+        if (response.message === 'error_duplicidad') {
+          this.toastr.warning('Descripción ya se encuentra registrada en el sistema.',
+            'Ups! algo salio mal.', {
+            timeOut: 2000,
+          })
+        }
+        else if (response.message === 'error') {
+          this.toastr.error('Intentelo más tarde.',
+            'Ups! algo salio mal.', {
+            timeOut: 2000,
+          })
+        }
+        else {
+          this.toastr.success('Ubicación registrada exitosamente.',
+            '', {
+            timeOut: 2000,
+          })
+          this.ventanap.close(response.respuesta.id);
+        }
       });
     }
     else {
       this.toastr.error('Por favor ingresar coordenadas de ubicación.',
-        'Ups!!! algo salio mal.', {
+        'Ups! algo salio mal.', {
         timeOut: 2000,
       })
     }
@@ -142,7 +159,7 @@ export class CrearCoordenadasComponent implements OnInit {
           this.contDuplicado = this.contDuplicado + 1;
           if (this.contDuplicado === 1) {
             this.toastr.info('El perímetro ingresado ya se encuentra registrado.',
-              'Ups!!! algo salío mal.', {
+              'Ups! algo salío mal.', {
               timeOut: 4000,
             })
           }

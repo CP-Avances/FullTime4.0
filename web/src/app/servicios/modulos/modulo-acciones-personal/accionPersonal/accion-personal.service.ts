@@ -50,6 +50,7 @@ export class AccionPersonalService {
 
   /** SERVICIOS PARA TABLA PEDIDO_ACCION_EMPLEADO */
   IngresarPedidoAccion(datos: any) {
+    console.log('datos a enviar: ',datos)
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion`, datos);
   }
 
@@ -96,4 +97,11 @@ export class AccionPersonalService {
   RegistrarPlantilla(data: any) {
       return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/cargar_plantilla', data);
   }
+
+  // METODO PARA ELIMINAR DE MANERA MULTIPLE EL REGISTR DE DETALLE DE TIPO ACCION PERSONAL
+  EliminarDetalleTipoAccionMult(data: any) {
+    console.log('data: ',data);
+      return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/accionPersonal/eliminarProcesoMult', data);
+  }
+  
 }

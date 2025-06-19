@@ -188,7 +188,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
             console.log('res info ... ', plan)
             // LECTURA DE DATOS DE USUARIO
             let usuario = '<tr><th>' + this.leer_datos.nombre +
-              '</th><th>' + this.leer_datos.cedula + '</th></tr>';
+              '</th><th>' + this.leer_datos.identificacion + '</th></tr>';
             let cuenta_correo = this.leer_datos.correo;
 
             // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -236,7 +236,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     this.data.planifica.map((obj: any) => {
 
       // LECTURA DE NOMBRES DE USUARIOS
-      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
+      usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.identificacion + '</th></tr>';
 
       // LECTURA DE DATOS DE TODOS LOS USUARIOS SELECCIONADOS
       planEmpleado.id_empl_contrato = obj.id_contrato;

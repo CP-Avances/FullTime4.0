@@ -4,9 +4,9 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-//import * as XLSX from 'xlsx';
 import { DateTime } from 'luxon';
-
+import * as ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 //IMPORTAR SERVICIOS
 import { PlanificacionHorariaService } from 'src/app/servicios/horarios/catPlanificacionHoraria/planificacionHoraria.service';
@@ -100,14 +100,10 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: DateTime, datepicker: MatDatepicker<DateTime>) {
     const ctrlValue = fecha;
-    console.log("ctrlValue", ctrlValue)
-    let inicio = ctrlValue.set({ day: 1 }).toFormat('dd/MM/yyyy');
-    console.log("inicio luxon", inicio)
-    let final = `${ctrlValue.daysInMonth}${ctrlValue.toFormat('/MM/yyyy')}`;
-    console.log("final luxon", final)
-    this.fechaInicialF.setValue(DateTime.fromFormat(inicio, 'dd/MM/yyyy').toJSDate());
-    console.log("fechaInicialF", this.fechaInicialF.value)
-    this.fechaFinalF.setValue(DateTime.fromFormat(final, 'dd/MM/yyyy').toJSDate());
+    let inicio = ctrlValue.set({ day: 1 });
+    let final = ctrlValue.endOf('month');
+    this.fechaInicialF.setValue(inicio.toJSDate());
+    this.fechaFinalF.setValue(final.toJSDate());
     datepicker.close();
   }
 
@@ -185,7 +181,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }
@@ -207,7 +203,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
         });
       },
       error: (error: any) => {
-        this.toastr.error('Error al verificar la plantilla de planificación horaria.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al verificar la plantilla de planificación horaria.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -272,6 +268,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
   // METODO PARA SOLICITAR CONFIRMACION DE REGISTRO DE PLANIFICACIONES
   ConfirmarRegistroPlanificaciones() {
     const mensaje = 'registro-planificacion';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed().subscribe((confimado: Boolean) => {
       if (confimado) {
         this.RegistrarPlanificaciones();
@@ -318,7 +315,7 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
         });
       }
     }, (error: any) => {
-      this.toastr.error('Error al importar la plantilla de planificaciones horarias.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al importar la plantilla de planificaciones horarias.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     });
@@ -330,60 +327,86 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
 
   // METODO PARA GENERAR EXCEL  ** CORREGI
-  GenerarExcel(fechaInicial: DateTime, fechaFinal: DateTime, usuarios: any[]) {
-/*
-    console.log("ver fechaInicial: ", fechaInicial)
-    if (fechaInicial === null || fechaFinal === null) {
+  GenerarExcel(fechaInicial: Date, fechaFinal: Date, usuarios: any[]) {
+    console.log('fecha Inicia: ', fechaInicial);
+    console.log('fecha Final: ', fechaFinal);
+
+    if (!fechaInicial || !fechaFinal) {
       this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
         timeOut: 6000,
       });
       return;
     }
-    const fechaInicialD = new Date(fechaInicial);
-    const fechaInicio = DateTime.fromJSDate(fechaInicialD);
 
-    const fechaFinalD = new Date(fechaFinal);
-    const fechaFin = DateTime.fromJSDate(fechaFinalD);
-    // CREAR UN ARRAY PARA LAS FILAS DEL ARCHIVO EXCEL
+    const fechaInicio =  DateTime.fromJSDate(fechaInicial);
+    let fechaFin = DateTime.fromJSDate(fechaFinal);
+
     const filas: any[] = [];
-    // CREAR LA FILA DE ENCABEZADOS
-    const encabezados = ['CEDULA', 'EMPLEADO'];
-    for (let fecha = new Date(fechaInicio); fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
-      // CONVERTIR FECHA A ESTE FORMATO VIERNES 26/01/2024
-      const opciones: Intl.DateTimeFormatOptions = {
-        weekday: 'long',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      };
-      const fechaFormateada = new Date(fecha).toLocaleDateString('es-ES', opciones).toUpperCase();
+    const encabezados = ['IDENTIFICACION', 'EMPLEADO'];
 
+    // Crear rango de fechas
+    let fecha = fechaInicio.startOf('day');
+    fechaFin = fechaFin.startOf('day');
+
+    while (fecha <= fechaFin) {
+      const fechaFormateada = fecha.setLocale('es').toFormat("cccc, dd/LL/yyyy").toUpperCase();
       encabezados.push(fechaFormateada);
+      fecha = fecha.plus({ days: 1 });
     }
+
     filas.push(encabezados);
 
-    // CREAR LAS FILAS DE DATOS
+    // Agregar filas de usuarios
     for (const usuario of usuarios) {
-      const fila = [usuario.cedula, usuario.nombre];
+      const fila = [usuario.identificacion, usuario.nombre];
       filas.push(fila);
     }
 
-    // CREAR EL LIBRO DE TRABAJO Y LA HOJA DE CÁLCULO
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(filas);
+    // Crear libro y hoja con ExcelJS
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Planificacion');
 
+    // Definir la tabla como objeto
+    worksheet.addTable({
+      name: 'PlanificacionTable',
+      ref: 'A1',
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: 'TableStyleMedium16',
+        showRowStripes: true,
+      },
+      columns: encabezados.map(titulo => ({ name: titulo })),
+      rows: usuarios.map(usuario => {
+        const fila = [usuario.identificacion, usuario.nombre];
+        // Agregar columnas vacías para cada día
+        for (let i = 2; i < encabezados.length; i++) {
+          fila.push(''); // puedes rellenar con datos si los tienes
+        }
+        return fila;
+      }),
+    });
 
-    // ESTABLECER EL ANCHO DE LAS COLUMNAS
-    const columnWidths = Array(encabezados.length).fill({ wpx: 125 });
-    columnWidths[1] = { wpx: 300 }; // ESTABLECER EL ANCHO DE LA SEGUNDA COLUMNA
+    // Definir anchos de columnas
+    worksheet.columns = encabezados.map((_, index) => ({
+      width: index === 1 ? 40 : 20
+    }));
 
-    ws['!cols'] = columnWidths;
+    // Definir ancho de columnas
+    worksheet.columns = encabezados.map((_, index) => {
+      return {
+        width: index === 1 ? 40 : 20 // Segunda columna más ancha
+      };
+    });
 
-    // AGREGAR LA HOJA DE CÁLCULO AL LIBRO DE TRABAJO
-    XLSX.utils.book_append_sheet(wb, ws, 'Planificacion');
-
-    // ESCRIBIR EL LIBRO DE TRABAJO EN UN ARCHIVO EXCEL
-    XLSX.writeFile(wb, 'plantillaPlanificacionMultiple.xlsx');*/
+    // Guardar el archivo
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, 'plantillaPlanificacionMultiple.xlsx');
+    }).catch((error) => {
+      console.error('Error al generar el archivo Excel', error);
+      this.toastr.error('Hubo un error al generar el archivo Excel', 'Error', { timeOut: 6000 });
+    });
   }
 
   /** ************************************************************************************************* **

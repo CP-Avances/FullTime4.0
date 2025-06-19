@@ -187,7 +187,7 @@ export class RegistrarFeriadosComponent implements OnInit {
       });
     }
     else {
-      this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       })
     }
@@ -407,7 +407,7 @@ export class RegistrarFeriadosComponent implements OnInit {
         }, error => {
           this.contadorc = this.contadorc + 1;
           this.VerMensaje(id);
-          this.toastr.error('Verificar asignación de ciudades.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Verificar asignación de ciudades.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           })
         });

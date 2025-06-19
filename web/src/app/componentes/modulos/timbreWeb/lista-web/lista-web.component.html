@@ -6,7 +6,7 @@
             <mat-card-content>
 
                 <div id="resultados_dh" class="row w-100 m-auto">
-                    <div class="col-1 col-md-2 mb-2 mb-md-0"> 
+                    <div class="col-1 col-md-2 mb-2 mb-md-0">
                     </div>
                     <div class="col-10 col-md-8 mb-2 mb-md-0 Tabla_titulo">
                         <span>
@@ -14,7 +14,8 @@
                         </span>
                     </div>
                     <div class="col-1 col-md-2 mb-2 mb-md-0">
-                        <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario(2)">highlight_off</mat-icon>
+                        <mat-icon class="float-right" id="cerrar"
+                            (click)="LimpiarFormulario(2)">highlight_off</mat-icon>
                     </div>
                 </div>
                 <br>
@@ -36,7 +37,7 @@
                                 [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de sucursales por nombre.">
-                                help_outline
+                                location_city
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -52,7 +53,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -65,7 +66,7 @@
                                         [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de régimen laboral por nombre.">
-                                        help_outline
+                                        article
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -83,7 +84,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -96,7 +97,7 @@
                                         [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
-                                        help_outline
+                                        group
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -114,7 +115,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -127,7 +128,7 @@
                                         [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
-                                        help_outline
+                                        account_balance
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -137,84 +138,90 @@
                 <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_emp">
                     <div class="row">
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Sucursal</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
-                              [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
-                          </mat-form-field>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Sucursal</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de sucursales por nombre.">
+                                        location_city
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Nombres</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 11)"
-                              [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
-                          </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Nombres</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 11)"
+                                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por nombre.">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Código</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 9)"
-                              [formControl]="codigo">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
-                          </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Código</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 9)"
+                                        [formControl]="codigo">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por código.">
+                                        code
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                  
+
                     <div class="row">
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Cédula</mat-label>
-                            <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 10)"
-                              oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                              [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)" >
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
-                          </mat-form-field>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Identificación</mat-label>
+                                    <input matInput placeholder="Buscar" maxlength="10"
+                                        (input)="Filtrar(cedula.value, 10)"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por número de identificación.">
+                                        badge
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Rol</mat-label>
-                                <input type="text"
-                                       matInput
-                                       placeholder="Buscar"
-                                       aria-label="Rol"
-                                       [formControl]="nombre_rol"
-                                       [matAutocomplete]="autoRol"
-                                       (keypress)="IngresarSoloLetras($event)">  
-                                <mat-autocomplete #autoRol="matAutocomplete">
-                                  <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
-                                    {{ rol.nombre }}
-                                  </mat-option>
-                                </mat-autocomplete>
-                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                                  help_outline
-                                </mat-icon>
-                            </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Rol</mat-label>
+                                    <input type="text" matInput placeholder="Buscar" aria-label="Rol"
+                                        [formControl]="nombre_rol" [matAutocomplete]="autoRol"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                    <mat-autocomplete #autoRol="matAutocomplete">
+                                        <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                            {{ rol.nombre }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                        admin_panel_settings
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
                     </div>
                 </form>
 
                 <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)" *ngIf="getDesactivarUsuarios()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)"
+                        *ngIf="getDesactivarUsuarios()">
                         Deshabilitar usuarios
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario(2)">Cancelar</button>
@@ -223,9 +230,9 @@
                 <hr>
                 <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
                 <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
-                    
+
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -234,7 +241,7 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                             (click)="MostrarLista()">
+                                (click)="MostrarLista()">
                                 Mostrar lista
                             </button>
                         </div>
@@ -272,8 +279,9 @@
                                     </td>
                                     <td>{{s.sucursal}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros(s)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
-                                            class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros(s)" id="plan"
+                                            *ngIf="individual && getDesactivarUsuarios()" class="fas fa-thumbs-down"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
                                         </i>
@@ -292,7 +300,7 @@
                 <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
 
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -301,7 +309,7 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                             (click)="MostrarLista()">
+                                (click)="MostrarLista()">
                                 Mostrar lista
                             </button>
                         </div>
@@ -341,8 +349,9 @@
                                     <td>{{r.sucursal}}</td>
                                     <td>{{r.nombre}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros(r)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
-                                            class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros(r)" id="plan"
+                                            *ngIf="individual && getDesactivarUsuarios()" class="fas fa-thumbs-down"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
                                         </i>
@@ -361,7 +370,7 @@
                 <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
 
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -370,7 +379,7 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                             (click)="MostrarLista()">
+                                (click)="MostrarLista()">
                                 Mostrar lista
                             </button>
                         </div>
@@ -410,8 +419,9 @@
                                     <td>{{c.sucursal}}</td>
                                     <td>{{c.nombre}}</td>
                                     <td lass="justify-content-center">
-                                        <i (click)="GuardarRegistros(c)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
-                                            class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros(c)" id="plan"
+                                            *ngIf="individual && getDesactivarUsuarios()" class="fas fa-thumbs-down"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
                                         </i>
@@ -431,7 +441,7 @@
                 <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
 
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -440,7 +450,7 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                             (click)="MostrarLista()">
+                                (click)="MostrarLista()">
                                 Mostrar lista
                             </button>
                         </div>
@@ -480,8 +490,9 @@
                                     <td>{{d.sucursal}}</td>
                                     <td>{{d.departamento}}</td>
                                     <td class="d-flex justify-content-center">
-                                        <i (click)="GuardarRegistros(d)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
-                                            class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros(d)" id="plan"
+                                            *ngIf="individual && getDesactivarUsuarios()" class="fas fa-thumbs-down"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
                                         </i>
@@ -499,9 +510,9 @@
 
                 <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
-                    
+
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -509,12 +520,11 @@
                             </span>
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                            matSuffix matTooltipPosition="right"
-                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                             style="margin-top: -3px;"
-                             (click)="MostrarLista()">
-                                    Mostrar lista
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" matSuffix
+                                matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                                style="margin-top: -3px;" (click)="MostrarLista()">
+                                Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -537,7 +547,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -554,7 +564,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>
@@ -582,7 +592,7 @@
         <div style="padding-top: 20px;" *ngIf="activar_deshabilitados">
             <mat-card-content>
                 <div id="resultados" class="row w-100 m-auto">
-                    <div class="col-1 col-md-2 mb-2 mb-md-0"> 
+                    <div class="col-1 col-md-2 mb-2 mb-md-0">
                     </div>
                     <div class="col-10 col-md-8 mb-2 mb-md-0 Tabla_titulo">
                         <span>
@@ -590,7 +600,8 @@
                         </span>
                     </div>
                     <div class="col-1 col-md-2 mb-2 mb-md-0">
-                        <mat-icon class="float-right" id="cerrar" (click)="LimpiarFormulario(1)">highlight_off</mat-icon>
+                        <mat-icon class="float-right" id="cerrar"
+                            (click)="LimpiarFormulario(1)">highlight_off</mat-icon>
                     </div>
                 </div>
                 <br>
@@ -612,7 +623,7 @@
                                 [formControl]="nombre_suc_dh" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de sucursales por nombre.">
-                                help_outline
+                                location_city
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -630,7 +641,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -664,7 +675,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -678,7 +689,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
-                                        help_outline
+                                        group
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -698,7 +709,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -712,7 +723,7 @@
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
-                                        help_outline
+                                        account_balance
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -723,85 +734,86 @@
                 <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_emp">
                     <div class="row">
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Sucursal</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
-                              [formControl]="nombre_suc_dh" type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
-                          </mat-form-field>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Sucursal</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
+                                        [formControl]="nombre_suc_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de sucursales por nombre.">
+                                        location_city</mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Nombres</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_emp_dh.value, 6)"
-                              [formControl]="nombre_emp_dh" type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
-                          </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Nombres</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_emp_dh.value, 6)"
+                                        [formControl]="nombre_emp_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por nombre.">person</mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Código</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(codigo_dh.value, 4)"
-                              [formControl]="codigo_dh">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
-                          </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Código</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(codigo_dh.value, 4)"
+                                        [formControl]="codigo_dh">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por código.">code</mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                  
+
                     <div class="row">
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Cédula</mat-label>
-                            <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar_DH(cedula_dh.value, 5)"
-                              oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                              [formControl]="cedula_dh" type="tel" (keypress)="IngresarSoloNumeros($event)" >
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
-                          </mat-form-field>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Identificación</mat-label>
+                                    <input matInput placeholder="Buscar" maxlength="10"
+                                        (input)="Filtrar_DH(cedula_dh.value, 5)"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        [formControl]="cedula_dh" type="tel" (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por número de identificación.">badge</mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Rol</mat-label>
-                                <input type="text"
-                                       matInput
-                                       placeholder="Buscar"
-                                       aria-label="Rol"
-                                       [formControl]="nombre_rol_dh"
-                                       [matAutocomplete]="autoRol"
-                                       (keypress)="IngresarSoloLetras($event)">  
-                                <mat-autocomplete #autoRol="matAutocomplete">
-                                  <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
-                                    {{ rol.nombre }}
-                                  </mat-option>
-                                </mat-autocomplete>
-                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                                  help_outline
-                                </mat-icon>
-                            </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Rol</mat-label>
+                                    <input type="text" matInput placeholder="Buscar" aria-label="Rol"
+                                        [formControl]="nombre_rol_dh" [matAutocomplete]="autoRol"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                    <mat-autocomplete #autoRol="matAutocomplete">
+                                        <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                            {{ rol.nombre }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                        admin_panel_settings
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                  </form>
+                </form>
 
                 <div *ngIf="activar_boton_dh" class="d-flex flex-wrap justify-content-center"
                     style="padding-top: 15px;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros_DH(0)" *ngIf="getActivarUsuarios()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros_DH(0)"
+                        *ngIf="getActivarUsuarios()">
                         Habilitar usuarios
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario(1)">Cancelar</button>
@@ -812,15 +824,16 @@
                 <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_suc" class="mat-elevation-z8" style="background: white;">
                     <div id="resultados_dh" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>RESULTADO SUCURSALES</span>
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                                style="margin-top: -3px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                                (click)="MostrarLista_DH()">Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -859,8 +872,9 @@
                                     </td>
                                     <td>{{sdh.sucursal}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(sdh)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
-                                            class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros_DH(sdh)" id="plan_dh"
+                                            *ngIf="individual_dh && getActivarUsuarios()" class="fas fa-thumbs-up"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
                                         </i>
@@ -879,15 +893,16 @@
                 <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div id="resultados_dh" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>RESULTADO RÉGIMEN LABORAL</span>
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                                style="margin-top: -3px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                                (click)="MostrarLista_DH()">Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -927,8 +942,9 @@
                                     <td>{{rdh.sucursal}}</td>
                                     <td>{{rdh.nombre}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(rdh)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
-                                            class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros_DH(rdh)" id="plan_dh"
+                                            *ngIf="individual_dh && getActivarUsuarios()" class="fas fa-thumbs-up"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
                                         </i>
@@ -947,15 +963,16 @@
                 <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_cargo" class="mat-elevation-z8" style="background: white;">
                     <div id="resultados_dh" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>RESULTADO CARGOS</span>
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                                style="margin-top: -3px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                                (click)="MostrarLista_DH()">Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -995,8 +1012,9 @@
                                     <td>{{c.sucursal}}</td>
                                     <td>{{c.nombre}}</td>
                                     <td lass="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(c)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
-                                            class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros_DH(c)" id="plan_dh"
+                                            *ngIf="individual_dh && getActivarUsuarios()" class="fas fa-thumbs-up"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
                                         </i>
@@ -1015,15 +1033,16 @@
                 <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_dep" class="mat-elevation-z8" style="background: white;">
                     <div id="resultados_dh" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>RESULTADO DEPARTAMENTOS</span>
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                                style="margin-top: -3px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                                (click)="MostrarLista_DH()">Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -1063,8 +1082,9 @@
                                     <td>{{d.sucursal}}</td>
                                     <td>{{d.departamento}}</td>
                                     <td class="d-flex justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(d)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
-                                            class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
+                                        <i (click)="GuardarRegistros_DH(d)" id="plan_dh"
+                                            *ngIf="individual_dh && getActivarUsuarios()" class="fas fa-thumbs-up"
+                                            matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
                                         </i>
@@ -1083,15 +1103,16 @@
                 <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_emp" class="mat-elevation-z8" style="background: white;">
                     <div id="resultados_dh" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>RESULTADO USUARIOS</span>
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                             matSuffix matTooltipPosition="right" matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
-                            (click)="MostrarLista_DH()">Mostrar lista
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                                style="margin-top: -3px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                                (click)="MostrarLista_DH()">Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -1114,7 +1135,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -1132,7 +1153,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>
@@ -1160,12 +1181,14 @@
             <div class="row" style="text-align:center;">
                 <div class="col-md" *ngIf="ver_imagen">
                     <br>
-                    <img class="avatar" src="../../../../../assets/imagenes/timbrar_virtual.png">
+                    <img class="avatar" src="../../../../../assets/imagenes/img_timbrar_virtual.jpg" width="150"
+                        height="150" alt="Timbrar virtual">
                 </div>
                 <div class="col-md">
                     <div class="col-md">
                         <br>
-                        <div (click)="VerTablas(2)" style=" padding-bottom: 10px;" *ngIf="inactivar && getActivarUsuarios()">
+                        <div (click)="VerTablas(2)" style=" padding-bottom: 10px;"
+                            *ngIf="inactivar && getActivarUsuarios()">
                             <!--  ************************  LISTAR USUARIOS INACTIVOS  ****************************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-dos'" style="color: antiquewhite;">
                                 <mat-card-content>
@@ -1182,7 +1205,8 @@
                                 </mat-card-content>
                             </mat-card>
                         </div>
-                        <div (click)="VerTablas(1)" style="padding-bottom: 10px;" *ngIf="activar && getDesactivarUsuarios()">
+                        <div (click)="VerTablas(1)" style="padding-bottom: 10px;"
+                            *ngIf="activar && getDesactivarUsuarios()">
                             <!--  ***********************  LISTAR USUARIOS ACTIVO  **********************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-uno'" style="color: antiquewhite;">
                                 <mat-card-content>

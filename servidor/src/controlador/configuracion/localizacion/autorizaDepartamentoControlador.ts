@@ -249,7 +249,7 @@ class AutorizaDepartamentoControlador {
             `
             SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
                 da.estado, dae.id_contrato, da.id_empleado_cargo, da.id_empleado, 
-                (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, c.permiso_mail, 
+                (dae.nombre || ' ' || dae.apellido) as fullname, dae.identificacion, dae.correo, c.permiso_mail, 
                 c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, c.hora_extra_mail, 
                 c.hora_extra_notificacion  
             FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae, 

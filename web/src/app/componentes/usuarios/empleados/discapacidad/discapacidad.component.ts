@@ -176,7 +176,7 @@ export class DiscapacidadComponent implements OnInit {
       nombre: (tipo.nombre).toUpperCase()
     }
     this.rest.BuscarDiscapacidadNombre(discapacidad).subscribe(response => {
-      this.toastr.warning('Tipo discapacidad ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Tipo discapacidad ingresado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 4000,
       })
     }, vacio => {
@@ -198,7 +198,7 @@ export class DiscapacidadComponent implements OnInit {
       nombre: (tipo.nombre).toUpperCase()
     }
     this.rest.BuscarDiscapacidadNombre(discapacidad).subscribe(response => {
-      this.toastr.warning('Tipo discapacidad ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Tipo discapacidad ingresado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 4000,
       })
     }, vacio => {

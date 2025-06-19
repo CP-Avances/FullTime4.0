@@ -22,14 +22,12 @@ export class EditarGrupoOcupacionalComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   grupo = new FormControl('', Validators.required);
-  numero_partida = new FormControl('');
 
   procesos: any = [];
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     grupoForm: this.grupo,
-    numero_partidaForm: this.numero_partida
   });
 
   constructor(
@@ -53,7 +51,6 @@ export class EditarGrupoOcupacionalComponent implements OnInit {
   ImprimirDatos() {
     this.formulario.patchValue({
       grupoForm: this.data.descripcion,
-      numero_partidaForm: this.data.numero_partida
     })
   }
 
@@ -68,7 +65,6 @@ export class EditarGrupoOcupacionalComponent implements OnInit {
     let dataGrado = {
       id_grupo: this.data.id,
       grupo: form.grupoForm,
-      numero_partida: form.numero_partidaForm,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     };

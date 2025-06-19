@@ -95,6 +95,7 @@ class RelojesControlador {
     // METODO PARA REGISTRAR DISPOSITIVO   **USADO
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("Entro a crear un reloj");
             try {
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo, ip_local } = req.body;
                 // INICIAR TRANSACCION
@@ -111,12 +112,13 @@ class RelojesControlador {
                     `, [codigo.toUpperCase(), serie.toUpperCase()]);
                 }
                 if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
+                    const contraseñaFinal = (contrasenia === undefined || contrasenia === null || contrasenia.trim() === '') ? '0' : contrasenia;
                     const response = yield database_1.default.query(`
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
                         id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, temperatura,
                         zona_horaria_dispositivo, formato_gmt_dispositivo)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *
-                    `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                    `, [nombre, ip, puerto, contraseñaFinal, marca, modelo, serie, id_fabricacion, fabricante, mac,
                         tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, zona_horaria_dispositivo,
                         formato_gmt_dispositivo
                     ]);
@@ -208,13 +210,14 @@ class RelojesControlador {
                     `, [codigo.toUpperCase(), serie.toUpperCase(), id_real]);
                 }
                 if (VERIFICA_CODIGO.rows[0] == undefined || VERIFICA_CODIGO.rows[0] == '') {
+                    const contraseñaFinal = (contrasenia === undefined || contrasenia === null || contrasenia.trim() === '') ? '0' : contrasenia;
                     yield database_1.default.query(`
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                         modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
                         tipo_conexion = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, temperatura = $15,
                         zona_horaria_dispositivo = $16, formato_gmt_dispositivo = $17
                     WHERE id = $18
-                    `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                    `, [nombre, ip, puerto, contraseñaFinal, marca, modelo, serie, id_fabricacion, fabricante, mac,
                         tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, zona_horaria_dispositivo,
                         formato_gmt_dispositivo, id_real]);
                     // AUDITORIA
@@ -285,7 +288,7 @@ class RelojesControlador {
             }
             catch (error) {
                 console.log('error ', error);
-                return res.status(500).jsonp({ message: 'Ups!!! algo salio mal. No se han encontrado registros.' });
+                return res.status(500).jsonp({ message: 'Ups! algo salio mal. No se han encontrado registros.' });
             }
         });
     }

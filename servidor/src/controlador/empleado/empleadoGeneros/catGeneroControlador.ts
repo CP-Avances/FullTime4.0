@@ -81,6 +81,7 @@ class GeneroControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
+      console.log('error genero ', error)
       return res.status(500).jsonp({ message: 'Error al registrar el genero.' });
     }
   }

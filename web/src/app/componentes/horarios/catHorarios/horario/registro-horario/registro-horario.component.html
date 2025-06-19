@@ -1,5 +1,5 @@
 <div id="titulo" class="row w-100 m-auto">
-    <div class="col-2 col-md-2 mb-2 mb-md-0"> 
+    <div class="col-2 col-md-2 mb-2 mb-md-0">
         <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     </div>
     <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
@@ -29,7 +29,7 @@
                             <input matInput placeholder="Ej: Administrativo" [formControl]="nombre" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar un nombre de horario.">
-                                help_outline
+                                event_note
                             </mat-icon>
                         </mat-form-field>
                         <mat-form-field>
@@ -37,7 +37,7 @@
                             <input matInput placeholder="Ej: ADMIN" [formControl]="codigoF" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar un código de horario.">
-                                help_outline
+                                code
                             </mat-icon>
                         </mat-form-field>
                         <mat-form-field>
@@ -46,7 +46,7 @@
                                 (keypress)="IngresarSoloNumerosEnteros($event)">
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar minutos de alimentación que dispondrá el usuario.">
-                                help_outline
+                                schedule
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -59,7 +59,7 @@
                                 (keypress)="IngresarNumeroCaracter($event)">
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de jornada. 
                             En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
-                                help_outline
+                                alarm
                             </mat-icon>
                             <mat-error id="hora" *ngIf="horaTrabajo.invalid">
                                 {{ObtenerMensajeErrorHoraTrabajo()}}
@@ -109,7 +109,8 @@
                     <div class="d-flex flex-wrap justify-content-center" *ngIf="isChecked">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
-                                <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
+                                <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file"
+                                    [formControl]="archivoForm" id="file">
                                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="i-cursor" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cargar archivo como respaldo de registro de horario. (Opcional)">

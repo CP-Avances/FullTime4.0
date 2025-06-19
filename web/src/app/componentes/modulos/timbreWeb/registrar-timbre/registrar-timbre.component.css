@@ -178,3 +178,80 @@ label {
     justify-content: center;
     margin-bottom: 20px;
 }
+
+.tituloCamara{
+    font-weight: bold;
+    font-size: small;
+}
+.estado-card {
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    width: 70%;
+    margin: auto;
+    height: 200px;
+    border-radius: 4%;
+
+    &.activo {
+        background-color: #1391df;
+        color: #125982;
+        width: 60% !important;
+        height: 11% !important;
+        margin-bottom: 1%;
+    }
+
+    &.inactivo {
+        background-color: #b8b8b8; 
+        color: #6d6d6d;
+    }
+}
+
+.estado-card:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+
+    &.activo {
+        background-color: #0875b8;
+        color: #125982;
+    }
+
+    &.inactivo {
+        background-color: #959595; 
+        color: #787878;
+    }
+}
+
+.ocultar-contenido {
+    transform: scaleY(0);
+    transform-origin: top;
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .mostrar-contenido {
+    transform: scaleY(1);
+    opacity: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    height: 100% !important;
+  }
+
+.contenedor_btnImg{
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    width: 65%;
+    align-items: center;
+    align-content: center;
+    margin: auto;
+    padding: auto;
+    height: 310px;
+    border-radius: 10%;
+    background-color: #2a415911;
+}
+
+.icono_camara{
+    font-size: 95px;
+    height: 85%;
+    width: 85%;
+}
+

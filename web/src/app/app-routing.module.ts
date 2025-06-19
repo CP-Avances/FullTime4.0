@@ -133,7 +133,7 @@ import { AlimentosInvitadosComponent } from './componentes/reportes/modulos/alim
 // REPORTE  --ANALISIS DATOS
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 // REPORTE  --AUDITORIA
-import { ReporteAuditoriaComponent } from './componentes/reportes/reporte-auditoria/reporte-auditoria.component';
+import { AuditoriaSistemaComponent } from './componentes/reportes/auditoria/auditoria-sistema/auditoria-sistema.component';
 // VERIFICAR SU USO
 import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
 import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
@@ -320,7 +320,7 @@ const routes: Routes = [
   { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard] },
 
   // REPORTE  --AUDITORIA
-  { path: 'reporte-auditoria', component: ReporteAuditoriaComponent, canActivate: [AuthGuard] },
+  { path: 'reporte-auditoria', component: AuditoriaSistemaComponent, canActivate: [AuthGuard] },
 
   // VERIFICAR SU USO
   { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },

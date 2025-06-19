@@ -27,7 +27,7 @@ class AlimentacionRutas {
         this.router.post('/servicios/invitados', [TokenValidation, ModuloAlimentacionValidation], ALIMENTACION_CONTROLADOR.DetallarServiciosInvitados);
 
         // TIMBRES DE ALIMENTACION   **USADO
-        this.router.post('/timbres-alimentacion/:desde/:hasta', [TokenValidation, ModuloAlimentacionValidation], ALIMENTACION_CONTROLADOR.ReporteTimbresAlimentacion);
+        this.router.post('/timbres-alimentacion/:desde/:hasta', [TokenValidation], ALIMENTACION_CONTROLADOR.ReporteTimbresAlimentacion);
     }
 }
 

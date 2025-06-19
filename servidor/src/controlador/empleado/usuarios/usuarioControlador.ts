@@ -74,6 +74,33 @@ class UsuarioControlador {
     }
   }
 
+  // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL **USADO
+  public async ObtenerInformacionUsuario(req: Request, res: Response): Promise<any> {
+    const { id_empleado } = req.params;
+    const USUARIO = await pool.query(
+      `
+      SELECT 
+	      tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
+	      tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
+	      tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
+	      COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
+	      COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
+	      COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional	
+      FROM 
+	      informacion_general AS tb1, eu_empleado_cargos AS tb2
+      WHERE 
+  	    tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
+	      tb2.estado = 'true'
+      `
+      , [id_empleado]);
+    if (USUARIO.rowCount != 0) {
+      return res.jsonp(USUARIO.rows);
+    }
+    else {
+      res.status(404).jsonp({ text: 'Ups los sentimos, el usuario no tiene registrada la información necesaria, por favor revise que cumpla con todos los requisitos.' });
+    }
+  }
+
   public async ObtenerDepartamentoUsuarios(req: Request, res: Response) {
     const { id_empleado } = req.params;
     const EMPLEADO = await pool.query(
@@ -537,7 +564,7 @@ class UsuarioControlador {
     try {
       const DISPOSITIVOS = await pool.query(
         `
-        SELECT e.codigo, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
+        SELECT e.codigo, e.id AS id_empleado, (e.nombre || \' \' || e.apellido) AS nombre, e.identificacion, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
         INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
@@ -635,7 +662,7 @@ class UsuarioControlador {
   public async RestablecerFrase(req: Request, res: Response) {
     const correo = req.body.correo;
     const url_page = req.body.url_page;
-    const cedula = req.body.cedula;
+    const identificacion = req.body.identificacion;
 
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
@@ -649,11 +676,11 @@ class UsuarioControlador {
       `
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2  AND u.frase IS NOT NULL 
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2  AND u.frase IS NOT NULL 
       `
-      , [correo, cedula]);
+      , [correo, identificacion]);
 
-    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o cédula o frase de usuario no válido.');
+    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o identificación o frase de usuario no válido.');
 
     var datos = await Credenciales(1);
 
@@ -727,7 +754,7 @@ class UsuarioControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -1144,7 +1171,7 @@ class UsuarioControlador {
   public async getEmpleadosActivos(req: Request, res: Response): Promise<Response> {
     try {
       const query = `
-        SELECT e.cedula, e.codigo, e.nombre, e.apellido,
+        SELECT e.identificacion, e.codigo, e.nombre, e.apellido,
                (e.apellido || ' ' || e.nombre) AS fullname,
                e.correo, e.id, e.telefono, e.id_rol, u.usuario, e.name_rol,
                e.domicilio, e.ciudad, e.name_suc, e.name_dep, e.name_regimen,

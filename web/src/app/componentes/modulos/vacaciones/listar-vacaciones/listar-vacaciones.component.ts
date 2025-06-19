@@ -122,7 +122,7 @@ export class ListarVacacionesComponent implements OnInit {
     if (this.habilitarVacaciones === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Vacaciones. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }

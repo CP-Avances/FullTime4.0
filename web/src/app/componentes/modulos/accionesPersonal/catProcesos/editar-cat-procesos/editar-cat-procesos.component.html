@@ -27,15 +27,15 @@
                         required>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Ingresar nombre con el que se va a identificar el nuevo proceso.">
-                        help_outline
+                        settings
                     </mat-icon>
                 </mat-form-field>
                 <br>
                 <mat-form-field>
-                    <mat-label>Proceso Padre</mat-label>
+                    <mat-label>Proceso Superior</mat-label>
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                         matTooltip="Seleccionar proceso superior.">
-                        help_outline
+                        workspace_premium
                     </mat-icon>
                     <mat-select [formControl]="procesoPadre" required>
                         <mat-option *ngFor="let p of procesos" [value]="p.nombre">

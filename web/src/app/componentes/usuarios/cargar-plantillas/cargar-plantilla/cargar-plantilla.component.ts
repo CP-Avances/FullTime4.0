@@ -61,10 +61,10 @@ export class CargarPlantillaComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
@@ -184,7 +184,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal.', {
             timeOut: 4000,
           });
         }
@@ -254,16 +254,8 @@ export class CargarPlantillaComponent implements OnInit {
     }
     this.restE.RevisarFormato(formData).subscribe(res => {
       this.DatosContrato = res.data;
+      console.log('Datos contrato ', this.DatosContrato)
       this.messajeExcel = res.message;
-      this.DatosContrato.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
 
       if (this.messajeExcel == 'error') {
         this.DatosContrato = [];
@@ -280,6 +272,17 @@ export class CargarPlantillaComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+
+        this.DatosContrato.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+
         this.DatosContrato.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaContratosCorrectas.push(item);
@@ -298,6 +301,7 @@ export class CargarPlantillaComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -330,7 +334,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal.', {
             timeOut: 4000,
           });
         }
@@ -391,14 +395,14 @@ export class CargarPlantillaComponent implements OnInit {
     else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
     }
-    else if (observacion == 'Cédula no existe en el sistema' ||
+    else if (observacion == 'Identificación no existe en el sistema' ||
       observacion == 'Cargo no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema' ||
       observacion == 'Sucursal no existe en el sistema' ||
-      observacion == 'Cédula no tiene registrado un contrato') {
+      observacion == 'Identificación no tiene registrado un contrato') {
       return 'rgb(255, 192, 203)';
     }
-    else if (observacion == 'Registro duplicado (cédula)') {
+    else if (observacion == 'Registro duplicado (identificación)') {
       return 'rgb(156, 214, 255)';
     }
     else if (arrayObservacion[0] == 'Formato') {
@@ -491,6 +495,7 @@ export class CargarPlantillaComponent implements OnInit {
   ConfirmarRegistroMultipleCargos() {
     const mensaje = 'registro';
     console.log('listaCargosCorrectas: ', this.listaCargosCorrectas);
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -507,12 +512,13 @@ export class CargarPlantillaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubidoCargo.length; i++) {
       formData.append("uploads", this.archivoSubidoCargo[i], this.archivoSubidoCargo[i].name);
     }
-    console.log('formData: ',formData);
+    console.log('formData: ', formData);
     this.restCa.RevisarFormato(formData).subscribe(res => {
       console.log("ver cargos: ", res)
       this.DatosCargos = res.data;
       this.messajeExcelCargos = res.message;
-      if(this.DatosCargos?.length > 0){
+      
+      if (this.DatosCargos?.length > 0) {
         this.DatosCargos.sort((a: any, b: any) => {
           if (a.observacion !== 'ok' && b.observacion === 'ok') {
             return -1;
@@ -523,7 +529,7 @@ export class CargarPlantillaComponent implements OnInit {
           return 0;
         });
       }
-      
+
       if (this.messajeExcelCargos == 'error') {
         this.DatosCargos = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -564,7 +570,7 @@ export class CargarPlantillaComponent implements OnInit {
       }
       this.restCa.SubirArchivoExcelCargo(datos).subscribe({
         next: (response) => {
-          console.log('respuesta: ',response)
+          console.log('respuesta: ', response)
           this.toastr.success('Plantilla de Cargos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
@@ -574,7 +580,7 @@ export class CargarPlantillaComponent implements OnInit {
           this.nameFile = '';
         },
         error: (error) => {
-          this.toastr.error('No se pudo cargar la plantilla.', 'Ups!!! algo salio mal', {
+          this.toastr.error('No se pudo cargar la plantilla.', 'Ups! algo salio mal', {
             timeOut: 4000,
           });
         }
@@ -605,15 +611,15 @@ export class CargarPlantillaComponent implements OnInit {
     }
   }
 
-  getCargarContratos(){
+  getCargarContratos() {
     return this.tienePermiso('Cargar Datos Contratos');
   }
 
-  getCargarCargos(){
+  getCargarCargos() {
     return this.tienePermiso('Cargar Datos Cargos');
   }
 
-  getCargarNivelDepartamentos(){
+  getCargarNivelDepartamentos() {
     return this.tienePermiso('Cargar Datos Nivel departamentos');
   }
 

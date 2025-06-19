@@ -4,7 +4,7 @@
     <!-- PANTALLA CARGAR NIVELES DE DEPARTAMENTOS -->
     <mat-tab>
         <ng-template mat-tab-label *ngIf="getCargarNivelDepartamentos()">
-            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">account_balance</mat-icon>
             <h6 id="items" (click)="LimpiarCampos()">&nbsp; Cargar Niveles Departamento</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px;" *ngIf="getCargarNivelDepartamentos()">
@@ -134,7 +134,7 @@
     <!-- PANTALLA CARGAR CONTRATOS -->
     <mat-tab>
         <ng-template mat-tab-label *ngIf="getCargarCargos()">
-            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">assignment</mat-icon>
             <h6 id="items" (click)="LimpiarCampos()">&nbsp; Cargar Contratos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px;" *ngIf="getCargarCargos()">
@@ -208,7 +208,7 @@
                             <tr style="text-align: center; font-size: 13px;">
                                 <th scope="col">Item</th>
                                 <th scope="col">Observación</th>
-                                <th scope="col">Cédula</th>
+                                <th scope="col">Identificación</th>
                                 <th scope="col">País</th>
                                 <th scope="col">Régimen Laboral</th>
                                 <th scope="col">Modalidad Laboral</th>
@@ -230,8 +230,8 @@
                                         {{contrato.observacion}}
                                     </div>
                                 </td>
-                                <td [style.color]="EstiloTextoCelda(contrato.cedula)" style="font-size: 12px;">
-                                    {{contrato.cedula}}</td>
+                                <td [style.color]="EstiloTextoCelda(contrato.identificacion)" style="font-size: 12px;">
+                                    {{contrato.identificacion}}</td>
                                 <td [style.color]="EstiloTextoCelda(contrato.pais)" style="font-size: 12px;">
                                     {{contrato.pais}}</td>
                                 <td [style.color]="EstiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">
@@ -272,7 +272,7 @@
     <!--  PANTALLA CARGAR CARGOS -->
     <mat-tab>
         <ng-template mat-tab-label *ngIf="getCargarCargos()">
-            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">group</mat-icon>
             <h6 id="items" (click)="LimpiarCampos()">&nbsp; Cargar Cargos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px;" *ngIf="getCargarCargos()">
@@ -349,7 +349,7 @@
                             <tr style="text-align: center; font-size: 13px;">
                                 <th scope="col">Item</th>
                                 <th scope="col">Observación</th>
-                                <th scope="col">Cédula</th>
+                                <th scope="col">Identificación</th>
                                 <th scope="col">Sucursal</th>
                                 <th scope="col">Departamento</th>
                                 <th scope="col">Cargo</th>
@@ -372,8 +372,8 @@
                                         {{cargo.observacion}}
                                     </div>
                                 </td>
-                                <td [style.color]="EstiloTextoCelda(cargo.cedula)" style="font-size: 12px;">
-                                    {{cargo.cedula}}</td>
+                                <td [style.color]="EstiloTextoCelda(cargo.identificacion)" style="font-size: 12px;">
+                                    {{cargo.identificacion}}</td>
                                 <td [style.color]="EstiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">
                                     {{cargo.sucursal}}</td>
                                 <td [style.color]="EstiloTextoCelda(cargo.departamento)" style="font-size: 12px;">

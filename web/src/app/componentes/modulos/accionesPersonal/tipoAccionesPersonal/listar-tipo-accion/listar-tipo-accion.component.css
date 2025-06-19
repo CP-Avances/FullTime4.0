@@ -4,17 +4,8 @@
     margin: 5px 10px 5px 10px;
 }
 
-mat-form-field {
-    width: 250px;
-    padding: 10px 10px 0px 10px;
-}
-
 p {
     font-size: x-small;
-}
-
-mat-form-field {
-    padding: 10px 15px 0px 15px;
 }
 
 table {
@@ -28,6 +19,8 @@ table {
 }
 
 td {
+    padding-top: 10px;
+    text-align: center;
     vertical-align: middle;
 }
 

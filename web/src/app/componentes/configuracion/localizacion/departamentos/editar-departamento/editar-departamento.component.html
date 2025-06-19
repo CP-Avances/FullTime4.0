@@ -26,7 +26,8 @@
                         <mat-form-field *ngIf="Habilitar">
                             <mat-label id="letras">Seleccionar establecimiento</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Lista de establecimientos registrados.">help_outline
+                                matTooltip="Lista de establecimientos registrados.">
+                                location_city
                             </mat-icon>
                             <mat-select [formControl]="idSucursal" required>
                                 <mat-option *ngFor="let suc of sucursales" [value]="suc.id"
@@ -40,7 +41,9 @@
                             <mat-label>Departamento</mat-label>
                             <input matInput placeholder="Ej: Contabilidad" [formControl]="nombre" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Ingresar nombre del nuevo departamento.">help_outline</mat-icon>
+                                matTooltip="Ingresar nombre del nuevo departamento.">
+                                account_balance
+                            </mat-icon>
                         </mat-form-field>
                     </div>
                 </div>

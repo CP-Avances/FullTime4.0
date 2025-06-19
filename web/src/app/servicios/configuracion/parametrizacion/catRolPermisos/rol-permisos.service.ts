@@ -42,6 +42,12 @@ export class RolPermisosService {
       catchError(data));;
   }
 
+  // METODO PARA ASIGNAR ACCIONES AL ROL
+  CrearAccionesRol(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones/insertar`, data).pipe(
+      catchError(data));;
+  }
+
   // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
   BuscarPaginasRol(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/todaspaginasrol`, datos);

@@ -27,7 +27,7 @@ import { DepartamentoPipe } from "src/app/filtros/catDepartamentos/departamento/
 
 export interface PermisosElemento {
   apellido: string;
-  cedula: string;
+  identificacion: string;
   descripcion: string;
   docu_nombre: string;
   documento: string;
@@ -128,7 +128,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     if (this.habilitarPermiso === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
         message: "¿Te gustaría activarlo? Comunícate con nosotros.",
         url: "www.casapazmino.com.ec",
       };

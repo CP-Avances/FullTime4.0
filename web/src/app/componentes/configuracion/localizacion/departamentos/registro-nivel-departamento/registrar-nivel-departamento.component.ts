@@ -137,7 +137,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     // SI EXISTE UN REGISTRO SE INDICA AL USUARIO
     if (this.contador === 1) {
       this.contador = 0;
-      this.toastr.error('Ups!!! algo salio mal.', 'Departamento o nivel ya se encuentra registrado.', {
+      this.toastr.error('Ups! algo salio mal.', 'Departamento o nivel ya se encuentra registrado.', {
         timeOut: 3000,
       });
     }
@@ -158,7 +158,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
           }
         });
       } else {
-        this.toastr.error('Ups!!! algo salio mal.', 'Le hace falta registrar niveles de aprobación inferiores.', {
+        this.toastr.error('Ups! algo salio mal.', 'Le hace falta registrar niveles de aprobación inferiores.', {
           timeOut: 3000,
         });
       }

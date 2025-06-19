@@ -115,6 +115,11 @@ export class CrearVacunaComponent implements OnInit {
     });
   }
 
+  // RESETEA EL SUBIR CONTRATO PARA NO DAR PROBLEMA SI SE SELECCIONA EL MISMO ARCHIVO
+  ReseteoArchivo(event: any) {
+    event.target.value = null; 
+  }  
+
   // METODO PARA VISUALIZAR CAMPO REGISTRO DE TIPO DE VACUNA
   AbrirVentana(form: any) {
     if (form.vacunaForm === undefined) {
@@ -148,7 +153,7 @@ export class CrearVacunaComponent implements OnInit {
       fecha: dataCarnet.fecha,
     }
     this.restVacuna.BuscarVacunaFechaTipo(vacuna).subscribe(response => {
-      this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
@@ -205,7 +210,7 @@ export class CrearVacunaComponent implements OnInit {
         this.archivoF.reset();
         this.nameFile = '';
         if (res.message === 'error') {
-          this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+          this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }
@@ -220,7 +225,7 @@ export class CrearVacunaComponent implements OnInit {
           });
         }
       }, error => {
-        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Intente nuevamente.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

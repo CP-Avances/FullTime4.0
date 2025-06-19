@@ -16,6 +16,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-registro',
@@ -59,7 +60,9 @@ export class RegistroComponent implements OnInit {
     public ventana: MatDialog,
     public generoS: GenerosService,
     public estadoS: EstadoCivilService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private restParametros: ParametrosService,
+
   ) {
 
   }
@@ -73,12 +76,12 @@ export class RegistroComponent implements OnInit {
     });
 
     this.CargarRoles();
-    this.VerificarCodigo();
+    this.SincronizarYVerificarCodigo();
     this.AsignarFormulario();
     this.ObtenerNacionalidades();
     this.ObtenerEstadoCivil()
     this.ObtenerGeneros();
-
+    this.CargarEstadoValidacionCedula();
   }
 
   // METODO DE FILTRACION DE DATOS DE NACIONALIDAD
@@ -117,6 +120,7 @@ export class RegistroComponent implements OnInit {
       codigoForm: [''],
       emailForm: ['', Validators.email],
       fechaForm: ['', Validators.required],
+      tipoIdentificacionForm: ['', Validators.required],
     });
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
@@ -129,6 +133,7 @@ export class RegistroComponent implements OnInit {
       userForm: ['', Validators.required],
       passForm: ['', Validators.required],
       rolForm: ['', Validators.required],
+      partidaForm: [''],
     });
   }
 
@@ -145,7 +150,6 @@ export class RegistroComponent implements OnInit {
         this.escritura = true;
       }
       else if (this.datosCodigo.cedula === true) {
-        console.log("this.identificacion", this.identificacion)
         if(this.identificacion == 'Pasaporte')
         {
           this.escritura = false;
@@ -170,108 +174,134 @@ export class RegistroComponent implements OnInit {
     });
   }
 
+  //VERIFICA EL VALOR MAS ALTO CUANDO ESTA EN AUTOMATICO EL CODIGO EN TABLA e_codigo PARA EVITAR ERRORES DE CRUCE DE CODIGO
+  SincronizarYVerificarCodigo() {
+    this.rest.ObtenerCodigo().subscribe(config => {
+      this.datosCodigo = config[0];
+      if (this.datosCodigo.automatico === true) {
+        this.rest.ObtenerCodigoMAX().subscribe(max => {
+          const maximo = parseInt(max[0].codigo) || 0;
+          const actualValor = parseInt(this.datosCodigo.valor) || 0;
+          if (maximo > actualValor) {
+            const dataCodigo = {
+              id: 1,
+              valor: maximo,
+              manual: this.datosCodigo.manual,
+              automatico: this.datosCodigo.automatico,
+              identificacion: this.datosCodigo.cedula,
+              user_name: this.user_name,
+              ip: this.ip,
+              ip_local: this.ips_locales,
+            };
+            this.rest.ActualizarCodigoTotal(dataCodigo).subscribe(() => {
+              this.VerificarCodigo();
+            }, error => {
+              this.toastr.info('No se pudo actualizar el código automáticamente.', '', { timeOut: 6000 });
+              this.VerificarCodigo();
+            });
+          } else {
+            this.VerificarCodigo();
+          }
+        }, error => {
+          this.toastr.info('No se pudo obtener el código máximo.', '', { timeOut: 6000 });
+          this.VerificarCodigo();
+        });
+      } else {
+        this.VerificarCodigo(); 
+      }
+    }, error => {
+      this.toastr.info('Configurar ingreso de código de usuarios.', '', {
+        timeOut: 6000,
+      });
+      this.router.navigate(['/codigo/']);
+    });
+  }  
+
   // METODO PARA REGISTRAR EMPLEADO
   InsertarEmpleado(form1: any, form2: any, form3: any) {
-    // BUSCA EL ID DE LA NACIONALIDAD ELEGIDA EN EL AUTOCOMPLETADO
     this.nacionalidades.forEach((obj: any) => {
       if (form2.nacionalidadForm == obj.nombre) {
         this.idNacionalidad = obj.id;
       }
     });
-
-    // REALIZAR UN CAPITAL LETTER A LOS NOMBRES
-    var NombreCapitalizado: any;
-    let nombres = form1.nombreForm.split(' ');
-    if (nombres.length > 1) {
-      let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-      let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-      NombreCapitalizado = name1 + ' ' + name2;
-    }
-    else {
-      let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-      var NombreCapitalizado = name1
-    }
-
-    // REALIZAR UN CAPITAL LETTER A LOS APELLIDOS
-    var ApellidoCapitalizado: any;
-    let apellidos = form1.apellidoForm.split(' ');
-    if (apellidos.length > 1) {
-      let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-      let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-      ApellidoCapitalizado = lastname1 + ' ' + lastname2;
-    }
-    else {
-      let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-      ApellidoCapitalizado = lastname1
-    }
-
-    // CAPTURAR DATOS DEL FORMULARIO
-    let empleado = {
+    const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    const NombreCapitalizado = form1.nombreForm.split(' ').map(capitalizar).join(' ');
+    const ApellidoCapitalizado = form1.apellidoForm.split(' ').map(capitalizar).join(' ');
+    const empleado = {
       id_nacionalidad: this.idNacionalidad,
       fec_nacimiento: form1.fechaForm,
       esta_civil: form2.estadoCivilForm,
       domicilio: form2.domicilioForm,
       apellido: ApellidoCapitalizado,
       telefono: form2.telefonoForm,
-      cedula: form1.cedulaForm,
+      identificacion: form1.cedulaForm,
+      tipo_identificacion: form1.tipoIdentificacionForm === 'Cedula' ? 1 : 2,
       nombre: NombreCapitalizado,
       genero: form2.generoForm,
       correo: form1.emailForm,
       codigo: form1.codigoForm,
       estado: 1,
+      numero_partida_individual: form3.partidaForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
-
-    // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
-    if (this.contador === 0) {
-      this.rest.RegistrarEmpleados(empleado).subscribe(response => {
+    if (this.empleadoGuardado && this.empleadoGuardado.id) {
+      this.GuardarDatosUsuario(form3, this.empleadoGuardado.id, form1);
+      return;
+    }
+    this.rest.RegistrarEmpleados(empleado).subscribe({
+      next: (response) => {
         if (response.message === 'error') {
-          this.toastr.error('Cédula o código de usuario ya se encuentran registrados.', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Identificación o código ya se encuentran registrados.', 'Ups! algo salió mal.', {
             timeOut: 6000,
           });
-        }
-        else {
+        } else {
           this.empleadoGuardado = response;
           this.GuardarDatosUsuario(form3, this.empleadoGuardado.id, form1);
-
         }
-      });
-    }
-    else {
-      this.GuardarDatosUsuario(form3, this.empleadoGuardado.id, form1);
-    }
+      },
+      error: () => {
+        this.toastr.error('La identificación ya está registrada en el sistema.', 'Error al registrar empleado.', {
+          timeOut: 6000,
+        });
+      }
+    });
   }
 
   // METODO PARA GUARDAR DATOS DE USUARIO
-  contador: number = 0;
   GuardarDatosUsuario(form3: any, id: any, form1: any) {
-    // CIFRADO DE CONTRASEÑA
-    let clave = form3.passForm.toString();
-    let dataUser = {
+    const clave = form3.passForm.toString();
+    const dataUser = {
       id_empleado: id,
       contrasena: clave,
       usuario: form3.userForm,
       id_rol: form3.rolForm,
       estado: true,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    this.user.RegistrarUsuario(dataUser).subscribe(data => {
-      if (data.message === 'error') {
-        this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Ups!!! algo salio mal.', {
+      ip: this.ip,
+      ip_local: this.ips_locales,
+    };
+    this.user.RegistrarUsuario(dataUser).subscribe({
+      next: (data) => {
+        if (data.message === 'error') {
+          this.toastr.error('Nombre de usuario ya se encuentra registrado.', 'Ups! algo salió mal.', {
+            timeOut: 6000,
+          });
+        } else {
+          this.ActualizarCodigo(form1.codigoForm);
+          this.VerDatos(id);
+          this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+            timeOut: 6000,
+          });
+          this.LimpiarCampos();
+          this.empleadoGuardado = null; 
+        }
+      },
+      error: () => {
+        this.toastr.error('No se pudo registrar el usuario.', 'Error inesperado', {
           timeOut: 6000,
         });
-        this.contador = 1;
-      }
-      else {
-        this.ActualizarCodigo(form1.codigoForm);
-        this.VerDatos(id);
-        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-          timeOut: 6000,
-        });
-        this.LimpiarCampos();
-        this.contador = 0;
       }
     });
   }
@@ -366,31 +396,41 @@ export class RegistroComponent implements OnInit {
   }
 
 
-
-  CambiarIdentificacion(ob: MatRadioChange){
-    this.identificacion=ob.value;
+  //METODO QUE DETECTA EL CAMBIO EN TIPO DE IDENTIFICACION DE CEDULA A PASAPORTE
+  CambiarIdentificacion(ob: MatRadioChange) {
+    this.identificacion = ob.value;
+    const valor = this.primeroFormGroup.get('cedulaForm')?.value;
+  
+    if (this.identificacion === 'Cedula') {
+      this.ValidarCedula({ cedulaForm: valor }); 
+    } else {
+      this.cedulaValida = true;
+      this.pasaporteValida = true;
+      this.primeroFormGroup.get('cedulaForm')?.setErrors(null); 
+    }
   }
 
-  cedulaValida:boolean=false;
+  //METODO QUE VALIDA LA CEDULA POR ALGORITMO
+  cedulaValida: boolean = false;
   ValidarCedula(cedula: any) {
-    console.log("entra a validar Cedula", cedula);
+    if (!this.validarCedulaActiva) {
+      this.cedulaValida = true;
+      this.primeroFormGroup.controls['cedulaForm'].setErrors(null);
+      return;
+    }
     const inputElement = cedula.cedulaForm;
-  
     const cad: string = inputElement;
     let total: number = 0;
     const longitud: number = cad.length;
     const longcheck: number = longitud - 1;
   
-    // 👉 Si es menos de 10 dígitos, marcar como inválido
     if (longitud < 10) {
       this.cedulaValida = false;
       this.cdRef.detectChanges();
       this.primeroFormGroup.controls['cedulaForm'].setErrors({ minlength: true });
-      console.log("Cédula con menos de 10 dígitos");
-      return; // salir
+      return;
     }
   
-    // 👉 Validación normal si tiene 10 dígitos
     if (cad !== "" && longitud === 10) {
       for (let i = 0; i < longcheck; i++) {
         let num = parseInt(cad.charAt(i), 10);
@@ -405,27 +445,31 @@ export class RegistroComponent implements OnInit {
   
       total = total % 10 ? 10 - (total % 10) : 0;
   
-      if (parseInt(cad.charAt(longitud - 1), 10) === total) {
+      if (parseInt(cad.charAt(longcheck), 10) === total) {
         this.cedulaValida = true;
-        console.log("Cédula Válida");
+        this.primeroFormGroup.controls['cedulaForm'].setErrors(null); 
       } else {
         this.cedulaValida = false;
         this.cdRef.detectChanges();
         this.primeroFormGroup.controls['cedulaForm'].setErrors({ invalidCedula: true });
-        console.log("Cédula Inválida");
       }
     }
   }
   
 
+  //METODO PARA OBTENER EL  DETALLE DEL PARAMETRO VALIDAR CEDULA (ACTIVADO/DESACTIVADO)
+  validarCedulaActiva: boolean = true;
+  CargarEstadoValidacionCedula() {
+    this.restParametros.BuscarDetallesParametros().subscribe(detalles => {
+      const parametro36 = detalles.find((d: any) => d.id_parametro === 36);
+      this.validarCedulaActiva = parametro36?.descripcion?.toLowerCase() !== 'no';
+    });
+  }
 
   pasaporteValida:boolean=false;
   ValidarPasaporte(pasaporte:any){
 
-
   }
-
-
 }
 
 

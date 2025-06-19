@@ -84,7 +84,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       valor: form.inicioForm,
       manual: this.manualF,
       automatico: this.automaticoF,
-      cedula: this.cedulaF,
+      identificacion: this.cedulaF,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     }
@@ -111,7 +111,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       valor: null,
       manual: this.manualF,
       automatico: this.automaticoF,
-      cedula: this.cedulaF,
+      identificacion: this.cedulaF,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     }
@@ -132,7 +132,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       valor: form.inicioForm,
       manual: this.manualF,
       automatico: this.automaticoF,
-      cedula: this.cedulaF,
+      identificacion: this.cedulaF,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     }
@@ -169,7 +169,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       valor: null,
       manual: this.manualF,
       automatico: this.automaticoF,
-      cedula: this.cedulaF,
+      identificacion: this.cedulaF,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
     }
@@ -262,7 +262,7 @@ export class ConfigurarCodigoComponent implements OnInit {
           this.informacion = 'El sistema se encuentra configurado para ingresar de forma manual el código de enrolamiento de los usuarios.';
         }
         else if (datos[0].cedula === true) {
-          this.informacion = 'El sistema se encuentra configurado para considerar el número de cédula como código de enrolamiento de los usuarios.';
+          this.informacion = 'El sistema se encuentra configurado para considerar el número de identificación como código de enrolamiento de los usuarios.';
         }
       }, error => {
         this.informacion = 'El sistema no tienen una configuración de registro de código de enrolamiento.';

@@ -73,8 +73,8 @@
                                     <div class="row">
                                         <div class="col-md">
                                             <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Cédula:</label>
-                                                <label>{{e.cedula}}</label>
+                                                <label id="datosF">Identificación:</label>
+                                                <label>{{e.identificacion}}</label>
                                             </div>
                                         </div>
                                     </div>
@@ -421,7 +421,7 @@
                 </app-registro-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="editar_contrato">
-                <app-editar-contrato [contrato]="contrato_editar" [pagina]="pagina_contrato">
+                <app-editar-contrato [contrato]="contrato_editar" [fecha]="fecha_seleccionada" [pagina]="pagina_contrato">
                 </app-editar-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="crear_cargo">
@@ -520,7 +520,7 @@
                                                 </a>
                                                 <ng-template #ContratoCargar>
                                                     <a mat-raised-button id="btndocumento" type="submit"
-                                                        (click)="AbrirVentanaEditarContrato(ce)">
+                                                        (click)="AbrirVentanaEditarContrato(ce, '')">
                                                         Cargar Contrato de Trabajo
                                                     </a>
                                                 </ng-template>
@@ -529,7 +529,7 @@
                                     </div>
                                     <div style="text-align: right; padding-top: 5%;" *ngIf="!editar_contrato">
                                         <i type="submit" id="edit" style="margin-right: 6px;"
-                                            (click)="AbrirVentanaEditarContrato(ce)" matSuffix
+                                            (click)="AbrirVentanaEditarContrato(ce, '')" matSuffix
                                             matTooltipPosition="right"
                                             matTooltip="Modificar los datos generales de este registro"
                                             class="fas fa-edit">
@@ -797,7 +797,7 @@
                                 <div style="text-align: right; margin-top: 5px;"
                                     *ngIf="ce.id != datoActual.id_contrato">
                                     <i type="submit" id="edit" style="margin-right: 6px;"
-                                        (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
+                                        (click)="AbrirVentanaEditarContrato(ce, contratoForm.value)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
@@ -2310,80 +2310,6 @@
         </div>
     </mat-tab>
 
-    <!-- PROCESOS DEL EMPLEADO -->
-    <mat-tab *ngIf="HabilitarAccion" label="accion_personal">
-        <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon" id="icono_pestaña">wc</mat-icon>
-            <h6 id="items"> Procesos</h6>
-        </ng-template>
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-            <div class="row">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div id="titulo" class="row w-100 m-auto">
-                            <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
-                            </div>
-                            <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
-                                <span>
-                                    PROCESOS
-                                </span>
-                            </div>
-                            <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                    (click)="AbrirVentanaProcesos()" *ngIf="getCrearDatos()">
-                                    Añadir
-                                </button>
-                            </div>
-                        </div>
-                        <mat-card-content>
-                            <div class="container"
-                                *ngFor="let e of empleadoProcesos | paginate:tamanio_pagina:numero_pagina"
-                                style="padding-top: 15px;">
-                                <div class="container">
-                                    <div class="row w-100">
-                                        <div class="col-12 col-md-4">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Proceso:</label>
-                                                <label>{{e.proceso}}</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Fecha Inicio:</label>
-                                                <label>{{e.fecha_inicio_}}</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Fecha Final:</label>
-                                                <label>{{e.fecha_final_}}</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <i class="fas fa-edit" id="edit" (click)="AbrirVentanaEditarProceso(e)"
-                                            matSuffix matTooltipPosition="right"
-                                            matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
-                                            <p>Editar</p>
-                                        </i>
-                                        <i class=" far fa-trash-alt" id="delete" (click)="ConfirmarDeleteProceso(e)"
-                                            matTooltipPosition="right" matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
-                                            <p>Eliminar</p>
-                                        </i>
-                                    </div>
-                                </div>
-                                <mat-divider style="margin-bottom: 10px;"></mat-divider>
-                            </div>
-                            <mat-paginator id="pagina" [length]="empleadoProcesos.length" [pageSize]="tamanio_pagina"
-                                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
-                                showFirstLastButtons>
-                            </mat-paginator>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
-            </div>
-        </div>
-    </mat-tab>
 
     <!-- AUTORIZACIONES -->
     <mat-tab *ngIf="autorizar" label="autorizar">

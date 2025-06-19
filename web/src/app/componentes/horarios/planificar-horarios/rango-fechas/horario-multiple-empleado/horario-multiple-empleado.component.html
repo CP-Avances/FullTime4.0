@@ -66,7 +66,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -79,7 +79,7 @@
                                     [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de régimen laboral por nombre.">
-                                    help_outline
+                                    article
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -97,7 +97,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -110,7 +110,7 @@
                                     [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de cargos por su descripción.">
-                                    help_outline
+                                    group
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -128,7 +128,7 @@
                                     [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
-                                    help_outline
+                                    location_city
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -141,7 +141,7 @@
                                     [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de departamentos por nombre.">
-                                    help_outline
+                                    account_balance
                                 </mat-icon>
                             </mat-form-field>
                         </div>
@@ -151,100 +151,109 @@
             <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
             <form *ngIf="_booleanOptions.bool_emp">
                 <div class="row">
-                  <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                      <mat-form-field>
-                        <mat-label>Sucursal</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
-                          [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                          matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
-                      </mat-form-field>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Sucursal</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de sucursales por nombre.">
+                                    location_city
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                  </div>
-              
-                  <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                      <mat-form-field>
-                        <mat-label>Nombres</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 5)"
-                          [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                          matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
-                      </mat-form-field>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Nombres</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 5)"
+                                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por nombre.">
+                                    person
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                  </div>
-              
-                  <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                      <mat-form-field>
-                        <mat-label>Código</mat-label>
-                        <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 3)"
-                          [formControl]="codigo">
-                        <mat-icon matSuffix matTooltipPosition="right"
-                          matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
-                      </mat-form-field>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Código</mat-label>
+                                <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 3)"
+                                    [formControl]="codigo">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por código.">
+                                    code
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              
+
                 <div class="row">
-                  <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                      <mat-form-field>
-                        <mat-label>Cédula</mat-label>
-                        <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 4)"
-                          oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                          [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)" >
-                        <mat-icon matSuffix matTooltipPosition="right"
-                          matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
-                      </mat-form-field>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Identificación</mat-label>
+                                <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 4)"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de empleado por número de identificación.">
+                                    badge
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                  </div>
-              
-                  <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Rol</mat-label>
-                            <input type="text"
-                                   matInput
-                                   placeholder="Buscar"
-                                   aria-label="Rol"
-                                   [formControl]="nombre_rol"
-                                   [matAutocomplete]="autoRol"
-                                   (keypress)="IngresarSoloLetras($event)">  
-                            <mat-autocomplete #autoRol="matAutocomplete">
-                              <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
-                                {{ rol.nombre }}
-                              </mat-option>
-                            </mat-autocomplete>
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                              help_outline
-                            </mat-icon>
-                        </mat-form-field>
+
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Rol</mat-label>
+                                <input type="text" matInput placeholder="Buscar" aria-label="Rol"
+                                    [formControl]="nombre_rol" [matAutocomplete]="autoRol"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-autocomplete #autoRol="matAutocomplete">
+                                    <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                        {{ rol.nombre }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                    admin_panel_settings
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </form>
-              
+            </form>
+
 
             <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'e')" *ngIf="getEliminarPlanificaciones()">
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'e')"
+                    *ngIf="getEliminarPlanificaciones()">
                     Eliminar
                 </button>
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'b')" *ngIf="getBuscarPlanificaciones()">
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'b')"
+                    *ngIf="getBuscarPlanificaciones()">
                     Buscar Planificación
                 </button>
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'p')" *ngIf="getPlanificacionFija()">
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'p')"
+                    *ngIf="getPlanificacionFija()">
                     Planificación Fija
                 </button>
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'm')" *ngIf="getPlanificacionMultiple()">
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'm')"
+                    *ngIf="getPlanificacionMultiple()">
                     Planificación Múltiple
                 </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="VerCargarTimbres()" *ngIf="getAsignarTimbres()">
                     Asignar timbres
                 </button>
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'c')" *ngIf="getCargarPlantilla()">
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'c')"
+                    *ngIf="getCargarPlantilla()">
                     Cargar plantilla
                 </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
@@ -317,9 +326,9 @@
 
             <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
             <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
-                
+
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -327,8 +336,8 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">Mostrar lista</button>
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">Mostrar lista</button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -365,23 +374,27 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td>
-                                    <i (click)="GuardarRegistros(r, 'p')" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
-                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(r, 'p')" id="plan"
+                                        *ngIf="auto_individual && getPlanificacionFija()" class="fa fa-calendar"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación fija.">
                                         <p>Fija</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(r, 'm')" id="multiple_" *ngIf="auto_individual && getPlanificacionMultiple()"
-                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(r, 'm')" id="multiple_"
+                                        *ngIf="auto_individual && getPlanificacionMultiple()" class="fa fa-files-o"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación múltiple.">
                                         <p>Multiple</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(r, 'b')" id="busca" *ngIf="auto_individual && getBuscarPlanificaciones()"
-                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(r, 'b')" id="busca"
+                                        *ngIf="auto_individual && getBuscarPlanificaciones()" class="fa fa-search"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de planificaciones asignadas.">
                                         <p>Buscar</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(r, 'e')" id="elimina_" *ngIf="auto_individual && getEliminarPlanificaciones()"
-                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(r, 'e')" id="elimina_"
+                                        *ngIf="auto_individual && getEliminarPlanificaciones()" class="far fa-trash-alt"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Eliminar planificaciones asignadas.">
                                         <p>Eliminar</p>
                                     </i>
@@ -401,7 +414,7 @@
             <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -409,8 +422,8 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">Mostrar lista</button>
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">Mostrar lista</button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -447,23 +460,27 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td>
-                                    <i (click)="GuardarRegistros(c, 'p')" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
-                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(c, 'p')" id="plan"
+                                        *ngIf="auto_individual && getPlanificacionFija()" class="fa fa-calendar"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación fija.">
                                         <p>Fija</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(c, 'm')" id="multiple_" *ngIf="auto_individual && getPlanificacionMultiple()"
-                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(c, 'm')" id="multiple_"
+                                        *ngIf="auto_individual && getPlanificacionMultiple()" class="fa fa-files-o"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación múltiple.">
                                         <p>Multiple</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(c, 'b')" id="busca" *ngIf="auto_individual && getBuscarPlanificaciones()"
-                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(c, 'b')" id="busca"
+                                        *ngIf="auto_individual && getBuscarPlanificaciones()" class="fa fa-search"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de planificaciones asignadas.">
                                         <p>Buscar</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(c, 'e')" id="elimina_" *ngIf="auto_individual && getEliminarPlanificaciones()"
-                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(c, 'e')" id="elimina_"
+                                        *ngIf="auto_individual && getEliminarPlanificaciones()" class="far fa-trash-alt"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Eliminar planificaciones asignadas.">
                                         <p>Eliminar</p>
                                     </i>
@@ -482,7 +499,7 @@
             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -490,8 +507,8 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">Mostrar lista</button>
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">Mostrar lista</button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -528,23 +545,27 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td>
-                                    <i (click)="GuardarRegistros(d, 'p')" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
-                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(d, 'p')" id="plan"
+                                        *ngIf="auto_individual && getPlanificacionFija()" class="fa fa-calendar"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación fija.">
                                         <p>Fija</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(d, 'm')" id="multiple_" *ngIf="auto_individual && getPlanificacionMultiple()"
-                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(d, 'm')" id="multiple_"
+                                        *ngIf="auto_individual && getPlanificacionMultiple()" class="fa fa-files-o"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación múltiple.">
                                         <p>Multiple</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(d, 'b')" id="busca" *ngIf="auto_individual && getBuscarPlanificaciones()"
-                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(d, 'b')" id="busca"
+                                        *ngIf="auto_individual && getBuscarPlanificaciones()" class="fa fa-search"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de planificaciones asignadas.">
                                         <p>Buscar</p>
                                     </i>
-                                    <i (click)="GuardarRegistros(d, 'e')" id="elimina_" *ngIf="auto_individual && getEliminarPlanificaciones()"
-                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(d, 'e')" id="elimina_"
+                                        *ngIf="auto_individual && getEliminarPlanificaciones()" class="far fa-trash-alt"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Eliminar planificaciones asignadas.">
                                         <p>Eliminar</p>
                                     </i>
@@ -563,7 +584,7 @@
             <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -571,8 +592,8 @@
                         </span>
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: -3px;"
-                            (click)="MostrarLista()">
+                        <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
+                            style="margin-top: -3px;" (click)="MostrarLista()">
                             Mostrar lista
                         </button>
                     </div>
@@ -595,7 +616,7 @@
                                     </mat-checkbox>
                                 </th>
                                 <th scope="col">Sucursal</th>
-                                <th scope="col">Cédula</th>
+                                <th scope="col">Identificación</th>
                                 <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Rol</th>
@@ -612,28 +633,32 @@
                                     </mat-checkbox>
                                 </td>
                                 <td>{{e.sucursal}}</td>
-                                <td>{{e.cedula}}</td>
+                                <td>{{e.identificacion}}</td>
                                 <td>{{e.codigo}}</td>
                                 <td>{{e.apellido}} {{e.nombre}}</td>
                                 <td>{{e.rol}}</td>
                                 <td>
-                                    <i (click)="PlanificarIndividual(e, 'p')" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
-                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
+                                    <i (click)="PlanificarIndividual(e, 'p')" id="plan"
+                                        *ngIf="auto_individual && getPlanificacionFija()" class="fa fa-calendar"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación fija.">
                                         <p>Fija</p>
                                     </i>
-                                    <i (click)="AbrirMultipleIndividual(e)" id="multiple_" *ngIf="auto_individual && getPlanificacionMultiple()"
-                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                    <i (click)="AbrirMultipleIndividual(e)" id="multiple_"
+                                        *ngIf="auto_individual && getPlanificacionMultiple()" class="fa fa-files-o"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de asignación de planificación múltiple.">
                                         <p>Múltiple</p>
                                     </i>
-                                    <i (click)="PlanificarIndividual(e, 'b')" id="busca" *ngIf="auto_individual && getBuscarPlanificaciones()"
-                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                    <i (click)="PlanificarIndividual(e, 'b')" id="busca"
+                                        *ngIf="auto_individual && getBuscarPlanificaciones()" class="fa fa-search"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de planificaciones asignadas.">
                                         <p>Buscar</p>
                                     </i>
-                                    <i (click)="EliminarHorarios([e])" id="elimina_" *ngIf="auto_individual && getEliminarPlanificaciones()"
-                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                    <i (click)="EliminarHorarios([e])" id="elimina_"
+                                        *ngIf="auto_individual && getEliminarPlanificaciones()" class="far fa-trash-alt"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Eliminar planificaciones asignadas.">
                                         <p>Eliminar</p>
                                     </i>

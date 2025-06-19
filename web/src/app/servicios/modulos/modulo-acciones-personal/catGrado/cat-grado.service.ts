@@ -60,6 +60,7 @@ export class CatGradoService {
   }
 
   RegistroGrado(data: any){
+    console.log('datossssssss: ',data)
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/grado/registrarGrados', data)
   }
 

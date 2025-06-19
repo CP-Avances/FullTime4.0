@@ -49,7 +49,7 @@ export class OlvidarContraseniaComponent implements OnInit {
       return 'Ingrese código empresarial';
     }
     if (this.cedula.toString().trim().length === 0) {
-      return 'Ingrese cédula';
+      return 'Ingrese su identificación';
     }
   }
 
@@ -95,7 +95,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                   },
                 error: (e) => 
                   {
-                    this.toastr.error('No se ha definido ruta de instalación.', 'Ups!!! algo salio mal.', {
+                    this.toastr.error('No se ha definido ruta de instalación.', 'Ups! algo salio mal.', {
                       timeOut: 6000,
                     });
                   },
@@ -106,7 +106,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                     let dataPass = {
                       correo: form.usuarioF,
                       url_page: this.cadena,
-                      cedula: form.cedulaF
+                      identificacion: form.cedulaF
                     };
                     this.rest.EnviarCorreoContrasena(dataPass).subscribe(res => {
                       this.respuesta = res;
@@ -117,7 +117,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                         this.router.navigate(['/login']);
                       }
                       else {
-                        this.toastr.error('Revisar la configuración de correo electrónico.', 'Ups!!! algo salio mal.', {
+                        this.toastr.error('Revisar la configuración de correo electrónico.', 'Ups! algo salio mal.', {
                           timeOut: 6000,
                         });
                         this.correo.reset();
@@ -126,7 +126,7 @@ export class OlvidarContraseniaComponent implements OnInit {
                         this.router.navigate(['/login']);
                       }
                     }, error => {
-                      this.toastr.error('El correo electrónico o cédula ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
+                      this.toastr.error('El correo electrónico o identificación ingresada no consta en los registros.', 'Ups! algo salio mal.', {
                         timeOut: 6000,
                       });
                       this.correo.reset();

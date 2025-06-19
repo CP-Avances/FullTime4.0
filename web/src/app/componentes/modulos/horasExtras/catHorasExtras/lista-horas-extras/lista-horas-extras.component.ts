@@ -69,7 +69,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     if (this.habilitarHorasE === false) {
       let mensaje = {
         access: false,
-        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
         message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
       }
@@ -217,6 +217,7 @@ export class ListaHorasExtrasComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

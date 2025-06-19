@@ -67,10 +67,10 @@ export class EditarPlanificacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.BuscarHora();
     this.BuscarFeriados();
   }
@@ -93,8 +93,8 @@ export class EditarPlanificacionComponent implements OnInit {
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     this.feriados = [];
     let datos = {
-      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.datos_horarios.idEmpleado)
     }
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
@@ -110,8 +110,8 @@ export class EditarPlanificacionComponent implements OnInit {
   BuscarFeriadosRecuperar(fecha: any) {
     this.recuperar = [];
     let datos = {
-      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
       id_empleado: parseInt(this.datos_horarios.idEmpleado)
     }
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
@@ -203,7 +203,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     console.log("ListarHorariosSeleccionados fecha", fecha);
 
-    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd');
+    let fecha_ = DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd');
     console.log("ver fecha_", fecha_)
     this.dia_fecha = DateTime.fromFormat(fecha_, 'yyyy-MM-dd').setLocale('es')
       .toFormat('MMMM, EEE. dd, yyyy')
@@ -258,8 +258,8 @@ export class EditarPlanificacionComponent implements OnInit {
     this.lista_feriados = [];
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     let busqueda = {
-      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
-      fecha_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+      fecha_inicio: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
+      fecha_final: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
       id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
@@ -293,7 +293,7 @@ export class EditarPlanificacionComponent implements OnInit {
   antes: any = [];
   BuscarPlanificacionAntes() {
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    var restar = DateTime.fromFormat(formato, "yyyy-MM-d")
+    var restar = DateTime.fromFormat(formato, "yyyy-M-d")
       .minus({ days: 1 })
       .toFormat("yyyy-MM-dd");
     console.log("ver restar: ", restar)
@@ -330,7 +330,7 @@ export class EditarPlanificacionComponent implements OnInit {
   despues: any = [];
   BuscarPlanificacionDespues() {
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
-    var restar = DateTime.fromFormat(formato, "yyyy-MM-d")
+    var restar = DateTime.fromFormat(formato, "yyyy-M-d")
       .plus({ days: 1 })
       .toFormat("yyyy-MM-dd");
     var fecha = restar;
@@ -554,12 +554,12 @@ export class EditarPlanificacionComponent implements OnInit {
         }
       }
       if (verificador === 1) {
-        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else if (verificador === 2) {
-        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
           timeOut: 6000,
         });
       }
@@ -574,7 +574,7 @@ export class EditarPlanificacionComponent implements OnInit {
         }
 
         if (verificador === 3) {
-          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
             timeOut: 6000,
           });
         }
@@ -595,7 +595,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
           // FIN DE LAS VALIDACIONES
           if (verificador === 4) {
-            this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+            this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups! VERIFICAR.', {
               timeOut: 6000,
             });
           }
@@ -609,7 +609,7 @@ export class EditarPlanificacionComponent implements OnInit {
       }
     }
     else {
-      this.toastr.warning('Dia configurado como feriado en el sistema. Puede ingresar horarios de tipo Feriado.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Dia configurado como feriado en el sistema. Puede ingresar horarios de tipo Feriado.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -647,7 +647,7 @@ export class EditarPlanificacionComponent implements OnInit {
   asignado_libre: any = [];
   AgregarLibre() {
     if (this.horas.length != 0) {
-      this.toastr.warning('Este día ya tiene configurado horarios. No puede ser libre.', 'Ups!!! VERIFICAR.', {
+      this.toastr.warning('Este día ya tiene configurado horarios. No puede ser libre.', 'Ups! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -781,8 +781,8 @@ export class EditarPlanificacionComponent implements OnInit {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       let plan_fecha = {
         id_empleado: this.datos_horarios.idEmpleado,
-        fec_final: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
-        fec_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+        fec_final: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
+        fec_inicio: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
         id_horario: horario.horarios.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
@@ -804,7 +804,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 }
               }
               else {
-                this.toastr.error('Ups!!! se ha producido un error.',
+                this.toastr.error('Ups! se ha producido un error.',
                   'Verificar nuevamente.', {
                   timeOut: 6000,
                 });
@@ -824,7 +824,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 }
               }
               else {
-                this.toastr.error('Ups!!! se ha producido un error.',
+                this.toastr.error('Ups! se ha producido un error.',
                   'Verificar nuevamente.', {
                   timeOut: 6000,
                 });
@@ -927,14 +927,14 @@ export class EditarPlanificacionComponent implements OnInit {
                   min_alimentacion: deta.minutos_comida,
                 };
                 if (deta.segundo_dia === true) {
-                  plan.fec_hora_horario = DateTime.fromFormat(fecha, 'yyyy-MM-dd')
-                  .plus({ days: 1 })
-                  .toFormat('yyyy-MM-dd') + ' ' + deta.hora; + ' ' + deta.hora;
+                  plan.fec_hora_horario = DateTime.fromFormat(fecha, 'yyyy-M-dd')
+                    .plus({ days: 1 })
+                    .toFormat('yyyy-MM-dd') + ' ' + deta.hora; + ' ' + deta.hora;
                 }
                 if (deta.tercer_dia === true) {
-                  plan.fec_hora_horario = DateTime.fromFormat(fecha, 'yyyy-MM-dd')
-                  .plus({ days: 2 })
-                  .toFormat('yyyy-MM-dd') + ' ' + deta.hora; + ' ' + deta.hora;
+                  plan.fec_hora_horario = DateTime.fromFormat(fecha, 'yyyy-M-dd')
+                    .plus({ days: 2 })
+                    .toFormat('yyyy-MM-dd') + ' ' + deta.hora; + ' ' + deta.hora;
                 }
                 // ALMACENAMIENTO DE PLANIFICACION GENERAL
                 this.plan_general = this.plan_general.concat(plan);
@@ -975,15 +975,16 @@ export class EditarPlanificacionComponent implements OnInit {
         this.cargar = true;
         this.ver_feriado = false;
         this.ver_guardar = false;
+        this.CerrarVentana(2);
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+        this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
           timeOut: 6000,
         });
         this.CerrarVentana(2);
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error.', 'Verificar la planificación.', {
+      this.toastr.error('Ups! se ha producido un error.', 'Verificar la planificación.', {
         timeOut: 6000,
       });
       this.CerrarVentana(2);
@@ -1027,12 +1028,12 @@ export class EditarPlanificacionComponent implements OnInit {
     var codigos = '\'' + this.datos_horarios.codigo + '\'';
     let usuarios = {
       codigo: codigos,
-      fec_final: DateTime.fromFormat(fecha, 'yyyy-MM-d')
-      .plus({ days: 2 })
-      .toFormat('yyyy-MM-dd'),
-    
-      fec_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d')
-      .toFormat('yyyy-MM-dd'),
+      fec_final: DateTime.fromFormat(fecha, 'yyyy-M-d')
+        .plus({ days: 2 })
+        .toFormat('yyyy-MM-dd'),
+
+      fec_inicio: DateTime.fromFormat(fecha, 'yyyy-M-d')
+        .toFormat('yyyy-MM-dd'),
     };
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
       if (datos.message === 'vacio') {
@@ -1043,7 +1044,7 @@ export class EditarPlanificacionComponent implements OnInit {
       }
       else if (datos.message === 'error') {
         this.toastr.info(
-          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          'Ups! algo salio mal', 'No se cargaron todos los registros.', {
           timeOut: 6000,
         })
       }
@@ -1075,8 +1076,8 @@ export class EditarPlanificacionComponent implements OnInit {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       let plan_fecha = {
         id_empleado: this.datos_horarios.idEmpleado,
-        fec_final:  DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
-        fec_inicio: DateTime.fromFormat(fecha, 'yyyy-MM-d').toFormat('yyyy-MM-dd'),
+        fec_final: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
+        fec_inicio: DateTime.fromFormat(fecha, 'yyyy-M-d').toFormat('yyyy-MM-dd'),
         id_horario: horario.horarios.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {

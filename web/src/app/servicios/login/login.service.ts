@@ -4,6 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
+//Servicios
+import { SocketService } from '../socket/socket.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +15,9 @@ export class LoginService {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    public router: Router) { }
+    public router: Router,
+    private socket: SocketService,
+  ) { }
 
 
   // VALIDACIONES DE INGRESO AL SISTEMA     **USADO
@@ -29,6 +34,11 @@ export class LoginService {
   // METODO PARA CAMBIAR CONTRASEÑA   **USADO
   ActualizarContrasenia(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/cambiar-contrasenia`, data)
+  }
+
+  // AUDITAR INICIO DE SESION
+  AuditarInicio(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/registrar_acceso`, data)
   }
 
   // VERIFICAR EXISTENCIA DE INICIO DE SESION
@@ -60,12 +70,13 @@ export class LoginService {
   logout() {
     localStorage.clear();
     sessionStorage.clear();
+    this.socket.disconnectSocket();
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
 
   //SELECTOR DE EMPRESAS
-  getEmpresa(data: any){
+  getEmpresa(data: any) {
     return this.http.post<any>(`${environment.url}/fulltime`, data);
   }
- 
+
 }

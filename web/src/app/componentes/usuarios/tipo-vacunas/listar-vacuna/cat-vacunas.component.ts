@@ -98,10 +98,10 @@ export class CatVacunasComponent implements OnInit {
 
   ngOnInit() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.vacunas = [];
     this.ObtenerEmpleados(this.idEmpleado);
@@ -125,7 +125,7 @@ export class CatVacunasComponent implements OnInit {
       pattern: "solid",
       fgColor: { argb: "4F81BD" }, // Azul claro
     };
-    
+
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
@@ -149,7 +149,7 @@ export class CatVacunasComponent implements OnInit {
           timeOut: 1500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al cargar los datos.', 'Ups! algo salio mal.', {
           timeOut: 3500,
         });
       }
@@ -171,6 +171,7 @@ export class CatVacunasComponent implements OnInit {
 
   // METODO PARA ABRI VENTANA VACUNA
   AbrirVentanaRegistrarVacuna(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(TipoVacunaComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
@@ -272,16 +273,6 @@ export class CatVacunasComponent implements OnInit {
       this.Datos_vacunas = res.data;
       this.messajeExcel = res.message;
 
-      this.Datos_vacunas.sort((a: any, b: any) => {
-        if (a.observacion !== 'ok' && b.observacion === 'ok') {
-          return -1;
-        }
-        if (a.observacion === 'ok' && b.observacion !== 'ok') {
-          return 1;
-        }
-        return 0;
-      });
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -295,6 +286,16 @@ export class CatVacunasComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
+        this.Datos_vacunas.sort((a: any, b: any) => {
+          if (a.observacion !== 'ok' && b.observacion === 'ok') {
+            return -1;
+          }
+          if (a.observacion === 'ok' && b.observacion !== 'ok') {
+            return 1;
+          }
+          return 0;
+        });
+
         this.Datos_vacunas.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaVacunasCorrectas.push(item);
@@ -339,6 +340,7 @@ export class CatVacunasComponent implements OnInit {
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -347,7 +349,7 @@ export class CatVacunasComponent implements OnInit {
       });
   }
 
-// METODO PARA CARGAR DATOS DE PLANTILLA AL SISTEMA
+  // METODO PARA CARGAR DATOS DE PLANTILLA AL SISTEMA
   SubirDatosPlantilla() {
     if (this.listaVacunasCorrectas.length > 0) {
       const data = {
@@ -357,15 +359,16 @@ export class CatVacunasComponent implements OnInit {
       }
       this.rest.SubirArchivoExcel(data).subscribe({
         next: (response) => {
-          this.toastr.success('Plantilla de vacunas importada.', 'Operación exitosa.',  {
+          this.toastr.success('Plantilla de vacunas importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
           this.LimpiarCampos();
           this.archivoForm.reset();
           this.nameFile = '';
         },
-        error: (error) => {;
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+        error: (error) => {
+          ;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
             timeOut: 4000,
           });
         }
@@ -705,7 +708,8 @@ export class CatVacunasComponent implements OnInit {
     const data = {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales,
-    }
+    };
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -740,17 +744,17 @@ export class CatVacunasComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales,
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionVacuna.selected.length;
-  
+
     this.vacunasEliminar = this.selectionVacuna.selected;
-  
+
     this.vacunasEliminar.forEach((datos: any) => {
       this.rest.Eliminar(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -759,7 +763,7 @@ export class CatVacunasComponent implements OnInit {
           eliminados++;
           this.vacunas = this.vacunas.filter((item: any) => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
@@ -773,10 +777,11 @@ export class CatVacunasComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -789,7 +794,7 @@ export class CatVacunasComponent implements OnInit {
             this.selectionVacuna.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado TIPO VACUNAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TIPO VACUNAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -814,23 +819,23 @@ export class CatVacunasComponent implements OnInit {
     }
   }
 
-  getCrearTipoVacuna(){
+  getCrearTipoVacuna() {
     return this.tienePermiso('Crear Tipo Vacuna');
   }
 
-  getEditarTipoVacuna(){
+  getEditarTipoVacuna() {
     return this.tienePermiso('Editar Tipo Vacuna');
   }
 
-  getEliminarTipoVacuna(){
+  getEliminarTipoVacuna() {
     return this.tienePermiso('Eliminar Tipo Vacuna');
   }
 
-  getCargarPlantillaTipoVacuna(){
+  getCargarPlantillaTipoVacuna() {
     return this.tienePermiso('Cargar Plantilla Tipo Vacuna');
   }
 
-  getDescargarReportesTipoVacuna(){
+  getDescargarReportesTipoVacuna() {
     return this.tienePermiso('Descargar Reportes Tipo Vacuna');
   }
 

@@ -66,7 +66,7 @@ export class EditarTituloComponent implements OnInit {
     else {
       // VERIFICAR DUPLICADO DE REGISTRO
       this.rest.BuscarTituloEspecifico(titulo).subscribe(data => {
-        this.toastr.warning('Registro ya se encuentra en el sistema.', 'Ups!!! algo salio mal.', {
+        this.toastr.warning('Registro ya se encuentra en el sistema.', 'Ups! algo salio mal.', {
           timeOut: 3000,
         });
       }, vacio => {

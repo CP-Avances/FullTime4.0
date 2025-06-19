@@ -125,7 +125,7 @@ export class EditarCatProcesosComponent implements OnInit {
           timeOut: 6000,
         });
       }else{
-        this.toastr.error(err.error.message, 'Erro server', {
+        this.toastr.error(err.error.message, 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }

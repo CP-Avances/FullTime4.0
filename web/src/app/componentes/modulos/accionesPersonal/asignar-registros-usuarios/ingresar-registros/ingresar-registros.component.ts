@@ -163,12 +163,6 @@ export class IngresarRegistrosComponent {
     
   }
 
-  ocultarRegistroGrado(valor: boolean) {
-    this.MostrarListaProcesos = !valor;
-    this.RegistroMultipleProcesos = valor;
-    this.RegistroInterfazProcesos = false;
-  }
-
   ocultarRegistroProceso(valor: boolean) {
     this.MostrarListaProcesos = !valor;
     this.RegistroMultipleProcesos = valor;
@@ -194,6 +188,12 @@ export class IngresarRegistrosComponent {
     this.MostrarListaGrupoOcupacional = true;
     this.RegistroInterfazGrupoOcupacional = false;
     this.RegistroMultipleGrupoOcupacional = false;
+  }
+
+  ocultarRegistroGrado(valor: boolean) {
+    this.MostrarListaGrado = !valor;
+    this.RegistroMultipleGrado = valor;
+    this.RegistroInterfazGrado = false;
   }
 
   //CONTROL BOTONES

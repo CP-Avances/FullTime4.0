@@ -31,7 +31,7 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Fecha desde</th>
@@ -84,7 +84,7 @@
                                 [aria-label]="checkboxLabel(h)">
                             </mat-checkbox>
                         </td>
-                        <td>{{h.cedula}}</td>
+                        <td>{{h.identificacion}}</td>
                         <td>{{h.nombre}} {{h.apellido}}</td>
                         <td>{{h.plan_estado}}</td>
                         <td>{{h.fecha_desde.split('T')[0]}}</td>
@@ -143,12 +143,12 @@
                     <form>
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>Ingresar Cédula</mat-label>
+                                <mat-label>Ingresar Identificación</mat-label>
                                 <input matInput placeholder="Ej: " maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon id="iemple" matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de empleado por la cédula de identificación o pasaporte.">
+                                    matTooltip="Búsqueda de empleado por número de identificación.">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -195,7 +195,7 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Fecha desde</th>
@@ -216,7 +216,7 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
-                        <td>{{h.cedula}}</td>
+                        <td>{{h.identificacion}}</td>
                         <td>{{h.nombre}} {{h.apellido}}</td>
                         <td>{{h.plan_estado}}</td>
                         <td>{{h.fecha_desde.split('T')[0]}}</td>
@@ -274,7 +274,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Cédula</th>
+                        <th scope="col">Identificación</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Fecha desde</th>
@@ -287,7 +287,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let h of horas_extras_autorizadas | paginate:tamanio_pagina_auto:numero_pagina_auto">
-                        <td>{{h.cedula}}</td>
+                        <td>{{h.identificacion}}</td>
                         <td>{{h.nombre}} {{h.apellido}}</td>
                         <td>{{h.plan_estado}}</td>
                         <td>{{h.fecha_desde.split('T')[0]}}</td>

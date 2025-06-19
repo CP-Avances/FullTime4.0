@@ -211,6 +211,7 @@ export class EmpleadoGradoComponent {
 
   ConfirmarDelete(gra: any) {
     const mensaje = 'eliminar';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

@@ -1,18 +1,18 @@
 <div *ngFor="let c of coordenadas" style="padding-top: 20px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo" class="row w-100 m-auto">
-            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+            <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                 <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
-                value="Atras" (click)="ListarCoordenadas()">
-                Atras
-            </button>
+                    value="Atras" (click)="ListarCoordenadas()">
+                    Atras
+                </button>
             </div>
             <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                 <span>DATOS GENERALES</span>
             </div>
             <div class="col-6 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                 <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" style="margin-top: 3px;"
-                (click)="AbrirVentanaEditar(c)" *ngIf="getEditarUbicacion()">
+                    (click)="AbrirVentanaEditar(c)" *ngIf="getEditarUbicacion()">
                     Editar
                 </button>
             </div>
@@ -65,7 +65,7 @@
                                 [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de sucursales por nombre.">
-                                help_outline
+                                location_city
                             </mat-icon>
                         </mat-form-field>
                     </div>
@@ -82,7 +82,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -95,7 +95,7 @@
                                         [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de régimen laboral por nombre.">
-                                        help_outline
+                                        article
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -113,7 +113,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -126,7 +126,7 @@
                                         [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
-                                        help_outline
+                                        group
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -144,7 +144,7 @@
                                         [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
-                                        help_outline
+                                        location_city
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -157,7 +157,7 @@
                                         [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
-                                        help_outline
+                                        account_balance
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -167,79 +167,84 @@
                 <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_emp">
                     <div class="row">
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Sucursal</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
-                              [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de sucursales por nombre.">help_outline</mat-icon>
-                          </mat-form-field>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Sucursal</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de sucursales por nombre.">
+                                        location_city
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Nombres</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
-                              [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por nombre.">help_outline</mat-icon>
-                          </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Nombres</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
+                                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por nombre.">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Código</mat-label>
-                            <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
-                              [formControl]="codigo">
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por código.">help_outline</mat-icon>
-                          </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Código</mat-label>
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
+                                        [formControl]="codigo">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por código.">
+                                        code
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                  
+
                     <div class="row">
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <mat-form-field>
-                            <mat-label>Cédula</mat-label>
-                            <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
-                              oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                              [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)" >
-                            <mat-icon matSuffix matTooltipPosition="right"
-                              matTooltip="Búsqueda de datos de empleado por cédula de identificación.">help_outline</mat-icon>
-                          </mat-form-field>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Identificación</mat-label>
+                                    <input matInput placeholder="Buscar" maxlength="10"
+                                        (input)="Filtrar(cedula.value, 5)"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        [formControl]="cedula" type="tel" (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de datos de empleado por número de identificación.">
+                                        badge
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
-                  
-                      <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label>Rol</mat-label>
-                                <input type="text"
-                                       matInput
-                                       placeholder="Buscar"
-                                       aria-label="Rol"
-                                       [formControl]="nombre_rol"
-                                       [matAutocomplete]="autoRol"
-                                       (keypress)="IngresarSoloLetras($event)">  
-                                <mat-autocomplete #autoRol="matAutocomplete">
-                                  <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
-                                    {{ rol.nombre }}
-                                  </mat-option>
-                                </mat-autocomplete>
-                                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
-                                  help_outline
-                                </mat-icon>
-                            </mat-form-field>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Rol</mat-label>
+                                    <input type="text" matInput placeholder="Buscar" aria-label="Rol"
+                                        [formControl]="nombre_rol" [matAutocomplete]="autoRol"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                    <mat-autocomplete #autoRol="matAutocomplete">
+                                        <mat-option *ngFor="let rol of filteredRoles | async" [value]="rol.nombre">
+                                            {{ rol.nombre }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de roles.">
+                                        admin_panel_settings
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
                         </div>
-                      </div>
                     </div>
                 </form>
                 <div class="d-flex justify-content-around">
@@ -252,7 +257,7 @@
                 <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
 
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -261,8 +266,8 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                            (click)="MostrarLista()">
-                            Mostrar lista
+                                (click)="MostrarLista()">
+                                Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -309,9 +314,9 @@
                 </div>
                 <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                 <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
-                    
+
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -320,8 +325,8 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                            (click)="MostrarLista()">
-                            Mostrar lista
+                                (click)="MostrarLista()">
+                                Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -370,9 +375,9 @@
                 </div>
                 <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
                 <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
-                   
+
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -381,8 +386,8 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                            (click)="MostrarLista()">
-                            Mostrar lista
+                                (click)="MostrarLista()">
+                                Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -433,7 +438,7 @@
                 <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
 
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -442,8 +447,8 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                            (click)="MostrarLista()">
-                            Mostrar lista
+                                (click)="MostrarLista()">
+                                Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -492,9 +497,9 @@
                 </div>
                 <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
-                   
+
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                         </div>
                         <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                             <span>
@@ -503,8 +508,8 @@
                         </div>
                         <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                             <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                            (click)="MostrarLista()">
-                            Mostrar lista
+                                (click)="MostrarLista()">
+                                Mostrar lista
                             </button>
                         </div>
                     </div>
@@ -527,7 +532,7 @@
                                         </mat-checkbox>
                                     </th>
                                     <th scope="col">Sucursal</th>
-                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Identificación</th>
                                     <th scope="col">Código</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Rol</th>
@@ -543,7 +548,7 @@
                                         </mat-checkbox>
                                     </td>
                                     <td>{{e.sucursal}}</td>
-                                    <td>{{e.cedula}}</td>
+                                    <td>{{e.identificacion}}</td>
                                     <td>{{e.codigo}}</td>
                                     <td>{{e.apellido}} {{e.nombre}}</td>
                                     <td>{{e.rol}}</td>
@@ -559,14 +564,14 @@
                 </div>
             </div>
 
-    
+
             <div style="padding-top: 15px; text-align: center;" *ngIf="!asignar">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="titulo" class="row w-100 m-auto">
-                        <div class="col-2 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                        <div class="col-2 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                             <mat-icon class="flex-shrink-1 bd-highlight" matSuffix matTooltipPosition="right"
-                            matTooltip="Eliminar de la lista usuarios seleccionados." id="SelectCheck"
-                            (click)="HabilitarSeleccion()">
+                                matTooltip="Eliminar de la lista usuarios seleccionados." id="SelectCheck"
+                                (click)="HabilitarSeleccion()">
                                 library_add_check
                             </mat-icon>
                         </div>
@@ -574,12 +579,13 @@
                             <span>USUARIOS ASIGNADOS EN {{c.descripcion.toUpperCase()}}</span>
                         </div>
                         <div class="col-10 col-md-1 mb-2 mb-md-0 order-2 order-md-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar" 
+                            <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
                                 (click)="ConfirmarDeleteVarios()">Eliminar</button>
                         </div>
                         <div class="col-10 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaBusqueda()" value="Asignar a usuario" *ngIf="getVerAsignarUsuario()">
+                                (click)="AbrirVentanaBusqueda()" value="Asignar a usuario"
+                                *ngIf="getVerAsignarUsuario()">
                                 Asignar usuarios
                             </button>
                         </div>
@@ -615,9 +621,9 @@
                                     <td>{{dp.apellido}}</td>
                                     <td>{{dp.nombre}}</td>
                                     <td>
-                                        <i *ngIf="auto_individual && getVerEliminarAsignacionUsuario()" matSuffix matTooltipPosition="right"
-                                            matTooltip="Eliminar registro." class="far fa-trash-alt"
-                                            (click)="ConfirmarDelete(dp)" id="t-eliminar">
+                                        <i *ngIf="auto_individual && getVerEliminarAsignacionUsuario()" matSuffix
+                                            matTooltipPosition="right" matTooltip="Eliminar registro."
+                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dp)" id="t-eliminar">
                                             <p>Eliminar</p>
                                         </i>
                                     </td>

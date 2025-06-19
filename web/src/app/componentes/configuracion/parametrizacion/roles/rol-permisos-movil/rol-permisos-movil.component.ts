@@ -121,17 +121,16 @@ export class RolPermisosMovilComponent implements OnInit {
     public rest: RolPermisosService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
-    
-  ) {
-  }
+
+  ) { }
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
     this.rol.BuscarUnRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
@@ -200,7 +199,6 @@ export class RolPermisosMovilComponent implements OnInit {
       });
       datos.sort((a: any, b: any) => a.id - b.id);
       this.data_general = datos.filter((item: any) => item.id === this.id_rol);
-      console.log('funciones ', this.data_general);
     });
   }
 
@@ -325,9 +323,9 @@ export class RolPermisosMovilComponent implements OnInit {
   }
 
   // METODO PARA RETIRAR ACCIONES
-  QuitarAccion(id: any, data: any) {
+  QuitarAccion(id: any, data: any, j: number) {
     this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter((s: any) => s !== data);
-    (<HTMLInputElement>document.getElementById('seleccionarAccion' + id)).checked = false;
+    if (this.nombresAccionesPorPagina[id][0].length > 1) (<HTMLInputElement>document.getElementById(`seleccionarAccion${id}_${j}`)).checked = false;
   }
 
   // METODO PARA AGREGAR TODAS LAS PAGINAS
@@ -407,7 +405,6 @@ export class RolPermisosMovilComponent implements OnInit {
   // METODO PARA VERIFICAR SELECCION DE OPCION "Todas"
   isChecked: boolean = false;
   SeleccionarTodas(event: any) {
-    console.log(event)
     if (event === true) {
       this.AgregarTodos();
     }
@@ -481,279 +478,190 @@ export class RolPermisosMovilComponent implements OnInit {
 
   // METODO PARA VERIFICAR SELECCION DE ACCIONES
   isCheckedAccion_: boolean = false;
-  SeleccionarIndividualAccion(event: any, id: any, valor: any) {
+  SeleccionarIndividualAccion(event: any, id: any, valor: any, j: number) {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {
       this.AgregarAccion(id, valor);
-      if (this.accionesSeleccionadasPorPagina[id].length == this.nombresAccionesPorPagina[id][0].length) {
-        (<HTMLInputElement>document.getElementById('seleccionarAccion' + id)).checked = true;
+      if (this.nombresAccionesPorPagina[id][0].length > 1 && this.accionesSeleccionadasPorPagina[id].length == this.nombresAccionesPorPagina[id][0].length) {
+        (<HTMLInputElement>document.getElementById(`seleccionarAccion${id}_${j}`)).checked = true;
       }
     }
     else {
-      this.QuitarAccion(id, valor);
+      this.QuitarAccion(id, valor, j);
     }
   }
 
-  // METODO PARA ASIGNAR PAGINAS A ESTE ROL
-  contador: number = 0;
-  ingresar: boolean = false;
   //INSERTAR PAGINA
-  InsertarPaginaRol() {
-    this.ingresar = false;
-    this.contador = 0;
-    // VALIDAR SI SE HA SELECCIONADO PAGINAS
-    if (this.paginasSeleccionadas.length != 0) {
-      this.habilitarprogress = true;
-      // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
-      this.paginasSeleccionadas.map((obj: any) => {
-        // VERIFICAR SI LA PAGINA TIENE ACCIONES
-        if (this.ObtenerTodasPaginasAcciones()[obj.id].length != 0) {
-          if (this.accionesSeleccionadasPorPagina[obj.id].length > 0) {
-            this.accionesSeleccionadasPorPagina[obj.id].map((accion: any) => {
-              var buscarPagina = {
-                funcion: obj.nombre,
-                id_rol: this.id_rol,
-                id_accion: accion.id
-              };
+  InsertarPaginasRol() {
+    const arrayAccionesSeleccionadas: any[] = [];
 
-              // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
-              this.paginasRol = [];
-              this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
-                datos => {
-                  this.contador = this.contador + 1;
-                  this.paginasRol = datos;
-                  this.habilitarprogress = false;
-                  this.toastr.info('Se indica que ' + obj.nombre + ' con accion ' + this.MetodoParaMostrarAccion(accion.id) + ' ya fue asignada a este Rol.', '', {
-                    timeOut: 7000,
-                  })
-                }, error => {
-                  // INSERTAR PAGINA Y ACCION
-                  var rolPermisosbody = {
-                    funcion: obj.nombre,
-                    link: obj.link,
-                    id_rol: this.id_rol,
-                    id_accion: accion.id,
-                    movil: this.plataforma,
-                    user_name: this.user_name,
-                    ip: this.ip, ip_local: this.ips_locales,
-                  }
-                  this.contador = this.contador + 1;
-                  this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
-                    if (!this.ingresar) {
-                      this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
-                        timeOut: 6000,
-                      })
-                      this.ObtenerRoles();
-                      this.ingresar = true;
-                    }
-                    this.rest.BuscarPaginasRol(rol).subscribe(datos => {
-                      this.paginas = datos;
-                    })
-                  }, error => {
-                    this.contador = this.contador + 1;
-                    this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
-                      timeOut: 6000,
-                    })
-                  });
-                }
-              );
-            })
-          } else {
-            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
-              timeOut: 6000,
-            })
-          }
-        } else {
-          var buscarPagina = {
-            funcion: obj.nombre,
-            id_rol: this.id_rol
-          };
-          var rolPermisosbody = {
-            funcion: obj.nombre,
-            link: obj.link,
-            id_rol: this.id_rol,
-            id_accion: null,
-            movil: this.plataforma,
-            user_name: this.user_name,
-            ip: this.ip, ip_local: this.ips_locales,
-          }
-          // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
-          this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
-            this.contador = this.contador + 1;
-            this.habilitarprogress = false;
-            this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
-              timeOut: 7000,
-            })
-          }, error => {
-            // INSERTAR PAGINA
-            this.contador = this.contador + 1;
-            this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
-              if (!this.ingresar) {
-                this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
-                  timeOut: 6000,
-                })
-                this.ObtenerRoles();
-                this.ingresar = true;
-              }
-              this.rest.BuscarPaginasRol(rol).subscribe(datos => {
-                this.paginas = datos;
-              })
-            }, error => {
-              this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
-                timeOut: 6000,
-              })
-            });
-          }
-          );
-        }
-        (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-        for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
-          (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
-        }
-        delete this.nombresAccionesPorPagina[obj.id];
-        this.accionesSeleccionadasPorPagina[obj.id] = [];
-        this.paginasSeleccionadas = [];
-      }
-      );
-      var rol = {
-        id_rol: this.id_rol,
-        tipo: this.plataforma
-      };
-    }
-    else {
-      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups!!! algo salio mal.', {
+    // VALIDAR SI SE HA SELECCIONADO PAGINAS
+    if (this.paginasSeleccionadas.length === 0) {
+      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
         timeOut: 6000,
-      })
+      });
+      return;
     }
+
+    for (const pagina of this.paginasSeleccionadas) {
+      const acciones = this.accionesSeleccionadasPorPagina[pagina.id];
+      const accionesDisponibles = this.todasPaginasAcciones[pagina.id] || [];
+
+      const baseAccionRegistro = {
+        funcion: pagina.nombre,
+        link: pagina.link,
+        id_rol: this.id_rol,
+        movil: this.plataforma,
+        user_name: this.user_name,
+        ip: this.ip,
+        ip_local: this.ips_locales,
+      };
+
+      if (acciones && acciones.length > 0) {
+        // SI HAY ACCIONES SELECCIONADAS, AGREGARLAS CON ID
+        for (const accion of acciones) {
+          arrayAccionesSeleccionadas.push({
+            ...baseAccionRegistro,
+            id_accion: accion.id,
+          });
+        }
+      } else if (accionesDisponibles.length === 0) {
+        // SI NO HAY ACCIONES DISPONIBLES EN GENERAL, AGREGAR CON NULL
+        arrayAccionesSeleccionadas.push({
+          ...baseAccionRegistro,
+          id_accion: null,
+        });
+      } else {
+        // SI HABÍA ACCIONES DISPONIBLES PERO NO SE SELECCIONARON
+        this.toastr.warning(
+          'No ha seleccionado ACCIONES en ' + pagina.nombre + '.',
+          'Ups! algo salió mal.',
+          { timeOut: 6000 }
+        );
+        return;
+      }
+    }
+
+    if (arrayAccionesSeleccionadas.length > 0) {
+      const data = {acciones: arrayAccionesSeleccionadas}
+      this.rest.CrearAccionesRol(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Operación exitosa.', 'Se ha guardado las acciones del rol.', {
+            timeOut: 6000,
+          });
+          this.ObtenerRoles();
+          this.LimpiarPaginasRol();
+          this.rest.BuscarPaginasRol({ id_rol: this.id_rol, tipo: this.plataforma }).subscribe(datos => {
+            this.paginas = datos;
+          });
+        }, 
+        error: () => {
+          console.error('Error al insertar acciones:');
+          this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
+            timeOut: 6000,
+          });
+        }
+      });
+    }
+  }
+
+  LimpiarPaginasRol() {
+    this.paginasSeleccionadas.forEach((pagina: any) => {
+      this.accionesSeleccionadasPorPagina[pagina.id] = [];
+      delete this.nombresAccionesPorPagina[pagina.id];
+      (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+      for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+        (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+      }
+    });
+    this.paginasSeleccionadas = [];
   }
 
   //INSERTAR PAGINA DE LOS MODULOS
   InsertarPaginaModulosRol() {
-    this.ingresar = false;
-    this.contador = 0;
-    // VALIDAR SI SE HA SELECCIONADO PAGINAS
-    if (this.paginasSeleccionadasM.length != 0) {
-      this.habilitarprogress = true;
-      // RECORRER LA LISTA DE PAGINAS DE LOS MODULOS SELECCIONADAS
-      this.paginasSeleccionadasM.map((obj: any) => {
-        // VERIFICAR SI LA PAGINA DE LOS MODULOS TIENE ACCIONES
-        if ((this.ObtenerTodasModulosAcciones()[obj.id]).length != 0) {
-          if (this.accionesSeleccionadasPorPagina[obj.id].length > 0) {
-            this.accionesSeleccionadasPorPagina[obj.id].map((accion: any) => {
-              var buscarPagina = {
-                funcion: obj.nombre,
-                id_rol: this.id_rol,
-                id_accion: accion.id
-              };
-              // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
-              this.paginasRol = [];
-              this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
-                datos => {
-                  this.contador = this.contador + 1;
-                  this.paginasRol = datos;
-                  this.habilitarprogress = false;
-                  this.toastr.info('Se indica que ' + obj.nombre + 'con acción ' + this.MetodoParaMostrarAccion(accion.id) + ' ya fue asignada a este Rol.', '', {
-                    timeOut: 7000,
-                  })
-                }, error => {
-                  // INSERTAR PAGINA
-                  var rolPermisosbody = {
-                    funcion: obj.nombre,
-                    link: obj.link,
-                    id_rol: this.id_rol,
-                    id_accion: accion.id,
-                    movil: this.plataforma,
-                    user_name: this.user_name,
-                    ip: this.ip, ip_local: this.ips_locales,
-                  }
-                  this.contador = this.contador + 1;
-                  this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
-                    if (!this.ingresar) {
-                      this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
-                        timeOut: 6000,
-                      })
-                      this.ObtenerRoles();
-                      this.ingresar = true;
-                    }
-                    this.rest.BuscarPaginasRol(rol).subscribe(datos => {
-                      this.paginas = datos;
-                    })
-                  }, error => {
-                    this.contador = this.contador + 1;
-                    this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR', {
-                      timeOut: 6000,
-                    })
-                  });
-                }
-              );
-            });
-          } else {
-            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
-              timeOut: 6000,
-            })
-          }
-        } else {
-          // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
-          var buscarPagina = {
-            funcion: obj.nombre,
-            id_rol: this.id_rol
-          };
-          var rolPermisosbody = {
-            funcion: obj.nombre,
-            link: obj.link,
-            id_rol: this.id_rol,
-            id_accion: null,
-            movil: this.plataforma,
-            user_name: this.user_name,
-            ip: this.ip, ip_local: this.ips_locales,
-          }
-          this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
-            this.contador = this.contador + 1;
-            this.habilitarprogress = false;
-            this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
-              timeOut: 7000,
-            })
-          }, error => {
-            // INSERTAR PAGINA
-            this.contador = this.contador + 1;
-            this.rest.CrearPaginaRol(rolPermisosbody).subscribe(response => {
-              if (!this.ingresar) {
-                this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
-                  timeOut: 6000,
-                })
-                this.ObtenerRoles();
-                this.ingresar = true;
-              }
-              (<HTMLInputElement>document.getElementById('seleccionarmodulo' + obj.nombre_modulo)).checked = false;
-              this.rest.BuscarPaginasRol(rol).subscribe(datos => {
-                this.paginas = datos;
-              })
-              this.ObtenerMenuModulos();
-            }, error => {
-              this.contador = this.contador + 1;
-              this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
-                timeOut: 6000,
-              })
-            });
-          }
-          );
-        }
-        this.nombresAccionesPorPagina[obj.id] = [];
-        this.accionesSeleccionadasPorPagina[obj.id] = [];
-        this.paginasSeleccionadasM = [];
-        this.paginasSeleccionadasModulos[obj.nombre_modulo] = [];
-        this.ObtenerMenuModulos();
-        (<HTMLInputElement>document.getElementById('seleccionarmodulo' + obj.nombre_modulo)).checked = false;
-      })
-      var rol = {
-        id_rol: this.id_rol,
-        tipo: this.plataforma,
-      }
-    } else {
-      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+    const arrayModulosSeleccionados: any[] = [];
+
+    // VALIDAR SI SE HA SELECCIONADO PAGINAS DE LOS MODULOS
+    if (this.paginasSeleccionadasM.length === 0) {
+      this.toastr.warning('No ha seleccionado PÁGINAS de los MODULOS.', 'Ups! algo salio mal.', {
         timeOut: 6000,
-      })
+      });
+      return;
     }
+
+    for (const pagina of this.paginasSeleccionadasM) {
+      const acciones = this.accionesSeleccionadasPorPagina[pagina.id];
+      const accionesDisponibles = this.todosModulosAcciones[pagina.id] || [];
+
+      const baseAccionRegistro = {
+        funcion: pagina.nombre,
+        link: pagina.link,
+        id_rol: this.id_rol,
+        movil: this.plataforma,
+        user_name: this.user_name,
+        ip: this.ip,
+        ip_local: this.ips_locales,
+      };
+
+      if (acciones && acciones.length > 0) {
+        // SI HAY ACCIONES SELECCIONADAS, AGREGARLAS CON ID
+        for (const accion of acciones) {
+          arrayModulosSeleccionados.push({
+            ...baseAccionRegistro,
+            id_accion: accion.id,
+          });
+        }
+      } else if (accionesDisponibles.length === 0) {
+        // SI NO HAY ACCIONES DISPONIBLES EN GENERAL, AGREGAR CON NULL
+        arrayModulosSeleccionados.push({
+          ...baseAccionRegistro,
+          id_accion: null,
+        });
+      } else {
+        // SI HABÍA ACCIONES DISPONIBLES PERO NO SE SELECCIONARON
+        this.toastr.warning(
+          'No ha seleccionado ACCIONES en ' + pagina.nombre + '.',
+          'Ups! algo salió mal.',
+          { timeOut: 6000 }
+        );
+        return;
+      }
+    }
+
+    if (arrayModulosSeleccionados.length > 0) {
+      const data = {acciones: arrayModulosSeleccionados}
+      this.rest.CrearAccionesRol(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Operación exitosa.', 'Se ha guardado las acciones del rol.', {
+            timeOut: 6000, 
+          });
+          this.ObtenerRoles();
+          this.LimpiarPaginasModulosRol();
+          this.rest.BuscarPaginasRol({ id_rol: this.id_rol, tipo: this.plataforma }).subscribe(datos => {
+            this.paginas = datos;
+          });
+        },
+        error: () => {
+          console.error('Error al insertar acciones de modulos:');
+          this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
+            timeOut: 6000,
+          });
+        }
+      });
+    }
+  }
+
+  LimpiarPaginasModulosRol() {
+    this.paginasSeleccionadasM.forEach((pagina: any) => {
+      this.accionesSeleccionadasPorPagina[pagina.id] = [];
+      delete this.nombresAccionesPorPagina[pagina.id];
+      (<HTMLInputElement>document.getElementById('seleccionarmodulo' + pagina.nombre_modulo)).checked = false;
+      for (var i = 0; i <= this.paginasModulos[pagina.nombre_modulo].length - 1; i++) {
+        (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + pagina.nombre_modulo)).checked = false;
+      }
+    });
+    this.paginasSeleccionadasM = [];
+    this.paginasSeleccionadasModulos = {};
   }
 
   // METODO PARA BUSCAR LAS PAGINAS QUE FUERON ASIGNADAS A ESE ROL
@@ -804,53 +712,59 @@ export class RolPermisosMovilComponent implements OnInit {
   }
 
   // ELIMINAR PAGINAS SELECCIONADAS POR EL ROL
-  EliminarPaginaRol() {
-    this.ingresar = false;
-    this.contador = 0;
+  EliminarPaginasRol() {
     this.paginasEliminar = this.selectionPaginas.selected;
-    this.paginasEliminar.forEach((datos: any) => {
-      this.paginas = this.paginas.filter(item => item.id !== datos.id);
-      var buscarPagina = {
-        id: datos.id,
-        user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
-      };
-      this.contador = this.contador + 1;
-      this.rest.EliminarPaginasRol(buscarPagina).subscribe(
-        res => {
-          if (res.message === 'error') {
-            this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
-              timeOut: 6000,
-            });
-          } else {
-            if (!this.ingresar) {
-              this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-                timeOut: 6000,
-              });
-              this.ObtenerRoles();
-              this.ingresar = true;
-            }
-            this.MostrarPaginasRol();
-          }
-        }
-      )
+
+    // VALIDAR SI SE HA SELECCIONADO PAGINAS
+    if (this.paginasEliminar.length === 0) {
+      this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
+        timeOut: 6000,
+      });
+      return;
     }
-    )
+
+    const idPaginasEliminar = this.paginasEliminar.map((pagina: any) => pagina.id);
+    this.paginas = this.paginas.filter((pagina: any) => !idPaginasEliminar.includes(pagina.id));
+
+    const data = {
+      ids: idPaginasEliminar,
+      user_name: this.user_name,
+      ip: this.ip,
+      ip_local: this.ips_locales,
+    }
+
+    this.rest.EliminarPaginasRol(data).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Se han eliminado las páginas seleccionadas.', 'Operación exitosa.', {
+          timeOut: 6000,
+        });
+        this.ObtenerRoles();
+        this.MostrarPaginasRol();
+        this.selectionPaginas.clear();
+      },
+      error: (error: any) => {
+        console.error('Error al eliminar páginas:', error);
+        this.toastr.error('Error al eliminar páginas.', 'VERIFICAR.', {
+          timeOut: 6000,
+        });
+      }
+    })
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           if (this.paginasEliminar.length != 0) {
-            this.EliminarPaginaRol();
+            this.EliminarPaginasRol();
             this.activar_seleccion = true;
             this.plan_multiple = false;
             this.plan_multiple_ = false;
             this.selectionPaginas.clear();
           } else {
-            this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PÁGINAS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }
@@ -1113,7 +1027,9 @@ export class RolPermisosMovilComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           det.movil == false ? 'Sí' : '',
           det.movil == true ? 'Sí' : '',
         ])
@@ -1256,7 +1172,9 @@ export class RolPermisosMovilComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           "aplicacion_web": det.movil == false ? 'Sí' : '',
           "aplicacion_movil": det.movil == true ? 'Sí' : '',
         });
@@ -1330,7 +1248,9 @@ export class RolPermisosMovilComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           aplicacion_web: det.movil == false ? 'Sí' : '',
           aplicacion_movil: det.movil == true ? 'Sí' : '',
         });

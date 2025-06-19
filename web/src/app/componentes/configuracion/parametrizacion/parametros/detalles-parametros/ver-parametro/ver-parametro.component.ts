@@ -183,7 +183,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar el mensaje de cumpleaños a los colaboradores. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar el mensaje de cumpleaños a los colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -201,7 +201,7 @@ export class VerParametroComponent implements OnInit {
       this.nota_parametro =
         `
         NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de atrasos de los 
-        colaboradores. Por ejemplo: 23.
+        colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -228,7 +228,7 @@ export class VerParametroComponent implements OnInit {
       this.nota_parametro =
         `
         NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de atrasos de los 
-        colaboradores. Por ejemplo: 23.
+        colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -328,7 +328,7 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-        NOTA: Hora en la que se va a enviar el mensaje de aniversario a los colaboradores. Por ejemplo: 23.
+        NOTA: Hora en la que se va a enviar el mensaje de aniversario a los colaboradores. Por ejemplo: 23:30.
         `
         ;
     }
@@ -337,8 +337,8 @@ export class VerParametroComponent implements OnInit {
     if (this.idParametro === '26') {
       this.nota_parametro =
         `
-          NOTA: Enviar notificaciones diarias con el reporte de salidas anticipadas de los colaboradores.
-          `
+        NOTA: Enviar notificaciones diarias con el reporte de salidas anticipadas de los colaboradores.
+        `
         ;
     }
     // HORA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS DIARIO
@@ -346,26 +346,26 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-          NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de salidas anticipadas de los 
-          colaboradores. Por ejemplo: 23.
-          `
+        NOTA: Hora en la que se va a enviar la notificación diaria con el reporte de salidas anticipadas de los 
+        colaboradores. Por ejemplo: 23:30.
+        `
         ;
     }
     // CORREO DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS DIARIO
     if (this.idParametro === '28') {
       this.nota_parametro =
         `
-          NOTA: Registrar dirección de correo al que se enviará la notificación diaria con el reporte de faltas 
-          general de los colaboradores.
-          `
+        NOTA: Registrar dirección de correo al que se enviará la notificación diaria con el reporte de faltas 
+        general de los colaboradores.
+        `
         ;
     }
     // ENVIAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
     if (this.idParametro === '29') {
       this.nota_parametro =
         `
-          NOTA: Enviar notificaciones semanales con el reporte de salidas anticipadas de los colaboradores.
-          `
+        NOTA: Enviar notificaciones semanales con el reporte de salidas anticipadas de los colaboradores.
+        `
         ;
     }
     // HORA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
@@ -373,9 +373,9 @@ export class VerParametroComponent implements OnInit {
       this.horas = true;
       this.nota_parametro =
         `
-          NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
-          colaboradores. Por ejemplo: 23.
-          `
+        NOTA: Hora en la que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
+        colaboradores. Por ejemplo: 23:30.
+        `
         ;
     }
     // DIA DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
@@ -383,18 +383,53 @@ export class VerParametroComponent implements OnInit {
       this.seleccionar_dia = true;
       this.nota_parametro =
         `
-          NOTA: Seleccionar día en el que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
-          colaboradores.
-          `
+        NOTA: Seleccionar día en el que se va a enviar la notificación semanal con el reporte de salidas anticipadas de los 
+        colaboradores.
+        `
         ;
     }
     // CORREO DE ENVIO DE REPORTE DE SALIDAS ANTICIPADAS SEMANAL
     if (this.idParametro === '32') {
       this.nota_parametro =
         `
-          NOTA: Registrar dirección de correo al que se enviará la notificación semanal con el reporte de salidas anticipadas 
-          general de los colaboradores.
-          `
+        NOTA: Registrar dirección de correo al que se enviará la notificación semanal con el reporte de salidas anticipadas 
+        general de los colaboradores.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE NOTIFICACIONES DE FALTAS INDIVIDUALES
+    if (this.idParametro === '33') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar las notificaciones de faltas a cada colaborador. Por ejemplo: 23:30.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE NOTIFICACIONES DE ATRASOS INDIVIDUALES
+    if (this.idParametro === '34') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar las notificaciones de atrasos a cada colaborador. Por ejemplo: 23:30.
+        `
+        ;
+    }
+    // HORA DE ENVIO DE NOTIFICACIONES DE SALIDAS ANTICIPADAS INDIVIDUALES
+    if (this.idParametro === '35') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+        NOTA: Hora en la que se va a enviar las notificaciones de salidas anticipadas a cada colaborador. Por ejemplo: 23:30.
+        `
+        ;
+    }
+    // VALIDAR CEDULA ECUATORIANA
+    if (this.idParametro === '36') {
+      this.nota_parametro =
+        `
+        NOTA: Verificar que la cédula ecuatoriana exista y sea válida.
+        `
         ;
     }
     // TIPO CARGA VACACIONES
@@ -449,6 +484,9 @@ export class VerParametroComponent implements OnInit {
       || this.idParametro === '28'  // ----> CORREO REPORTE SALIDAS ANTICIPADAS DIARIO
       || this.idParametro === '30'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS SEMANAL
       || this.idParametro === '32'  // ----> CORREO REPORTE SALIDAS ANTICIPADAS SEMANAL
+      || this.idParametro === '33'  // ----> HORA ENVIO NOTIFICACION FALTAS INDIVIDUAL
+      || this.idParametro === '34'  // ----> HORA ENVIO NOTIFICACION ATRASOS INDIVIDUAL
+      || this.idParametro === '35'  // ----> HORA ENVIO NOTIFICACION SALIDAS ANTICIPADAS INDIVIDUAL
       || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
     ) {
       this.ver_editar = true;
@@ -465,6 +503,7 @@ export class VerParametroComponent implements OnInit {
       || this.idParametro === '24' // ----> ACTIVAR MENSAJE DE ANIVERSARIO
       || this.idParametro === '26' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
       || this.idParametro === '29' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+      || this.idParametro === '36' // ----> ACTIVAR VALIDACION CEDULA ECUATORIANA
     ) {
       this.ver_formulario = true;
     }
@@ -566,6 +605,9 @@ export class VerParametroComponent implements OnInit {
         || this.idParametro === '25'  // ----> HORA ENVIO ANIVERSARIO
         || this.idParametro === '27'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS DIARIO
         || this.idParametro === '30'  // ----> HORA ENVIO REPORTE SALIDAS ANTICIPADAS SEMANAL
+        || this.idParametro === '33'  // ----> HORA ENVIO NOTIFICACION FALTAS INDIVIDUAL
+        || this.idParametro === '34'  // ----> HORA ENVIO NOTIFICACION ATRASOS INDIVIDUAL
+        || this.idParametro === '35'  // ----> HORA ENVIO NOTIFICACION SALIDAS ANTICIPADAS INDIVIDUAL
         || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
       ) {
         this.boton_registrar = false;
@@ -582,6 +624,7 @@ export class VerParametroComponent implements OnInit {
         || this.idParametro === '24' // ----> ACTIVAR MENSAJE DE ANIVERSARIO
         || this.idParametro === '26' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS DIARIO
         || this.idParametro === '29' // ----> ACTIVAR REPORTE DE SALIDAS ANTICIPADAS SEMANAL
+        || this.idParametro === '36' // ----> ACTIVAR VALIDAR CEDULA ECUATORIANA
       ) {
         this.VerConfiguracionRegistro();
       }
@@ -602,6 +645,7 @@ export class VerParametroComponent implements OnInit {
 
   // METODO PARA INGRESAR DETALLE DE PARAMETRO
   AbrirVentanaDetalles(datos: any): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(CrearDetalleParametroComponent,
       { width: '400px', data: { parametros: datos, actualizar: true } })
       .afterClosed().subscribe(item => {
@@ -638,6 +682,7 @@ export class VerParametroComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -974,15 +1019,15 @@ export class VerParametroComponent implements OnInit {
     }
   }
 
-  getVerParametroRegistrarDetalleParametro(){
+  getVerParametroRegistrarDetalleParametro() {
     return this.tienePermiso('Ver Parámetro - Registrar Detalle Parámetro');
   }
 
-  getVerParametroEditarDetalleParametro(){
+  getVerParametroEditarDetalleParametro() {
     return this.tienePermiso('Ver Parámetro - Editar Detalle Parámetro');
   }
 
-  getVerParametroEliminarDetalleParametro(){
+  getVerParametroEliminarDetalleParametro() {
     return this.tienePermiso('Ver Parámetro - Eliminar Detalle Parámetro');
   }
 

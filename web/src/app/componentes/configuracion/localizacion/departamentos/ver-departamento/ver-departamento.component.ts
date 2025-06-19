@@ -150,7 +150,7 @@ export class VerDepartamentoComponent implements OnInit {
           if (res.message === 'error') {
             if (actualiza === arreglo.length) {
               this.toastr.error('No se logro actualizar la tabla niveles de autorizacion. Revisar la configuración.',
-                'Ups!!! algo salio mal.', {
+                'Ups! algo salio mal.', {
                 timeOut: 1000,
               });
               this.CargarDatos(this.info);
@@ -305,6 +305,7 @@ export class VerDepartamentoComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -353,6 +354,7 @@ export class VerDepartamentoComponent implements OnInit {
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -365,7 +367,7 @@ export class VerDepartamentoComponent implements OnInit {
             this.selectionNivel.clear();
 
           } else {
-            this.toastr.warning('No ha seleccionado NIVEL.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado NIVEL.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

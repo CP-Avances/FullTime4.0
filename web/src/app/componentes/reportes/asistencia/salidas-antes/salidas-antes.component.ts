@@ -5,6 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
+import { Validators, FormControl } from '@angular/forms';
 
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
@@ -102,6 +103,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
   //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
@@ -114,7 +120,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
 
   constructor(
@@ -299,7 +305,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -316,7 +322,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
-      console.log("ver los datos de la salidas anticipadas: ", this.data_pdf )
+      console.log("ver los datos de la salidas anticipadas: ", this.data_pdf)
       switch (accion) {
         case 'excel': this.generarExcel(); break;
         case 'ver': this.VerDatos(); break;
@@ -516,7 +522,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -746,7 +752,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
           datos.push([
             n++,
-            usu.cedula,
+            usu.identificacion,
             usu.codigo,
             usu.apellido + ' ' + usu.nombre,
             usu.ciudad,
@@ -799,7 +805,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     });
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
       { key: "ciudad", width: 20 },
@@ -818,7 +824,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -913,8 +919,10 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           n = n + 1;
           let ele = {
             n: n,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             codigo: usu.codigo,
+            nombre: usu.nombre,
+            apellido: usu.apellido,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,

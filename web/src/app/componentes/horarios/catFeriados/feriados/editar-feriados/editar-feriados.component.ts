@@ -168,7 +168,7 @@ export class EditarFeriadosComponent implements OnInit {
       if (response.message === 'error') {
         this.toastr.error(
           'Verificar los datos ingresados.',
-          'Ups!!! algo salio mal.', {
+          'Ups! algo salio mal.', {
           timeOut: 6000,
         })
       }

@@ -88,7 +88,7 @@ class TiposCargosControlador {
                 if (TipoCargos) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
                 } else {
-                    return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' })
+                    return res.status(404).jsonp({ message: 'Ups! algo slaio mal.', status: '400' })
                 }
             } else {
                 return res.jsonp({ message: 'Tipo cargo ya existe en el sistema.', status: '300' })
@@ -171,7 +171,7 @@ class TiposCargosControlador {
                 if (TipoCargos) {
                     return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
                 } else {
-                    return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
+                    return res.status(404).jsonp({ message: 'Ups! algo salio mal.', status: '400' })
                 }
             }
         }

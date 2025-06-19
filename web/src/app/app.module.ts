@@ -16,6 +16,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 // CAMBIAR EL LOCAL DE LA APP
@@ -27,9 +28,7 @@ import { AuthGuard } from './servicios/generales/guards/auth.guard';
 // RUTA
 import { environment } from 'src/environments/environment';
 // NOTIFICACIONES EN TIEMPO REAL
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-const ruta = environment.url.split("/")[2];
-const config: SocketIoConfig = { url: ruta, options: {} };
+import { SocketIoModule } from 'ngx-socket-io';
 // COMPONETE PRINCIPAL
 import { AppComponent } from './app.component';
 // COMPONENTES DE PROGRESO
@@ -233,8 +232,6 @@ import { EditarCatProcesosComponent } from './componentes/modulos/accionesPerson
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
 import { CrearPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/crear-pedido-accion/crear-pedido-accion.component';
 import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/listar-pedido-accion/listar-pedido-accion.component';
-import { RegistrarEmpleProcesoComponent } from './componentes/modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
-import { EditarEmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { CrearTipoaccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/crear-tipoaccion/crear-tipoaccion.component';
 import { EditarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/editar-tipo-accion/editar-tipo-accion.component';
 import { VerTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/ver-tipo-accion/ver-tipo-accion.component';
@@ -550,8 +547,6 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     ListarTipoAccionComponent,
     CrearPedidoAccionComponent,
     ListarPedidoAccionComponent,
-    RegistrarEmpleProcesoComponent,
-    EditarEmpleadoProcesoComponent,
     CrearTipoaccionComponent,
     EditarTipoAccionComponent,
     VerTipoAccionComponent,
@@ -657,7 +652,7 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
 
   imports: [
     BrowserModule,
-    SocketIoModule.forRoot(config),
+    SocketIoModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
@@ -673,6 +668,7 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     MatPaginatorModule,
     MatTableModule,
     MatDatepickerModule,
+    MatTimepickerModule,
     MatNativeDateModule,
     ReportesModule,
     SpinnerModule,

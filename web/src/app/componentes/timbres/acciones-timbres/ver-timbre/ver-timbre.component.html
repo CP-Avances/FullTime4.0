@@ -9,19 +9,32 @@
     <div class="nota">
         <div class="row">
             <div class="col-12 col-md-4" style="text-align: center !important;">
+                <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic"
+                    style="text-align: center !important;">
+                    <img src="{{urlImagen}}" alt="" id="avatarImagen">
+                </div>
+                <ng-template #inic>
+                    <div>
+                        <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left"
+                            matTooltip="Ver timbre."
+                            style="font-size: 120px; color: rgb(10, 62, 110); padding-bottom: 5px;">
+                        </i>
+                    </div>
+                </ng-template>
                 <b>
-                    {{timbre.empleado}}
-                </b>
-                <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left" matTooltip="Ver timbre."
-                    style="font-size: 120px; color: rgb(10, 62, 110);">
-                </i>
-                <br><b>
                     ID RELOJ: {{timbre.id_reloj}}
                 </b>
             </div>
             <div class="col-12 col-md-8">
-                
                 <div class="row mt-2">
+                    <div class="col-6 col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Colaborador:
+                    </div>
+                    <div class="col-6 col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                        {{timbre.empleado}}
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-6 col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
                         Fecha del timbre:
                     </div>
@@ -53,23 +66,23 @@
                         {{timbre.tecla_funcion}}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="timbre.latitud">
                     <div class="col-6 col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
                         Ubicación:
                     </div>
                     <div class="col-6 col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                        lat: {{timbre.latitud}} / long: {{timbre.longitud}}
+                        latitud: {{timbre.latitud}} / longitud: {{timbre.longitud}}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6 col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                        Observación del timbre:
+                        Observación:
                     </div>
                     <div class="col-6 col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
                         {{timbre.observacion}}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="timbre.novedades_conexion">
                     <div class="col-6 col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
                         Novedades:
                     </div>

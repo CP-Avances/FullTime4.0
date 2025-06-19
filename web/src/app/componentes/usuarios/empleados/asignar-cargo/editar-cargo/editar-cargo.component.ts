@@ -92,19 +92,17 @@ export class EditarCargoComponent implements OnInit {
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-
+    });
+    this.BuscarUsuarioDepartamento(() => {
+      this.ObtenerCargoEmpleado();
+    });
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
-    this.BuscarUsuarioDepartamento();
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
-    this.ObtenerCargoEmpleado();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
-
-    console.log('id cargo ', this.idSelectCargo)
   }
 
   // BUSCAR DATOS DE CONTRATO
@@ -192,36 +190,33 @@ export class EditarCargoComponent implements OnInit {
     this.restEmplCargos.BuscarCargoID(this.idSelectCargo).subscribe(res => {
       this.cargo = res;
       this.id_empl_contrato = this.cargo[0].id_contrato;
-      this.cargo.forEach((obj: any) => {
-        this.ObtenerDepartamentosImprimir(obj.id_sucursal);
-        // FORMATEAR HORAS
-        if (obj.hora_trabaja.split(':').length === 3) {
-          this.horaTrabaja.setValue(obj.hora_trabaja.split(':')[0] + ':' + obj.hora_trabaja.split(':')[1]);
-        }
-        else if (obj.hora_trabaja.split(':').length === 2) {
-          if (parseInt(obj.hora_trabaja.split(':')[0]) < 10) {
-            this.horaTrabaja.setValue('0' + parseInt(obj.hora_trabaja.split(':')[0]) + ':00');
-          }
-          else {
-            this.horaTrabaja.setValue(obj.hora_trabaja);
-          }
-        }
-        this.formulario.patchValue({
-          idSucursalForm: obj.id_sucursal,
-          fecInicioForm: obj.fecha_inicio,
-          fecFinalForm: obj.fecha_final,
-          idDeparForm: obj.id_departamento,
-          sueldoForm: obj.sueldo.split('.')[0],
-          tipoForm: obj.id_tipo_cargo,
-          jefeForm: obj.jefe,
-          administraForm: this.administra,
-          personalForm: this.personal,
-        })
-      });
+      this.BuscarUsuarioDepartamento(() => {
+        this.cargo.forEach((obj: any) => {
+          this.ObtenerDepartamentosImprimir(obj.id_sucursal);
 
-      // BUSCAR DATOS DE CONTRATO
-      this.BuscarDatosContrato();
-    })
+          // FORMATEAR HORAS
+          const partesHora = obj.hora_trabaja.split(':');
+          if (partesHora.length === 3) {
+            this.horaTrabaja.setValue(`${partesHora[0]}:${partesHora[1]}`);
+          } else if (partesHora.length === 2) {
+            const hora = parseInt(partesHora[0]) < 10 ? `0${parseInt(partesHora[0])}` : partesHora[0];
+            this.horaTrabaja.setValue(`${hora}:00`);
+          }
+          this.formulario.patchValue({
+            idSucursalForm: obj.id_sucursal,
+            fecInicioForm: obj.fecha_inicio,
+            fecFinalForm: obj.fecha_final,
+            idDeparForm: obj.id_departamento,
+            sueldoForm: obj.sueldo.split('.')[0],
+            tipoForm: obj.id_tipo_cargo,
+            jefeForm: obj.jefe,
+            administraForm: this.administra,
+            personalForm: this.personal,
+          });
+        });
+        this.BuscarDatosContrato();
+      });
+    });
   }
 
   // METODO DE BUSQUEDA DE TIPO DE CARGOS
@@ -230,22 +225,18 @@ export class EditarCargoComponent implements OnInit {
     this.tipoCargo = [];
     this.restEmplCargos.ObtenerTipoCargos().subscribe(datos => {
       this.tipoCargo = datos;
-      this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+      this.tipoCargo[this.tipoCargo.length] = { id: 'OTRO', cargo: "OTRO" };
     })
   }
 
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
     // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
-    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd');
-    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd');
-    let contrato_inicio = this.validar.DarFormatoFecha(this.contrato_actual.fecha_ingreso, 'yyyy-MM-dd');
-    let contrato_fin = this.validar.DarFormatoFecha(this.contrato_actual.fecha_salida, 'yyyy-MM-dd');
-    /*console.log('inicio ', registro_inicio)
-    console.log('fin ', registro_fin)
-    console.log('inicio ', contrato_inicio)
-    console.log('fin ', contrato_fin)
-    */
+    let registro_inicio = this.validar.DarFormatoFecha(form.fecInicioForm, 'yyyy-MM-dd')!;
+    let registro_fin = this.validar.DarFormatoFecha(form.fecFinalForm, 'yyyy-MM-dd')!;
+    let contrato_inicio = this.validar.DarFormatoFecha(this.contrato_actual.fecha_ingreso, 'yyyy-MM-dd')!;
+    let contrato_fin = this.validar.DarFormatoFecha(this.contrato_actual.fecha_salida, 'yyyy-MM-dd')!;
+
     // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
     if ((contrato_inicio <= registro_inicio) &&
       (contrato_fin >= registro_fin)) {
@@ -310,11 +301,11 @@ export class EditarCargoComponent implements OnInit {
       fecha_fin: datos.fec_final
     }
     this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
-      if (form.tipoForm === undefined) {
+      if (!form.tipoForm || form.tipoForm === 'OTRO') {
         this.VerificarTipoCargo(form, datos);
       }
       else {
@@ -344,16 +335,30 @@ export class EditarCargoComponent implements OnInit {
   // METODO PARA MOSTRAR INGRESO DE CARGO
   habilitarCargo: boolean = false;
   habilitarSeleccion: boolean = true;
-  IngresarOtro(form: any) {
-    if (form.tipoForm === undefined) {
-      this.formulario.patchValue({
-        cargoForm: '',
-      });
+  IngresarOtro(valor: any) {
+    if (valor === undefined || valor === 'OTRO') {
+      this.formulario.patchValue({ cargoForm: '' });
       this.habilitarCargo = true;
+      this.habilitarSeleccion = false;
+      this.cargoF.setValidators([Validators.required, Validators.minLength(3)]);
+      this.cargoF.updateValueAndValidity();
+      this.tipoF.clearValidators();
+      this.tipoF.setValue(null);
+      this.tipoF.updateValueAndValidity();
       this.toastr.info('Ingresar nombre del nuevo cargo.', 'Etiqueta Cargo a desempeñar activa.', {
         timeOut: 6000,
-      })
-      this.habilitarSeleccion = false;
+      });
+
+    } else {
+      this.habilitarCargo = false;
+      this.habilitarSeleccion = true;
+
+      this.cargoF.clearValidators();
+      this.cargoF.setValue('');
+      this.cargoF.updateValueAndValidity();
+
+      this.tipoF.setValidators(Validators.required);
+      this.tipoF.updateValueAndValidity();
     }
   }
 
@@ -364,6 +369,7 @@ export class EditarCargoComponent implements OnInit {
     });
     this.habilitarCargo = false;
     this.habilitarSeleccion = true;
+    this.tipoF.setValue(null);
   }
 
   // METODO PARA REGISTRAR TIPO CARGO
@@ -392,7 +398,7 @@ export class EditarCargoComponent implements OnInit {
       nombre: (form.cargoForm).toUpperCase()
     }
     this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
-      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {
@@ -448,24 +454,22 @@ export class EditarCargoComponent implements OnInit {
   asignaciones: any = [];
   principal_false: number = 0;
   principal_true: number = 0;
-  BuscarUsuarioDepartamento() {
+  BuscarUsuarioDepartamento(callback: () => void) {
     this.asignaciones = [];
     this.principal_false = 0;
     this.principal_true = 0;
-    let datos = {
-      id_empleado: this.idEmpleado,
-    }
+    const datos = { id_empleado: this.idEmpleado };
     this.usuario.BuscarAsignacionesUsuario(datos).subscribe(res => {
       if (res != null) {
-        console.log('res ', res)
         this.asignaciones = res;
         this.asignaciones.forEach((a: any) => {
           if (a.principal === true) {
             this.personal = a.personal;
             this.administra = a.administra;
           }
-        })
+        });
       }
+      callback();
     });
   }
 

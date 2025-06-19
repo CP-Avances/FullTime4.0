@@ -25,14 +25,14 @@
                     (keypress)="IngresarSoloLetras($event)" required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Ingresar nuevo título profesional.">
-                    help_outline
+                    school
                 </mat-icon>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Nivel</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Seleccionar nivel del título profesional.">
-                    help_outline
+                    leaderboard
                 </mat-icon>
                 <mat-select [formControl]="nivel">
                     <mat-option *ngFor="let n of niveles" [value]="n.id"
@@ -47,7 +47,7 @@
                     (keypress)="IngresarSoloLetras($event)">
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Nombre del nuevo nivel de titulación.">
-                    help_outline
+                    leaderboard
                 </mat-icon>
             </mat-form-field>
         </div>

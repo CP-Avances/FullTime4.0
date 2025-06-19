@@ -34,7 +34,7 @@
                                     <input matInput placeholder="Navidad" [formControl]="descripcionF" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar nombre del nuevo feriado.">
-                                        help_outline
+                                        celebration
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -88,7 +88,7 @@
                                     <mat-label>Seleccionar continente</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Lista de continentes.">
-                                        help_outline
+                                        language
                                     </mat-icon>
                                     <mat-select [formControl]="nombreContinenteF" required>
                                         <mat-option *ngFor="let c of continentes" [value]="c.continente"
@@ -114,7 +114,7 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Lista de países del continente seleccionado.">
-                                        help_outline
+                                        public
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -134,7 +134,7 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Lista de provincias, departamentos o estados del país seleccionado.">
-                                        help_outline
+                                        travel_explore
                                     </mat-icon>
                                 </mat-form-field>
                             </div>

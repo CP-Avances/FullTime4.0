@@ -95,7 +95,7 @@ class GradoControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        res.jsonp({ message: 'El grado ha sido guardado con éxito', codigo: 200 });
+        res.jsonp({ message: 'El grado ha sido guardado con éxito.', codigo: 200 });
       }
 
     } catch (error) {
@@ -148,7 +148,7 @@ class GradoControlador {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        res.status(200).jsonp({ message: 'Grado actualizado con éxito', codigo: 200 });
+        res.status(200).jsonp({ message: 'Grado actualizado con éxito.', codigo: 200 });
 
       }
 
@@ -489,10 +489,12 @@ class GradoControlador {
     const { id_grado, listaUsuarios, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
 
+    console.log('datos: ', id_grado, listaUsuarios, user_name, ip, ip_local)
+
     try {
       for (const item of listaUsuarios) {
 
-        const { id_empleado } = item;
+        const { id } = item;
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -500,7 +502,7 @@ class GradoControlador {
           `
             SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
            `
-          , [id_grado, id_empleado]);
+          , [id_grado, id]);
 
         const [grados] = response.rows;
         // AUDITORIA
@@ -527,7 +529,7 @@ class GradoControlador {
             `
             SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
            `
-            , [id_empleado]);
+            , [id]);
 
           const [grado_activo] = response.rows;
           // AUDITORIA
@@ -554,7 +556,7 @@ class GradoControlador {
               `
               INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_empleado, id_grado, true]);
+              , [id, id_grado, true]);
 
             const [grado_insert] = responsee.rows;
 
@@ -605,7 +607,7 @@ class GradoControlador {
               `
                INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
               `
-              , [id_empleado, id_grado, true]);
+              , [id, id_grado, true]);
 
             const [nuevo_grado] = response.rows;
             // AUDITORIA
@@ -633,7 +635,7 @@ class GradoControlador {
               `
             SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
            `
-              , [id_empleado]);
+              , [id]);
 
             const [grado_activo1] = response.rows;
             // AUDITORIA
@@ -768,7 +770,7 @@ class GradoControlador {
           fila: '',
           nombre: '',
           apellido: '',
-          cedula: '',
+          identificacion: '',
           grado: '',
           observacion: ''
         };
@@ -788,7 +790,7 @@ class GradoControlador {
 
           // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
           if (!headers['ITEM'] || !headers['NOMBRE'] || !headers['APELLIDO'] ||
-            !headers['CEDULA'] || !headers['GRADO']
+            !headers['IDENTIFICACION'] || !headers['GRADO']
           ) {
             return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
           }
@@ -802,21 +804,21 @@ class GradoControlador {
             const ITEM = row.getCell(headers['ITEM']).value;
             const NOMBRE = row.getCell(headers['NOMBRE']).value?.toString().trim();
             const APELLIDO = row.getCell(headers['APELLIDO']).value?.toString().trim();
-            const CEDULA = row.getCell(headers['CEDULA']).value?.toString().trim();
+            const IDENTIFICACION = row.getCell(headers['IDENTIFICACION']).value?.toString().trim();
             const GRADO = row.getCell(headers['GRADO']).value?.toString().trim();
 
             // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
             if ((ITEM != undefined && ITEM != '') &&
               (NOMBRE != undefined && NOMBRE != '') &&
               (APELLIDO != undefined && APELLIDO != '') &&
-              (CEDULA != undefined && CEDULA != '') &&
+              (IDENTIFICACION != undefined && IDENTIFICACION != '') &&
               (GRADO != undefined && GRADO != '')
             ) {
 
               data.fila = ITEM;
               data.nombre = NOMBRE;
               data.apellido = APELLIDO;
-              data.cedula = CEDULA;
+              data.identificacion = IDENTIFICACION;
               data.grado = GRADO;
               data.observacion = 'no registrado';
 
@@ -826,7 +828,7 @@ class GradoControlador {
               data.fila = ITEM;
               data.nombre = NOMBRE;
               data.apellido = APELLIDO;
-              data.cedula = CEDULA;
+              data.identificacion = IDENTIFICACION;
               data.grado = GRADO;
               data.observacion = 'no registrado';
 
@@ -843,9 +845,9 @@ class GradoControlador {
                 data.apellido = '-';
               }
 
-              if (CEDULA == undefined) {
-                data.cedula = 'No registrado';
-                data.observacion = 'Cédula ' + data.observacion;
+              if (IDENTIFICACION == undefined) {
+                data.identificacion = 'No registrado';
+                data.observacion = 'Identificación ' + data.observacion;
               }
 
               if (GRADO == undefined) {
@@ -875,9 +877,9 @@ class GradoControlador {
           if (item.observacion == 'no registrado') {
             const VERIFICAR_IDEMPLEADO = await pool.query(
               `
-              SELECT id FROM eu_empleados WHERE cedula = $1
+              SELECT id FROM eu_empleados WHERE identificacion = $1
               `
-              , [item.cedula.trim()]);
+              , [item.identificacion.trim()]);
 
             if (VERIFICAR_IDEMPLEADO.rows[0] != undefined) {
 
@@ -907,7 +909,7 @@ class GradoControlador {
                 } else {
                   if (item.observacion == 'no registrado') {
                     // DISCRIMINACION DE ELEMENTOS IGUALES
-                    if (duplicados.find((p: any) => (p.cedula.trim() === item.cedula.trim())
+                    if (duplicados.find((p: any) => (p.identificacion.trim() === item.identificacion.trim())
                     ) == undefined) {
                       duplicados.push(item);
                     } else {
@@ -921,7 +923,7 @@ class GradoControlador {
               }
 
             } else {
-              item.observacion = 'La cédula ingresada no esta registrada en el sistema'
+              item.observacion = 'La identificación ingresada no esta registrada en el sistema'
             }
 
           }
@@ -986,7 +988,7 @@ class GradoControlador {
     try {
       for (const item of plantilla) {
 
-        const { cedula, grado } = item;
+        const { identificacion, grado } = item;
 
         await pool.query('BEGIN');
         const VERIFICAR_IDGRADO = await pool.query(
@@ -1003,9 +1005,9 @@ class GradoControlador {
         await pool.query('BEGIN');
         const VERIFICAR_IDEMPLEADO = await pool.query(
           `
-          SELECT id FROM eu_empleados WHERE cedula = $1
+          SELECT id FROM eu_empleados WHERE identificacion = $1
           `
-          , [cedula.trim()]);
+          , [identificacion.trim()]);
 
         const id_empleado = VERIFICAR_IDEMPLEADO.rows[0].id;
         // FINALIZAR TRANSACCION
@@ -1277,39 +1279,98 @@ class GradoControlador {
     const { listaEliminar, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
     var count = 0;
-    var datoEliminar = ''
+    var count_no = 0;
+    var list_Grados: any = [];
     try {
 
       for (const item of listaEliminar) {
+
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
-        datoEliminar = item.descripcion
-        const res = await pool.query(
+      
+        const resultado = await pool.query(
           `
-               DELETE FROM map_cat_grado WHERE id = $1
-             `
+             SELECT * FROM map_cat_grado WHERE id = $1
+           `
           , [item.id]);
+        const [existe_grado] = resultado.rows;
 
-        console.log('res: ', res)
-
-        // AUDITORIA
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'map_cat_grado',
-          usuario: user_name,
-          accion: 'I',
-          datosOriginales: '',
-          datosNuevos: `{"id": "${item.id}"}`,
-          ip: ip,
-          ip_local: ip_local,
-          observacion: null
-        });
-
+        if (!existe_grado) {
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'map_cat_grado',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            ip_local: ip_local,
+            observacion: `Error al eliminar el Grado con id: ${item.id}. Registro no encontrado.`
+          });
+        } 
+        
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        count += 1;
+
+        if (existe_grado) {
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+          
+          const resultado = await pool.query(
+            `
+             SELECT * FROM map_empleado_grado WHERE id_grado = $1
+           `
+            , [item.id]);
+
+            const [existe_grado_emple] = resultado.rows;
+
+          if (!existe_grado_emple) {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const res = await pool.query(
+              `
+               DELETE FROM map_cat_grado WHERE id = $1
+             `
+              , [item.id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'map_cat_grado',
+              usuario: user_name,
+              accion: 'D',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(existe_grado),
+              ip: ip,
+              ip_local: ip_local,
+              observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            count += 1;
+
+          } else {
+            list_Grados.push(item.descripcion)
+            count_no += 1;
+          }
+
+        }
+
+        
       }
 
-      res.status(200).jsonp({ message: 'Registro eliminados con éxito', codigo: 200 });
+      var meCount = "registro eliminado"
+      if(count > 1){
+        meCount = "registros eliminados"
+      }
+
+      res.status(200).jsonp({ message: count.toString()+' '+ meCount +' con éxito.', 
+                              ms2: 'Existen datos relacionados con ', 
+                              codigo: 200, 
+                              eliminados: count, 
+                              relacionados: count_no,
+                              listaNoEliminados: list_Grados
+                            });
 
     } catch (err) {
       // REVERTIR TRANSACCION
@@ -1318,9 +1379,11 @@ class GradoControlador {
       if (error) {
         if (err.table == 'map_empleado_grado') {
           if(count <= 1){
-            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registro.', ms2:'Existen datos relacionados con el grado '+datoEliminar });
+            return res.status(300).jsonp({ message: 'Se ha eliminado '+count+ ' registro.', ms2:'Existen datos relacionados con ', eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Grados });
           }else if(count > 1){
-            return res.status(300).jsonp({ message: 'Se han eliminado '+count+ ' registros.', ms2:'Existen datos relacionados con el grado '+datoEliminar });
+            return res.status(300).jsonp({ message: 'Se han eliminado '+count+ ' registros.', ms2:'Existen datos relacionados con ', eliminados: count, 
+              relacionados: count_no, listaNoEliminados: list_Grados });
           }
         } else {
           return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });

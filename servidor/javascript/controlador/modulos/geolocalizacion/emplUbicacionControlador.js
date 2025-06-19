@@ -24,31 +24,39 @@ class UbicacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { latitud, longitud, descripcion, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO mg_cat_ubicaciones (latitud, longitud, descripcion)
-                VALUES ($1, $2, $3) RETURNING *
-                `, [latitud, longitud, descripcion]);
-                const [coordenadas] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mg_cat_ubicaciones',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (coordenadas) {
-                    return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas });
+                const UBICACIONES = yield database_1.default.query(`
+                SELECT * FROM mg_cat_ubicaciones WHERE descripcion = UPPER($1)
+                `, [descripcion]);
+                if (UBICACIONES.rowCount != 0) {
+                    return res.jsonp({ message: 'error_duplicidad' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'error' });
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+                    INSERT INTO mg_cat_ubicaciones (latitud, longitud, descripcion)
+                    VALUES ($1, $2, $3) RETURNING *
+                    `, [latitud, longitud, descripcion]);
+                    const [coordenadas] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'mg_cat_ubicaciones',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (coordenadas) {
+                        return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
                 }
             }
             catch (error) {
@@ -65,42 +73,52 @@ class UbicacionControlador {
                 const { latitud, longitud, descripcion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const coordenada = yield database_1.default.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
-                const [datosOriginales] = coordenada.rows;
-                if (!datosOriginales) {
+                // CONSULTAR REGISTROS EXISTENTES
+                const ubicacion = yield database_1.default.query(`
+                SELECT * FROM mg_cat_ubicaciones WHERE descripcion = UPPER($2) AND NOT id = $1
+                `, [id, descripcion]);
+                const [duplicidad] = ubicacion.rows;
+                if (duplicidad) {
+                    return res.jsonp({ message: 'error_duplicidad' });
+                }
+                else {
+                    // CONSULTAR DATOSORIGINALES
+                    const coordenada = yield database_1.default.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
+                    const [datosOriginales] = coordenada.rows;
+                    if (!datosOriginales) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'mg_cat_ubicaciones',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: `Error al actualizar coordenada con id: ${id}`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'Error al actualizar coordenada' });
+                    }
+                    yield database_1.default.query(`
+                    UPDATE mg_cat_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3
+                    WHERE id = $4
+                    `, [latitud, longitud, descripcion, id]);
+                    // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'mg_cat_ubicaciones',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
                         ip: ip,
                         ip_local: ip_local,
-                        observacion: `Error al actualizar coordenada con id: ${id}`
+                        observacion: null
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al actualizar coordenada' });
+                    return res.jsonp({ message: 'Registro guardado.' });
                 }
-                yield database_1.default.query(`
-                UPDATE mg_cat_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3
-                WHERE id = $4
-                `, [latitud, longitud, descripcion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mg_cat_ubicaciones',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -362,7 +380,7 @@ class UbicacionControlador {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                res.status(404).jsonp({ text: 'Usuarios no asociados a la ubicación.', sin_usuarios: true });
             }
         });
     }

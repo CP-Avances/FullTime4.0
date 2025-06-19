@@ -239,13 +239,13 @@ export class EliminarIndividualComponent implements OnInit {
         this.CerrarVentana();
       }
       else {
-        this.toastr.error('Ups!!! se ha producido un error y solo algunos registros fueron eliminados.',
+        this.toastr.error('Ups! se ha producido un error y solo algunos registros fueron eliminados.',
           'Intentar eliminar los registros nuevamente.', {
           timeOut: 6000,
         });
       }
     }, error => {
-      this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+      this.toastr.error('Ups! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
         timeOut: 6000,
       });
     })
@@ -262,7 +262,7 @@ export class EliminarIndividualComponent implements OnInit {
         });
     }
     else {
-      this.toastr.warning('Ups!!! verificar. No ha seleccionado horarios para eliminar registros.', '', {
+      this.toastr.warning('Ups! verificar. No ha seleccionado horarios para eliminar registros.', '', {
         timeOut: 6000,
       });
     }

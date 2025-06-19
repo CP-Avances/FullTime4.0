@@ -54,7 +54,7 @@ export class RegistrarGeneroComponent {
     };
 
     this.generoS.BuscarGenero(nombre_genero).subscribe(response => {
-      this.toastr.warning('El género ingresado ya existe en el sistema.', 'Ups!!! algo salió mal.', {
+      this.toastr.warning('El género ingresado ya existe en el sistema.', 'Ups! algo salió mal.', {
         timeOut: 3000,
       });
     }, vacio => {

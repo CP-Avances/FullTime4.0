@@ -469,7 +469,7 @@ class NotificacionTiempoRealControlador {
     ActualizarConfigEmpleadoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, vaca_mail, vaca_notificacion, permiso_mail, permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, faltas_noti, salidas_anticipadas_mail, salidas_anticipadas_notificacion, user_name, ip, ip_local } = req.body;
+                const { id_empleado, vaca_mail, vaca_notificacion, permiso_mail, permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail, comunicado_notificacion, atrasos_mail, atrasos_notificacion, faltas_mail, faltas_notificacion, salidas_anticipadas_mail, salidas_anticipadas_notificacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ORIGINALES
@@ -490,7 +490,7 @@ class NotificacionTiempoRealControlador {
                     atrasos_mail: atrasos_mail,
                     atrasos_notificacion: atrasos_notificacion,
                     faltas_mail: faltas_mail,
-                    faltas_notificacion: faltas_noti,
+                    faltas_notificacion: faltas_notificacion,
                     salidas_anticipadas_mail: salidas_anticipadas_mail,
                     salidas_anticipadas_notificacion: salidas_anticipadas_notificacion
                 };
@@ -608,41 +608,53 @@ class NotificacionTiempoRealControlador {
             const { id_envia, correo, mensaje, asunto } = req.body;
             if (datos === 'ok') {
                 const USUARIO_ENVIA = yield database_1.default.query(`
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
-          e.name_cargo AS cargo, e.name_dep AS departamento 
-        FROM informacion_general AS e
-        WHERE e.id = $1
+          SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
+            e.name_cargo AS cargo, e.name_dep AS departamento 
+          FROM informacion_general AS e
+          WHERE e.id = $1
         `, [id_envia]);
                 let data = {
                     to: correo,
                     from: settingsMail_1.email,
                     subject: asunto,
                     html: `
-          <body>
-            <div style="text-align: center;">
-              <img width="100%" height="100%" src="cid:cabeceraf"/>
-            </div>
-            <br>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              El presente correo es para informar el siguiente comunicado: <br>  
-            </p>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-              <b>Empresa:</b> ${settingsMail_1.nombre}<br>
-              <b>Asunto:</b> ${asunto} <br>
-              <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
-              <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
-              <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-              <b>Generado mediante:</b> Aplicación Web <br>
-              <b>Fecha de envío:</b> ${fecha} <br> 
-              <b>Hora de envío:</b> ${hora} <br><br>                  
-              <b>Mensaje:</b> ${mensaje} <br><br>
-            </p>
-            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Gracias por la atención</b><br>
-              <b>Saludos cordiales,</b> <br><br>
-            </p>
-            <img src="cid:pief" width="100%" height="100%"/>
-          </body>
+            <body style="font-family: Arial, sans-serif; font-size: 12px; color: rgb(11, 22, 121); line-height: 1.5;">
+
+              <div style="text-align: center; margin: 0; padding: 0;">
+                <img src="cid:cabeceraf" 
+                      alt="Encabezado"
+                      style="display: block; width: 100%; height: auto; margin: 0; padding: 0; border: 0;" />
+                </div>
+              
+                <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
+                
+                <p>
+                  El presente correo es para informar el siguiente comunicado: <br>  
+                </p>
+            
+                <p>
+                  <strong>Empresa:</strong> ${settingsMail_1.nombre}<br>
+                  <strong>Asunto:</strong> ${asunto} <br>
+                  <strong>Colaborador que envía:</strong> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
+                  <strong>Cargo:</strong> ${USUARIO_ENVIA.rows[0].cargo} <br>
+                  <strong>Departamento:</strong> ${USUARIO_ENVIA.rows[0].departamento} <br>
+                  <strong>Generado mediante:</strong> Aplicación Web <br>
+                  <strong>Fecha de envío:</strong> ${fecha} <br> 
+                  <strong>Hora de envío:</strong> ${hora} <br>                 
+                  <strong>Mensaje:</strong> ${mensaje} <br>
+                </p>
+                
+                <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
+
+                <p style="color: #555; font-style: italic; font-size: 11px;">
+                   <strong>Este correo ha sido generado automáticamente. Por favor, no responda a este mensaje.</strong>
+                </p>
+                                    
+                <div style="text-align: center; margin: 0; padding: 0;">
+                  <img src="cid:pief" alt="Pie de página"
+                        style="display: block; width: 100%; height: auto; margin: 0; padding: 0; border: 0;" />
+                  </div>
+            </body>
           `,
                     attachments: [
                         {
@@ -671,7 +683,7 @@ class NotificacionTiempoRealControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -815,7 +827,7 @@ class NotificacionTiempoRealControlador {
             }
             if (datos === 'ok') {
                 const USUARIO_ENVIA = yield database_1.default.query(`
-        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion,
           e.name_cargo AS cargo, e.name_dep AS departamento 
         FROM informacion_general AS e
         WHERE e.id = $1 
@@ -882,7 +894,7 @@ class NotificacionTiempoRealControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -893,7 +905,7 @@ class NotificacionTiempoRealControlador {
             try {
                 const { codigo } = req.query;
                 const query = `
-            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.cedula,
+            SELECT da.id_depa,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, da.identificacion,
             da.correo, da.codigo, da.estado, da.id_suc, da.id_contrato,
             (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_depa) AS ndepartamento,
             (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_suc) AS nsucursal

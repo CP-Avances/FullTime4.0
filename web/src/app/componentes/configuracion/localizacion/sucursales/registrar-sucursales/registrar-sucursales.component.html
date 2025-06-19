@@ -23,9 +23,9 @@
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-between">
                     <mat-form-field class="m-auto w-100">
-                        <mat-label id="fuente">Seleccionar continente</mat-label>
+                        <mat-label class="fuente">Seleccionar continente</mat-label>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de continentes.">
-                            help_outline
+                            language
                         </mat-icon>
                         <mat-select [formControl]="nombreContinenteF" required>
                             <mat-option *ngFor="let c of continentes" [value]="c.continente"
@@ -46,7 +46,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de países del continente seleccionado.">
-                            help_outline
+                            public
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field class="m-auto w-100">
@@ -61,7 +61,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de provincias, departamentos o estados ubicados en el país seleccionado.">
-                            help_outline
+                            travel_explore
                         </mat-icon>
                     </mat-form-field>
                 </div>
@@ -80,7 +80,7 @@
                         </mat-autocomplete>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de ciudades de la provincia, departamento o estado seleccionado.">
-                            help_outline
+                            place
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field class="m-auto w-100">
@@ -89,7 +89,7 @@
                             [readonly]="sucursal">
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingresar nombre de identificación del nuevo establecimiento.">
-                            help_outline
+                            account_balance
                         </mat-icon>
                     </mat-form-field>
                 </div>

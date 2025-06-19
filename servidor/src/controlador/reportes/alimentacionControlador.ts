@@ -100,7 +100,7 @@ class AlimentacionControlador {
         const { fec_inicio, fec_final } = req.body;
         const DATOS = await pool.query(
             `
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo, 
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo, 
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -110,7 +110,7 @@ class AlimentacionControlador {
                 AND pc.extra = false AND pce.consumido = true AND e.id = pce.id_empleado AND 
                 pc.id = pce.id_detalle_plan AND pc.fecha BETWEEN $1 AND $2 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC
+                e.apellido, e.identificacion, e.codigo ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
         if (DATOS.rowCount != 0) {
@@ -125,7 +125,7 @@ class AlimentacionControlador {
         const { fec_inicio, fec_final } = req.body;
         const DATOS = await pool.query(
             `
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo,
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo,
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -135,7 +135,7 @@ class AlimentacionControlador {
                 AND sc.extra = false AND pce.consumido = true AND e.id = sc.id_empleado AND 
                 sc.fecha_comida BETWEEN $1 AND $2  AND pce.id_solicitud_comida = sc.id 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo 
+                e.apellido, e.identificacion, e.codigo 
             ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
@@ -151,7 +151,7 @@ class AlimentacionControlador {
         const { fec_inicio, fec_final } = req.body;
         const DATOS = await pool.query(
             `
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo, 
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo, 
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -161,7 +161,7 @@ class AlimentacionControlador {
                 AND pc.extra = true AND pce.consumido = true AND e.id = pce.id_empleado AND 
                 pc.id = pce.id_detalle_plan AND pc.fecha BETWEEN $1 AND $2 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo 
+                e.apellido, e.identificacion, e.codigo 
             ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
@@ -177,7 +177,7 @@ class AlimentacionControlador {
         const { fec_inicio, fec_final } = req.body;
         const DATOS = await pool.query(
             `
-            SELECT e.nombre, e.apellido, e.cedula, e.codigo,
+            SELECT e.nombre, e.apellido, e.identificacion, e.codigo,
                 tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
                 ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
                 (COUNT(dm.nombre) * dm.valor) AS total 
@@ -187,7 +187,7 @@ class AlimentacionControlador {
                 AND sc.extra = true AND pce.consumido = true AND e.id = sc.id_empleado AND 
                 sc.fecha_comida BETWEEN $1 AND $2  AND pce.id_solicitud_comida = sc.id 
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
-                e.apellido, e.cedula, e.codigo 
+                e.apellido, e.identificacion, e.codigo 
             ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
@@ -225,6 +225,7 @@ class AlimentacionControlador {
 
     // METODO PARA BUSCAR DATOS DE ALIMENTACION   **USADO
     public async ReporteTimbresAlimentacion(req: Request, res: Response) {
+        console.log("LLEGA HASTA AQUI EN EL BACKEND")
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
@@ -241,7 +242,7 @@ class AlimentacionControlador {
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de timbres de alimentación.' })
 
         return res.status(200).jsonp(nuevo)
     }

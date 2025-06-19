@@ -13,7 +13,7 @@ interface depa_alimentacion {
 
 interface emp_alimentacion {
     id: number,
-    cedula: string,
+    identificacion: string,
     codigo: string | number,
     cargo?: string,
     genero?: string | number,

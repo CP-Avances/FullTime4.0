@@ -398,7 +398,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
             },
             {
               border: [false, true, false, true],
-              text: 'C.C.: ' + e.cedula,
+              text: 'C.C.: ' + e.identificacion,
               style: 'itemsTableInfo'
             },
             {

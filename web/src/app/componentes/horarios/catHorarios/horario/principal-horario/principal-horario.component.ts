@@ -261,6 +261,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA REGISTRAR HORARIO
   AbrirVentanaRegistrarHorario(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(RegistroHorarioComponent, { width: '1000px' })
       .afterClosed().subscribe(items => {
         if (items > 0) {
@@ -378,7 +379,7 @@ export class PrincipalHorarioComponent implements OnInit {
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo.', 'Ups! algo salio mal.', {
         timeOut: 6000,
       });
     }
@@ -396,6 +397,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.rest.VerificarDatosHorario(formData).subscribe({
       next: (res) => {
         this.dataHorarios = res;
+        console.log("DETALLE DE HORARIO", this.dataHorarios)
         this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
           if (obj.OBSERVACION == 'Ok') {
             this.listaHorariosCorrectos.push(obj);
@@ -413,7 +415,7 @@ export class PrincipalHorarioComponent implements OnInit {
         this.detallesCorrectos = this.listaDetalleCorrectos.length;
       },
       error: (err) => {
-        this.toastr.error('Error al verificar la plantilla.', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al verificar la plantilla.', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
       }
@@ -457,6 +459,7 @@ export class PrincipalHorarioComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE HORARIOS Y DETALLES DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -482,7 +485,7 @@ export class PrincipalHorarioComponent implements OnInit {
     } else {
       this.rest.CargarHorariosMultiples(data).subscribe(res => {
         if (res.mensaje === 'error') {
-          this.toastr.error('Error al importar horarios y detalles', 'Ups!!! algo salio mal.', {
+          this.toastr.error('Error al importar horarios y detalles', 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
           this.archivo1Form.reset();
@@ -510,7 +513,7 @@ export class PrincipalHorarioComponent implements OnInit {
           this.LimpiarCampos();
         }
       }, error => {
-        this.toastr.error('Error al importar horarios y detalles', 'Ups!!! algo salio mal.', {
+        this.toastr.error('Error al importar horarios y detalles', 'Ups! algo salio mal.', {
           timeOut: 6000,
         });
         this.LimpiarCamposPlantilla();
@@ -1031,6 +1034,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -1087,6 +1091,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -1095,7 +1100,7 @@ export class PrincipalHorarioComponent implements OnInit {
             this.HabilitarSeleccion();
             this.ObtenerHorarios();
           } else {
-            this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups! algo salio mal.', {
               timeOut: 6000,
             })
           }

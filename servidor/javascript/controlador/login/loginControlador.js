@@ -14,13 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTAR LIBRERIAS
 const settingsMail_1 = require("../../libs/settingsMail");
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
+const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const ipaddr_js_1 = __importDefault(require("ipaddr.js"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
 class LoginControlador {
     // METODO PARA VALIDAR DATOS DE ACCESO AL SISTEMA     **USADO
     ValidarCredenciales(req, res) {
@@ -57,31 +57,27 @@ class LoginControlador {
                     let ACTIVO = yield database_1.default.query(
                     //FIXME
                     `
-          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.cedula, e.imagen
+          SELECT u.app_habilita, e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access, e.nombre, e.apellido, e.identificacion, e.imagen
           FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `, [USUARIO.rows[0].id])
                         .then((result) => {
                         return result.rows;
                     });
-                    const { empleado, usuario, codigo, web_access, nombre, apellido, cedula, imagen, app_habilita } = ACTIVO[0];
+                    const { empleado, usuario, codigo, web_access, nombre, apellido, identificacion, imagen, app_habilita } = ACTIVO[0];
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     console.log('verificar activo ', empleado, ' usu ', usuario);
                     if (empleado === 2 && usuario === false) {
-                        return res.jsonp({ message: 'inactivo' });
+                        return res.jsonp({ message: 'inactivo', text: ip_cliente });
                     }
                     console.log('web_access: ', web_access);
                     console.log('app_habilita: ', app_habilita);
                     console.log('movil: ', movil);
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
                     if (!web_access)
-                        return res.status(404).jsonp({ message: "sin_permiso_acceso" });
+                        return res.status(404).jsonp({ message: "sin_permiso_acceso", text: ip_cliente });
                     // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO A LA APP_MOVIL
                     if (!app_habilita && movil == true)
-                        return res.jsonp({ message: "sin_permiso_acces_movil" });
-                    // BUSQUEDA DE MODULOS DEL SISTEMA
-                    const [modulos] = yield database_1.default.query(`
-          SELECT * FROM e_funciones LIMIT 1
-          `).then((result) => { return result.rows; });
+                        return res.jsonp({ message: "sin_permiso_acces_movil", text: ip_cliente });
                     // BUSQUEDA DE CLAVE DE LICENCIA
                     //FIXME
                     const EMPRESA = yield database_1.default.query(`
@@ -90,6 +86,7 @@ class LoginControlador {
                     //TODO: Cambiar validacion de licencia a la que usa el direccionamiento
                     const { public_key, id_empresa, ruc } = EMPRESA.rows[0];
                     // BUSQUEDA DE LICENCIA DE USO DE APLICACION
+                    //console.log('llave ', public_key)
                     const licenciaData = yield fetch(`${process.env.DIRECCIONAMIENTO}/licencia`, {
                         method: "POST",
                         headers: {
@@ -98,16 +95,16 @@ class LoginControlador {
                         body: JSON.stringify({ public_key: public_key })
                     });
                     if (!licenciaData.ok) {
-                        return res.status(404).jsonp({ message: 'licencia_no_existe' });
+                        return res.status(404).jsonp({ message: 'licencia_no_existe', text: ip_cliente });
                     }
                     const dataLic = yield licenciaData.json();
                     const fec_activacion = new Date(dataLic[0].fecha_activacion);
                     const fec_desactivacion = new Date(dataLic[0].fecha_desactivacion);
                     const hoy = new Date();
                     if (hoy > fec_desactivacion)
-                        return res.status(404).jsonp({ message: 'licencia_expirada' });
+                        return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
                     if (hoy < fec_activacion)
-                        return res.status(404).jsonp({ message: 'licencia_expirada' });
+                        return res.status(404).jsonp({ message: 'licencia_expirada', text: ip_cliente });
                     caducidad_licencia = fec_desactivacion;
                     // BUSQUEDA DE INFORMACION
                     const INFORMACION = yield database_1.default.query(`
@@ -134,7 +131,6 @@ class LoginControlador {
                             _empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
-                            modulos: modulos,
                             id_contrato: id_contrato
                         }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: expiresIn, algorithm: 'HS512' });
                         return res.status(200).jsonp({
@@ -149,11 +145,10 @@ class LoginControlador {
                             empresa: id_empresa,
                             cargo: id_cargo,
                             ip_adress: ip_cliente,
-                            modulos: modulos,
                             id_contrato: id_contrato,
                             nombre: nombre,
                             apellido: apellido,
-                            cedula: cedula,
+                            identificacion: identificacion,
                             imagen: imagen,
                             codigo: codigo,
                             ruc: ruc,
@@ -165,21 +160,20 @@ class LoginControlador {
                         if (id_rol === 1) {
                             const token = jsonwebtoken_1.default.sign({
                                 _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-                                _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente,
-                                modulos: modulos
+                                _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente
                             }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
                             return res.status(200).jsonp({
                                 caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-                                empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos //, modulos: modulos
+                                empresa: id_empresa, ip_adress: ip_cliente
                             });
                         }
                         else {
-                            return res.jsonp({ message: 'error_' });
+                            return res.jsonp({ message: 'error_', text: ip_cliente });
                         }
                     }
                 }
                 else {
-                    return res.jsonp({ message: 'error' });
+                    return res.jsonp({ message: 'error', text: ip_cliente });
                 }
             }
             catch (error) {
@@ -193,7 +187,7 @@ class LoginControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const correo = req.body.correo;
             const url_page = req.body.url_page;
-            const cedula = req.body.cedula;
+            const identificacion = req.body.identificacion;
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
@@ -203,10 +197,10 @@ class LoginControlador {
             const correoValido = yield database_1.default.query(`
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2 
-      `, [correo, cedula]);
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2 
+      `, [correo, identificacion]);
             if (correoValido.rows[0] == undefined)
-                return res.status(401).send('Correo o cédula de usuario no válido.');
+                return res.status(401).send('Correo o identificación de usuario no válido.');
             var datos = yield (0, settingsMail_1.Credenciales)(1);
             if (datos === 'ok') {
                 const token = jsonwebtoken_1.default.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail', { expiresIn: 60 * 5, algorithm: 'HS512' });
@@ -273,7 +267,7 @@ class LoginControlador {
                 });
             }
             else {
-                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -343,6 +337,28 @@ class LoginControlador {
                     expiro: 'si',
                     message: "Tiempo para cambiar contraseña ha expirado. Vuelva a solicitar cambio de contraseña."
                 });
+            }
+        });
+    }
+    // AUDITORIA DE INICIO DE SESION
+    RegistrarAuditoriaLogin(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plataforma, user_name, ip_addres, ip_addres_local, acceso, observaciones } = req.body;
+            console.log('acceso ', req.body);
+            const ahora = new Date();
+            const fecha = ahora.toISOString().split('T')[0]; // YYYY-MM-DD
+            const hora = ahora.toTimeString().split(' ')[0]; // HH:mm:ss
+            try {
+                yield database_1.default.query(`
+        INSERT INTO audit.acceso_sistema 
+          (plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones)   
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [plataforma, user_name, fecha, hora, acceso, ip_addres, ip_addres_local, observaciones]);
+                return res.jsonp({ message: 'ok' });
+            }
+            catch (err) {
+                console.error('Error al registrar auditoría de login:', err);
+                res.jsonp({ message: 'Ups! algo salio mal.' });
             }
         });
     }

@@ -301,7 +301,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -496,7 +496,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -646,7 +646,6 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((data: any) => {
       data.empleados.forEach((usu: any) => {
         usu.timbres.forEach((t: any) => {
-          n++;
           let servidor_fecha: any = '';
           let servidor_hora = '';
           if (t.fecha_hora_timbre_validado != '' && t.fecha_hora_timbre_validado != null) {
@@ -670,7 +669,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           if (this.timbreDispositivo) {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.ciudad,
@@ -691,7 +690,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           } else {
             datos.push([
               n++,
-              usu.cedula,
+              usu.identificacion,
               usu.codigo,
               `${usu.apellido} ${usu.nombre}`,
               usu.ciudad,
@@ -752,7 +751,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "ciudad", width: 20 },
@@ -773,7 +772,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -845,7 +844,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
       });
       worksheet.columns = [
         { key: "n", width: 10 },
-        { key: "cedula", width: 20 },
+        { key: "identificacion", width: 20 },
         { key: "codigo", width: 20 },
         { key: "apenombre", width: 20 },
         { key: "ciudad", width: 20 },
@@ -864,7 +863,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-        { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+        { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
         { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
         { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
         { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -973,7 +972,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           let ele = {
             n: n,
             codigo: usu.codigo,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,
             sucursal: usu.sucursal,

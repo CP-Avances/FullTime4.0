@@ -9,6 +9,16 @@ mat-form-field {
     width: 350px;
 }
 
+.inputText{
+    padding: 10px 0px 0px 10px;
+    width: 350px;
+}
+
+.inputDate{
+    padding: 10px 0px 0px 10px;
+    width: 200px;
+}
+
 .abrv {
     padding: 10px 10px 0px 10px;
     width: 80px;
@@ -45,6 +55,36 @@ mat-form-field {
     margin-left: 20px;
 }
 
+.inputCedula{
+    width: 30%;
+}
+
+.radio-group-estilo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* Ajusta la alineación del contenido dentro de cada radio button */
+.radio-group-estilo mat-radio-button {
+  display: flex;
+  align-items: center;
+  height: 40px; /* Asegura altura consistente */
+  line-height: 1;
+  margin: 0; /* Evita que Angular Material agregue espaciado extra */
+}
+
+/* Alinea el texto con el círculo */
+::ng-deep mat-radio-button .mat-radio-label-content {
+  display: flex;
+  align-items: center;
+  padding-left: 8px; /* Espacio entre círculo y texto */
+  font-size: 16px;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
 /*Estilo para ajustar el texto del titulo de las tablas*/
 @media (max-width: 530px) {
     .nota{
@@ -70,5 +110,35 @@ mat-form-field {
         margin: 0px;
         padding: 0px;
     }
+
+    .inputCedula{
+        width: 90%;
+    }
 }
 
+.subtitulo{
+    font-size: small;
+    font-weight: 900;
+}
+
+.declaracion-radio-group {
+    margin: 1rem 0;
+  }
+  
+  .declaracion-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 16px;
+  }
+  
+  .radio-options {
+    align-items: center;
+  }
+  
+  mat-radio-button {
+    font-size: 15px;
+  }
+
+  label{
+    font-size: small;
+  }

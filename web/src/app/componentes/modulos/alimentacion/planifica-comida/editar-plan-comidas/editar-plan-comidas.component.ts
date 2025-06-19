@@ -76,10 +76,10 @@ export class EditarPlanComidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerServicios();
     this.CargarDatos();
@@ -320,7 +320,7 @@ export class EditarPlanComidasComponent implements OnInit {
           var end = new Date(this.finDate);
           // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DÍA DEL PERIODO INDICADO
           while (start <= end) {
-            this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
+            this.fechasHorario.push(DateTime.fromISO(start.toISOString()).toFormat('yyyy-MM-dd'));
             var newDate = start.setDate(start.getDate() + 1);
             start = new Date(newDate);
           }
@@ -341,7 +341,7 @@ export class EditarPlanComidasComponent implements OnInit {
 
           // LECTURA DE DATOS DE USUARIO
           let usuario = '<tr><th>' + this.data.solicitud.nombre +
-            '</th><th>' + this.data.solicitud.cedula + '</th></tr>';
+            '</th><th>' + this.data.solicitud.identificacion + '</th></tr>';
           let cuenta_correo = this.data.solicitud.correo;
 
           // LECTURA DE DATOS DE LA PLANIFICACIÓN
@@ -538,7 +538,7 @@ export class EditarPlanComidasComponent implements OnInit {
       var end = new Date(this.finDate);
       // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DÍA DEL PERIODO INDICADO
       while (start <= end) {
-        this.fechasHorario.push(DateTime.fromISO(start).toFormat('yyyy-MM-dd'));
+        this.fechasHorario.push(DateTime.fromISO(start.toISOString()).toFormat('yyyy-MM-dd'));
         var newDate = start.setDate(start.getDate() + 1);
         start = new Date(newDate);
       }
@@ -561,7 +561,7 @@ export class EditarPlanComidasComponent implements OnInit {
         planEmpleado.id_empleado = obj.id;
 
         // LECTURA DE NOMBRES DE USUARIOS
-        usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
+        usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.identificacion + '</th></tr>';
 
         this.contadorFechas = 0;
 

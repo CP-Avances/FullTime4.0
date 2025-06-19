@@ -93,6 +93,7 @@ class RelojesControlador {
 
     // METODO PARA REGISTRAR DISPOSITIVO   **USADO
     public async CrearRelojes(req: Request, res: Response) {
+        console.log("Entro a crear un reloj")
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                 tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, user_name, user_ip,
@@ -119,6 +120,7 @@ class RelojesControlador {
             }
 
             if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
+                const contraseñaFinal = (contrasenia === undefined || contrasenia === null || contrasenia.trim() === '') ? '0' : contrasenia;
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
@@ -126,7 +128,7 @@ class RelojesControlador {
                         zona_horaria_dispositivo, formato_gmt_dispositivo)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *
                     `
-                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                    , [nombre, ip, puerto, contraseñaFinal, marca, modelo, serie, id_fabricacion, fabricante, mac,
                         tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, zona_horaria_dispositivo,
                         formato_gmt_dispositivo
                     ]);
@@ -238,6 +240,7 @@ class RelojesControlador {
             }
 
             if (VERIFICA_CODIGO.rows[0] == undefined || VERIFICA_CODIGO.rows[0] == '') {
+                const contraseñaFinal = (contrasenia === undefined || contrasenia === null || contrasenia.trim() === '') ? '0' : contrasenia;
                 await pool.query(
                     `
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
@@ -246,7 +249,7 @@ class RelojesControlador {
                         zona_horaria_dispositivo = $16, formato_gmt_dispositivo = $17
                     WHERE id = $18
                     `
-                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                    , [nombre, ip, puerto, contraseñaFinal, marca, modelo, serie, id_fabricacion, fabricante, mac,
                         tipo_conexion, id_sucursal, id_departamento, codigo, temperatura, zona_horaria_dispositivo,
                         formato_gmt_dispositivo, id_real]);
 
@@ -325,7 +328,7 @@ class RelojesControlador {
 
         } catch (error) {
             console.log('error ', error)
-            return res.status(500).jsonp({ message: 'Ups!!! algo salio mal. No se han encontrado registros.' });
+            return res.status(500).jsonp({ message: 'Ups! algo salio mal. No se han encontrado registros.' });
         }
     }
 
@@ -472,7 +475,7 @@ class RelojesControlador {
                                 data.observacion = '1';
                             }
 
-                           
+
 
                             listDispositivos.push(data);
 
@@ -597,7 +600,7 @@ class RelojesControlador {
                                     }
                                 }
                             }
-                            
+
                             listDispositivos.push(data);
 
                         }
@@ -820,7 +823,7 @@ class RelojesControlador {
             plantilla.forEach(async (data: any) => {
                 // DATOS DE LA PLANTILLA INGRESADA
                 const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, tipo_conexion,
-                    temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, 
+                    temperatura, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac,
                     contrasena, zona_horaria } = data;
 
                 // INICIAR TRANSACCION

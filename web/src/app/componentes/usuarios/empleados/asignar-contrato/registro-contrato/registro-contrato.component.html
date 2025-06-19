@@ -49,19 +49,7 @@
                                         help_outline
                                     </mat-icon>
                                 </mat-form-field>
-                                <mat-form-field *ngIf="habilitarSeleccion">
-                                    <mat-label>Modalidad Laboral</mat-label>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
-                                        help_outline
-                                    </mat-icon>
-                                    <mat-select [formControl]="tipoF" required>
-                                        <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id"
-                                            (click)="IngresarOtro(formulario.value)">
-                                            {{tc.descripcion}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
+
                                 <mat-form-field>
                                     <mat-label>Régimen Laboral</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -74,6 +62,20 @@
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
+
+                                <mat-form-field *ngIf="habilitarSeleccion">
+                                    <mat-label>Modalidad Laboral</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Seleccione el tipo de contrato con el que va a laborar.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="tipoF" required (selectionChange)="IngresarOtro($event.value)">
+                                      <mat-option *ngFor="let tc of tipoContrato" [value]="tc.id">
+                                        {{tc.descripcion}}
+                                      </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+
                                 <mat-form-field *ngIf="habilitarContrato">
                                     <mat-label>Tipo Contrato</mat-label>
                                     <input matInput placeholder="Ej: Indefinido" [formControl]="contratoF">
@@ -167,10 +169,10 @@
 
                         <div *ngIf="isChecked" class="col-md">
                             <div class="d-flex flex-wrap justify-content-around">
-                                <div class="separar">
+                                <div class="separar"> 
                                     <form method="post" enctype="multipart/form-data">
-                                        <input (change)="fileChange($event)" type="file" id="file">
-                                        <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="iHor"
+                                        <input (click)="ReseteoArchivo($event)" (change)="fileChange($event)" type="file" id="file">
+                                        <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" 
                                             matSuffix matTooltipPosition="right"
                                             matTooltip="Subir el repectivo documento contrato del empleado">
                                             Subir Contrato

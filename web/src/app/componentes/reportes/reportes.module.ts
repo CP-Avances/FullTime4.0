@@ -8,7 +8,10 @@ import { FiltrosModule } from '../../filtros/filtros.module';
 
 import { RangoFechasComponent } from './configuracion-reportes/rango-fechas/rango-fechas.component';
 import { ReporteFaltasComponent } from './asistencia/reporte-faltas/reporte-faltas.component';
-import { ReporteAuditoriaComponent } from './reporte-auditoria/reporte-auditoria.component';
+
+import { ReporteAuditoriaComponent } from './auditoria/reporte-auditoria/reporte-auditoria.component';
+import { AuditoriaSistemaComponent } from './auditoria/auditoria-sistema/auditoria-sistema.component';
+import { AuditoriaAccesosComponent } from './auditoria/auditoria-accesos/auditoria-accesos.component';
 
 import { CriteriosBusquedaComponent } from './configuracion-reportes/criterios-busqueda/criterios-busqueda.component';
 import { ReporteTimbresMultiplesComponent } from './timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
@@ -46,6 +49,7 @@ import { OpcionAccionComponent } from './configuracion-reportes/opcion-accion/op
 
 import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
 import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.component';
+
 
 @NgModule({
   declarations: [
@@ -85,6 +89,8 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     OpcionAccionComponent,
     TimbreMrlComponent,
     AnalisisDatosComponent,
+    AuditoriaSistemaComponent,
+    AuditoriaAccesosComponent,
   ],
   exports: [
     ReporteFaltasComponent,
@@ -101,7 +107,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     AsistenciaConsolidadoComponent,
     ReportePermisosComponent,
     ReporteEntradaSalidaComponent,
-    SolicitudVacacionComponent,
+    SolicitudVacacionComponent
   ],
   imports: [
     BrowserAnimationsModule,

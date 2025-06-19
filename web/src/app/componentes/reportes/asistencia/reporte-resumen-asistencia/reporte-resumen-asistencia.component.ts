@@ -117,7 +117,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
   constructor(
     private reportesTiempoLaborado: TiempoLaboradoService,
@@ -252,6 +252,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA
   ValidarReporte(action: any) {
+
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
     if (
       this.bool.bool_suc === false &&
@@ -311,7 +312,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'Ups!!! algo salio mal.',
+          'Ups! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -615,7 +616,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
               [
                 {
                   border: [true, true, false, false],
-                  text: 'C.C.: ' + empl.cedula,
+                  text: 'C.C.: ' + empl.identificacion,
                   style: 'itemsTableInfoEmpleado',
                 },
                 {
@@ -660,7 +661,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
         n.push({
           style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 45, 'auto', 'auto', 40, '*'],
             headerRows: 2,
             body: [
               [
@@ -725,22 +726,22 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
                     : (lab.origen === 'L' || lab.origen === 'FD' ? lab.origen : lab.control ? 'FT' : 'SCA'))
                   : '';
                 const alimentacion_asignada = lab.tipo == 'EAS' ? lab.inicioAlimentacion.minutos_alimentacion : 0;
-                const diferenciaEnMinutos = this.CalcularDiferenciaFechas(lab);
-                const minutosAlimentacion = diferenciaEnMinutos[0];
+                // const diferenciaEnMinutos = this.CalcularDiferenciaFechas(lab);
+                const minutosAlimentacion = lab.minAlimentacion;
                 const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
                 let minutosLaborados = 0
                 let tiempoLaborado = ''
                 if (lab.control) {
-                  minutosLaborados = diferenciaEnMinutos[1];
+                  minutosLaborados = lab.minLaborados;
                   tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                 } else {
-                  minutosLaborados = diferenciaEnMinutos[4];
+                  minutosLaborados = lab.minPlanificados;
                   tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                 }
 
-                const minutosAtraso = diferenciaEnMinutos[2];
+                const minutosAtraso = lab.minAtrasos;
                 const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
-                const minutosSalidaAnticipada = diferenciaEnMinutos[3];
+                const minutosSalidaAnticipada = lab.minSalidasAnticipadas;
                 const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
                 totalTiempoLaboradoEmpleado += minutosLaborados;
                 totalTiempoAtrasosEmpleado += minutosAtraso;
@@ -938,26 +939,25 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           let alimentacion_asignada = t.tipo == 'EAS' ? t.inicioAlimentacion.minutos_alimentacion : 0;
           alimentacion_asignada = this.MinutosAHorasMinutosSegundos(Number(alimentacion_asignada));
 
-          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(t);
-          const minutosAlimentacion = diferenciaEnMinutos[0];
+          const minutosAlimentacion = t.minAlimentacion;
           const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
           let minutosLaborados = 0
           let tiempoLaborado = ''
           if (t.control) {
-            minutosLaborados = diferenciaEnMinutos[1];
+            minutosLaborados = t.minLaborados;
             tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           } else {
-            minutosLaborados = diferenciaEnMinutos[4];
+            minutosLaborados = t.minPlanificados;
             tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           }
-          const minutosAtraso = diferenciaEnMinutos[2];
+          const minutosAtraso = t.minAtrasos;
           const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
-          const minutosSalidaAnticipada = diferenciaEnMinutos[3];
+          const minutosSalidaAnticipada = t.minSalidasAnticipadas;
           const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
 
           datos.push([
             n++,
-            usu.cedula,
+            usu.identificacion,
             usu.codigo,
             usu.apellido + ' ' + usu.nombre,
             usu.ciudad,
@@ -1021,7 +1021,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
     worksheet.columns = [
       { key: "n", width: 10 },
-      { key: "cedula", width: 20 },
+      { key: "identificacion", width: 20 },
       { key: "codigo", width: 20 },
       { key: "apenombre", width: 20 },
       { key: "ciudad", width: 20 },
@@ -1047,7 +1047,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
-      { name: "CÉDULA", totalsRowLabel: "Total:", filterButton: true },
+      { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
       { name: "CÓDIGO", totalsRowLabel: "", filterButton: true },
       { name: "APELLIDO NOMBRE", totalsRowLabel: "", filterButton: true },
       { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
@@ -1164,28 +1164,28 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           let alimentacion_asignada = t.tipo == 'EAS' ? t.inicioAlimentacion.minutos_alimentacion : 0;
           alimentacion_asignada = Number(alimentacion_asignada);
 
-          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(t);
-          const minutosAlimentacion = diferenciaEnMinutos[0];
+          const minutosAlimentacion = t.minAlimentacion;
           const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
           let minutosLaborados = 0
           let tiempoLaborado = ''
+
           if (t.control) {
-            minutosLaborados = diferenciaEnMinutos[1];
+            minutosLaborados = t.minLaborados;
             tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           } else {
-            minutosLaborados = diferenciaEnMinutos[4];
+            minutosLaborados = t.minPlanificados;
             tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           }
 
-          const minutosAtraso = diferenciaEnMinutos[2];
+          const minutosAtraso = t.minAtrasos;
           const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
-          const minutosSalidaAnticipada = diferenciaEnMinutos[3];
+          const minutosSalidaAnticipada = t.minSalidasAnticipadas;
           const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
 
           n = n + 1;
           const ele = {
             n,
-            cedula: usu.cedula,
+            identificacion: usu.identificacion,
             codigo: usu.codigo,
             empleado: usu.apellido + ' ' + usu.nombre,
             ciudad: usu.ciudad,

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DateTime } from 'luxon';
 import CryptoJS from 'crypto-js';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,8 @@ export class ValidacionesService {
 
   constructor(
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) { }
 
 
@@ -115,7 +117,7 @@ export class ValidacionesService {
 
   FormatearFecha(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    console.log('ingresa fecha ', fecha)
+    //console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaLuxon = DateTime.fromISO(fecha).setLocale(idioma);
     // MANEJAR EL FORMATO PARA EL DIA
@@ -136,19 +138,15 @@ export class ValidacionesService {
   }
 
   FormatearHora(hora: string, formato: string) {
-    console.log('hora ', hora, ' formato ', formato)
-
+    //console.log('hora ', hora, ' formato ', formato)
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;
   }
 
   DarFormatoFecha(fechaString: any, formatoSalida: any) {
-
-    console.log("fechaString: ", fechaString)
-    console.log("formatoSalida: ", formatoSalida)
-
-
+    //console.log("fechaString: ", fechaString)
+    //console.log("formatoSalida: ", formatoSalida)
     let formatos = ['yyyy-MM-dd', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd'];
     let fecha: DateTime;
     // VERIFICAR SI LA FECHA ES UN OBJETO MOMENT
@@ -169,13 +167,13 @@ export class ValidacionesService {
       }
     }
     // SI NO ES VALIDA EN NINGUNO DE LOS FORMATOS, DEVUELVE UN ERROR
-    console.error('Formato de fecha no válido:', fechaString);
+    //console.error('Formato de fecha no válido:', fechaString);
     return null;
   }
 
   FormatearFechaAuditoria(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    console.log('ingresa fecha ', fecha)
+    //console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaISO = fecha.replace(' ', 'T').replace(/-\d{2}$/, '');
 
@@ -467,7 +465,7 @@ export class ValidacionesService {
         nombre: obj.nombre,
         apellido: obj.apellido,
         codigo: obj.codigo,
-        cedula: obj.cedula,
+        identificacion: obj.identificacion,
         correo: obj.correo,
         genero: obj.genero,
         id_nacionalidad: obj.id_nacionalidad,
@@ -611,6 +609,13 @@ export class ValidacionesService {
     const pdfFonts = await import('src/assets/build/vfs_fonts.js');
     pdfMake.default.vfs = pdfFonts.default.pdfMake.vfs;
     return pdfMake.default;
+  }
+
+  //MICROSERVICIO
+  generarReporteGeneros(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/generos/pdf', data, {
+      responseType: 'blob'
+    });
   }
 
 
