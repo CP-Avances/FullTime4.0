@@ -155,6 +155,22 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ObtenerModulos();
     this.ObtenerTodasModulosAcciones();
     this.VerModulos();
+    this.ManejarEstilos();
+
+  }
+
+  // METODO PARA OBTENER ROLES
+  roles: any = [];
+  ObtenerRoles() {
+    this.roles = [];
+    this.rol.BuscarRoles().subscribe(res => {
+      this.roles = res;
+      this.ObtenerFuncionesRoles();
+    });
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -177,17 +193,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
-
-  }
-
-  // METODO PARA OBTENER ROLES
-  roles: any = [];
-  ObtenerRoles() {
-    this.roles = [];
-    this.rol.BuscarRoles().subscribe(res => {
-      this.roles = res;
-      this.ObtenerFuncionesRoles();
-    });
   }
 
   // METODO PARA BUSCAR FUNCIONES DE LOS ROLES
@@ -542,7 +547,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           id_accion: null,
         });
       } else {
-        // SI HABÍA ACCIONES DISPONIBLES PERO NO SE SELECCIONARON
+        // SI HABIA ACCIONES DISPONIBLES PERO NO SE SELECCIONARON
         this.toastr.warning(
           'No ha seleccionado ACCIONES en ' + pagina.nombre + '.',
           'Ups! algo salió mal.',
@@ -553,7 +558,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     }
 
     if (arrayAccionesSeleccionadas.length > 0) {
-      const data = {acciones: arrayAccionesSeleccionadas}
+      const data = { acciones: arrayAccionesSeleccionadas }
       this.rest.CrearAccionesRol(data).subscribe({
         next: (response: any) => {
           this.toastr.success('Operación exitosa.', 'Se ha guardado las acciones del rol.', {
@@ -564,7 +569,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           this.rest.BuscarPaginasRol({ id_rol: this.id_rol, tipo: this.plataforma }).subscribe(datos => {
             this.paginas = datos;
           });
-        }, 
+        },
         error: () => {
           console.error('Error al insertar acciones:');
           this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
@@ -587,7 +592,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.paginasSeleccionadas = [];
   }
 
-  //INSERTAR PAGINA DE LOS MODULOS
+  // INSERTAR PAGINA DE LOS MODULOS
   InsertarPaginaModulosRol() {
     const arrayModulosSeleccionados: any[] = [];
 
@@ -628,7 +633,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           id_accion: null,
         });
       } else {
-        // SI HABÍA ACCIONES DISPONIBLES PERO NO SE SELECCIONARON
+        // SI HABIA ACCIONES DISPONIBLES PERO NO SE SELECCIONARON
         this.toastr.warning(
           'No ha seleccionado ACCIONES en ' + pagina.nombre + '.',
           'Ups! algo salió mal.',
@@ -639,11 +644,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     }
 
     if (arrayModulosSeleccionados.length > 0) {
-      const data = {acciones: arrayModulosSeleccionados}
+      const data = { acciones: arrayModulosSeleccionados }
       this.rest.CrearAccionesRol(data).subscribe({
         next: (response: any) => {
           this.toastr.success('Operación exitosa.', 'Se ha guardado las acciones del rol.', {
-            timeOut: 6000, 
+            timeOut: 6000,
           });
           this.ObtenerRoles();
           this.LimpiarPaginasModulosRol();
@@ -825,7 +830,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     var buscarAcciones = {
       id_funcion: id
     };
-    this.rest.BuscarAccionesExistentesPaginas(buscarAcciones).subscribe( {
+    this.rest.BuscarAccionesExistentesPaginas(buscarAcciones).subscribe({
 
       next: (res: any) => {
         this.nombresAcciones = res;
@@ -870,7 +875,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
-
   // METODO PARA CREAR ARCHIVO PDF
   async GenerarPdf(action = 'open') {
     //console.log('data ', this.data_general)
@@ -886,7 +890,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   DefinirInformacionPDF() {
     return {
-      // ENCABEZADO DE PÁGINA
+      // ENCABEZADO DE PAGINA
       pageSize: 'A4',
       pageOrientation: 'portrait',
       pageMargins: [40, 50, 40, 50],
@@ -1119,7 +1123,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       rows: datos,
     });
 
-
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 7; j++) {
@@ -1189,9 +1192,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                           ? 'Aplicación Móvil'
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
-                             : det.nombre_modulo === 'notificaciones'
-                            ? 'Notificaciones'
-                            : det.nombre_modulo,
+                            : det.nombre_modulo === 'notificaciones'
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           "aplicacion_web": det.movil == false ? 'Sí' : '',
           "aplicacion_movil": det.movil == true ? 'Sí' : '',
         });
@@ -1266,8 +1269,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                           : det.nombre_modulo === 'aprobar'
                             ? 'Aprobaciones Solicitudes'
                             : det.nombre_modulo === 'notificaciones'
-                            ? 'Notificaciones'
-                            : det.nombre_modulo,
+                              ? 'Notificaciones'
+                              : det.nombre_modulo,
           aplicacion_web: det.movil == false ? 'Sí' : '',
           aplicacion_movil: det.movil == true ? 'Sí' : '',
         });

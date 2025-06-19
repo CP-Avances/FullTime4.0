@@ -22,6 +22,9 @@ const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class ContratoEmpleadoControlador {
+    /** ******************************************************************************************** **
+     ** **                      MANEJO DE DATOS DE CONTRATO DEL USUARIO                           ** **
+     ** ******************************************************************************************** **/
     // REGISTRAR CONTRATOS    **USADO
     CrearContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -467,71 +470,59 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    /** **************************************************************************** **
-     ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
-     ** **************************************************************************** **/
-    // LISTAR TIPOS DE MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
-    ListarTiposContratos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const CONTRATOS = yield database_1.default.query(`
-            SELECT * FROM e_cat_modalidad_trabajo
-            `);
-            if (CONTRATOS.rowCount != 0) {
-                return res.jsonp(CONTRATOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    // REGISTRAR MODALIDAD DE TRABAJO    **USADO
-    CrearTipoContrato(req, res) {
+    //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
+    EliminarContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, user_name, ip, ip_local } = req.body;
+                const { id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
-                `, [descripcion]);
-                const [contrato] = response.rows;
+                // CONSULTA DATOS ORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const ELIMINAR = yield database_1.default.query(`
+                DELETE FROM eu_empleado_contratos WHERE id = $1 RETURNING *
+                `, [id]);
+                const [datosEliminados] = ELIMINAR.rows;
+                var fechaIngresoE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_ingreso, 'ddd');
+                var fechaSalidaE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_salida, 'ddd');
+                datosEliminados.fecha_ingreso = fechaIngresoE;
+                datosEliminados.fecha_salida = fechaSalidaE;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_cat_modalidad_trabajo',
+                    tabla: 'eu_empleado_contratos',
                     usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(contrato),
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosEliminados),
+                    datosNuevos: '',
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null
                 });
-                if (contrato) {
-                    return res.status(200).jsonp(contrato);
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
-            }
-        });
-    }
-    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE   **USADO
-    BuscarModalidadLaboralNombre(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.body;
-            const CONTRATOS = yield database_1.default.query(`
-            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-            `, [nombre]);
-            if (CONTRATOS.rowCount != 0) {
-                return res.jsonp(CONTRATOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
             }
         });
     }
@@ -540,8 +531,8 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_contrato } = req.body;
             const FECHA = yield database_1.default.query(`
-            SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
-            WHERE con.id = $1    
+                SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
+                WHERE con.id = $1    
             `, [id_contrato]);
             if (FECHA.rowCount != 0) {
                 return res.jsonp(FECHA.rows);
@@ -561,7 +552,6 @@ class ContratoEmpleadoControlador {
             const workbook = new exceljs_1.default.Workbook();
             yield workbook.xlsx.readFile(ruta);
             let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'EMPLEADOS_CONTRATOS');
-            console.log('ingresa ', verificador);
             if (verificador === false) {
                 return res.jsonp({ message: 'no_existe', data: undefined });
             }
@@ -583,7 +573,6 @@ class ContratoEmpleadoControlador {
                 var listContratos = [];
                 var duplicados = [];
                 var mensaje = 'correcto';
-                console.log('plantilla ', plantilla);
                 if (plantilla) {
                     // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
                     const headerRow = plantilla.getRow(1);
@@ -597,7 +586,6 @@ class ContratoEmpleadoControlador {
                     if (!headers['ITEM'] || !headers['IDENTIFICACION'] || !headers['PAIS'] ||
                         !headers['REGIMEN_LABORAL'] || !headers['MODALIDAD_LABORAL'] || !headers['FECHA_DESDE'] ||
                         !headers['FECHA_HASTA'] || !headers['CONTROLAR_ASISTENCIA'] || !headers['CONTROLAR_VACACIONES']) {
-                        console.log('ingresa a cabeceras');
                         return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
                     }
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
@@ -749,7 +737,6 @@ class ContratoEmpleadoControlador {
                         data = {};
                     });
                 }
-                //console.log('contratos ', listContratos)
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -762,34 +749,34 @@ class ContratoEmpleadoControlador {
                 listContratos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                     if (valor.observacion == 'no registrado') {
                         var VERIFICAR_CEDULA = yield database_1.default.query(`
-                        SELECT * FROM eu_empleados WHERE identificacion = $1
+                            SELECT * FROM eu_empleados WHERE identificacion = $1
                         `, [valor.identificacion]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                             if (valor.identificacion != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                                 const fechaRango = yield database_1.default.query(`
-                                SELECT * FROM eu_empleado_contratos 
-                                WHERE id_empleado = $1 AND 
-                                    ($2 BETWEEN fecha_ingreso AND fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
-                                    fecha_ingreso BETWEEN $2 AND $3)
+                                    SELECT * FROM eu_empleado_contratos 
+                                    WHERE id_empleado = $1 AND 
+                                        ($2 BETWEEN fecha_ingreso AND fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
+                                        fecha_ingreso BETWEEN $2 AND $3)
                                 `, [VERIFICAR_CEDULA.rows[0].id, valor.fecha_desde, valor.fecha_hasta]);
                                 if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                     valor.observacion = 'Existe un contrato vigente en esas fechas';
                                 }
                                 else {
                                     var VERIFICAR_PAISES = yield database_1.default.query(`
-                                    SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                                        SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
                                     `, [valor.pais.toUpperCase()]);
                                     if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
                                         var id_pais = VERIFICAR_PAISES.rows[0].id;
                                         if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
                                             var VERIFICAR_REGIMENES = yield database_1.default.query(`
-                                            SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                                                SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
                                             `, [valor.regimen_la.toUpperCase()]);
                                             if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
                                                 if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
                                                     if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
                                                         var VERIFICAR_MODALIDAD = yield database_1.default.query(`
-                                                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                                                            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                                                         `, [valor.modalida_la.toUpperCase()]);
                                                         if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
                                                             if (luxon_1.DateTime.fromISO(valor.fecha_desde).toFormat('yyyy-MM-dd') >= luxon_1.DateTime.fromISO(valor.fecha_hasta).toFormat('yyyy-MM-dd')) {
@@ -888,13 +875,13 @@ class ContratoEmpleadoControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const ID_EMPLEADO = yield database_1.default.query(`
-                    SELECT id FROM eu_empleados WHERE UPPER(identificacion) = $1
+                        SELECT id FROM eu_empleados WHERE UPPER(identificacion) = $1
                     `, [identificacion]);
                     const ID_REGIMEN = yield database_1.default.query(`
-                    SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                        SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
                     `, [regimen_la.toUpperCase()]);
                     const ID_TIPO_CONTRATO = yield database_1.default.query(`
-                    SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                        SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                     `, [modalida_la.toUpperCase()]);
                     // TRANSFORMAR EL STRING EN BOOLEANO
                     let vaca_controla;
@@ -915,9 +902,9 @@ class ContratoEmpleadoControlador {
                     const id_regimen = ID_REGIMEN.rows[0].id;
                     const id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
                     const response = yield database_1.default.query(`
-                    INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-                        controlar_asistencia, id_regimen, id_modalidad_laboral) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                        INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                            controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
                     `, [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
                         id_tipo_contrato]);
                     const [contrato] = response.rows;
@@ -951,60 +938,71 @@ class ContratoEmpleadoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
-    //ELIMINAR REGISTRO DEL CONTRATO SELECCIONADO **USADO
-    EliminarContrato(req, res) {
+    /** **************************************************************************** **
+     ** **      METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
+     ** **************************************************************************** **/
+    // LISTAR TIPOS DE MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
+    ListarTiposContratos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const CONTRATOS = yield database_1.default.query(`
+            SELECT * FROM e_cat_modalidad_trabajo
+            `);
+            if (CONTRATOS.rowCount != 0) {
+                return res.jsonp(CONTRATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // REGISTRAR MODALIDAD DE TRABAJO    **USADO
+    CrearTipoContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, user_name, ip, ip_local } = req.body;
-                //console.log('query ', req.body)
+                const { descripcion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTA DATOS ORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_empleado_contratos WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_empleado_contratos',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar eu_empleado_contratos con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                const ELIMINAR = yield database_1.default.query(`
-                DELETE FROM eu_empleado_contratos WHERE id = $1 RETURNING *
-                `, [id]);
-                const [datosEliminados] = ELIMINAR.rows;
-                var fechaIngresoE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_ingreso, 'ddd');
-                var fechaSalidaE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_salida, 'ddd');
-                datosEliminados.fecha_ingreso = fechaIngresoE;
-                datosEliminados.fecha_salida = fechaSalidaE;
+                const response = yield database_1.default.query(`
+                INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
+                `, [descripcion]);
+                const [contrato] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_contratos',
+                    tabla: 'e_cat_modalidad_trabajo',
                     usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosEliminados),
-                    datosNuevos: '',
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(contrato),
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
+                if (contrato) {
+                    return res.status(200).jsonp(contrato);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'No se pudo eliminar el registro, error con el servidor' });
+                return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE   **USADO
+    BuscarModalidadLaboralNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.body;
+            const CONTRATOS = yield database_1.default.query(`
+            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+            `, [nombre]);
+            if (CONTRATOS.rowCount != 0) {
+                return res.jsonp(CONTRATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

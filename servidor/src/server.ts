@@ -38,7 +38,6 @@ import DISCAPACIDADES_RUTAS from './rutas/empleado/empleadoDiscapacidad/catDisca
 import HORARIO_RUTA from './rutas/horarios/catHorarioRutas';
 import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorarioRutas';
 import PLANIFICACION_HORARIA_RUTAS from './rutas/horarios/catPlanificacionHorariaRutas';
-
 //EMPLEADOS
 import LOGIN_RUTA from './rutas/login/loginRuta';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRegistro/empleadoRutas';
@@ -53,7 +52,6 @@ import TIMBRES_RUTAS from './rutas/timbres/timbresRutas';
 import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
 import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
-import LICENCIAS_RUTAS from './utils/licencias';
 import GENERO_RUTAS from './rutas/empleado/generos/catGeneroRutas'
 import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
@@ -83,10 +81,7 @@ import GRUPO_OCUPACIONAL_RUTAS from './rutas/modulos/acciones-personal/grupoOcup
 
 // MODULO GEOLOCALIZACION
 import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
-// MODULO RELOJ VIRTUAL
-import RELOJ_VIRTUAL_RUTAS from './utils/reloj_virtual';
 // REPORTES
-import ASISTENCIA_RUTAS from './rutas/reportes/asistenciaRutas';
 import REPORTES_RUTAS from './rutas/reportes/reportesRutas';
 import REPORTES_A_RUTAS from './rutas/reportes/reportesAsistenciaRutas';
 import VACUNAS_REPORTE_RUTAS from './rutas/reportes/reporteVacunasRutas';
@@ -221,10 +216,7 @@ class Servidor {
         this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
         this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);
         this.app.use(`/${ruta}/alimentacion`, ALIMENTACION_RUTAS);
-        // MODULO RELOJ VIRTUAL
-        this.app.use(`/${ruta}/reloj-virtual`, RELOJ_VIRTUAL_RUTAS);
         // REPORTES
-        this.app.use(`/${ruta}/asistencia`, ASISTENCIA_RUTAS);
         this.app.use(`/${ruta}/reportes/vacacion`, KARDEX_VACACION_RUTAS);
         this.app.use(`/${ruta}/reportes/hora-extra`, REPORTE_HORA_EXTRA_RUTAS);
         this.app.use(`/${ruta}/reporte`, REPORTES_RUTAS);
@@ -237,8 +229,6 @@ class Servidor {
         this.app.use(`/${ruta}/reportes-auditoria`, AUDITORIA_RUTAS);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, VACUNAS_REPORTE_RUTAS);
         this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, VACACIONES_REPORTES_RUTAS);
-        // LICENCIAS
-        this.app.use(`/${ruta}/licencias`, LICENCIAS_RUTAS);
     }
 
     start(): void {

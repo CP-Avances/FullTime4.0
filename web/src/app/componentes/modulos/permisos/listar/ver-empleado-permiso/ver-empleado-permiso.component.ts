@@ -16,7 +16,7 @@ import { PermisosService } from 'src/app/servicios/modulos/modulo-permisos/permi
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
-import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
+import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-permisos/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
 
 @Component({
   selector: 'app-ver-empleado-permiso',

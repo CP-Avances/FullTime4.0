@@ -145,7 +145,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO DE BUSQUEDA DE SUCURSALES **USADO
+  // METODO DE BUSQUEDA DE SUCURSALES     **USADO
   public async ListarSucursales(req: Request, res: Response) {
     const SUCURSAL = await pool.query(
       `
@@ -163,7 +163,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTRO **USADO
+  // METODO PARA ELIMINAR REGISTRO      **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, ip_local } = req.body;
@@ -196,7 +196,7 @@ class SucursalControlador {
 
       await pool.query(
         `
-        DELETE FROM e_sucursales WHERE id = $1
+          DELETE FROM e_sucursales WHERE id = $1
         `
         , [id]);
 
@@ -302,8 +302,6 @@ class SucursalControlador {
           data.nom_sucursal = NOMBRE;
           data.ciudad = CIUDAD;
 
-          console.log('dataaaaaaaaaaaaaa: ',data);
-
           if ((data.fila != undefined && data.fila != '') &&
             (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
             (data.ciudad != undefined && data.ciudad != '')) {
@@ -311,7 +309,7 @@ class SucursalControlador {
             // VALIDAR PRIMERO QUE EXISTA LA CIUDAD EN LA TABLA CIUDADES
             const existe_ciudad = await pool.query(
               `
-              SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+                SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
               `
               , [CIUDAD]);
 
@@ -321,8 +319,8 @@ class SucursalControlador {
               // VERIFICACION SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
               const VERIFICAR_SUCURSAL = await pool.query(
                 `
-                SELECT * FROM e_sucursales 
-                WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+                  SELECT * FROM e_sucursales 
+                  WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
                 `
                 , [NOMBRE, id_ciudad.id]);
 
@@ -342,21 +340,15 @@ class SucursalControlador {
                 data.nom_sucursal = data.nom_sucursal.trim();
                 data.ciudad = data.ciudad.trim();
 
-                console.log('dataaa 010101010101: ',data);
-
                 listSucursales.push(data);
               } else {
                 data.fila = ITEM
                 data.nom_sucursal = NOMBRE;
                 data.ciudad = CIUDAD;
                 data.observacion = 'Ya existe en el sistema';
-
                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                 data.nom_sucursal = data.nom_sucursal.trim();
                 data.ciudad = data.ciudad.trim();
-
-                console.log('dataaa 000000000: ',data);
-
                 listSucursales.push(data);
               }
             } else {
@@ -372,9 +364,6 @@ class SucursalControlador {
               //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
               data.nom_sucursal = data.nom_sucursal.trim();
               data.ciudad = data.ciudad.trim();
-
-              console.log('dataaa 111111111: ',data);
-
               listSucursales.push(data);
             }
           } else {
@@ -404,15 +393,11 @@ class SucursalControlador {
             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
             data.nom_sucursal = data.nom_sucursal.trim();
             data.ciudad = data.ciudad.trim();
-
-            console.log('dataaa 222222: ',data);
-
             listSucursales.push(data);
           }
           data = {};
         });
       }
-      //console.log('listaSucursales ', listSucursales)
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -475,7 +460,7 @@ class SucursalControlador {
 
         const response: QueryResult = await pool.query(
           `
-          INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+            INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
           `
           , [nombre, id_ciudad, id_empresa]);
 
@@ -501,13 +486,11 @@ class SucursalControlador {
         await pool.query('ROLLBACK');
         error = true;
       }
-
     }
 
     if (error) {
       return res.status(500).jsonp({ message: 'error' });
     }
-
     return res.status(200).jsonp({ message: 'ok' })
   }
 

@@ -18,12 +18,12 @@ import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
-import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 
 @Component({
   selector: "app-listar-regimen",
@@ -61,7 +61,7 @@ export class ListarRegimenComponent implements OnInit {
   empleado: any = [];
   regimen: any = [];
   rangos_antiguedad: any = [];
-  periodos_vacacionales: any =[];
+  periodos_vacacionales: any = [];
 
   idEmpleado: number; // VARIABLE QUE ALMACENA EL ID DEL EMPELADO QUE INICIA SESIÓN
 
@@ -102,13 +102,18 @@ export class ListarRegimenComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -126,7 +131,7 @@ export class ListarRegimenComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
@@ -380,7 +385,7 @@ export class ListarRegimenComponent implements OnInit {
     this.regimen.forEach((obj: any) => {
       const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
       const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
-      
+
       // BLOQUE 1 – INFORMACION GENERAL
       bloques.push({
         style: 'tableMarginCabeceraHorario',
@@ -394,7 +399,7 @@ export class ListarRegimenComponent implements OnInit {
               { text: `CÓDIGO: ${obj.id}`, style: 'itemsTableInfoHorario', border: [false, true, true, false] }
             ],
             [
-              { text: `PERIODO LABORAL: ${obj.mes_periodo}`+' Meses', style: 'itemsTableInfoHorario', border: [true, false, false, true] },
+              { text: `PERIODO LABORAL: ${obj.mes_periodo}` + ' Meses', style: 'itemsTableInfoHorario', border: [true, false, false, true] },
               { text: `DÍAS POR MES: ${obj.dias_mes}`, style: 'itemsTableInfoHorario', border: [false, false, false, true] },
               {
                 text: `TIEMPO MÍNIMO: ${obj.trabajo_minimo_mes > 0 ? obj.trabajo_minimo_mes + ' Meses' : obj.trabajo_minimo_horas + ' Horas'}`,
@@ -406,7 +411,7 @@ export class ListarRegimenComponent implements OnInit {
           ]
         }
       });
-  
+
       // BLOQUES 
       bloques.push({
         columns: [
@@ -438,15 +443,15 @@ export class ListarRegimenComponent implements OnInit {
                     [{ text: 'VACACIONES POR PERÍODOS', style: 'tableHeader' }, { text: obj.vacacion_divisible ? 'SI' : 'NO', style: 'itemsTableCentrado' }],
                     ...(obj.vacacion_divisible
                       ? (
-                          periodos.length > 0
+                        periodos.length > 0
                           ? periodos.map((p: any) => [
-                              { text: p.descripcion, style: 'tableHeader' },
-                              { text: `${p.dias_vacacion} días`, style: 'itemsTableCentrado' }
-                            ])
+                            { text: p.descripcion, style: 'tableHeader' },
+                            { text: `${p.dias_vacacion} días`, style: 'itemsTableCentrado' }
+                          ])
                           : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]]
-                        )
+                      )
                       : [])
-                    
+
                   ]
                 },
                 layout: {
@@ -455,7 +460,7 @@ export class ListarRegimenComponent implements OnInit {
               }
             ]
           },
-  
+
           // BLOQUE 3 – VACACIONES GANADAS
           {
             width: '34%',
@@ -505,23 +510,23 @@ export class ListarRegimenComponent implements OnInit {
                 table: {
                   widths: ['60%', '40%'],
                   body:
-                  obj.antiguedad_fija
-                    ? [
+                    obj.antiguedad_fija
+                      ? [
                         [{ text: 'TIPO', style: 'tableHeader' }, { text: 'FIJA', style: 'itemsTableCentrado' }],
                         [{ text: 'AÑOS ANTIGÜEDAD', style: 'tableHeader' }, { text: obj.anio_antiguedad, style: 'itemsTableCentrado' }],
                         [{ text: 'DÍAS ADICIONALES', style: 'tableHeader' }, { text: obj.dias_antiguedad, style: 'itemsTableCentrado' }]
                       ]
-                    : obj.antiguedad_variable
-                      ? [
+                      : obj.antiguedad_variable
+                        ? [
                           [{ text: 'TIPO', style: 'tableHeader' }, { text: 'VARIABLE', style: 'itemsTableCentrado' }],
                           ...(rangos.length > 0
                             ? rangos.map((r: any) => [
-                                { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta} años`, style: 'tableHeader' },
-                                { text: `${r.dias_antiguedad} días`, style: 'itemsTableCentrado' }
-                              ])
+                              { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta} años`, style: 'tableHeader' },
+                              { text: `${r.dias_antiguedad} días`, style: 'itemsTableCentrado' }
+                            ])
                             : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]])
                         ]
-                      : [[{ colSpan: 2, text: 'NO APLICA', style: 'itemsTableCentrado' }, {}]]
+                        : [[{ colSpan: 2, text: 'NO APLICA', style: 'itemsTableCentrado' }, {}]]
 
                 },
                 layout: {
@@ -533,7 +538,7 @@ export class ListarRegimenComponent implements OnInit {
         ]
       });
     });
-  
+
     return bloques;
   }
 
@@ -551,17 +556,17 @@ export class ListarRegimenComponent implements OnInit {
 
       const textoPeriodos = obj.vacacion_divisible
         ? (periodos.length > 0
-            ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       const textoRangos = obj.antiguedad_variable
         ? (rangos.length > 0
-            ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
-      // Tipo antigüedad
+      // TIPO ANTIGÜEDAD
       let tipoAntiguedad = 'NO APLICA';
       if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
       if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';
@@ -735,7 +740,7 @@ export class ListarRegimenComponent implements OnInit {
       let tipoAntiguedad = 'NO APLICA';
       if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
       if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';
-  
+
       const objeto = {
         regimen_laboral: {
           $: { id: obj.id },
@@ -762,23 +767,23 @@ export class ListarRegimenComponent implements OnInit {
           dias_adicionales: obj.dias_antiguedad,
           detalle_vacaciones_periodos: obj.vacacion_divisible
             ? (periodos.length > 0
-                ? { periodo: periodos.map(p => ({ descripcion: p.descripcion, dias: p.dias_vacacion })) }
-                : 'NO DEFINIDO')
+              ? { periodo: periodos.map(p => ({ descripcion: p.descripcion, dias: p.dias_vacacion })) }
+              : 'NO DEFINIDO')
             : 'NO APLICA',
           detalle_rangos_antiguedad_variable: obj.antiguedad_variable
             ? (rangos.length > 0
-                ? { rango: rangos.map(r => ({ desde: r.anio_desde, hasta: r.anio_hasta, dias: r.dias_antiguedad })) }
-                : 'NO DEFINIDO')
+              ? { rango: rangos.map(r => ({ desde: r.anio_desde, hasta: r.anio_hasta, dias: r.dias_antiguedad })) }
+              : 'NO DEFINIDO')
             : 'NO APLICA',
         },
       };
       arregloRegimen.push(objeto);
     });
-  
+
     const xmlBuilder = new xml2js.Builder({ rootName: 'Regimen_laboral_listado', xmldec: { version: '1.0', encoding: 'UTF-8' } });
     const xml = xmlBuilder.buildObject({ regimen: arregloRegimen });
     if (!xml) return;
-  
+
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
     const newTab = window.open(xmlUrl, '_blank');
@@ -793,7 +798,7 @@ export class ListarRegimenComponent implements OnInit {
     a.download = 'Regimen_laboral.xml';
     a.click();
     this.ObtenerRegimen();
-  }  
+  }
 
   /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
@@ -810,14 +815,14 @@ export class ListarRegimenComponent implements OnInit {
 
       const textoPeriodos = obj.vacacion_divisible
         ? (periodos.length > 0
-            ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       const textoRangos = obj.antiguedad_variable
         ? (rangos.length > 0
-            ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       let tipoAntiguedad = 'NO APLICA';
@@ -1042,23 +1047,23 @@ export class ListarRegimenComponent implements OnInit {
     }
   }
 
-  getCrearRegimenLaboral(){
+  getCrearRegimenLaboral() {
     return this.tienePermiso('Crear Régimen Laboral');
   }
 
-  getVerRegimenLaboral(){
+  getVerRegimenLaboral() {
     return this.tienePermiso('Ver Régimen Laboral');
   }
 
-  getEditarRegimenLaboral(){
+  getEditarRegimenLaboral() {
     return this.tienePermiso('Editar Régimen Laboral');
   }
 
-  getEliminarRegimenLaboral(){
+  getEliminarRegimenLaboral() {
     return this.tienePermiso('Eliminar Régimen Laboral');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Régimen Laboral', 5);
   }
 

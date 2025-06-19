@@ -1,6 +1,7 @@
 // SECCION LIBRERIAS
-import { ObtenerRuta, ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';
+import { ObtenerRuta, ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
@@ -12,7 +13,6 @@ import pool from '../../../database';
 import path from 'path';
 import sharp from 'sharp';
 import fs from 'fs';
-import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';
 
 class EmpleadoControlador {
 
@@ -218,9 +218,28 @@ class EmpleadoControlador {
   }
 
 
-  /** ** ********************************************************************************************* ** 
-   ** ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** ** 
-   ** ** ********************************************************************************************* **/
+  /** ********************************************************************************************* ** 
+   ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** ** 
+   ** ********************************************************************************************* **/
+
+  // BUSQUEDA DE UN SOLO EMPLEADO  **USADO
+  public async BuscarEmpleado(req: Request, res: Response): Promise<any> {
+    const { id } = req.params;
+    const EMPLEADO = await pool.query(
+      `
+        SELECT e.*, r.nombre AS rol FROM eu_empleados e
+        INNER JOIN eu_usuarios u ON e.id = u.id_empleado 
+        INNER JOIN ero_cat_roles r ON u.id_rol = r.id
+        WHERE e.id = $1
+      `
+      , [id]);
+    if (EMPLEADO.rowCount != 0) {
+      return res.jsonp(EMPLEADO.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
 
   // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS    **USADO
   public async InsertarEmpleado(req: Request, res: Response) {
@@ -283,13 +302,14 @@ class EmpleadoControlador {
       const { identificacion, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
         domicilio, telefono, id_nacionalidad, codigo, user_name, ip, ip_local, numero_partida_individual, tipo_identificacion } = req.body;
       const partidaFinal = numero_partida_individual === '' ? null : numero_partida_individual;
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
       const empleado = await pool.query(
         `
-        SELECT * FROM eu_empleados WHERE id = $1
+          SELECT * FROM eu_empleados WHERE id = $1
         `
         , [id]);
 
@@ -460,53 +480,13 @@ class EmpleadoControlador {
     }
   }
 
-  // BUSQUEDA DE UN SOLO EMPLEADO  **USADO
-  public async BuscarEmpleado(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const EMPLEADO = await pool.query(
-      `
-      SELECT e.*, r.nombre AS rol FROM eu_empleados e
-      INNER JOIN eu_usuarios u ON e.id = u.id_empleado 
-      INNER JOIN ero_cat_roles r ON u.id_rol = r.id
-      WHERE e.id = $1
-      `
-      , [id]);
-    if (EMPLEADO.rowCount != 0) {
-      return res.jsonp(EMPLEADO.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-  // BUSQUEDA DE INFORMACION ESPECIFICA DE EMPLEADOS
-  public async ListarBusquedaEmpleados(req: Request, res: Response): Promise<any> {
-    const empleado = await pool.query(
-      `
-      SELECT id, nombre, apellido FROM eu_empleados ORDER BY apellido
-      `
-    ).then((result: any) => {
-      return result.rows.map((obj: any) => {
-        return {
-          id: obj.id,
-          empleado: obj.apellido + ' ' + obj.nombre
-        }
-      })
-    })
-
-    res.jsonp(empleado);
-  }
-
   // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA    **USADO
   public async Listar(req: Request, res: Response) {
-
     const empleado = await pool.query(
       `
-      SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
+        SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
       `
     );
-
-    console.log('empleado', empleado.rowCount);
     return res.jsonp(empleado.rows);
   }
 
@@ -517,10 +497,8 @@ class EmpleadoControlador {
       SELECT * FROM eu_empleados WHERE estado = 2 ORDER BY id
       `
     );
-    console.log('empleado desactivado', empleado.rowCount);
     res.jsonp(empleado.rows);
   }
-
 
   // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA   **USADO
   public async DesactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
@@ -632,7 +610,7 @@ class EmpleadoControlador {
           // CONSULTAR DATOS ORIGINALES
           const empleado = await pool.query(
             `
-            SELECT * FROM eu_empleados WHERE id = $1
+              SELECT * FROM eu_empleados WHERE id = $1
             `,
             [obj]
           );
@@ -640,7 +618,7 @@ class EmpleadoControlador {
 
           const usuario = await pool.query(
             `
-            SELECT * FROM eu_usuarios WHERE id_empleado = $1
+              SELECT * FROM eu_usuarios WHERE id_empleado = $1
             `,
             [obj]
           );
@@ -677,7 +655,7 @@ class EmpleadoControlador {
           // 1 => ACTIVADO
           await pool.query(
             `
-            UPDATE eu_empleados SET estado = 1 WHERE id = $1
+              UPDATE eu_empleados SET estado = 1 WHERE id = $1
             `,
             [obj]
           );
@@ -699,7 +677,7 @@ class EmpleadoControlador {
           // TRUE => TIENE ACCESO
           await pool.query(
             `
-            UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+              UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
             `,
             [obj]
           );
@@ -749,7 +727,7 @@ class EmpleadoControlador {
 
       const unEmpleado = await pool.query(
         `
-        SELECT * FROM eu_empleados WHERE id = $1
+          SELECT * FROM eu_empleados WHERE id = $1
         `
         , [id]);
 
@@ -760,7 +738,6 @@ class EmpleadoControlador {
         let verificar_imagen = 0;
         // RUTA DE LA CARPETA IMAGENES DEL USUARIO
         const carpetaImagenes = await ObtenerRutaUsuario(id);
-        console.log('carpetaImagenes_', carpetaImagenes);
         // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
         fs.access(carpetaImagenes, fs.constants.F_OK, (err) => {
           if (err) {
@@ -809,7 +786,7 @@ class EmpleadoControlador {
           // CONSULTAR DATOSORIGINALES
           const empleado = await pool.query(
             `
-            SELECT * FROM eu_empleados WHERE id = $1
+              SELECT * FROM eu_empleados WHERE id = $1
             `
             , [id]);
           const [datosOriginales] = empleado.rows;
@@ -833,12 +810,11 @@ class EmpleadoControlador {
 
           await pool.query(
             `
-            UPDATE eu_empleados SET imagen = $2 WHERE id = $1
+              UPDATE eu_empleados SET imagen = $2 WHERE id = $1
             `
             , [id, imagen]);
 
           const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
-
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -869,329 +845,6 @@ class EmpleadoControlador {
   }
 
 
-  // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
-  public async GeolocalizacionCrokis(req: Request, res: Response): Promise<Response> {
-    let id = req.params.id
-    let { lat, lng, user_name, ip, ip_local } = req.body
-    try {
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const empleado = await pool.query(
-        `
-        SELECT * FROM eu_empleados WHERE id = $1
-        `
-        , [id]);
-      const [datosOriginales] = empleado.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_empleados',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
-      }
-
-      const datosNuevos = await pool.query(
-        `
-        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3 RETURNING *
-        `
-        , [lat, lng, id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_empleados',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.status(200).jsonp({ message: 'Registro actualizado.' });
-
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: error });
-    }
-  }
-
-  /** **************************************************************************************** **
-   ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** ** 
-   ** **************************************************************************************** **/
-
-  // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
-  public async ObtenerTitulosEmpleado(req: Request, res: Response): Promise<any> {
-    const { id_empleado } = req.params;
-    const unEmpleadoTitulo = await pool.query(
-      `
-      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
-        et.id_empleado, ct.nombre, nt.nombre as nivel
-      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
-      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
-      ORDER BY id
-      `
-      , [id_empleado]);
-    if (unEmpleadoTitulo.rowCount != 0) {
-      return res.jsonp(unEmpleadoTitulo.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-  // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
-  public async ObtenerTituloEspecifico(req: Request, res: Response): Promise<any> {
-    const { id_empleado, id_titulo } = req.body;
-    const unEmpleadoTitulo = await pool.query(
-      `
-      SELECT et.id
-      FROM eu_empleado_titulos AS et
-      WHERE et.id_empleado = $1 AND et.id_titulo = $2
-      `
-      , [id_empleado, id_titulo]);
-    if (unEmpleadoTitulo.rowCount != 0) {
-      return res.jsonp(unEmpleadoTitulo.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-  // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
-  public async CrearEmpleadoTitulos(req: Request, res: Response): Promise<void> {
-    try {
-      const { observacion, id_empleado, id_titulo, user_name, ip, ip_local } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      const usuario = await pool.query(
-        `
-        SELECT id FROM eu_usuarios WHERE id_empleado = $1
-        `
-        , [id_empleado]);
-
-      const id_usuario = usuario.rows[0].id;
-
-
-      const datosNuevos = await pool.query(
-        `
-        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4) RETURNING *
-        `
-        , [observacion, id_empleado, id_titulo, id_usuario]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_empleado_titulos',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      res.jsonp({ message: 'Registro guardado.' });
-
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'error' });
-    }
-  }
-
-  // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
-  public async EditarTituloEmpleado(req: Request, res: Response): Promise<Response> {
-    try {
-      const id = req.params.id_empleado_titulo;
-      const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
-      const [datosOriginales] = empleado.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_empleado_titulos',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
-      }
-
-      const datosNuevos = await pool.query(
-        `
-        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3 RETURNING *
-        `
-        , [observacion, id_titulo, id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_empleado_titulos',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Registro actualizado.' });
-
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
-    }
-  }
-
-  // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
-  public async EliminarTituloEmpleado(req: Request, res: Response): Promise<Response> {
-    try {
-      const { user_name, ip, ip_local } = req.body;
-      const id = req.params.id_empleado_titulo;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
-      const [datosOriginales] = empleado.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_empleado_titulos',
-          usuario: user_name,
-          accion: 'D',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          ip_local: ip_local,
-          observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al eliminar titulo del empleado.' });
-      }
-
-      await pool.query(
-        `
-        DELETE FROM eu_empleado_titulos WHERE id = $1
-        `
-        , [id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_empleado_titulos',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Registro eliminado.' });
-
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
-    }
-  }
-
-
-  /** ******************************************************************************************* **
-   ** **               CONSULTAS DE COORDENADAS DE UBICACION DEL USUARIO                       ** ** 
-   ** ******************************************************************************************* **/
-
-  // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
-  public async BuscarCoordenadas(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const UBICACION = await pool.query(
-      `
-      SELECT longitud, latitud FROM eu_empleados WHERE id = $1
-      `
-      , [id]);
-    if (UBICACION.rowCount != 0) {
-      return res.jsonp(UBICACION.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se ha encontrado registros.' });
-    }
-  }
-
-  // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
-  public async BuscarEmpleadoNombre(req: Request, res: Response): Promise<any> {
-    const { informacion } = req.body;
-    const EMPLEADO = await pool.query(
-      `
-      SELECT * FROM informacion_general WHERE
-      (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
-      `
-      , [informacion]);
-    if (EMPLEADO.rowCount != 0) {
-      return res.jsonp(EMPLEADO.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-  // BUSQUEDA DE IMAGEN DE EMPLEADO
-  public async BuscarImagen(req: Request, res: Response): Promise<any> {
-    const imagen = req.params.imagen;
-    const id = req.params.id;
-    let separador = path.sep;
-
-    let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
-    console.log('ver file ', ruta)
-
-    fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        res.sendFile(path.resolve(ruta));
-      }
-    });
-  }
-
   // METODO PARA CONVERTIR IMAGEN EN BASE64 **USADO
   public async CodificarImagenBase64(req: Request, res: Response): Promise<any> {
     const imagen = req.params.imagen;
@@ -1218,8 +871,6 @@ class EmpleadoControlador {
       res.status(200).jsonp({ imagen: 0 })
     }
   }
-
-
 
   // METODO PARA ELIMINAR REGISTROS    **USADO
   public async EliminarEmpleado(req: Request, res: Response) {
@@ -1343,6 +994,165 @@ class EmpleadoControlador {
     return res.jsonp({ message: 'Usuarios eliminados correctamente.' });
   }
 
+  // BUSQUEDA DE INFORMACION ESPECIFICA DE EMPLEADOS
+  public async ListarBusquedaEmpleados(req: Request, res: Response): Promise<any> {
+    const empleado = await pool.query(
+      `
+      SELECT id, nombre, apellido FROM eu_empleados ORDER BY apellido
+      `
+    ).then((result: any) => {
+      return result.rows.map((obj: any) => {
+        return {
+          id: obj.id,
+          empleado: obj.apellido + ' ' + obj.nombre
+        }
+      })
+    })
+
+    res.jsonp(empleado);
+  }
+
+  // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
+  public async BuscarEmpleadoNombre(req: Request, res: Response): Promise<any> {
+    const { informacion } = req.body;
+    const EMPLEADO = await pool.query(
+      `
+        SELECT * FROM informacion_general WHERE
+        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+      `
+      , [informacion]);
+    if (EMPLEADO.rowCount != 0) {
+      return res.jsonp(EMPLEADO.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
+
+  // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
+  public async CrearCarpetasEmpleado(req: Request, res: Response) {
+    const { empleados, permisos, vacaciones, horasExtras } = req.body;
+    let errorOccurred = false;
+
+    for (const e of empleados) {
+      const { codigo, identificacion } = e;
+
+      if (permisos) {
+        const carpetaPermisos = await ObtenerRuta(codigo, identificacion, 'permisos');
+        try {
+          await fs.promises.access(carpetaPermisos, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaPermisos, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
+      }
+
+      if (vacaciones) {
+        const carpetaVacaciones = await ObtenerRuta(codigo, identificacion, 'vacaciones');
+        try {
+          await fs.promises.access(carpetaVacaciones, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaVacaciones, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
+      }
+
+      if (horasExtras) {
+        const carpetaHorasExtras = await ObtenerRuta(codigo, identificacion, 'horasExtras');
+        try {
+          await fs.promises.access(carpetaHorasExtras, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaHorasExtras, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
+      }
+    }
+
+    if (errorOccurred) {
+      res.status(500).jsonp({ message: 'Ups! se produjo un error al crear las carpetas.' });
+    } else {
+      res.jsonp({ message: 'Carpetas creadas con éxito.' });
+    }
+  }
+
+  // METODO PARA CONSULTAR INFORMACION DE CONTRATOS   **USADO
+  public async getContratosCargos(req: Request, res: Response) {
+    const { id_empleado } = req.body
+    try {
+
+      var listaCargos: any = [];
+      var listaContratos: any = []
+
+      const contratos: QueryResult = await pool.query(
+        `
+        SELECT 
+	        emC.id, emC.id_empleado as id_empleado, emC.id_modalidad_laboral, 
+          moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
+          emC.controlar_asistencia,  reg.descripcion as regimen
+        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda, ere_cat_regimenes AS reg
+        WHERE 
+	        emc.id_empleado = $1 AND
+	        moda.id = emC.id_modalidad_laboral AND
+			    reg.id = emc.id_regimen
+        `, [id_empleado]);
+      listaContratos = contratos.rows;
+
+      listaContratos.forEach(async (item: any) => {
+        const cargos: QueryResult = await pool.query(
+          `
+          SELECT 
+            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre as sucursal, 
+            emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
+            emC.jefe, emC.estado
+          FROM 
+            eu_empleado_cargos AS emC, ed_departamentos AS ed, 
+            e_sucursales AS su, e_cat_tipo_cargo AS carg
+          WHERE 
+            emc.id_contrato = $1 AND
+            ed.id = emC.id_departamento AND
+            su.id = ed.id_sucursal AND
+            carg.id = emC.id_tipo_cargo
+          `, [item.id]);
+
+        const Cargos = cargos.rows;
+        Cargos.forEach((item: any) => {
+          listaCargos.push(item);
+        })
+
+      })
+
+      setTimeout(() => {
+        return res.status(200).jsonp({ listacontratos: listaContratos, listacargos: listaCargos });
+      }, 2000);
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
+  }
+
+  // BUSQUEDA DE IMAGEN DE EMPLEADO
+  public async BuscarImagen(req: Request, res: Response): Promise<any> {
+    const imagen = req.params.imagen;
+    const id = req.params.id;
+    let separador = path.sep;
+    let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        res.sendFile(path.resolve(ruta));
+      }
+    });
+  }
 
   /** **************************************************************************************** **
    ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            ** 
@@ -1807,7 +1617,7 @@ class EmpleadoControlador {
         var app_habilita = false;
 
         //OBTENER ID DE LA NACIONALIDAD
-        const id_nacionalidad = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,[nacionalidad.toUpperCase()]);
+        const id_nacionalidad = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [nacionalidad.toUpperCase()]);
 
         //OBTENER ID DEL ROL
         const id_rol = await pool.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [rol.toUpperCase()]);
@@ -2409,7 +2219,7 @@ class EmpleadoControlador {
         var app_habilita = false;
 
         // OBTENER ID DE LA NACIONALIDAD
-        const id_nacionalidad = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`,[nacionalidad.toUpperCase()]);
+        const id_nacionalidad = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [nacionalidad.toUpperCase()]);
 
         // OBTENER ID DEL ROL
         const id_rol = await pool.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [rol.toUpperCase()]);
@@ -2513,65 +2323,299 @@ class EmpleadoControlador {
     }
   }
 
-  /** **************************************************************************************** **
-   ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           ** 
-   ** **************************************************************************************** **/
+  /** ********************************************************************************************* **
+   ** **               CONSULTAS DE GEOLOCALIZACION DEL USUARIO                                  ** ** 
+   ** ********************************************************************************************* **/
 
-  // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
-  public async CrearCarpetasEmpleado(req: Request, res: Response) {
-    const { empleados, permisos, vacaciones, horasExtras } = req.body;
-    let errorOccurred = false;
-
-    for (const e of empleados) {
-      const { codigo, identificacion } = e;
-
-      if (permisos) {
-        const carpetaPermisos = await ObtenerRuta(codigo, identificacion, 'permisos');
-        try {
-          await fs.promises.access(carpetaPermisos, fs.constants.F_OK);
-        } catch (error) {
-          try {
-            await fs.promises.mkdir(carpetaPermisos, { recursive: true });
-          } catch (error) {
-            errorOccurred = true;
-          }
-        }
-      }
-
-      if (vacaciones) {
-        const carpetaVacaciones = await ObtenerRuta(codigo, identificacion, 'vacaciones');
-        try {
-          await fs.promises.access(carpetaVacaciones, fs.constants.F_OK);
-        } catch (error) {
-          try {
-            await fs.promises.mkdir(carpetaVacaciones, { recursive: true });
-          } catch (error) {
-            errorOccurred = true;
-          }
-        }
-      }
-
-      if (horasExtras) {
-        const carpetaHorasExtras = await ObtenerRuta(codigo, identificacion, 'horasExtras');
-        try {
-          await fs.promises.access(carpetaHorasExtras, fs.constants.F_OK);
-        } catch (error) {
-          try {
-            await fs.promises.mkdir(carpetaHorasExtras, { recursive: true });
-          } catch (error) {
-            errorOccurred = true;
-          }
-        }
-      }
+  // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
+  public async BuscarCoordenadas(req: Request, res: Response): Promise<any> {
+    const { id } = req.params;
+    const UBICACION = await pool.query(
+      `
+        SELECT longitud, latitud FROM eu_empleados WHERE id = $1
+      `
+      , [id]);
+    if (UBICACION.rowCount != 0) {
+      return res.jsonp(UBICACION.rows)
     }
-
-    if (errorOccurred) {
-      res.status(500).jsonp({ message: 'Ups! se produjo un error al crear las carpetas.' });
-    } else {
-      res.jsonp({ message: 'Carpetas creadas con éxito.' });
+    else {
+      return res.status(404).jsonp({ text: 'No se ha encontrado registros.' });
     }
   }
-  //------------------------------ Metodos de APP MOVIL -----------------------------------------------------------------------------
+
+  // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
+  public async GeolocalizacionCrokis(req: Request, res: Response): Promise<Response> {
+    let id = req.params.id
+    let { lat, lng, user_name, ip, ip_local } = req.body
+    try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query(
+        `
+        SELECT * FROM eu_empleados WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
+      }
+
+      const datosNuevos = await pool.query(
+        `
+        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3 RETURNING *
+        `
+        , [lat, lng, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleados',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.status(200).jsonp({ message: 'Registro actualizado.' });
+
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
+    }
+  }
+
+  /** **************************************************************************************** **
+   ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** ** 
+   ** **************************************************************************************** **/
+
+  // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
+  public async ObtenerTitulosEmpleado(req: Request, res: Response): Promise<any> {
+    const { id_empleado } = req.params;
+    const unEmpleadoTitulo = await pool.query(
+      `
+      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
+        et.id_empleado, ct.nombre, nt.nombre as nivel
+      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
+      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
+      ORDER BY id
+      `
+      , [id_empleado]);
+    if (unEmpleadoTitulo.rowCount != 0) {
+      return res.jsonp(unEmpleadoTitulo.rows)
+    }
+    else {
+      res.status(404).jsonp({ text: 'No se encuentran registros.' });
+    }
+  }
+
+  // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
+  public async CrearEmpleadoTitulos(req: Request, res: Response): Promise<void> {
+    try {
+      const { observacion, id_empleado, id_titulo, user_name, ip, ip_local } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      const usuario = await pool.query(
+        `
+          SELECT id FROM eu_usuarios WHERE id_empleado = $1
+        `
+        , [id_empleado]);
+
+      const id_usuario = usuario.rows[0].id;
+
+
+      const datosNuevos = await pool.query(
+        `
+          INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4) RETURNING *
+        `
+        , [observacion, id_empleado, id_titulo, id_usuario]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_titulos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: 'error' });
+    }
+  }
+
+  // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
+  public async ObtenerTituloEspecifico(req: Request, res: Response): Promise<any> {
+    const { id_empleado, id_titulo } = req.body;
+    const unEmpleadoTitulo = await pool.query(
+      `
+      SELECT et.id
+      FROM eu_empleado_titulos AS et
+      WHERE et.id_empleado = $1 AND et.id_titulo = $2
+      `
+      , [id_empleado, id_titulo]);
+    if (unEmpleadoTitulo.rowCount != 0) {
+      return res.jsonp(unEmpleadoTitulo.rows)
+    }
+    else {
+      res.status(404).jsonp({ text: 'No se encuentran registros.' });
+    }
+  }
+
+  // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
+  public async EditarTituloEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id_empleado_titulo;
+      const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_titulos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
+      }
+
+      const datosNuevos = await pool.query(
+        `
+        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3 RETURNING *
+        `
+        , [observacion, id_titulo, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_titulos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
+  }
+
+  // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
+  public async EliminarTituloEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip, ip_local } = req.body;
+      const id = req.params.id_empleado_titulo;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_titulos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          ip_local: ip_local,
+          observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al eliminar titulo del empleado.' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM eu_empleado_titulos WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_titulos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip: ip,
+        ip_local: ip_local,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
+  }
+
+
+
+  /** ******************************************************************************************** **
+   ** **      M E T O D O S   U S A D O S    E N    L A    A P L I C A C I O N    M O V I L     ** ** 
+   ** ******************************************************************************************** **/
 
   public async getHorariosEmpleadoByCodigo(req: Request, res: Response): Promise<Response> {
     try {
@@ -2673,80 +2717,20 @@ class EmpleadoControlador {
     }
   };
 
-  /** **************************************************************************************** **
-  ** **              OPTIENE LA INFORMACION DE CONTRATOS Y CARGOS POR EMPLEADO                ** 
-  ** **************************************************************************************** **/
-  public async getContratosCargos(req: Request, res: Response) {
-    const { id_empleado } = req.body
-    try {
-
-      var listaCargos: any = [];
-      var listaContratos: any = []
-
-      const contratos: QueryResult = await pool.query(
-        `
-        SELECT 
-	        emC.id, emC.id_empleado as id_empleado, emC.id_modalidad_laboral, 
-          moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
-          emC.controlar_asistencia,  reg.descripcion as regimen
-        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda, ere_cat_regimenes AS reg
-        WHERE 
-	        emc.id_empleado = $1 AND
-	        moda.id = emC.id_modalidad_laboral AND
-			    reg.id = emc.id_regimen
-        `, [id_empleado]);
-      listaContratos = contratos.rows;
-
-      listaContratos.forEach(async (item: any) => {
-        const cargos: QueryResult = await pool.query(
-          `
-          SELECT 
-            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre as sucursal, 
-            emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
-            emC.jefe, emC.estado
-          FROM 
-            eu_empleado_cargos AS emC, ed_departamentos AS ed, 
-            e_sucursales AS su, e_cat_tipo_cargo AS carg
-          WHERE 
-            emc.id_contrato = $1 AND
-            ed.id = emC.id_departamento AND
-            su.id = ed.id_sucursal AND
-            carg.id = emC.id_tipo_cargo
-          `, [item.id]);
-
-        const Cargos = cargos.rows;
-        Cargos.forEach((item: any) => {
-          listaCargos.push(item);
-        })
-
-      })
-
-      setTimeout(() => {
-        return res.status(200).jsonp({ listacontratos: listaContratos, listacargos: listaCargos });
-      }, 2000);
-
-    } catch (error) {
-      console.log(error);
-      return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-    }
-  }
-
-
-
-
 }
 
 export const EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 export default EMPLEADO_CONTROLADOR;
 
-
+// METODO PARA VALIDAR NUMERO DE CEDULA ECUATORIANA   **USADO
 export async function ValidarCedula(cedula: string): Promise<boolean> {
-  const result = await pool.query(`
-    SELECT descripcion 
-    FROM ep_detalle_parametro 
-    WHERE id_parametro = 36 
-    LIMIT 1
-  `);
+  const result = await pool.query(
+    `
+      SELECT descripcion 
+      FROM ep_detalle_parametro 
+      WHERE id_parametro = 36 
+      LIMIT 1
+    `);
 
   const activarValidacion = result.rows[0]?.descripcion?.toLowerCase().trim() === 'si';
 
@@ -2783,7 +2767,7 @@ export async function ValidarCedula(cedula: string): Promise<boolean> {
   }
 }
 
-//METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA COMPLETA
+// METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA COMPLETA    **USADO 
 export async function validarEmpleadoCompleto(
   data: any,
   regex: any,
@@ -2831,35 +2815,35 @@ export async function validarEmpleadoCompleto(
   }
   if (!valiContra.test(data.contrasena.toString())) {
     if (data.contrasena.toString().length <= 10) {
-          if (data.correo == undefined || !regexCorreo.test(data.correo)) {
-            data.observacion = 'Verificar correo';
+      if (data.correo == undefined || !regexCorreo.test(data.correo)) {
+        data.observacion = 'Verificar correo';
+        return;
+      }
+      if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
+        if (LONGITUD != undefined || LATITUD != undefined) {
+          if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+            data.observacion = 'Verificar ubicación';
             return;
           }
-          if (DateTime.fromFormat(data.fec_nacimiento, 'yyyy-MM-dd').isValid) {
-            if (LONGITUD != undefined || LATITUD != undefined) {
-              if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                data.observacion = 'Verificar ubicación';
-                return;
-              }
-            } else if (LONGITUD == undefined || LATITUD == undefined) {
-              data.observacion = 'Verificar ubicación';
+        } else if (LONGITUD == undefined || LATITUD == undefined) {
+          data.observacion = 'Verificar ubicación';
+          return;
+        }
+        if (TELEFONO != undefined) {
+          if (regex.test(data.telefono.toString())) {
+            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+              data.observacion = 'El teléfono ingresado no es válido';
               return;
             }
-            if (TELEFONO != undefined) {
-              if (regex.test(data.telefono.toString())) {
-                if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                  data.observacion = 'El teléfono ingresado no es válido';
-                  return;
-                }
-              } else {
-                data.observacion = 'El teléfono ingresado no es válido';
-                return;
-              }
-            }
           } else {
-            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+            data.observacion = 'El teléfono ingresado no es válido';
             return;
           }
+        }
+      } else {
+        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+        return;
+      }
     } else {
       data.observacion = 'La contraseña debe tener máximo 10 caracteres';
       return;
@@ -2954,7 +2938,7 @@ export async function validarEmpleadoCompleto(
   data.observacion = 'no registrado';
 }
 
-//METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA INCOMPLETA
+// METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA INCOMPLETA   **USADO
 export async function validarEmpleadoIncompleto(
   data: any,
   ITEM: any,

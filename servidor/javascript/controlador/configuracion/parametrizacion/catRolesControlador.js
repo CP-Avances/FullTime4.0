@@ -81,7 +81,7 @@ class RolesControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR ROL
+    // METODO PARA REGISTRAR ROL   **USADO
     CrearRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -113,7 +113,7 @@ class RolesControlador {
             }
         });
     }
-    // LISTAR ROLES A EXCEPCION EL QUE SE EDITA **USADO
+    // LISTAR ROLES A EXCEPCION EL QUE SE EDITA     **USADO
     ListarRolesActualiza(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -128,7 +128,7 @@ class RolesControlador {
             }
         });
     }
-    // METODO PARA LISTAR INFORMACION DEL ROL **USADO
+    // METODO PARA LISTAR INFORMACION DEL ROL    **USADO
     ObtenerUnRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -143,7 +143,7 @@ class RolesControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR ROLES  **USADO
+    // METODO PARA ACTUALIZAR ROLES    **USADO
     ActualizarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -192,7 +192,7 @@ class RolesControlador {
             }
         });
     }
-    // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS  **USADO
+    // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS     **USADO
     ActualizarRolUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

@@ -5,6 +5,7 @@ import { catchError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+
 export class NivelTitulosService {
 
   constructor(
@@ -24,6 +25,7 @@ export class NivelTitulosService {
     };
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
+
   // METODO PARA REGISTRAR NIVEL DE TITULO    **USADO
   RegistrarNivel(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/nivel-titulo`, data);

@@ -6,13 +6,13 @@ import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { DateTime, WeekdayNumbers } from 'luxon';
 
 
-import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
+import { HorasExtrasRealesService } from 'src/app/servicios/reportes/modulos/horasExtrasReales/horas-extras-reales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { CiudadFeriadosService } from 'src/app/servicios/horarios/ciudadFeriados/ciudad-feriados.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { EntradasSalidas } from 'src/app/model/timbres.model';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -284,7 +284,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     }
     this.empleadoHorario = [];
     this.empleadoPlan = [];
-
+/*  este método no existe
     // BUSQUEDA de la lista de los horarios del empleado
     this.restHorario.ObtenerHorariosFechasEmpleado(codigo, fechas).subscribe(data => {
       this.empleadoHorario = data;
@@ -301,7 +301,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
         this.VerArchivos(codigo, archivo, form, fechasTotales);
       })*/
 
-    }, error => {
+  //  }, error => {
       // BUSQUEDA de la lista de las planificaciones del empleado
       /* this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
          this.empleadoPlan = dataP;
@@ -313,7 +313,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
          // Llamado a ver archivos cuando no existe horarios de planifiación del empleado
          this.VerArchivos(codigo, archivo, form, fechasTotales);
        })*/
-    })
+   // })
   }
 
   VerArchivos(codigo, archivo, form, fechasTotales) {

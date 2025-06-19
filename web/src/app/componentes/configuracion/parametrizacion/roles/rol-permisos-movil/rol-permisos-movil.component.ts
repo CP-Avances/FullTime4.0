@@ -151,6 +151,21 @@ export class RolPermisosMovilComponent implements OnInit {
     this.ObtenerModulos();
     this.ObtenerTodasModulosAcciones();
     this.VerModulos();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA OBTENER ROLES
+  roles: any = [];
+  ObtenerRoles() {
+    this.roles = [];
+    this.rol.BuscarRoles().subscribe(res => {
+      this.roles = res;
+      this.ObtenerFuncionesRoles();
+    });
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -168,21 +183,11 @@ export class RolPermisosMovilComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
-  }
-
-  // METODO PARA OBTENER ROLES
-  roles: any = [];
-  ObtenerRoles() {
-    this.roles = [];
-    this.rol.BuscarRoles().subscribe(res => {
-      this.roles = res;
-      this.ObtenerFuncionesRoles();
-    });
   }
 
   // METODO PARA BUSCAR FUNCIONES DE LOS ROLES
@@ -277,7 +282,7 @@ export class RolPermisosMovilComponent implements OnInit {
 
   // METODO PARA AGREGAR PAGINAS
   AgregarPagina(data: any) {
-    if (this.paginasSeleccionadas.some(subArreglo => JSON.stringify(subArreglo) === JSON.stringify(data))) {
+    if (this.paginasSeleccionadas.some((subArreglo: any) => JSON.stringify(subArreglo) === JSON.stringify(data))) {
     } else {
       this.paginasSeleccionadas.push(data);
     }
@@ -543,7 +548,7 @@ export class RolPermisosMovilComponent implements OnInit {
     }
 
     if (arrayAccionesSeleccionadas.length > 0) {
-      const data = {acciones: arrayAccionesSeleccionadas}
+      const data = { acciones: arrayAccionesSeleccionadas }
       this.rest.CrearAccionesRol(data).subscribe({
         next: (response: any) => {
           this.toastr.success('Operación exitosa.', 'Se ha guardado las acciones del rol.', {
@@ -554,7 +559,7 @@ export class RolPermisosMovilComponent implements OnInit {
           this.rest.BuscarPaginasRol({ id_rol: this.id_rol, tipo: this.plataforma }).subscribe(datos => {
             this.paginas = datos;
           });
-        }, 
+        },
         error: () => {
           console.error('Error al insertar acciones:');
           this.toastr.error('Ups!!! algo salio mal.', 'VERIFICAR.', {
@@ -565,6 +570,7 @@ export class RolPermisosMovilComponent implements OnInit {
     }
   }
 
+  // METODO PARA LIMPIAR SELECCION
   LimpiarPaginasRol() {
     this.paginasSeleccionadas.forEach((pagina: any) => {
       this.accionesSeleccionadasPorPagina[pagina.id] = [];
@@ -629,11 +635,11 @@ export class RolPermisosMovilComponent implements OnInit {
     }
 
     if (arrayModulosSeleccionados.length > 0) {
-      const data = {acciones: arrayModulosSeleccionados}
+      const data = { acciones: arrayModulosSeleccionados }
       this.rest.CrearAccionesRol(data).subscribe({
         next: (response: any) => {
           this.toastr.success('Operación exitosa.', 'Se ha guardado las acciones del rol.', {
-            timeOut: 6000, 
+            timeOut: 6000,
           });
           this.ObtenerRoles();
           this.LimpiarPaginasModulosRol();
@@ -651,6 +657,7 @@ export class RolPermisosMovilComponent implements OnInit {
     }
   }
 
+  // LIMPIAR SELECCION DE MODULOS
   LimpiarPaginasModulosRol() {
     this.paginasSeleccionadasM.forEach((pagina: any) => {
       this.accionesSeleccionadasPorPagina[pagina.id] = [];

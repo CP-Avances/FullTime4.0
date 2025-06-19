@@ -12,10 +12,18 @@ import fs from 'fs';
 
 class AccionPersonalControlador {
 
-    public async ListarTipoAccion(req: Request, res: Response) {
+    // METODO PARA LISTAR DETALLES TIPOS DE ACCION DE PERSONAL   **USADO
+    public async ListarTipoAccionPersonal(req: Request, res: Response) {
         const ACCION = await pool.query(
             `
-            SELECT * FROM map_tipo_accion_personal
+                SELECT 
+                    dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, 
+                    tap.descripcion AS nombre 
+                FROM 
+                    map_detalle_tipo_accion_personal AS dtap, 
+                    map_tipo_accion_personal AS tap 
+                WHERE 
+                    tap.id = dtap.id_tipo_accion_personal
             `
         );
         if (ACCION.rowCount != 0) {
@@ -26,48 +34,7 @@ class AccionPersonalControlador {
         }
     }
 
-    public async CrearTipoAccion(req: Request, res: Response) {
-        try {
-            const { descripcion, user_name, ip, ip_local } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-            const response: QueryResult = await pool.query(
-                `
-                INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
-                `
-                , [descripcion]);
-
-            const [datos] = response.rows;
-
-            if (datos) {
-                // INSERTAR REGISTRO DE AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'map_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(200).jsonp(datos)
-            }
-            else {
-                await pool.query('ROLLBACK');
-                return res.status(300).jsonp({ message: 'error, no se insertaron los datos' })
-            }
-        } catch (error) {
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: error })
-        }
-    }
-
-
+    // METODO PARA REGISTRAR DETALLE DE TIPOS DE ACCIONES DE PERSONAL   **USADO
     public async CrearTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
 
         try {
@@ -78,7 +45,9 @@ class AccionPersonalControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES($1, $2, $3) RETURNING*
+                    INSERT INTO map_detalle_tipo_accion_personal 
+                        (id_tipo_accion_personal, descripcion, base_legal) 
+                        VALUES($1, $2, $3) RETURNING*
                 `
                 , [id_tipo, descripcion, base_legal]);
 
@@ -93,11 +62,10 @@ class AccionPersonalControlador {
                     datosOriginales: '',
                     datosNuevos:
                         `
-                        {
+                            {
                             "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}",                      
-                        }
-                        `
-                    ,
+                            }
+                        `,
                     ip: ip,
                     ip_local: ip_local,
                     observacion: null
@@ -117,55 +85,7 @@ class AccionPersonalControlador {
         }
     }
 
-    // TABLA TIPO_ACCION_PERSONAL 
-    public async ListarTipoAccionPersonal(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
-            FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
-            WHERE tap.id = dtap.id_tipo_accion_personal
-            `
-        );
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async ListarTipoAccionEdicion(req: Request, res: Response) {
-        const { id } = req.params;
-        const ACCION = await pool.query(
-            `
-            SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo_accion_personal = $1
-            `
-            , [id]);
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async EncontrarTipoAccionPersonalId(req: Request, res: Response) {
-        const { id } = req.params;
-        const ACCION = await pool.query(
-            `
-            SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
-            FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
-            WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
-            `
-            , [id]);
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
+    // METODO DE ACTUALIZACION DEL DETALLE DE LA ACCION DE PERSONAL    **USADO
     public async ActualizarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const { id_tipo, descripcion, base_legal, id, user_name, ip, ip_local } = req.body;
@@ -199,8 +119,8 @@ class AccionPersonalControlador {
 
             await pool.query(
                 `
-                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
-                     WHERE id = $4
+                    UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3 
+                    WHERE id = $4
                 `
                 , [id_tipo, descripcion, base_legal, id]);
 
@@ -232,6 +152,7 @@ class AccionPersonalControlador {
         }
     }
 
+    // METODO PARA ELIMINAR REGISTROS DE DETALLES DE TIPO DE ACCION DE PERSONAL  *USADO
     public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
@@ -243,7 +164,7 @@ class AccionPersonalControlador {
             // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
             const response = await pool.query(
                 `
-                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+                    SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
                 `
                 , [id]);
             const [datos] = response.rows;
@@ -266,7 +187,7 @@ class AccionPersonalControlador {
 
             await pool.query(
                 `
-                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                    DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
                 `
                 , [id]);
 
@@ -292,11 +213,471 @@ class AccionPersonalControlador {
         }
     }
 
+    // METODO PARA ELIMINAR LOS TIPOS DE ACCION PERSONAL DE MANERA MULTIPLE   **USADO
+    public async EliminarTipoAccionMultiple(req: Request, res: Response): Promise<any> {
+        const { listaEliminar, user_name, ip, ip_local } = req.body;
+        let error: boolean = false;
+        var count = 0;
+        var count_no = 0;
+        var list_tipoAccionPersonal: any = [];
+
+        try {
+
+            for (const item of listaEliminar) {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+                const resultado = await pool.query(
+                    `
+                        SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
+                    `,
+                    [item.id]);
+                const [existe_datos] = resultado.rows;
+                if (!existe_datos) {
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'map_detalle_tipo_accion_personal',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
+                    });
+                }
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+                if (existe_datos) {
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+                    const resultado = await pool.query(
+                        `
+                            SELECT id FROM map_documento_accion_personal WHERE id_detalle_tipo_accion = $1
+                        `
+                        , [item.id]);
+
+                    const [existe_detalle] = resultado.rows
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+
+                    if (!existe_detalle) {
+                        // INICIAR TRANSACCION
+                        await pool.query('BEGIN');
+                        const res = await pool.query(
+                            `
+                                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                            `, [item.id]);
+
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'map_detalle_tipo_accion_personal',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(existe_datos),
+                            ip: ip,
+                            ip_local: ip_local,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
+                        count += 1;
+                    } else {
+                        list_tipoAccionPersonal.push(item.nombre)
+                        count_no += 1;
+                    }
+                }
+            }
+            var meCount = "registro eliminado"
+            if (count > 1) {
+                meCount = "registros eliminados"
+            }
+            return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
+
+        } catch (err) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            error = true;
+            if (error) {
+                if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
+                    if (count <= 1) {
+                        return res.status(300).jsonp({
+                            message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                        });
+                    } else if (count > 1) {
+                        return res.status(300).jsonp({
+                            message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
+                        });
+                    }
+                } else {
+                    return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
+                }
+            }
+        }
+    }
+
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
+    public async RevisarDatos(req: Request, res: Response): Promise<any> {
+        try {
+            const documento = req.file?.originalname;
+            let separador = path.sep;
+            let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+            const workbook = new Excel.Workbook();
+            await workbook.xlsx.readFile(ruta);
+            let verificador = ObtenerIndicePlantilla(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
+                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
+
+                let data: any = {
+                    fila: '',
+                    tipo_accion_personal: '',
+                    descripcion: '',
+                    base_legal: '',
+                    observacion: ''
+                };
+
+                var listaAccionPersonal: any = [];
+                var mensaje: string = 'correcto';
+
+                if (plantilla) {
+                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
+                    const headerRow = plantilla.getRow(1);
+                    const headers: any = {};
+                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
+                    headerRow.eachCell((cell: any, colNumber) => {
+                        headers[cell.value.toString().toUpperCase()] = colNumber;
+                    });
+                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
+                    if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']
+                    ) {
+                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
+                    }
+
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.eachRow((row, rowNumber) => {
+                        // SALTAR LA FILA DE LAS CABECERAS
+                        if (rowNumber === 1) return;
+                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
+                        const ITEM = row.getCell(headers['ITEM']).value;
+                        const TIPO_ACCION_PERSONAL = row.getCell(headers['TIPO_ACCION_PERSONAL']).value?.toString().trim();
+                        const DESCRIPCION = row.getCell(headers['DESCRIPCION']).value?.toString().trim();
+                        const BASE_LEGAL = row.getCell(headers['BASE_LEGAL']).value?.toString().trim();
+
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
+                            (DESCRIPCION != undefined && DESCRIPCION != '') &&
+                            (BASE_LEGAL != undefined && BASE_LEGAL != '')) {
+
+                            data.fila = ITEM;
+                            data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                            data.descripcion = DESCRIPCION;
+                            data.base_legal = BASE_LEGAL;
+                            data.observacion = 'no registrado';
+                            listaAccionPersonal.push(data);
+
+                        }
+                        else {
+                            data.fila = ITEM;
+                            data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
+                            data.descripcion = DESCRIPCION;
+                            data.base_legal = BASE_LEGAL;
+                            data.observacion = 'no registrado';
+
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
+                                mensaje = 'error'
+                            }
+
+                            if (TIPO_ACCION_PERSONAL == undefined) {
+                                data.tipo_accion_personal = 'No registrado';
+                                data.observacion = 'Tipo de acción de personal ' + data.observacion;
+                            }
+
+                            if (DESCRIPCION == undefined) {
+                                data.descripcion = 'No registrado';
+                                data.observacion = 'Descripción ' + data.observacion;
+                            }
+
+                            if (BASE_LEGAL == undefined) {
+                                data.base_legal = '-';
+                            }
+
+                            listaAccionPersonal.push(data);
+                        }
+                        data = {};
+                    });
+                }
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+
+                // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+                listaAccionPersonal.forEach(async (item: any, index: number) => {
+                    if (item.observacion == 'no registrado') {
+                        const VERIFICAR_TIPO_ACCION = await pool.query(
+                            `
+                                SELECT * FROM map_tipo_accion_personal 
+                                WHERE UPPER(descripcion) = UPPER($1)
+                            `
+                            , [item.tipo_accion_personal]);
+
+                        if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
+                            item.observacion = 'No existe el tipo de acción de personal en el sistema';
+                        }
+                    }
+                });
+
+                setTimeout(() => {
+                    listaAccionPersonal.sort((a: any, b: any) => {
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
+                        if (a.fila < b.fila) {
+                            return -1;
+                        }
+                        if (a.fila > b.fila) {
+                            return 1;
+                        }
+                        return 0; // SON IGUALES
+                    });
+
+                    var filaDuplicada: number = 0;
+
+                    listaAccionPersonal.forEach(async (item: any) => {
+                        if (item.observacion == '1') {
+                            item.observacion = 'Registro duplicado'
+                        } else if (item.observacion == 'no registrado') {
+                            item.observacion = 'ok'
+                        }
+
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        } else {
+                            return mensaje = 'error';
+                        }
+
+                        filaDuplicada = item.fila;
+
+                    });
+
+                    if (mensaje == 'error') {
+                        listaAccionPersonal = undefined;
+                    }
+                    return res.jsonp({ message: mensaje, data: listaAccionPersonal });
+                }, 1000)
+            }
+
+        } catch (error) {
+            return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
+        }
+    }
+
+    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
+    public async CargarPlantilla(req: Request, res: Response) {
+        const { plantilla, user_name, ip, ip_local } = req.body;
+        let error: boolean = false;
+        for (const item of plantilla) {
+            const { tipo_accion_personal, descripcion, base_legal } = item;
+            try {
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                const response: QueryResult = await pool.query(
+                    `
+                        SELECT * FROM map_tipo_accion_personal 
+                         WHERE UPPER(descripcion) = UPPER($1)
+                    `
+                    , [tipo_accion_personal]);
+
+                const [tipo_acciones] = response.rows;
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                const response_accion: QueryResult = await pool.query(
+                    `
+                        INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
+                    `
+                    , [response.rows[0].id, descripcion, base_legal]);
+                const [detalleAccion] = response_accion.rows;
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'map_detalle_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(detalleAccion),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'map_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(tipo_acciones),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+            }
+        }
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+        }
+        return res.status(200).jsonp({ message: 'ok' });
+    }
+
+
+    /**  *************************************************************************************** **
+     **  **                      TABLA DE TIPOS DE ACCION DE PERSONAL                         ** **                     
+     **  *************************************************************************************** **/
+
+    // METODO PARA CONSULTAR TIPOS DE ACCION PERSONAL   **USADO
+    public async ListarTipoAccion(req: Request, res: Response) {
+        const ACCION = await pool.query(
+            `
+                SELECT * FROM map_tipo_accion_personal
+            `
+        );
+        if (ACCION.rowCount != 0) {
+            return res.jsonp(ACCION.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+    // METODO PARA REGISTRAR UNA ACCION DE PERSONAL   **USADO
+    public async CrearTipoAccion(req: Request, res: Response) {
+        try {
+            const { descripcion, user_name, ip, ip_local } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response: QueryResult = await pool.query(
+                `
+                    INSERT INTO map_tipo_accion_personal (descripcion) VALUES ($1) RETURNING *
+                `
+                , [descripcion]);
+
+            const [datos] = response.rows;
+
+            if (datos) {
+                // INSERTAR REGISTRO DE AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'map_tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"descripcion": "${descripcion}"}`,
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(200).jsonp(datos)
+            }
+            else {
+                await pool.query('ROLLBACK');
+                return res.status(300).jsonp({ message: 'error, no se insertaron los datos' })
+            }
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: error })
+        }
+    }
+
+    // METODO PARA BUSCAR UN DETALLE DE TIPO DE ACCION DE PERSONAL POR ID    **USADO
+    public async EncontrarTipoAccionPersonalId(req: Request, res: Response) {
+        const { id } = req.params;
+        const ACCION = await pool.query(
+            `
+                SELECT dtap.id, dtap.id_tipo_accion_personal, dtap.descripcion, dtap.base_legal, tap.descripcion AS nombre 
+                FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
+                WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
+            `
+            , [id]);
+        if (ACCION.rowCount != 0) {
+            return res.jsonp(ACCION.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+    // METODO PARA BUSCAR DATOS DEL DETALLE DE ACCION DE PERSONAL PARA EDICION   **USADO
+    public async ListarTipoAccionEdicion(req: Request, res: Response) {
+        const { id } = req.params;
+        const ACCION = await pool.query(
+            `
+            SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo_accion_personal = $1
+            `
+            , [id]);
+        if (ACCION.rowCount != 0) {
+            return res.jsonp(ACCION.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+    // VER LOGO DE MINISTERIO TRABAJO     **USADO
+    public async verLogoMinisterio(req: Request, res: Response): Promise<any> {
+        const file_name = 'ministerio_trabajo.png';
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name;
+        const codificado = await ConvertirImagenBase64(ruta);
+        if (codificado === 0) {
+            res.send({ imagen: 0 })
+        } else {
+            res.send({ imagen: codificado })
+        }
+    }
+
+
+    /**  *************************************************************************************** **
+     **  **                      TABLA DE DOCUMENTOS DE ACCION DE PERSONAL                    ** **                     
+     **  *************************************************************************************** **/
+
     // TABLA SOLICITUD ACCION PERSONAL
     public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local } = req.body;
-            console.log('req.body: ', req.body)
             let datosNuevos = req.body;
             const fechaActual = new Date();
             let id_empleado_comunicacion = null;
@@ -364,9 +745,6 @@ class AccionPersonalControlador {
             delete datosNuevos.user_name;
             delete datosNuevos.ip;
 
-            console.log('response_accion: ', response_accion.rows[0])
-            const [registroPedido] = response_accion.rows;
-
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'map_documento_accion_personal',
@@ -404,6 +782,20 @@ class AccionPersonalControlador {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     public async ActualizarPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
             const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
@@ -511,136 +903,9 @@ class AccionPersonalControlador {
         }
     }
 
-    public async EliminarTipoAccionMultipleMult(req: Request, res: Response): Promise<any> {
 
-        const { listaEliminar, user_name, ip, ip_local } = req.body;
-        let error: boolean = false;
-        var count = 0;
-        var count_no = 0;
-        var list_tipoAccionPersonal: any = [];
 
-        try {
 
-            for (const item of listaEliminar) {
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-                const resultado = await pool.query(
-                    `
-                        SELECT id FROM map_detalle_tipo_accion_personal WHERE id = $1
-                    `,
-                    [item.id]);
-                const [existe_datos] = resultado.rows;
-                if (!existe_datos) {
-                    // AUDITORIA
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'map_detalle_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
-                    });
-                }
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-
-                if (existe_datos) {
-                    // INICIAR TRANSACCION
-                    await pool.query('BEGIN');
-                    const resultado = await pool.query(
-                        `
-                        SELECT id FROM map_documento_accion_personal WHERE id_detalle_tipo_accion = $1
-           `
-                        , [item.id]);
-
-                    const [existe_detalle] = resultado.rows
-                    console.log('existe_detalle: ', existe_detalle)
-
-                    // FINALIZAR TRANSACCION
-                    await pool.query('COMMIT');
-
-                    if (!existe_detalle) {
-                        console.log('existe_detalle entro: ', existe_detalle)
-                        console.log('item 11: ', item.id)
-                        // INICIAR TRANSACCION
-                        await pool.query('BEGIN');
-                        const res = await pool.query(
-                            `
-                                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-                            `, [item.id]);
-
-                        // AUDITORIA
-                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'map_detalle_tipo_accion_personal',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(existe_datos),
-                            ip: ip,
-                            ip_local: ip_local,
-                            observacion: null
-                        });
-                        // FINALIZAR TRANSACCION
-                        await pool.query('COMMIT');
-                        console.log('res: ', res)
-                        count += 1;
-                    } else {
-
-                        console.log('existe_detalle afuera: ', existe_detalle)
-                        console.log('item: ', item)
-                        list_tipoAccionPersonal.push(item.nombre)
-                        count_no += 1;
-                    }
-
-                }
-
-            }
-
-            var meCount = "registro eliminado"
-            if (count > 1) {
-                meCount = "registros eliminados"
-            }
-
-            return res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.', ms2: 'Existen datos relacionados con ', codigo: 200, eliminados: count, relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal });
-
-        } catch (err) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            error = true;
-            if (error) {
-                if (err.table == 'map_cat_procesos' || err.table == 'map_empleado_procesos') {
-                    if (count <= 1) {
-                        return res.status(300).jsonp({
-                            message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
-                        });
-                    } else if (count > 1) {
-                        return res.status(300).jsonp({
-                            message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                            relacionados: count_no, listaNoEliminados: list_tipoAccionPersonal
-                        });
-                    }
-                } else {
-                    return res.status(500).jsonp({ message: 'No se puedo completar la operacion' });
-                }
-            }
-        }
-    }
-
-    public async verLogoMinisterio(req: Request, res: Response): Promise<any> {
-        const file_name = 'ministerio_trabajo.png';
-        let separador = path.sep;
-        let ruta = ObtenerRutaLogos() + separador + file_name;
-        //console.log( 'solo ruta ', ruta)
-        const codificado = await ConvertirImagenBase64(ruta);
-        if (codificado === 0) {
-            res.send({ imagen: 0 })
-        } else {
-            res.send({ imagen: codificado })
-        }
-    }
 
     // CONSULTAS GENERACIÓN DE PDF
     public async EncontrarDatosEmpleados(req: Request, res: Response) {
@@ -838,409 +1103,6 @@ class AccionPersonalControlador {
         }
     }
 
-
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
-    public async RevisarDatos(req: Request, res: Response): Promise<any> {
-        try {
-            const documento = req.file?.originalname;
-            let separador = path.sep;
-            let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-            const workbook = new Excel.Workbook();
-            await workbook.xlsx.readFile(ruta);
-            let verificador = ObtenerIndicePlantilla(workbook, 'DETALLE_TIPO_ACCION_PERSONAL');
-            if (verificador === false) {
-                return res.jsonp({ message: 'no_existe', data: undefined });
-            }
-            else {
-                const sheet_name_list = workbook.worksheets.map(sheet => sheet.name);
-                const plantilla = workbook.getWorksheet(sheet_name_list[verificador]);
-
-                let data: any = {
-                    fila: '',
-                    tipo_accion_personal: '',
-                    descripcion: '',
-                    base_legal: '',
-                    observacion: ''
-                };
-
-                var listaAccionPersonal: any = [];
-                var duplicados: any = [];
-                var mensaje: string = 'correcto';
-
-                if (plantilla) {
-                    // SUPONIENDO QUE LA PRIMERA FILA SON LAS CABECERAS
-                    const headerRow = plantilla.getRow(1);
-                    const headers: any = {};
-                    // CREAR UN MAPA CON LAS CABECERAS Y SUS POSICIONES, ASEGURANDO QUE LAS CLAVES ESTEN EN MAYUSCULAS
-                    headerRow.eachCell((cell: any, colNumber) => {
-                        headers[cell.value.toString().toUpperCase()] = colNumber;
-                    });
-                    // VERIFICA SI LAS CABECERAS ESENCIALES ESTAN PRESENTES
-                    if (!headers['ITEM'] || !headers['TIPO_ACCION_PERSONAL'] || !headers['DESCRIPCION'] || !headers['BASE_LEGAL']
-                    ) {
-                        return res.jsonp({ message: 'Cabeceras faltantes', data: undefined });
-                    }
-
-                    // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla.eachRow((row, rowNumber) => {
-                        // SALTAR LA FILA DE LAS CABECERAS
-                        if (rowNumber === 1) return;
-                        // LEER LOS DATOS SEGUN LAS COLUMNAS ENCONTRADAS
-                        const ITEM = row.getCell(headers['ITEM']).value;
-                        const TIPO_ACCION_PERSONAL = row.getCell(headers['TIPO_ACCION_PERSONAL']).value?.toString().trim();
-                        const DESCRIPCION = row.getCell(headers['DESCRIPCION']).value?.toString().trim();
-                        const BASE_LEGAL = row.getCell(headers['BASE_LEGAL']).value?.toString().trim();
-
-                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                        if ((ITEM != undefined && ITEM != '') &&
-                            (TIPO_ACCION_PERSONAL != undefined && TIPO_ACCION_PERSONAL != '') &&
-                            (DESCRIPCION != undefined && DESCRIPCION != '') &&
-                            (BASE_LEGAL != undefined && BASE_LEGAL != '')) {
-
-                            data.fila = ITEM;
-                            data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
-                            data.descripcion = DESCRIPCION;
-                            data.base_legal = BASE_LEGAL;
-                            data.observacion = 'no registrado';
-
-                            listaAccionPersonal.push(data);
-
-                        } else {
-                            data.fila = ITEM;
-                            data.tipo_accion_personal = TIPO_ACCION_PERSONAL;
-                            data.descripcion = DESCRIPCION;
-                            data.base_legal = BASE_LEGAL;
-                            data.observacion = 'no registrado';
-
-                            if (data.fila == '' || data.fila == undefined) {
-                                data.fila = 'error';
-                                mensaje = 'error'
-                            }
-
-                            if (TIPO_ACCION_PERSONAL == undefined) {
-                                data.tipo_accion_personal = 'No registrado';
-                                data.observacion = 'Tipo de acción de personal ' + data.observacion;
-                            }
-
-                            if (DESCRIPCION == undefined) {
-                                data.descripcion = 'No registrado';
-                                data.observacion = 'Descripción ' + data.observacion;
-                            }
-
-                            if (BASE_LEGAL == undefined) {
-                                data.base_legal = '-';
-                            }
-
-                            listaAccionPersonal.push(data);
-                        }
-                        data = {};
-                    });
-                }
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs.access(ruta, fs.constants.F_OK, (err) => {
-                    if (err) {
-                    } else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs.unlinkSync(ruta);
-                    }
-                });
-
-                // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-                listaAccionPersonal.forEach(async (item: any, index: number) => {
-                    if (item.observacion == 'no registrado') {
-                        const VERIFICAR_TIPO_ACCION = await pool.query(
-                            `
-                    SELECT * FROM map_tipo_accion_personal 
-                    WHERE UPPER(descripcion) = UPPER($1)
-                    `
-                            , [item.tipo_accion_personal]);
-
-                        if (VERIFICAR_TIPO_ACCION.rowCount === 0) {
-                            item.observacion = 'No existe el tipo de acción de personal en el sistema'
-                        } else {
-
-                            // const VERIFICAR_ACCION = await pool.query(
-                            //     `
-                            //     SELECT * FROM map_detalle_tipo_accion_personal
-                            //     WHERE id_tipo_accion_personal = $1
-                            //     `
-                            //     , [VERIFICAR_TIPO_ACCION.rows[0].id]);
-
-                            // if (VERIFICAR_ACCION.rowCount === 0) {
-
-                            //     // DISCRIMINACION DE ELEMENTOS IGUALES
-                            //     if (duplicados.find((p: any) => (p.tipo_accion_personal.toLowerCase() === item.tipo_accion_personal.toLowerCase()) ) == undefined) {
-                            //         duplicados.push(item);
-                            //     } else {
-                            //         item.observacion = '1';
-                            //     }
-                            // }else{
-                            //     item.observacion = 'Ya existe en el sistema'  
-                            // }
-
-                        }
-                    }
-                });
-
-                setTimeout(() => {
-                    listaAccionPersonal.sort((a: any, b: any) => {
-                        // COMPARA LOS NUMEROS DE LOS OBJETOS
-                        if (a.fila < b.fila) {
-                            return -1;
-                        }
-                        if (a.fila > b.fila) {
-                            return 1;
-                        }
-                        return 0; // SON IGUALES
-                    });
-
-                    var filaDuplicada: number = 0;
-
-                    listaAccionPersonal.forEach(async (item: any) => {
-                        if (item.observacion == '1') {
-                            item.observacion = 'Registro duplicado'
-                        } else if (item.observacion == 'no registrado') {
-                            item.observacion = 'ok'
-                        }
-
-                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                            if (item.fila == filaDuplicada) {
-                                mensaje = 'error';
-                            }
-                        } else {
-                            return mensaje = 'error';
-                        }
-
-                        filaDuplicada = item.fila;
-
-                    });
-
-                    if (mensaje == 'error') {
-                        listaAccionPersonal = undefined;
-                    }
-                    return res.jsonp({ message: mensaje, data: listaAccionPersonal });
-                }, 1000)
-            }
-
-        } catch (error) {
-            return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
-        }
-    }
-
-    // REGISTRAR PLANTILLA TIPO VACUNA    **USADO 
-    public async CargarPlantilla(req: Request, res: Response) {
-        const { plantilla, user_name, ip, ip_local } = req.body;
-        let error: boolean = false;
-        var listaProcesosInsertados: any = [];
-
-        for (const item of plantilla) {
-            const { tipo_accion_personal, descripcion, base_legal } = item;
-            console.log('items: ', item)
-
-            try {
-
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                const response: QueryResult = await pool.query(
-                    `
-              SELECT * FROM map_tipo_accion_personal 
-                    WHERE UPPER(descripcion) = UPPER($1)
-              `
-                    , [tipo_accion_personal]);
-
-                const [tipo_acciones] = response.rows;
-
-                console.log('response: ', response)
-
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                const response_accion: QueryResult = await pool.query(
-                    `
-          INSERT INTO map_detalle_tipo_accion_personal (id_tipo_accion_personal, descripcion, base_legal) VALUES ($1, $2, $3) RETURNING *
-          `
-                    , [response.rows[0].id, descripcion, base_legal]);
-                const [detalleAccion] = response_accion.rows;
-
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'map_detalle_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(detalleAccion),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-
-
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'map_tipo_accion_personal',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(tipo_acciones),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-
-
-
-
-
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
-                error = true;
-            }
-
-        }
-
-        if (error) {
-            return res.status(500).jsonp({ message: 'error' });
-        }
-        return res.status(200).jsonp({ message: 'ok' });
-    }
-
-    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
-    public async EliminarTipoAccionMultiple(req: Request, res: Response): Promise<any> {
-        const { listaEliminar, user_name, ip, ip_local } = req.body;
-        let error: boolean = false;
-        var count = 0;
-        var count_no = 0;
-        var list_TipoAccion: any = [];
-
-        try {
-
-            for (const item of listaEliminar) {
-
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                const resultado = await pool.query(
-                    `
-             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-           `
-                    , [item.id]);
-                const [existe_tipo] = resultado.rows;
-
-                if (!existe_tipo) {
-                    // AUDITORIA
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'map_detalle_tipo_accion_personal',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar el tipo accion personal con id: ${item.id}. Registro no encontrado.`
-                    });
-                }
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-
-                if (existe_tipo) {
-
-                    // INICIAR TRANSACCION
-                    await pool.query('BEGIN');
-
-                    const resultado = await pool.query(
-                        `
-             SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
-           `
-                        , [item.id]);
-
-                    const [existe_tipo_emple] = resultado.rows;
-
-                    if (!existe_tipo_emple) {
-                        // INICIAR TRANSACCION
-                        await pool.query('BEGIN');
-
-                        const res = await pool.query(
-                            `
-             DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-           `
-                            , [item.id]);
-
-                        // AUDITORIA
-                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'map_detalle_tipo_accion_personal',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: JSON.stringify(existe_tipo),
-                            datosNuevos: '',
-                            ip: ip,
-                            ip_local: ip_local,
-                            observacion: null
-                        });
-
-                        // FINALIZAR TRANSACCION
-                        await pool.query('COMMIT');
-
-                        //CONTADOR ELIMINADOS
-                        count += 1;
-
-                    } else {
-                        list_TipoAccion.push(item.descripcion)
-                        count_no += 1;
-                    }
-
-                }
-
-            }
-
-            var meCount = "registro eliminado"
-            if (count > 1) {
-                meCount = "registros eliminados"
-            }
-
-            res.status(200).jsonp({
-                message: count.toString() + ' ' + meCount + ' con éxito.',
-                ms2: 'Existen datos relacionados con ',
-                codigo: 200,
-                eliminados: count,
-                relacionados: count_no,
-                listaNoEliminados: list_TipoAccion
-            });
-
-        } catch (err) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            error = true;
-
-            if (error) {
-                if (err.table == 'map_empleado_grupo_ocupacional') {
-                    if (count == 1) {
-                        return res.status(300).jsonp({
-                            message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                            relacionados: count_no, listaNoEliminados: list_TipoAccion
-                        });
-                    } else {
-                        return res.status(300).jsonp({
-                            message: 'Se ha eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                            relacionados: count_no, listaNoEliminados: list_TipoAccion
-                        });
-                    }
-                } else {
-                    return res.status(500).jsonp({ message: 'No se puedo completar la operacion.' });
-                }
-            }
-        }
-
-    }
 
 }
 

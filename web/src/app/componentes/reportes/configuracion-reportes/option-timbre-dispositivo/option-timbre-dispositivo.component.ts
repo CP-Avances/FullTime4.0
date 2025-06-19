@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { ReportesService } from '../../../../servicios/reportes/reportes.service';
+import { ReportesService } from '../../../../servicios/reportes/opcionesReportes/reportes.service';
 
 @Component({
   selector: 'app-option-timbre-dispositivo',

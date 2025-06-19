@@ -16,7 +16,7 @@ export class CiudadService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/informacion-ciudad/${id_ciudad}`);
   }
 
-  // BUSQUEDA DE CIUDADES
+  // BUSQUEDA DE CIUDADES   **USADO
   ConsultarCiudades() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/listaCiudad`);
   }

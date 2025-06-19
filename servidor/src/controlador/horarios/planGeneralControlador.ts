@@ -91,125 +91,20 @@ class PlanGeneralControlador {
         }
     }
 
-    public CrearPlanificacionPorLotes1 = async (req: Request, res: Response): Promise<any> => {
-        const { parte, user_name, ip, ip_local } = req.body;
-
-        // Validación del input
-        if (!Array.isArray(parte) || parte.length === 0) {
-            return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
-        }
-
-        const batchSize = 1000; // Ajusta este número según tu caso
-        const totalResults = []; // Para almacenar los resultados de cada lote
-
-        // Procesar en lotes
-        for (let i = 0; i < parte.length; i += batchSize) {
-            const batch = parte.slice(i, i + batchSize);
-            const valores = [];
-            const placeholders = [];
-
-            // Recorrer los objetos del batch y construir los placeholders para la consulta
-            for (let j = 0; j < batch.length; j++) {
-                const p = batch[j];
-                const index = j * 15; // 15 es el número de campos a insertar
-                valores.push(
-                    p.fec_hora_horario,
-                    p.tolerancia,
-                    p.estado_timbre,
-                    p.id_det_horario,
-                    p.fec_horario,
-                    p.id_empl_cargo,
-                    p.tipo_entr_salida,
-                    p.id_empleado,
-                    p.id_horario,
-                    p.tipo_dia,
-                    p.salida_otro_dia,
-                    p.min_antes,
-                    p.min_despues,
-                    p.estado_origen,
-                    p.min_alimentacion
-                );
-                // Crear los placeholders para la consulta
-                placeholders.push(
-                    `($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, 
-                      $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10}, 
-                      $${index + 11}, $${index + 12}, $${index + 13}, $${index + 14}, $${index + 15})`
-                );
-            }
-
-            // Crear la consulta de inserción masiva para el batch
-            const query = `
-                INSERT INTO eu_asistencia_general (
-                    fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado,
-                    id_horario, tipo_dia, salida_otro_dia, minutos_antes,
-                    minutos_despues, estado_origen, minutos_alimentacion
-                ) VALUES ${placeholders.join(', ')} RETURNING *
-            `;
-
-            try {
-                // INICIAR TRANSACCIÓN
-                await pool.query('BEGIN');
-
-                const result = await pool.query(query, valores);
-                const plans = result.rows;
-                totalResults.push(...plans); // Guardar resultados del lote
-
-                let auditoria = []
-                for (const plan of plans) {
-                    const fecha_hora_horario1 = await FormatearHora(plan.fecha_hora_horario.toLocaleString().split(' ')[1]);
-                    const fecha_hora_horario = await FormatearFecha2(plan.fecha_hora_horario, 'ddd');
-                    const fecha_horario = await FormatearFecha2(plan.fecha_horario, 'ddd');
-
-                    plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-                    plan.fecha_horario = fecha_horario;
-
-                    auditoria.push({
-                        tabla: 'eu_asistencia_general',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(plan),
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: null
-                    })
-                }
-                await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
-                // FINALIZAR TRANSACCION
-
-                await pool.query('COMMIT');
-            } catch (error) {
-                // REVERTIR TRANSACCIÓN
-                console.error("Detalles del error:", {
-                    message: error.message,
-                    stack: error.stack,
-                    code: error.code,
-                    detail: error.detail
-                });
-                await pool.query('ROLLBACK');
-
-                return res.status(500).json({ message: 'Error al procesar la parte', error: error.message });
-            }
-        }
-
-        // Respuesta final con 'OK' si todo se procesó correctamente
-        return res.status(200).json({ message: 'OK', totalResults });
-    };
-
+    // METODO PARA CREAR PLAN GENERAL POR LOTES  **USADO
     public CrearPlanificacionPorLotes = async (req: Request, res: Response): Promise<any> => {
         const { parte, user_name, ip, ip_local } = req.body;
 
-        // Validación del input
+        // VALIDACION DEL INPUT
         if (!Array.isArray(parte) || parte.length === 0) {
             return res.status(400).json({ message: 'El campo "parte" debe ser un array y no estar vacío.' });
         }
 
-        const client = await pool.connect();  // Conectar al cliente
+        const client = await pool.connect();  // CONECTAR AL CLIENTE
         try {
-            await client.query('BEGIN');  // Iniciar una transacción
+            await client.query('BEGIN');  // INICIAR UNA TRANSACCION
 
-            // Crear un flujo de datos para el COPY usando pg-copy-streams, desde un flujo de entrada en formato csv
+            // CREAR UN FLUJO DE DATOS PARA EL COPY USANDO PG-COPY-STREAMS, DESDE UN FLUJO DE ENTRADA EN FORMATO csv
             const stream = client.query(copyStream.from(
                 `COPY eu_asistencia_general (
                     fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
@@ -219,7 +114,7 @@ class PlanGeneralControlador {
                 ) FROM STDIN WITH (FORMAT csv, DELIMITER '\t')`
             ));
 
-            // Escribir los datos en el flujo COPY
+            // ESCRIBIR LOS DATOS EN EL FLUJO COPY
             for (const p of parte) {
                 const row = [
                     p.fec_hora_horario,
@@ -237,21 +132,20 @@ class PlanGeneralControlador {
                     p.min_despues,
                     p.estado_origen,
                     p.min_alimentacion
-                ].join('\t');  // Formatear la fila con tabuladores
+                ].join('\t');  // FORMATEAR LA FILA CON TABULADORES
 
-                stream.write(`${row}\n`);  // Escribir la fila en el flujo
+                stream.write(`${row}\n`);  // ESCRIBIR LA FILA EN EL FLUJO
             }
 
-            stream.end();  // Finalizar el flujo
+            stream.end();  // FINALIZAR EL FLUJO
 
-            // Esperar a que el COPY termine
+            // ESPERAR A QUE EL COPY TERMINE
             await new Promise<void>((resolve, reject) => {
-                stream.on('finish', resolve);  // Esperar la finalización del COPY
-                stream.on('error', reject);  // Manejar posibles errores
+                stream.on('finish', resolve);  // ESPERAR LA FINALIZACION DEL COPY
+                stream.on('error', reject);  // MANEJAR POSIBLES ERRORES
             });
 
-
-            // Realizar la inserción en auditoría después de completar la inserción masiva
+            // REALIZAR LA INSERCION EN AUDITORIA DESPUES DE COMPLETAR LA INSERCION MASIVA
             const auditoria = parte.map((p) => ({
                 tabla: 'eu_asistencia_general',
                 usuario: user_name,
@@ -264,10 +158,10 @@ class PlanGeneralControlador {
             }));
             await AUDITORIA_CONTROLADOR.InsertarAuditoriaPorLotes(auditoria, user_name, ip, ip_local);
 
-            await client.query('COMMIT');  // Finalizar la transacción
+            await client.query('COMMIT');  // FINALIZAR LA TRANSACCION
             res.status(200).json({ message: 'OK', totalResults: parte.length });
         } catch (error) {
-            await client.query('ROLLBACK');  // Revertir la transacción en caso de error
+            await client.query('ROLLBACK');  // REVERTIR LA TRANSACCIÓN EN CASO DE ERROR
             console.error("Detalles del error:", {
                 message: error.message,
                 stack: error.stack,
@@ -278,48 +172,17 @@ class PlanGeneralControlador {
         }
 
         finally {
-            client.release();  // Liberar el cliente
+            client.release();  // LIBERAR EL CLIENTE
         }
     };
-
-
-
-
-    public BuscarFechasMultiples = async (req: Request, res: Response): Promise<any> => {
-        const { listaEliminar } = req.body;
-        console.log("ver req body", req.body);
-        let resultados: any[] = [];  // Array para almacenar todos los objetos de los resultados
-
-        for (const item of listaEliminar) {
-            console.log("ver fec_inicio e id", item.fec_inicio + ' ' + item.id_empleado)
-            console.log("ver fec_final e id ", item.fec_final + ' ' + item.id_empleado)
-
-            const FECHAS = await pool.query(
-                `
-                    SELECT id FROM eu_asistencia_general 
-                    WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
-                `,
-                [item.fec_inicio, item.fec_final, item.id_horario, item.id_empleado]
-            );
-
-            // Concatena los resultados obtenidos en cada iteración
-            resultados = resultados.concat(FECHAS.rows);  // `rows` contiene los registros devueltos por la consulta
-        }
-        // Si no se encontró ningún resultado en ninguna consulta
-        if (resultados.length === 0) {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        } else {
-            return res.jsonp(resultados);  // Devuelve un único array con todos los resultados concatenados
-        }
-    }
 
     // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
     public async BuscarFechas(req: Request, res: Response) {
         const { fec_inicio, fec_final, id_horario, id_empleado } = req.body;
         const FECHAS = await pool.query(
             `
-            SELECT id FROM eu_asistencia_general 
-            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+                SELECT id FROM eu_asistencia_general 
+                WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
             `
             , [fec_inicio, fec_final, id_horario, id_empleado]);
         if (FECHAS.rowCount != 0) {
@@ -330,8 +193,35 @@ class PlanGeneralControlador {
         }
     }
 
+    // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL MULTIPLE    **USADO
+    public BuscarFechasMultiples = async (req: Request, res: Response): Promise<any> => {
+        const { listaEliminar } = req.body;
+        let resultados: any[] = [];  // ARRAY PARA ALMACENAR TODOS LOS OBJETOS DE LOS RESULTADOS
+
+        for (const item of listaEliminar) {
+
+            const FECHAS = await pool.query(
+                `
+                    SELECT id FROM eu_asistencia_general 
+                    WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
+                `,
+                [item.fec_inicio, item.fec_final, item.id_horario, item.id_empleado]
+            );
+
+            // CONCATENA LOS RESULTADOS OBTENIDOS EN CADA ITERACIÓN
+            resultados = resultados.concat(FECHAS.rows);  // `rows` CONTIENE LOS REGISTROS DEVUELTOS POR LA CONSULTA
+        }
+        // SI NO SE ENCONTRO NINGUN RESULTADO EN NINGUNA CONSULTA
+        if (resultados.length === 0) {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        } else {
+            return res.jsonp(resultados);  // DEVUELVE UN ÚNICO ARRAY CON TODOS LOS RESULTADOS CONCATENADOS
+        }
+    }
+
     // METODO PARA ELIMINAR REGISTROS    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+        console.log("ENTRA AL METODO ELIMINAR AHORITA SIENDO REVISADO")
         var errores: number = 0;
         let ocurrioError = false;
         let mensajeError = '';
@@ -423,11 +313,10 @@ class PlanGeneralControlador {
         }
     }
 
-
+    // METODO PARA ELIMINAR REGISTROS MULTIPLES  **USADO
     public async EliminarRegistrosMultiples(req: Request, res: Response): Promise<Response> {
         const { user_name, ip, id_plan, ip_local } = req.body;
-        console.log("ver req.body", req.body)
-        // Iniciar transacción
+        // INICIAR TRANSACCIÓN
         try {
             if (!Array.isArray(id_plan) || id_plan.length === 0) {
                 return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
@@ -458,7 +347,6 @@ class PlanGeneralControlador {
 
                 if (idsNoEncontrados.length != 0) {
                     const auditoria = idsNoEncontrados.map((id: number) => ({
-
                         tabla: 'eu_asistencia_general',
                         usuario: user_name,
                         accion: 'D',
@@ -512,35 +400,6 @@ class PlanGeneralControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.jsonp({ message: 'error' });
-        }
-    }
-
-
-    // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
-    public async BuscarHorarioFechas(req: Request, res: Response) {
-        try {
-            const { id_empleado, lista_fechas } = req.body;
-
-            const HORARIO = await pool.query(
-                `
-                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.id_empleado, pg.estado_origen 
-                FROM eu_asistencia_general AS pg, eu_empleado_cargos AS c 
-                WHERE pg.fecha_horario IN (${lista_fechas}) 
-                    AND pg.id_empleado = $1 AND c.id = pg.id_empleado_cargo 
-                    AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
-                ORDER BY pg.fecha_horario ASC
-                `
-                , [id_empleado]);
-
-            if (HORARIO.rowCount != 0) {
-                return res.jsonp(HORARIO.rows)
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-        }
-        catch (error) {
             return res.jsonp({ message: 'error' });
         }
     }
@@ -609,7 +468,6 @@ class PlanGeneralControlador {
         }
     }
 
-
     // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              **USADO
     public async ListarDetalleHorarios(req: Request, res: Response) {
         try {
@@ -638,7 +496,6 @@ class PlanGeneralControlador {
             return res.jsonp({ message: 'error', error: error });
         }
     }
-
 
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO  **USADO
     public async ListarHorariosUsuario(req: Request, res: Response) {
@@ -696,13 +553,13 @@ class PlanGeneralControlador {
             if (ids.length > 0) {
                 const ASISTENCIA = await pool.query(
                     `
-                    SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
-                        p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
-                        empleado.identificacion, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
-                    FROM eu_asistencia_general p_g
-                    INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
-                    WHERE p_g.fecha_horario BETWEEN $1 AND $2
-                    ORDER BY p_g.fecha_hora_horario ASC
+                        SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
+                            p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                            empleado.identificacion, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
+                        FROM eu_asistencia_general p_g
+                        INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
+                        WHERE p_g.fecha_horario BETWEEN $1 AND $2
+                        ORDER BY p_g.fecha_hora_horario ASC
                     `
                     , [inicio, fin, ids]);
 
@@ -726,7 +583,7 @@ class PlanGeneralControlador {
             const { codigo, fecha, id, accion, id_timbre, user_name, ip, ip_local } = req.body;
             const ASIGNADO = await pool.query(
                 `
-                SELECT * FROM fnbuscarregistroasignado ($1, $2);
+                    SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `
                 , [fecha, codigo]);
 
@@ -756,7 +613,7 @@ class PlanGeneralControlador {
 
             const PLAN = await pool.query(
                 `
-                UPDATE eu_asistencia_general SET fecha_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
+                    UPDATE eu_asistencia_general SET fecha_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
                 `
                 , [fecha, id]);
 
@@ -773,10 +630,25 @@ class PlanGeneralControlador {
                 tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `id: ${datosOriginales.id}
-                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha_hora_timbre + ' ' + fecha_hora_timbre1}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
-                datosNuevos: `id: ${datosOriginales.id}
-                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip: ip,
+                datosOriginales: `id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, 
+                                id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario},
+                                id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, 
+                                fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+                                fecha_hora_timbre: ${fecha_hora_timbre + ' ' + fecha_hora_timbre1}, 
+                                estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, 
+                                tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, 
+                                tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, 
+                                minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen},
+                                minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                datosNuevos: `id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, 
+                            id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, 
+                            id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, 
+                            fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, 
+                            estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, 
+                            tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, 
+                            tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, 
+                            minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, 
+                            minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip: ip,
                 ip_local: ip_local,
                 observacion: null
             });
@@ -784,7 +656,7 @@ class PlanGeneralControlador {
             if (PLAN.rowCount != 0) {
                 const TIMBRE = await pool.query(
                     `
-                    UPDATE eu_timbres SET accion = $1 WHERE id = $2
+                        UPDATE eu_timbres SET accion = $1 WHERE id = $2
                     `
                     , [accion, id_timbre]);
 
@@ -818,24 +690,51 @@ class PlanGeneralControlador {
         }
     }
 
-    public async BuscarFecha(req: Request, res: Response) {
-        const { fec_inicio, id_horario, id_empleado } = req.body;
-        const FECHAS = await pool.query(
-            `
-            SELECT id FROM eu_asistencia_general 
-            WHERE fecha_horario = $1 AND id_horario = $2 AND id_empleado = $3
-            `
-            , [fec_inicio, id_horario, id_empleado]);
-        if (FECHAS.rowCount != 0) {
-            return res.jsonp(FECHAS.rows)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
+    public async BuscarHorarioFechas(req: Request, res: Response) {
+        try {
+            const { id_empleado, lista_fechas } = req.body;
+
+            const HORARIO = await pool.query(
+                `
+                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.id_empleado, pg.estado_origen 
+                FROM eu_asistencia_general AS pg, eu_empleado_cargos AS c 
+                WHERE pg.fecha_horario IN (${lista_fechas}) 
+                    AND pg.id_empleado = $1 AND c.id = pg.id_empleado_cargo 
+                    AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
+                ORDER BY pg.fecha_horario ASC
+                `
+                , [id_empleado]);
+
+            if (HORARIO.rowCount != 0) {
+                return res.jsonp(HORARIO.rows)
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
         }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        catch (error) {
+            return res.jsonp({ message: 'error' });
         }
     }
 
 }
 
+// METODO PARA BUSCAR DATOS DE EMPLEADOS    **USADO
 async function BuscarEmpleadoPorParametro(parametro: string, valor: string | { nombre: string; apellido: string }) {
     let query = '';
     let queryParams: any[] | undefined = [];

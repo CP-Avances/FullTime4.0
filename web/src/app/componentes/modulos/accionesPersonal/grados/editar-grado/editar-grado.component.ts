@@ -1,10 +1,10 @@
-import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
-
 
 @Component({
   selector: 'app-editar-grado',
@@ -16,7 +16,7 @@ import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-perso
 export class EditarGradoComponent {
 
   ips_locales: any = '';
-  
+
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
@@ -68,35 +68,33 @@ export class EditarGradoComponent {
   }
 
   // METODO PARA EDITAR DEL REGISTRO
-  EditarGrado(form: any){
+  EditarGrado(form: any) {
     let dataGrado = {
       id_grado: this.data.id,
       grado: form.gradoForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     this._grados.EditarGrado(dataGrado).subscribe({
       next: (res: any) => {
-        
-          this.toastr.success(res.message, 'Registro actualizado.', {
-            timeOut: 6000,
-          });
-          this.Salir();
-        
-      },error: (err) => {
-        if(err.status == 300){
+        this.toastr.success(res.message, 'Registro actualizado.', {
+          timeOut: 6000,
+        });
+        this.Salir();
+      }, error: (err) => {
+        if (err.status == 300) {
           this.toastr.warning(err.error.message, 'Advertencia.', {
             timeOut: 6000,
           });
-        }else{
+        } else {
           this.toastr.error(err.error.message, 'Ups! algo salio mal.', {
             timeOut: 6000,
           });
         }
       },
     })
-
   }
 
 }

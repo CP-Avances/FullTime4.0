@@ -1,16 +1,17 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import ExcelJS, { FillPattern } from "exceljs";
+import ExcelJS from "exceljs";
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import { FillPatterns } from 'exceljs';
+(ExcelJS as any).crypto = null; // DESACTIVA FUNCIONES NO SOPORTADAS EN EL NAVEGADOR
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
@@ -19,11 +20,6 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { auto } from '@popperjs/core';
-import { ExcelService } from 'src/app/servicios/generarDocumentos/excel.service';
-import { SelectionModel } from '@angular/cdk/collections';
-
-(ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
 
 @Component({
   selector: 'app-listar-tipo-accion',
@@ -72,8 +68,6 @@ export class ListarTipoAccionComponent implements OnInit {
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
-  private bordeGrueso!: Partial<ExcelJS.Borders>;
-  private fillAzul!: FillPatterns;
   private fontTitulo!: Partial<ExcelJS.Font>;
   private imagen: any;
 
@@ -90,7 +84,6 @@ export class ListarTipoAccionComponent implements OnInit {
     private router: Router,
     private validar: ValidacionesService,
     private funciones: MainNavService,
-    private generarExcel: ExcelService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -253,14 +246,16 @@ export class ListarTipoAccionComponent implements OnInit {
         }
       });
   }
+
   EliminarMultiple() {
     const data = {
       listaEliminar: this.tipoAccionEliminar,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
 
-     this.rest.EliminarDetalleTipoAccionMult(data).subscribe({
+    this.rest.EliminarDetalleTipoAccionMult(data).subscribe({
       next: (response) => {
         this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
@@ -446,7 +441,6 @@ export class ListarTipoAccionComponent implements OnInit {
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
@@ -475,7 +469,6 @@ export class ListarTipoAccionComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS
   RegistrarAcciones() {
-    console.log('listaProcesosCorrectas: ', this.listaTipoAccionesCorrectas.length)
     if (this.listaTipoAccionesCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaTipoAccionesCorrectas,
@@ -514,10 +507,9 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
 
-  /******************************************************************************************************
- *                                         METODO PARA EXPORTAR A PDF
- ******************************************************************************************************/
-
+  /** ************************************************************************************************** **
+   ** **                                METODO PARA EXPORTAR A PDF                                    ** **
+   ** ************************************************************************************************** **/
 
   async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
@@ -532,9 +524,7 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
   DefinirInformacionPDF() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -590,7 +580,6 @@ export class ListarTipoAccionComponent implements OnInit {
                 { text: 'TIPO DE ACCIÓN DE PERSONAL', style: 'tableHeader' },
                 { text: 'DESCRIPCIÓN', style: 'tableHeader' },
                 { text: 'BASE LEGAL', style: 'tableHeader' },
-                //{ text: 'TIPO', style: 'tableHeader' },
               ],
               ...this.tipo_acciones.map((obj: any) => {
                 return [
@@ -598,7 +587,6 @@ export class ListarTipoAccionComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
                   { text: obj.base_legal, style: 'itemsTable' },
-                  //{ text: (obj.tipo_permiso == true ? 'Permiso' : obj.tipo_vacacion == true ? 'Vacación' : 'Situación propuesta'), style: 'itemsTable' },
                 ];
               })
             ]
@@ -619,16 +607,8 @@ export class ListarTipoAccionComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   async exportToExcel() {
-
-    var f = DateTime.now();
-    let fecha = f.toFormat('yyyy-MM-dd');
-    let hora = f.toFormat('HH:mm:ss');
-    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
     const tipoAccion: any[] = [];
-
-    console.log('tipo_acciones: ', this.tipo_acciones);
     this.tipo_acciones.forEach((accion: any, index: number) => {
-
       tipoAccion.push([
         index + 1,
         accion.id_tipo_accion_personal,
@@ -686,8 +666,6 @@ export class ListarTipoAccionComponent implements OnInit {
       { name: "DESCRIPCIÓN", totalsRowLabel: "", filterButton: true },
       { name: "BASE LEGAL", totalsRowLabel: "", filterButton: true },
     ];
-    console.log("ver Tipo Accion Personal", tipoAccion);
-    console.log("Columnas:", columnas);
 
     worksheet.addTable({
       name: "TipoAccionPersonal",
@@ -745,11 +723,11 @@ export class ListarTipoAccionComponent implements OnInit {
 
   exportToCVS() {
     var arreglo = this.tipo_acciones;
-    // 1. Crear un nuevo workbook
+    // 1. CREAR UN NUEVO WORKBOOK
     const workbook = new ExcelJS.Workbook();
-    // 2. Crear una hoja en el workbook
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
     const worksheet = workbook.addWorksheet('TipoAccionPersonalCSV');
-    // 3. Agregar encabezados de las columnas
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
     worksheet.columns = [
       { header: 'ID', key: 'id', width: 30 },
       { header: 'TIPO_ACCION_PERSONAL', key: 'tipo_accion_personal', width: 30 },
@@ -758,7 +736,7 @@ export class ListarTipoAccionComponent implements OnInit {
       { header: 'BASE_LEGAL', key: 'base_legal', width: 15 },
     ];
 
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     arreglo.map((obj: any) => {
       worksheet.addRow({
         id: obj.id,
@@ -769,9 +747,9 @@ export class ListarTipoAccionComponent implements OnInit {
       }).commit();
     });
 
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "TipoAccionPersonalCSV.csv");
     });
@@ -784,10 +762,8 @@ export class ListarTipoAccionComponent implements OnInit {
   urlxml: string;
   data: any = [];
   exportToXML() {
-
     var objeto: any;
     var arregloTipoAcciones: any = [];
-    console.log('this.tipo_acciones: ', this.tipo_acciones)
     this.tipo_acciones.forEach((obj: any) => {
       objeto = {
         "tipo_accion_personal": {
@@ -825,8 +801,8 @@ export class ListarTipoAccionComponent implements OnInit {
     a.click();
   }
 
-   //CONTROL BOTONES
-   private tienePermiso(accion: string): boolean {
+  //CONTROL BOTONES
+  private tienePermiso(accion: string): boolean {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       try {
@@ -836,32 +812,33 @@ export class ListarTipoAccionComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
-  getCrearDetalleTipoAccionPersonal(){
+  getCrearDetalleTipoAccionPersonal() {
     return this.tienePermiso('Crear Detalle Tipo Acción Personal');
   }
 
-  getEditarDetalleTipoAccionPersonal(){
+  getEditarDetalleTipoAccionPersonal() {
     return this.tienePermiso('Editar Detalle Tipo Acción Personal');
   }
 
-  getEliminarDetalleTipoAccionPersonal(){
+  getEliminarDetalleTipoAccionPersonal() {
     return this.tienePermiso('Eliminar Detalle Tipo Acción Personal');
   }
 
-  getVerDetalleTipoAccionPersonal(){
+  getVerDetalleTipoAccionPersonal() {
     return this.tienePermiso('Eliminar Detalle Tipo Acción Personal');
   }
 
-  getCargarPlantillaDetalleTipoAccionPersonal(){
+  getCargarPlantillaDetalleTipoAccionPersonal() {
     return this.tienePermiso('Cargar Plantilla Detalle Tipo Acción Personal');
   }
 
-  getDescargarReportesDetalleTipoAccionPersonal(){
+  getDescargarReportesDetalleTipoAccionPersonal() {
     return this.tienePermiso('Descargar Reportes Detalle Tipo Acción Personal');
   }
+  
 }

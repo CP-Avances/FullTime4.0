@@ -516,7 +516,7 @@ export class PlanificacionMultipleComponent implements OnInit {
         if (existe[i].default_ === 'DL' || existe[i].default_ === 'DFD') {
           // PREPARAR DATA PARA ELIMINAR HORARIO
           let plan_fecha = {
-            codigo: this.datosSeleccionados.usuarios[index].codigo,
+            id_empleado: this.datosSeleccionados.usuarios[index].id,
             fec_final: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
             fec_inicio: DateTime.fromFormat(fecha, 'd-M-yyyy').toFormat('yyyy-MM-dd'),
             id_horario: existe[i].id_horario,
@@ -1167,10 +1167,12 @@ ControlarBotones(verificar: boolean, guardar: boolean) {
 GuardarPlanificacion() {
   let contador = 0;
   if (this.eliminar_lista.length === 0) {
+    console.log("ENTRO AL IF")
     this.RegistrarPlanificacionMultiple();
   }
   else {
-    let listaEliminar = this.eliminar_lista
+    console.log("ENTRO AL ELSE")
+    let listaEliminar = this.eliminar_lista;
     console.log("ver lista eliminar ", listaEliminar)
     this.restP.BuscarFechasMultiples({ listaEliminar }).subscribe((res: any) => {
       console.log("ver res", res)

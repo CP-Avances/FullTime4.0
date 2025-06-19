@@ -106,17 +106,24 @@ class RolPermisosControlador {
             }
         });
     }
-    //FIXME SQL
-    // METODO PARA BUSCAR ID DE PAGINAS Y MENU LATERAL
+    // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL   **USADO
     ObtenerPaginasMenuRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_rol } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-        SELECT ero_rol_permisos.id, ero_rol_permisos.pagina as funcion, ero_rol_permisos.link, ero_rol_permisos.id_rol, ero_rol_permisos.id_accion, es_acciones_paginas.id_pagina as id_funcion, es_acciones_paginas.accion  
-        FROM ero_rol_permisos ero_rol_permisos 
-        LEFT JOIN es_acciones_paginas es_acciones_paginas ON es_acciones_paginas.id = ero_rol_permisos.id_accion 
-        WHERE ero_rol_permisos.id_rol = $1 
-        ORDER BY 6, 5
+        SELECT 
+          rp.id, 
+          rp.pagina AS funcion, 
+          rp.link, 
+          rp.id_rol, 
+          rp.id_accion, 
+          ap.id_pagina AS id_funcion, 
+          ap.accion  
+        FROM ero_rol_permisos rp
+        LEFT JOIN es_acciones_paginas ap 
+          ON ap.id = rp.id_accion 
+        WHERE rp.id_rol = $1
+        ORDER BY ap.id_pagina, rp.id_accion;
       `, [id_rol]);
             if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
@@ -126,7 +133,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA ASIGNAR FUNCIONES AL ROL
+    // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
     AsignarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -134,7 +141,7 @@ class RolPermisosControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
+          INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
         `, [funcion, link, id_rol, id_accion, movil]);
                 const [datosOriginales] = response.rows;
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -163,7 +170,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA ASIGNAR PAGINAS/ACCIONES AL ROL
+    // METODO PARA ASIGNAR ACCIONES AL ROL   **USADO
     AsignarAccionesRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const arrayAccionesSeleccionadas = req.body.acciones;
@@ -224,10 +231,10 @@ class RolPermisosControlador {
                     paramsAuditoria.push("APLICACION WEB", 'ero_rol_permisos', user_name, 'D', JSON.stringify(original), '', ip, null, ip_local);
                 }
                 const queryAuditoria = `
-        INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
-          action, original_data, new_data, ip_address, observacion, ip_address_local)
-        VALUES ${valuesAuditoria.join(', ')}
-      `;
+          INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+            action, original_data, new_data, ip_address, observacion, ip_address_local)
+          VALUES ${valuesAuditoria.join(', ')}
+        `;
                 yield database_1.default.query(queryAuditoria, paramsAuditoria);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -260,8 +267,8 @@ class RolPermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_funcion } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-          SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
-          `, [id_funcion]);
+        SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+      `, [id_funcion]);
             if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
@@ -313,7 +320,6 @@ class RolPermisosControlador {
             else if (SIN_ACCIONES.rowCount != 0) {
                 respuesta = SIN_ACCIONES.rows;
             }
-            console.log('respuesta ', respuesta.length);
             if (respuesta.length != 0) {
                 return res.jsonp(respuesta);
             }
@@ -323,6 +329,7 @@ class RolPermisosControlador {
         });
     }
 }
+// FUNCION UTIL PARA FILTRAR LAS ACCIONES SELECCIONADAS  **USADO
 function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas) {
     return __awaiter(this, void 0, void 0, function* () {
         if (arrayAccionesSeleccionadas.length === 0)
@@ -343,9 +350,9 @@ function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas) {
             }
         }
         const query = `
-    SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
-    WHERE ${conditions.join(' OR ')}
-  `;
+      SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
+      WHERE ${conditions.join(' OR ')}
+    `;
         const result = yield database_1.default.query(query, values);
         // CONVERTIMOS LOS REGISTROS EXISTENTES A UN SET DE CLAVES PARA COMPARAR RÁPIDO
         const clavesExistentes = new Set(result.rows.map(r => { var _a; return `${r.pagina}|${r.id_rol}|${(_a = r.id_accion) !== null && _a !== void 0 ? _a : 'null'}`; }));
@@ -356,11 +363,12 @@ function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas) {
         });
     });
 }
+// FUNCION PARA INSERTAR EN LA BASE DE DATOS LAS ACCIONES SELECCIONADAS   **USADO
 function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas) {
     return __awaiter(this, void 0, void 0, function* () {
         if (arrayAccionesSeleccionadas.length === 0)
             return;
-        // CONSTRUIMOS LA CONSULTA DE INSERCIÓN
+        // CONSTRUIMOS LA CONSULTA DE INSERCION
         const values = [];
         const params = [];
         let i = 1;
@@ -377,26 +385,26 @@ function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas) {
                 values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
                 params.push(funcion, link, id_rol, movil);
             }
-            // PREPARAR DATOS PARA AUDITORÍA
+            // PREPARAR DATOS PARA AUDITORIA
             valuesAuditoria.push(`($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`);
             paramsAuditoria.push("APLICACION WEB", 'ero_rol_permisos', user_name, 'now()', 'I', '', JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), ip, null, ip_local);
         }
         const query = `
-    INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
-    VALUES ${values.join(', ')}
-  `;
+      INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
+      VALUES ${values.join(', ')}
+    `;
         const queryAuditoria = `
-    INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+      INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
         action, original_data, new_data, ip_address, observacion, ip_address_local)
-    VALUES ${valuesAuditoria.join(', ')}
-  `;
-        // añadir transacción
+      VALUES ${valuesAuditoria.join(', ')}
+    `;
+        // AÑADIR TRANSACCION
         yield database_1.default.query('BEGIN');
         yield database_1.default
             .query(query, params)
-            .catch(error => {
+            .catch((error) => {
             console.error('Error al insertar acciones seleccionadas:', error);
-            // Revertir transacción en caso de error
+            // REVERTIR TRANSACCIÓN EN CASO DE ERROR
             return database_1.default.query('ROLLBACK')
                 .then(() => {
                 throw new Error('Error al insertar acciones seleccionadas: ' + error.message);
@@ -404,15 +412,15 @@ function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas) {
         });
         yield database_1.default
             .query(queryAuditoria, paramsAuditoria)
-            .catch(error => {
+            .catch((error) => {
             console.error('Error al insertar auditoría de acciones seleccionadas:', error);
-            // Revertir transacción en caso de error
+            // REVERTIR TRANSACCIÓN EN CASO DE ERROR
             return database_1.default.query('ROLLBACK')
                 .then(() => {
                 throw new Error('Error al insertar auditoría de acciones seleccionadas: ' + error.message);
             });
         });
-        // Finalizar transacción
+        // FINALIZAR TRANSACCION
         yield database_1.default.query('COMMIT');
         console.log('Acciones seleccionadas insertadas correctamente.');
     });

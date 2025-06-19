@@ -4,10 +4,10 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
 export class RolesService {
 
   constructor(private http: HttpClient) { }
-
 
   // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
   BuscarRoles() {
@@ -23,12 +23,10 @@ export class RolesService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // METODO PARA REGISTRAR ROL
+  // METODO PARA REGISTRAR ROL     ** USADO
   RegistraRol(data: any) {
-    console.log(data);
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
-
 
   // METODO PARA LISTAR INFORMACION DEL ROL **USADO
   BuscarUnRol(id: number) {
@@ -45,8 +43,7 @@ export class RolesService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 
-
-  // METODO PARA ACTUALIZAR ROLES  DE FORMA MASIVA **USADO
+  // METODO PARA ACTUALIZAR ROLES DE FORMA MASIVA     **USADO
   ActualizarRoles(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol/updateUsers`, data);
   }

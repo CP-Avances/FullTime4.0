@@ -75,7 +75,7 @@ export class FeriadosService {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload/revision', formData);
   }
 
-  // METODO PARA REGISTRAR DATOS DE PLANTILLA
+  // METODO PARA REGISTRAR DATOS DE PLANTILLA    ** USADO
   Crear_feriados(form: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string)  + '/feriados/upload/crearFeriado', form);
   }

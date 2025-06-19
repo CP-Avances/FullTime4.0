@@ -474,11 +474,7 @@ class RelojesControlador {
                             } else {
                                 data.observacion = '1';
                             }
-
-
-
                             listDispositivos.push(data);
-
                         }
                         else {
                             data.fila = ITEM;

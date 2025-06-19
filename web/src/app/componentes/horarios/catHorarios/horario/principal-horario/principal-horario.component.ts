@@ -130,16 +130,21 @@ export class PrincipalHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.nameFile = '';
     this.ObtenerLogo();
     this.ObtenerColores();
     this.ObtenerHorarios();
     this.ObtenerEmpleados();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -157,7 +162,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
@@ -397,7 +402,6 @@ export class PrincipalHorarioComponent implements OnInit {
     this.rest.VerificarDatosHorario(formData).subscribe({
       next: (res) => {
         this.dataHorarios = res;
-        console.log("DETALLE DE HORARIO", this.dataHorarios)
         this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
           if (obj.OBSERVACION == 'Ok') {
             this.listaHorariosCorrectos.push(obj);
@@ -474,7 +478,8 @@ export class PrincipalHorarioComponent implements OnInit {
       horarios: this.listaHorariosCorrectos,
       detalles: this.listaDetalleCorrectos,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
@@ -776,7 +781,6 @@ export class PrincipalHorarioComponent implements OnInit {
       rows: datos,
     });
 
-
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 14; j++) {
@@ -836,7 +840,7 @@ export class PrincipalHorarioComponent implements OnInit {
       { header: 'minutos_antes', key: 'minutos_antes', width: 15 },
       { header: 'minutos_despues', key: 'minutos_despues', width: 15 },
     ];
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     let n: number = 1;
 
     this.horarios.forEach((obj: any) => {
@@ -856,13 +860,13 @@ export class PrincipalHorarioComponent implements OnInit {
           otro_dia: det.segundo_dia == true ? 'Sí' : 'No',
           minutos_antes: det.minutos_antes,
           minutos_despues: det.minutos_despues,
-        }).commit();                                                                                                                                             
+        }).commit();
       })
     })
 
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "HorariosCSV.csv");
     });
@@ -1053,17 +1057,17 @@ export class PrincipalHorarioComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionHorarios.selected.length;
-  
+
     this.horariosEliminar = this.selectionHorarios.selected;
-  
+
     this.horariosEliminar.forEach((datos: any) => {
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -1072,14 +1076,14 @@ export class PrincipalHorarioComponent implements OnInit {
           eliminados++;
           this.horarios = this.horarios.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
           }
-  
+
           this.selectionHorarios.clear();
           this.horariosEliminar = [];
           this.ObtenerHorarios();
@@ -1087,7 +1091,7 @@ export class PrincipalHorarioComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
@@ -1127,35 +1131,35 @@ export class PrincipalHorarioComponent implements OnInit {
     }
   }
 
-  getCrearHorario(){
+  getCrearHorario() {
     return this.tienePermiso('Crear Horario');
   }
 
-  getVerHorario(){
+  getVerHorario() {
     return this.tienePermiso('Ver Horario');
   }
 
-  getEditarHorario(){
+  getEditarHorario() {
     return this.tienePermiso('Editar Horario');
   }
 
-  getEliminarHorario(){
+  getEliminarHorario() {
     return this.tienePermiso('Eliminar Horario');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Horarios');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Horarios');
   }
 
-  getDescargarDocumento(){
+  getDescargarDocumento() {
     return this.tienePermiso('Descargar Documento Horario');
   }
 
-  getCrearDetalleHorario(){
+  getCrearDetalleHorario() {
     return this.tienePermiso('Crear Detalle Horario');
   }
 }

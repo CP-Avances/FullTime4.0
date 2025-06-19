@@ -8,10 +8,10 @@ import { DateTime } from 'luxon';
 
 
 // IMPORTAR SERVICIOS
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+import { ReportesAsistenciasService } from 'src/app/servicios/reportes/timbres/reportes-asistencias.service';
 import { ValidacionesService } from '../../../../../servicios/generales/validaciones/validaciones.service';
 import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 
 @Component({

@@ -123,6 +123,30 @@ export class ListarFeriadosComponent implements OnInit {
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
+    this.ManejarEstilos();
+  }
+
+  /** **************************************************************************************** **
+   ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** **
+   ** **************************************************************************************** **/
+
+  formato_fecha: string = 'dd/MM/yyyy';
+  idioma_fechas: string = 'es';
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+        this.ObtenerFeriados(this.formato_fecha)
+      },
+      vacio => {
+        this.ObtenerFeriados(this.formato_fecha)
+      });
+  }
+
+  // METODO DE MANEJO DE ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -145,25 +169,6 @@ export class ListarFeriadosComponent implements OnInit {
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
     this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
-  }
-
-  /** **************************************************************************************** **
-   ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** **
-   ** **************************************************************************************** **/
-
-  formato_fecha: string = 'dd/MM/yyyy';
-  idioma_fechas: string = 'es';
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
-  BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 1
-    this.parametro.ListarDetalleParametros(1).subscribe(
-      res => {
-        this.formato_fecha = res[0].descripcion;
-        this.ObtenerFeriados(this.formato_fecha)
-      },
-      vacio => {
-        this.ObtenerFeriados(this.formato_fecha)
-      });
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -530,7 +535,6 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-
   async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
     this.OrdenarDatos(this.feriados);
@@ -623,8 +627,6 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
 
-
-
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -670,14 +672,12 @@ export class ListarFeriadosComponent implements OnInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "codigo", width: 20 },
       { key: "feriado", width: 20 },
       { key: "fecha", width: 20 },
       { key: "fecha_recupera", width: 30 },
-
     ];
 
     const columnas = [
@@ -700,7 +700,6 @@ export class ListarFeriadosComponent implements OnInit {
       columns: columnas,
       rows: datos,
     });
-
 
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -792,21 +791,20 @@ export class ListarFeriadosComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
-
   ExportToCSV() {
-    // 1. Crear un nuevo workbook
+    // 1. CREAR UN NUEVO WORKBOOK
     this.OrdenarDatos(this.feriados);
     const workbook = new ExcelJS.Workbook();
-    // 2. Crear una hoja en el workbook
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
     const worksheet = workbook.addWorksheet('FeriadosCSV');
-    // 3. Agregar encabezados de las columnas
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
     worksheet.columns = [
       { header: 'CODIGO', key: 'codigo', width: 10 },
       { header: 'FERIADO', key: 'feriado', width: 30 },
       { header: 'FECHA', key: 'fecha', width: 15 },
       { header: 'FECHA_RECUPERA', key: 'fecha_recupera', width: 15 }
     ];
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     this.feriados.forEach((obj: any) => {
       worksheet.addRow({
         codigo: obj.id,
@@ -816,9 +814,9 @@ export class ListarFeriadosComponent implements OnInit {
       }).commit();
     });
 
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "FeriadosCSV.csv");
     });
@@ -871,8 +869,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  Eliminar(id_feriado: number) {
-    console.log("METODO QUE ELIMINA");
+  Eliminar(id_feriado: number) {;
     const datos = {
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
@@ -894,7 +891,6 @@ export class ListarFeriadosComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
-    console.log("ENTRADO A CONFIRMACION DE DELETE");
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -915,7 +911,8 @@ export class ListarFeriadosComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     };
     this.contador = 0;
     let totalProcesados = 0;

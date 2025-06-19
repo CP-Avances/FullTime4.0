@@ -50,10 +50,10 @@ export class RegistroProcesoComponent implements OnInit {
   ngOnInit(): void {
     this.Obtenerprocesos();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // METODO DE VALIDACION DE CAMPOS
@@ -72,42 +72,42 @@ export class RegistroProcesoComponent implements OnInit {
       let dataProceso = {
         nombre: form.procesoNombreForm,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       };
-      this.rest.postProcesoRest(dataProceso)
+      this.rest.RegistrarProceso(dataProceso)
         .subscribe(response => {
-          console.log('response: ',response);
           this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
           this.CerrarVentana();
-        }, error => { 
+        }, error => {
           this.toastr.error(error.error.message, 'Registro.', {
             timeOut: 6000,
           });
         });
     } else {
-      this.rest.getIdProcesoPadre(procesoPadreNombre).subscribe(data => {
+      this.rest.ObtenerIDProcesoSuperior(procesoPadreNombre).subscribe(data => {
         procesoPadreId = data[0].id;
         let dataProceso = {
           nombre: form.procesoNombreForm,
           proc_padre: procesoPadreId,
           user_name: this.user_name,
-          ip: this.ip, ip_local: this.ips_locales
+          ip: this.ip,
+          ip_local: this.ips_locales
         };
-        this.rest.postProcesoRest(dataProceso)
-        .subscribe(response => {
-          console.log('response: ',response);
-          this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
-            timeOut: 6000,
+        this.rest.RegistrarProceso(dataProceso)
+          .subscribe(response => {
+            this.toastr.success('Operacion exitosa.', 'Registro guardado.', {
+              timeOut: 6000,
+            });
+            this.CerrarVentana();
+          }, error => {
+            console.log('error.message: ', error.error.message)
+            this.toastr.error(error.error.message, 'Registro.', {
+              timeOut: 6000,
+            });
           });
-          this.CerrarVentana();
-        }, error => { 
-          console.log('error.message: ',error.error.message)
-          this.toastr.error(error.error.message, 'Registro.', {
-            timeOut: 6000,
-          });
-        });
       });
     }
   }

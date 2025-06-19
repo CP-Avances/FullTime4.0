@@ -4,6 +4,8 @@ import path from 'path';
 import fs from 'fs';
 
 class PlantillasControlador {
+    
+    // METODO PARA DESCARGAR LA PLANTILLA DE INGRESO DE DATOS   
     public async DescargarPlantilla(req: Request, res: Response): Promise<any> {
         const documento = req.params.docs;
         let separador = path.sep;

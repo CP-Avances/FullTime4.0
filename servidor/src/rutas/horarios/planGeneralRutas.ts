@@ -12,18 +12,16 @@ class DepartamentoRutas {
     configuracion(): void {
         // METODO PARA REGISTRAR PLAN GENERAL  **USADO
         this.router.post('/', TokenValidation, PLAN_GENERAL_CONTROLADOR.CrearPlanificacion);
+        // METODO PARA CREAR PLAN GENERAL POR LOTES  **USADO
         this.router.post('/cargar-planificacion', TokenValidation, PLAN_GENERAL_CONTROLADOR.CrearPlanificacionPorLotes);
-
         // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL  **USADO
         this.router.post('/buscar_fechas', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarFechas);
-        // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL MULTIPLE 
+        // METOOD PARA BUSCAR ID POR FECHAS PLAN GENERAL MULTIPLE    **USADO
         this.router.post('/buscar_fechas_multiple', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarFechasMultiples);
         // METODO PARA ELIMINAR REGISTROS  **USADO
         this.router.post('/eliminar', TokenValidation, PLAN_GENERAL_CONTROLADOR.EliminarRegistros);
-          // METODO PARA ELIMINAR REGISTROS MULTIPLES  **USADO
-          this.router.post('/eliminar-multiples', TokenValidation, PLAN_GENERAL_CONTROLADOR.EliminarRegistrosMultiples);
-        // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS
-        this.router.post('/horario-general-fechas', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarHorarioFechas);
+        // METODO PARA ELIMINAR REGISTROS MULTIPLES  **USADO
+        this.router.post('/eliminar-multiples', TokenValidation, PLAN_GENERAL_CONTROLADOR.EliminarRegistrosMultiples);
         // METODO PARA LISTAR PLANIFICACION DE USUARIOS  **USADO
         this.router.post('/horario-general-planificacion', TokenValidation, PLAN_GENERAL_CONTROLADOR.ListarPlanificacionHoraria);
         // METODO PARA LISTAR DETALLE DE HORARIOS DE LOS USUARIOS    **USADO
@@ -36,7 +34,12 @@ class DepartamentoRutas {
         this.router.post('/actualizar-asistencia/manual', TokenValidation, PLAN_GENERAL_CONTROLADOR.ActualizarManual);
 
 
-        this.router.post('/buscar_fecha/plan', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarFecha);
+
+
+
+
+        // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS
+        this.router.post('/horario-general-fechas', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarHorarioFechas);
     }
 }
 

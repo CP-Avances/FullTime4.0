@@ -180,7 +180,8 @@ export class RealtimeAvisosComponent implements OnInit {
         id: obj.id,
         empleado: obj.empleado
       }
-    })
+    });
+    (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(EliminarRealtimeComponent,
       { width: '500px', data: { opcion: opcion, lista: EmpleadosSeleccionados } }).afterClosed().subscribe(item => {
         if (item === true) {

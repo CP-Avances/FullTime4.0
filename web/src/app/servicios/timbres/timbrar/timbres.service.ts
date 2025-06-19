@@ -4,12 +4,12 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
+
 export class TimbresService {
 
   constructor(
     private http: HttpClient
   ) { }
-  //Metodos aun en desarrollo
 
   // METODO PARA LISTAR MARCACIONES    **USADO
   ObtenerTimbres() {
@@ -122,32 +122,52 @@ export class TimbresService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  /**
-   * METODO PARA TRAER LAS NOTIFICACIONES DE ATRASOS O SALIDAS ANTES SOLO VIENEN 5 NOTIFICACIONES
-   * @param id_empleado Id DEL EMPLEADO QUE INICIA SESION
-   */
 
-  // METODO DE CONSULTA DE AVISOS GENERALES
-  BuscarAvisosGenerales(id_empleado: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/avisos-generales/${id_empleado}`);
-  }
+  /** ********************************************************************************** **
+   ** **              TRATAMIENTO DE AVISOS QUE EMITE EL SISTEMA                      ** **
+   ** ********************************************************************************** **/
 
-  // METODO DE CONSULTA DE AVISOS ESPECIFICOS
+  // METODO DE CONSULTA DE AVISOS ESPECIFICOS    ** USADO
   ObtenerUnAviso(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/aviso-individual/${id}`);
   }
 
+  // METODO UTILIZADO PARA ACTUALIZAR ESTADO DE LA NOTIFICACION   ** USADO
   ActualizarVistaAvisos(id_noti_timbre: number, datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
-  // LISTA DE AVISOS
+  // LISTA DE AVISOS    **USADO
   ListarAvisos(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/avisos/${id_empleado}`);
   }
 
+  // ELIMINAR AVISOS DEL SISTEMA   **USADO
   EliminarAvisos(Seleccionados: any) {
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-multiples/avisos`, Seleccionados);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // METODO DE CONSULTA DE AVISOS GENERALES   ** USADO
+  BuscarAvisosGenerales(id_empleado: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/avisos-generales/${id_empleado}`);
+  }
+
+
 
 }

@@ -1,6 +1,6 @@
-import { Router } from 'express';
 import PARAMETROS_CONTROLADOR from '../../../controlador/configuracion/parametrizacion/parametrosControlador';
-import { TokenValidation } from '../../../libs/verificarToken'
+import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
 
 class ParametrosRutas {
     public router: Router = Router();

@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DOCUMENTOS_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const listarArchivos_1 = require("../../libs/listarArchivos");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const luxon_1 = require("luxon");
-const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
@@ -45,7 +45,7 @@ class DocumentosControlador {
             res.jsonp(yield (0, listarArchivos_1.ListarContratos)(nombre));
         });
     }
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS           **USADO
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS    **USADO
     ListarCarpetaPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
@@ -60,14 +60,14 @@ class DocumentosControlador {
             res.jsonp(yield (0, listarArchivos_1.ListarDocumentosIndividuales)(nombre, tipo));
         });
     }
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS            **USADO
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS      **USADO
     ListarCarpetaHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             res.jsonp(yield (0, listarArchivos_1.ListarHorarios)(nombre));
         });
     }
-    // METODO LISTAR ARCHIVOS DE CARPETAS             **USADO
+    // METODO LISTAR ARCHIVOS DE CARPETAS    **USADO
     ListarArchivosCarpeta(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;

@@ -17,6 +17,7 @@ const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class PlantillasControlador {
+    // METODO PARA DESCARGAR LA PLANTILLA DE INGRESO DE DATOS   
     DescargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const documento = req.params.docs;

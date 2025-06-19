@@ -5,7 +5,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { FormControl } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 import { DateTime } from 'luxon';
 import ExcelJS, { FillPattern } from "exceljs";
 import * as FileSaver from 'file-saver';
@@ -15,7 +15,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { ReportesService } from '../../../../servicios/reportes/reportes.service';
+import { ReportesService } from '../../../../servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
@@ -57,7 +57,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -139,6 +139,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   pageSizeOptions_res = [5, 10, 20, 50];
   tamanio_pagina_res: number = 5;
   numero_pagina_res: number = 1;
+
+  // CAMPOS DEL FORMULARIO
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+
 
   // ARREGLO DE DATOS DE HORARIOS
   nomenclatura = [
@@ -1282,6 +1288,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
           n,
           identificacion: empleado.identificacion,
           codigo: empleado.codigo,
+          nombre: empleado.nombre,
+          apellido: empleado.apellido,
           empleado: empleado.apellido + ' ' + empleado.nombre,
           ciudad: empleado.ciudad,
           sucursal: empleado.sucursal,

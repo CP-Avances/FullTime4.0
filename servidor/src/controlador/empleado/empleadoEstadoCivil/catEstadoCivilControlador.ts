@@ -1,12 +1,11 @@
-import { Request, Response } from 'express';
-import pool from '../../../database';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import pool from '../../../database';
 
 class EstadoCivilControlador {
 
-  // LISTA DE GENEROS
-
+  // METODO PARA LISTAR ESTADO CIVIL   **USADO
   public async ListarEstadosCivil(req: Request, res: Response) {
     const ESTADOS = await pool.query(
       `
@@ -22,7 +21,7 @@ class EstadoCivilControlador {
     }
   }
 
-  // METODO PARA BUSCAR TITULO POR SU NOMBRE   **USADO
+  // METODO PARA BUSCAR ESTADO CIVIL POR SU NOMBRE   **USADO
   public async ObtenerEstadoCivil(req: Request, res: Response): Promise<any> {
     const { estado } = req.params;
     const unEstado = await pool.query(
@@ -40,7 +39,7 @@ class EstadoCivilControlador {
   }
 
 
-  // METODO PARA REGISTRAR NIVEL DE TITULO   **USADO
+  // METODO PARA REGISTRAR ESTADO CIVIL   **USADO
   public async CrearEstadoCivil(req: Request, res: Response): Promise<Response> {
     try {
       const { estado, user_name, ip, ip_local } = req.body;
@@ -85,7 +84,7 @@ class EstadoCivilControlador {
     }
   }
 
-
+  // METODO PARA ACTUALIZAR REGISTRO DE ESTADO CIVIL   **USADO
   public async ActualizarEstadoCivil(req: Request, res: Response): Promise<Response> {
     try {
       const { estado, id, user_name, ip, ip_local } = req.body;
@@ -144,8 +143,6 @@ class EstadoCivilControlador {
       return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
     }
   }
-
-
 
   // METODO PARA ELIMINAR REGISTROS   **USADO
   public async EliminarEstadoCivil(req: Request, res: Response): Promise<Response> {

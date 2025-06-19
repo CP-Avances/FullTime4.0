@@ -16,7 +16,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 
-import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
+import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/aprobar-solicitudes/solicitudes-horas-extras/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 
 export interface HoraExtraElemento {
   apellido: string;
