@@ -1,12 +1,14 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { ToastrService } from 'ngx-toastr';
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
 import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
-import { environment } from 'src/environments/environment';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-registro-multiple-grupo',
@@ -26,6 +28,7 @@ export class RegistroMultipleGrupoComponent {
   ips_locales: any = '';
 
   archivoForm = new FormControl('', Validators.required);
+
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
   hipervinculo: string = environment.url
 
@@ -53,10 +56,10 @@ export class RegistroMultipleGrupoComponent {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
@@ -114,18 +117,15 @@ export class RegistroMultipleGrupoComponent {
   VerificarPlantilla() {
     this.listaGrupoOcupacionalCorrectas = [];
     let formData = new FormData();
-    
+
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormatoEmpleGrupoOcu(formData).subscribe(res => {
-        this.Datos_grupoOcupacional = res.data;
-        this.messajeExcel = res.message;
-
-        console.log('this.Datos_procesos: ',this.Datos_grupoOcupacional)
-
+      this.Datos_grupoOcupacional = res.data;
+      this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -139,7 +139,6 @@ export class RegistroMultipleGrupoComponent {
         this.mostrarbtnsubir = false;
       }
       else {
-
         this.Datos_grupoOcupacional.sort((a: any, b: any) => {
           if (a.observacion !== 'ok' && b.observacion === 'ok') {
             return -1;
@@ -174,81 +173,74 @@ export class RegistroMultipleGrupoComponent {
           this.RegistrarProcesos();
         }
       });
-   }
+  }
 
-   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
-   colorCelda: string = ''
-   EstiloCelda(observacion: string): string {
-     let arrayObservacion = observacion.split(" ");
-     if (observacion == 'Registro duplicado') {
-       return 'rgb(156, 214, 255)';
-     } else if (observacion == 'ok') {
-       return 'rgb(159, 221, 154)';
-     } else if (observacion == 'Ya existe un registro activo con este Grupo Ocupacional.') {
-       return 'rgb(239, 203, 106)';
-     } else if (observacion  == 'La identificación ingresada no esta registrada en el sistema' ||
-       observacion == 'Grupo Ocupacional no esta registrado en el sistema'
-     ) {
-       return 'rgb(255, 192, 203)';
-     } else {
-       return 'rgb(242, 21, 21)';
-     }
-   }
- 
-   colorTexto: string = '';
-   EstiloTextoCelda(texto: string): string {
-     texto = texto.toString()
-     let arrayObservacion = texto.split(" ");
-     if (arrayObservacion[0] == 'No') {
-       return 'rgb(255, 80, 80)';
-     } else {
-       return 'black'
-     }
-   }
- 
-   // METODO PARA REGISTRAR DATOS
-   RegistrarProcesos() {
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  EstiloCelda(observacion: string): string {
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe un registro activo con este Grupo Ocupacional.') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'La identificación ingresada no esta registrada en el sistema' ||
+      observacion == 'Grupo Ocupacional no esta registrado en el sistema'
+    ) {
+      return 'rgb(255, 192, 203)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
 
-    console.log('listaGrupoOcupacionalCorrectas: ',this.listaGrupoOcupacionalCorrectas.length)
-     if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
-       const data = {
-         plantilla: this.listaGrupoOcupacionalCorrectas,
-         user_name: this.user_name,
-         ip: this.ip, ip_local: this.ips_locales
-       }
+  colorTexto: string = '';
+  EstiloTextoCelda(texto: string): string {
+    texto = texto.toString()
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
 
-       this.rest.RegistrarPlantillaEmpleGrupoOcu(data).subscribe({
-         next: (response: any) => {
-           this.toastr.success('Plantilla de Grupo Ocupacional importada.', 'Operación exitosa.', {
-             timeOut: 5000,
-           });
-           if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
-             setTimeout(() => {
+  // METODO PARA REGISTRAR DATOS
+  RegistrarProcesos() {
+    if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
+      const data = {
+        plantilla: this.listaGrupoOcupacionalCorrectas,
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales
+      }
+      this.rest.RegistrarPlantillaEmpleGrupoOcu(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Plantilla de Grupo Ocupacional importada.', 'Operación exitosa.', {
+            timeOut: 5000,
+          });
+          if (this.listaGrupoOcupacionalCorrectas?.length > 0) {
+            setTimeout(() => {
               this.cerrarComponente.emit(false);
-             }, 500);
-           }
-           
-         },
-         error: (error) => {
-           this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
-             timeOut: 4000,
-           });
-           this.archivoForm.reset();
-         }
-       });
+            }, 500);
+          }
 
-     } else {
-       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
-         timeOut: 4000,
-       });
-       this.archivoForm.reset();
-     }
- 
-     this.archivoSubido = [];
-     this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
 
-
-   }
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+    this.archivoSubido = [];
+    this.nameFile = '';
+  }
 
 
 }

@@ -240,19 +240,6 @@ class DiscapacidadControlador {
             }
         });
     }
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const DISCAPACIDAD = yield database_1.default.query(`
-      SELECT * FROM eu_empleado_discapacidad
-      `);
-            if (DISCAPACIDAD.rowCount != 0) {
-                return res.jsonp(DISCAPACIDAD.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
 }
 exports.DISCAPACIDAD_CONTROLADOR = new DiscapacidadControlador();
 exports.default = exports.DISCAPACIDAD_CONTROLADOR;

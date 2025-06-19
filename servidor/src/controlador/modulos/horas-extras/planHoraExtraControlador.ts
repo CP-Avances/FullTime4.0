@@ -1,12 +1,8 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { enviarCorreos, fechaHora, Credenciales, FormatearFecha, FormatearHora, dia_completo, FormatearFecha2 } from '../../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
-import {
-  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
-}
-  from '../../../libs/settingsMail';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import path from 'path';
 
@@ -536,7 +532,7 @@ class PlanHoraExtraControlador {
 
     var datos = await Credenciales(req.id_empresa);
 
-    if (datos === 'ok') {
+    if (datos.message === 'ok') {
 
       const { id_empl_envia, correos, nombres, observacion, desde, hasta, inicio, fin,
         horas, asunto, tipo_solicitud, proceso } = req.body;
@@ -551,7 +547,7 @@ class PlanHoraExtraControlador {
         , [id_empl_envia]).then((resultado: any) => { return resultado.rows[0] });
 
       let data = {
-        from: email,
+        from: datos.informacion.email,
         to: correos,
         subject: asunto,
         html:
@@ -566,7 +562,7 @@ class PlanHoraExtraControlador {
             </p>
             <h3 style="font-family: Arial; text-align: center;">DATOS DEL COLABORADOR QUE ${tipo_solicitud} PLANIFICACIÓN HORAS EXTRAS</h3>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${nombre} <br>   
+              <b>Empresa:</b> ${datos.informacion.nombre} <br>   
               <b>Asunto:</b> ${asunto} <br> 
               <b>Colaborador que envía:</b> ${Envia.nombre} ${Envia.apellido} <br>
               <b>Número de identificación:</b> ${Envia.identificacion} <br>
@@ -606,17 +602,17 @@ class PlanHoraExtraControlador {
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
-            path: `${path_folder}${separador}${cabecera_firma}`,
+            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           },
           {
             filename: 'pie_firma.jpg',
-            path: `${path_folder}${separador}${pie_firma}`,
+            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
           }]
       };
 
-      var corr = enviarMail(servidor, parseInt(puerto));
+      var corr = enviarCorreos(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
       corr.sendMail(data, function (error: any, info: any) {
         if (error) {
           corr.close();

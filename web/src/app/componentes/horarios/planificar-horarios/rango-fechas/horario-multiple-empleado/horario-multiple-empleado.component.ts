@@ -18,7 +18,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 

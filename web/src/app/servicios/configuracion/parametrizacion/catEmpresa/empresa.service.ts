@@ -10,7 +10,7 @@ export class EmpresaService {
     private http: HttpClient,
   ) { }
 
-  // CONSULTAR DATOS DE EMPRESA PARA RECUPERAR CUENTA
+  // CONSULTAR DATOS DE EMPRESA PARA RECUPERAR CUENTA   **USADO
   ConsultarEmpresaCadena() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/navegar`);
   }
@@ -81,7 +81,7 @@ export class EmpresaService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/credenciales/${id_empresa}`, data);
   }
 
-  //Empresas
+  // METODO PARA CONSULTAR EMPRESA   **USADO
   ConsultarEmpresas() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas`);
   }

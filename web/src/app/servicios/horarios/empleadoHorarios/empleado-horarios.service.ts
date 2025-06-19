@@ -25,6 +25,7 @@ export class EmpleadoHorariosService {
   VerificarDuplicidadHorarios(id_empleado: string, datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/validarFechas/${id_empleado}`, datos);
   }
+
   // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
   VerificarHorariosExistentes(id_empleado: string, datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horarios-existentes1/${id_empleado}`, datos);
@@ -34,6 +35,21 @@ export class EmpleadoHorariosService {
   VerificarHorariosExistentesMultiples(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horarios-existentes`, datos);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS MISMO DIA (MD)
   BuscarHorarioHorasMD(datos: any) {
@@ -55,13 +71,5 @@ export class EmpleadoHorariosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horario-comida-horas-dias-diferentes`, datos);
   }
 
-  //Horarios Empleado
-  ObtenerHorariosFechasEmpleado(codigo: string | number, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/fechas_horario/${codigo}`, data)
-  }
-
-  BuscarHorarioFechas(codigo: any, datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/busqueda-horarios/${codigo}`, datos);
-  }
 
 }

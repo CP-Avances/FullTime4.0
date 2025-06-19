@@ -5,7 +5,6 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
-import { error } from 'console';
 
 // AYUDA PARA CREAR LOS NIVELES
 interface Nivel {
@@ -56,7 +55,6 @@ export class EditarCatProcesosComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    //console.log('data ', this.data)
   }
 
   // METODO PARA MOSTRAR DATOS DEL REGISTRO
@@ -74,13 +72,10 @@ export class EditarCatProcesosComponent implements OnInit {
     }
   }
 
-
   // METODO PARA EDITAR REGISTRO
   EditarProceso(form: any) {
     var procesoPadreId: any;
     var procesoPadreNombre = form.procesoPadreForm;
-
-    console.log('procesoPadreNombre: ',procesoPadreNombre)
 
     if (procesoPadreNombre === 'Ninguno') {
       let dataProceso = {
@@ -88,11 +83,12 @@ export class EditarCatProcesosComponent implements OnInit {
         nombre: form.procesoNombreForm,
         proc_padre: "",
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       };
       this.ActualizarDatos(dataProceso);
     } else {
-      this.rest.getIdProcesoPadre(procesoPadreNombre).subscribe(data => {
+      this.rest.ObtenerIDProcesoSuperior(procesoPadreNombre).subscribe(data => {
         procesoPadreId = data[0].id;
         let dataProceso = {
           id: this.data.datosP.id,
@@ -101,9 +97,6 @@ export class EditarCatProcesosComponent implements OnInit {
           user_name: this.user_name,
           ip: this.ip, ip_local: this.ips_locales
         };
-
-        console.log('dataProceso: ',dataProceso)
-
         this.ActualizarDatos(dataProceso);
       });
     }
@@ -112,7 +105,6 @@ export class EditarCatProcesosComponent implements OnInit {
   // METODO PARA ACTUALIZAR DATOS EN BASE DE DATOS
   ActualizarDatos(datos: any) {
     this.rest.ActualizarUnProceso(datos).subscribe(response => {
-      //console.log(datos)
       this.toastr.success('Operacion exitosa.', 'Proceso actualizado', {
         timeOut: 6000,
       });
@@ -144,7 +136,6 @@ export class EditarCatProcesosComponent implements OnInit {
     this.rest.ConsultarProcesos().subscribe(data => {
       this.procesos = data;
       this.procesos.push({ nombre: 'Ninguno' });
-      //console.log('procesos', this.procesos)
     })
   }
 

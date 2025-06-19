@@ -27,13 +27,13 @@ class RolPermisosRutas {
         // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
         this.router.post('/menu/todaspaginasrol', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerPaginasRol);
 
-        //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL
+        // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL   **USADO
         this.router.post('/menu/todaspaginasmenurol', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerPaginasMenuRol);
 
         // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
         this.router.post('/menu/paginas/insertar', TokenValidation, ROLPERMISOSCONTROLADOR.AsignarPaginaRol);
 
-        // METODO PARA ASIGNAR ACCIONES AL ROL
+        // METODO PARA ASIGNAR ACCIONES AL ROL   **USADO
         this.router.post('/menu/paginas/acciones/insertar', TokenValidation, ROLPERMISOSCONTROLADOR.AsignarAccionesRol);
 
         // METODO PARA ELIMINAR REGISTRO  **USADO

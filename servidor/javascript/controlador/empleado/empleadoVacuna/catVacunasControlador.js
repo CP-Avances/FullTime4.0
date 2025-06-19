@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPO_VACUNAS_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../../database"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));

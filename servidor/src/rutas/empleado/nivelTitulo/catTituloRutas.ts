@@ -1,9 +1,9 @@
-import { Router } from 'express';
 import TITULO_CONTROLADOR from '../../../controlador/empleado/nivelTitulo/catTituloControlador';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
 
 import multer from 'multer';
-import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 
 const storage = multer.diskStorage({
 

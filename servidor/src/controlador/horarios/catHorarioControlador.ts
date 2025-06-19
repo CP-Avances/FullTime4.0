@@ -1,8 +1,8 @@
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -678,7 +678,6 @@ class HorarioControlador {
 
             // CAMBIAR TOLERANCIA
             TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
-
             console.log("ver codigosHorariosCargados: ", codigosHorariosCargados)
             // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
             const ID_HORARIO: number = (codigosHorariosCargados.find((codigo: any) => codigo.codigoHorario === CODIGO_HORARIO))?.idHorario;
@@ -916,7 +915,6 @@ class HorarioControlador {
           data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA ?? 'No';
           data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA ?? 0) : '';
 
-
           if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
             data.OBSERVACION = 'Requerido codigo de horario existente';
             continue;
@@ -967,14 +965,14 @@ class HorarioControlador {
 
 }
 
-// FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA PLANTILLA
+// FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA PLANTILLA    **USADO
 function VerificarDuplicado(codigos: any, codigo: string): boolean {
   const valores = codigos.filter((valor: string) => valor.toLowerCase() === codigo.toLowerCase());
   const duplicado = valores.length > 1;
   return duplicado;
 }
 
-// FUNCION PARA VERIFICAR QUE LOS TIPOS DE DATOS EN LOS HORARIOS SEAN LOS CORRECTOS
+// FUNCION PARA VERIFICAR QUE LOS TIPOS DE DATOS EN LOS HORARIOS SEAN LOS CORRECTOS    **USADO
 function VerificarFormatoDatos(data: any): [boolean, string] {
   let observacion = '';
   let error = true
@@ -994,7 +992,7 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
   return [error, observacion];
 }
 
-// FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
+// FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS    **USADO
 async function VerificarDuplicadoBase(codigo: string): Promise<boolean> {
   const result = await pool.query(
     `
@@ -1004,13 +1002,13 @@ async function VerificarDuplicadoBase(codigo: string): Promise<boolean> {
   return result.rowCount != 0;
 }
 
-// FUNCION PARA COMPROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
+// FUNCION PARA COMPROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLA HORARIOS    **USADO
 function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]): boolean {
   const result = plantillaHorarios.filter((valor: Horario) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'Ok');
   return result.length > 0;
 }
 
-// FUNCION PARA COMPROBAR LOS FORMATOS DE LOS DATOS EN LA PLANTILLA DETALLE HORARIO
+// FUNCION PARA COMPROBAR LOS FORMATOS DE LOS DATOS EN LA PLANTILLA DETALLE HORARIO    **USADO
 function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   let observacion = '';
   let error = true
@@ -1032,7 +1030,7 @@ function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   return [error, observacion];
 }
 
-// FUNCION PARA AGRUPAR LOS DETALLES QUE PERTENEZCAN A UN MISMO HORARIO
+// FUNCION PARA AGRUPAR LOS DETALLES QUE PERTENEZCAN A UN MISMO HORARIO     **USADO
 function AgruparDetalles(plantillaDetalles: DetalleHorario[]): any {
   const result = plantillaDetalles.reduce((r: any, a: any) => {
     r[a.CODIGO_HORARIO] = [...r[a.CODIGO_HORARIO] || [], a];
@@ -1067,7 +1065,6 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
       } else if (tiposAccionExistentes.length > tiposAccionRequeridos.length) {
         codigosDetalles.push({ codigo: codigoHorario, observacion: `Requerido solo ${tiposAccionRequeridos.length} detalles` });
       }
-
 
       //VERIFICAR QUE EN LOS TIPOSACCIONEXISTENTES ESTEN TODOS LOS TIPOSACCIONREQUERIDOS
       else if (tiposAccionRequeridos.some((tipo: string) => !tiposAccionExistentes.includes(tipo))) {
@@ -1117,6 +1114,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
   return codigosDetalles;
 }
 
+// METODO PARA CONVERTIR HORAS TOTALES A MINUTOS    **USADO
 function convertirHorasTotalesAMinutos(horasTotales: string): number {
   if (horasTotales.includes(':')) {
     const [horas, minutos] = horasTotales.split(':').map(Number);
@@ -1126,7 +1124,7 @@ function convertirHorasTotalesAMinutos(horasTotales: string): number {
   }
 }
 
-// FUNCION PARA FORMATEAR HORAS
+// FUNCION PARA FORMATEAR HORAS     **USADO
 function FormatearHoras(hora: string, detalle: boolean): string {
   let partes = hora.split(':');
   let horas = parseInt(partes[0]);
@@ -1144,7 +1142,7 @@ function FormatearHoras(hora: string, detalle: boolean): string {
   return `${horasStr}:${minutos}`;
 }
 
-//FUNCION PARA VALIDAR SI EL HORARIO ES >= 24:00 Y < 72:00 (NO DETALLES DE ALIMENTACION
+// FUNCION PARA VALIDAR SI EL HORARIO ES >= 24:00 Y < 72:00 (NO DETALLES DE ALIMENTACION)   **USADO
 function ValidarHorasTotales(horario: Horario): Horario {
   const hora = FormatearHoras(horario.HORAS_TOTALES.toString(), true);
   if ((hora >= '24:00' && hora < '72:00') ||
@@ -1156,6 +1154,7 @@ function ValidarHorasTotales(horario: Horario): Horario {
   return horario;
 }
 
+// METODO PARA ELIMINAR LA PLANTILLA DEL ALMACENAMIENTO TEMPORAL   **USADO
 function EliminarPlantilla(ruta: string) {
   // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
   fs.access(ruta, fs.constants.F_OK, (err) => {

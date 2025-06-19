@@ -13,20 +13,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GRADO_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
-const database_1 = __importDefault(require("../../../database"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const database_1 = __importDefault(require("../../../database"));
 const exceljs_1 = __importDefault(require("exceljs"));
 class GradoControlador {
     // METODO PARA BUSCAR LISTA DE GRADOS **USADO 
-    listaGrados(req, res) {
+    ListaGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const GRADOS = yield database_1.default.query(`
-        SELECT g.id, g.descripcion FROM map_cat_grado AS g
-        ORDER BY g.id ASC
+          SELECT g.id, g.descripcion FROM map_cat_grado AS g
+          ORDER BY g.id ASC
         `);
                 res.jsonp(GRADOS.rows);
             }
@@ -37,15 +37,15 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR EL GRADO POR EL ID DEL EMPLEADO **USADO 
+    // METODO PARA BUSCAR EL GRADO POR EL ID DEL EMPLEADO    **USADO 
     GradoByEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             console.log('req.params: ', req.params);
             const EMPLEADO_GRADO = yield database_1.default.query(`
-      SELECT eg.id, eg.id_grado, eg.estado, cg.descripcion AS grado 
-      FROM map_empleado_grado AS eg, map_cat_grado AS cg
-      WHERE eg.id_empleado = $1 AND eg.id_grado = cg.id
+        SELECT eg.id, eg.id_grado, eg.estado, cg.descripcion AS grado 
+        FROM map_empleado_grado AS eg, map_cat_grado AS cg
+        WHERE eg.id_empleado = $1 AND eg.id_grado = cg.id
       `, [id_empleado]);
             if (EMPLEADO_GRADO.rowCount != 0) {
                 return res.status(200).jsonp({ grados: EMPLEADO_GRADO.rows, text: 'correcto', status: 200 });
@@ -61,7 +61,7 @@ class GradoControlador {
                 const GRADOS = yield database_1.default.query(`
           SELECT g.id, g.descripcion FROM map_cat_grado AS g
           WHERE UPPER(g.descripcion) = UPPER($1)
-          `, [grado]);
+        `, [grado]);
                 if (GRADOS.rows[0] != '' && GRADOS.rows[0] != null, GRADOS.rows[0] != undefined) {
                     res.jsonp({ message: 'Ya existe un grado con ese nombre', codigo: 300 });
                 }
@@ -70,7 +70,7 @@ class GradoControlador {
                     yield database_1.default.query('BEGIN');
                     yield database_1.default.query(`
             INSERT INTO map_cat_grado (descripcion) VALUES ($1)
-            `, [grado]);
+          `, [grado]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'map_cat_procesos',
@@ -94,7 +94,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA EDITAR EL GRADO **USADO 
+    // METODO PARA EDITAR EL GRADO     **USADO 
     EditarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grado, grado, user_name, ip, ip_local } = req.body;
@@ -102,8 +102,8 @@ class GradoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const DataGrado = yield database_1.default.query(`
-            SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1) AND id != $2
-          `, [grado, id_grado]);
+          SELECT * FROM map_cat_grado WHERE UPPER(descripcion) = UPPER($1) AND id != $2
+        `, [grado, id_grado]);
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (DataGrado.rows[0] != undefined && DataGrado.rows[0] != null && DataGrado.rows[0] != "") {
@@ -142,13 +142,12 @@ class GradoControlador {
     EliminarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grado, user_name, ip, ip_local } = req.body;
-            console.log('datos a enviar: ', req.body);
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-            DELETE FROM map_cat_grado WHERE id = $1
-          `, [id_grado]);
+          DELETE FROM map_cat_grado WHERE id = $1
+        `, [id_grado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_cat_procesos',
@@ -171,13 +170,12 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR EL GRADO POR EMPLEADO **USADO 
+    // METODO PARA ELIMINAR EL GRADO POR EMPLEADO    **USADO 
     EliminarEmpleGrado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { user_name, ip, ip_local } = req.body;
                 const id = req.params.id;
-                console.log('id: ', id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -199,7 +197,7 @@ class GradoControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-        DELETE FROM map_empleado_grado WHERE id = $1
+          DELETE FROM map_empleado_grado WHERE id = $1
         `, [id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -311,9 +309,9 @@ class GradoControlador {
                     listaGrados.forEach((item, index) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrado') {
                             const VERIFICAR_PROCESO = yield database_1.default.query(`
-                        SELECT g.id, g.descripcion FROM map_cat_grado AS g
-                        WHERE UPPER(g.descripcion) = UPPER($1)
-                      `, [item.descripcion]);
+                SELECT g.id, g.descripcion FROM map_cat_grado AS g
+                WHERE UPPER(g.descripcion) = UPPER($1)
+              `, [item.descripcion]);
                             if (VERIFICAR_PROCESO.rowCount === 0) {
                                 // DISCRIMINACION DE ELEMENTOS IGUALES
                                 if (duplicados.find((p) => (p.descripcion.toLowerCase() === item.descripcion.toLowerCase())
@@ -413,12 +411,11 @@ class GradoControlador {
             return res.status(200).jsonp({ message: 'ok' });
         });
     }
-    // REGISTRAR PROCESOS POR MEDIO DE INTERFAZ
+    // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ  **USADO
     RegistrarGrados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_grado, listaUsuarios, user_name, ip, ip_local } = req.body;
             let error = false;
-            console.log('datos: ', id_grado, listaUsuarios, user_name, ip, ip_local);
             try {
                 for (const item of listaUsuarios) {
                     const { id } = item;
@@ -426,7 +423,7 @@ class GradoControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
-           `, [id_grado, id]);
+          `, [id_grado, id]);
                     const [grados] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -441,13 +438,12 @@ class GradoControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    console.log('grados: ', grados);
                     if (grados == undefined || grados == '' || grados == null) {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
-           `, [id]);
+              SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+            `, [id]);
                         const [grado_activo] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -462,12 +458,11 @@ class GradoControlador {
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
-                        console.log('grado_activo: ', grado_activo);
                         if (grado_activo == undefined || grado_activo == '' || grado_activo == null) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const responsee = yield database_1.default.query(`
-              INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_grado (id_empleado, id_grado, estado) VALUES ($1, $2, $3) RETURNING *
               `, [id, id_grado, true]);
                             const [grado_insert] = responsee.rows;
                             // AUDITORIA
@@ -488,7 +483,7 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const grado_update = yield database_1.default.query(`
-              UPDATE map_empleado_grado SET estado = false WHERE id = $1
+                UPDATE map_empleado_grado SET estado = false WHERE id = $1
               `, [grado_activo.id]);
                             const [grado_UPD] = grado_update.rows;
                             // AUDITORIA
@@ -530,8 +525,8 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
-           `, [id]);
+                SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+              `, [id]);
                             const [grado_activo1] = response.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -550,8 +545,8 @@ class GradoControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const proceso_update = yield database_1.default.query(`
-              UPDATE map_empleado_grado SET estado = true WHERE id = $1
-              `, [grados.id]);
+                  UPDATE map_empleado_grado SET estado = true WHERE id = $1
+                `, [grados.id]);
                                 const [grado_UPD] = proceso_update.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -569,8 +564,8 @@ class GradoControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const proceso_update1 = yield database_1.default.query(`
-              UPDATE map_empleado_grado SET estado = false WHERE id = $1
-              `, [grado_activo1.id]);
+                  UPDATE map_empleado_grado SET estado = false WHERE id = $1
+                `, [grado_activo1.id]);
                                 const [grado_UPD1] = proceso_update1.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -590,8 +585,8 @@ class GradoControlador {
                                 // INICIAR TRANSACCION
                                 yield database_1.default.query('BEGIN');
                                 const grado_update = yield database_1.default.query(`
-              UPDATE map_empleado_grado SET estado = true WHERE id = $1
-              `, [grados.id]);
+                  UPDATE map_empleado_grado SET estado = true WHERE id = $1
+                `, [grados.id]);
                                 const [grado_UPD] = grado_update.rows;
                                 // AUDITORIA
                                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -745,7 +740,6 @@ class GradoControlador {
                    SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2 and estado = true
                   `, [id_grado, id_empleado]);
                                     const [grado_emple] = response.rows;
-                                    console.log('grado_emple: ', grado_emple);
                                     if (grado_emple != undefined && grado_emple != '' && grado_emple != null) {
                                         item.observacion = 'Ya existe un registro activo con este Grado.';
                                     }
@@ -813,7 +807,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA
+    // METODO PARA REGISTRAR EMPLEADOS PROCESO POR MEDIO DE PLANTILLA      **USADO
     RegistrarEmpleadoGrado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip, ip_local } = req.body;
@@ -840,7 +834,7 @@ class GradoControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
             SELECT * FROM map_empleado_grado WHERE id_grado = $1 and id_empleado = $2
-           `, [id_grado, id_empleado]);
+          `, [id_grado, id_empleado]);
                     const [grados] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -859,8 +853,8 @@ class GradoControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const response = yield database_1.default.query(`
-            SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
-           `, [id_empleado]);
+              SELECT * FROM map_empleado_grado WHERE id_empleado = $1 and estado = true
+            `, [id_empleado]);
                         const [grado_activo] = response.rows;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -879,7 +873,7 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const responsee = yield database_1.default.query(`
-              INSERT INTO map_empleado_grado (id_grado, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_grado (id_grado, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `, [id_grado, id_empleado, true]);
                             const [grado_insert] = responsee.rows;
                             // AUDITORIA
@@ -900,7 +894,7 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const grado_update = yield database_1.default.query(`
-              UPDATE map_empleado_grado SET estado = false WHERE id = $1
+                UPDATE map_empleado_grado SET estado = false WHERE id = $1
               `, [grado_activo.id]);
                             const [grado_UPD] = grado_update.rows;
                             // AUDITORIA
@@ -919,7 +913,7 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const response = yield database_1.default.query(`
-               INSERT INTO map_empleado_grado (id_grado, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
+                INSERT INTO map_empleado_grado (id_grado, id_empleado, estado) VALUES ($1, $2, $3) RETURNING *
               `, [id_grado, id_empleado, true]);
                             const [nuevo_proceso] = response.rows;
                             // AUDITORIA
@@ -938,7 +932,6 @@ class GradoControlador {
                         }
                     }
                     else {
-                        console.log('proceso: ', grados.estado);
                         if (grados.estado == false) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
@@ -962,7 +955,7 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const grado_update = yield database_1.default.query(`
-              UPDATE map_empleado_grado SET estado = true WHERE id = $1
+                UPDATE map_empleado_grado SET estado = true WHERE id = $1
               `, [grados.id]);
                             const [grados_UPD] = grado_update.rows;
                             // AUDITORIA
@@ -981,7 +974,7 @@ class GradoControlador {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const grados_update1 = yield database_1.default.query(`
-              UPDATE map_empleado_procesos SET estado = false WHERE id = $1
+                UPDATE map_empleado_procesos SET estado = false WHERE id = $1
               `, [grado_activo1.id]);
                             const [proceso_UPD1] = grado_update.rows;
                             // AUDITORIA
@@ -1012,7 +1005,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA EDITAR EL REGISTRO DEL EMPLEADOS PROCESOS
+    // METODO PARA ACTUALIZAR EL GRADO   **USADO
     EditarRegistroGradoEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1026,16 +1019,16 @@ class GradoControlador {
                     if (grado_ != undefined || grado_ != null) {
                         yield database_1.default.query(`
               UPDATE map_empleado_grado SET estado = $1 WHERE id = $2
-              `, [false, grado_.id]);
+            `, [false, grado_.id]);
                     }
                     yield database_1.default.query(`
             UPDATE map_empleado_grado SET id_grado = $1, estado = $2 WHERE id = $3
-            `, [id_accion, estado, id]);
+          `, [id_accion, estado, id]);
                 }
                 else {
                     yield database_1.default.query(`
             UPDATE map_empleado_grado SET id_grado = $1, estado = $2 WHERE id = $3
-            `, [id_accion, estado, id]);
+          `, [id_accion, estado, id]);
                 }
                 return res.jsonp({ message: 'El proceso actualizado exitosamente' });
             }
@@ -1044,7 +1037,7 @@ class GradoControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR DATOS DE MANERA MULTIPLE
+    // METODO PARA ELIMINAR GRUPOS DE MANERA MULTIPLE   **USADO
     EliminarGradoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { listaEliminar, user_name, ip, ip_local } = req.body;
@@ -1057,8 +1050,8 @@ class GradoControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const resultado = yield database_1.default.query(`
-             SELECT * FROM map_cat_grado WHERE id = $1
-           `, [item.id]);
+            SELECT * FROM map_cat_grado WHERE id = $1
+          `, [item.id]);
                     const [existe_grado] = resultado.rows;
                     if (!existe_grado) {
                         // AUDITORIA
@@ -1079,15 +1072,15 @@ class GradoControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         const resultado = yield database_1.default.query(`
-             SELECT * FROM map_empleado_grado WHERE id_grado = $1
-           `, [item.id]);
+              SELECT * FROM map_empleado_grado WHERE id_grado = $1
+            `, [item.id]);
                         const [existe_grado_emple] = resultado.rows;
                         if (!existe_grado_emple) {
                             // INICIAR TRANSACCION
                             yield database_1.default.query('BEGIN');
                             const res = yield database_1.default.query(`
-               DELETE FROM map_cat_grado WHERE id = $1
-             `, [item.id]);
+                DELETE FROM map_cat_grado WHERE id = $1
+              `, [item.id]);
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
                                 tabla: 'map_cat_grado',
@@ -1113,7 +1106,8 @@ class GradoControlador {
                 if (count > 1) {
                     meCount = "registros eliminados";
                 }
-                res.status(200).jsonp({ message: count.toString() + ' ' + meCount + ' con éxito.',
+                res.status(200).jsonp({
+                    message: count.toString() + ' ' + meCount + ' con éxito.',
                     ms2: 'Existen datos relacionados con ',
                     codigo: 200,
                     eliminados: count,
@@ -1128,12 +1122,16 @@ class GradoControlador {
                 if (error) {
                     if (err.table == 'map_empleado_grado') {
                         if (count <= 1) {
-                            return res.status(300).jsonp({ message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_Grados });
+                            return res.status(300).jsonp({
+                                message: 'Se ha eliminado ' + count + ' registro.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Grados
+                            });
                         }
                         else if (count > 1) {
-                            return res.status(300).jsonp({ message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
-                                relacionados: count_no, listaNoEliminados: list_Grados });
+                            return res.status(300).jsonp({
+                                message: 'Se han eliminado ' + count + ' registros.', ms2: 'Existen datos relacionados con ', eliminados: count,
+                                relacionados: count_no, listaNoEliminados: list_Grados
+                            });
                         }
                     }
                     else {

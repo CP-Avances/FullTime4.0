@@ -21,15 +21,12 @@ export class CrearTipoaccionComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  selec1: boolean = false;
-  selec2: boolean = false;
-  selec3: boolean = false;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
   baseLegalF = new FormControl('');
-  tipoAccionF = new FormControl('',[Validators.required]);
+  tipoAccionF = new FormControl('', [Validators.required]);
   tipoF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
@@ -52,10 +49,10 @@ export class CrearTipoaccionComponent implements OnInit {
     this.ObtenerTiposAccionPersonal();
     this.ObtenerTiposAccion();
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // METODO PARA CREAR TIPO DE ACCION
@@ -64,11 +61,9 @@ export class CrearTipoaccionComponent implements OnInit {
       id_tipo: form.tipoAccionForm,
       descripcion: form.descripcionForm,
       base_legal: form.baseLegalForm,
-      tipo_permiso: this.selec1,
-      tipo_vacacion: this.selec2,
-      tipo_situacion_propuesta: this.selec3,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     this.GuardarInformacion(datosAccion);
   }
@@ -87,28 +82,6 @@ export class CrearTipoaccionComponent implements OnInit {
         timeOut: 6000,
       })
     });
-  }
-
-  // METODO PARA CAMBIAR ESTADO PERMISO
-  CambiarEstadosPermisos() {
-    this.selec1 = true;
-    this.selec2 = false;
-    this.selec3 = false;
-  }
-
-
-  // METODO PARA CAMBIAR ESTADO VACACIONES
-  CambiarEstadosVacaciones() {
-    this.selec2 = true;
-    this.selec1 = false;
-    this.selec3 = false;
-  }
-
-  // METODO PARA CAMBIAR ESTADO SITUACION PROPUESTA
-  CambiarEstadosSituacion() {
-    this.selec3 = true;
-    this.selec1 = false;
-    this.selec2 = false;
   }
 
   // METODO PARA BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCION_PERSONAL
@@ -134,12 +107,10 @@ export class CrearTipoaccionComponent implements OnInit {
     let tipo = {
       descripcion: form.descripcionForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     }
-    console.log('form: ',form);
-    console.log('datosAccion: ',datos);
     this.VerificarDuplicidad(form, tipo, datos);
-
   }
 
   // METODO PARA VERIFICAR DUPLICIDAD
@@ -157,8 +128,7 @@ export class CrearTipoaccionComponent implements OnInit {
         timeOut: 6000,
       })
     } else {
-      console.log('tipo data: ',tipo)
-
+      console.log('tipo data: ', tipo)
       this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
         datos.id_tipo = resol.id;
         // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL

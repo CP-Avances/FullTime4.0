@@ -138,7 +138,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA DE SUCURSALES **USADO
+    // METODO DE BUSQUEDA DE SUCURSALES     **USADO
     ListarSucursales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const SUCURSAL = yield database_1.default.query(`
@@ -155,7 +155,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO **USADO
+    // METODO PARA ELIMINAR REGISTRO      **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -182,7 +182,7 @@ class SucursalControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-        DELETE FROM e_sucursales WHERE id = $1
+          DELETE FROM e_sucursales WHERE id = $1
         `, [id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -278,21 +278,20 @@ class SucursalControlador {
                         data.fila = ITEM;
                         data.nom_sucursal = NOMBRE;
                         data.ciudad = CIUDAD;
-                        console.log('dataaaaaaaaaaaaaa: ', data);
                         if ((data.fila != undefined && data.fila != '') &&
                             (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
                             (data.ciudad != undefined && data.ciudad != '')) {
                             console.log('ingresa undfined');
                             // VALIDAR PRIMERO QUE EXISTA LA CIUDAD EN LA TABLA CIUDADES
                             const existe_ciudad = yield database_1.default.query(`
-              SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+                SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
               `, [CIUDAD]);
                             var id_ciudad = existe_ciudad.rows[0];
                             if (id_ciudad != undefined && id_ciudad != '') {
                                 // VERIFICACION SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
                                 const VERIFICAR_SUCURSAL = yield database_1.default.query(`
-                SELECT * FROM e_sucursales 
-                WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+                  SELECT * FROM e_sucursales 
+                  WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
                 `, [NOMBRE, id_ciudad.id]);
                                 if (VERIFICAR_SUCURSAL.rowCount === 0) {
                                     data.fila = ITEM;
@@ -307,7 +306,6 @@ class SucursalControlador {
                                     //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                     data.nom_sucursal = data.nom_sucursal.trim();
                                     data.ciudad = data.ciudad.trim();
-                                    console.log('dataaa 010101010101: ', data);
                                     listSucursales.push(data);
                                 }
                                 else {
@@ -318,7 +316,6 @@ class SucursalControlador {
                                     //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                     data.nom_sucursal = data.nom_sucursal.trim();
                                     data.ciudad = data.ciudad.trim();
-                                    console.log('dataaa 000000000: ', data);
                                     listSucursales.push(data);
                                 }
                             }
@@ -333,7 +330,6 @@ class SucursalControlador {
                                 //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                                 data.nom_sucursal = data.nom_sucursal.trim();
                                 data.ciudad = data.ciudad.trim();
-                                console.log('dataaa 111111111: ', data);
                                 listSucursales.push(data);
                             }
                         }
@@ -359,13 +355,11 @@ class SucursalControlador {
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                             data.nom_sucursal = data.nom_sucursal.trim();
                             data.ciudad = data.ciudad.trim();
-                            console.log('dataaa 222222: ', data);
                             listSucursales.push(data);
                         }
                         data = {};
                     }));
                 }
-                //console.log('listaSucursales ', listSucursales)
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -422,7 +416,7 @@ class SucursalControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
-          INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+            INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
           `, [nombre, id_ciudad, id_empresa]);
                     const [sucursal] = response.rows;
                     // AUDITORIA

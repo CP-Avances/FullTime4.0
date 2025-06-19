@@ -1,6 +1,6 @@
+import { rango, checkOptions, FormCriteriosBusqueda } from "src/app/model/reportes.model";
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { rango, checkOptions, FormCriteriosBusqueda } from "src/app/model/reportes.model";
 
 @Injectable({
   providedIn: 'root'
@@ -12,25 +12,9 @@ export class ReportesService {
     private http: HttpClient,
   ) { }
 
-  ObtenerPermisosHorarios(codigo: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/horarios/${codigo}`);
-  }
-
-  ObtenerEntradaSalidaHorario(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/horarios/${codigo}`, data);
-  }
-
-  ObtenerEntradaSalidaPlanificacion(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/planificacion/${codigo}`, data);
-  }
-
-  ObtenerPermisosHorariosFechas(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
-  }
-
-  /**
-   * SERVICIOS CENTRALIZADOS RANGO DE FECHAS
-   */
+  /** ********************************************************************************************** **
+   ** **                           SERVICIOS CENTRALIZADOS RANGO DE FECHAS                        ** **
+   ** ********************************************************************************************** **/
 
   private _fechas: rango = {
     fec_inico: '',
@@ -45,9 +29,10 @@ export class ReportesService {
     this._fechas = { fec_inico: inicio, fec_final: final }
   }
 
-  /**
-   * LOS CHECKS DE LOS CRITERIOS DE BUSQUEDA
-   */
+
+  /** ********************************************************************************************** **
+   ** **                           LOS CHECKS DE LOS CRITERIOS DE BUSQUEDA                        ** **
+   ** ********************************************************************************************** **/
 
   private _check: checkOptions[] = [
     { opcion: 's', valor: 'Sucursal' },
@@ -62,7 +47,7 @@ export class ReportesService {
   checkOptions(num_items: any): checkOptions[] {
     let valores: any = []
     this._check.forEach((obj: any) => {
-      num_items.forEach(a => {
+      num_items.forEach((a: any) => {
         if (obj.opcion === a.opcion) {
           valores = valores.concat(obj)
         }
@@ -76,9 +61,7 @@ export class ReportesService {
     return valores;
   }
 
-  /**
-   * EL NUMERO DE LA OPCION ESCOGIDA YA SEA (SUCURSAL, DEPARTAMENTO, EMPLEADO, TABULADO ?, INCOMPLETO ?)
-   */
+  // EL NUMERO DE LA OPCION ESCOGIDA YA SEA (SUCURSAL, DEPARTAMENTO, EMPLEADO, TABULADO ?, INCOMPLETO ?)
 
   private _opcion = '';
 
@@ -90,9 +73,8 @@ export class ReportesService {
     return this._opcion
   }
 
-  /**
-   * PARA MOSTRAR LOS FORMS DE ACUERDO A LA OPCION SELECCIONADA
-   */
+  // PARA MOSTRAR LOS FORMS DE ACUERDO A LA OPCION SELECCIONADA
+
   private _formCriteriosBusqueda: FormCriteriosBusqueda = {
     bool_suc: false,
     bool_dep: false,
@@ -121,11 +103,10 @@ export class ReportesService {
     this._formCriteriosBusqueda.bool_reg = false;
   }
 
-  /***************************************************************************
-   ** 
-   ** GET Y SET FILTROS DE LOS FORMULARIOS COMPONENTES DE REPORTES MULTIPLES
-   ** 
-   ***************************************************************************/
+  
+  /** ******************************************************************************* **
+   ** **   GET Y SET FILTROS DE LOS FORMULARIOS COMPONENTES DE REPORTES MULTIPLES  ** **
+   ** ******************************************************************************* **/
 
   // FILTRO FORMULARIO NOMBRE DE SUCURSAL
   private _filtroNombreSuc: string = '';
@@ -168,8 +149,8 @@ export class ReportesService {
   get filtroNombreEmp() { return this._filtroNombreEmp; }
   setFiltroNombreEmp(arr: any) { this._filtroNombreEmp = arr; }
 
-  get filtroRolEmp(){return this._filtroRolEmp;}
-  setFiltroRolEmp(arr: any){this._filtroRolEmp = arr; }
+  get filtroRolEmp() { return this._filtroRolEmp; }
+  setFiltroRolEmp(arr: any) { this._filtroRolEmp = arr; }
 
   // FILTRO FORMULARIO DE TABULACION
   private _filtroCodigo_tab: number = 0;
@@ -199,7 +180,6 @@ export class ReportesService {
   get filtroNombreInc() { return this._filtroNombreInc; }
   setFiltroNombreInc(arr: any) { this._filtroNombreInc = arr; }
 
-
   DefaultValoresFiltros() {
     this._filtroNombreSuc = '';
     this._filtroNombreReg = '';
@@ -218,18 +198,51 @@ export class ReportesService {
   }
 
 
-  /***************************************************************************************
-   *                                                                                     *
-   * VALIDACION DE FUNCIONALIDAD DE MOSTRAR O NO EL CAMPO DE LOS TIMBRES DEL DISPOSITIVO *
-   *                                                                                     *
-   ***************************************************************************************/
+  /** *************************************************************************************************** **
+   ** **        VALIDACION DE FUNCIONALIDAD DE MOSTRAR O NO EL CAMPO DE LOS TIMBRES DEL DISPOSITIVO    ** **
+   ** *************************************************************************************************** **/
 
   private _valueTimbreDispositivo: Boolean = false;
 
   get mostrarTimbreDispositivo() { return this._valueTimbreDispositivo }
+
   setMostrarTimbreDispositivo(value: any) { this._valueTimbreDispositivo = value; }
 
   DefaultTimbreDispositivo() { this._valueTimbreDispositivo = false; }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ObtenerPermisosHorarios(codigo: any) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/horarios/${codigo}`);
+  }
+
+  ObtenerEntradaSalidaHorario(codigo: any, data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/horarios/${codigo}`, data);
+  }
+
+  ObtenerEntradaSalidaPlanificacion(codigo: any, data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/planificacion/${codigo}`, data);
+  }
+
+  ObtenerPermisosHorariosFechas(codigo: any, data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
+  }
 
 }

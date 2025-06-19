@@ -1,16 +1,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom, of } from 'rxjs';
 import { environment } from 'src/environments/environment';;
 import { Injectable } from '@angular/core';
 import { catchError } from 'rxjs/operators';
-import { firstValueFrom, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class EmpleadoService {
 
   url: string;
-
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'
@@ -21,9 +21,9 @@ export class EmpleadoService {
     private http: HttpClient
   ) { }
 
-  /** ** ********************************************************************************************* **
-   ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
-   ** ** ********************************************************************************************* **/
+  /** ********************************************************************************************* **
+   ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
+   ** ********************************************************************************************* **/
 
   // METODO PARA BUSCAR CONFIGURACION DE CODIGO DE USUARIO   **USADO
   ObtenerCodigo() {
@@ -80,16 +80,6 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/nacionalidades`)
   }
 
-  //METODO PARA OBTENER LISTA DE GENERO
-  BuscarGeneros() {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generos`);
-  }
-
-  //METODO PARA OBTENER LISTA DE ESTADOS CIVILES
-  BuscarEstadoCivil() {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/estados-civiles`);
-  }
-
   // METODO PARA LISTAR EMPLEADOS ACTIVOS    **USADO
   ListarEmpleadosActivos() {
     const headers = new HttpHeaders({
@@ -120,11 +110,6 @@ export class EmpleadoService {
     return firstValueFrom(this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/activar/masivo`, data));
   }
 
-  // METODO PARA REACTIVAR USUARIOS   **USADO VERIFICAR FUNCIONAMIENTO
-  async ReActivarVariosUsuarios(data: any): Promise<any> {
-    return firstValueFrom(this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/re-activar/masivo`, data));
-  }
-
   // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
   SubirImagen(formData: any, idEmpleado: number) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/${idEmpleado}/uploadImage`, formData)
@@ -153,6 +138,50 @@ export class EmpleadoService {
     this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
     return this.http.get<any>(`${(this.url as string)}/empleado/buscador/empleado`);
   }
+
+  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO     **USADO
+  BuscarEmpleadoNombre(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/buscar/informacion`, data);
+  }
+
+  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA AUTOMATICA    **USADO
+  VerificarArchivoExcel_Automatico(formData: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/verificar/automatico/plantillaExcel/`, formData);
+  }
+
+  // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS    **USADO
+  CrearCarpetasUsuarios(data: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/crear_carpetas`, data).pipe(
+      catchError(error => {
+        return of({ error: true, message: error.error.message });
+      })
+    );
+  }
+
+  // METODO PARA CONSULTAR INFORMACION DE CONTRATOS   **USADO
+  ObtenerContratosCargos(data: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/infoContratoCargos`, data).pipe(
+      catchError(error => {
+        return of({ error: true, message: error.error.message });
+      })
+    );
+  }
+
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO AUTOMATICO   **USADO
+  SubirArchivoExcel_Automatico(formData: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/cargar_automatico/plantillaExcel/`, formData);
+  }
+
+  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA MANUAL    **USADO
+  VerificarArchivoExcel_Manual(formData: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/verificar/manual/plantillaExcel/`, formData);
+  }
+
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
+  SubirArchivoExcel_Manual(formData: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/cargar_manual/plantillaExcel/`, formData);
+  }
+
 
   /** *********************************************************************** **
    ** **       METODOS PARA MANEJO DE DATOS DE TITULO PROFESIONAL             **
@@ -280,34 +309,10 @@ export class EmpleadoService {
   BuscarFechaContrato(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/buscarFecha`, datos);
   }
+
   // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO
   BuscarFechaContratoUsuarios(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/buscarFechaUsuarios`, datos);
-  }
-
-  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO
-  BuscarEmpleadoNombre(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/buscar/informacion`, data);
-  }
-
-  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA AUTOMATICA    **USADO
-  VerificarArchivoExcel_Automatico(formData: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/verificar/automatico/plantillaExcel/`, formData);
-  }
-
-  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO AUTOMATICO   **USADO
-  SubirArchivoExcel_Automatico(formData: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/cargar_automatico/plantillaExcel/`, formData);
-  }
-
-  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA MANUAL    **USADO
-  VerificarArchivoExcel_Manual(formData: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/verificar/manual/plantillaExcel/`, formData);
-  }
-
-  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
-  SubirArchivoExcel_Manual(formData: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/cargar_manual/plantillaExcel/`, formData);
   }
 
   // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
@@ -325,22 +330,6 @@ export class EmpleadoService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/cargar_plantilla/`, formData);
   }
 
-  // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS    **USADO
-  CrearCarpetasUsuarios(data: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/crear_carpetas`, data).pipe(
-      catchError(error => {
-        return of({ error: true, message: error.error.message });
-      })
-    );
-  }
 
-  ObtenerContratosCargos(data: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/infoContratoCargos`, data).pipe(
-      catchError(error => {
-        return of({ error: true, message: error.error.message });
-      })
-    );
-
-  }
 
 }

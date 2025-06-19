@@ -9,9 +9,9 @@ class CiudadControlador {
         const { id_ciudad } = req.params;
         const CIUDAD = await pool.query(
             `
-            SELECT p.continente, p.nombre AS pais, p.id AS id_pais, pro.nombre AS provincia
-            FROM e_cat_paises AS p, e_provincias AS pro, e_ciudades AS c
-            WHERE c.id = $1 AND c.id_provincia = pro.id AND p.id = pro.id_pais
+                SELECT p.continente, p.nombre AS pais, p.id AS id_pais, pro.nombre AS provincia
+                FROM e_cat_paises AS p, e_provincias AS pro, e_ciudades AS c
+                WHERE c.id = $1 AND c.id_provincia = pro.id AND p.id = pro.id_pais
             `
             , [id_ciudad]
         );
@@ -23,11 +23,11 @@ class CiudadControlador {
         }
     }
 
-    // BUSCAR LISTA DE CIUDADES
+    // BUSCAR LISTA DE CIUDADES     **USADO
     public async ListarCiudades(req: Request, res: Response) {
         const CIUDAD = await pool.query(
             `
-            SELECT * FROM e_ciudades
+                SELECT * FROM e_ciudades
             `
         );
         if (CIUDAD.rowCount != 0) {
@@ -43,7 +43,7 @@ class CiudadControlador {
         const { id_provincia } = req.params;
         const CIUDAD = await pool.query(
             `
-            SELECT * FROM e_ciudades WHERE id_provincia = $1
+                SELECT * FROM e_ciudades WHERE id_provincia = $1
             `
             , [id_provincia]);
 
@@ -65,7 +65,7 @@ class CiudadControlador {
 
             const datosNuevos = await pool.query(
                 `
-                INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2) RETURNING *
+                    INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2) RETURNING *
                 `
                 , [id_provincia, descripcion]);
 
@@ -84,7 +84,7 @@ class CiudadControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             res.jsonp({ message: 'Registro guardado.' });
-            
+
         } catch (error) {
             // FINALIZAR TRANSACCION
             await pool.query('ROLLBACK');
@@ -96,10 +96,10 @@ class CiudadControlador {
     public async ListarNombreCiudad(req: Request, res: Response) {
         const CIUDAD = await pool.query(
             `
-            SELECT c.id, c.descripcion AS nombre, p.nombre AS provincia, p.id AS id_prov
-            FROM e_ciudades c, e_provincias p
-            WHERE c.id_provincia = p.id
-            ORDER BY provincia, nombre ASC
+                SELECT c.id, c.descripcion AS nombre, p.nombre AS provincia, p.id AS id_prov
+                FROM e_ciudades c, e_provincias p
+                WHERE c.id_provincia = p.id
+                ORDER BY provincia, nombre ASC
             `
         );
         if (CIUDAD.rowCount != 0) {
@@ -143,7 +143,7 @@ class CiudadControlador {
 
             await pool.query(
                 `
-                DELETE FROM e_ciudades WHERE id = $1
+                    DELETE FROM e_ciudades WHERE id = $1
                 `
                 , [id]);
 
@@ -176,7 +176,7 @@ class CiudadControlador {
         const { id } = req.params;
         const CIUDAD = await pool.query(
             `
-            SELECT * FROM e_ciudades WHERE id = $1
+                SELECT * FROM e_ciudades WHERE id = $1
             `
             , [id]);
         if (CIUDAD.rowCount != 0) {

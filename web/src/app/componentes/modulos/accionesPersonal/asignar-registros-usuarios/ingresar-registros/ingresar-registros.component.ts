@@ -1,11 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ToastrService } from 'ngx-toastr';
+import { Component, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-ingresar-registros',
@@ -35,9 +35,6 @@ export class IngresarRegistrosComponent {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-
-
-
   DatosProcesos: any
   DatosGrado: any
 
@@ -58,10 +55,9 @@ export class IngresarRegistrosComponent {
 
   constructor(
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
-    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public validar: ValidacionesService,
-    private rest: SucursalService,
     public restE: EmpleadoService,
+    private rest: SucursalService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -77,11 +73,13 @@ export class IngresarRegistrosComponent {
         this.MostrarListaProcesos = false;
         this.RegistroInterfazProcesos = true;
         this.RegistroMultipleProcesos = false;
-      } else if (tipo_registro == 'multiple') {
+      }
+      else if (tipo_registro == 'multiple') {
         this.MostrarListaProcesos = false;
         this.RegistroInterfazProcesos = false;
         this.RegistroMultipleProcesos = true;
-      }else if(tipo_registro == 'registros'){
+      }
+      else if (tipo_registro == 'registros') {
         this.MostrarListaProcesos = true;
         this.RegistroInterfazProcesos = false;
         this.RegistroMultipleProcesos = false;
@@ -93,11 +91,13 @@ export class IngresarRegistrosComponent {
         this.MostrarListaGrado = false;
         this.RegistroInterfazGrado = true;
         this.RegistroMultipleGrado = false;
-      } else if (tipo_registro == 'multiple') {
+      }
+      else if (tipo_registro == 'multiple') {
         this.MostrarListaGrado = false;
         this.RegistroInterfazGrado = false;
         this.RegistroMultipleGrado = true;
-      }else if(tipo_registro == 'registros'){
+      }
+      else if (tipo_registro == 'registros') {
         this.MostrarListaGrado = true;
         this.RegistroInterfazGrado = false;
         this.RegistroMultipleGrado = false;
@@ -109,11 +109,13 @@ export class IngresarRegistrosComponent {
         this.MostrarListaGrupoOcupacional = false;
         this.RegistroInterfazGrupoOcupacional = true;
         this.RegistroMultipleGrupoOcupacional = false;
-      } else if (tipo_registro == 'multiple') {
+      }
+      else if (tipo_registro == 'multiple') {
         this.MostrarListaGrupoOcupacional = false;
         this.RegistroInterfazGrupoOcupacional = false;
         this.RegistroMultipleGrupoOcupacional = true;
-      }else if(tipo_registro == 'registros'){
+      }
+      else if (tipo_registro == 'registros') {
         this.MostrarListaGrupoOcupacional = true;
         this.RegistroInterfazGrupoOcupacional = false;
         this.RegistroMultipleGrupoOcupacional = false;
@@ -143,7 +145,6 @@ export class IngresarRegistrosComponent {
     return this.validar.IngresarSoloLetras(e);
   }
 
-
   listadoUsuariosProceso: boolean = false;
   listadoUsuariosGrado: boolean = false;
   listadoUsuariosGrupoOcupa: boolean = false;
@@ -151,20 +152,21 @@ export class IngresarRegistrosComponent {
   dataList: any;
   VerUsuarioAsignado(datos: any, tipo: string) {
     this.dataList = datos
-    if(tipo == 'procesos'){
+    if (tipo == 'procesos') {
       this.listadoUsuariosProceso = true;
       this.listadoUsuariosGrado = false;
       this.listadoUsuariosGrupoOcupa = false;
-    }else if(tipo == 'grado'){
+    } 
+    else if (tipo == 'grado') {
       this.listadoUsuariosProceso = false;
       this.listadoUsuariosGrado = true;
       this.listadoUsuariosGrupoOcupa = false;
-    }else if(tipo == 'grupo'){
+    } 
+    else if (tipo == 'grupo') {
       this.listadoUsuariosProceso = false;
       this.listadoUsuariosGrado = false;
       this.listadoUsuariosGrupoOcupa = true;
     }
-    
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -172,11 +174,11 @@ export class IngresarRegistrosComponent {
     this.MostrarListaProcesos = true;
     this.RegistroInterfazProcesos = false;
     this.RegistroMultipleProcesos = false;
-  
+
     this.MostrarListaGrado = true;
     this.RegistroInterfazGrado = false;
     this.RegistroMultipleGrado = false;
-  
+
     this.MostrarListaGrupoOcupacional = true;
     this.RegistroInterfazGrupoOcupacional = false;
     this.RegistroMultipleGrupoOcupacional = false;
@@ -197,8 +199,8 @@ export class IngresarRegistrosComponent {
   ocultarRegistroGrupo(valor: boolean) {
     this.MostrarListaGrupoOcupacional = !valor;
     this.RegistroMultipleGrupoOcupacional = valor;
-    this.RegistroInterfazGrupoOcupacional = false;
-  }
+    this.RegistroInterfazGrupoOcupacional = false;
+  }
 
   //CONTROL BOTONES
   private tienePermiso(accion: string): boolean {
@@ -211,7 +213,7 @@ export class IngresarRegistrosComponent {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }

@@ -21,9 +21,9 @@ class CiudadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_ciudad } = req.params;
             const CIUDAD = yield database_1.default.query(`
-            SELECT p.continente, p.nombre AS pais, p.id AS id_pais, pro.nombre AS provincia
-            FROM e_cat_paises AS p, e_provincias AS pro, e_ciudades AS c
-            WHERE c.id = $1 AND c.id_provincia = pro.id AND p.id = pro.id_pais
+                SELECT p.continente, p.nombre AS pais, p.id AS id_pais, pro.nombre AS provincia
+                FROM e_cat_paises AS p, e_provincias AS pro, e_ciudades AS c
+                WHERE c.id = $1 AND c.id_provincia = pro.id AND p.id = pro.id_pais
             `, [id_ciudad]);
             if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
@@ -33,11 +33,11 @@ class CiudadControlador {
             }
         });
     }
-    // BUSCAR LISTA DE CIUDADES
+    // BUSCAR LISTA DE CIUDADES     **USADO
     ListarCiudades(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM e_ciudades
+                SELECT * FROM e_ciudades
             `);
             if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
@@ -52,7 +52,7 @@ class CiudadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_provincia } = req.params;
             const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM e_ciudades WHERE id_provincia = $1
+                SELECT * FROM e_ciudades WHERE id_provincia = $1
             `, [id_provincia]);
             if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
@@ -70,7 +70,7 @@ class CiudadControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
-                INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2) RETURNING *
+                    INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2) RETURNING *
                 `, [id_provincia, descripcion]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -98,10 +98,10 @@ class CiudadControlador {
     ListarNombreCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CIUDAD = yield database_1.default.query(`
-            SELECT c.id, c.descripcion AS nombre, p.nombre AS provincia, p.id AS id_prov
-            FROM e_ciudades c, e_provincias p
-            WHERE c.id_provincia = p.id
-            ORDER BY provincia, nombre ASC
+                SELECT c.id, c.descripcion AS nombre, p.nombre AS provincia, p.id AS id_prov
+                FROM e_ciudades c, e_provincias p
+                WHERE c.id_provincia = p.id
+                ORDER BY provincia, nombre ASC
             `);
             if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
@@ -139,7 +139,7 @@ class CiudadControlador {
                     return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
                 }
                 yield database_1.default.query(`
-                DELETE FROM e_ciudades WHERE id = $1
+                    DELETE FROM e_ciudades WHERE id = $1
                 `, [id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -168,7 +168,7 @@ class CiudadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM e_ciudades WHERE id = $1
+                SELECT * FROM e_ciudades WHERE id = $1
             `, [id]);
             if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);

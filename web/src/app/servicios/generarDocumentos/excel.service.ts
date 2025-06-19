@@ -1,52 +1,41 @@
 import { Injectable } from '@angular/core';
-import { DateTime } from 'luxon';
-import { Router } from '@angular/router';
 
-import ExcelJS, { FillPattern } from "exceljs";
-import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import { FillPatterns } from 'exceljs';
+import ExcelJS from "exceljs";
 
-import { EmpleadoService } from '../usuarios/empleado/empleadoRegistro/empleado.service';
-import { AccionPersonalService } from '../modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
-import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from '../configuracion/parametrizacion/catEmpresa/empresa.service';
+import { EmpleadoService } from '../usuarios/empleado/empleadoRegistro/empleado.service';
 import { ValidacionesService } from '../generales/validaciones/validaciones.service';
+import { AccionPersonalService } from '../modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ExcelService {
 
-  private bordeCompleto!: Partial<ExcelJS.Borders>;
-  private bordeGrueso!: Partial<ExcelJS.Borders>;
-  private fillAzul!: FillPatterns;
-  private fontTitulo!: Partial<ExcelJS.Font>;
   private imagen: any;
 
-   // VARIABLES PARA AUDITORIA
-   ips_locales: any = '';
-   user_name: string | null;
-   ip: string | null;
+  // VARIABLES PARA AUDITORIA
+  ips_locales: any = '';
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public restE: EmpleadoService,
     private rest: AccionPersonalService,
     public restEmpre: EmpresaService,
     private validar: ValidacionesService,
-    private toastr: ToastrService,
-  ) { 
+  ) {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-
-    
+    });
     this.ObtenerTipoAccionesPersonal();
     this.ObtenerLogo();
     this.ObtenerColores();
-  
+
   }
 
   // METODO PARA OBTENER TIPOS DE ACCIONES
@@ -78,29 +67,17 @@ export class ExcelService {
   }
 
   async generarExcel() {
-    var f = DateTime.now();
-    let fecha = f.toFormat('yyyy-MM-dd');
-    let hora = f.toFormat('HH:mm:ss');
-
-    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
-
-    console.log('this.tipo_acciones: ', this.tipo_acciones);
-
     const tipo_acciones_perso: any[] = [];
     this.tipo_acciones.forEach((accion: any, index: number) => {
-
-       tipo_acciones_perso.push([
-         index + 1,
-         accion.nombre,
-         accion.descripcion,
-         accion.base_legal
-       ]);
+      tipo_acciones_perso.push([
+        index + 1,
+        accion.nombre,
+        accion.descripcion,
+        accion.base_legal
+      ]);
     });
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Tipos accion personal");
-
-
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
@@ -167,7 +144,6 @@ export class ExcelService {
     worksheet.getRow(102).height = 30;
     worksheet.getRow(108).height = 70;
     worksheet.getRow(109).height = 50;
-
 
     // COMBINAR CELDAS
     worksheet.mergeCells("A1:J5");
@@ -386,9 +362,7 @@ export class ExcelService {
     worksheet.mergeCells("A109:H109");
     worksheet.mergeCells("I109:P109");
 
-
     // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
-    //worksheet.getCell("K1").value = localStorage.getItem('name_empresa')?.toUpperCase();
     worksheet.getCell("K1").value = "Acción de Personal".toUpperCase();
     worksheet.getCell("K3").value = "Nro.";
     worksheet.getCell("K4").value = "Fecha de elaboración".toUpperCase();
@@ -400,7 +374,6 @@ export class ExcelService {
     worksheet.getCell("I9").value = "Desde ".toUpperCase() + "(dd-mm-aaaa)"
     worksheet.getCell("M9").value = "Hasta ".toUpperCase() + "(dd-mm-aaaa)(cuando aplica)"
     worksheet.getCell("A11").value = "Escoja una opción (según lo estipulado en el artículo 21 del Reglamento General a la Ley Orgánica del Servicio Público)"
-
 
     worksheet.getCell("B13").value = "ingreso".toUpperCase()
     worksheet.getCell("B14").value = "reingreso".toUpperCase()
@@ -528,7 +501,7 @@ export class ExcelService {
     });
 
 
-    //DAMOS EL ESTILO DE BORDES A LAS CELDAS
+    // DAMOS EL ESTILO DE BORDES A LAS CELDAS
     const borderStyle: Partial<ExcelJS.Borders> = {
       top: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
       left: { style: "thin", color: { argb: "000000" } }, // Borde izquierdo negro
@@ -558,7 +531,7 @@ export class ExcelService {
       right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
     };
 
-    //DAMOS EL ESTILO DE BACKGROUND COLOR A LAS CELDAS
+    // DAMOS EL ESTILO DE BACKGROUND COLOR A LAS CELDAS
     const backgroundColorStyle: ExcelJS.FillPattern = {
       type: "pattern",
       pattern: "solid",
@@ -572,8 +545,8 @@ export class ExcelService {
       fgColor: { argb: "FFFFFF" }, // BLANCO (puedes cambiarlo por otro color)
     };
 
-    const totalFilas = 110; // Empieza en la fila 6 (donde comienza la tabla)
-    const totalColumnas = 16; // Número de columnas en la tabla
+    const totalFilas = 110; // EMPIEZA EN LA FILA 6 (DONDE COMIENZA LA TABLA)
+    const totalColumnas = 16; // NUMERO DE COLUMNAS EN LA TABLA
 
     for (let i = 0; i <= totalFilas; i++) {
       for (let j = 1; j <= totalColumnas; j++) {
@@ -588,7 +561,7 @@ export class ExcelService {
           (i == 18 && j == 12) || (i == 13 && j == 15) || (i == 14 && j == 15) || (i == 20 && (j == 10 || j == 12))
           || (i == 93 && j == 6)
         ) {
-          cell.border = borderStyle; // Aplicar bordes negros
+          cell.border = borderStyle; // APLICAR BORDES NEGROS
         } else if ((i >= 12 && i <= 21 && j == 16) || (i >= 26 && i <= 44) || (i >= 46 && i <= 54 && j == 16) ||
           (i >= 56 && i <= 62 && j == 8) || (i >= 56 && i <= 61 && j == 16) || (i == 62)
         ) {
@@ -682,7 +655,7 @@ export class ExcelService {
           (i == 36) || (i == 38) || (i == 40) || (i == 42) || (i == 45) || (i == 55) ||
           (i == 65) || (i == 67) || (i == 80) || (i == 91)
         ) {
-          cell.fill = backgroundColorStyle; // Aplicar color de fondo
+          cell.fill = backgroundColorStyle; // APLICAR COLOR DE FONDO
         }
 
         if ((i >= 13 && i <= 19) || (i >= 46 && i <= 54) ||
@@ -697,7 +670,6 @@ export class ExcelService {
         } else {
           cell.alignment = {
             vertical: "middle",
-            //horizontal: this.obtenerAlineacionHorizontalEmpleados(j),
           };
         }
 
@@ -801,8 +773,6 @@ export class ExcelService {
 
     });
 
-    // console.log("ver tipo_acciones_perso", tipo_acciones_perso);
-
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/octet-stream" });
@@ -811,16 +781,6 @@ export class ExcelService {
       console.error("Error al generar el archivo Excel:", error);
     }
 
-  }
-
-  private obtenerAlineacionHorizontalEmpleados(
-    j: number
-  ): "left" | "center" | "right" {
-    if (j === 1 || j === 9 || j === 10 || j === 11) {
-      return "center";
-    } else {
-      return "left";
-    }
   }
 
 }

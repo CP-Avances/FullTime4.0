@@ -103,17 +103,24 @@ class RolPermisosControlador {
     }
   }
 
-  //FIXME SQL
-  // METODO PARA BUSCAR ID DE PAGINAS Y MENU LATERAL
+  // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL   **USADO
   public async ObtenerPaginasMenuRol(req: Request, res: Response): Promise<any> {
     const { id_rol } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-        SELECT ero_rol_permisos.id, ero_rol_permisos.pagina as funcion, ero_rol_permisos.link, ero_rol_permisos.id_rol, ero_rol_permisos.id_accion, es_acciones_paginas.id_pagina as id_funcion, es_acciones_paginas.accion  
-        FROM ero_rol_permisos ero_rol_permisos 
-        LEFT JOIN es_acciones_paginas es_acciones_paginas ON es_acciones_paginas.id = ero_rol_permisos.id_accion 
-        WHERE ero_rol_permisos.id_rol = $1 
-        ORDER BY 6, 5
+        SELECT 
+          rp.id, 
+          rp.pagina AS funcion, 
+          rp.link, 
+          rp.id_rol, 
+          rp.id_accion, 
+          ap.id_pagina AS id_funcion, 
+          ap.accion  
+        FROM ero_rol_permisos rp
+        LEFT JOIN es_acciones_paginas ap 
+          ON ap.id = rp.id_accion 
+        WHERE rp.id_rol = $1
+        ORDER BY ap.id_pagina, rp.id_accion;
       `
       , [id_rol]);
     if (PAGINA_ROL.rowCount != 0) {
@@ -124,7 +131,7 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ASIGNAR FUNCIONES AL ROL
+  // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
       const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = req.body;
@@ -133,7 +140,7 @@ class RolPermisosControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
+          INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
         `
         , [funcion, link, id_rol, id_accion, movil]);
       const [datosOriginales] = response.rows;
@@ -164,7 +171,7 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ASIGNAR PAGINAS/ACCIONES AL ROL
+  // METODO PARA ASIGNAR ACCIONES AL ROL   **USADO
   public async AsignarAccionesRol(req: Request, res: Response) {
     const arrayAccionesSeleccionadas: any[] = req.body.acciones;
 
@@ -245,11 +252,12 @@ class RolPermisosControlador {
         );
       }
 
-      const queryAuditoria = `
-        INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
-          action, original_data, new_data, ip_address, observacion, ip_address_local)
-        VALUES ${valuesAuditoria.join(', ')}
-      `;
+      const queryAuditoria =
+        `
+          INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+            action, original_data, new_data, ip_address, observacion, ip_address_local)
+          VALUES ${valuesAuditoria.join(', ')}
+        `;
 
       await pool.query(queryAuditoria, paramsAuditoria);
 
@@ -284,8 +292,8 @@ class RolPermisosControlador {
     const { id_funcion } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-          SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
-          `
+        SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+      `
       , [id_funcion]);
     if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
@@ -346,9 +354,6 @@ class RolPermisosControlador {
     else if (SIN_ACCIONES.rowCount != 0) {
       respuesta = SIN_ACCIONES.rows;
     }
-
-    console.log('respuesta ', respuesta.length)
-
     if (respuesta.length != 0) {
       return res.jsonp(respuesta)
     } else {
@@ -357,6 +362,7 @@ class RolPermisosControlador {
   }
 }
 
+// FUNCION UTIL PARA FILTRAR LAS ACCIONES SELECCIONADAS  **USADO
 async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionadas: any[]): Promise<any[]> {
   if (arrayAccionesSeleccionadas.length === 0) return [];
 
@@ -376,10 +382,11 @@ async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionad
     }
   }
 
-  const query = `
-    SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
-    WHERE ${conditions.join(' OR ')}
-  `;
+  const query =
+    `
+      SELECT pagina, id_rol, id_accion FROM ero_rol_permisos
+      WHERE ${conditions.join(' OR ')}
+    `;
 
   const result = await pool.query(query, values);
 
@@ -397,12 +404,13 @@ async function filtrarAccionesSeleccionadasNoExistentes(arrayAccionesSeleccionad
   });
 }
 
+// FUNCION PARA INSERTAR EN LA BASE DE DATOS LAS ACCIONES SELECCIONADAS   **USADO
 async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) {
   if (arrayAccionesSeleccionadas.length === 0) return;
-  // CONSTRUIMOS LA CONSULTA DE INSERCIÓN
+  // CONSTRUIMOS LA CONSULTA DE INSERCION
   const values: string[] = [];
   const params: any[] = [];
-  let i = 1;  
+  let i = 1;
 
   const valuesAuditoria: string[] = [];
   const paramsAuditoria: any[] = [];
@@ -417,44 +425,45 @@ async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) 
       values.push(`($${i++}, $${i++}, $${i++}, NULL, $${i++})`);
       params.push(funcion, link, id_rol, movil);
     }
-    // PREPARAR DATOS PARA AUDITORÍA
+    // PREPARAR DATOS PARA AUDITORIA
     valuesAuditoria.push(
       `($${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++}, $${j++})`
     );
     paramsAuditoria.push(
-      "APLICACION WEB", 
+      "APLICACION WEB",
       'ero_rol_permisos',
       user_name,
       'now()',
       'I',
       '',
-      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }), 
+      JSON.stringify({ pagina: funcion, link, id_rol, id_accion, movil }),
       ip,
       null,
       ip_local
     );
   }
 
+  const query =
+    `
+      INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
+      VALUES ${values.join(', ')}
+    `;
 
-  const query = `
-    INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil)
-    VALUES ${values.join(', ')}
-  `;
-
-  const queryAuditoria = `
-    INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+  const queryAuditoria =
+    `
+      INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
         action, original_data, new_data, ip_address, observacion, ip_address_local)
-    VALUES ${valuesAuditoria.join(', ')}
-  `;
+      VALUES ${valuesAuditoria.join(', ')}
+    `;
 
-  // añadir transacción
+  // AÑADIR TRANSACCION
   await pool.query('BEGIN');
 
-  await pool 
+  await pool
     .query(query, params)
-    .catch(error => {
+    .catch((error): any => {
       console.error('Error al insertar acciones seleccionadas:', error);
-      // Revertir transacción en caso de error
+      // REVERTIR TRANSACCIÓN EN CASO DE ERROR
       return pool.query('ROLLBACK')
         .then(() => {
           throw new Error('Error al insertar acciones seleccionadas: ' + error.message);
@@ -463,17 +472,17 @@ async function insertarAccionesSeleccionadas(arrayAccionesSeleccionadas: any[]) 
 
   await pool
     .query(queryAuditoria, paramsAuditoria)
-    .catch(error => {
+    .catch((error): any => {
       console.error('Error al insertar auditoría de acciones seleccionadas:', error);
-      // Revertir transacción en caso de error
+      // REVERTIR TRANSACCIÓN EN CASO DE ERROR
       return pool.query('ROLLBACK')
-        .then(() => { 
+        .then(() => {
           throw new Error('Error al insertar auditoría de acciones seleccionadas: ' + error.message);
         });
 
-  });
+    });
 
-  // Finalizar transacción
+  // FINALIZAR TRANSACCION
   await pool.query('COMMIT');
   console.log('Acciones seleccionadas insertadas correctamente.');
 }

@@ -7,7 +7,6 @@ import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
 
-
 class DepartamentoControlador {
 
   // REGISTRAR DEPARTAMENTO    **USADO
@@ -20,7 +19,7 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
+          INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
         `
         , [nombre, id_sucursal]);
 
@@ -47,6 +46,49 @@ class DepartamentoControlador {
     }
   }
 
+  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL  **USADO
+  public async ObtenerDepartamentosSucursal(req: Request, res: Response): Promise<any> {
+    const { id_sucursal } = req.params;
+    const DEPARTAMENTO = await pool.query(
+      `
+        SELECT * FROM ed_departamentos WHERE id_sucursal = $1
+      `
+      , [id_sucursal]);
+    if (DEPARTAMENTO.rowCount != 0) {
+      return res.jsonp(DEPARTAMENTO.rows)
+    }
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+  }
+
+  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO   **USADO
+  public async ObtenerDepartamentosSucursal_(req: Request, res: Response): Promise<any> {
+    const { id_sucursal, id } = req.params;
+    const DEPARTAMENTO = await pool.query(
+      `
+        SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
+      `
+      , [id_sucursal, id]);
+    if (DEPARTAMENTO.rowCount != 0) {
+      return res.jsonp(DEPARTAMENTO.rows)
+    }
+    res.status(404).jsonp({ text: 'Registro no encontrado.' });
+  }
+
+  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL   **USADO
+  public async ObtenerDepartamento(req: Request, res: Response): Promise<any> {
+    const { id } = req.params;
+    const DEPARTAMENTO = await pool.query(
+      `
+      SELECT d.*, s.nombre AS sucursal
+      FROM ed_departamentos AS d, e_sucursales AS s 
+      WHERE d.id = $1 AND s.id = d.id_sucursal
+      `
+      , [id]);
+    if (DEPARTAMENTO.rowCount != 0) {
+      return res.jsonp(DEPARTAMENTO.rows)
+    }
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+  }
 
   // ACTUALIZAR REGISTRO DE DEPARTAMENTO   **USADO
   public async ActualizarDepartamento(req: Request, res: Response) {
@@ -80,8 +122,8 @@ class DepartamentoControlador {
 
       const datosNuevos = await pool.query(
         `
-        UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
-        WHERE id = $3 RETURNING *
+          UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
+          WHERE id = $3 RETURNING *
         `
         , [nombre, id_sucursal, id]);
 
@@ -109,123 +151,31 @@ class DepartamentoControlador {
     }
   }
 
-
-  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL   **USADO
-  public async ObtenerDepartamento(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const DEPARTAMENTO = await pool.query(
-      `
-      SELECT d.*, s.nombre AS sucursal
-      FROM ed_departamentos AS d, e_sucursales AS s 
-      WHERE d.id = $1 AND s.id = d.id_sucursal
-      `
-      , [id]);
-    if (DEPARTAMENTO.rowCount != 0) {
-      return res.jsonp(DEPARTAMENTO.rows)
-    }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
-  }
-
-
-  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL  **USADO
-  public async ObtenerDepartamentosSucursal(req: Request, res: Response): Promise<any> {
-    const { id_sucursal } = req.params;
-    const DEPARTAMENTO = await pool.query(
-      `
-      SELECT * FROM ed_departamentos WHERE id_sucursal = $1
-      `
-      , [id_sucursal]);
-    if (DEPARTAMENTO.rowCount != 0) {
-      return res.jsonp(DEPARTAMENTO.rows)
-    }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
-  }
-
-  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO   **USADO
-  public async ObtenerDepartamentosSucursal_(req: Request, res: Response): Promise<any> {
-    const { id_sucursal, id } = req.params;
-    const DEPARTAMENTO = await pool.query(
-      `
-      SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
-      `
-      , [id_sucursal, id]);
-    if (DEPARTAMENTO.rowCount != 0) {
-      return res.jsonp(DEPARTAMENTO.rows)
-    }
-    res.status(404).jsonp({ text: 'Registro no encontrado.' });
-  }
-
-  // METODO DE BUSQUEDA DE DEPARTAMENTOS   USADO
-  public async ListarDepartamentos(req: Request, res: Response) {
-
-    const NIVELES = await pool.query(
-      `
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
-        n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
-      FROM ed_niveles_departamento AS n, e_sucursales AS s
-      WHERE n.id_sucursal = s.id AND 
-        n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
-      ORDER BY s.nombre, n.departamento ASC
-      `
-    );
-
-    const DEPARTAMENTOS = await pool.query(
-      `
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
-        0 AS NIVEL, null AS departamento_padre
-      FROM ed_departamentos AS cd, e_sucursales AS s
-      WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
-        s.id = cd.id_sucursal
-      ORDER BY s.nombre, cd.nombre ASC;
-      `
-    );
-
-    if (DEPARTAMENTOS.rowCount != 0 && NIVELES.rowCount != 0) {
-      NIVELES.rows.forEach((obj: any) => {
-        DEPARTAMENTOS.rows.push(obj);
-      });
-      return res.jsonp(DEPARTAMENTOS.rows);
-    }
-
-    else if (DEPARTAMENTOS.rowCount != 0) {
-      return res.jsonp(DEPARTAMENTOS.rows);
-    }
-
-    else if (NIVELES.rowCount != 0) {
-      return res.jsonp(NIVELES.rows);
-    }
-
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-
-  }
-
   // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   **USADO
   public async ListarDepartamentosSucursal(req: Request, res: Response) {
 
     const id = req.params.id_sucursal;
     const NIVEL = await pool.query(
       `
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
-        n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
-      FROM ed_niveles_departamento AS n, e_sucursales AS s
-      WHERE n.id_sucursal = s.id AND 
-        n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
-        AND s.id = $1
-      ORDER BY s.nombre, n.departamento ASC
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
+          n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
+        FROM ed_niveles_departamento AS n, e_sucursales AS s
+        WHERE n.id_sucursal = s.id AND 
+          n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
+          AND s.id = $1
+        ORDER BY s.nombre, n.departamento ASC
       `
       , [id]
     );
 
     const DEPARTAMENTO = await pool.query(
       `
-      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
-        0 AS NIVEL, null AS departamento_padre
-      FROM ed_departamentos AS cd, e_sucursales AS s
-      WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
-        s.id = cd.id_sucursal AND s.id = $1
-      ORDER BY s.nombre, cd.nombre ASC
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
+          0 AS NIVEL, null AS departamento_padre
+        FROM ed_departamentos AS cd, e_sucursales AS s
+        WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
+          s.id = cd.id_sucursal AND s.id = $1
+         ORDER BY s.nombre, cd.nombre ASC
       `
       , [id]
     );
@@ -243,6 +193,52 @@ class DepartamentoControlador {
 
     else if (NIVEL.rowCount != 0) {
       return res.jsonp(NIVEL.rows);
+    }
+
+    else {
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+    }
+
+  }
+
+  // METODO DE BUSQUEDA DE DEPARTAMENTOS   **USADO
+  public async ListarDepartamentos(req: Request, res: Response) {
+
+    const NIVELES = await pool.query(
+      `
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
+          n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
+        FROM ed_niveles_departamento AS n, e_sucursales AS s
+        WHERE n.id_sucursal = s.id AND 
+          n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
+        ORDER BY s.nombre, n.departamento ASC
+      `
+    );
+
+    const DEPARTAMENTOS = await pool.query(
+      `
+        SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
+          0 AS NIVEL, null AS departamento_padre
+        FROM ed_departamentos AS cd, e_sucursales AS s
+        WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
+          s.id = cd.id_sucursal
+        ORDER BY s.nombre, cd.nombre ASC;
+      `
+    );
+
+    if (DEPARTAMENTOS.rowCount != 0 && NIVELES.rowCount != 0) {
+      NIVELES.rows.forEach((obj: any) => {
+        DEPARTAMENTOS.rows.push(obj);
+      });
+      return res.jsonp(DEPARTAMENTOS.rows);
+    }
+
+    else if (DEPARTAMENTOS.rowCount != 0) {
+      return res.jsonp(DEPARTAMENTOS.rows);
+    }
+
+    else if (NIVELES.rowCount != 0) {
+      return res.jsonp(NIVELES.rows);
     }
 
     else {
@@ -283,7 +279,7 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        DELETE FROM ed_departamentos WHERE id = $1
+          DELETE FROM ed_departamentos WHERE id = $1
         `
         , [id]);
 
@@ -307,7 +303,6 @@ class DepartamentoControlador {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
-
     }
   }
 
@@ -322,9 +317,9 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        INSERT INTO ed_niveles_departamento (departamento, id_departamento, nivel, departamento_nombre_nivel, 
-          id_departamento_nivel, id_sucursal, id_sucursal_departamento_nivel ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+          INSERT INTO ed_niveles_departamento (departamento, id_departamento, nivel, departamento_nombre_nivel, 
+            id_departamento_nivel, id_sucursal, id_sucursal_departamento_nivel ) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
         `
         , [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
 
@@ -357,11 +352,11 @@ class DepartamentoControlador {
     const { id_departamento, id_establecimiento } = req.params;
     const NIVELESDEP = await pool.query(
       `
-      SELECT n.*, s.nombre AS suc_nivel
-      FROM ed_niveles_departamento AS n, e_sucursales AS s
-      WHERE id_departamento = $1 AND id_sucursal = $2 
-        AND s.id = n.id_sucursal_departamento_nivel
-      ORDER BY nivel DESC 
+        SELECT n.*, s.nombre AS suc_nivel
+        FROM ed_niveles_departamento AS n, e_sucursales AS s
+        WHERE id_departamento = $1 AND id_sucursal = $2 
+          AND s.id = n.id_sucursal_departamento_nivel
+        ORDER BY nivel DESC 
       `
       , [id_departamento, id_establecimiento]);
     if (NIVELESDEP.rowCount != 0) {
@@ -402,8 +397,8 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        UPDATE ed_niveles_departamento set nivel = $1 
-        WHERE id = $2
+          UPDATE ed_niveles_departamento set nivel = $1 
+          WHERE id = $2
         `
         , [nivel, id]);
 
@@ -462,7 +457,7 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        DELETE FROM ed_niveles_departamento WHERE id = $1
+          DELETE FROM ed_niveles_departamento WHERE id = $1
         `
         , [id]);
 
@@ -524,8 +519,8 @@ class DepartamentoControlador {
         else {
           await pool.query(
             `
-            UPDATE ed_niveles_departamento SET departamento = $1
-            WHERE id_departamento = $2
+              UPDATE ed_niveles_departamento SET departamento = $1
+              WHERE id_departamento = $2
             `
             , [departamento, id_departamento]);
 
@@ -563,8 +558,8 @@ class DepartamentoControlador {
         else {
           await pool.query(
             `
-            UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
-            WHERE id_departamento_nivel = $2
+              UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
+              WHERE id_departamento_nivel = $2
             `
             , [departamento, id_departamento]);
 
@@ -594,7 +589,7 @@ class DepartamentoControlador {
     }
   }
 
-  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR    **USADO
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
     let separador = path.sep;
@@ -641,14 +636,12 @@ class DepartamentoControlador {
           if ((ITEM != undefined && ITEM != '') &&
             (NOMBRE != undefined) && (SUCURSAL != undefined)) {
             data.fila = ITEM;
-            data.nombre = NOMBRE; 
+            data.nombre = NOMBRE;
             data.sucursal = SUCURSAL;
             data.observacion = 'no registrado';
-
             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
             data.nombre = data.nombre.trim();
             data.sucursal = data.sucursal.trim();
-
             listDepartamentos.push(data);
           } else {
             data.fila = ITEM;
@@ -672,7 +665,7 @@ class DepartamentoControlador {
             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
             data.nombre = data.nombre.trim();
             data.sucursal = data.sucursal.trim();
-            
+
             listDepartamentos.push(data);
           }
           data = {};
@@ -690,13 +683,13 @@ class DepartamentoControlador {
         if (item.observacion == 'no registrado') {
           var VERIFICAR_SUCURSAL = await pool.query(
             `
-            SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+              SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
             `
             , [item.sucursal.toUpperCase()]);
           if (VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != '') {
             var VERIFICAR_DEPARTAMENTO = await pool.query(
               `
-              SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
+                SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
               `
               , [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()])
             if (VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == '') {
@@ -750,7 +743,7 @@ class DepartamentoControlador {
     }
   }
 
-  // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
+  // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS    **USADO
   public async CargarPlantilla(req: Request, res: Response) {
     const { plantilla, user_name, ip, ip_local } = req.body;
     let error: boolean = false;
@@ -763,13 +756,13 @@ class DepartamentoControlador {
         await pool.query('BEGIN');
 
         const id_sucursal: any = await pool.query(
-          ` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+          ` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1 `
           , [sucursal.toUpperCase()]);
 
         const id = id_sucursal.rows[0].id;
 
         const response: QueryResult = await pool.query(
-          `INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *`
+          ` INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING * `
           , [nombre.toUpperCase(), id]);
 
         const [departamento] = response.rows;
@@ -795,13 +788,10 @@ class DepartamentoControlador {
         error = true;
       }
     }
-
     if (error) {
       return res.status(500).jsonp({ message: 'error' });
     }
-
     return res.status(200).jsonp({ message: 'ok' });
-
   }
 
   // METODO PARA REVISAR DATOS DE NIVELES DE DEPARTAMENTOS   **USADO
@@ -875,9 +865,7 @@ class DepartamentoControlador {
               data.depa_superior = DEPARTAMENTO_SUPERIOR?.trim();
               data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR?.trim();
               data.observacion = 'no registrada';
-
               data.nivel = parseInt(data.nivel)
-
               listNivelesDep.push(data);
             } else {
 
@@ -889,9 +877,7 @@ class DepartamentoControlador {
               data.depa_superior = DEPARTAMENTO_SUPERIOR?.trim();
               data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR?.trim();
               data.observacion = 'no registrada';
-
               data.nivel = parseInt(data.nivel)
-
               if (data.fila == '' || data.fila == undefined) {
                 data.fila = 'error';
                 mensaje = 'error'
@@ -916,7 +902,6 @@ class DepartamentoControlador {
                 data.sucursal_depa_superior = 'No registrado';
                 data.observacion = 'Sucursal superior no registrada';
               }
-
               listNivelesDep.push(data);
             }
             data = {};
@@ -934,19 +919,19 @@ class DepartamentoControlador {
           if (item.observacion == 'no registrada') {
             var validSucursal = await pool.query(
               `
-              SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
               `
               , [item.sucursal.toUpperCase()])
             if (validSucursal.rows[0] != undefined && validSucursal.rows[0] != '') {
               var validDeparta = await pool.query(
                 `
-                SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                  SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                 `
                 , [item.departamento.toUpperCase()])
               if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
                 var validDepaSucu = await pool.query(
                   `
-                  SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                   `
                   , [validSucursal.rows[0].id, item.departamento.toUpperCase()])
                 if (validDepaSucu.rows[0] != undefined && validDepaSucu.rows[0] != '') {
@@ -954,13 +939,13 @@ class DepartamentoControlador {
                     if (item.nivel > 0 && item.nivel <= 5) {
                       var validDepSuperior = await pool.query(
                         `
-                        SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                          SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
                         `
                         , [item.depa_superior.toUpperCase()])
                       if (validDepSuperior.rows[0] != undefined && validDepSuperior.rows[0] != '') {
                         var validSucSuperior = await pool.query(
                           `
-                          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
                           `
                           , [item.sucursal_depa_superior.toUpperCase()])
 
@@ -968,15 +953,15 @@ class DepartamentoControlador {
 
                           var validDepaSucuSuper = await pool.query(
                             `
-                            SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                              SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
                             `
                             , [validSucSuperior.rows[0].id, item.depa_superior.toUpperCase()])
 
                           if (validDepaSucuSuper.rows[0] != undefined && validDepaSucuSuper.rows[0] != '') {
                             var validNivelExiste = await pool.query(
                               `
-                              SELECT * FROM ed_niveles_departamento 
-                              WHERE UPPER(departamento) = $1 AND nivel = $2
+                                SELECT * FROM ed_niveles_departamento 
+                                WHERE UPPER(departamento) = $1 AND nivel = $2
                               `
                               , [item.departamento.toUpperCase(), item.nivel])
                             if (validNivelExiste.rows[0] != undefined && validNivelExiste.rows[0] != '') {
@@ -985,15 +970,14 @@ class DepartamentoControlador {
 
                               var validaDepaSuperiorNivel = await pool.query(
                                 `
-                                SELECT id FROM ed_niveles_departamento 
-                                WHERE UPPER(departamento) = $1 AND UPPER(departamento_nombre_nivel) = $2
+                                  SELECT id FROM ed_niveles_departamento 
+                                  WHERE UPPER(departamento) = $1 AND UPPER(departamento_nombre_nivel) = $2
                                 `
                                 , [item.departamento.toUpperCase(), item.depa_superior.toUpperCase()])
 
                               if (validaDepaSuperiorNivel.rows[0] != undefined && validaDepaSuperiorNivel.rows[0] != '') {
                                 item.observacion = 'Departamento superior ya se encuentra configurado';
                               } else {
-
                                 // DISCRIMINACION DE ELEMENTOS IGUALES
                                 if (duplicados.find((p: any) => p.sucursal.toLowerCase() === item.sucursal.toLowerCase() &&
                                   p.departamento.toLowerCase() === item.departamento.toLowerCase() &&
@@ -1108,10 +1092,10 @@ class DepartamentoControlador {
           uniqueDepartments.forEach(async (item: any) => {
             let ValidNiveles = await pool.query(
               `
-              SELECT nivel, departamento_nombre_nivel 
-              FROM ed_niveles_departamento 
-              WHERE UPPER(departamento) = $1 
-              ORDER BY nivel DESC
+                SELECT nivel, departamento_nombre_nivel 
+                FROM ed_niveles_departamento 
+                WHERE UPPER(departamento) = $1 
+                ORDER BY nivel DESC
               `
               , [item.departamento.toUpperCase()])
 
@@ -1183,25 +1167,25 @@ class DepartamentoControlador {
 
         var validSucursal = await pool.query(
           `
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
           `
           , [sucursal.toUpperCase()])
 
         var validDeparta = await pool.query(
           `
-          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+            SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
           `
           , [departamento.toUpperCase()])
 
         var validDepSuperior = await pool.query(
           `
-          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+            SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
           `
           , [depa_superior.toUpperCase()])
 
         var validSucSuperior = await pool.query(
           `
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
           `
           , [sucursal_depa_superior.toUpperCase()])
 
@@ -1213,7 +1197,8 @@ class DepartamentoControlador {
 
         // REGISTRO DE LOS DATOS DE CONTRATOS
         const response: QueryResult = await pool.query(
-          `INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
+          ` 
+            INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
           `
           , [id_sucursal, id_departamento, departamento, nivel, id_sucuDepSuperior, depa_superior, id_depaDepSuperior]);
@@ -1231,24 +1216,19 @@ class DepartamentoControlador {
           ip_local: ip_local,
           observacion: null
         });
-
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
         error = true;
       }
     }
-
     if (error) {
       return res.status(500).jsonp({ message: error });
     }
-
     return res.status(200).jsonp({ message: 'ok' });
   }
-
 
   // CONSULTA PARA ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MULTIPLE  **USADO
   public async ActualizarDepartamentosUsuario(req: Request, res: Response) {
@@ -1258,17 +1238,17 @@ class DepartamentoControlador {
       listaUsuarios.forEach(async (item: any) => {
         let res = await pool.query(
           `
-          UPDATE eu_usuario_departamento
-          SET id_departamento = $1 
-          WHERE id_empleado = $2
+            UPDATE eu_usuario_departamento
+            SET id_departamento = $1 
+            WHERE id_empleado = $2
           `
           , [idDepartamento, item.id]);
 
         await pool.query(
           `
-          UPDATE eu_empleado_cargos
-          SET id_departamento = $1 
-          WHERE id_contrato = $2
+            UPDATE eu_empleado_cargos
+            SET id_departamento = $1 
+            WHERE id_contrato = $2
           `
           , [idDepartamento, item.id_contrato]);
 
@@ -1286,7 +1266,6 @@ class DepartamentoControlador {
         }
       }, 1500)
 
-
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
@@ -1303,6 +1282,29 @@ class DepartamentoControlador {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// VERIFICAR
   public async BuscarDepartamentoPorCargo(req: Request, res: Response) {
     const id = req.params.id_cargo
     const departamento = await pool.query(

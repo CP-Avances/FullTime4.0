@@ -1,6 +1,6 @@
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { Request, Response } from 'express';
 import { FormatearHora } from '../../libs/settingsMail';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import pool from '../../database';
 
 class DetalleCatalogoHorarioControlador {

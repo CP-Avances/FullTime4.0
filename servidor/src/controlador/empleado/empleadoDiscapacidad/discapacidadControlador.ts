@@ -264,21 +264,6 @@ class DiscapacidadControlador {
     }
   }
 
-  public async list(req: Request, res: Response) {
-    const DISCAPACIDAD = await pool.query(
-      `
-      SELECT * FROM eu_empleado_discapacidad
-      `
-    );
-    if (DISCAPACIDAD.rowCount != 0) {
-      return res.jsonp(DISCAPACIDAD.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-
 }
 
 export const DISCAPACIDAD_CONTROLADOR = new DiscapacidadControlador();

@@ -1,16 +1,18 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../../database';
 import Excel from 'exceljs';
+import { Credenciales } from '../../../libs/settingsMail';
 
 class DiscapacidadControlador {
 
     // METODO PARA LISTAR TIPO DE DISCAPACIDAD    **USADO
     public async ListarDiscapacidad(req: Request, res: Response) {
+        
         try {
             const DISCAPACIDAD = await pool.query(
                 `
@@ -111,7 +113,6 @@ class DiscapacidadControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
-
 
             if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                 const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
@@ -221,7 +222,7 @@ class DiscapacidadControlador {
         }
     }
 
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **usado
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
         try {
             const documento = req.file?.originalname;
@@ -273,7 +274,6 @@ class DiscapacidadControlador {
 
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                             data.discapacidad = data.discapacidad.trim();
-
                             listaDiscapacidad.push(data);
 
                         } else {
@@ -291,9 +291,8 @@ class DiscapacidadControlador {
                                 data.observacion = 'Discapacidad no registrada';
                             }
 
-                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
-                             data.discapacidad = data.discapacidad.trim();
-
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            data.discapacidad = data.discapacidad.trim();
                             listaDiscapacidad.push(data);
                         }
 

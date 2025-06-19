@@ -4136,7 +4136,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   ExportToXML() {
     if (!this.listaPedidos || this.listaPedidos.length === 0) {
       this.toastr.info('No hay datos para mostrar en el reporte.');
-      return; 
+      return;
     }
     var objeto;
     var arregloPedidos: any = [];
@@ -4155,12 +4155,13 @@ export class ListarPedidoAccionComponent implements OnInit {
       arregloPedidos.push(objeto);
     });
 
-    this.restAccion.CrearXML(arregloPedidos).subscribe((res) => {
-      this.data = res;
-      this.urlxml =
-        `${(localStorage.getItem('empresaURL') as string)}/accionPersonal/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    /* este metodo ya no se usa borrar y hacer el que corresponde
+        this.restAccion.CrearXML(arregloPedidos).subscribe((res) => {
+          this.data = res;
+          this.urlxml =
+            `${(localStorage.getItem('empresaURL') as string)}/accionPersonal/download/` + this.data.name;
+          window.open(this.urlxml, "_blank");
+        });*/
   }
 
   /** ************************************************************************************************** **

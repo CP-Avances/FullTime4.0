@@ -16,7 +16,7 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general/${estado}`);
   }
 
-  // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS
+  // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS PARA ACTUALIZAR DEPARTAMENTO  **USADO
   ObtenerInformacionGeneralDep(estado: any) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general-rol/${estado}`);
   }
@@ -45,7 +45,17 @@ export class DatosGeneralesService {
   InformarEmpleadoAutoriza(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/empleadoAutoriza/${id_empleado}`);
   }
+
+
+
+
+
+
+
+
+
   
+
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO
   ListarInformacionActual() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/info_actual`);

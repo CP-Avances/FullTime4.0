@@ -24,7 +24,6 @@ class CiudadRutas {
         this.router.post('/insertar', verificarToken_1.TokenValidation, ciudadFeriadoControlador_1.default.AsignarCiudadFeriado);
         // METODO PARA ACTUALIZAR REGISTRO    **USADO
         this.router.put('/', verificarToken_1.TokenValidation, ciudadFeriadoControlador_1.default.ActualizarCiudadFeriado);
-        this.router.get('/ciudad/:id_ciudad', verificarToken_1.TokenValidation, ciudadFeriadoControlador_1.default.ObtenerFeriadosCiudad);
     }
 }
 const CIUDAD_FERIADOS_RUTAS = new CiudadRutas();

@@ -275,7 +275,7 @@
             <mat-form-field class="input-tables cedula" style="width: 175px;">
                 <input matInput placeholder="Buscar identificación" maxlength="10"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                    [formControl]="cedula">
             </mat-form-field>
 
             <mat-form-field class="input-tables codigo" style="width: 140px;">

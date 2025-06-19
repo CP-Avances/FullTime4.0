@@ -636,7 +636,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
     if (e.id != undefined && e.id != null) {
-      this.restUsu.BuscarInfoUsuarioAcci(e.id).subscribe((datos) => {
+      this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
         this.InfoUser = datos
       
         this.InfoUser.forEach(valor => {

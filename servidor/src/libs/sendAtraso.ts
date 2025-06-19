@@ -109,7 +109,7 @@ export const atrasosIndividual = async function (desde: any, hasta: any) {
 
         const fecha = FormatearFecha(DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas)
         const hora_reporte = FormatearHora(DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-        console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha)
+
         // VERIFICAR HORA DE ENVIO
         const Empre = await pool.query(
             `

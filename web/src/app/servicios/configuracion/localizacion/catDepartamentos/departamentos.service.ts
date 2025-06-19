@@ -95,11 +95,6 @@ export class DepartamentosService {
     );
   }
   
-  // catalogo de departamentos
-  ConsultarDepartamentoPorContrato(id_cargo: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);
-  }
-
   // METODO PARA REVISAR DATOS DE PLANTILLA DE DEPARTAMENTOS   **USADO
   RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/departamento/upload/revision', formData);
@@ -108,10 +103,6 @@ export class DepartamentosService {
   // METODO PARA SUBIR EL ARCHIVO DE DEPARTAMENTOS AL SISTEMA   **USADO
   subirArchivoExcel(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/departamento/cargar_plantilla/`, formData);
-  }
-
-  BuscarDepartamentoRegimen(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/buscar/regimen-departamento/${id}`);
   }
 
   // METODO PARA VALIDAR DATOS DE PLANTILLA DE NIVELES DE DEPARTAMENTO   **USADO
@@ -128,5 +119,23 @@ export class DepartamentosService {
   ActualizarUserDepa(Data: any){
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/departamento/actualizarUserDepa`, Data);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // catalogo de departamentos --------------------------------------------------------
+    ConsultarDepartamentoPorContrato(id_cargo: number) {
+      return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);
+    }
 
 }

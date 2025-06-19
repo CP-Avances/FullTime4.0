@@ -1,24 +1,25 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
-import { EditarGradoComponent } from '../editar-grado/editar-grado.component';
-import { MatDialog } from '@angular/material/dialog';
-import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { Router } from '@angular/router';
-import { DateTime } from 'luxon';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { FormControl, Validators } from '@angular/forms';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
-import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
-import { RegistrarGradoComponent } from '../registrar-grado/registrar-grado.component';
-import { ToastrService } from 'ngx-toastr';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { CatGradoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service';
 import { SelectionModel } from '@angular/cdk/collections';
+import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
 
-import ExcelJS, { FillPattern } from "exceljs";
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { ToastrService } from 'ngx-toastr';
+
+import { RegistrarGradoComponent } from '../registrar-grado/registrar-grado.component';
+import { EditarGradoComponent } from '../editar-grado/editar-grado.component';
+import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
+
+import ExcelJS from "exceljs";
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import { FillPatterns } from 'exceljs';
 
 @Component({
   selector: 'app-grados',
@@ -30,8 +31,6 @@ import { FillPatterns } from 'exceljs';
 export class GradosComponent implements OnInit {
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
-  private bordeGrueso!: Partial<ExcelJS.Borders>;
-  private fillAzul!: FillPatterns;
   private fontTitulo!: Partial<ExcelJS.Font>;
   private imagen: any;
 
@@ -217,7 +216,6 @@ export class GradosComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA EDITAR PROCESO
   AbrirVentanaEditar(datosSeleccionados: any): void {
-    //console.log(datosSeleccionados);
     this.ventana.open(EditarGradoComponent,
       {
         width: '450px', data: datosSeleccionados
@@ -228,7 +226,6 @@ export class GradosComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
-    //console.log(datos);
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -239,12 +236,14 @@ export class GradosComponent implements OnInit {
         }
       });
   }
+
   // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_grado: number) {
     let dataGrado = {
       id_grado: id_grado,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
     this._grados.ElminarGrado(dataGrado).subscribe((res: any) => {
       if (res.codigo != 200) {
@@ -283,6 +282,7 @@ export class GradosComponent implements OnInit {
         }
       });
   }
+
   EliminarMultiple() {
     const data = {
       listaEliminar: this.gradoEliminar,
@@ -290,7 +290,7 @@ export class GradosComponent implements OnInit {
       ip: this.ip, ip_local: this.ips_locales
     }
 
-    this._grados.EliminarGradoMult(data).subscribe({
+    this._grados.EliminarGradoMultiple(data).subscribe({
       next: (response) => {
         this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
@@ -329,6 +329,7 @@ export class GradosComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
+
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
   ManejarPaginaMulti(e: PageEvent) {
     this.tamanio_paginaMul = e.pageSize;
@@ -372,10 +373,12 @@ export class GradosComponent implements OnInit {
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
   }
+
   // METODO PARA VALIDAR DATOS DE PLANTILLAS
   Datos_grados: any
   listaGradosCorrectas: any = [];
   listaGradosCorrectasCont: number;
+
   // METODO PARA VERIFICAR DATOS DE PLANTILLA
   VerificarPlantilla() {
     this.listaGradosCorrectas = [];
@@ -428,10 +431,10 @@ export class GradosComponent implements OnInit {
     });
 
   }
+
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
-    let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
@@ -467,12 +470,12 @@ export class GradosComponent implements OnInit {
   }
 
   RegistrarGrados() {
-    console.log('ListaGradosCorrectas: ', this.listaGradosCorrectas.length)
     if (this.listaGradosCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaGradosCorrectas,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       }
 
       this._grados.RegistrarPlantilla(data).subscribe({
@@ -507,11 +510,9 @@ export class GradosComponent implements OnInit {
   }
 
 
-
-
   /** ************************************************************************************************** **
-     ** **                               METODO PARA EXPORTAR A PDF                                     ** **
-     ** ************************************************************************************************** **/
+   ** **                               METODO PARA EXPORTAR A PDF                                     ** **
+   ** ************************************************************************************************** **/
 
   async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
@@ -525,9 +526,7 @@ export class GradosComponent implements OnInit {
   }
 
   DefinirInformacionPDF() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -604,16 +603,8 @@ export class GradosComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   async exportToExcel() {
-
-    var f = DateTime.now();
-    let fecha = f.toFormat('yyyy-MM-dd');
-    let hora = f.toFormat('HH:mm:ss');
-    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
     const grados: any[] = [];
-
-    console.log('this.grados: ', this.ListGrados);
     this.ListGrados.forEach((accion: any, index: number) => {
-
       grados.push([
         index + 1,
         accion.id,
@@ -665,8 +656,6 @@ export class GradosComponent implements OnInit {
       { name: "CODIGO", totalsRowLabel: "Total:", filterButton: true },
       { name: "GRADO", totalsRowLabel: "", filterButton: true },
     ];
-    console.log("ver grados", grados);
-    console.log("Columnas:", columnas);
 
     worksheet.addTable({
       name: "Grados",
@@ -680,7 +669,6 @@ export class GradosComponent implements OnInit {
       columns: columnas,
       rows: grados,
     });
-
 
     worksheet.getRow(6).font = this.fontTitulo;
 
@@ -724,17 +712,16 @@ export class GradosComponent implements OnInit {
 
   exportToCVS() {
     var arreglo = this.ListGrados;
-    // 1. Crear un nuevo workbook
+    // 1. CREAR UN NUEVO WORKBOOK
     const workbook = new ExcelJS.Workbook();
-    // 2. Crear una hoja en el workbook
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
     const worksheet = workbook.addWorksheet('GradoCSV');
-    // 3. Agregar encabezados de las columnas
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
     worksheet.columns = [
       { header: 'ID', key: 'id', width: 30 },
       { header: 'DESCRIPCION', key: 'descripcion', width: 15 },
     ];
-
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     arreglo.map((obj: any) => {
       worksheet.addRow({
         id: obj.id,
@@ -742,9 +729,9 @@ export class GradosComponent implements OnInit {
       }).commit();
     });
 
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "GradoCSV.csv");
     });
@@ -754,13 +741,11 @@ export class GradosComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
    ** ************************************************************************************************* **/
 
-   urlxml: string;
-   data: any = [];
-   exportToXML() {
-     
+  urlxml: string;
+  data: any = [];
+  exportToXML() {
     var objeto: any;
     var arregloGrados: any = [];
-    console.log('this.tipo_acciones: ',this.ListGrados)
     this.ListGrados.forEach((obj: any) => {
       objeto = {
         "grado": {
@@ -769,31 +754,31 @@ export class GradosComponent implements OnInit {
         }
       }
       arregloGrados.push(objeto)
-     });
-     const xmlBuilder = new xml2js.Builder({ rootName: 'Grados' });
-     const xml = xmlBuilder.buildObject(arregloGrados);
- 
-     if (xml === undefined) {
-       return;
-     }
- 
-     const blob = new Blob([xml], { type: 'application/xml' });
-     const xmlUrl = URL.createObjectURL(blob);
- 
-     // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
-     const newTab = window.open(xmlUrl, '_blank');
-     if (newTab) {
-       newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
-       newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
-     } else {
-       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
-     }
-     const a = document.createElement('a');
-     a.href = xmlUrl;
-     a.download = 'Grados.xml';
-     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
-     a.click();
-   }
+    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Grados' });
+    const xml = xmlBuilder.buildObject(arregloGrados);
+
+    if (xml === undefined) {
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Grados.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
+  }
 
   //CONTROL BOTONES
   private tienePermiso(accion: string): boolean {
@@ -806,11 +791,11 @@ export class GradosComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
-  
+
   getCrearGrado(): boolean {
     return this.tienePermiso('Crear Grado');
   }

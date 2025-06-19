@@ -79,7 +79,7 @@ class RolesControlador {
     }
   }
 
-  // METODO PARA REGISTRAR ROL
+  // METODO PARA REGISTRAR ROL   **USADO
   public async CrearRol(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, user_name, ip, ip_local } = req.body;
@@ -116,7 +116,7 @@ class RolesControlador {
 
   }
 
-  // LISTAR ROLES A EXCEPCION EL QUE SE EDITA **USADO
+  // LISTAR ROLES A EXCEPCION EL QUE SE EDITA     **USADO
   public async ListarRolesActualiza(req: Request, res: Response) {
     const id = req.params.id;
     const ROL = await pool.query(
@@ -133,7 +133,7 @@ class RolesControlador {
   }
 
 
-  // METODO PARA LISTAR INFORMACION DEL ROL **USADO
+  // METODO PARA LISTAR INFORMACION DEL ROL    **USADO
   public async ObtenerUnRol(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const ROL = await pool.query(
@@ -148,7 +148,7 @@ class RolesControlador {
     }
   }
 
-  // METODO PARA ACTUALIZAR ROLES  **USADO
+  // METODO PARA ACTUALIZAR ROLES    **USADO
   public async ActualizarRol(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, id, user_name, ip, ip_local } = req.body;
@@ -203,7 +203,7 @@ class RolesControlador {
     }
   }
 
-  // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS  **USADO
+  // CONSULTA PARA ACTUALIZAR ROLES A VARIOS USUARIOS     **USADO
   public async ActualizarRolUsuario(req: Request, res: Response) {
     try {
       const { idRol, listaUsuarios } = req.body;

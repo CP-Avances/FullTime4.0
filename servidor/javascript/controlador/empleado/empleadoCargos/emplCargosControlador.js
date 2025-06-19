@@ -13,30 +13,73 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CARGO_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../../libs/settingsMail");
 const luxon_1 = require("luxon");
-const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class EmpleadoCargosControlador {
-    // METODO PARA BUSCAR CARGO ACTIVO   **USADO
-    BuscarCargosActivos(req, res) {
+    /** **************************************************************************************** **
+     ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **
+     ** **************************************************************************************** **/
+    // METODO DE BUSQUEDA DE TIPO DE CARGOS   **USADO
+    ListarTiposCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.body;
-            const CARGO = yield database_1.default.query(`
-      SELECT * FROM contrato_cargo_vigente WHERE id_empleado = $1;
-      `, [id_empleado]);
-            if (CARGO.rowCount != 0) {
-                return res.jsonp({ message: 'contrato_cargo', datos: CARGO.rows[0] });
+            const Cargos = yield database_1.default.query(`
+      SELECT * FROM e_cat_tipo_cargo
+      `);
+            if (Cargos.rowCount != 0) {
+                return res.jsonp(Cargos.rows);
             }
             else {
-                return res.status(404).jsonp({ message: 'No se han encontrado registro.' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
+    // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
+    CrearTipoCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { cargo, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
+        `, [cargo]);
+                const [tipo_cargo] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(tipo_cargo),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (tipo_cargo) {
+                    return res.status(200).jsonp(tipo_cargo);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    /** ***************************************************************************************** **
+     ** **                METODO DE CONSULTA DE CARGOS DEL USUARIO                             ** **
+     ** ***************************************************************************************** **/
     // METODO PARA ACTUALIZAR ESTADO DEL CARGO    **USADO
     EditarEstadoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -46,7 +89,7 @@ class EmpleadoCargosControlador {
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const cargoConsulta = yield database_1.default.query(`
-        SELECT * FROM eu_empleado_cargos WHERE id = $1
+          SELECT * FROM eu_empleado_cargos WHERE id = $1
         `, [id_cargo]);
                 const [datosOriginales] = cargoConsulta.rows;
                 if (!datosOriginales) {
@@ -66,8 +109,8 @@ class EmpleadoCargosControlador {
                     return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE eu_empleado_cargos SET estado = $2 
-        WHERE id = $1
+          UPDATE eu_empleado_cargos SET estado = $2 
+          WHERE id = $1
         `, [id_cargo, estado]);
                 const [empleadoCargo] = datosNuevos.rows;
                 const fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
@@ -93,6 +136,76 @@ class EmpleadoCargosControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR CARGO ACTIVO   **USADO
+    BuscarCargosActivos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const CARGO = yield database_1.default.query(`
+        SELECT * FROM contrato_cargo_vigente WHERE id_empleado = $1;
+      `, [id_empleado]);
+            if (CARGO.rowCount != 0) {
+                return res.jsonp({ message: 'contrato_cargo', datos: CARGO.rows[0] });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'No se han encontrado registro.' });
+            }
+        });
+    }
+    // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
+    EliminarCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOS ORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_empleado_cargos WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_cargos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar eu_empleado_cargos con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const ELIMINAR = yield database_1.default.query(`
+          DELETE FROM eu_empleado_cargos WHERE id = $1 RETURNING *
+        `, [id]);
+                const [datosEliminados] = ELIMINAR.rows;
+                const fechaIngresoE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_inicio, 'ddd');
+                const fechaSalidaE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_final, 'ddd');
+                datosEliminados.fecha_inicio = fechaIngresoE;
+                datosEliminados.fecha_final = fechaSalidaE;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_cargos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosEliminados),
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'No fue posible eliminar.' });
             }
         });
     }
@@ -277,129 +390,6 @@ class EmpleadoCargosControlador {
             }
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    EncontrarIdCargo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const CARGO = yield database_1.default.query(`
-      SELECT ec.id 
-      FROM eu_empleado_cargos AS ec, eu_empleado_contratos AS ce, eu_empleados AS e 
-      WHERE ce.id_empleado = e.id AND ec.id_contrato = ce.id AND e.id = $1
-      `, [id_empleado]);
-            if (CARGO.rowCount != 0) {
-                return res.jsonp(CARGO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    BuscarTipoDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const Cargos = yield database_1.default.query(`
-      SELECT tc.id, tc.cargo 
-      FROM e_cat_tipo_cargo AS tc, eu_empleado_cargos AS ec
-      WHERE tc.id = ec.id_tipo_cargo AND id_departamento = $1 
-      GROUP BY tc.cargo, tc.id
-      `, [id]);
-            if (Cargos.rowCount != 0) {
-                return res.jsonp(Cargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    //TODO REVISAR
-    BuscarTipoSucursal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const Cargos = yield database_1.default.query(`
-      SELECT tc.id, tc.cargo 
-      FROM e_cat_tipo_cargo AS tc, eu_empleado_cargos AS ec 
-      WHERE tc.id = ec.id_tipo_cargo AND id_sucursal = $1 
-      GROUP BY tc.cargo, tc.id
-      `, [id]);
-            if (Cargos.rowCount != 0) {
-                return res.jsonp(Cargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    BuscarTipoRegimen(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const Cargos = yield database_1.default.query(`
-      SELECT tc.id, tc.cargo 
-      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c, e_cat_tipo_cargo AS tc 
-      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_tipo_cargo = tc.id AND r.id = $1 
-      GROUP BY tc.id, tc.cargo
-      `, [id]);
-            if (Cargos.rowCount != 0) {
-                return res.jsonp(Cargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    /** **************************************************************************************** **
-     ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** **
-     ** **************************************************************************************** **/
-    // METODO DE BUSQUEDA DE TIPO DE CARGOS   **USADO
-    ListarTiposCargo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const Cargos = yield database_1.default.query(`
-      SELECT * FROM e_cat_tipo_cargo
-      `);
-            if (Cargos.rowCount != 0) {
-                return res.jsonp(Cargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    // METODO DE REGISTRO DE TIPO DE CARGO   **USADO
-    CrearTipoCargo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { cargo, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-        INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
-        `, [cargo]);
-                const [tipo_cargo] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_cat_tipo_cargo',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(tipo_cargo),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (tipo_cargo) {
-                    return res.status(200).jsonp(tipo_cargo);
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -642,51 +632,50 @@ class EmpleadoCargosControlador {
                 yield Promise.all(listCargos.map((valor) => __awaiter(this, void 0, void 0, function* () {
                     if (valor.observacion == 'no registrado') {
                         var VERIFICAR_CEDULA = yield database_1.default.query(`
-            SELECT * FROM eu_empleados WHERE identificacion = $1
+              SELECT * FROM eu_empleados WHERE identificacion = $1
             `, [valor.identificacion]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                             const ID_CONTRATO = yield database_1.default.query(`
-              SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
-              WHERE e.id = uc.id_empleado AND e.identificacion = $1
+                SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
+                WHERE e.id = uc.id_empleado AND e.identificacion = $1
               `, [valor.identificacion]);
                             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
                                 ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
                                 const ID_CONTRATO_FECHAS = yield database_1.default.query(` 
-                SELECT euc.id FROM eu_empleado_contratos AS euc
-                WHERE euc.id = $1 AND (
-                  ($2 BETWEEN fecha_ingreso AND fecha_salida) AND 
-                  ($3 BETWEEN fecha_ingreso AND fecha_salida))
+                  SELECT euc.id FROM eu_empleado_contratos AS euc
+                  WHERE euc.id = $1 AND (
+                    ($2 BETWEEN fecha_ingreso AND fecha_salida) AND 
+                    ($3 BETWEEN fecha_ingreso AND fecha_salida))
                 `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
                                 if (ID_CONTRATO_FECHAS.rows[0] != undefined && ID_CONTRATO_FECHAS.rows[0] != '') {
                                     var VERIFICAR_SUCURSALES = yield database_1.default.query(`
-                SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
-                `, [valor.sucursal.toUpperCase()]);
+                    SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+                  `, [valor.sucursal.toUpperCase()]);
                                     if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
                                         var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
-                  SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
-                  `, [valor.departamento.toUpperCase()]);
+                      SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                    `, [valor.departamento.toUpperCase()]);
                                         if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
                                             var VERIFICAR_DEP_SUC = yield database_1.default.query(`
-                    SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
-                    `, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
+                        SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2
+                      `, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
                                             if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
                                                 var VERFICAR_CARGO = yield database_1.default.query(`
-                      SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-                      `, [valor.cargo.toUpperCase()]);
+                          SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                        `, [valor.cargo.toUpperCase()]);
                                                 if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                                                     if (luxon_1.DateTime.fromISO(valor.fecha_desde).toFormat('yyyy-MM-dd') >= luxon_1.DateTime.fromISO(valor.fecha_hasta).toFormat('yyyy-MM-dd')) {
                                                         valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                                     }
                                                     else {
                                                         const fechaRango = yield database_1.default.query(`
-                          SELECT id FROM eu_empleado_cargos 
-                          WHERE id_contrato = $1 AND 
-                            ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
-                            fecha_inicio BETWEEN $2 AND $3)
-                          `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
+                              SELECT id FROM eu_empleado_cargos 
+                              WHERE id_contrato = $1 AND 
+                                ($2 BETWEEN fecha_inicio AND fecha_final OR $3 BETWEEN fecha_inicio AND fecha_final OR 
+                                fecha_inicio BETWEEN $2 AND $3)
+                            `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
                                                         if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                                             valor.observacion = 'Existe un cargo en esas fechas';
-                                                            //console.log("ver valor.observacion", valor.observacion)
                                                         }
                                                         else {
                                                             // DISCRIMINACION DE ELEMENTOS IGUALES
@@ -727,7 +716,6 @@ class EmpleadoCargosControlador {
                             valor.observacion = 'Identificación no existe en el sistema';
                         }
                     }
-                    //console.log("ver valor.observacion final", valor.observacion)
                 })));
                 var tiempo = 2000;
                 if (listCargos.length > 500 && listCargos.length <= 1000) {
@@ -749,15 +737,12 @@ class EmpleadoCargosControlador {
                     });
                     var filaDuplicada = 0;
                     listCargos.forEach((item) => {
-                        let io = item.observacion;
-                        console.log("ver ioo", io);
                         if (item.observacion != undefined) {
                             let arrayObservacion = item.observacion.split(" ");
                             if (arrayObservacion[0] == 'no') {
                                 item.observacion = 'ok';
                             }
                         }
-                        console.log("ver item.observacion: ", item.observacion);
                         // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
                             // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
@@ -789,20 +774,20 @@ class EmpleadoCargosControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const ID_EMPLEADO = yield database_1.default.query(`
-          SELECT id FROM eu_empleados WHERE identificacion = $1
+            SELECT id FROM eu_empleados WHERE identificacion = $1
           `, [identificacion]);
                     const ID_CONTRATO = yield database_1.default.query(`
-          SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
-          WHERE e.id = uc.id_empleado AND e.identificacion = $1
+            SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
+            WHERE e.id = uc.id_empleado AND e.identificacion = $1
           `, [identificacion]);
                     const ID_SUCURSAL = yield database_1.default.query(`
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
           `, [sucursal.toUpperCase()]);
                     const ID_DEPARTAMENTO = yield database_1.default.query(`
-          SELECT id FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
+            SELECT id FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
           `, [ID_SUCURSAL.rows[0].id, departamento.toUpperCase()]);
                     const ID_TIPO_CARGO = yield database_1.default.query(`
-          SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+            SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
           `, [cargo.toUpperCase()]);
                     let id_empleado = ID_EMPLEADO.rows[0].id;
                     let id_contrato = ID_CONTRATO.rows[0].id_contrato;
@@ -812,29 +797,28 @@ class EmpleadoCargosControlador {
                     if (admini_depa.toLowerCase() == 'si') {
                         admin_dep = true;
                     }
-                    //Optener el ultimo cargo
+                    // OBTENER EL ULTIMO CARGO
                     const id_last_cargo = yield database_1.default.query(`
            SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1 AND estado = true order by id desc
           `, [id_contrato]);
                     if (id_last_cargo.rows[0] != undefined) {
                         yield database_1.default.query(`
-            UPDATE eu_empleado_cargos set estado = $2 
-            WHERE id = $1 AND estado = 'true' RETURNING *
+              UPDATE eu_empleado_cargos set estado = $2 
+              WHERE id = $1 AND estado = 'true' RETURNING *
             `, [id_last_cargo.rows[0].id, false]);
                     }
                     const response = yield database_1.default.query(`
-          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
-            sueldo, id_tipo_cargo, hora_trabaja, jefe, estado) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+            INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
+              sueldo, id_tipo_cargo, hora_trabaja, jefe, estado) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
           `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
                         hora_trabaja, admin_dep, true]);
                     const [cargos] = response.rows;
                     const id_usuario_depa = yield database_1.default.query(`
-           SELECT * FROM eu_usuario_departamento 
-           WHERE id_empleado = $1 AND id_departamento = $2
+            SELECT * FROM eu_usuario_departamento 
+            WHERE id_empleado = $1 AND id_departamento = $2
           `, [id_empleado, id_departamento]);
                     if (id_usuario_depa.rows[0] != undefined) {
-                        //console.log('departamento ', id_usuario_depa.rows[0])
                         if (id_usuario_depa.rows[0].principal == true) {
                             console.log('ingresa if 2');
                             yield database_1.default.query(`
@@ -844,15 +828,13 @@ class EmpleadoCargosControlador {
                 `, [id_usuario_depa.rows[0].id, id_departamento, true, true, admin_dep]);
                         }
                         else {
-                            //console.log('ingresa else 2',)
                             const id_usuario_depa_principal = yield database_1.default.query(`
-               SELECT * FROM eu_usuario_departamento 
-               WHERE id_empleado = $1 AND principal = true;
+                SELECT * FROM eu_usuario_departamento 
+                WHERE id_empleado = $1 AND principal = true;
               `, [id_empleado]);
-                            //console.log('departamento 2 ', id_usuario_depa_principal.rows[0])
                             if (id_usuario_depa_principal.rows[0] != undefined) {
                                 yield database_1.default.query(`
-                DELETE FROM eu_usuario_departamento WHERE id = $1
+                  DELETE FROM eu_usuario_departamento WHERE id = $1
                 `, [id_usuario_depa_principal.rows[0].id]);
                             }
                             yield database_1.default.query(`
@@ -864,8 +846,8 @@ class EmpleadoCargosControlador {
                     }
                     else {
                         const id_usuario_depa_principal = yield database_1.default.query(`
-             SELECT * FROM eu_usuario_departamento 
-             WHERE id_empleado = $1 AND principal = true
+              SELECT * FROM eu_usuario_departamento 
+              WHERE id_empleado = $1 AND principal = true
             `, [id_empleado]);
                         if (id_usuario_depa_principal.rows[0] != undefined) {
                             yield database_1.default.query(`
@@ -876,8 +858,8 @@ class EmpleadoCargosControlador {
                         }
                         else {
                             const response2 = yield database_1.default.query(`
-              INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-              VALUES ($1, $2, $3, $4, $5) RETURNING *
+                INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+                VALUES ($1, $2, $3, $4, $5) RETURNING *
               `, [id_empleado, id_departamento, true, true, admin_dep]);
                             const [usuarioDep] = response2.rows;
                             // AUDITORIA
@@ -925,59 +907,20 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DEL CARGO SELECCIONADO    **USADO
-    EliminarCargo(req, res) {
+    // VERIFICAR
+    EncontrarIdCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTA DATOS ORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_empleado_cargos WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_empleado_cargos',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar eu_empleado_cargos con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                const ELIMINAR = yield database_1.default.query(`
-        DELETE FROM eu_empleado_cargos WHERE id = $1 RETURNING *
-        `, [id]);
-                const [datosEliminados] = ELIMINAR.rows;
-                const fechaIngresoE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_inicio, 'ddd');
-                const fechaSalidaE = yield (0, settingsMail_1.FormatearFecha2)(datosEliminados.fecha_final, 'ddd');
-                datosEliminados.fecha_inicio = fechaIngresoE;
-                datosEliminados.fecha_final = fechaSalidaE;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_cargos',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosEliminados),
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro eliminado correctamente.', status: '200' });
+            const { id_empleado } = req.params;
+            const CARGO = yield database_1.default.query(`
+      SELECT ec.id 
+      FROM eu_empleado_cargos AS ec, eu_empleado_contratos AS ce, eu_empleados AS e 
+      WHERE ce.id_empleado = e.id AND ec.id_contrato = ce.id AND e.id = $1
+      `, [id_empleado]);
+            if (CARGO.rowCount != 0) {
+                return res.jsonp(CARGO.rows);
             }
-            catch (error) {
-                //console.log('error ', error)
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'No fue posible eliminar.' });
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }

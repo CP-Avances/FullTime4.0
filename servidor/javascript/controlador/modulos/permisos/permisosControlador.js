@@ -13,9 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PERMISOS_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const settingsMail_1 = require("../../../libs/settingsMail");
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
 const luxon_1 = require("luxon");
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../../database"));
@@ -785,7 +785,7 @@ class PermisosControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, id, asunto, tipo_solicitud, proceso } = req.body;
                 const correoInfoPidePermiso = yield database_1.default.query(`
                 SELECT e.id, e.correo, e.nombre, e.apellido, 
@@ -801,7 +801,7 @@ class PermisosControlador {
                 var url = `${process.env.URL_DOMAIN}/ver-permiso`;
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
                     <body>
@@ -814,7 +814,7 @@ class PermisosControlador {
                         </p>
                         <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Empresa:</b> ${datos.informacion.nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
                             <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
@@ -847,17 +847,17 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         console.log('Email error: ' + error);
@@ -886,7 +886,7 @@ class PermisosControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, id, asunto, tipo_solicitud, proceso, adesde, ahasta, ah_inicio, ah_fin, aobservacion, aestado_p, asolicitud, atipo_permiso, adias_permiso, ahoras_permiso } = req.body;
                 const correoInfoPidePermiso = yield database_1.default.query(`
                 SELECT e.id, e.correo, e.nombre, e.apellido, 
@@ -902,7 +902,7 @@ class PermisosControlador {
                 var url = `${process.env.URL_DOMAIN}/ver-permiso`;
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
                     <body>
@@ -915,7 +915,7 @@ class PermisosControlador {
                         </p>
                         <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Empresa:</b> ${datos.informacion.nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
                             <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
@@ -1018,17 +1018,17 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         console.log('Email error: ' + error);
@@ -1062,7 +1062,7 @@ class PermisosControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { correo, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, asunto, tipo_solicitud, proceso, usuario_solicita, tipo } = req.body;
                 var tablaHTML = yield generarTablaHTMLWeb(usuarios, tipo);
                 if (observacion != '' && observacion != undefined) {
@@ -1079,7 +1079,7 @@ class PermisosControlador {
                 `, [usuario_solicita]);
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
                     <body>
@@ -1092,7 +1092,7 @@ class PermisosControlador {
                         </p>
                         <h3 style="font-family: Arial; text-align: center;">REGISTRO MÚLTIPLE DE PERMISO</h3>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Empresa:</b> ${datos.informacion.nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>${tipo_solicitud}:</b> ${solicita.rows[0].empleado} <br>
                             <b>Número de identificación:</b> ${solicita.rows[0].identificacion} <br>
@@ -1126,17 +1126,17 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         console.log('Email error: ' + error);
@@ -1359,7 +1359,7 @@ class PermisosControlador {
             let separador = path_1.default.sep;
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso } = req.body;
                 console.log('req.body: ', req.body);
                 const correoInfoPidePermiso = yield database_1.default.query(`
@@ -1374,7 +1374,7 @@ class PermisosControlador {
                 `, [id_empl_contrato]);
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
                     <body>
@@ -1387,7 +1387,7 @@ class PermisosControlador {
                         </p>
                         <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Empresa:</b> ${datos.informacion.nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
                             <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
@@ -1419,17 +1419,17 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();
@@ -1459,7 +1459,7 @@ class PermisosControlador {
             const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
             console.log('datos: ', datos);
-            if (datos === 'ok') {
+            if (datos.message === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso, adesde, ahasta, ah_inicio, ah_fin, aobservacion, aestado_p, asolicitud, atipo_permiso, adias_permiso, ahoras_permiso } = req.body;
                 const correoInfoPidePermiso = yield database_1.default.query(`
                 SELECT e.id, e.correo, e.nombre, e.apellido, e.identificacion, ecr.id_departamento, ecr.id_sucursal, 
@@ -1473,7 +1473,7 @@ class PermisosControlador {
                 `, [id_empl_contrato]);
                 let data = {
                     to: correo,
-                    from: settingsMail_1.email,
+                    from: datos.informacion.email,
                     subject: asunto,
                     html: `
                      <body>
@@ -1486,7 +1486,7 @@ class PermisosControlador {
                         </p>
                         <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Empresa:</b> ${datos.informacion.nombre} <br>   
                             <b>Asunto:</b> ${asunto} <br> 
                             <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
                             <b>Número de identificación:</b> ${correoInfoPidePermiso.rows[0].identificacion} <br>
@@ -1588,17 +1588,17 @@ class PermisosControlador {
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
                             cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         },
                         {
                             filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
                             cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
                 };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
                 corr.sendMail(data, function (error, info) {
                     if (error) {
                         corr.close();

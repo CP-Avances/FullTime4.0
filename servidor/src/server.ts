@@ -38,7 +38,6 @@ import DISCAPACIDADES_RUTAS from './rutas/empleado/empleadoDiscapacidad/catDisca
 import HORARIO_RUTA from './rutas/horarios/catHorarioRutas';
 import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorarioRutas';
 import PLANIFICACION_HORARIA_RUTAS from './rutas/horarios/catPlanificacionHorariaRutas';
-
 //EMPLEADOS
 import LOGIN_RUTA from './rutas/login/loginRuta';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRegistro/empleadoRutas';

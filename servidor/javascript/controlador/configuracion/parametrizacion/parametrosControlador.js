@@ -257,17 +257,18 @@ class ParametrosControlador {
                     ELSE 'vacio'
                     END AS verificar
                 `, [lat1, lng1, lat2, lng2, valor]);
-                console.log("ver datos body de  CompararCoordenadas: ", req.body);
                 return res.jsonp(VALIDACION.rows);
             }
             catch (error) {
-                console.log('error --> ', error);
                 return res.status(500)
                     .jsonp({ message: 'error_500' });
             }
         });
     }
-    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+    /** ********************************************************************************************************************* **
+     ** **                        M E T O D O S    D E    L A    A P L I C A C I O N    M O V I L                          ** **
+     ** ********************************************************************************************************************* */
+    // METODO PARA BUSCAR FECHAS Y HORAS DE PARAMETROS DEL SISTEMA   **USADO
     BuscarFechasHoras(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

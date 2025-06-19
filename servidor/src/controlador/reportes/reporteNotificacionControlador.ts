@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
-import { QueryResult } from 'pg';
 
 class NotificacionesControlador {
 
@@ -755,7 +754,7 @@ class NotificacionesControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
-  
+
 }
 
 export const NOTIFICACIONES_CONTROLADOR = new NotificacionesControlador();

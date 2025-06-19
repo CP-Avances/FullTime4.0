@@ -8,7 +8,7 @@ import { DateTime } from 'luxon';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { KardexService } from 'src/app/servicios/reportes/kardex.service';
+import { KardexService } from 'src/app/servicios/reportes/modulos/kardex/kardex.service';
 
 @Component({
   selector: 'app-reporte-kardex',

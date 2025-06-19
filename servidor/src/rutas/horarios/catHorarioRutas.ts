@@ -71,7 +71,7 @@ class HorarioRutas {
         this.router.get('/:id', TokenValidation, HORARIO_CONTROLADOR.ObtenerUnHorario);
         // METODO PARA ACTUALIZAR HORAS TRABAJADAS   **USADO
         this.router.put('/update-horas-trabaja/:id', TokenValidation, HORARIO_CONTROLADOR.EditarHorasTrabaja);
-        // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA   **USADO
+        // VERIFICAR DATOS DE LA PLANTILLA DE CATALOGO HORARIO Y LUEGO SUBIR AL SISTEMA   **USADO
         this.router.post('/cargarHorario/verificarDatos/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarDatos);
         // REGISTRAR DATOS DE PLANTILLA EN EL SISTEMA   **USADO
         this.router.post('/cargarHorario/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.CargarHorarioPlantilla);

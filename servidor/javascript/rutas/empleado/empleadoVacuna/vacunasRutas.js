@@ -51,7 +51,7 @@ class VacunaRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR REGISTROS DE UN USUARIO   **USADO
+        // METODO PARA BUSCAR REGISTROS DE VACUNA DE UN EMPLEADO   **USADO
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarUnRegistro);
         // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS   **USADO
         this.router.get('/lista/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarTipoVacuna);
@@ -71,8 +71,6 @@ class VacunaRutas {
         this.router.delete('/eliminar/:id/:documento', verificarToken_1.TokenValidation, vacunasControlador_1.default.EliminarRegistro);
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs/:id', vacunasControlador_1.default.ObtenerDocumento);
-        // METODO PARA LEER TODOS LOS REGISTROS DE VACUNACION
-        this.router.get('/', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarRegistro);
     }
 }
 const VACUNA_RUTAS = new VacunaRutas();

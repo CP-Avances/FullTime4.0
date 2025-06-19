@@ -24,7 +24,7 @@ class ModalidaLaboralRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR MODALIDAD LABORAL
+        // METODO PARA LISTAR REGISTROS DE MODALIDAD LABORAL   ** USADO
         this.router.get('/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.ListaModalidadLaboral);
         // METODO PARA REGISTRAR MODALIDAD LABORAL     **USADO
         this.router.post('/crearModalidad', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.CrearModalidadLaboral);

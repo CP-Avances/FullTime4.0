@@ -17,8 +17,9 @@ exports.ValidarCedula = ValidarCedula;
 exports.validarEmpleadoCompleto = validarEmpleadoCompleto;
 exports.validarEmpleadoIncompleto = validarEmpleadoIncompleto;
 // SECCION LIBRERIAS
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const settingsMail_1 = require("../../../libs/settingsMail");
@@ -28,7 +29,6 @@ const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = __importDefault(require("fs"));
-const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service"));
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -202,9 +202,27 @@ class EmpleadoControlador {
             }
         });
     }
-    /** ** ********************************************************************************************* **
-     ** ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** **
-     ** ** ********************************************************************************************* **/
+    /** ********************************************************************************************* **
+     ** **                         MANEJO DE DATOS DE EMPLEADO                                     ** **
+     ** ********************************************************************************************* **/
+    // BUSQUEDA DE UN SOLO EMPLEADO  **USADO
+    BuscarEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const EMPLEADO = yield database_1.default.query(`
+        SELECT e.*, r.nombre AS rol FROM eu_empleados e
+        INNER JOIN eu_usuarios u ON e.id = u.id_empleado 
+        INNER JOIN ero_cat_roles r ON u.id_rol = r.id
+        WHERE e.id = $1
+      `, [id]);
+            if (EMPLEADO.rowCount != 0) {
+                return res.jsonp(EMPLEADO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // INGRESAR REGISTRO DE EMPLEADO EN BASE DE DATOS    **USADO
     InsertarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -260,7 +278,7 @@ class EmpleadoControlador {
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const empleado = yield database_1.default.query(`
-        SELECT * FROM eu_empleados WHERE id = $1
+          SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
                 const [datosOriginales] = empleado.rows;
                 const codigoAnterior = datosOriginales.codigo;
@@ -416,47 +434,12 @@ class EmpleadoControlador {
             }
         });
     }
-    // BUSQUEDA DE UN SOLO EMPLEADO  **USADO
-    BuscarEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const EMPLEADO = yield database_1.default.query(`
-      SELECT e.*, r.nombre AS rol FROM eu_empleados e
-      INNER JOIN eu_usuarios u ON e.id = u.id_empleado 
-      INNER JOIN ero_cat_roles r ON u.id_rol = r.id
-      WHERE e.id = $1
-      `, [id]);
-            if (EMPLEADO.rowCount != 0) {
-                return res.jsonp(EMPLEADO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    // BUSQUEDA DE INFORMACION ESPECIFICA DE EMPLEADOS
-    ListarBusquedaEmpleados(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const empleado = yield database_1.default.query(`
-      SELECT id, nombre, apellido FROM eu_empleados ORDER BY apellido
-      `).then((result) => {
-                return result.rows.map((obj) => {
-                    return {
-                        id: obj.id,
-                        empleado: obj.apellido + ' ' + obj.nombre
-                    };
-                });
-            });
-            res.jsonp(empleado);
-        });
-    }
     // LISTAR EMPLEADOS ACTIVOS EN EL SISTEMA    **USADO
     Listar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
-      SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
+        SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
       `);
-            console.log('empleado', empleado.rowCount);
             return res.jsonp(empleado.rows);
         });
     }
@@ -466,7 +449,6 @@ class EmpleadoControlador {
             const empleado = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE estado = 2 ORDER BY id
       `);
-            console.log('empleado desactivado', empleado.rowCount);
             res.jsonp(empleado.rows);
         });
     }
@@ -561,11 +543,11 @@ class EmpleadoControlador {
                         yield database_1.default.query('BEGIN');
                         // CONSULTAR DATOS ORIGINALES
                         const empleado = yield database_1.default.query(`
-            SELECT * FROM eu_empleados WHERE id = $1
+              SELECT * FROM eu_empleados WHERE id = $1
             `, [obj]);
                         const [datosOriginales] = empleado.rows;
                         const usuario = yield database_1.default.query(`
-            SELECT * FROM eu_usuarios WHERE id_empleado = $1
+              SELECT * FROM eu_usuarios WHERE id_empleado = $1
             `, [obj]);
                         const [datosOriginalesUsuario] = usuario.rows;
                         if (!datosOriginales || !datosOriginalesUsuario) {
@@ -595,7 +577,7 @@ class EmpleadoControlador {
                         }
                         // 1 => ACTIVADO
                         yield database_1.default.query(`
-            UPDATE eu_empleados SET estado = 1 WHERE id = $1
+              UPDATE eu_empleados SET estado = 1 WHERE id = $1
             `, [obj]);
                         const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                         // AUDITORIA
@@ -611,7 +593,7 @@ class EmpleadoControlador {
                         });
                         // TRUE => TIENE ACCESO
                         yield database_1.default.query(`
-            UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+              UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
             `, [obj]);
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -653,7 +635,7 @@ class EmpleadoControlador {
                 const separador = path_1.default.sep;
                 const { user_name, ip, ip_local } = req.body;
                 const unEmpleado = yield database_1.default.query(`
-        SELECT * FROM eu_empleados WHERE id = $1
+          SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
                 let ruta_temporal = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
                 console.log('ruta_temporal_', ruta_temporal);
@@ -662,7 +644,6 @@ class EmpleadoControlador {
                     let verificar_imagen = 0;
                     // RUTA DE LA CARPETA IMAGENES DEL USUARIO
                     const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
-                    console.log('carpetaImagenes_', carpetaImagenes);
                     // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
                     fs_1.default.access(carpetaImagenes, fs_1.default.constants.F_OK, (err) => {
                         if (err) {
@@ -708,7 +689,7 @@ class EmpleadoControlador {
                         yield database_1.default.query('BEGIN');
                         // CONSULTAR DATOSORIGINALES
                         const empleado = yield database_1.default.query(`
-            SELECT * FROM eu_empleados WHERE id = $1
+              SELECT * FROM eu_empleados WHERE id = $1
             `, [id]);
                         const [datosOriginales] = empleado.rows;
                         if (!datosOriginales) {
@@ -727,7 +708,7 @@ class EmpleadoControlador {
                             throw new Error('Error al actualizar imagen del usuario con id: ' + id);
                         }
                         yield database_1.default.query(`
-            UPDATE eu_empleados SET imagen = $2 WHERE id = $1
+              UPDATE eu_empleados SET imagen = $2 WHERE id = $1
             `, [id, imagen]);
                         const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
                         // AUDITORIA
@@ -755,287 +736,6 @@ class EmpleadoControlador {
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al actualizar imagen del usuario.' });
             }
-        });
-    }
-    // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
-    GeolocalizacionCrokis(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id;
-            let { lat, lng, user_name, ip, ip_local } = req.body;
-            try {
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query(`
-        SELECT * FROM eu_empleados WHERE id = $1
-        `, [id]);
-                const [datosOriginales] = empleado.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_empleados',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
-                }
-                const datosNuevos = yield database_1.default.query(`
-        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3 RETURNING *
-        `, [lat, lng, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleados',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro actualizado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
-            }
-        });
-    }
-    /** **************************************************************************************** **
-     ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
-     ** **************************************************************************************** **/
-    // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
-    ObtenerTitulosEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const unEmpleadoTitulo = yield database_1.default.query(`
-      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
-        et.id_empleado, ct.nombre, nt.nombre as nivel
-      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
-      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
-      ORDER BY id
-      `, [id_empleado]);
-            if (unEmpleadoTitulo.rowCount != 0) {
-                return res.jsonp(unEmpleadoTitulo.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
-    ObtenerTituloEspecifico(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, id_titulo } = req.body;
-            const unEmpleadoTitulo = yield database_1.default.query(`
-      SELECT et.id
-      FROM eu_empleado_titulos AS et
-      WHERE et.id_empleado = $1 AND et.id_titulo = $2
-      `, [id_empleado, id_titulo]);
-            if (unEmpleadoTitulo.rowCount != 0) {
-                return res.jsonp(unEmpleadoTitulo.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
-    CrearEmpleadoTitulos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { observacion, id_empleado, id_titulo, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const usuario = yield database_1.default.query(`
-        SELECT id FROM eu_usuarios WHERE id_empleado = $1
-        `, [id_empleado]);
-                const id_usuario = usuario.rows[0].id;
-                const datosNuevos = yield database_1.default.query(`
-        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4) RETURNING *
-        `, [observacion, id_empleado, id_titulo, id_usuario]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_titulos',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
-    EditarTituloEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = req.params.id_empleado_titulo;
-                const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
-                const [datosOriginales] = empleado.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_empleado_titulos',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
-                }
-                const datosNuevos = yield database_1.default.query(`
-        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3 RETURNING *
-        `, [observacion, id_titulo, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_titulos',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro actualizado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
-    EliminarTituloEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { user_name, ip, ip_local } = req.body;
-                const id = req.params.id_empleado_titulo;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
-                const [datosOriginales] = empleado.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_empleado_titulos',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al eliminar titulo del empleado.' });
-                }
-                yield database_1.default.query(`
-        DELETE FROM eu_empleado_titulos WHERE id = $1
-        `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_titulos',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    /** ******************************************************************************************* **
-     ** **               CONSULTAS DE COORDENADAS DE UBICACION DEL USUARIO                       ** **
-     ** ******************************************************************************************* **/
-    // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
-    BuscarCoordenadas(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const UBICACION = yield database_1.default.query(`
-      SELECT longitud, latitud FROM eu_empleados WHERE id = $1
-      `, [id]);
-            if (UBICACION.rowCount != 0) {
-                return res.jsonp(UBICACION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se ha encontrado registros.' });
-            }
-        });
-    }
-    // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
-    BuscarEmpleadoNombre(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { informacion } = req.body;
-            const EMPLEADO = yield database_1.default.query(`
-      SELECT * FROM informacion_general WHERE
-      (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
-      `, [informacion]);
-            if (EMPLEADO.rowCount != 0) {
-                return res.jsonp(EMPLEADO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    // BUSQUEDA DE IMAGEN DE EMPLEADO
-    BuscarImagen(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const imagen = req.params.imagen;
-            const id = req.params.id;
-            let separador = path_1.default.sep;
-            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
-            console.log('ver file ', ruta);
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
-                }
-                else {
-                    res.sendFile(path_1.default.resolve(ruta));
-                }
-            });
         });
     }
     // METODO PARA CONVERTIR IMAGEN EN BASE64 **USADO
@@ -1171,6 +871,161 @@ class EmpleadoControlador {
                 return res.status(404).jsonp({ message: 'No se eliminaron algunos usuarios ya que tienen información registrada.' });
             }
             return res.jsonp({ message: 'Usuarios eliminados correctamente.' });
+        });
+    }
+    // BUSQUEDA DE INFORMACION ESPECIFICA DE EMPLEADOS
+    ListarBusquedaEmpleados(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const empleado = yield database_1.default.query(`
+      SELECT id, nombre, apellido FROM eu_empleados ORDER BY apellido
+      `).then((result) => {
+                return result.rows.map((obj) => {
+                    return {
+                        id: obj.id,
+                        empleado: obj.apellido + ' ' + obj.nombre
+                    };
+                });
+            });
+            res.jsonp(empleado);
+        });
+    }
+    // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
+    BuscarEmpleadoNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { informacion } = req.body;
+            const EMPLEADO = yield database_1.default.query(`
+        SELECT * FROM informacion_general WHERE
+        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+      `, [informacion]);
+            if (EMPLEADO.rowCount != 0) {
+                return res.jsonp(EMPLEADO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
+    CrearCarpetasEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { empleados, permisos, vacaciones, horasExtras } = req.body;
+            let errorOccurred = false;
+            for (const e of empleados) {
+                const { codigo, identificacion } = e;
+                if (permisos) {
+                    const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRuta)(codigo, identificacion, 'permisos');
+                    try {
+                        yield fs_1.default.promises.access(carpetaPermisos, fs_1.default.constants.F_OK);
+                    }
+                    catch (error) {
+                        try {
+                            yield fs_1.default.promises.mkdir(carpetaPermisos, { recursive: true });
+                        }
+                        catch (error) {
+                            errorOccurred = true;
+                        }
+                    }
+                }
+                if (vacaciones) {
+                    const carpetaVacaciones = yield (0, accesoCarpetas_1.ObtenerRuta)(codigo, identificacion, 'vacaciones');
+                    try {
+                        yield fs_1.default.promises.access(carpetaVacaciones, fs_1.default.constants.F_OK);
+                    }
+                    catch (error) {
+                        try {
+                            yield fs_1.default.promises.mkdir(carpetaVacaciones, { recursive: true });
+                        }
+                        catch (error) {
+                            errorOccurred = true;
+                        }
+                    }
+                }
+                if (horasExtras) {
+                    const carpetaHorasExtras = yield (0, accesoCarpetas_1.ObtenerRuta)(codigo, identificacion, 'horasExtras');
+                    try {
+                        yield fs_1.default.promises.access(carpetaHorasExtras, fs_1.default.constants.F_OK);
+                    }
+                    catch (error) {
+                        try {
+                            yield fs_1.default.promises.mkdir(carpetaHorasExtras, { recursive: true });
+                        }
+                        catch (error) {
+                            errorOccurred = true;
+                        }
+                    }
+                }
+            }
+            if (errorOccurred) {
+                res.status(500).jsonp({ message: 'Ups! se produjo un error al crear las carpetas.' });
+            }
+            else {
+                res.jsonp({ message: 'Carpetas creadas con éxito.' });
+            }
+        });
+    }
+    // METODO PARA CONSULTAR INFORMACION DE CONTRATOS   **USADO
+    getContratosCargos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            try {
+                var listaCargos = [];
+                var listaContratos = [];
+                const contratos = yield database_1.default.query(`
+        SELECT 
+	        emC.id, emC.id_empleado as id_empleado, emC.id_modalidad_laboral, 
+          moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
+          emC.controlar_asistencia,  reg.descripcion as regimen
+        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda, ere_cat_regimenes AS reg
+        WHERE 
+	        emc.id_empleado = $1 AND
+	        moda.id = emC.id_modalidad_laboral AND
+			    reg.id = emc.id_regimen
+        `, [id_empleado]);
+                listaContratos = contratos.rows;
+                listaContratos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    const cargos = yield database_1.default.query(`
+          SELECT 
+            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre as sucursal, 
+            emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
+            emC.jefe, emC.estado
+          FROM 
+            eu_empleado_cargos AS emC, ed_departamentos AS ed, 
+            e_sucursales AS su, e_cat_tipo_cargo AS carg
+          WHERE 
+            emc.id_contrato = $1 AND
+            ed.id = emC.id_departamento AND
+            su.id = ed.id_sucursal AND
+            carg.id = emC.id_tipo_cargo
+          `, [item.id]);
+                    const Cargos = cargos.rows;
+                    Cargos.forEach((item) => {
+                        listaCargos.push(item);
+                    });
+                }));
+                setTimeout(() => {
+                    return res.status(200).jsonp({ listacontratos: listaContratos, listacargos: listaCargos });
+                }, 2000);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
+        });
+    }
+    // BUSQUEDA DE IMAGEN DE EMPLEADO
+    BuscarImagen(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const imagen = req.params.imagen;
+            const id = req.params.id;
+            let separador = path_1.default.sep;
+            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(ruta));
+                }
+            });
         });
     }
     /** **************************************************************************************** **
@@ -2139,68 +1994,257 @@ class EmpleadoControlador {
             }
         });
     }
-    /** **************************************************************************************** **
-     ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           **
-     ** **************************************************************************************** **/
-    // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
-    CrearCarpetasEmpleado(req, res) {
+    /** ********************************************************************************************* **
+     ** **               CONSULTAS DE GEOLOCALIZACION DEL USUARIO                                  ** **
+     ** ********************************************************************************************* **/
+    // METODO PARA BUSCAR DATOS DE COORDENADAS DE DOMICILIO    **USADO
+    BuscarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { empleados, permisos, vacaciones, horasExtras } = req.body;
-            let errorOccurred = false;
-            for (const e of empleados) {
-                const { codigo, identificacion } = e;
-                if (permisos) {
-                    const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRuta)(codigo, identificacion, 'permisos');
-                    try {
-                        yield fs_1.default.promises.access(carpetaPermisos, fs_1.default.constants.F_OK);
-                    }
-                    catch (error) {
-                        try {
-                            yield fs_1.default.promises.mkdir(carpetaPermisos, { recursive: true });
-                        }
-                        catch (error) {
-                            errorOccurred = true;
-                        }
-                    }
-                }
-                if (vacaciones) {
-                    const carpetaVacaciones = yield (0, accesoCarpetas_1.ObtenerRuta)(codigo, identificacion, 'vacaciones');
-                    try {
-                        yield fs_1.default.promises.access(carpetaVacaciones, fs_1.default.constants.F_OK);
-                    }
-                    catch (error) {
-                        try {
-                            yield fs_1.default.promises.mkdir(carpetaVacaciones, { recursive: true });
-                        }
-                        catch (error) {
-                            errorOccurred = true;
-                        }
-                    }
-                }
-                if (horasExtras) {
-                    const carpetaHorasExtras = yield (0, accesoCarpetas_1.ObtenerRuta)(codigo, identificacion, 'horasExtras');
-                    try {
-                        yield fs_1.default.promises.access(carpetaHorasExtras, fs_1.default.constants.F_OK);
-                    }
-                    catch (error) {
-                        try {
-                            yield fs_1.default.promises.mkdir(carpetaHorasExtras, { recursive: true });
-                        }
-                        catch (error) {
-                            errorOccurred = true;
-                        }
-                    }
-                }
-            }
-            if (errorOccurred) {
-                res.status(500).jsonp({ message: 'Ups! se produjo un error al crear las carpetas.' });
+            const { id } = req.params;
+            const UBICACION = yield database_1.default.query(`
+        SELECT longitud, latitud FROM eu_empleados WHERE id = $1
+      `, [id]);
+            if (UBICACION.rowCount != 0) {
+                return res.jsonp(UBICACION.rows);
             }
             else {
-                res.jsonp({ message: 'Carpetas creadas con éxito.' });
+                return res.status(404).jsonp({ text: 'No se ha encontrado registros.' });
             }
         });
     }
-    //------------------------------ Metodos de APP MOVIL -----------------------------------------------------------------------------
+    // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO   **USADO
+    GeolocalizacionCrokis(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let id = req.params.id;
+            let { lat, lng, user_name, ip, ip_local } = req.body;
+            try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query(`
+        SELECT * FROM eu_empleados WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleados',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
+                }
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3 RETURNING *
+        `, [lat, lng, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleados',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
+            }
+        });
+    }
+    /** **************************************************************************************** **
+     ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
+     ** **************************************************************************************** **/
+    // BUSQUEDA DE TITULOS PROFESIONALES DEL EMPLEADO   **USADO
+    ObtenerTitulosEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const unEmpleadoTitulo = yield database_1.default.query(`
+      SELECT et.id, et.observacion As observaciones, et.id_titulo, 
+        et.id_empleado, ct.nombre, nt.nombre as nivel
+      FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
+      WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
+      ORDER BY id
+      `, [id_empleado]);
+            if (unEmpleadoTitulo.rowCount != 0) {
+                return res.jsonp(unEmpleadoTitulo.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // INGRESAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
+    CrearEmpleadoTitulos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { observacion, id_empleado, id_titulo, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const usuario = yield database_1.default.query(`
+          SELECT id FROM eu_usuarios WHERE id_empleado = $1
+        `, [id_empleado]);
+                const id_usuario = usuario.rows[0].id;
+                const datosNuevos = yield database_1.default.query(`
+          INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4) RETURNING *
+        `, [observacion, id_empleado, id_titulo, id_usuario]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_titulos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO   **USADO
+    ObtenerTituloEspecifico(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, id_titulo } = req.body;
+            const unEmpleadoTitulo = yield database_1.default.query(`
+      SELECT et.id
+      FROM eu_empleado_titulos AS et
+      WHERE et.id_empleado = $1 AND et.id_titulo = $2
+      `, [id_empleado, id_titulo]);
+            if (unEmpleadoTitulo.rowCount != 0) {
+                return res.jsonp(unEmpleadoTitulo.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
+    EditarTituloEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = req.params.id_empleado_titulo;
+                const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_titulos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
+                }
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3 RETURNING *
+        `, [observacion, id_titulo, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_titulos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO   **USADO
+    EliminarTituloEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { user_name, ip, ip_local } = req.body;
+                const id = req.params.id_empleado_titulo;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_titulos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar titulo del empleado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM eu_empleado_titulos WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_titulos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    /** ******************************************************************************************** **
+     ** **      M E T O D O S   U S A D O S    E N    L A    A P L I C A C I O N    M O V I L     ** **
+     ** ******************************************************************************************** **/
     getHorariosEmpleadoByCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -2301,69 +2345,19 @@ class EmpleadoControlador {
         });
     }
     ;
-    /** **************************************************************************************** **
-    ** **              OPTIENE LA INFORMACION DE CONTRATOS Y CARGOS POR EMPLEADO                **
-    ** **************************************************************************************** **/
-    getContratosCargos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.body;
-            try {
-                var listaCargos = [];
-                var listaContratos = [];
-                const contratos = yield database_1.default.query(`
-        SELECT 
-	        emC.id, emC.id_empleado as id_empleado, emC.id_modalidad_laboral, 
-          moda.descripcion, emC.fecha_ingreso, emC.fecha_salida, emC.controlar_vacacion, 
-          emC.controlar_asistencia,  reg.descripcion as regimen
-        FROM eu_empleado_contratos AS emC, e_cat_modalidad_trabajo AS moda, ere_cat_regimenes AS reg
-        WHERE 
-	        emc.id_empleado = $1 AND
-	        moda.id = emC.id_modalidad_laboral AND
-			    reg.id = emc.id_regimen
-        `, [id_empleado]);
-                listaContratos = contratos.rows;
-                listaContratos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                    const cargos = yield database_1.default.query(`
-          SELECT 
-            emC.id, emC.id_contrato as contrato, emC.id_departamento, ed.nombre, su.nombre as sucursal, 
-            emC.id_tipo_cargo, carg.cargo, emC.fecha_inicio, emC.fecha_final, emC.sueldo, emC.hora_trabaja,
-            emC.jefe, emC.estado
-          FROM 
-            eu_empleado_cargos AS emC, ed_departamentos AS ed, 
-            e_sucursales AS su, e_cat_tipo_cargo AS carg
-          WHERE 
-            emc.id_contrato = $1 AND
-            ed.id = emC.id_departamento AND
-            su.id = ed.id_sucursal AND
-            carg.id = emC.id_tipo_cargo
-          `, [item.id]);
-                    const Cargos = cargos.rows;
-                    Cargos.forEach((item) => {
-                        listaCargos.push(item);
-                    });
-                }));
-                setTimeout(() => {
-                    return res.status(200).jsonp({ listacontratos: listaContratos, listacargos: listaCargos });
-                }, 2000);
-            }
-            catch (error) {
-                console.log(error);
-                return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
 }
 exports.EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 exports.default = exports.EMPLEADO_CONTROLADOR;
+// METODO PARA VALIDAR NUMERO DE CEDULA ECUATORIANA   **USADO
 function ValidarCedula(cedula) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         const result = yield database_1.default.query(`
-    SELECT descripcion 
-    FROM ep_detalle_parametro 
-    WHERE id_parametro = 36 
-    LIMIT 1
-  `);
+      SELECT descripcion 
+      FROM ep_detalle_parametro 
+      WHERE id_parametro = 36 
+      LIMIT 1
+    `);
         const activarValidacion = ((_b = (_a = result.rows[0]) === null || _a === void 0 ? void 0 : _a.descripcion) === null || _b === void 0 ? void 0 : _b.toLowerCase().trim()) === 'si';
         if (!activarValidacion) {
             return true;
@@ -2394,7 +2388,7 @@ function ValidarCedula(cedula) {
         }
     });
 }
-//METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA COMPLETA
+// METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA COMPLETA    **USADO 
 function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, TIPO_IDENTIFICACION, pool, TELEFONO, LONGITUD, LATITUD, ValidarCedula, modoCodigo) {
     return __awaiter(this, void 0, void 0, function* () {
         if (data.identificacion.toString().length != 0) {
@@ -2537,7 +2531,7 @@ function validarEmpleadoCompleto(data, regex, regexCorreo, valiContra, regexLati
         data.observacion = 'no registrado';
     });
 }
-//METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA INCOMPLETA
+// METODO QUE VALIDA LA FILA DE PLANTILLA DE REGISTRO DE USUARIO, SI ES QUE ESTA INCOMPLETA   **USADO
 function validarEmpleadoIncompleto(data, ITEM, IDENTIFICACION, APELLIDO, NOMBRE, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD, USUARIO, CONTRASENA, ROL, TIPO_IDENTIFICACION, NUMERO_PARTIDA_INDIVIDUAL, regex, regexCorreo, valiContra, regexLatitud, regexLongitud, estadoCivilArray, tipogenero, pool, ValidarCedula, modoCodigo) {
     return __awaiter(this, void 0, void 0, function* () {
         data.fila = ITEM;

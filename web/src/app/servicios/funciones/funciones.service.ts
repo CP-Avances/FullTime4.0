@@ -11,7 +11,7 @@ export class FuncionesService {
     private http: HttpClient,
   ) { }
   
-  // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA
+  // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA   **USADO
   ListarFunciones(data: any) {
     return this.http.post<any>(`${environment.url}/administracion/funcionalidad`, data)
   }

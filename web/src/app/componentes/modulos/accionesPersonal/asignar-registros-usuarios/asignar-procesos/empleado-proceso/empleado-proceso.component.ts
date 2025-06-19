@@ -1,21 +1,20 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, Input } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
 
-import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
-import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
+import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
+import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { PageEvent } from '@angular/material/paginator';
-import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { EditarRegistroComponent } from '../../../asignar-registros-usuarios/editar-registro/editar-registro.component';
-import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 
 @Component({
   selector: 'app-empleado-proceso',
@@ -65,9 +64,8 @@ export class EmpleadoProcesoComponent {
     public sucursal: SucursalService,
     public ventana: MatDialog,
     public general: DatosGeneralesService,
-    public toastr: ToastrService,
-    private usuario: UsuarioService,
     public validar: ValidacionesService,
+    public toastr: ToastrService,
     private rest: EmpleadoProcesosService,
     private restPro: ProcesoService
   ) {
@@ -80,8 +78,6 @@ export class EmpleadoProcesoComponent {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     }); 
-
-    console.log('dataList: ',this.data)
     this.name_sucursal = this.data.nombre
     this.BuscarUsuariosSucursal();
     this.infoEmpleProceso = false;
@@ -113,15 +109,6 @@ export class EmpleadoProcesoComponent {
      });
   }
 
-  // METODO PARA VER PANTALLA PRINCIPAL SUCURSAL USUARIO
-  pagina: string = '';
-  VerUsuarioAsignado() {
-  //     //console.log('ingresa')
-  //     this.pagina = 'asignar-usuario';
-  //     this.ventanasu.ver_principal = true;
-  //     this.ventanasu.ver_informacion = false;
-  }
-  
   // METODO PARA MANEJAR LA PAGINACION
   ManejarPaginaPrincipal(e: PageEvent) {
     this.tamanio_pagina_p = e.pageSize;
@@ -191,7 +178,6 @@ export class EmpleadoProcesoComponent {
         }
       },error: (err: any) => {
         this.listaEmpleProce = []
-        console.log('err: ',err)
         this.infoEmpleProceso = false;
         this.toastr.warning(err.error.text, 'Advertencia.', {
           timeOut: 4500,
@@ -226,6 +212,7 @@ export class EmpleadoProcesoComponent {
         }
       });
   }
+
   EliminarRegistro(pro: any){
     const data = {
       user_name: this.user_name,
@@ -262,7 +249,7 @@ export class EmpleadoProcesoComponent {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }

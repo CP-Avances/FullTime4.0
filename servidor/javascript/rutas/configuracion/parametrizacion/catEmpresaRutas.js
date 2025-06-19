@@ -24,12 +24,8 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
-        // CADENA DE NAVEGACION
+        // CADENA DE NAVEGACION   **USADO
         this.router.get('/navegar', catEmpresaControlador_1.default.BuscarCadena);
-        // BUSQUEDA DE LOGO **USADO
-        this.router.get('/logo/codificado/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ConvertirImagenBase64);
-        // METODO PARA EDITAR LOGO DE EMPRESA **USADO
-        this.router.put('/logo/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], catEmpresaControlador_1.default.ActualizarLogoEmpresa);
         // BUSCAR DATOS GENERALES DE EMPRESA  **USADO
         this.router.get('/buscar/datos/:id', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarEmpresaId);
         // ACTUALIZAR DATOS DE EMPRESA **USADO
@@ -40,6 +36,10 @@ class DepartamentoRutas {
         this.router.put('/reporte/marca', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarMarcaAgua);
         // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA **USADO
         this.router.put('/doble/seguridad', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarSeguridad);
+        // BUSQUEDA DE LOGO **USADO
+        this.router.get('/logo/codificado/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ConvertirImagenBase64_);
+        // METODO PARA EDITAR LOGO DE EMPRESA **USADO
+        this.router.put('/logo/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], catEmpresaControlador_1.default.ActualizarLogoEmpresa);
         // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
         this.router.put('/cabecera/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], catEmpresaControlador_1.default.ActualizarCabeceraCorreo);
         // METODO PARA BUSCAR LOGO CABECERA DE CORREO  **USADO
@@ -53,7 +53,7 @@ class DepartamentoRutas {
         // METODO PARA BUSCAR DATOS DE EMPRESA
         this.router.get('/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarEmpresa);
         // CONSULTA USADA EN MODULO DE ALMUERZOS 
-        this.router.get('/logo/codificados/:id_empresa', catEmpresaControlador_1.default.ConvertirImagenBase64);
+        this.router.get('/logo/codificados/:id_empresa', catEmpresaControlador_1.default.ConvertirImagenBase64_);
     }
 }
 const EMPRESA_RUTAS = new DepartamentoRutas();

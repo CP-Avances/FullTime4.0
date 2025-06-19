@@ -12,12 +12,13 @@ class EstadoCivilRutas {
         this.configuracion();
     }
     configuracion() {
+        // METODO PARA LISTAR ESTADO CIVIL   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catEstadoCivilControlador_1.default.ListarEstadosCivil);
-        // METODO PARA BUSCAR GENERO   **USADO
+        // METODO PARA BUSCAR ESTADO CIVIL POR SU NOMBRE   **USADO
         this.router.get('/buscar/:estado', verificarToken_1.TokenValidation, catEstadoCivilControlador_1.default.ObtenerEstadoCivil);
-        // METODO PARA CREAR GENERO   **USADO
+        // METODO PARA REGISTRAR ESTADO CIVIL   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, catEstadoCivilControlador_1.default.CrearEstadoCivil);
-        // METODO PARA EDITAR GENERO   **USADO
+        // METODO PARA ACTUALIZAR REGISTRO DE ESTADO CIVIL   **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catEstadoCivilControlador_1.default.ActualizarEstadoCivil);
         // METODO PARA ELIMINAR REGISTROS   **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catEstadoCivilControlador_1.default.EliminarEstadoCivil);

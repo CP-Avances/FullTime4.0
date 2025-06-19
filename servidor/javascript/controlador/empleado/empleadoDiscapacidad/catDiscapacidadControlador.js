@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DISCAPACIDADCONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
@@ -204,7 +204,7 @@ class DiscapacidadControlador {
             }
         });
     }
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **usado
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     RevisarDatos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;

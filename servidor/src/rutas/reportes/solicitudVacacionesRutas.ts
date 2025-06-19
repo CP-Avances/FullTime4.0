@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../libs/verificarToken'
 import VACACIONES_REPORTE_CONTROLADOR from '../../controlador/reportes/solicitudVacacionControlador';
+import { TokenValidation } from '../../libs/verificarToken'
+import { Router } from 'express';
 
 class SolicitudVacacionesRutas {
     public router: Router = Router();
@@ -10,10 +10,12 @@ class SolicitudVacacionesRutas {
     }
 
     configuracion(): void {
+
         // REPORTE DE SOLICITUDES DE VACACIONES
         this.router.put('/vacaciones-solicitudes/:desde/:hasta', TokenValidation, VACACIONES_REPORTE_CONTROLADOR.ReporteVacacionesMultiple);
 
     }
+    
 }
 
 const VACACIONES_REPORTE_RUTAS = new SolicitudVacacionesRutas();

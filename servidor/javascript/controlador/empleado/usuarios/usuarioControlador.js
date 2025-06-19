@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.USUARIO_CONTROLADOR = void 0;
-const settingsMail_1 = require("../../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const rsa_keys_service_1 = __importDefault(require("../../llaves/rsa-keys.service"));
+const settingsMail_1 = require("../../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const rsa_keys_service_1 = __importDefault(require("../../llaves/rsa-keys.service"));
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 class UsuarioControlador {
     // CREAR REGISTRO DE USUARIOS    **USADO
     CrearUsuario(req, res) {
@@ -70,51 +70,6 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL **USADO
-    ObtenerInformacionUsuario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const USUARIO = yield database_1.default.query(`
-        SELECT 
-	        tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
-	        tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
-	        tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
-	        COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
-	        COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
-	        COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional,
-		      tb3.numero_partida_individual
-        FROM 
-	        informacion_general AS tb1, eu_empleado_cargos AS tb2, eu_empleados AS tb3
-        WHERE 
-  	      tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
-		      tb3.id = tb1.id AND
-	        tb2.estado = 'true'
-      `, [id_empleado]);
-            if (USUARIO.rowCount != 0) {
-                return res.jsonp(USUARIO.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Ups los sentimos, el usuario no tiene registrada la información necesaria, por favor revise que cumpla con todos los requisitos.' });
-            }
-        });
-    }
-    ObtenerDepartamentoUsuarios(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const EMPLEADO = yield database_1.default.query(`
-      SELECT e.id_empleado AS id, e.id_departamento, e.id_contrato, ed_departamentos.nombre 
-      FROM contrato_cargo_vigente AS e 
-      INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
-      WHERE id_contrato = $1
-      `, [id_empleado]);
-            if (EMPLEADO.rowCount != 0) {
-                return res.jsonp(EMPLEADO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-        });
-    }
     // METODO PARA OBTENER EL ID DEL USUARIO MEDIANTE DEPARTAMENTO VIGENTE DEL USUARIO **USADO
     ObtenerIdUsuariosDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -158,8 +113,8 @@ class UsuarioControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
-        WHERE id_empleado = $4 RETURNING *
+          UPDATE eu_usuarios SET usuario = $1, id_rol = $2, estado = $3 
+          WHERE id_empleado = $4 RETURNING *
         `, [usuario, id_rol, estado, id_empleado]);
                 datosOriginales.contrasena = '';
                 // AUDITORIA
@@ -217,7 +172,7 @@ class UsuarioControlador {
                     return res.status(403).jsonp({ message: 'La contraseña actual no es correcta.' });
                 }
                 yield database_1.default.query(`
-        UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
+          UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
         `, [contrasena_encriptada, id_empleado]);
                 datosOriginales.contrasena = '';
                 // AUDITORIA
@@ -242,62 +197,38 @@ class UsuarioControlador {
             }
         });
     }
-    // ADMINISTRACION DEL MODULO DE ALIMENTACION
-    RegistrarAdminComida(req, res) {
+    // METODO DE BUSQUEDA PARA OBTENER LA INFORMACION DEL USUARIO PARA LA ASIGNACION DE ACCION PERSONAL   **USADO
+    ObtenerInformacionUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { admin_comida, id_empleado, user_name, ip, ip_local } = req.body;
-                const adminComida = (yield admin_comida.toLowerCase()) === 'si' ? true : false;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_usuarios',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                const actualizacion = yield database_1.default.query(`
-        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2 RETURNING *
-        `, [adminComida, id_empleado]);
-                const [datosNuevos] = actualizacion.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_usuarios',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(datosNuevos),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado.' });
+            const { id_empleado } = req.params;
+            const USUARIO = yield database_1.default.query(`
+        SELECT 
+	        tb1.codigo, tb1.identificacion, tb1.estado AS estado_empleado, tb1.id_regimen, tb1.name_regimen, 
+	        tb1.id_suc, tb1.name_suc, tb1.id_depa, tb1.name_dep, tb1.id_ciudad, tb1.ciudad,
+	        tb2.id_tipo_cargo, tb2.id_contrato, tb2.id_departamento, tb2.sueldo, tb2.fecha_inicio, tb2.fecha_final,
+	        COALESCE((SELECT id_proceso FROM map_empleado_procesos WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_proceso,
+	        COALESCE((SELECT id_grado FROM map_empleado_grado WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grado,
+	        COALESCE((SELECT id_grupo_ocupacional FROM map_empleado_grupo_ocupacional WHERE id_empleado = tb1.id AND estado = 'true'),'0') AS id_grupo_ocupacional,
+		      tb3.numero_partida_individual
+        FROM 
+	        informacion_general AS tb1, eu_empleado_cargos AS tb2, eu_empleados AS tb3
+        WHERE 
+  	      tb1.id = $1 AND tb2.id = tb1.id_cargo AND 
+		      tb3.id = tb1.id AND
+	        tb2.estado = 'true'
+      `, [id_empleado]);
+            if (USUARIO.rowCount != 0) {
+                return res.jsonp(USUARIO.rows);
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+            else {
+                res.status(404).jsonp({ text: 'Ups los sentimos, el usuario no tiene registrada la información necesaria, por favor revise que cumpla con todos los requisitos.' });
             }
         });
     }
     /** ************************************************************************************* **
      ** **                METODO FRASE DE SEGURIDAD ADMINISTRADOR                          ** **
      ** ************************************************************************************* **/
-    // METODO PARA GUARDAR FRASE DE SEGURIDAD
+    // METODO PARA GUARDAR FRASE DE SEGURIDAD      **USADO
     ActualizarFrase(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -344,6 +275,167 @@ class UsuarioControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA CAMBIAR FRASE DE SEGURIDAD    **USADO
+    CambiarFrase(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var token = req.body.token;
+            var frase = req.body.frase;
+            const { user_name, ip, ip_local } = req.body;
+            try {
+                const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
+                const id_empleado = payload._id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+          UPDATE eu_usuarios SET frase = $2 WHERE id_empleado = $1
+        `, [id_empleado, frase]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"frase": "${frase}"}`,
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
+            }
+        });
+    }
+    /** ******************************************************************************************************************* **
+     ** **                           ENVIAR CORREO PARA CAMBIAR FRASE DE SEGURIDAD                                       ** **
+     ** ******************************************************************************************************************* **/
+    // METODO PARA RESTABLECER LA CONTRASEÑA   **USADO
+    RestablecerFrase(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const correo = req.body.correo;
+            const url_page = req.body.url_page;
+            const identificacion = req.body.identificacion;
+            var tiempo = (0, settingsMail_1.fechaHora)();
+            var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
+            var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
+            // OBTENER RUTA DE LOGOS
+            let separador = path_1.default.sep;
+            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
+            const correoValido = yield database_1.default.query(`
+      SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
+      FROM eu_empleados AS e, eu_usuarios AS u 
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2  AND u.frase IS NOT NULL 
+      `, [correo, identificacion]);
+            if (correoValido.rows[0] == undefined)
+                return res.status(401).send('Correo o identificación o frase de usuario no válido.');
+            var datos = yield (0, settingsMail_1.Credenciales)(1);
+            if (datos.message === 'ok') {
+                const token = jsonwebtoken_1.default.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail', { expiresIn: 60 * 5, algorithm: 'HS512' });
+                var url = url_page + '/recuperar-frase';
+                let data = {
+                    to: correoValido.rows[0].correo,
+                    from: datos.informacion.email,
+                    subject: 'FULLTIME CAMBIO FRASE DE SEGURIDAD',
+                    html: `
+            <body style="font-family: Arial, sans-serif; font-size: 12px; color: rgb(11, 22, 121); line-height: 1.5;">
+
+              <div style="text-align: center; margin: 0; padding: 0;">
+                <img src="cid:cabeceraf" alt="Encabezado"
+                    style="display: block; width: 100%; height: auto; margin: 0; padding: 0; border: 0;" />
+              </div>
+
+              <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
+
+              <p>
+                El presente correo tiene como finalidad informarle que se ha generado un enlace para cambiar su frase de seguridad.
+              </p>
+
+              <h3 style="text-align: center; color: rgb(11, 22, 121);">DATOS DEL SOLICITANTE</h3>
+              
+              <p>
+                <strong>Empresa:</strong> ${datos.informacion.nombre} <br>
+                <strong>Asunto:</strong> CAMBIAR FRASE DE SEGURIDAD <br>
+                <strong>Colaborador que envía:</strong> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
+                <strong>Generado mediante:</strong> Aplicación Web <br>
+                <strong>Fecha de envío:</strong> ${fecha} <br>
+                <strong>Hora de envío:</strong> ${hora} <br>
+              </p>
+
+              <h3 style="text-align: center; color: rgb(11, 22, 121);">CAMBIAR FRASE DE SEGURIDAD</h3>
+              
+              <p>
+                <strong>Por favor, haga clic en el siguiente enlace para registrar una nueva frase de seguridad:</strong><br><br>
+                <a href="${url}/${token}" style="color: #0b1679;">${url}/${token}</a>
+              </p>
+
+              <hr style="border: none; border-top: 1px solid #aaa; margin: 20px 0;" />
+
+              <p style="color: #555; font-style: italic; font-size: 11px;">
+                <strong>Este correo ha sido generado automáticamente. Por favor, no responda a este mensaje.</strong>
+              </p>
+
+              <div style="text-align: center; margin: 0; padding: 0;">
+                <img src="cid:pief" alt="Pie de página"
+                  style="display: block; width: 100%; height: auto; margin: 0; padding: 0; border: 0;" />
+              </div>
+
+            </body>
+          `,
+                    attachments: [
+                        {
+                            filename: 'cabecera_firma.jpg',
+                            path: `${path_folder}${separador}${datos.informacion.cabecera_firma}`,
+                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        },
+                        {
+                            filename: 'pie_firma.jpg',
+                            path: `${path_folder}${separador}${datos.informacion.pie_firma}`,
+                            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        }
+                    ]
+                };
+                var corr = (0, settingsMail_1.enviarCorreos)(datos.informacion.servidor, parseInt(datos.informacion.puerto), datos.informacion.email, datos.informacion.pass);
+                corr.sendMail(data, function (error, info) {
+                    if (error) {
+                        console.log('Email error: ' + error);
+                        corr.close();
+                        return res.jsonp({ message: 'error' });
+                    }
+                    else {
+                        console.log('Email sent: ' + info.response);
+                        corr.close();
+                        return res.jsonp({ message: 'ok' });
+                    }
+                });
+            }
+            else {
+                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
             }
         });
     }
@@ -420,20 +512,6 @@ class UsuarioControlador {
       FROM informacion_general AS ig, eu_usuarios AS u 
       WHERE ig.estado = $1 AND u.id_empleado = ig.id AND u.app_habilita = $2
       `, [estado, habilitado]).then((result) => { return result.rows; });
-            if (respuesta.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            return res.status(200).jsonp(respuesta);
-        });
-    }
-    // METODO PARA LEER DATOS GENERALES DE USUARIO TIMBRE MOVIL   **USADO
-    accesoMovil(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let id_empleado = req.params.id_empleado;
-            let respuesta = yield database_1.default.query(`
-        SELECT u.app_habilita 
-        FROM eu_usuarios AS u 
-        WHERE u.id_empleado = $1
-        `, [id_empleado]).then((result) => { return result.rows; });
             if (respuesta.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             return res.status(200).jsonp(respuesta);
@@ -561,151 +639,6 @@ class UsuarioControlador {
             }
             catch (error) {
                 return res.status(500).jsonp({ message: error });
-            }
-        });
-    }
-    /** ******************************************************************************************************************* **
-     ** **                           ENVIAR CORREO PARA CAMBIAR FRASE DE SEGURIDAD                                       ** **
-     ** ******************************************************************************************************************* **/
-    RestablecerFrase(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const correo = req.body.correo;
-            const url_page = req.body.url_page;
-            const identificacion = req.body.identificacion;
-            var tiempo = (0, settingsMail_1.fechaHora)();
-            var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
-            var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
-            // OBTENER RUTA DE LOGOS
-            let separador = path_1.default.sep;
-            const path_folder = (0, accesoCarpetas_1.ObtenerRutaLogos)();
-            const correoValido = yield database_1.default.query(`
-      SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
-      FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.identificacion = $2  AND u.frase IS NOT NULL 
-      `, [correo, identificacion]);
-            if (correoValido.rows[0] == undefined)
-                return res.status(401).send('Correo o identificación o frase de usuario no válido.');
-            var datos = yield (0, settingsMail_1.Credenciales)(1);
-            if (datos === 'ok') {
-                const token = jsonwebtoken_1.default.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail', { expiresIn: 60 * 5, algorithm: 'HS512' });
-                var url = url_page + '/recuperar-frase';
-                let data = {
-                    to: correoValido.rows[0].correo,
-                    from: settingsMail_1.email,
-                    subject: 'FULLTIME CAMBIO FRASE DE SEGURIDAD',
-                    html: `
-          <body>
-            <div style="text-align: center;">
-              <img width="100%" height="100%" src="cid:cabeceraf"/>
-            </div>
-            <br>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              El presente correo es para informar que se ha enviado un link para cambiar su frase de seguridad. <br>  
-            </p>
-            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
-              <b>Asunto:</b> CAMBIAR FRASE DE SEGURIDAD <br> 
-              <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
-              <b>Generado mediante:</b> Aplicación Web <br>
-              <b>Fecha de envío:</b> ${fecha} <br> 
-              <b>Hora de envío:</b> ${hora} <br><br> 
-            </p>
-            <h3 style="font-family: Arial; text-align: center;">CAMBIAR FRASE DE SEGURIDAD</h3>
-            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Ingrese al siguiente link y registre una nueva frase de seguridad.</b> <br>   
-              <a href="${url}/${token}">${url}/${token}</a>  
-            </p>
-            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-              <b>Gracias por la atención</b><br>
-              <b>Saludos cordiales,</b> <br><br>
-            </p>
-            <img src="cid:pief" width="100%" height="100%"/>
-          </body>
-          `,
-                    attachments: [
-                        {
-                            filename: 'cabecera_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.cabecera_firma}`,
-                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-                        },
-                        {
-                            filename: 'pie_firma.jpg',
-                            path: `${path_folder}${separador}${settingsMail_1.pie_firma}`,
-                            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
-                        }
-                    ]
-                };
-                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
-                corr.sendMail(data, function (error, info) {
-                    if (error) {
-                        console.log('Email error: ' + error);
-                        corr.close();
-                        return res.jsonp({ message: 'error' });
-                    }
-                    else {
-                        console.log('Email sent: ' + info.response);
-                        corr.close();
-                        return res.jsonp({ message: 'ok' });
-                    }
-                });
-            }
-            else {
-                res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
-            }
-        });
-    }
-    // METODO PARA CAMBIAR FRASE DE SEGURIDAD
-    CambiarFrase(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var token = req.body.token;
-            var frase = req.body.frase;
-            const { user_name, ip, ip_local } = req.body;
-            try {
-                const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
-                const id_empleado = payload._id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTA DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_usuarios',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        ip_local: ip_local,
-                        observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-        UPDATE eu_usuarios SET frase = $2 WHERE id_empleado = $1
-        `, [id_empleado, frase]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_usuarios',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"frase": "${frase}"}`,
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
             }
         });
     }
@@ -884,18 +817,6 @@ class UsuarioControlador {
             }
         });
     }
-    //METODO PARA OBTENER DATO ENCRIPTADO
-    ObtenerDatoEncriptado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { contrasena } = req.body;
-                res.jsonp({ message: rsa_keys_service_1.default.encriptarLogin(contrasena) });
-            }
-            catch (error) {
-                return res.jsonp({ message: 'error' });
-            }
-        });
-    }
     // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO    **USADO
     RegistrarUsuarioDepartamentoMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -942,7 +863,9 @@ class UsuarioControlador {
             return res.json({ message: 'Proceso completado.' });
         });
     }
-    //-------------------------------------- METODOS PARA APP_MOVIL ------------------------------------------------
+    /** **************************************************************************************************************** **
+     ** **             M E T O D O S    U S A D O S    E N    L A    A P L I C A C I O N    M O V I L                 ** **
+     ** **************************************************************************************************************** **/
     // BUSCAR EL DISPOSITIVO POR ID DEL EMPLEADO
     getidDispositivo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1072,7 +995,78 @@ class UsuarioControlador {
         });
     }
     ;
+    ObtenerDepartamentoUsuarios(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const EMPLEADO = yield database_1.default.query(`
+      SELECT e.id_empleado AS id, e.id_departamento, e.id_contrato, ed_departamentos.nombre 
+      FROM contrato_cargo_vigente AS e 
+      INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
+      WHERE id_contrato = $1
+      `, [id_empleado]);
+            if (EMPLEADO.rowCount != 0) {
+                return res.jsonp(EMPLEADO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
+    // ADMINISTRACION DEL MODULO DE ALIMENTACION
+    RegistrarAdminComida(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { admin_comida, id_empleado, user_name, ip, ip_local } = req.body;
+                const adminComida = (yield admin_comida.toLowerCase()) === 'si' ? true : false;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        ip_local: ip_local,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const actualizacion = yield database_1.default.query(`
+        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2 RETURNING *
+        `, [adminComida, id_empleado]);
+                const [datosNuevos] = actualizacion.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos),
+                    ip: ip,
+                    ip_local: ip_local,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
 }
+exports.USUARIO_CONTROLADOR = new UsuarioControlador();
+exports.default = exports.USUARIO_CONTROLADOR;
 /* @return
     CASOS DE RETORNO
     0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
@@ -1080,7 +1074,7 @@ class UsuarioControlador {
     2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL)
     3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION
 */
-// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION
+// METODO PARA VERIFICAR ASIGNACIONES DE INFORMACION    **USADO
 function VerificarAsignaciones(datos, personal, isPersonal) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id_empleado, id_departamento } = datos;
@@ -1105,7 +1099,7 @@ function VerificarAsignaciones(datos, personal, isPersonal) {
         return 3;
     });
 }
-// METODO PARA REGISTRAR UNA ASIGNACION
+// METODO PARA REGISTRAR UNA ASIGNACION   **USADO
 function RegistrarUsuarioDepartamento(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -1137,7 +1131,7 @@ function RegistrarUsuarioDepartamento(datos) {
         }
     });
 }
-// METODO PARA EDITAR UNA ASIGNACION
+// METODO PARA EDITAR UNA ASIGNACION    **USADO
 function EditarUsuarioDepartamento(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -1189,5 +1183,3 @@ function EditarUsuarioDepartamento(datos) {
         }
     });
 }
-exports.USUARIO_CONTROLADOR = new UsuarioControlador();
-exports.default = exports.USUARIO_CONTROLADOR;
