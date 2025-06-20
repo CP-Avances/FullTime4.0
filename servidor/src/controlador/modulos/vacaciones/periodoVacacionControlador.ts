@@ -11,7 +11,7 @@ class PeriodoVacacionControlador {
     const { id_empleado } = req.params;
     const VACACIONES = await pool.query(
       `
-      SELECT pv.id, pv.id_empleado_cargo
+      SELECT pv.id
       FROM mv_periodo_vacacion AS pv
       WHERE pv.id = (SELECT MAX(pv.id) AS id 
         FROM mv_periodo_vacacion AS pv 

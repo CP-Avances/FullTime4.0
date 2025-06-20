@@ -411,6 +411,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
 
     this.restF.ListarFunciones(funcionesSistema).subscribe(datos => {
+      console.log('ver datos de funciones ', datos)
       if (datos[0].hora_extra === true) {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
@@ -429,20 +430,20 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.HabilitarPermisos = true;
         this.VerRegistroAutorizar();
       }
-      if (this.funcionalidades.vacaciones === true) {
+      if (datos[0].vacaciones === true) {
         this.habilitarVacaciones = true;
         this.VerRegistroAutorizar();
       }
-      if (this.funcionalidades.hora_extra === true) {
+      if (datos[0].hora_extra === true) {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
         }
       }
-      if (this.funcionalidades.alimentacion === true) {
+      if (datos[0].alimentacion === true) {
         this.HabilitarAlimentacion = true;
         this.autorizar = true;
       }
-      if (this.funcionalidades.accion_personal === true) {
+      if (datos[0].accion_personal === true) {
         this.HabilitarAccion = true;
       }
       // METODOS DE CONSULTAS GENERALES
