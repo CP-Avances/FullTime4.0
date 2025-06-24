@@ -182,6 +182,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.listaPedidos = [];
     this.restAccion.BuscarDatosPedido().subscribe((data) => {
       this.listaPedidos = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
+      console.log('listaPedidos: ',this.listaPedidos);
       this.FormatearDatos(
         this.listaPedidos,
         this.formato_fecha,
