@@ -48,8 +48,9 @@
                                         <div class="d-flex flex-wrap justify-content-around"
                                             style="text-align: center; justify-content: center;">
                                             <form method="post" enctype="multipart/form-data">
-                                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
-                                                    id="file" accept="image/png, image/jpeg">
+                                                <input (change)="FileChange($event)" type="file"
+                                                    [formControl]="archivoForm" id="file"
+                                                    accept="image/png, image/jpeg">
                                                 <label for="file" class="btn-2">{{textoBoton}}</label>
                                             </form>
                                         </div>
@@ -112,8 +113,8 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <i type="submit" id="edit" *ngIf="!editar_empleado" (click)="AbirVentanaEditarEmpleado(e)" matSuffix
-                                        matTooltipPosition="right"
+                                    <i type="submit" id="edit" *ngIf="!editar_empleado"
+                                        (click)="AbirVentanaEditarEmpleado(e)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
                                         <p>Editar</p>
                                     </i>
@@ -182,13 +183,13 @@
                                 </mat-grid-tile>
                                 <mat-grid-tile *ngIf="activar_frase">
                                     <button *ngIf="frase"
-                                        class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
-                                        (click)="IngresarFrase()">
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector" (click)="IngresarFrase()">
                                         Frase Seguridad
                                     </button>
                                     <button *ngIf="cambiar_frase"
-                                        class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
-                                        (click)="CambiarFrase()">
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector" (click)="CambiarFrase()">
                                         Cambiar Frase
                                     </button>
                                 </mat-grid-tile>
@@ -313,7 +314,8 @@
                                     <div class="col" style="text-align: right;">
                                         <i type="submit" style="margin-left: 2%;" class="far fa-trash-alt"
                                             (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)" matSuffix
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
+                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro"
+                                            *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -390,7 +392,8 @@
                                             <p>Editar</p>
                                         </i>
                                         <i class="far fa-trash-alt" id="delete" (click)="ConfirmarEliminarVacuna(dv)"
-                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarDatos()">
+                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
+                                            *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -421,7 +424,8 @@
                 </app-registro-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="editar_contrato">
-                <app-editar-contrato [contrato]="contrato_editar" [fecha]="fecha_seleccionada" [pagina]="pagina_contrato">
+                <app-editar-contrato [contrato]="contrato_editar" [fecha]="fecha_seleccionada"
+                    [pagina]="pagina_contrato">
                 </app-editar-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="crear_cargo">
@@ -445,8 +449,9 @@
                                     </span>
                                 </div>
                                 <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                                    <button *ngIf="!editar_contrato && getCrearDatos()" type="submit" class="btn btn-outline-light btn-sm"
-                                        style="float: right;" (click)="AbrirVentanaCrearContrato()">
+                                    <button *ngIf="!editar_contrato && getCrearDatos()" type="submit"
+                                        class="btn btn-outline-light btn-sm" style="float: right;"
+                                        (click)="AbrirVentanaCrearContrato()">
                                         Añadir
                                     </button>
                                 </div>
@@ -797,15 +802,17 @@
                                 <div style="text-align: right; margin-top: 5px;"
                                     *ngIf="ce.id != datoActual.id_contrato">
                                     <i type="submit" id="edit" style="margin-right: 6px;"
-                                        (click)="AbrirVentanaEditarContrato(ce, contratoForm.value)" matSuffix matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
+                                        (click)="AbrirVentanaEditarContrato(ce, contratoForm.value)" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit"
+                                        *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                         (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
-                                        matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
-                                        class="far fa-trash-alt">
+                                        matTooltip="Elimina los datos generales de este registro"
+                                        *ngIf="getEliminarDatos()" class="far fa-trash-alt">
                                         <p>Eliminar</p>
                                     </i>
                                 </div>
@@ -920,7 +927,8 @@
                                                     autorenew
                                                 </mat-icon></label>
                                         </div>
-                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado" *ngIf="getEditarDatos()">
+                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado"
+                                            *ngIf="getEditarDatos()">
                                             <div class="row">
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
@@ -947,15 +955,15 @@
                                         <div style="text-align: right; margin-top: 5px;">
                                             <i type="submit" id="edit" style="margin-right: 6px;"
                                                 (click)="VerCargoEdicion(c.id)" matSuffix matTooltipPosition="right"
-                                                matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()"
-                                                class="fas fa-edit">
+                                                matTooltip="Modificar los datos generales de este registro"
+                                                *ngIf="getEditarDatos()" class="fas fa-edit">
                                                 <p>Editar</p>
                                             </i>
                                             <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                                 (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                                 matTooltipPosition="right"
-                                                matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
-                                                class="far fa-trash-alt">
+                                                matTooltip="Elimina los datos generales de este registro"
+                                                *ngIf="getEliminarDatos()" class="far fa-trash-alt">
                                                 <p>Eliminar</p>
                                             </i>
                                         </div>
@@ -1629,8 +1637,8 @@
                         </span>
                     </div>
                     <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;" *ngIf="getCrearDatos()"
-                            (click)="AbrirVentanaPermiso()">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                            *ngIf="getCrearDatos()" (click)="AbrirVentanaPermiso()">
                             {{btnTitulo}}
                         </button>
                     </div>
@@ -1730,9 +1738,9 @@
                                 matTooltip="Descargar solicitud de permiso.">
                                 <p>Descargar</p>
                             </i>
-                            <i *ngIf="pt.estado === 1 && getEditarDatos()" class="fas fa-edit" id="edit" style="margin-right: 5px;"
-                                (click)="EditarPermiso(pt)" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar los datos generales de este registro.">
+                            <i *ngIf="pt.estado === 1 && getEditarDatos()" class="fas fa-edit" id="edit"
+                                style="margin-right: 5px;" (click)="EditarPermiso(pt)" matSuffix
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
                             <i *ngIf="pt.estado === 1 && getEliminarDatos()" class="fas fa-trash-alt" id="delete"
@@ -1796,8 +1804,13 @@
                             <div class="row">
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Activo:</label>
+                                        <label *ngIf="p.estado == true">Sí</label>
+                                        <label *ngIf="p.estado == false">No</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Descripción:</label>
-                                        <label>{{p.descripcion}}</label>
+                                        <label>{{p.observacion}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Inicia Periodo:</label>
@@ -1807,41 +1820,51 @@
                                         <label id="datosF">Finaliza Periodo:</label>
                                         <label>{{p.fec_final_}}</label>
                                     </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha de carga:</label>
+                                        <label>{{p.fecha_desde_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha última actualizacion:</label>
+                                        <label>{{p.fecha_actualizacion_}}</label>
+                                    </div>
                                 </div>
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Vacaciones usadas:</label>
-                                        <label *ngIf="p.estado == 1">Sí</label>
-                                        <label *ngIf="p.estado == 2">No</label>
+                                        <label id="datosF">Vacaciones transferidas:</label>
+                                        <label>{{p.saldo_transferido}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Días de Vacaciones:</label>
+                                        <label>{{p.dias_vacacion}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Días usados de Vacaciones:</label>
+                                        <label>{{p.usados_dias_vacacion}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Días por Antiguedad:</label>
-                                        <label>{{p.dia_antiguedad}}</label>
+                                        <label>{{p.dias_antiguedad}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días Perdidos:</label>
-                                        <label>{{p.dia_perdido}}</label>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días de Vacaciones:</label>
-                                        <label>{{p.dia_vacacion}}</label>
+                                        <label id="datosF">Días usados por antiguedad:</label>
+                                        <label>{{p.usados_antiguedad}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Horas de Vacaciones:</label>
-                                        <label>{{p.horas_vacaciones}}</label>
+                                        <label id="datosF">Días perdidos:</label>
+                                        <label>{{p.dias_perdidos}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Minutos de Vacaciones:</label>
-                                        <label>{{p.minutos_vacaciones}}</label>
+                                        <label id="datosF">Fecha inicio perdida:</label>
+                                        <label>{{p.fecha_inicio_perdida}}</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div style="text-align: right; margin-right: 1px;">
                             <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDatos()">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro."
+                                *ngIf="getEditarDatos()">
                                 <p>Editar</p>
                             </i>
                         </div>
@@ -2202,7 +2225,8 @@
                     <div style="text-align: right;"
                         *ngIf="(pc.aprobada === false || pc.aprobada === null) && pc.fec_comida > FechaActual">
                         <i class="fas fa-edit" id="edit" (click)="AbrirEditarPlanComidas(pc)" matSuffix
-                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
+                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro"
+                            *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                     </div>
@@ -2292,7 +2316,8 @@
                     </div>
                     <div style="text-align: right;" *ngIf="pc.fec_final > FechaActual">
                         <i class="fas fa-edit" id="edit" (click)="AbrirEditarPlanComidas(pc)" matSuffix
-                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
+                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro"
+                            *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                         <i style="color:red; margin-left: 15px;" (click)="ConfirmarDeletePlanComidas(pc)"
@@ -2399,7 +2424,8 @@
                                             <td class="justify-content-center">
                                                 <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
                                                     matSuffix matTooltipPosition="right"
-                                                    matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
+                                                    matTooltip="Modificar los datos generales de este registro"
+                                                    *ngIf="getEditarDatos()">
                                                     <p>Editar</p>
                                                 </i>
                                                 <i style="color:red; margin-left: 15px;"
@@ -2514,4 +2540,3 @@
     </mat-tab>
 
 </mat-tab-group>
-

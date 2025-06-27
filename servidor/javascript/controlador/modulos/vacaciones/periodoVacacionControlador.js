@@ -16,39 +16,24 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const settingsMail_1 = require("../../../libs/settingsMail");
 const database_1 = __importDefault(require("../../../database"));
 class PeriodoVacacionControlador {
-    // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES   **USADO
-    EncontrarIdPerVacaciones(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const VACACIONES = yield database_1.default.query(`
-      SELECT pv.id
-      FROM mv_periodo_vacacion AS pv
-      WHERE pv.id = (SELECT MAX(pv.id) AS id 
-        FROM mv_periodo_vacacion AS pv 
-        WHERE pv.id_empleado = $1 )
-      `, [id_empleado]);
-            if (VACACIONES.rowCount != 0) {
-                return res.jsonp(VACACIONES.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado' });
-        });
-    }
+    // METODO PARA CREAR PERIODO DE VACACIONES   **USADO
     CrearPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, ip_local } = req.body;
+                const { observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion, dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida, id_empleado, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const datosNuevos = yield database_1.default.query(`
-          INSERT INTO mv_periodo_vacacion (id_empleado_cargo., descripcion, dia_vacacion,
-              dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, id_empleado)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
-        `, [id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado,
-                    fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
-                    id_empleado,]);
+          INSERT INTO mv_periodo_vacacion (observacion, fecha_inicio, fecha_final, fecha_desde, fecha_ultima_actualizacion, 
+            dias_vacacion, usados_dias_vacacion, dias_antiguedad, usados_antiguedad, dias_perdidos, 
+            fecha_inicio_perdida, id_empleado, estado)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *
+        `, [observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion,
+                    dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida,
+                    id_empleado, estado]);
                 const [periodo] = datosNuevos.rows;
-                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final, 'ddd');
                 periodo.fecha_inicio = fechaInicioN;
                 periodo.fecha_final = fechaFinalN;
                 // AUDITORIA
@@ -71,6 +56,23 @@ class PeriodoVacacionControlador {
                 yield database_1.default.query("ROLLBACK");
                 res.status(500).jsonp({ message: "Error al guardar período de vacación." });
             }
+        });
+    }
+    // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES   **USADO
+    EncontrarIdPerVacaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const VACACIONES = yield database_1.default.query(`
+      SELECT pv.id
+      FROM mv_periodo_vacacion AS pv
+      WHERE pv.id = (SELECT MAX(pv.id) AS id 
+        FROM mv_periodo_vacacion AS pv 
+        WHERE pv.id_empleado = $1 )
+      `, [id_empleado]);
+            if (VACACIONES.rowCount != 0) {
+                return res.jsonp(VACACIONES.rows);
+            }
+            res.status(404).jsonp({ text: 'Registro no encontrado' });
         });
     }
     // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION    **USADO
