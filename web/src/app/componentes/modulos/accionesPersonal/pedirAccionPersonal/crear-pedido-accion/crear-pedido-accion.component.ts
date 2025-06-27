@@ -23,9 +23,18 @@ import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-perso
 import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
-import { number } from "echarts/core";
 
+ export function rangoFechasValidator(fechaInicioKey: string, fechaFinKey: string): ValidatorFn {
+  return (formGroup: AbstractControl): { [key: string]: any } | null => {
+    const fechaInicio = formGroup.get(fechaInicioKey)?.value;
+    const fechaFin = formGroup.get(fechaFinKey)?.value;
 
+    if (fechaInicio && fechaFin && new Date(fechaFin) < new Date(fechaInicio)) {
+      return { rangoFechasInvalido: true };
+    }
+    return null;
+  };
+}
 
 export function noRegistradoValidator(): ValidatorFn {
   return (control: AbstractControl) => {
@@ -55,6 +64,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   filtroNombreRE: Observable<any[]>; //Responsable elaborado
   filtroNombreRR: Observable<any[]>; //Responsable revicion
   filtroNombreRC: Observable<any[]>; //Responsable control
+  filtroNombreNC: Observable<any[]>; //Responsable control
 
 
 
@@ -90,9 +100,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   ingresoCargo: boolean = false;
   vistaCargo: boolean = true;
 
-
   // INICIACION DE CAMPOS DEL FORMULARIO
-
   otroDecretoF = new FormControl("", [Validators.minLength(3)]);
   otroCargoF = new FormControl("", [Validators.minLength(3)]);
   numPartidaF = new FormControl("", [Validators.required]);
@@ -198,6 +206,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     funcionarioForm: this.funcionarioF,
     fechaRigeDeseForm: this.fechaRigeDesde,
     fechaRigeHastaForm: this.fechaRigeHasta,
+  }, {
+  validators: rangoFechasValidator('fechaRigeDeseForm', 'fechaRigeHastaForm')
   });
   public secondFormGroup = new FormGroup({
     idTipoAccionFom: this.idTipoAccion,
@@ -292,6 +302,8 @@ export class CrearPedidoAccionComponent implements OnInit {
   get habilitarAccion(): boolean {
     return this.funciones.accionesPersonal;
   }
+
+  private timerInterval: any;
 
   constructor(
     private asignaciones: AsignacionesService,
@@ -393,9 +405,12 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarDeparta(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.departamentosact.filter((info: any) =>
+      const filtrados = this.departamentosact.filter((info: any) =>
         info.nombre.toUpperCase().includes(filterValue)
       );
+      // Eliminar duplicados usando Set o Map
+      const unicos = Array.from(new Map(filtrados.map(item => [item.id, item])).values());
+      return unicos
     }
   }
 
@@ -757,37 +772,46 @@ export class CrearPedidoAccionComponent implements OnInit {
         map((value: any) => this._filtrarEmpleado(value))
       );
 
-      this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleadoR(value))
-      );
-
-      this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleadoR(value))
-      );
-
-      this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleadoR(value))
-      );
-
-      this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleadoR(value))
-      );
-
-      this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleadoR(value))
-      );
-
-      this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleadoR(value))
-      );
-
     });
+  }
+
+  filtrosEmpleados() {
+
+    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
   }
 
   datosForm6(formValue: any, stepper: any) {
@@ -798,10 +822,19 @@ export class CrearPedidoAccionComponent implements OnInit {
 
         const ahora = new Date();
         const fecha = ahora.toISOString().split('T')[0];
-        const hora = ahora.toTimeString().slice(0, 5);
+        this.timerInterval = setInterval(() => {
+          const now = new Date();
+          const horas = String(now.getHours()).padStart(2, '0');
+          const minutos = String(now.getMinutes()).padStart(2, '0');
+          const segundos = String(now.getSeconds()).padStart(2, '0');
+
+          const horaFormateada = `${horas}:${minutos}:${segundos}`;
+
+          // Esto actualiza visualmente el campo en tiempo real
+          this.sixthFormGroup.get('horaComunicadoForm')?.setValue(horaFormateada, { emitEvent: false });
+        }, 1000);
 
         this.sixthFormGroup.controls['fechaComunicadoForm'].setValue(fecha);
-        this.sixthFormGroup.controls['horaComunicadoForm'].setValue(hora);
 
         stepper.next();
 
@@ -819,6 +852,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   ListaEmpleadosFirmas(id_empleado: any) {
     this.listaAuxiliar = this.listaAuxiliar.filter(user => user.id !== id_empleado);
+    this.filtrosEmpleados();
   }
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
@@ -853,6 +887,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   FiltrarDepaActua() {
+    
     this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
       startWith(""),
       map((value: any) => this._filtrarDeparta(value))
@@ -1239,6 +1274,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.thirdFormGroup.markAllAsTouched();
     } else {
 
+      this.ListaEmpleadosFirmas(this.idUserSelect);
       this.habilitarformPosesion = formValue.habilitarForm4
       stepper.next();
     }

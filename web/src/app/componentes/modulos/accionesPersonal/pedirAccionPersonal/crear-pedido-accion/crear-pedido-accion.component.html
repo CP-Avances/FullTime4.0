@@ -122,6 +122,10 @@
                                             </mat-datepicker-toggle>
                                             <mat-datepicker touchUi #pickerFechaHasta></mat-datepicker>
                                         </mat-form-field>
+                                        <div *ngIf="firstFormGroup.errors?.['rangoFechasInvalido'] && firstFormGroup.get('fechaRigeHastaForm')?.touched"
+                                            class="text-danger">
+                                            La fecha final debe ser mayor o igual a la fecha inicial.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -743,7 +747,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma1?.cargo != null && cargoFirma1?.cargo != ''"
-                                    style="font-size: x-small;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
                             </div>
 
                         </div>
@@ -770,7 +774,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma2?.cargo != null && cargoFirma2?.cargo != ''"
-                                    style="font-size: x-small;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
@@ -854,12 +858,8 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="w-100">
                                     <mat-label>Razón</mat-label>
-                                    <textarea matInput #acta maxlength="200"
-                                        placeholder="Detalle la razón por la negativa"
-                                        formControlName="razonForm"></textarea>
-                                    <mat-hint align="start"><strong>Ingresar hasta 200
-                                            caracteres</strong></mat-hint>
-                                    <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
+                                    <textarea matInput #acta placeholder="Detalle la razón por la negativa"
+                                        formControlName="razonForm" readonly></textarea>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -890,7 +890,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma3?.cargo != null && cargoFirma3?.cargo != ''"
-                                    style="font-size: x-small;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
                             </div>
                         </div>
                         <div class="col-12 col-md-5">
@@ -916,14 +916,14 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma4?.cargo != null && cargoFirma4?.cargo != ''"
-                                    style="font-size: x-small;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
 
                     <div class="row mt-1 w-100">
                         <div class="col-12 col-md-5">
-                            <div class="d-flex flex-wrap justify-content-center">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
                                     Registro y Control</mat-label>
                                 <mat-form-field style="width: 20%;">
@@ -945,7 +945,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma5?.cargo != null && cargoFirma5?.cargo != ''"
-                                    style="font-size: x-small;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
@@ -1043,7 +1043,7 @@
                                         <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoC"
                                             [matAutocomplete]="auto27">
                                         <mat-autocomplete #auto27="matAutocomplete">
-                                            <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
+                                            <mat-option *ngFor="let g of filtroNombreNC | async" [value]="g.empleado">
                                                 {{g.empleado.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
