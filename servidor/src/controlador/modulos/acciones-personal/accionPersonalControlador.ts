@@ -782,6 +782,34 @@ class AccionPersonalControlador {
         }
     }
 
+    // TABLA INFORMACION DE ACCION PERSONAL POR EMPLEADO
+    public async pedidoAccionPersonal(req: Request, res: Response): Promise<Response>{
+        try {
+            const { id } = req.body;
+
+            // CONSULTAR PARA OPTENER LOS DATOS DEL PEDIDO
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            const response = await pool.query(
+            `
+                
+
+            `, [id]);
+
+            const [datos] = response.rows;
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+
+            return res.status(404).jsonp({ message: 'error' });
+
+        } catch (error) {
+            console.log('response_accion: ', error)
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: error });
+        }
+    }
+
 
 
 
@@ -944,36 +972,14 @@ class AccionPersonalControlador {
         const { id } = req.params;
         const ACCION = await pool.query(
             `
-            SELECT ap.id, ap.id_empleado_personal, ap.fecha_elaboracion, ap.fecha_rige_desde, ap.fecha_rige_hasta, 
-                ap.id_tipo_accion_personal, ap.numero_accion_personal, ap.id_contexto_legal,
-                ap.titulo_empleado_uno, ap.firma_empleado_uno, ap.titulo_empleado_dos, ap.firma_empleado_dos, 
-                ap.adicion_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
-                ap.numero_partida_propuesta, ap.salario_propuesto, ap.id_ciudad, ap.id_empleado_responsable, 
-                ap.numero_partida_individual, ap.acta_final_concurso, ap.fecha_acta_final_concurso, ap.nombre_reemplazo, 
-                ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 
-                ap.posesion_notificacion, ap.descripcion_posesion_notificacion, tap.base_legal, tap.id_tipo_accion_personal, 
-                ta.descripcion AS tipo 
-            FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, map_tipo_accion_personal AS ta 
-            WHERE ap.id_detalle_tipo_accion_personal = tap.id AND ap.id = $1 AND ta.id = tap.id_tipo_accion_personal
-            `
-            , [id]);
-        if (ACCION.rowCount != 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
-        }
-    }
-
-    // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
-    public async ListarPedidoAccion(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-                SELECT 
-                    ap.id, ap.numero_accion_personal, ap.fecha_elaboracion, 
+            SELECT 
+                    ap.id, 
+					ap.numero_accion_personal, 
+					ap.fecha_elaboracion, 
                     CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
                     ap.fecha_rige_desde, ap.fecha_rige_hasta, 
-                    ap.id_tipo_accion_personal, tp.descripcion AS accion_personal, 
+                    ap.id_tipo_accion_personal, 
+					tp.descripcion AS accion_personal, 
                     ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
                     ap.especificacion, ap.declaracion_jurada, ap.adicion_base_legal, 
                     ap.observacion, ap.id_proceso_actual, ps.nombre AS proceso_actual,
@@ -1067,10 +1073,41 @@ class AccionPersonalControlador {
                     ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion
 
                 FROM map_documento_accion_personal AS ap
-                INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
-                INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
-                INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
-                INNER JOIN map_cat_procesos AS ps ON ps.id = ap.id_proceso_actual;
+                    INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
+                    INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
+                    INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
+                    INNER JOIN map_cat_procesos AS ps ON ps.id = ap.id_proceso_actual
+
+                WHERE ap.id = $1`
+            , [id]);
+        if (ACCION.rowCount != 0) {
+            return res.jsonp(ACCION.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros' });
+        }
+    }
+
+    // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
+    public async ListarPedidoAccion(req: Request, res: Response) {
+        const ACCION = await pool.query(
+            `
+                SELECT 
+                    ap.id, 
+	                ap.numero_accion_personal, 
+	                ap.fecha_elaboracion, 
+                    CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
+                    ap.fecha_rige_desde, ap.fecha_rige_hasta, 
+                    ap.id_tipo_accion_personal, 
+	                tp.descripcion AS accion_personal, 
+                    ap.id_detalle_tipo_accion, 
+	                dtp.descripcion, 
+	                ap.proceso, 
+	                ap.id_vacacion
+                FROM map_documento_accion_personal AS ap
+                    INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
+                    INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
+                    INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
             `
         );
         if (ACCION.rowCount != 0) {
