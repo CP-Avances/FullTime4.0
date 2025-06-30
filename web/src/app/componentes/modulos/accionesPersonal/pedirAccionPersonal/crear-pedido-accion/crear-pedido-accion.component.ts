@@ -851,6 +851,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   ListaEmpleadosFirmas(id_empleado: any) {
+    this.listaAuxiliar = this.empleados;
     this.listaAuxiliar = this.listaAuxiliar.filter(user => user.id !== id_empleado);
     this.filtrosEmpleados();
   }
@@ -1141,10 +1142,11 @@ export class CrearPedidoAccionComponent implements OnInit {
         //parte formulario 5
         formulario5: {
           abrevia_talentoHunamo: form5.abrevHAForm,
-          firma_talentoHumano: this.cargoFirma1.id,
+          firma_talentoHumano: this.cargoFirma1.id_empleado,
           cargo_talentoHumano: this.cargoFirma1.id_cargo,
+
           abrevia_delegado: form5.abrevGAForm,
-          firma_delegado: this.cargoFirma2 == undefined ? null : this.cargoFirma2.id,
+          firma_delegado: this.cargoFirma2 == undefined ? null : this.cargoFirma2.id_empleado,
           cargo_delegado: this.cargoFirma2 == undefined ? null : this.cargoFirma2.id_cargo,
           abrevia_servidorPublico: form5.abrevHForm,
           firma_servidorPublico: idEmpl_pedido,
@@ -1153,18 +1155,20 @@ export class CrearPedidoAccionComponent implements OnInit {
 
           abrevia_negativa: form5.abrevGForm,
           firma_negativa: form5.idEmpleadoGForm,
-          fecha_negativa: form5.fechaNegativaF == '' ? null : form5.fechaNegativaF,
+          fecha_negativa: form5.fechaNegativaForm == '' ? null : form5.fechaNegativaForm,
           razon_negativa: form5.razonForm,
 
           abrevia_RespElaboracion: form5.abrevRGForm,
-          firma_RespElaboracion: this.cargoFirma3 == undefined ? null : this.cargoFirma3.id,
+          firma_RespElaboracion: this.cargoFirma3 == undefined ? null : this.cargoFirma3.id_empleado,
           cargo_RespElaboracion: this.cargoFirma3 == undefined ? null : this.cargoFirma3.id_cargo,
           abrevia_RespRevision: form5.abrevRHForm,
-          firma_RespRevision: this.cargoFirma4 == undefined ? null : this.cargoFirma4.id,
+          firma_RespRevision: this.cargoFirma4 == undefined ? null : this.cargoFirma4.id_empleado,
           cargo_RespRevision: this.cargoFirma4 == undefined ? null : this.cargoFirma4.id_cargo,
           abrevia_RespRegistro_control: form5.abrevRRCForm,
-          firma_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id,
-          cargo_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_cargo,
+          firma_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_empleado,
+          cargo_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_cargo
+
+
         },
 
         //parte formulario 6
@@ -1182,7 +1186,6 @@ export class CrearPedidoAccionComponent implements OnInit {
       };
 
       console.log("informacion", datosAccion);
-
       this.ValidacionesIngresos(form1, form2, datosAccion);
 
     })
