@@ -473,20 +473,60 @@ export class ListarRelojesComponent implements OnInit {
    ** ********************************************************************************* **/
 
 
-  async GenerarPdf(action = 'open') {
-    if (!this.relojes || this.relojes.length === 0) {
-      this.toastr.info('No hay datos para mostrar en el reporte.');
-      return;
-    }
+async GenerarPdf(action = 'open') {
+  if (!this.relojes || this.relojes.length === 0) {
+    this.toastr.info('No hay datos para mostrar en el reporte.');
+    return;
+  }
+
+  if (action === 'download') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      relojes: this.relojes.map((obj: any) => ({
+        codigo: obj.codigo,
+        nomempresa: obj.nomempresa,
+        nomciudad: obj.nomciudad,
+        nomsucursal: obj.nomsucursal,
+        nomdepar: obj.nomdepar,
+        nombre: obj.nombre,
+        ip: obj.ip,
+        puerto: obj.puerto,
+        marca: obj.marca,
+        modelo: obj.modelo,
+        serie: obj.serie,
+        mac: obj.mac,
+        idFabricacion: obj.id_fabricacion,
+        fabricante: obj.fabricante,
+        zonaHorariaDispositivo: obj.zona_horaria_dispositivo,
+        formatoGmtDispositivo: obj.formato_gmt_dispositivo
+      }))
+    };
+
+    console.log("Enviando al microservicio:", data);
+
+    this.validar.generarReporteRelojes(data).subscribe((pdfBlob: Blob) => {
+      FileSaver.saveAs(pdfBlob, 'Lista_Dispositivos.pdf');
+      console.log("PDF generado correctamente desde el microservicio.");
+    }, error => {
+      console.error("Error al generar PDF desde el microservicio:", error);
+      this.toastr.error('Ocurrió un error al generar el reporte.');
+    });
+
+  } else {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Lista_Dispositivos'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
+}
+
 
   DefinirInformacionPDF() {
     return {

@@ -788,16 +788,59 @@ export class ListaEmpleadosComponent implements OnInit {
    ** ************************************************************************************************* **/
 
 
-  async GenerarPdf(action = 'open', numero: any) {
+async GenerarPdf(action = 'open', numero: any) {
+  if (action === 'download') {
+    const empleados = (numero === 1 ? this.empleado : this.desactivados).map((obj: any) => {
+      const estado = this.EstadoSelect[obj.estado - 1];
+      const nacionalidad = this.nacionalidades.find((n: any) => n.id === obj.id_nacionalidad)?.nombre || '';
+      const genero = this.generos.find((g: any) => g.id === obj.genero)?.genero || '';
+      const estadoCivil = this.estadosCiviles.find((e: any) => e.id === obj.estado_civil)?.estado_civil || '';
+
+      return {
+        codigo: obj.codigo,
+        nombreCompleto: `${obj.apellido} ${obj.nombre}`,
+        identificacion: obj.identificacion,
+        fechaNacimiento: obj.fecha_nacimiento?.split("T")[0],
+        correo: obj.correo,
+        genero: genero,
+        estadoCivil: estadoCivil,
+        domicilio: obj.domicilio,
+        telefono: obj.telefono,
+        estadoTexto: estado,
+        nacionalidad: nacionalidad
+      };
+    });
+
+    const data = {
+      usuario: this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      empleados: empleados
+    };
+
+    console.log("Enviando al microservicio:", data);
+
+    this.validar.generarReporteEmpleados(data).subscribe((pdfBlob: Blob) => {
+      FileSaver.saveAs(pdfBlob, 'Empleados.pdf');
+      console.log("PDF generado correctamente desde el microservicio.");
+    }, error => {
+      console.error("Error al generar PDF desde el microservicio:", error);
+    });
+
+  } else {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF(numero);
+
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Empleados.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
+}
+
 
   DefinirInformacionPDF(numero: any) {
     return {

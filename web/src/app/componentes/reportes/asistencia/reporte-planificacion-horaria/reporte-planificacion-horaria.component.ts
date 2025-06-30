@@ -556,17 +556,51 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
+  obtenerTipoFiltro(): string {
+    if (this.bool.bool_reg) return 'regimen';
+    if (this.bool.bool_dep) return 'departamento';
+    if (this.bool.bool_cargo) return 'cargo';
+    if (this.bool.bool_suc) return 'sucursal';
+    if (this.bool.bool_emp) return 'empleado';
+    return 'desconocido';
+  }
+
+
   async GenerarPDF(action: any) {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     let doc_name = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print'),
+        empresa: (localStorage.getItem('name_empresa') as string).toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        tipoFiltro: this.obtenerTipoFiltro(),
+        titulo: `REPORTE DE PLANIFICACIÓN HORARIA - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
+        datos: this.horariosEmpleado,
+        detalle_acciones: this.detalle_acciones,
+        nomenclatura: this.nomenclatura,
+        periodoInicio: this.mes_inicio,
+        periodoFin: this.mes_fin,
+
+      };
+
+      this.validar.generarReportePlanificacion(data).subscribe(blob => {
+        FileSaver.saveAs(blob, doc_name);
+      });
+    } else {
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

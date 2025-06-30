@@ -219,17 +219,17 @@ export class ListarGeneroComponent {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     const peticiones = this.selectionGeneros.selected.map((datos: any) =>
       this.restG.EliminarGenero(datos.id, data).pipe(
         map((res: any) => ({ success: res.message !== 'error', genero: datos.genero })),
         catchError(() => of({ success: false, genero: datos.genero }))
       )
     );
-  
+
     forkJoin(peticiones).subscribe(resultados => {
       let eliminados = 0;
-  
+
       resultados.forEach(resultado => {
         if (resultado.success) {
           eliminados++;
@@ -239,13 +239,13 @@ export class ListarGeneroComponent {
           });
         }
       });
-  
+
       if (eliminados > 0) {
         this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
           timeOut: 6000,
         });
       }
-  
+
       this.generosEliminar = [];
       this.selectionGeneros.clear();
       this.ListarGeneros();
@@ -339,15 +339,9 @@ export class ListarGeneroComponent {
     });
   }
 
-
-
-
-
-
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
-
 
   async GenerarPdf(action = "open") {
     if (action === "download") {
@@ -356,11 +350,11 @@ export class ListarGeneroComponent {
         empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
         fraseMarcaAgua: this.frase,
         logoBase64: this.logo,
+        colorPrincipal: this.p_color, 
         generos: this.generos
       };
-  
       console.log("Enviando al microservicio:", data);
-  
+
       this.validar.generarReporteGeneros(data).subscribe((pdfBlob: Blob) => {
         const nombreArchivo = 'Géneros.pdf';
         FileSaver.saveAs(pdfBlob, nombreArchivo);
@@ -368,11 +362,11 @@ export class ListarGeneroComponent {
       }, error => {
         console.error('Error al generar PDF desde el microservicio:', error);
       });
-  
-    } else {
+    }
+    else {
       const pdfMake = await this.validar.ImportarPDF();
       const documentDefinition = this.DefinirInformacionPDF();
-      
+
       switch (action) {
         case "open":
           pdfMake.createPdf(documentDefinition).open();

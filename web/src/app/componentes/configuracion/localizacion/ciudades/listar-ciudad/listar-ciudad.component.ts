@@ -75,18 +75,18 @@ export class ListarCiudadComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
-    
+
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-  
+    });
+
     this.ListarCiudades();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -193,24 +193,46 @@ export class ListarCiudadComponent implements OnInit {
 
   // GENERACION DE REPORTE DE PDF
   async GenerarPdf(action = "open") {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      case "download":
-        pdfMake.createPdf(documentDefinition).download('Ciudades' + '.pdf');
-        break;
+    if (action === "download") {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        ciudades: this.datosCiudades.map((obj: any) => ({
+          provincia: obj.provincia,
+          nombre: obj.nombre
+        }))
+      };
 
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+      console.log("Enviando al microservicio:", data);
+
+      this.validar.generarReporteCiudades(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, 'Ciudades.pdf');
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+
+      switch (action) {
+        case "open":
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+        case "print":
+          pdfMake.createPdf(documentDefinition).print();
+          break;
+        default:
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {
@@ -451,7 +473,7 @@ export class ListarCiudadComponent implements OnInit {
     this.datosCiudades.forEach((obj: any) => {
       worksheet.addRow(obj);
     });
-  
+
     workbook.csv.writeBuffer().then((buffer) => {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "CiudadesCSV.csv");
@@ -599,17 +621,17 @@ export class ListarCiudadComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectiondatosCiudades.selected.length;
-  
+
     this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
-  
+
     this.datosCiudadesEliminar.forEach((datos: any) => {
       this.rest.EliminarCiudad(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -618,14 +640,14 @@ export class ListarCiudadComponent implements OnInit {
           eliminados++;
           this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
           }
-  
+
           this.selectiondatosCiudades.clear();
           this.datosCiudadesEliminar = [];
           this.ListarCiudades();
@@ -633,7 +655,7 @@ export class ListarCiudadComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
@@ -676,15 +698,15 @@ export class ListarCiudadComponent implements OnInit {
     }
   }
 
-  getCrearCiudad(){
+  getCrearCiudad() {
     return this.tienePermiso('Crear Ciudad');
   }
 
-  getEliminarCiudad(){
+  getEliminarCiudad() {
     return this.tienePermiso('Eliminar Ciudad');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Ciudades');
   }
 

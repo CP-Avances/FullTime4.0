@@ -447,15 +447,41 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // GENERACION DE REPORTE DE PDF
   async GenerarPdf(action = 'open') {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Departamentos.pdf'); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        departamentos: this.departamentos.map((d: any) => ({
+          id: d.id,
+          nombre: d.nombre,
+          nivel: d.nivel,
+          departamento_padre: d.departamento_padre,
+          nomsucursal: d.nomsucursal
+        }))
+      };
+
+      this.validar.generarReporteDepartamentos(data).subscribe((pdfBlob: Blob) => {
+        const nombreArchivo = 'Departamentos.pdf';
+        FileSaver.saveAs(pdfBlob, nombreArchivo);
+      }, error => {
+        console.error('Error al generar PDF desde el microservicio:', error);
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

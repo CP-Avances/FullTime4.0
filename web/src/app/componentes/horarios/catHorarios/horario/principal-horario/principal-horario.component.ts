@@ -130,10 +130,10 @@ export class PrincipalHorarioComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.nameFile = '';
     this.ObtenerLogo();
@@ -529,17 +529,60 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // GENERAR ARCHIVO PDF
   async GenerarPDF(action = 'open') {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.EstructurarPDF();
-    console.log('horarios', this.horarios);
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Horarios.pdf'); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
-    }
+    if (action === 'download') {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        horarios: this.horarios.map((h: any) => ({
+          codigo: h.codigo,
+          nombre: h.nombre,
+          horaTrabajo: h.hora_trabajo,
+          minutosComida: h.minutos_comida,
+          noturno: h.noturno,
+          documento: h.documento,
+          detalles: h.detalles.map((d: any) => ({
+            orden: d.orden,
+            hora: d.hora,
+            tolerancia: d.tolerancia,
+            tipoAccionShow: d.tipo_accion_show,
+            segundoDia: d.segundo_dia,
+            minutosAntes: d.minutos_antes,
+            minutosDespues: d.minutos_despues
+          }))
+        }))
+      };
 
+      console.log("Enviando al microservicio:", data);
+
+      this.validar.generarReporteHorarios(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, 'Horarios.pdf');
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'Error'
+        );
+      });
+
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.EstructurarPDF();
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
+    }
   }
+
 
   // DEFINICION DEL DOCUMENTO PDF
   EstructurarPDF() {
@@ -856,7 +899,7 @@ export class PrincipalHorarioComponent implements OnInit {
           otro_dia: det.segundo_dia == true ? 'Sí' : 'No',
           minutos_antes: det.minutos_antes,
           minutos_despues: det.minutos_despues,
-        }).commit();                                                                                                                                             
+        }).commit();
       })
     })
 
@@ -1053,17 +1096,17 @@ export class PrincipalHorarioComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionHorarios.selected.length;
-  
+
     this.horariosEliminar = this.selectionHorarios.selected;
-  
+
     this.horariosEliminar.forEach((datos: any) => {
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -1072,14 +1115,14 @@ export class PrincipalHorarioComponent implements OnInit {
           eliminados++;
           this.horarios = this.horarios.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
           }
-  
+
           this.selectionHorarios.clear();
           this.horariosEliminar = [];
           this.ObtenerHorarios();
@@ -1087,7 +1130,7 @@ export class PrincipalHorarioComponent implements OnInit {
       });
     });
   }
-  
+
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
@@ -1127,35 +1170,35 @@ export class PrincipalHorarioComponent implements OnInit {
     }
   }
 
-  getCrearHorario(){
+  getCrearHorario() {
     return this.tienePermiso('Crear Horario');
   }
 
-  getVerHorario(){
+  getVerHorario() {
     return this.tienePermiso('Ver Horario');
   }
 
-  getEditarHorario(){
+  getEditarHorario() {
     return this.tienePermiso('Editar Horario');
   }
 
-  getEliminarHorario(){
+  getEliminarHorario() {
     return this.tienePermiso('Eliminar Horario');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Horarios');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Horarios');
   }
 
-  getDescargarDocumento(){
+  getDescargarDocumento() {
     return this.tienePermiso('Descargar Documento Horario');
   }
 
-  getCrearDetalleHorario(){
+  getCrearDetalleHorario() {
     return this.tienePermiso('Crear Detalle Horario');
   }
 }

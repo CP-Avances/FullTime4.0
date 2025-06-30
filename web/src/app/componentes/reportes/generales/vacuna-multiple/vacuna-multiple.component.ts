@@ -405,26 +405,94 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
    ** **                         METODO DE CREACION DE  PDF                                   ** **
    ** ****************************************************************************************** **/
 
+  obtenerTipoFiltro(): string {
+    if (this.bool.bool_reg) return 'regimen';
+    if (this.bool.bool_dep) return 'departamento';
+    if (this.bool.bool_cargo) return 'cargo';
+    if (this.bool.bool_suc) return 'ciudad';
+    if (this.bool.bool_emp) return 'empleado';
+    return 'desconocido';
+  }
+
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open':
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case 'print':
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      case 'download':
-        pdfMake.createPdf(documentDefinition).download(doc_name);
-        break;
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+    const doc_name = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+    if (action === 'download') {
+      if (this.data_pdf.length === 0) {
+        this.toastr.info('No hay datos para generar el reporte', 'Vacunación');
+        return;
+      }
+
+      const data = {
+        usuario: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
+        empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        titulo: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
+        tipoFiltro: this.obtenerTipoFiltro(),
+        datos: this.data_pdf.map((selec: any) => ({
+          sucursal: selec.sucursal,
+          nombre: selec.nombre,
+          ciudad: selec.ciudad,
+          departamento: selec.departamento,
+          empleados: selec.empleados.map((empl: any) => {
+            const generoObj = this.generos.find((g: any) => g.id === empl.genero);
+            const nombreGenero = generoObj ? generoObj.genero : "No especificado";
+
+            const nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+            const nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+
+            return {
+              identificacion: empl.identificacion,
+              nombre: empl.nombre,
+              apellido: empl.apellido,
+              correo: empl.correo,
+              genero: nombreGenero, 
+              nacionalidad: nombreNacionalidad,
+              cargo: empl.cargo,
+              regimen: empl.regimen,
+              codigo: empl.codigo,
+              rol: empl.rol,
+              departamento: empl.departamento,
+              vacunas: empl.vacunas.map((vac: any) => ({
+                tipo_vacuna: vac.tipo_vacuna,
+                fecha: vac.fecha,
+                descripcion: vac.descripcion
+              }))
+            };
+          })
+        }))
+      };
+
+      console.log("Enviando al microservicio:", data);
+
+      this.validar.generarReporteVacunacionUsuarios(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, doc_name);
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+
+      switch (action) {
+        case 'open':
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+        case 'print':
+          pdfMake.createPdf(documentDefinition).print();
+          break;
+        default:
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

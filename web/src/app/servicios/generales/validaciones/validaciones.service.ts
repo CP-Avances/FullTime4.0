@@ -630,6 +630,131 @@ export class ValidacionesService {
     });
   }
 
+  generarReporteModalidadLaboral(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/modalidad-laboral/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTipoCargos(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/cargos/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteProvincias(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/provincias/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteCiudades(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/ciudades/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteSucursales(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/sucursales/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteDepartamentos(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/departamentos/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteEstadosCivil(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/estado-civil/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteNacionalidades(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/nacionalidades/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteNivelesTitulos(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/niveles-titulos/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTitulos(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/titulos/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteDiscapacidades(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/discapacidades/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteVacunas(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/vacunas/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteEmpleados(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/empleados/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteFeriados(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/feriados/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteHorarios(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/horarios/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteCoordenadas(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/coordenadas/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRelojes(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/relojes/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteVacunacionUsuarios(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/vacunacion-usuarios/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteUsuarios(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/usuarios/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReportePlanificacion(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/planificacion/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+
+
+
+
 
 
 
