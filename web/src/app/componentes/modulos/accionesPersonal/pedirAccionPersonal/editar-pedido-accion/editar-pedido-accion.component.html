@@ -119,8 +119,7 @@
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-end">
-                    <button mat-raised-button matStepperNext id="btn-raised" 
-                    class="float-right">Siguiente</button>
+                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right">Siguiente</button>
                 </div>
             </mat-step>
             <mat-step [stepControl]="secondFormGroup">
@@ -156,7 +155,7 @@
                             </div>
                         </div>
                     </div>
-                        
+
                     <div class="row">
                         <div class="col-md" [hidden]="activarOtro">
                             <div class="d-flex flex-wrap justify-content-start">
@@ -681,106 +680,254 @@
                     <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
                 </div>
             </mat-step>
-            <!-- <mat-step [stepControl]="fourthFormGroup">
+            <!-- ****************************** QUINTO FORMULARIO ******************************************* -->
+            <mat-step [stepControl]="fivethFormGroup">
                 <ng-template matStepLabel>
-                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 4:">
-                        settings
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 5: Responsables de aprobación">
+                        assignment_turned_in
                     </mat-icon>
                 </ng-template>
-                <form [formGroup]="fourthFormGroup">
+                <form [formGroup]="fivethFormGroup">
+                    <div class="subtitulo">
+                        <span>RESPONSABLES DE APROBACIÓN</span>
+                    </div>
                     <div class="row">
                         <div class="col-md">
-                            <div class="subtitulo">
-                                <span>LA PERSONA REEMPLAZA A</span>
-                            </div>
+
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field>
-                                    <mat-label class="letra">Nombre</mat-label>
-                                    <input matInput placeholder="" formControlName="nombreReempForm"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Director(a) o
+                                    responsable de Talento Humano</mat-label>
+                                <mat-form-field style="width: 15%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevHA">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Director(a) o responsable de Talento Humano</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRA"
+                                        [matAutocomplete]="auto20" required>
+                                    <mat-autocomplete #auto20="matAutocomplete">
+                                        <mat-option *ngFor="let option of filtroNombreH | async"
+                                            [value]="option.empleado" (click)="onCargo(option, 1)">
+                                            {{option.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el nombre">
-                                        help_outline
+                                        matTooltip="Responsable de Talento Humano.">
+                                        person
                                     </mat-icon>
                                 </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label class="letra">Puesto</mat-label>
-                                    <input matInput placeholder="" formControlName="puestoReempForm"
-                                        (keypress)="IngresarSoloLetras($event)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el puesto.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label>Funciones</mat-label>
-                                    <textarea matInput #funciones maxlength="200" placeholder="Ingresar las funcines"
-                                        formControlName="funcionesReempForm"></textarea>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar las funciones.">
-                                        help_outline
-                                    </mat-icon>
-                                    <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
-                                    <mat-hint align="end">{{funciones.value.length}} / 200</mat-hint>
-                                </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label class="letra">Número de acción</mat-label>
-                                    <input class="numero" matInput placeholder="13369689656312"
-                                        formControlName="accionReempForm" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de acción.">
-                                        help_outline
-                                    </mat-icon>
-                                </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label>Primera fecha</mat-label>
-                                    <input matInput [matDatepicker]="picker4" placeholder="dd/mm/aaaa"
-                                        formControlName="fechaReempForm">
-                                    <mat-datepicker-toggle matSuffix [for]="picker4" id="i-cursor"
-                                        matTooltipPosition="right"
-                                        matTooltip="Ingresar primera fecha. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                    </mat-datepicker-toggle>
-                                    <mat-datepicker touchUi #picker4></mat-datepicker>
-                                </mat-form-field>
+                                <label *ngIf="cargoFirma1?.cargo != null && cargoFirma1?.cargo != ''"
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
                             </div>
+
                         </div>
                         <div class="col-md">
-                            <div class="subtitulo">
-                                <span>POSESIÓN/NOTIFICACIÓN</span>
-                            </div>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field>
-                                    <mat-label class="letra">Posesión/Notificación</mat-label>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de posesiones y notificaciones.">
-                                        help_outline
-                                    </mat-icon>
-                                    <mat-select formControlName="posesionNotificacionForm" required>
-                                        <mat-option *ngFor="let ta of posesiones_notificaciones" [value]="ta.nombre">
-                                            {{ta.nombre}}
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Autoridad Nominadora
+                                    o su delegado</mat-label>
+                                <mat-form-field style="width: 15%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevGA">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Autoridad Nominadora o su delegado</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRF"
+                                        [matAutocomplete]="auto21">
+                                    <mat-autocomplete #auto21="matAutocomplete">
+                                        <mat-option *ngFor="let option of filtroNombreG | async"
+                                            [value]="option.empleado" (click)="onCargo(option, 2)">
+                                            {{option.empleado.toUpperCase()}}
                                         </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label>Descripción</mat-label>
-                                    <textarea matInput #descripcionP maxlength="200" placeholder="Ingresar las funcines"
-                                        formControlName="descripcionPForm"></textarea>
+                                    </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar la descripción de la posesión o notificación">
-                                        help_outline
+                                        matTooltip="Autoridad nominadora o su delegado.">
+                                        person
                                     </mat-icon>
-                                    <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
-                                    <mat-hint align="end">{{descripcionP.value.length}} / 200</mat-hint>
                                 </mat-form-field>
+                                <label *ngIf="cargoFirma2?.cargo != null && cargoFirma2?.cargo != ''"
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
+                    <div class="subtitulo">
+                        <span>RESPONSABLES DE FIRMAS</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-5">
+                            <label>ACEPTACIÓN Y/O RECEPCIÓN DEL SERVIDOR PÚBLICO</label>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Aceptación y/o
+                                    recepción del servidor público</mat-label>
+                                <mat-form-field style="width: 20%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevHF">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Aceptación y/o recepción del servidor público</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoHF"
+                                        [matAutocomplete]="auto22" required readonly>
+                                    <mat-autocomplete #auto22="matAutocomplete">
+                                        <mat-option *ngFor="let th of filtroNombreH | async" [value]="th.empleado">
+                                            {{th.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Identificación del funcionario.">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="contenedor-completo w-90">
+                                    <mat-label>Fecha</mat-label>
+                                    <input matInput [matDatepicker]="pickerfechaS" placeholder="dd/mm/aaaa"
+                                        formControlName="fechaServidorForm">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerfechaS" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Ingresar la fecha. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #pickerfechaS></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+
+                        </div>
+                        <div class="col-1" style="border-right: 1px solid #ccc;"></div>
+                        <div class="col-12 col-md-5">
+                            <label style="margin-left: 5px;">EN CASO DE NEGATIVA DE LA RECEPCIÓN (TESTIGO)</label>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">En caso de negativa
+                                    de la recepción</mat-label>
+                                <mat-form-field style="width: 20%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevGF">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>En caso de negativa de la recepción</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoGF"
+                                        [matAutocomplete]="auto23">
+                                    <mat-autocomplete #auto23="matAutocomplete">
+                                        <mat-option *ngFor="let th of filtroNombreN | async" [value]="th.empleado">
+                                            {{th.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Funcionario testigo en caso de negativa.">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="contenedor-completo w-90">
+                                    <mat-label>Fecha en caso de negativa</mat-label>
+                                    <input matInput [matDatepicker]="pickerNegativa" placeholder="dd/mm/aaaa"
+                                        formControlName="fechaNegativaForm">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerNegativa" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Ingresar la fecha. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #pickerNegativa></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="w-100">
+                                    <mat-label>Razón</mat-label>
+                                    <textarea matInput #acta placeholder="Detalle la razón por la negativa"
+                                        formControlName="razonForm" readonly></textarea>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row mt-4 w-100">
+                        <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
+                        <div class="col-12 col-md-5">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
+                                    Elaboración</mat-label>
+                                <mat-form-field style="width: 20%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevRGF">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Responsable de Elaboración</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRNA"
+                                        [matAutocomplete]="auto24">
+                                    <mat-autocomplete #auto24="matAutocomplete">
+                                        <mat-option *ngFor="let g of filtroNombreRE | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 3)">
+                                            {{g.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Funcionario responsable de la elaboración de la acción de personal.">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                                <label *ngIf="cargoFirma3?.cargo != null && cargoFirma3?.cargo != ''"
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
+                                    Revisión</mat-label>
+                                <mat-form-field style="width: 20%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevRHF">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Responsable de Revisión</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRNF"
+                                        [matAutocomplete]="auto25">
+                                    <mat-autocomplete #auto25="matAutocomplete">
+                                        <mat-option *ngFor="let g of filtroNombreRR | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 4)">
+                                            {{g.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Responsable de revisión de la acción de personal..">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                                <label *ngIf="cargoFirma4?.cargo != null && cargoFirma4?.cargo != ''"
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-1 w-100">
+                        <div class="col-12 col-md-5">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
+                                    Registro y Control</mat-label>
+                                <mat-form-field style="width: 20%;">
+                                    <input type="text" placeholder="ING." matInput [formControl]="abrevRRC">
+                                </mat-form-field>
+                                <mat-form-field style="width: 80%;">
+                                    <mat-label>Responsable de Registro y Control</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRRC"
+                                        [matAutocomplete]="auto26">
+                                    <mat-autocomplete #auto26="matAutocomplete">
+                                        <mat-option *ngFor="let g of filtroNombreRC | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 5)">
+                                            {{g.empleado.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Responsable del registro y control de la acción de personal.">
+                                        person
+                                    </mat-icon>
+                                </mat-form-field>
+                                <label *ngIf="cargoFirma5?.cargo != null && cargoFirma5?.cargo != ''"
+                                    style="font-size: medium;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-between">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
+                    <button mat-raised-button id="btn-raised" class="float-right"
+                        (click)="datosForm6(fivethFormGroup, stepper)">Siguiente</button>
                 </div>
-            </mat-step> -->
+            </mat-step>
 
         </mat-horizontal-stepper>
         <div style="text-align: center; margin-bottom: 3%;">

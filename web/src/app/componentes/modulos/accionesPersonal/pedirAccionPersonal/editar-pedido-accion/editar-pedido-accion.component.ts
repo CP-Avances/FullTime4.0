@@ -623,6 +623,84 @@ export class EditarPedidoAccionComponent implements OnInit {
     });
   }
 
+  onCargo(datos: any, firma: number) {
+    let info = {}
+    if (firma == 1) {
+      this.cargoFirma1 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    } else if (firma == 2) {
+      this.cargoFirma2 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    } else if (firma == 3) {
+      this.cargoFirma3 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    } else if (firma == 4) {
+      this.cargoFirma4 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    } else {
+      this.cargoFirma5 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }
+
+    // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
+    this.restE.BuscarEmpleadoNombre(info).subscribe((empl) => {
+      const x = {
+        id_empleado: empl[0].id,
+        id_cargo: empl[0].id_cargo_,
+        cargo: empl[0].name_cargo
+      }
+
+      if (firma == 1) {
+        this.cargoFirma1 = x
+      } else if (firma == 2) {
+        this.cargoFirma2 = x
+      } else if (firma == 3) {
+        this.cargoFirma3 = x
+      } else if (firma == 4) {
+        this.cargoFirma4 = x
+      } else if (firma == 5) {
+        this.cargoFirma5 = x
+      }
+
+    }, err => {
+      this.toastr.warning(
+        "El usuario seleccionado, no registra un cargo activo.",
+        "Advertencia.", { timeOut: 5000, }
+      );
+
+      const x = {
+        id_empleado: null,
+        id_cargo: null,
+        cargo: 'sin cargo'
+      }
+
+      if (firma == 1) {
+        this.cargoFirma1 = x
+      } else if (firma == 2) {
+        this.cargoFirma2 = x
+      } else if (firma == 3) {
+        this.cargoFirma3 = x
+      } else if (firma == 4) {
+        this.cargoFirma4 = x
+      } else if (firma == 5) {
+        this.cargoFirma5 = x
+      }
+
+    })
+
+
+  }
+
   // METODO PARA OBTENER LISTA DE CIUDADES
   id_sucursal: any = 0
   ObtenerSucursal() {
@@ -697,7 +775,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
-    InfoUser: any = {}
+  InfoUser: any = {}
   idUserSelect: any = 0;
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
@@ -798,7 +876,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
-    onSucursal(e: any) {
+  onSucursal(e: any) {
     if (e.id != undefined && e.id != null) {
       this.departamentosPro = [];
       const filtrados = this.departamentos.filter(item => item.id_sucursal == e.id);
@@ -824,11 +902,11 @@ export class EditarPedidoAccionComponent implements OnInit {
       // Marca los campos como tocados para mostrar errores
       this.thirdFormGroup.markAllAsTouched();
     } else {
-     
+
       this.ListaEmpleadosFirmas(this.idUserSelect);
       this.habilitarformPosesion = formValue.habilitarForm4
       stepper.next();
-      console.log('stepper.next(): ',stepper);
+      console.log('stepper.next(): ', stepper);
     }
   }
 
@@ -858,10 +936,10 @@ export class EditarPedidoAccionComponent implements OnInit {
         });
 
         var activarForm4 = false;
-        if(this.datosPedido[0].numero_acta_final != null && this.datosPedido[0].numero_acta_final != undefined && this.datosPedido[0].numero_acta_final != ""){
+        if (this.datosPedido[0].numero_acta_final != null && this.datosPedido[0].numero_acta_final != undefined && this.datosPedido[0].numero_acta_final != "") {
           activarForm4 = true
-        }else{
-           activarForm4 = false
+        } else {
+          activarForm4 = false
         }
 
         this.thirdFormGroup.patchValue({
@@ -892,8 +970,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           habilitarForm4: false
         });
 
-       this.thirdFormGroup.controls['habilitarForm4'].setValue(activarForm4);
-       console.log('habilitar form4: ',this.thirdFormGroup.value)
+        this.thirdFormGroup.controls['habilitarForm4'].setValue(activarForm4);
 
         this.fourthFormGroup.patchValue({
           funcionarioForm: this.datosPedido[0].nombres,
@@ -903,16 +980,29 @@ export class EditarPedidoAccionComponent implements OnInit {
           actaFinalForm: this.datosPedido[0].numero_acta_final,
           fechaActaFinalForm: this.datosPedido[0].fecha_acta_final,
         });
-        
-        // this.fourthFormGroup.patchValue({
-        //   funcionesReempForm: this.datosPedido[0].funciones_reemplazo,
-        //   nombreReempForm: this.datosPedido[0].nombre_reemplazo,
-        //   puestoReempForm: this.datosPedido[0].puesto_reemplazo,
-        //   accionReempForm: this.datosPedido[0].numero_accion_reemplazo,
-        //   fechaReempForm: this.datosPedido[0].primera_fecha_reemplazo,
-        //   posesionNotificacionForm: this.datosPedido[0].posesion_notificacion,
-        //   descripcionPForm: this.datosPedido[0].descripcion_posesion_notificacion,
-        // });
+
+        console.log('habilitar form4: ', this.fourthFormGroup.value)
+
+        this.fivethFormGroup.patchValue({
+          idEmpleadoRAForm: this.datosPedido[0].idEmpleadoRA,
+          idEmpleadoRForm: this.datosPedido[0].idEmpleadoRF,
+          idEmpleadoHForm: this.datosPedido[0].idEmpleadoHF,
+          idEmpleadoGForm: this.datosPedido[0].idEmpleadoRA,
+          abrevHAForm: this.datosPedido[0].abrevHA,
+          abrevGAForm: this.datosPedido[0].abrevGA,
+          abrevHForm: this.datosPedido[0].abrevHAF,
+          abrevGForm: this.datosPedido[0].abrevG,         
+          fechaServidorForm: this.datosPedido[0].fechaServidorForm,
+          fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
+          razonForm: this.datosPedido[0].razonForm,
+
+          idEmpleadoRNAForm: this.datosPedido[0].idEmpleadoRNA,
+          idEmpleadoRNForm: this.datosPedido[0].idEmpleadoRNF,
+          idEmpleadoRRCForm: this.datosPedido[0].idEmpleadoRRC,
+          abrevRGForm:this.datosPedido[0].abrevRGF,
+          abrevRHForm: this.datosPedido[0].abrevRHF,
+          abrevRRCForm: this.datosPedido[0].abrevRRC,
+        });
 
       });
   }
