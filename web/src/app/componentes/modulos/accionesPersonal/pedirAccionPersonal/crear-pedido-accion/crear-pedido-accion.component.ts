@@ -365,6 +365,21 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.ObtenerCargos();
       this.MostrarDatos();
     }
+
+
+    this.firstFormGroup.statusChanges.subscribe(status => {
+      const error = this.firstFormGroup.errors?.['rangoFechasInvalido'];
+      if (error) {
+        this.mostrarToastError();
+      }
+    });
+
+  }
+
+  mostrarToastError() {
+    this.toastr.warning('La fecha final no puede ser menor a la fecha inicial.', '', {
+      timeOut: 6000,
+    });
   }
 
   //METODO PARA VALIDAR DATOS EN LOS FORMULARIOS
@@ -597,8 +612,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (e.option.value != undefined && e.option.value != null) {
       this.tipos_accion.forEach(item => {
         if (item.descripcion == e.option.value) {
-          this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
-          this.textoFijo = item.base_legal + ' ';
+          this.textoFijo = item.base_legal;
         }
       });
 
@@ -610,29 +624,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
       this.secondFormGroup.controls['otroAccionForm'].setValue("");
       this.secondFormGroup.controls['otroEspecificacion'].setValue("");
-    }
-  }
-  onInputChange(event: any) {
-    const inputValue = event.target.value;
-    if (!inputValue.startsWith(this.textoFijo)) {
-      event.target.value = this.textoFijo
-      return;
-    }
-    this.secondFormGroup.controls['baseLegalForm'].setValue(inputValue);
-  }
-  onKeyDown(event: KeyboardEvent) {
-    const input = event.target as HTMLInputElement;
-    if (input.selectionStart! <= this.textoFijo.trim().length) {
-      const teclasBloqueadas = ['Backspace', 'Delete', 'ArrowLeft'];
-
-      if (teclasBloqueadas.includes(event.key)) {
-        event.preventDefault();
-      }
-    }
-  }
-  onFocus() {
-    if (this.baseLegalForm.value === this.textoFijo.trim()) {
-      this.baseLegalForm.setValue(this.textoFijo + ' ');
+    }else{ 
+       this.textoFijo = ""
     }
   }
 
