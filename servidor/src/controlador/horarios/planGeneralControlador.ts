@@ -221,6 +221,7 @@ class PlanGeneralControlador {
 
     // METODO PARA ELIMINAR REGISTROS    **USADO
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+        console.log("ENTRA AL METODO ELIMINAR AHORITA SIENDO REVISADO")
         var errores: number = 0;
         let ocurrioError = false;
         let mensajeError = '';

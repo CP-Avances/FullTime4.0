@@ -208,9 +208,20 @@
                                 <mat-label>¿Presentó la declaración jurada?</mat-label>
                                 <mat-radio-group class="example-radio-group" [formControl]="declaracionJuradaF"
                                     aria-label="Select an option">
-                                    <mat-radio-button class="example-radio-button" value="true">Si</mat-radio-button>
-                                    <mat-radio-button class="example-radio-button" value="false">No
-                                        aplica</mat-radio-button>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <mat-radio-button class="example-radio-button" value="true">
+                                                Si
+                                            </mat-radio-button>
+                                        </div>
+                                        <div class="col-md">
+                                            <mat-radio-button class="example-radio-button" value="false">
+                                                No aplica
+                                            </mat-radio-button>
+                                        </div>
+                                        <div class="col-md">
+                                        </div>
+                                    </div>
                                 </mat-radio-group>
                             </div>
                         </div>

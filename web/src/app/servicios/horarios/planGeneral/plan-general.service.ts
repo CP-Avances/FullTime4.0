@@ -28,11 +28,13 @@ export class PlanGeneralService {
 
   // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   **USADO
   BuscarFechasMultiples(datos: any) {
+    console.log(">>> Enviando a BuscarFechasMultiples:", datos);
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/buscar_fechas_multiple`, datos);
   }
 
   // METODO PARA ELIMINAR REGISTROS    **USADO
   EliminarRegistro(data: any,) {
+    console.log(">>> Enviando a eliminar:", data);
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacion_general/eliminar`, data);
   }
 

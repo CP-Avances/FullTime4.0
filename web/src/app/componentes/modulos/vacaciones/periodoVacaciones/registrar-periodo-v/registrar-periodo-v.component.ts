@@ -2,7 +2,6 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { DateTime } from 'luxon';
 
 import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
@@ -15,7 +14,6 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
   standalone: false,
   templateUrl: './registrar-periodo-v.component.html',
   styleUrls: ['./registrar-periodo-v.component.css'],
-
 })
 
 export class RegistrarPeriodoVComponent implements OnInit {
@@ -24,37 +22,38 @@ export class RegistrarPeriodoVComponent implements OnInit {
   @Input() datoEmpleado: any;
   @Input() pagina: string = '';
 
-  // Datos del empleado
-  empleados: any = [];
-
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
-  nombreEmpleadoF = new FormControl('', [Validators.required]);
-  descripcionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
-  diaVacacionF = new FormControl(0, [Validators.required]);
-  horaVacacionF = new FormControl(0, [Validators.required]);
-  minVacacionF = new FormControl(0, [Validators.required]);
-  diaAntiguedadF = new FormControl(0, [Validators.required]);
-  estadoF = new FormControl('', [Validators.required]);
-  fechaFinF = new FormControl();
+  observacionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   fechaInicioF = new FormControl('', [Validators.required]);
+  fechaFinF = new FormControl();
+  fechaCargaF = new FormControl();  // FECHA DESDE LA QUE SE TIENE QUE EMPEZAR HACER LOS CALCULOS
+  fechaActualizacionF = new FormControl();
+  diasVacacionF = new FormControl(0, [Validators.required]);
+  diasUsadosVacacionF = new FormControl(0, [Validators.required]);
+  diaAntiguedadF = new FormControl(0, [Validators.required]);
+  diasUsadosAntiguedadF = new FormControl(0, [Validators.required]);
   diaPerdidoF = new FormControl(0, [Validators.required]);
+  fechaPerdidaF = new FormControl();
+  estadoF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public PerVacacionesForm = new FormGroup({
-    nombreEmpleadoForm: this.nombreEmpleadoF,
-    descripcionForm: this.descripcionF,
-    diaVacacionForm: this.diaVacacionF,
-    horaVacacionForm: this.horaVacacionF,
-    minVacacionForm: this.minVacacionF,
-    diaAntiguedadForm: this.diaAntiguedadF,
-    estadoForm: this.estadoF,
-    fechaFinForm: this.fechaFinF,
+    observacionForm: this.observacionF,
     fechaInicioForm: this.fechaInicioF,
-    diaPerdidoForm: this.diaPerdidoF
+    fechaFinForm: this.fechaFinF,
+    fechaCargaForm: this.fechaCargaF,
+    fechaActualizacionForm: this.fechaActualizacionF,
+    diasVacacionForm: this.diasVacacionF,
+    diasUsadosVacacionForm: this.diasUsadosVacacionF,
+    diaAntiguedadForm: this.diaAntiguedadF,
+    diasUsadosAntiguedadForm: this.diasUsadosAntiguedadF,
+    diaPerdidoForm: this.diaPerdidoF,
+    fechaPerdidaForm: this.fechaPerdidaF,
+    estadoForm: this.estadoF,
   });
 
   constructor(
@@ -72,29 +71,15 @@ export class RegistrarPeriodoVComponent implements OnInit {
       this.ips_locales = ips;
     });
 
-    this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerContrato();
     this.PerVacacionesForm.patchValue({
-      diaVacacionForm: 0,
-      horaVacacionForm: 0,
-      minVacacionForm: 0,
+      diasVacacionForm: 0,
+      diasUsadosVacacionForm: 0,
       diaAntiguedadForm: 0,
+      diasUsadosAntiguedadForm: 0,
       diaPerdidoForm: 0
     })
   }
-
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO
-  ObtenerEmpleados(idemploy: any) {
-    this.empleados = [];
-    this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
-      this.empleados = data;
-      console.log(this.empleados)
-      this.PerVacacionesForm.patchValue({
-        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-      })
-    })
-  }
-
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
   datosContrato: any = [];
@@ -127,27 +112,31 @@ export class RegistrarPeriodoVComponent implements OnInit {
 
   InsertarPerVacacion(form: any) {
     let datosPerVacaciones = {
-      id_empl_contrato: this.datoEmpleado.idContrato,
-      descripcion: form.descripcionForm,
-      dia_vacacion: form.diaVacacionForm,
-      dia_antiguedad: form.diaAntiguedadForm,
-      estado: form.estadoForm,
-      fec_inicio: form.fechaInicioForm,
-      fec_final: form.fechaFinForm,
-      dia_perdido: form.diaPerdidoForm,
-      horas_vacaciones: form.horaVacacionForm,
-      min_vacaciones: form.minVacacionForm,
-      id_empleado: this.empleados[0].id,
+      id_empleado: this.datoEmpleado.idEmpleado,
+      observacion: form.observacionForm,
+      fecha_inicio: form.fechaInicioForm,
+      fecha_final: form.fechaFinForm,
+      fecha_carga: form.fechaCargaForm,
+      fecha_actualizacion: form.fechaActualizacionForm,
+      dias_vacacion: form.diasVacacionForm,
+      dias_usados_vacacion: form.diasUsadosVacacionForm,
+      dias_antiguedad: form.diaAntiguedadForm,
+      dias_usados_antiguedad: form.diasUsadosAntiguedadForm,
+      dias_perdido: form.diaPerdidoForm,
+      fecha_perdida: form.fechaPerdidaForm,
+      estado: true,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
+    console.log('ver periodo de vacaciones ', datosPerVacaciones);
     this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {
+      this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado.', {
         timeOut: 6000,
       })
       this.CerrarVentana();
     }, error => {
-      this.toastr.error('Ups! algo salio mal.', 'Período de Vacaciones no fue registrado', {
+      this.toastr.error('Ups! algo salio mal.', 'Período de Vacaciones no fue registrado.', {
         timeOut: 6000,
       })
     });
@@ -168,7 +157,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
   }
 
   ObtenerMensajeErrorNombre() {
-    if (this.descripcionF.hasError('required')) {
+    if (this.observacionF.hasError('required')) {
       return 'Campo obligatorio';
     }
   }
@@ -178,29 +167,23 @@ export class RegistrarPeriodoVComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  dInicio: any;
+
   validarFecha(event: any) {
     this.PerVacacionesForm.patchValue({
       fechaFinForm: ''
     });
-    this.dInicio = event.value._i;
-    var fecha = this.dInicio.toISOString();
-    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
+    // FORMATO ISO: "2025-06-11"
+    const fecha = event.value.toISODate();
+    // console.log('Fecha:', fecha);
     this.rest.BuscarDatosContrato(this.datoEmpleado.idContrato).subscribe(data => {
-      //console.log('ver data ', data)
-      if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(ingreso)) {
-        if (data[0].descripcion === 'CODIGO DE TRABAJO') {
-          fecha.setMonth(fecha.getMonth() + 12);
-          this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
-        }
-        else if (data[0].descripcion === 'LOSEP') {
-          fecha.setMonth(fecha.getMonth() + 11);
-          this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
-        }
-        else if (data[0].descripcion === 'LOES') {
-          fecha.setMonth(fecha.getMonth() + 11);
-          this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
-        }
+      // console.log('ver data ', data)
+      if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(fecha)) {
+        // SUMAR MESES DE PERIODO A LA FECHA
+        const fechaModificada = event.value.plus({ months: data[0].mes_periodo });
+        // RESTAMOS UN DIA A LA FECHA
+        const fechaMenosUnDia = fechaModificada.minus({ days: 1 });
+        //console.log('fecha menos un dia ', fechaMenosUnDia)
+        this.PerVacacionesForm.patchValue({ fechaFinForm: fechaMenosUnDia.toISODate() });
       }
       else {
         this.PerVacacionesForm.patchValue({ fechaInicioForm: '' });
