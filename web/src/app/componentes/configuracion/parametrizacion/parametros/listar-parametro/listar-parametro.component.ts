@@ -56,6 +56,7 @@ export class ListarParametroComponent implements OnInit {
   public formulario = new FormGroup({
     descripcionForm: this.descripcionF,
   });
+  toastr: any;
 
   constructor(
     public restE: EmpleadoService,
@@ -186,17 +187,51 @@ export class ListarParametroComponent implements OnInit {
    ** ************************************************************************************************** **/
 
 
-  async GenerarPdf(action = 'open') {
+async GenerarPdf(action = 'open') {
+  if (action === 'download') {
+const data = {
+  nombreUsuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+  nombreEmpresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+  fraseMarcaAgua: this.frase,
+  logoBase64: this.logo,
+  colorPrincipal: this.p_color,
+  colorSecundario: this.s_color,
+  parametros: this.parametros.map((param: any) => ({
+    id: param.id,
+    descripcion: param.descripcion,
+    detalles: param.detalles.map((detalle: any) => ({
+      id: detalle.id,
+      descripcion: detalle.descripcion,
+      observacion: detalle.observacion
+    }))
+  }))
+};
+
+
+    console.log("Enviando al microservicio:", data);
+
+    this.validar.generarReporteParametrosGenerales(data).subscribe((pdfBlob: Blob) => {
+      FileSaver.saveAs(pdfBlob, 'Parametros_Generales.pdf');
+      console.log("PDF generado correctamente desde el microservicio.");
+    }, error => {
+      console.error("Error al generar PDF desde el microservicio:", error);
+      const mensaje = error?.error?.message || 'Error desconocido al generar el reporte.';
+      this.toastr.error(mensaje, 'Error');
+    });
+
+  } else {
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Parametros_generales' + '.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Parametros_Generales.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
+}
+
+
 
   DefinirInformacionPDF() {
     return {

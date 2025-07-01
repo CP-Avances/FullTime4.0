@@ -350,7 +350,7 @@ export class ListarGeneroComponent {
         empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
         fraseMarcaAgua: this.frase,
         logoBase64: this.logo,
-        colorPrincipal: this.p_color, 
+        colorPrincipal: this.p_color,
         generos: this.generos
       };
       console.log("Enviando al microservicio:", data);
@@ -361,6 +361,10 @@ export class ListarGeneroComponent {
         console.log("Recibido del microservicio:");
       }, error => {
         console.error('Error al generar PDF desde el microservicio:', error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'Error'
+        );
       });
     }
     else {

@@ -612,6 +612,14 @@ export class ValidacionesService {
   }
 
   //MICROSERVICIO
+
+  generarReporteParametrosGenerales(data: any) {
+  return this.http.post('http://localhost:8080/api/reportes/parametros-generales/pdf', data, {
+    responseType: 'blob'
+  });
+}
+
+
   generarReporteGeneros(data: any) {
     return this.http.post('http://localhost:8080/api/reportes/generos/pdf', data, {
       responseType: 'blob'
