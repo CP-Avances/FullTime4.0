@@ -750,6 +750,27 @@ export class ValidacionesService {
     });
   }
 
+  generarReporteAsistencia(data: any) {
+    return this.http.post('http://localhost:8080/reporte/asistencia/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteFaltas(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/faltas/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTimbreIncompleto(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/faltas/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+
+
 
 
 

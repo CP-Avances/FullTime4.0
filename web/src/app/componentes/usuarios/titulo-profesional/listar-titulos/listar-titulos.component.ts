@@ -106,10 +106,10 @@ export class ListarTitulosComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();
@@ -410,47 +410,52 @@ export class ListarTitulosComponent implements OnInit {
    ** ************************************************************************************************* **/
 
 
-async GenerarPdf(action = "open") {
-  if (action === "download") {
-    const data = {
-      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-      fraseMarcaAgua: this.frase,
-      logoBase64: this.logo,
-      colorPrincipal: this.p_color,
-      titulos: this.verTitulos.map((obj: any) => ({
-        id: obj.id,
-        nivel: obj.nivel,
-        nombre: obj.nombre
-      }))
-    };
+  async GenerarPdf(action = "open") {
+    if (action === "download") {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        titulos: this.verTitulos.map((obj: any) => ({
+          id: obj.id,
+          nivel: obj.nivel,
+          nombre: obj.nombre
+        }))
+      };
 
-    console.log("Enviando al microservicio:", data);
+      console.log("Enviando al microservicio:", data);
 
-    this.validar.generarReporteTitulos(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'Titulos.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-      console.error("Error al generar PDF desde el microservicio:", error);
-    });
+      this.validar.generarReporteTitulos(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, 'Titulos.pdf');
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
 
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'Error'
+        );
+      });
 
-    switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+
+      switch (action) {
+        case "open":
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+        case "print":
+          pdfMake.createPdf(documentDefinition).print();
+          break;
+        default:
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+      }
     }
   }
-}
 
 
 
@@ -719,7 +724,7 @@ async GenerarPdf(action = "open") {
   /** ************************************************************************************************** **
    ** **                           METODO DE SELECCION MULTIPLE DE DATOS                              ** **
    ** ************************************************************************************************** **/
-  
+
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -809,17 +814,17 @@ async GenerarPdf(action = "open") {
       ip: this.ip,
       ip_local: this.ips_locales
     };
-  
+
     let eliminados = 0;
     let totalProcesados = 0;
     const totalSeleccionados = this.selectionTitulos.selected.length;
-  
+
     this.titulosEliminar = this.selectionTitulos.selected;
-  
+
     this.titulosEliminar.forEach((datos: any) => {
       this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         totalProcesados++;
-  
+
         if (res.message === 'error') {
           this.toastr.warning('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -828,14 +833,14 @@ async GenerarPdf(action = "open") {
           eliminados++;
           this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
         }
-  
+
         if (totalProcesados === totalSeleccionados) {
           if (eliminados > 0) {
             this.toastr.error(`Se ha eliminado ${eliminados} registro${eliminados > 1 ? 's' : ''}.`, '', {
               timeOut: 6000,
             });
           }
-  
+
           this.selectionTitulos.clear();
           this.titulosEliminar = [];
           this.ObtenerTitulos();
@@ -843,7 +848,7 @@ async GenerarPdf(action = "open") {
       });
     });
   }
-  
+
 
   // METODO DE CONFIRMACION DE ELIMINACION
   ConfirmarDeleteMultiple() {
@@ -887,23 +892,23 @@ async GenerarPdf(action = "open") {
     }
   }
 
-  getCrearTituloProfesional(){
+  getCrearTituloProfesional() {
     return this.tienePermiso('Crear Título Profesional');
   }
 
-  getPlantilla(){
+  getPlantilla() {
     return this.tienePermiso('Cargar Plantilla Títulos Profesionales');
   }
 
-  getEditarTituloProfesional(){
+  getEditarTituloProfesional() {
     return this.tienePermiso('Editar Título Profesional');
   }
 
-  getEliminarTituloProfesional(){
+  getEliminarTituloProfesional() {
     return this.tienePermiso('Eliminar Título Profesional');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Títulos Profesionales');
   }
 

@@ -367,16 +367,67 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
   async GenerarPDF(action: any) {
     const pdfMake = await this.validar.ImportarPDF();
-    let documentDefinition: any;
-    documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    const doc_name = `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+
+    // Si la acción es 'download', enviar al microservicio
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print'),
+        empresa: localStorage.getItem('name_empresa'),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        fechaInicio: this.rangoFechas.fec_inico,
+        fechaFin: this.rangoFechas.fec_final,
+        opcionBusqueda: this.opcionBusqueda,
+        resumen: this.bool.bool_emp,
+        grupos: this.data_pdf.map(grupo => ({
+          sucursal: grupo.sucursal,
+          ciudad: grupo.ciudad,
+          nombre: grupo.nombre,
+          departamento: grupo.departamento,
+          empleados: grupo.empleados.map(emp => ({
+            identificacion: emp.identificacion,
+            codigo: emp.codigo,
+            nombre: emp.nombre,
+            apellido: emp.apellido,
+            regimen: emp.regimen,
+            departamento: emp.departamento,
+            correo: emp.correo,
+            cargo: emp.cargo,
+            rol: emp.rol,
+            genero: emp.genero,
+            id_nacionalidad: emp.id_nacionalidad,
+            faltas: emp.faltas.map((f: any) => ({
+              fecha: f.fecha
+            }))
+          }))
+        }))
+      };
+
+      this.validar.generarReporteFaltas(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, doc_name);
+        console.log("✅ PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("❌ Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
+          'Error'
+        );
+      });
+
+    } else {
+      // Para open y print sigue usando pdfMake
+      const documentDefinition = this.DefinirInformacionPDF();
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

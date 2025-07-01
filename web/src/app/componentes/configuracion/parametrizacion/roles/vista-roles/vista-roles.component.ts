@@ -244,54 +244,58 @@ export class VistaRolesComponent implements OnInit {
 
 
   // METODO PARA CREAR ARCHIVO PDF
-async GenerarPdf(action = "open", id: number) {
-  this.SeleccionarDatos(id); // ← ya carga this.datos_archivo correctamente
+  async GenerarPdf(action = "open", id: number) {
+    this.SeleccionarDatos(id); // ← ya carga this.datos_archivo correctamente
 
-  if (action === "download") {
-    const data = {
-      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-      fraseMarcaAgua: this.frase,
-      logoBase64: this.logoE,
-      colorSecundario: this.s_color,
-      colorPrincipal: this.p_color, 
-      roles: this.datos_archivo.map((rol: any) => ({
-        nombre: rol.nombre,
-        funciones: rol.funciones.map((f: any) => ({
-          pagina: f.pagina,
-          accion: f.accion,
-          nombre_modulo: f.nombre_modulo,
-          movil: f.movil
+    if (action === "download") {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logoE,
+        colorSecundario: this.s_color,
+        colorPrincipal: this.p_color,
+        roles: this.datos_archivo.map((rol: any) => ({
+          nombre: rol.nombre,
+          funciones: rol.funciones.map((f: any) => ({
+            pagina: f.pagina,
+            accion: f.accion,
+            nombre_modulo: f.nombre_modulo,
+            movil: f.movil
+          }))
         }))
-      }))
-    };
+      };
 
-    console.log("Enviando al microservicio:", data);
+      console.log("Enviando al microservicio:", data);
 
-    this.validar.generarReporteRoles(data).subscribe((pdfBlob: Blob) => {
-      const nombreArchivo = 'Roles.pdf';
-      FileSaver.saveAs(pdfBlob, nombreArchivo);
-      console.log("Recibido del microservicio correctamente.");
-    }, error => {
-      console.error('Error al generar PDF desde el microservicio:', error);
-    });
+      this.validar.generarReporteRoles(data).subscribe((pdfBlob: Blob) => {
+        const nombreArchivo = 'Roles.pdf';
+        FileSaver.saveAs(pdfBlob, nombreArchivo);
+        console.log("Recibido del microservicio correctamente.");
+      }, error => {
+        console.error('Error al generar PDF desde el microservicio:', error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'Error'
+        );
+      });
 
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF(); // ← versión local de pdfMake
-    switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF(); // versión local de pdfMake
+      switch (action) {
+        case "open":
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+        case "print":
+          pdfMake.createPdf(documentDefinition).print();
+          break;
+        default:
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+      }
     }
   }
-}
 
 
   DefinirInformacionPDF() {

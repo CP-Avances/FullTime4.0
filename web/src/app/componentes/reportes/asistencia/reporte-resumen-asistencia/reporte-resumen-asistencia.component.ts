@@ -374,16 +374,91 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print'),
+        empresa: localStorage.getItem('name_empresa'),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        fechaInicio: this.rangoFechas.fec_inico,
+        fechaFin: this.rangoFechas.fec_final,
+        opcionBusqueda: this.opcionBusqueda,
+        resumen: this.bool,
+        grupos: this.data_pdf.map(grupo => ({
+          sucursal: grupo.sucursal,
+          ciudad: grupo.ciudad,
+          nombre: grupo.nombre,
+          departamento: grupo.departamento,
+          empleados: grupo.empleados.map(emp => ({
+            identificacion: emp.identificacion,
+            codigo: emp.codigo,
+            nombre: emp.nombre,
+            apellido: emp.apellido,
+            regimen: emp.regimen,
+            departamento: emp.departamento,
+            cargo: emp.cargo,
+            tLaborado: emp.tLaborado.map(reg => ({
+              tipo: reg.tipo,
+              origen: reg.origen,
+              control: reg.control,
+              entrada: {
+                fecha_horario: reg.entrada?.fecha_horario,
+                fecha_hora_horario: reg.entrada?.fecha_hora_horario,
+                fecha_hora_timbre: reg.entrada?.fecha_hora_timbre,
+              },
+              salida: {
+                fecha_horario: reg.salida?.fecha_horario,
+                fecha_hora_horario: reg.salida?.fecha_hora_horario,
+                fecha_hora_timbre: reg.salida?.fecha_hora_timbre,
+              },
+              inicioAlimentacion: {
+                fecha_horario: reg.inicioAlimentacion?.fecha_horario,
+                fecha_hora_horario: reg.inicioAlimentacion?.fecha_hora_horario,
+                fecha_hora_timbre: reg.inicioAlimentacion?.fecha_hora_timbre,
+                minutos_alimentacion: reg.inicioAlimentacion?.minutos_alimentacion,
+              },
+              finAlimentacion: {
+                fecha_horario: reg.finAlimentacion?.fecha_horario,
+                fecha_hora_horario: reg.finAlimentacion?.fecha_hora_horario,
+                fecha_hora_timbre: reg.finAlimentacion?.fecha_hora_timbre,
+              },
+              minLaborados: reg.minLaborados,
+              minPlanificados: reg.minPlanificados,
+              minAlimentacion: reg.minAlimentacion,
+              minAtrasos: reg.minAtrasos,
+              minSalidasAnticipadas: reg.minSalidasAnticipadas
+            }))
+          }))
+        }))
+      };
+
+      console.log("ENVIAND AL MICROSERVICIO:", data)
+      // Llamar al microservicio
+      this.validar.generarReporteAsistencia(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+        FileSaver.saveAs(pdfBlob, doc_name);
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
+          'Error'
+        );
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

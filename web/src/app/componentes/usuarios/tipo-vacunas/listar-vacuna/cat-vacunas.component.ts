@@ -388,46 +388,51 @@ export class CatVacunasComponent implements OnInit {
    ** ************************************************************************************************* **/
 
 
-async GenerarPdf(action = "open") {
-  if (action === "download") {
-    const data = {
-      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-      fraseMarcaAgua: this.frase,
-      logoBase64: this.logo,
-      colorPrincipal: this.p_color,
-      vacunas: this.vacunas.map((obj: any) => ({
-        id: obj.id,
-        nombre: obj.nombre
-      }))
-    };
+  async GenerarPdf(action = "open") {
+    if (action === "download") {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        vacunas: this.vacunas.map((obj: any) => ({
+          id: obj.id,
+          nombre: obj.nombre
+        }))
+      };
 
-    console.log("Enviando al microservicio:", data);
+      console.log("Enviando al microservicio:", data);
 
-    this.validar.generarReporteVacunas(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'Vacunas.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-      console.error("Error al generar PDF desde el microservicio:", error);
-    });
+      this.validar.generarReporteVacunas(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, 'Vacunas.pdf');
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
 
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'Error'
+        );
+      });
 
-    switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+
+      switch (action) {
+        case "open":
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+        case "print":
+          pdfMake.createPdf(documentDefinition).print();
+          break;
+        default:
+          pdfMake.createPdf(documentDefinition).open();
+          break;
+      }
     }
   }
-}
 
 
   DefinirInformacionPDF() {
