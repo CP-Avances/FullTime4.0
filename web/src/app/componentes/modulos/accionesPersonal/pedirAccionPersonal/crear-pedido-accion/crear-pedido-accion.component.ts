@@ -390,19 +390,25 @@ export class CrearPedidoAccionComponent implements OnInit {
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.empleados.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
-      );
+      const filterValue = value.toUpperCase().trim().split(/\s+/);
+      return this.empleados.filter((info: any) => {
+        const nombreCompleto = info.empleado.toUpperCase();
+        return filterValue.every(fragmento =>
+          nombreCompleto.includes(fragmento)
+        );
+      });  
     }
   }
 
   private _filtrarEmpleadoR(value: string): any {
     if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.listaAuxiliar.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
-      );
+      const filterValue = value.toUpperCase().trim().split(/\s+/);
+      return this.listaAuxiliar.filter((info: any) => {
+        const nombreCompleto = info.empleado.toUpperCase();
+        return filterValue.every(fragmento =>
+          nombreCompleto.includes(fragmento)
+        );
+      });
     }
   }
 
