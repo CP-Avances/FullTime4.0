@@ -1,4 +1,4 @@
-import { FormControl, Validators, FormGroup, ValidatorFn, AbstractControl } from "@angular/forms";
+import { FormControl, Validators, FormGroup, AbstractControl, ValidatorFn } from "@angular/forms";
 import { Component, OnInit, Input } from "@angular/core";
 import { startWith, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
@@ -6,24 +6,23 @@ import { Observable } from "rxjs";
 import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
 
-// IMPORTACION DE SERVICIOS
+/** IMPORTACION DE SERVICIOS */
 import { AccionPersonalService } from "src/app/servicios/modulos/modulo-acciones-personal/accionPersonal/accion-personal.service";
 import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
-import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
-import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
-import { ProcesoService } from "src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service";
-import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciudad/ciudad.service";
-
-import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedido-accion.component";
 import { AsignacionesService } from "src/app/servicios/usuarios/asignaciones/asignaciones.service";
-import { CatGrupoOcupacionalService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service";
-import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service";
+import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
+import { ProcesoService } from "src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service";
+import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
-import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
+import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciudad/ciudad.service";
 import { SucursalService } from "src/app/servicios/configuracion/localizacion/sucursales/sucursal.service";
 import { DepartamentosService } from "src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service";
+import { CatGrupoOcupacionalService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service";
+import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service";
 import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
+import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedido-accion.component";
 
 export function rangoFechasValidator(fechaInicioKey: string, fechaFinKey: string): ValidatorFn {
   return (formGroup: AbstractControl): { [key: string]: any } | null => {
@@ -133,7 +132,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   idTipoAccion = new FormControl("");
   otroAccionF = new FormControl("");
   otroEspecificacion = new FormControl("");
-  declaracionJuradaForm = new FormControl(false);
+  declaracionJuradaF = new FormControl(false);
   observacionForm = new FormControl("");
   baseLegalForm = new FormControl("");
 
@@ -215,7 +214,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     idTipoAccionFom: this.idTipoAccion,
     otroAccionForm: this.otroAccionF,
     otroEspecificacion: this.otroEspecificacion,
-    declaracionJuradaForm: this.declaracionJuradaForm,
+    declaracionJuradaForm: this.declaracionJuradaF,
     observacionForm: this.observacionForm,
     baseLegalForm: this.baseLegalForm
   });
@@ -285,6 +284,9 @@ export class EditarPedidoAccionComponent implements OnInit {
     idEmpleadoCForm: this.idEmpleadoC
   })
 
+  get habilitarAccion(): boolean {
+    return this.funciones.accionesPersonal;
+  }
 
   // INICIACION DE VARIABLES
   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
@@ -304,23 +306,23 @@ export class EditarPedidoAccionComponent implements OnInit {
   private timerInterval: any;
 
   constructor(
-    public restProcesos: ProcesoService,
-    public restEmpresa: EmpresaService,
-    public componentel: ListarPedidoAccionComponent,
-    public restAccion: AccionPersonalService,
-    public validar: ValidacionesService,
-    public restE: EmpleadoService,
-    public restC: CiudadService,
-    private toastr: ToastrService,
     private asignaciones: AsignacionesService,
+    public restProcesos: ProcesoService,
     public restGrupo: CatGrupoOcupacionalService,
     public restGrado: CatGradoService,
+    public restEmpresa: EmpresaService,
+    public restAccion: AccionPersonalService,
     private funciones: MainNavService,
+    private validar: ValidacionesService,
+    private toastr: ToastrService,
+    public restE: EmpleadoService,
     public restUsu: UsuarioService,
     public restSu: SucursalService,
     public restDe: DepartamentosService,
+    public restC: CiudadService,
     public restCargo: CatTipoCargosService,
-    public router: Router
+    public router: Router,
+    public componentel: ListarPedidoAccionComponent,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
@@ -333,43 +335,85 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.ips_locales = ips;
     });
 
-    this.CargarInformacion();
-    // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
-    var f = DateTime.now();
-    this.FechaActual = f.toFormat("yyyy-MM-dd");
-    this.firstFormGroup.patchValue({
-      fechaForm: this.FechaActual,
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
+    if (this.habilitarAccion === false) {
+      let mensaje = {
+        access: false,
+        title: `Ups! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
+        message: "¿Te gustaría activarlo? Comunícate con nosotros.",
+        url: "www.casapazmino.com.ec",
+      };
+      return this.validar.RedireccionarHomeAdmin(mensaje);
+    } else {
+
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+      // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
+      var f = DateTime.now();
+      this.FechaActual = f.toFormat("yyyy-MM-dd");
+      this.firstFormGroup.patchValue({
+        fechaForm: this.FechaActual,
+      });
+
+      // INVOCACION A LOS METODOS PARA CARGAR DATOS
+      this.ObtenerTiposAccion();
+      this.ObtenerEmpleados();
+      this.ObtenerSucursal();
+      this.ObtenerDepartamentos();
+      this.ObtenerCiudades();
+      this.ObtenerProcesos();
+      this.ObtenerGrupoOcupacional();
+      this.ObtenerGrados();
+      this.ObtenerCargos();
+      this.MostrarDatos();
+
+      this.CargarInformacion();
+
+    }
+
+    this.firstFormGroup.statusChanges.subscribe(status => {
+      const error = this.firstFormGroup.errors?.['rangoFechasInvalido'];
+      if (error) {
+        this.mostrarToastError();
+      }
     });
-    // INVOCACION A LOS METODOS PARA CARGAR DATOS
-    this.ObtenerTiposAccion();
-    this.ObtenerEmpleados();
-    this.ObtenerSucursal();
-    this.ObtenerDepartamentos();
-    this.ObtenerCiudades();
-    this.ObtenerProcesos();
-    this.ObtenerGrupoOcupacional();
-    this.ObtenerGrados();
-    this.ObtenerCargos();
-    this.MostrarDatos();
 
   }
 
-  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  mostrarToastError() {
+    this.toastr.warning('La fecha final no puede ser menor a la fecha inicial.', '', {
+      timeOut: 6000,
+    });
+  }
+
+  //METODO PARA VALIDAR DATOS EN LOS FORMULARIOS
+  siguiente(form: string) {
+    console.log('usuario: ', this.InfoUser)
+  }
+
+   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.empleados.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
-      );
+      const filterValue = value.toUpperCase().trim().split(/\s+/);
+      return this.empleados.filter((info: any) => {
+        
+        const nombreCompleto = info.empleado.toUpperCase();
+        return filterValue.every(fragmento =>
+          nombreCompleto.includes(fragmento)
+        );
+      });  
     }
   }
 
   private _filtrarEmpleadoR(value: string): any {
     if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.listaAuxiliar.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
-      );
+      const filterValue = value.toUpperCase().trim().split(/\s+/);
+      return this.listaAuxiliar.filter((info: any) => {
+        const nombreCompleto = info.empleado.toUpperCase();
+        return filterValue.every(fragmento =>
+          nombreCompleto.includes(fragmento)
+        );
+      });
     }
   }
 
@@ -455,16 +499,19 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
-  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
-  private _filtrarTipoAccion(value: string): any {
-    if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.tipos_accion.filter((info: any) =>
-        info.descripcion.toUpperCase().includes(filterValue)
-      );
-    }
+  // BUSQUEDA DE DATOS DE EMPRESA
+  empresa: any = [];
+  MostrarDatos() {
+    this.empresa = [];
+    this.restEmpresa
+      .ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
+      .subscribe((data) => {
+        this.empresa = data;
+        this.secondFormGroup.patchValue({
+          //numPartidaForm: this.empresa[0].numero_partida,
+        });
+      });
   }
-
   FiltrarDepaActua() {
     this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
       startWith(""),
@@ -735,6 +782,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.tipos_accion.forEach(item => {
         if (item.descripcion == e.option.value) {
           console.log('item: ', item);
+
           this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
           this.textoFijo = item.base_legal + ' ';
           datoOtro = item.nombre;
@@ -991,7 +1039,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           abrevHAForm: this.datosPedido[0].abrevHA,
           abrevGAForm: this.datosPedido[0].abrevGA,
           abrevHForm: this.datosPedido[0].abrevHAF,
-          abrevGForm: this.datosPedido[0].abrevG,         
+          abrevGForm: this.datosPedido[0].abrevG,
           fechaServidorForm: this.datosPedido[0].fechaServidorForm,
           fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
           razonForm: this.datosPedido[0].razonForm,
@@ -999,25 +1047,11 @@ export class EditarPedidoAccionComponent implements OnInit {
           idEmpleadoRNAForm: this.datosPedido[0].idEmpleadoRNA,
           idEmpleadoRNForm: this.datosPedido[0].idEmpleadoRNF,
           idEmpleadoRRCForm: this.datosPedido[0].idEmpleadoRRC,
-          abrevRGForm:this.datosPedido[0].abrevRGF,
+          abrevRGForm: this.datosPedido[0].abrevRGF,
           abrevRHForm: this.datosPedido[0].abrevRHF,
           abrevRRCForm: this.datosPedido[0].abrevRRC,
         });
 
-      });
-  }
-
-  // BUSQUEDA DE DATOS DE EMPRESA
-  empresa: any = [];
-  MostrarDatos() {
-    this.empresa = [];
-    this.restEmpresa
-      .ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
-      .subscribe((data) => {
-        this.empresa = data;
-        this.secondFormGroup.patchValue({
-          //numPartidaForm: this.empresa[0].numero_partida,
-        });
       });
   }
 
@@ -1059,6 +1093,15 @@ export class EditarPedidoAccionComponent implements OnInit {
     });
   }
 
+    // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarTipoAccion(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.tipos_accion.filter((info: any) =>
+        info.descripcion.toUpperCase().includes(filterValue)
+      );
+    }
+  }
 
   // LISTA DE POSESIONES Y NOTIFICACIONES
   posesiones_notificaciones: any = [
@@ -1102,7 +1145,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.listaAuxiliar = this.empleados;
 
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+      this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarEmpleado(value))
       );

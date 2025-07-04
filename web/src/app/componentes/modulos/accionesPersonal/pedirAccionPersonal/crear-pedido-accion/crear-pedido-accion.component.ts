@@ -333,6 +333,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
+    
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {
@@ -392,6 +393,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (value != null) {
       const filterValue = value.toUpperCase().trim().split(/\s+/);
       return this.empleados.filter((info: any) => {
+        
         const nombreCompleto = info.empleado.toUpperCase();
         return filterValue.every(fragmento =>
           nombreCompleto.includes(fragmento)
@@ -764,7 +766,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
       this.listaAuxiliar = this.empleados;
-
+    
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
       this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),
