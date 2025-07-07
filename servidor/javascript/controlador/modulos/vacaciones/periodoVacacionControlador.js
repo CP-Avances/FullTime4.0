@@ -20,17 +20,18 @@ class PeriodoVacacionControlador {
     CrearPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion, dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida, id_empleado, estado, user_name, ip, ip_local } = req.body;
+                const { observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion, dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida, id_empleado, estado, user_name, ip, ip_local, fecha_acreditar, transferido, dias_iniciales, dias_cargados } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const datosNuevos = yield database_1.default.query(`
           INSERT INTO mv_periodo_vacacion (observacion, fecha_inicio, fecha_final, fecha_desde, fecha_ultima_actualizacion, 
             dias_vacacion, usados_dias_vacacion, dias_antiguedad, usados_antiguedad, dias_perdidos, 
-            fecha_inicio_perdida, id_empleado, estado)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *
+            fecha_inicio_perdida, id_empleado, estado, fecha_acreditar_vacaciones, creado_manual, saldo_transferido,
+            dias_iniciales, dias_cargados)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *
         `, [observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion,
                     dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida,
-                    id_empleado, estado]);
+                    id_empleado, estado, fecha_acreditar, true, transferido, dias_iniciales, dias_cargados]);
                 const [periodo] = datosNuevos.rows;
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
                 const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final, 'ddd');
@@ -80,7 +81,7 @@ class PeriodoVacacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const PERIODO_VACACIONES = yield database_1.default.query(`
-      SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
+      SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1 ORDER BY id ASC
       `, [id_empleado]);
             if (PERIODO_VACACIONES.rowCount != 0) {
                 return res.jsonp(PERIODO_VACACIONES.rows);

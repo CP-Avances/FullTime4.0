@@ -82,6 +82,7 @@ import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 
 @Component({
@@ -2325,14 +2326,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.peridoVacaciones = [];
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
       this.peridoVacaciones = datos;
-
       this.peridoVacaciones.forEach((v: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
         v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_desde_ = this.validar.FormatearFecha(v.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_ultima_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fecha_acreditar_ = this.validar.FormatearFecha(v.fecha_acreditar_vacaciones, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        
+        console.log('ver antiguedad ', v.tomar_antiguedad)
       })
+      console.log('ver periodo ', this.peridoVacaciones)
     })
   }
 
