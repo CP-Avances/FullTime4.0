@@ -587,7 +587,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           const horaFormateada = `${horas}:${minutos}:${segundos}`;
 
           // Esto actualiza visualmente el campo en tiempo real
-          this.sixthFormGroup.get('horaComunicadoForm')?.setValue(horaFormateada, { emitEvent: false });
+          //this.sixthFormGroup.get('horaComunicadoForm')?.setValue(horaFormateada, { emitEvent: false });
         }, 1000);
 
         this.sixthFormGroup.controls['fechaComunicadoForm'].setValue(fecha);
@@ -745,8 +745,8 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     })
 
-
   }
+  
 
   // METODO PARA OBTENER LISTA DE CIUDADES
   id_sucursal: any = 0
@@ -828,11 +828,11 @@ export class EditarPedidoAccionComponent implements OnInit {
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
     this.thirdFormGroup.reset();
+    console.log('e: ',e);
     if (e.id != undefined && e.id != null) {
       this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
         this.InfoUser = datos
-
-
+        console.log('this.InfoUser : ',this.InfoUser );
         this.InfoUser.forEach(valor => {
 
           //this.firstFormGroup.controls['funcionarioForm'].setValue(this.idUserSelect);
@@ -958,6 +958,14 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
+  CargarInfoCargos(id_empleado: any, id_cargo: any, cargo: any ){
+    const x = {
+        id_empleado: id_empleado,
+        id_cargo: id_cargo,
+        cargo: cargo
+    }
+    return x;
+  }
 
   datosPedido: any = [];
   CargarInformacion() {
@@ -973,6 +981,17 @@ export class EditarPedidoAccionComponent implements OnInit {
           fechaRigeDeseForm: this.datosPedido[0].fecha_rige_desde,
           fechaRigeHastaForm: this.datosPedido[0].fecha_rige_hasta,
         });
+
+        this.tipos_accion.forEach(item => {
+          if (item.descripcion == this.datosPedido[0].descripcion) {
+           console.log('item: ', item);
+
+            this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
+            this.textoFijo = item.base_legal + ' ';
+            //datoOtro = item.nombre;
+          }
+        });
+
         this.secondFormGroup.patchValue({
           idTipoAccionFom: this.datosPedido[0].descripcion,
           otroAccionForm: this.datosPedido[0].detalle_otro,
@@ -1022,35 +1041,50 @@ export class EditarPedidoAccionComponent implements OnInit {
 
         this.fourthFormGroup.patchValue({
           funcionarioForm: this.datosPedido[0].nombres,
-          cedulaForm: this.datosPedido[0].nombres,
+          cedulaForm: this.datosPedido[0].cedula_empleado,
           lugar_trabajo: this.datosPedido[0].descripcion_lugar_posesion,
           fechaPosesionForm: this.datosPedido[0].fecha_posesion,
           actaFinalForm: this.datosPedido[0].numero_acta_final,
           fechaActaFinalForm: this.datosPedido[0].fecha_acta_final,
         });
 
-        console.log('habilitar form4: ', this.fourthFormGroup.value)
-
+        this.cargoFirma1 = this.CargarInfoCargos(this.datosPedido[0].empleado_director, this.datosPedido[0].id_tipo_cargo_director, this.datosPedido[0].cargo_director)
+        this.cargoFirma2 = this.CargarInfoCargos(this.datosPedido[0].empleado_autoridad_delegado, this.datosPedido[0].id_tipo_cargo_autoridad_delegado, this.datosPedido[0].cargo_autoridad_delegado)
+        this.cargoFirma3 = this.CargarInfoCargos(this.datosPedido[0].empleado_elaboracion, this.datosPedido[0].id_tipo_cargo_elaboracion, this.datosPedido[0].tipo_cargo_elaboracion)
+        this.cargoFirma4 = this.CargarInfoCargos(this.datosPedido[0].empleado_revision, this.datosPedido[0].id_tipo_cargo_revision, this.datosPedido[0].tipo_cargo_revision)
+        this.cargoFirma5 = this.CargarInfoCargos(this.datosPedido[0].empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
+        
         this.fivethFormGroup.patchValue({
-          idEmpleadoRAForm: this.datosPedido[0].idEmpleadoRA,
-          idEmpleadoRForm: this.datosPedido[0].idEmpleadoRF,
-          idEmpleadoHForm: this.datosPedido[0].idEmpleadoHF,
+          idEmpleadoRAForm: this.datosPedido[0].empleado_director,
+          idEmpleadoRForm: this.datosPedido[0].empleado_autoridad_delegado,
+          idEmpleadoHForm: this.datosPedido[0].empleado_testigo,
           idEmpleadoGForm: this.datosPedido[0].idEmpleadoRA,
           abrevHAForm: this.datosPedido[0].abrevHA,
           abrevGAForm: this.datosPedido[0].abrevGA,
           abrevHForm: this.datosPedido[0].abrevHAF,
           abrevGForm: this.datosPedido[0].abrevG,
-          fechaServidorForm: this.datosPedido[0].fechaServidorForm,
+          fechaServidorForm: this.datosPedido[0].fecha_testigo,
           fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
           razonForm: this.datosPedido[0].razonForm,
 
-          idEmpleadoRNAForm: this.datosPedido[0].idEmpleadoRNA,
-          idEmpleadoRNForm: this.datosPedido[0].idEmpleadoRNF,
-          idEmpleadoRRCForm: this.datosPedido[0].idEmpleadoRRC,
+          idEmpleadoRNAForm: this.datosPedido[0].empleado_elaboracion,
+          idEmpleadoRNForm: this.datosPedido[0].empleado_revision,
+          idEmpleadoRRCForm: this.datosPedido[0].empleado_control,
           abrevRGForm: this.datosPedido[0].abrevRGF,
           abrevRHForm: this.datosPedido[0].abrevRHF,
           abrevRRCForm: this.datosPedido[0].abrevRRC,
         });
+
+        this.btnForm1 = false
+
+        this.sixthFormGroup.patchValue({
+          ComunicacionElectForm: this.datosPedido[0].comunicacion_electronica,
+          fechaComunicadoForm: this.datosPedido[0].fecha_comunicacion,
+          horaComunicadoForm: this.datosPedido[0].hora_comunicacion,
+          medioComunicacionForm: this.datosPedido[0].medio_comunicacion,
+          abrevCForm: this.datosPedido[0].abrevRRC,
+          idEmpleadoCForm: this.datosPedido[0].empleado_comunicacion
+        })
 
       });
   }
@@ -1207,104 +1241,156 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA REALIZAR EL REGISTRO DE ACCIÓN DE PERSONAL
-  InsertarAccionPersonal(form1: any, form2: any, form3: any, form4: any) {
+  UpdateAccionPersonal(form1: any, form2: any, form3: any, form4: any, form5: any, form6: any) {
+
     // CAMBIO EL APELLIDO Y NOMBRE DE LOS EMPLEADOS SELECCIONADOS A LETRAS MAYÚSCULAS
     let datos1 = {
-      informacion: form2.idEmpleadoForm.toUpperCase(),
+      informacion: form1.funcionarioForm.toUpperCase(),
     };
-    let datos2 = {
-      informacion: form3.idEmpleadoHForm.toUpperCase(),
-    };
-    let datos3 = {
-      informacion: form3.idEmpleadoGForm.toUpperCase(),
-    };
-    let datos4 = {
-      informacion: form3.idEmpleadoRForm.toUpperCase(),
-    };
-    let nombreCapitalizado = this.CapitalizarNombre(
-      form4.nombreReempForm.split(" ")
-    );
+
+    const ahora = new Date();
+    const horaActual = ahora.toTimeString().split(' ')[0];
+
+    console.log('datos1: ',datos1);
 
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA EL PEDIDO DE ACCIÓN DE PERSONAL
     this.restE.BuscarEmpleadoNombre(datos1).subscribe((empl1) => {
-      var idEmpl_pedido = empl1[0].id;
-      // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA PRIMERA FIRMA
-      this.restE.BuscarEmpleadoNombre(datos2).subscribe((empl2) => {
-        var idEmpl_firmaH = empl2[0].id;
-        // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA LA SEGUNDA FIRMA
-        this.restE.BuscarEmpleadoNombre(datos3).subscribe((empl3) => {
-          var idEmpl_firmaG = empl3[0].id;
-          this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
-            var idEmpl_responsable = empl4[0].id;
-            let idCiudadSeleccionada = this.ObtenerIdCiudadSeleccionada(
-              form2.idCiudad
-            );
-            // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
-            let datosAccion = {
-              id_empleado: idEmpl_pedido,
-              fec_creacion: form1.fechaForm,
-              fec_rige_desde: this.validar.DarFormatoFecha(form2.fechaDesdeForm, "yyyy-MM-dd"),
-              fec_rige_hasta: form2.fechaHastaForm !== null ?
-                (this.validar.DarFormatoFecha(form2.fechaHastaForm, 'yyyy-MM-dd')) : null,
-              identi_accion_p: form1.identificacionForm,
-              num_partida: form2.numPartidaForm,
-              decre_acue_resol: form1.tipoDecretoForm,
-              abrev_empl_uno: form3.abrevHForm,
-              firma_empl_uno: idEmpl_firmaH,
-              abrev_empl_dos: form3.abrevGForm,
-              firma_empl_dos: idEmpl_firmaG,
-              adicion_legal: form1.baseForm,
-              tipo_accion: form1.accionForm,
-              cargo_propuesto: form2.tipoCargoForm,
-              proceso_propuesto: form2.tipoProcesoForm,
-              num_partida_propuesta: form2.numPropuestaForm,
-              salario_propuesto: form2.sueldoForm,
-              id_ciudad: idCiudadSeleccionada,
-              id_empl_responsable: idEmpl_responsable,
-              num_partida_individual: form2.numPartidaIForm,
-              act_final_concurso: form3.actaForm,
-              fec_act_final_concurso: form3.fechaActaForm !== null ?
-                (this.validar.DarFormatoFecha(form3.fechaActaForm, 'yyyy-MM-dd')) : null,
-              nombre_reemp: nombreCapitalizado,
-              puesto_reemp: form4.puestoReempForm,
-              funciones_reemp: form4.funcionesReempForm,
-              num_accion_reemp: form4.accionReempForm,
-              primera_fecha_reemp: form4.fechaReempForm !== null ?
-                (this.validar.DarFormatoFecha(form4.fechaReempForm, 'yyyy-MM-dd')) : null,
-              posesion_notificacion: form4.posesionNotificacionForm,
-              descripcion_pose_noti: form4.descripcionPForm,
-              id: this.idPedido,
-              user_name: this.user_name,
-              ip: this.ip, ip_local: this.ips_locales,
-            };
-            // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
-            if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
-              datosAccion.primera_fecha_reemp = null;
-            }
 
-            if (form2.fechaHastaForm === "" || form2.fechaHastaForm === null) {
-              datosAccion.fec_rige_hasta = null;
-              console.log("informacion", datosAccion);
-              this.ValidacionesIngresos(form1, form2, datosAccion);
-            } else {
-              if (
-                Date.parse(form2.fechaDesdeForm) <
-                Date.parse(form2.fechaHastaForm)
-              ) {
-                this.ValidacionesIngresos(form1, form2, datosAccion);
-              } else {
-                this.toastr.info(
-                  "Las fechas ingresadas no son las correctas.",
-                  "Revisar los datos ingresados.",
-                  {
-                    timeOut: 6000,
-                  }
-                );
-              }
-            }
-          });
-        });
-      });
+      var idEmpl_pedido = empl1[0].id;
+      var idEmpl_pedido_cargo = empl1[0].id_cargo_;
+      
+      let id_tipo_accion_personal = this.tipos_accion.find(item => item.descripcion === form2.idTipoAccionFom);
+      let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
+      let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
+      let unidad_admi_actual = this.departamentos.find(item => item.nombre === form3.DepartamentoForm)
+      let sucursal_actual = this.sucursal.find(item => item.nombre === form3.sucursalForm);
+      let lugar_trabajo_actual = this.ObtenerIdCiudadSeleccionada(form3.idCiudadForm);
+      let cargo_actual = this.cargos.find(item => item.cargo === form3.tipoCargoForm);
+      let grupo_ocupacional_actual = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalForm)
+      let grado_actual = this.grados.find(item => item.descripcion === form3.gradoForm);
+      let procesoPropuesto = this.procesos.find(item => item.nombre === form3.procesoPropuestoForm);
+      let nivel_gestion_propuesto = this.departamentos.find(item => item.nombre === form3.NivelDepaPropuestoForm)
+      let unidad_admi_propuesto = this.departamentos.find(item => item.nombre === form3.DepartamentoPropuestoForm)
+      let sucursal_propuesto = this.sucursal.find(item => item.nombre === form3.sucursalPropuestoForm);
+      let lugar_trabajo_propuesto = form3.idCiudadPropuestaForm != '' && form3.idCiudadPropuestaForm != null ? this.ObtenerIdCiudadSeleccionada(form3.idCiudadPropuestaForm) : null;
+      let cargo_propuesto = this.cargos.find(item => item.cargo === form3.tipoCargoPropuestoForm);
+      let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
+      let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
+
+      let hora_comuni = '';
+
+      if (form6.horaComunicadoForm != '') {
+        hora_comuni = form6.horaComunicadoForm
+      }
+
+      // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
+      let datosAccion = {
+
+        //parte formulario 1
+        formulario1: {
+          numero_accion_personal: form1.identificacionForm,
+          fecha_elaboracion: form1.fechaForm,
+          hora_elaboracion: form1.horaActual,
+          id_empleado_personal: idEmpl_pedido,
+          fecha_rige_desde: form1.fechaRigeDeseForm,
+          fecha_rige_hasta: form1.fechaRigeHastaForm,
+        },
+
+        //parte formulario 2
+        formulario2: {
+          id_tipo_accion_personal: id_tipo_accion_personal.id_tipo_accion_personal,
+          id_detalle_accion: id_tipo_accion_personal.id,
+          detalle_otro: form2.otroAccionForm,
+          especificacion: form2.otroEspecificacion,
+          declaracion_jurada: form2.declaracionJuradaForm,
+          adicion_base_legal: form2.baseLegalForm,
+          observacion: form2.observacionForm,
+        },
+
+        //parte formulario 3
+        formulario3: {
+          id_proceso_actual: procesoActual != undefined ? procesoActual.id : null,
+          id_nivel_gestion_actual: nivel_gestion_actual != undefined ? nivel_gestion_actual.id : null,
+          id_unidad_administrativa: unidad_admi_actual != undefined ? unidad_admi_actual.id : null,
+          id_sucursal_actual: sucursal_actual != undefined ? sucursal_actual.id : null,
+          id_lugar_trabajo_actual: lugar_trabajo_actual != undefined ? lugar_trabajo_actual : null,
+          id_tipo_cargo_actual: cargo_actual != undefined ? cargo_actual.id : null,
+          id_grupo_ocupacional_actual: grupo_ocupacional_actual != undefined ? grupo_ocupacional_actual.id : null,
+          id_grado_actual: grado_actual != undefined ? grado_actual.id : null,
+          remuneracion_actual: parseFloat(form3.sueldoForm),
+          partida_individual_actual: form3.actaForm,
+
+          id_proceso_propuesto: procesoPropuesto != undefined ? procesoPropuesto.id : null,
+          id_nivel_gestion_propuesto: nivel_gestion_propuesto != undefined ? nivel_gestion_propuesto.id : null,
+          id_unidad_administrativa_propuesta: unidad_admi_propuesto != undefined ? unidad_admi_propuesto.id : null,
+          id_sucursal_propuesta: sucursal_propuesto != undefined ? sucursal_propuesto.id : null,
+          id_lugar_trabajo_propuesto: lugar_trabajo_propuesto != undefined ? lugar_trabajo_propuesto : null,
+          id_tipo_cargo_propuesto: cargo_propuesto != undefined ? cargo_propuesto.id : null,
+          id_grupo_ocupacional_propuesto: grupo_ocupacional_propuesto != undefined ? grupo_ocupacional_propuesto.id : null,
+          id_grado_propuesto: grado_propuesto != undefined ? grado_propuesto.id : null,
+          remuneracion_propuesta: form3.sueldoPropuestoForm != '' ? parseFloat(form3.sueldoPropuestoForm) : null,
+          partida_individual_propuesta: form3.actaPropuestaFom,
+        },
+
+        //parte formulario 4
+        formulario4: {
+          funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
+          cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
+          lugar_posesion: form3.habilitarForm4 ? lugar_trabajo_actual : null,
+          fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
+          actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
+          fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
+        },
+
+        //parte formulario 5
+        formulario5: {
+          abrevia_talentoHunamo: form5.abrevHAForm,
+          firma_talentoHumano: this.cargoFirma1.id_empleado,
+          cargo_talentoHumano: this.cargoFirma1.id_cargo,
+
+          abrevia_delegado: form5.abrevGAForm,
+          firma_delegado: this.cargoFirma2 == undefined ? null : this.cargoFirma2.id_empleado,
+          cargo_delegado: this.cargoFirma2 == undefined ? null : this.cargoFirma2.id_cargo,
+          abrevia_servidorPublico: form5.abrevHForm,
+          firma_servidorPublico: idEmpl_pedido,
+          cargo_servidorPublico: idEmpl_pedido_cargo,
+          fecha_servidorPublico: form5.fechaServidorForm == '' ? null : form5.fechaServidorForm,
+
+          abrevia_negativa: form5.abrevGForm,
+          firma_negativa: form5.idEmpleadoGForm,
+          fecha_negativa: form5.fechaNegativaForm == '' ? null : form5.fechaNegativaForm,
+          razon_negativa: form5.razonForm,
+
+          abrevia_RespElaboracion: form5.abrevRGForm,
+          firma_RespElaboracion: this.cargoFirma3 == undefined ? null : this.cargoFirma3.id_empleado,
+          cargo_RespElaboracion: this.cargoFirma3 == undefined ? null : this.cargoFirma3.id_cargo,
+          abrevia_RespRevision: form5.abrevRHForm,
+          firma_RespRevision: this.cargoFirma4 == undefined ? null : this.cargoFirma4.id_empleado,
+          cargo_RespRevision: this.cargoFirma4 == undefined ? null : this.cargoFirma4.id_cargo,
+          abrevia_RespRegistro_control: form5.abrevRRCForm,
+          firma_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_empleado,
+          cargo_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_cargo
+
+
+        },
+
+        //parte formulario 6
+        formulario6: {
+          ComunicacionElect: form6.ComunicacionElectForm == '' ? false : form6.ComunicacionElectForm,
+          fechaComunicacion: form6.fechaComunicadoForm == '' ? null : form6.fechaComunicadoForm,
+          horaComunicado: form6.horaComunicadoForm == '' ? null : hora_comuni,
+          medioComunicacionForm: form6.medioComunicacionForm == '' ? null : form6.medioComunicacionForm,
+          abrevCForm: form6.abrevCForm == '' ? null : form6.abrevCForm,
+          firma_Resp_Notificacion: form6.idEmpleadoCForm == '' ? null : form6.idEmpleadoCForm,
+        },
+
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales,
+      };
+
+      console.log("informacion", datosAccion);
+      //this.ValidacionesIngresos(form1, form2, datosAccion);
+
     });
   }
 
@@ -1391,6 +1477,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   CerrarVentana(opcion: number, datos: any) {
     this.componentel.ver_editar = false;
+    console.log('opcion: ',opcion,' - ','datos: ',datos)
     if (opcion === 1 && this.pagina === 'listar-pedido') {
       this.componentel.ver_lista = true;
     }

@@ -893,9 +893,11 @@ class EmpleadoControlador {
     BuscarEmpleadoNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { informacion } = req.body;
+            console.log('informacion: ', informacion);
             const EMPLEADO = yield database_1.default.query(`
         SELECT * FROM informacion_general WHERE
-        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1) OR
+        ((UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
       `, [informacion]);
             if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);

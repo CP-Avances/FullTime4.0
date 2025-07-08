@@ -195,12 +195,12 @@
                                     aria-label="Select an option">
                                     <div class="row">
                                         <div class="col-md">
-                                            <mat-radio-button class="example-radio-button" value="true">
+                                            <mat-radio-button class="example-radio-button" [value]="true">
                                                 Si
                                             </mat-radio-button>
                                         </div>
                                         <div class="col-md">
-                                            <mat-radio-button class="example-radio-button" value="false">
+                                            <mat-radio-button class="example-radio-button" [value]="false">
                                                 No aplica
                                             </mat-radio-button>
                                         </div>
@@ -1050,7 +1050,8 @@
                 <div class="d-flex flex-wrap justify-content-between">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
                     <button id="btn-raised" class="btn btn-sm float-center"
-                        
+                        (click)="UpdateAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value, fivethFormGroup.value, sixthFormGroup.value)"
+                        [disabled]="!firstFormGroup.valid || !secondFormGroup.valid || !thirdFormGroup.valid || !fourthFormGroup.valid"
                         value="Guardar">Guardar
                     </button>
                 </div>

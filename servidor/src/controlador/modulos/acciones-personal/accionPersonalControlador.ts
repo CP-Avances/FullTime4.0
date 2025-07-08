@@ -976,6 +976,7 @@ class AccionPersonalControlador {
                     ap.id, 
 					ap.numero_accion_personal, 
 					ap.fecha_elaboracion, 
+                    ap.hora_elaboracion,
                     CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
                     ap.fecha_rige_desde, ap.fecha_rige_hasta, 
                     ap.id_tipo_accion_personal, 
@@ -983,6 +984,7 @@ class AccionPersonalControlador {
                     ap.id_detalle_tipo_accion, dtp.descripcion, ap.detalle_otro,
                     ap.especificacion, ap.declaracion_jurada, ap.adicion_base_legal, 
                     ap.observacion, ap.id_proceso_actual, ps.nombre AS proceso_actual,
+                    inf.identificacion As cedula_empleado,
                     -- NIVEL DE GESTION ACTUAL
                     ap.id_nivel_gestion_actual,
                     (SELECT nombre FROM ed_departamentos WHERE id = ap.id_nivel_gestion_actual) AS nivel_gestion_actual,
