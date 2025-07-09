@@ -333,6 +333,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
+    
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {
@@ -365,6 +366,21 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.ObtenerCargos();
       this.MostrarDatos();
     }
+
+
+    this.firstFormGroup.statusChanges.subscribe(status => {
+      const error = this.firstFormGroup.errors?.['rangoFechasInvalido'];
+      if (error) {
+        this.mostrarToastError();
+      }
+    });
+
+  }
+
+  mostrarToastError() {
+    this.toastr.warning('La fecha final no puede ser menor a la fecha inicial.', '', {
+      timeOut: 6000,
+    });
   }
 
   //METODO PARA VALIDAR DATOS EN LOS FORMULARIOS
@@ -375,19 +391,26 @@ export class CrearPedidoAccionComponent implements OnInit {
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.empleados.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
-      );
+      const filterValue = value.toUpperCase().trim().split(/\s+/);
+      return this.empleados.filter((info: any) => {
+        
+        const nombreCompleto = info.empleado.toUpperCase();
+        return filterValue.every(fragmento =>
+          nombreCompleto.includes(fragmento)
+        );
+      });  
     }
   }
 
   private _filtrarEmpleadoR(value: string): any {
     if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.listaAuxiliar.filter((info: any) =>
-        info.empleado.toUpperCase().includes(filterValue)
-      );
+      const filterValue = value.toUpperCase().trim().split(/\s+/);
+      return this.listaAuxiliar.filter((info: any) => {
+        const nombreCompleto = info.empleado.toUpperCase();
+        return filterValue.every(fragmento =>
+          nombreCompleto.includes(fragmento)
+        );
+      });
     }
   }
 
@@ -597,8 +620,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (e.option.value != undefined && e.option.value != null) {
       this.tipos_accion.forEach(item => {
         if (item.descripcion == e.option.value) {
-          this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
-          this.textoFijo = item.base_legal + ' ';
+          this.textoFijo = item.base_legal;
         }
       });
 
@@ -610,29 +632,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
       this.secondFormGroup.controls['otroAccionForm'].setValue("");
       this.secondFormGroup.controls['otroEspecificacion'].setValue("");
-    }
-  }
-  onInputChange(event: any) {
-    const inputValue = event.target.value;
-    if (!inputValue.startsWith(this.textoFijo)) {
-      event.target.value = this.textoFijo
-      return;
-    }
-    this.secondFormGroup.controls['baseLegalForm'].setValue(inputValue);
-  }
-  onKeyDown(event: KeyboardEvent) {
-    const input = event.target as HTMLInputElement;
-    if (input.selectionStart! <= this.textoFijo.trim().length) {
-      const teclasBloqueadas = ['Backspace', 'Delete', 'ArrowLeft'];
-
-      if (teclasBloqueadas.includes(event.key)) {
-        event.preventDefault();
-      }
-    }
-  }
-  onFocus() {
-    if (this.baseLegalForm.value === this.textoFijo.trim()) {
-      this.baseLegalForm.setValue(this.textoFijo + ' ');
+    }else{ 
+       this.textoFijo = ""
     }
   }
 
@@ -765,7 +766,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
       this.listaAuxiliar = this.empleados;
-
+    
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
       this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),

@@ -122,10 +122,6 @@
                                             </mat-datepicker-toggle>
                                             <mat-datepicker touchUi #pickerFechaHasta></mat-datepicker>
                                         </mat-form-field>
-                                        <div *ngIf="firstFormGroup.errors?.['rangoFechasInvalido'] && firstFormGroup.get('fechaRigeHastaForm')?.touched"
-                                            class="text-danger">
-                                            La fecha final debe ser mayor o igual a la fecha inicial.
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -249,11 +245,10 @@
                                 <span>MOTIVACIÓN (Se une la base legal del tipo de accion y la adicion)</span>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
+                                <mat-label style="font-size: smaller;">{{textoFijo.trim()}}</mat-label>
                                 <mat-form-field style="width: 90%;">
-                                    <mat-label>Adición a base legal:</mat-label>
-                                    <textarea matInput maxlength="200" placeholder="Ej: Laboratorista"
-                                        [formControl]="baseLegalForm" (input)="onInputChange($event)"
-                                        (focus)="onFocus()" (keydown)="onKeyDown($event)"></textarea>
+                                    <textarea matInput placeholder="Ej: Laboratorista"
+                                        [formControl]="baseLegalForm" ></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Regresar a la lista de opciones existentes.">
                                         gavel
@@ -747,7 +742,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma1?.cargo != null && cargoFirma1?.cargo != ''"
-                                    style="font-size: medium;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
+                                    style="font-size: medium; margin: auto; margin-top: -3px; margin-bottom: 2px;">Cargo <b>{{cargoFirma1?.cargo}}</b></label>
                             </div>
 
                         </div>
@@ -774,7 +769,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma2?.cargo != null && cargoFirma2?.cargo != ''"
-                                    style="font-size: medium;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
+                                    style="font-size: medium; margin: auto; margin-top: -3px; margin-bottom: 2px;">Cargo <b>{{cargoFirma2?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
@@ -856,11 +851,9 @@
                                 </mat-form-field>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-form-field class="w-100">
-                                    <mat-label>Razón</mat-label>
-                                    <textarea matInput #acta placeholder="Detalle la razón por la negativa"
-                                        formControlName="razonForm" readonly></textarea>
-                                </mat-form-field>
+                                <mat-label>Razón</mat-label>
+                                <mat-label style="font-size:  smaller;">En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.</mat-label>
+
                             </div>
                         </div>
 
@@ -890,9 +883,13 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma3?.cargo != null && cargoFirma3?.cargo != ''"
-                                    style="font-size: medium;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
+                                    style="font-size: medium; margin: auto; margin-top: -3px; margin-bottom: 2px;">Cargo <b>{{cargoFirma3?.cargo}}</b></label>
                             </div>
                         </div>
+                        
+                    </div>
+
+                    <div class="row mt-1 w-100">
                         <div class="col-12 col-md-5">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
@@ -916,7 +913,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma4?.cargo != null && cargoFirma4?.cargo != ''"
-                                    style="font-size: medium;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
+                                    style="font-size: medium; margin: auto; margin-top: -3px; margin-bottom: 2px;">Cargo <b>{{cargoFirma4?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
@@ -945,7 +942,7 @@
                                     </mat-icon>
                                 </mat-form-field>
                                 <label *ngIf="cargoFirma5?.cargo != null && cargoFirma5?.cargo != ''"
-                                    style="font-size: medium;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
+                                    style="font-size: medium; margin: auto; margin-top: -3px; margin-bottom: 2px;">Cargo <b>{{cargoFirma5?.cargo}}</b></label>
                             </div>
                         </div>
                     </div>
