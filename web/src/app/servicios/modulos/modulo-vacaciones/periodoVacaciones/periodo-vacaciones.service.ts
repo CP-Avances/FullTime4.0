@@ -10,21 +10,23 @@ export class PeriodoVacacionesService {
     private http: HttpClient,
   ) { }
 
-  // BUSCAR ID PERIODO DE VACACIONES   **USADO
-  BuscarIDPerVacaciones(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/buscar/${id}`);
-  }
-
+  // METODO PARA CREAR PERIODO DE VACACIONES   **USADO
   CrearPerVacaciones(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`, datos);
+  }
+
+  // METODO PARA ACTUALIZAR PERIODO DE VACACIONES  **USADO
+  ActualizarPeriodoV(datos: any) {
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`, datos);
   }
 
   // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION   **USADO
   ObtenerPeriodoVacaciones(id_empleado: string | number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/infoPeriodo/${id_empleado}`);
   }
-  ActualizarPeriodoV(datos: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`, datos);
-  }
 
+  // BUSCAR ID PERIODO DE VACACIONES   **USADO
+  BuscarIDPerVacaciones(id: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/buscar/${id}`);
+  }
 }

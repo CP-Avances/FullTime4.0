@@ -2347,12 +2347,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   ver_periodo: boolean = true;
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_cargo != undefined) {
-      this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
-        this.idPerVacacion = datos;
-        this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
-          timeOut: 6000,
-        })
-      }, error => {
+      // COMENTADO SOLO POR PRUEBAS -- EL CODIGO ES VALIDO
+     // this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
+      //  this.idPerVacacion = datos;
+      //  this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
+      //    timeOut: 6000,
+      //  })
+     // }, error => {
         this.ver_periodo = false;
         this.registrar_periodo = true;
         this.pagina_registrar_periodo = 'ver-empleado';
@@ -2360,7 +2361,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           idEmpleado: this.idEmpleado,
           idContrato: this.datoActual.id_contrato
         };
-      });
+      //});
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
