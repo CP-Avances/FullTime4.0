@@ -645,7 +645,7 @@ class AccionPersonalControlador {
                     lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
                     id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
                     fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion,
-                    abreviatura_director, abreviatura_delegado, abreviatura_testigo, abreviatura_elaborado, abreviatura_revision, abreviatura_control, abreviatura_comunicacion, abreviatura_empleado) 
+                    abreviatura_director, abreviatura_delegado, abreviatura_testigo, abreviatura_elaboracion, abreviatura_revision, abreviatura_control, abreviatura_comunicacion, abreviatura_empleado) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
                     $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
                     $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 

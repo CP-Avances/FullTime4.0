@@ -135,7 +135,8 @@ export class EditarHorarioComponent implements OnInit {
       codigo: form.codigoForm,
       default_: tipo,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
 
     // FORMATEAR HORAS

@@ -1802,15 +1802,46 @@
                     <div *ngFor="let p of peridoVacaciones" style="padding-top: 15px;">
                         <div class="container">
                             <div class="row">
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Activo:</label>
-                                        <label *ngIf="p.estado == true">Sí</label>
-                                        <label *ngIf="p.estado == false">No</label>
+                                <div class="espacio d-flex w-100">
+                                    <div class="ms-auto text-end">
+                                        <label id="datosF" [ngClass]="p.estado ? 'text-danger fw-bold' : ''">
+                                            {{ p.estado ? 'ACTIVO' : 'Cerrado' }}
+                                        </label>
                                     </div>
+                                </div>
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Descripción:</label>
                                         <label>{{p.observacion}}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.dias_iniciales && p.dias_iniciales != 0">
+                                        <label id="datosF">Fecha de carga inicial:</label>
+                                        <label>{{p.fecha_desde_}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">
+                                            {{ p.dias_iniciales > 0 ? 'Vacaciones iniciales:' : 'Vacaciones
+                                            transferidas:' }}
+                                        </label>
+                                        <label>
+                                            {{ p.dias_iniciales > 0 ? p.dias_iniciales : p.saldo_transferido }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha de carga:</label>
+                                        <label>{{p.fecha_acreditar_}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Inicia Periodo:</label>
@@ -1821,47 +1852,46 @@
                                         <label>{{p.fec_final_}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha de carga:</label>
-                                        <label>{{p.fecha_desde_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Fecha última actualizacion:</label>
                                         <label>{{p.fecha_actualizacion_}}</label>
                                     </div>
                                 </div>
                                 <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Vacaciones transferidas:</label>
-                                        <label>{{p.saldo_transferido}}</label>
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.dias_cargados != 0">
+                                        <label id="datosF">Días de vacaciones cargados:</label>
+                                        <label>{{p.dias_cargados}}</label>
                                     </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días de Vacaciones:</label>
-                                        <label>{{p.dias_vacacion}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días usados de Vacaciones:</label>
-                                        <label>{{p.usados_dias_vacacion}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días por Antiguedad:</label>
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.dias_antiguedad != 0">
+                                        <label id="datosF">Días cargados de antigüedad:</label>
                                         <label>{{p.dias_antiguedad}}</label>
                                     </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días usados por antiguedad:</label>
-                                        <label>{{p.usados_antiguedad}}</label>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.tomar_antiguedad === true && p.observacion_antiguedad">
+                                        <label id="datosF" style="font-size: 12px;">Observación antigüedad:</label>
+                                        <label style="font-size: 12px;">{{p.observacion_antiguedad}}</label>
                                     </div>
-                                    <div class="espacio d-flex justify-content-start">
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.tomar_antiguedad">
+                                        <label id="datosF" style="font-size: 12px;">Días de antigüedad tomados:</label>
+                                        <label style="font-size: 12px;">{{p.usados_antiguedad}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.dias_perdidos != 0">
                                         <label id="datosF">Días perdidos:</label>
                                         <label>{{p.dias_perdidos}}</label>
                                     </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha inicio perdida:</label>
-                                        <label>{{p.fecha_inicio_perdida}}</label>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.usados_dias_vacacion != 0">
+                                        <label id="datosF">Días usados de vacaciones:</label>
+                                        <label>{{p.usados_dias_vacacion}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.dias_cargados && p.dias_cargados != 0">
+                                        <label id="datosF">Días de vacaciones totales:</label>
+                                        <label>{{p.dias_vacacion}}</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div style="text-align: right; margin-right: 1px;">
+                        <div style="text-align: right; margin-right: 1px;" *ngIf="p.estado">
                             <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
                                 matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro."
                                 *ngIf="getEditarDatos()">
@@ -2144,7 +2174,7 @@
     <mat-tab *ngIf="HabilitarAlimentacion" label="alimentacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">local_dining</mat-icon>
-            <h6 id="items"> Alimentación</h6>
+            <h6 id="items">Alimentación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_comida">
             <mat-card class="mat-elevation-z8">

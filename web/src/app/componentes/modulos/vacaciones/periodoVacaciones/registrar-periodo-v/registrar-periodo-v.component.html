@@ -24,10 +24,9 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field class="observar">
-                                <mat-label>Observaciones</mat-label>
+                                <mat-label>Descripción</mat-label>
                                 <input matInput placeholder="Ej:" [formControl]="observacionF" required>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Ingresar nombre del período de vacaciones">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -42,7 +41,7 @@
                                 <input matInput [matDatepicker]="picker" (dateInput)="validarFecha($event)"
                                     placeholder="dd/mm/aaaa" [formControl]="fechaInicioF" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
-                                    matTooltip="Ingresar la fecha de inicio de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    matTooltip="Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker></mat-datepicker>
                             </mat-form-field>
@@ -53,10 +52,10 @@
                             <mat-form-field>
                                 <mat-label id="letras">Fecha hasta</mat-label>
                                 <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                    [formControl]="fechaFinF">
+                                    [formControl]="fechaFinF" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
                                     matTooltipPosition="right"
-                                    matTooltip="Ingresar la fecha de finalización de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    matTooltip="Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker2></mat-datepicker>
                             </mat-form-field>
@@ -72,7 +71,7 @@
                                     [formControl]="fechaCargaF" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker4" id="i-cursor"
                                     matTooltipPosition="right"
-                                    matTooltip="Ingresar la fecha de inicio de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    matTooltip="Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker4></mat-datepicker>
                             </mat-form-field>
@@ -86,7 +85,7 @@
                                     [formControl]="fechaActualizacionF" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker5" id="i-cursor"
                                     matTooltipPosition="right"
-                                    matTooltip="Ingresar la fecha de inicio de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    matTooltip="Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker5></mat-datepicker>
                             </mat-form-field>
@@ -99,8 +98,7 @@
                             <mat-form-field>
                                 <mat-label id="letras">Días de vacación</mat-label>
                                 <input matInput placeholder="Días de incremento" [formControl]="diasVacacionF" required>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Número de días que se incrementán a los días de vacaciones que se le conceden al empleado al cumplir los años indicados de antiguedad">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -111,37 +109,8 @@
                             <mat-form-field>
                                 <mat-label id="letras">Días usados de vacaciones</mat-label>
                                 <input matInput placeholder="Días de incremento" [formControl]="diasUsadosVacacionF"
-                                    required (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Número de días de vacaciones que tiene disponibles el empleado">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label id="letras">Días de vacación por antiguedad</mat-label>
-                                <input matInput placeholder="Días de incremento" [formControl]="diaAntiguedadF" required
                                     (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Número de días que se incrementán a los días de vacaciones que se le conceden al empleado al cumplir los años indicados de antiguedad">
-                                    help_outline
-                                </mat-icon>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <mat-form-field>
-                                <mat-label id="letras">Días usados de antiguedad</mat-label>
-                                <input matInput placeholder="Días de incremento" [formControl]="diasUsadosAntiguedadF"
-                                    required (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Número de horas de vacaciones que tiene disponibles el empleado">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -153,10 +122,25 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label id="letras">Dias de vacaciones perdidos</mat-label>
-                                <input matInput placeholder="Días de incremento" [formControl]="diaPerdidoF" required
+                                <input matInput placeholder="Días de incremento" [formControl]="diaPerdidoF"
                                     (keypress)="IngresarSoloNumeros($event)">
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Número de horas de vacaciones que tiene disponibles el empleado">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label id="letras">Días de vacación por antigüedad</mat-label>
+                                <input matInput placeholder="Días de incremento" [formControl]="diaAntiguedadF"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -165,14 +149,25 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label id="letras">Fecha inicio pérdida</mat-label>
-                                <input matInput [matDatepicker]="picker3" placeholder="dd/mm/aaaa"
-                                    [formControl]="fechaPerdidaF">
-                                <mat-datepicker-toggle matSuffix [for]="picker3" id="i-cursor"
-                                    matTooltipPosition="right"
-                                    matTooltip="Ingresar la fecha de inicio de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                </mat-datepicker-toggle>
-                                <mat-datepicker touchUi #picker3></mat-datepicker>
+                                <mat-label id="letras">Días usados de antigüedad</mat-label>
+                                <input matInput placeholder="Días de incremento" [formControl]="diasUsadosAntiguedadF"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field class="observar" style="width: 400px;">
+                                <mat-label>Observaciones</mat-label>
+                                <input matInput placeholder="Ej:" [formControl]="observacionAntiguedadF">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right">
+                                    help_outline
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>

@@ -82,6 +82,7 @@ import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 
 @Component({
@@ -2325,14 +2326,17 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.peridoVacaciones = [];
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
       this.peridoVacaciones = datos;
-
       this.peridoVacaciones.forEach((v: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
         v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_desde_ = this.validar.FormatearFecha(v.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_ultima_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fecha_acreditar_ = this.validar.FormatearFecha(v.fecha_acreditar_vacaciones, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        
+        console.log('ver antiguedad ', v.tomar_antiguedad)
       })
+      console.log('ver periodo ', this.peridoVacaciones)
     })
   }
 
@@ -2343,12 +2347,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   ver_periodo: boolean = true;
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_cargo != undefined) {
-      this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
-        this.idPerVacacion = datos;
-        this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
-          timeOut: 6000,
-        })
-      }, error => {
+      // COMENTADO SOLO POR PRUEBAS -- EL CODIGO ES VALIDO
+     // this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
+      //  this.idPerVacacion = datos;
+      //  this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
+      //    timeOut: 6000,
+      //  })
+     // }, error => {
         this.ver_periodo = false;
         this.registrar_periodo = true;
         this.pagina_registrar_periodo = 'ver-empleado';
@@ -2356,7 +2361,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           idEmpleado: this.idEmpleado,
           idContrato: this.datoActual.id_contrato
         };
-      });
+      //});
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
