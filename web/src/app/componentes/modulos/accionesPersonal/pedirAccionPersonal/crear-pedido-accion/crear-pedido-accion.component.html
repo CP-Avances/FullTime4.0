@@ -393,7 +393,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="w-100">
-                                        <mat-label class="letra">Denominacion del puesto propuesto</mat-label>
+                                        <mat-label class="letra">Denominacion del puesto</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="tipoCargoF"
                                             [matAutocomplete]="auto10" readonly>
                                         <mat-autocomplete #auto10="matAutocomplete">
@@ -409,7 +409,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label>Remuneración propuesta</mat-label>
+                                        <mat-label>Remuneración</mat-label>
                                         <input matInput type="tel" [formControl]="sueldoF" style="text-align: right;"
                                             (keypress)="IngresarSoloNumeros($event)" value="0" readonly>
                                         <span matTextPrefix>$&nbsp;</span>
@@ -423,7 +423,7 @@
                                         <mat-label>Partida Presupuestaria Individual</mat-label>
                                         <textarea matInput #acta maxlength="200"
                                             placeholder="Ingresar número del acta final del concurso"
-                                            formControlName="actaForm" readonly></textarea>
+                                            formControlName="actaForm" readonly required></textarea>
                                         <mat-hint align="start"><strong>Ingresar hasta 200
                                                 caracteres</strong></mat-hint>
                                         <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
@@ -574,7 +574,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label>Partida Presupuestaria Individual</mat-label>
+                                        <mat-label>Partida presupuestaria individual propuesta</mat-label>
                                         <textarea matInput #acta maxlength="200"
                                             placeholder="Ingresar número del acta final del concurso"
                                             [formControl]="actaPropuestaF"></textarea>

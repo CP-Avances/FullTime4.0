@@ -145,7 +145,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   grupoOcupacionalF = new FormControl("", [Validators.required]);
   gradoF = new FormControl("", [Validators.required, noRegistradoValidator()]);
   sueldoF = new FormControl("", [Validators.required]);
-  actaF = new FormControl("");
+  actaF = new FormControl("", [Validators.required]);
 
   procesoPropuesto = new FormControl("")
   idSucursalPropues = new FormControl("");
