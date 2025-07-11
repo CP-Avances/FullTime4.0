@@ -644,7 +644,8 @@ class AccionPersonalControlador {
                     id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, partida_individual_propuesta, 
                     lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
                     id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
-                    fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion) 
+                    fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion,
+                    abreviatura_director, abreviatura_delegado, abreviatura_testigo, abreviatura_elaboracion, abreviatura_revision, abreviatura_control, abreviatura_comunicacion, abreviatura_empleado) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
                     $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
                     $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
@@ -661,7 +662,8 @@ class AccionPersonalControlador {
                     formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado, formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
                     formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control, formulario5.cargo_RespRegistro_control,
                     formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion,
-                    id_empleado_comunica_cargo, fechaActual, null, null, null
+                    id_empleado_comunica_cargo, fechaActual, null, null, null, formulario5.abrevia_talentoHunamo, formulario5.abrevia_delegado, formulario5.abrevia_negativa,
+                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario5.abrevCForm, formulario5.abrevia_servidorPublico
                 ]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
@@ -952,7 +954,9 @@ class AccionPersonalControlador {
                     ap.id_tipo_cargo_comunicacion,
                     (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_comunicacion) AS cargo_comunicacion,
 
-                    ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion
+                    ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion,
+                    ap.abreviatura_director, ap.abreviatura_delegado, ap.abreviatura_testigo, ap.abreviatura_elaborado, ap.abreviatura_revision,
+                    ap.abreviatura_control, ap.abreviatura_comunicacion, ap.abreviatura_empleado
 
                 FROM map_documento_accion_personal AS ap
                     INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
