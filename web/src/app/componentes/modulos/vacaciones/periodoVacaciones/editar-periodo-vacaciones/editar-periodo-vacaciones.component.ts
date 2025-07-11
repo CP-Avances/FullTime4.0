@@ -40,14 +40,14 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
   fechaAcreditarF = new FormControl();
   diasCargadosF = new FormControl(0);
   diasIncialesF = new FormControl(0);
-  diasVacacionF = new FormControl(0, [Validators.required]);
+  diasVacacionF = new FormControl(0, [Validators.required, Validators.pattern(/^[-]?\d+(\.\d+)?$/)]);
   fechaPerdidaF = new FormControl();
-  diaPerdidoF = new FormControl(0);
+  diaPerdidoF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
   tomarAntiguedadF = new FormControl(false);
-  diaAntiguedadF = new FormControl(0);
-  diasUsadosVacacionF = new FormControl(0);
+  diaAntiguedadF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
+  diasUsadosVacacionF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
   observacionAntiguedadF = new FormControl('');
-  diasUsadosAntiguedadF = new FormControl(0);
+  diasUsadosAntiguedadF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
   saldoTransferidoF = new FormControl(0);
   estadoF = new FormControl('');
 
@@ -88,7 +88,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    //console.log('ver data ', this.data)
+    console.log('ver data ', this.data)
     // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
     var f = DateTime.now();
     var FechaActual = f.toFormat("yyyy-MM-dd");
@@ -114,6 +114,11 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       diasUsadosAntiguedadForm: this.data.datosPeriodo.usados_antiguedad,
       observacionAntiguedadForm: this.data.datosPeriodo.observacion_antiguedad,
       estadoForm: this.data.datosPeriodo.estado,
+      fechaPerdidaForm: this.data.datosPeriodo.fecha_inicio_perdida,
+      saldoTransferidoForm: this.data.datosPeriodo.saldo_transferido,
+      diasCargadosForm: this.data.datosPeriodo.dias_cargados,
+      diasInicialesForm: this.data.datosPeriodo.dias_iniciales,
+      fechaAcreditarForm: this.data.datosPeriodo.fecha_acreditar_vacaciones,
     });
     if (this.data.datosPeriodo.tomar_antiguedad === true) {
       this.ver_antiguedad = true;
@@ -129,6 +134,17 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     }
     else {
       this.ver_antiguedad = false;
+    }
+  }
+
+  // METODO PARA MARCAR COMO DIAS ADICIONALES
+  adicionales: boolean = false;
+  MarcarDiasAdicionales(evento: MatCheckboxChange) {
+    if (evento.checked === true) {
+      this.adicionales = true;
+    }
+    else {
+      this.adicionales = false;
     }
   }
 
@@ -175,7 +191,10 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       ip: this.ip,
       ip_local: this.ips_locales,
     };
-    console.log('ver dara ', datosPerVacaciones)
+    if (this.adicionales === true) {
+      datosPerVacaciones.dias_iniciales = datosPerVacaciones.dias_vacacion;
+    }
+    console.log('ver data ', datosPerVacaciones)
     this.restV.ActualizarPeriodoV(datosPerVacaciones).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Vacaciones actualizado', {
         timeOut: 6000,
@@ -215,7 +234,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     });
     // FORMATO ISO: "2025-06-11"
     const fecha = event.value.toISODate();
-    this.rest.BuscarDatosContrato(this.data.datosPeriodo.id_empl_contrato).subscribe(data => {
+    this.rest.BuscarDatosContrato(this.data.idContrato).subscribe(data => {
       if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(fecha)) {
         // VERIFICAR FECHAS DE PERIODO
         this.ObtenerFechaPeriodo(event.value, data[0].meses_calculo, data[0].mes_periodo);
@@ -231,7 +250,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
 
   // METODO PARA VERIFICAR FECHAS DE PERIODO
   ObtenerFechaPeriodo(fecha: any, meses_calculo: any, mes_periodo: any) {
-    //console.log('fecha ', fecha)
+    console.log('fecha ', fecha)
     var fecha_inicio = fecha;
     const fecha_actual = DateTime.now();
 
@@ -273,8 +292,11 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     else {
       // AUN NO PASA
       console.log('AUN NO PASA')
-      fecha_fin = fecha_inicio.plus({ months: meses_calculo });
-      acreditar = fecha_inicio.plus({ months: mes_periodo });
+      var anio_actual = fecha_inicio.set({ year: anioHoy });
+      nuevo_inicio = anio_actual.minus({ years: 1 });
+      fecha_fin = nuevo_inicio.plus({ months: meses_calculo });
+      acreditar = nuevo_inicio.plus({ months: mes_periodo });
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: nuevo_inicio });
     }
     this.PerVacacionesForm.patchValue({ fechaFinForm: fecha_fin, fechaAcreditarForm: acreditar });
     //console.log('fecha ', fecha_fin, 'acreditar ', acreditar)

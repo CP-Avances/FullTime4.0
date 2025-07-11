@@ -27,12 +27,12 @@ class PeriodoVacacionControlador {
           INSERT INTO mv_periodo_vacacion (observacion, fecha_inicio, fecha_final, fecha_desde, fecha_ultima_actualizacion, 
             dias_vacacion, usados_dias_vacacion, dias_antiguedad, usados_antiguedad, dias_perdidos, 
             fecha_inicio_perdida, id_empleado, estado, fecha_acreditar_vacaciones, creado_manual, saldo_transferido,
-            dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING *
+            dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad, anios_antiguedad)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20 $21) RETURNING *
         `, [observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion,
                     dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida,
                     id_empleado, estado, fecha_acreditar, true, transferido, dias_iniciales, dias_cargados,
-                    tomar_antiguedad, observacion_antiguedad]);
+                    tomar_antiguedad, observacion_antiguedad, 0]);
                 const [periodo] = datosNuevos.rows;
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
                 const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final, 'ddd');
@@ -154,6 +154,26 @@ class PeriodoVacacionControlador {
                 return res.jsonp(VACACIONES.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado' });
+        });
+    }
+    // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL
+    CerrarPeriodoVacaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { empleados, fecha } = req.body;
+            console.log('ver datos cerrar ', req.body);
+            try {
+                const resultado = yield database_1.default.query(`
+        SELECT public.fn_cierre_masivo_periodos($1, $2) AS resumen;
+        `, [empleados, fecha]);
+                res.status(200).json({ mensaje: resultado.rows });
+            }
+            catch (error) {
+                console.error('Error al cerrar periodos:', error.message);
+                res.status(500).json({
+                    error: 'Error',
+                    detalle: error.message
+                });
+            }
         });
     }
 }

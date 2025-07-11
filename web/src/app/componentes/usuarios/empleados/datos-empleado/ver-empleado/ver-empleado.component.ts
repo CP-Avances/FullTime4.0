@@ -2324,23 +2324,34 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   peridoVacaciones: any;
   ObtenerPeriodoVacaciones(formato_fecha: string) {
     this.peridoVacaciones = [];
+    let contador = 0;
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
       this.peridoVacaciones = datos;
       this.peridoVacaciones.forEach((v: any) => {
+        v.ultimo = false;
+        contador++;
         // TRATAMIENTO DE FECHAS Y HORAS
+        if (contador === this.peridoVacaciones.length) {
+          v.ultimo = true;
+        }
         v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_desde_ = this.validar.FormatearFecha(v.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_ultima_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_acreditar_ = this.validar.FormatearFecha(v.fecha_acreditar_vacaciones, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        
-        console.log('ver antiguedad ', v.tomar_antiguedad)
+        if (v.ultimo === true && (v.estado === false || v.cerrar_manual === true)) {
+          this.ver_agregar_periodo = true;
+        }
+        else {
+          this.ver_agregar_periodo = false;
+        }
       })
       console.log('ver periodo ', this.peridoVacaciones)
     })
   }
 
   // VENTANA PARA INGRESAR PERIODO DE VACACIONES
+  ver_agregar_periodo: boolean = true;
   registrar_periodo: boolean = false;
   data_registrar_periodo: any = [];
   pagina_registrar_periodo: string = '';
@@ -2348,19 +2359,19 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_cargo != undefined) {
       // COMENTADO SOLO POR PRUEBAS -- EL CODIGO ES VALIDO
-     // this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
+      // this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
       //  this.idPerVacacion = datos;
       //  this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
       //    timeOut: 6000,
       //  })
-     // }, error => {
-        this.ver_periodo = false;
-        this.registrar_periodo = true;
-        this.pagina_registrar_periodo = 'ver-empleado';
-        this.data_registrar_periodo = {
-          idEmpleado: this.idEmpleado,
-          idContrato: this.datoActual.id_contrato
-        };
+      // }, error => {
+      this.ver_periodo = false;
+      this.registrar_periodo = true;
+      this.pagina_registrar_periodo = 'ver-empleado';
+      this.data_registrar_periodo = {
+        idEmpleado: this.idEmpleado,
+        idContrato: this.datoActual.id_contrato
+      };
       //});
     }
     else {
@@ -2375,10 +2386,51 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   data_periodo: any = [];
   pagina_periodo: string = '';
   AbrirEditarPeriodoVacaciones(datoSeleccionado: any): void {
-    this.data_periodo = { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado };
+    this.data_periodo = { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado, idContrato: this.datoActual.id_contrato };
     this.ver_periodo = false;
     this.editar_periodo = true;
     this.pagina_periodo = 'ver-empleado';
+  }
+
+
+  // CERRAR PERIODO DE VACACIONES
+  cerrar_periodo: boolean = false;
+  fechaCerrar = new FormControl();
+  CerrarPeriodo() {
+    if (this.cerrar_periodo) {
+      this.cerrar_periodo = false;
+      console.log('fecha cerrar ', this.fechaCerrar.value);
+      this.fechaCerrar.setValue('');
+    }
+    else {
+      this.cerrar_periodo = true;
+    }
+  }
+
+  // GUARDAR LOS DATOS DEL PERIODO QUE ESTA CERRADO
+  GuardarPeriodoCerrado() {
+    if (this.fechaCerrar.value) {
+      let cerrar = {
+        empleados: [parseInt(this.idEmpleado)],
+        fecha: this.fechaCerrar.value
+      }
+      this.restPerV.CerrarPeriodoVacaciones(cerrar).subscribe(datos => {
+        console.log('ver cerrar ', datos.mensaje[0])
+        this.ObtenerPeriodoVacaciones(this.formato_fecha);
+        this.toastr.info(datos.mensaje[0].resumen, '', {
+          timeOut: 6000,
+        })
+      }, error => {
+        this.toastr.error('Verifique los datos ingresados.', 'Ups!!! se ha producido un error.', {
+          timeOut: 6000,
+        })
+      })
+    }
+    else {
+      this.toastr.warning('Ingrese la fecha de cierre de periodo.', '', {
+        timeOut: 6000,
+      })
+    }
   }
 
 

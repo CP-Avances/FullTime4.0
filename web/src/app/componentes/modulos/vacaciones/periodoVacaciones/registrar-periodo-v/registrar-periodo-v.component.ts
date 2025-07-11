@@ -1,6 +1,7 @@
 
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
@@ -35,14 +36,14 @@ export class RegistrarPeriodoVComponent implements OnInit {
   fechaCargaF = new FormControl();  // FECHA DESDE LA QUE SE TIENE QUE EMPEZAR HACER LOS CALCULOS
   fechaActualizacionF = new FormControl();
   diasIncialesF = new FormControl(0);
-  diasVacacionF = new FormControl(0, [Validators.required]);
+  diasVacacionF = new FormControl(0, [Validators.required, Validators.pattern(/^[-]?\d+(\.\d+)?$/)]);
   diasUsadosVacacionF = new FormControl(0);
   diasCargadosF = new FormControl(0);
   saldoTransferidoF = new FormControl(0);
   fechaPerdidaF = new FormControl();
-  diaPerdidoF = new FormControl(0);
-  diaAntiguedadF = new FormControl(0);
-  diasUsadosAntiguedadF = new FormControl(0);
+  diaPerdidoF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
+  diaAntiguedadF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
+  diasUsadosAntiguedadF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
   observacionAntiguedadF = new FormControl('');
   estadoF = new FormControl('');
 
@@ -162,8 +163,11 @@ export class RegistrarPeriodoVComponent implements OnInit {
     else {
       // AUN NO PASA
       console.log('AUN NO PASA')
-      fecha_fin = fecha_inicio.plus({ months: meses_calculo });
-      acreditar = fecha_inicio.plus({ months: mes_periodo });
+      var anio_actual = fecha_inicio.set({ year: anioHoy });
+      nuevo_inicio = anio_actual.minus({ years: 1 });
+      fecha_fin = nuevo_inicio.plus({ months: meses_calculo });
+      acreditar = nuevo_inicio.plus({ months: mes_periodo });
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: nuevo_inicio });
     }
     this.PerVacacionesForm.patchValue({ fechaFinForm: fecha_fin, fechaAcreditarForm: acreditar });
 
@@ -213,7 +217,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
       ip_local: this.ips_locales,
       ip: this.ip,
     };
-    if (periodo.transferido === 0) {
+    if (this.adicionales === true) {
       periodo.dias_iniciales = periodo.dias_vacacion;
     }
     if (periodo.dias_usados_antiguedad != 0) {
@@ -231,6 +235,17 @@ export class RegistrarPeriodoVComponent implements OnInit {
       })
     });
 
+  }
+
+  // METODO PARA MARCAR COMO DIAS ADICIONALES
+  adicionales: boolean = false;
+  MarcarDiasAdicionales(evento: MatCheckboxChange) {
+    if (evento.checked === true) {
+      this.adicionales = true;
+    }
+    else {
+      this.adicionales = false;
+    }
   }
 
   // METODO PARA LIMPIAR FORMULARIO

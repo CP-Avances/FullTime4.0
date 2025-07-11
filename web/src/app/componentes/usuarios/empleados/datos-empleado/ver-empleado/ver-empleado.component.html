@@ -1793,7 +1793,7 @@
                     </div>
                     <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
-                            (click)="AbrirVentanaPerVacaciones()" *ngIf="getCrearDatos()">Añadir
+                            (click)="AbrirVentanaPerVacaciones()" *ngIf="getCrearDatos() && ver_agregar_periodo">Añadir
                         </button>
                     </div>
                 </div>
@@ -1819,6 +1819,21 @@
 
                             <div class="row">
                                 <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Inicia Periodo:</label>
+                                        <label>{{p.fec_inicio_}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Finaliza Periodo:</label>
+                                        <label>{{p.fec_final_}}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-top: 10px;" >
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start"
                                         *ngIf="p.dias_iniciales && p.dias_iniciales != 0">
                                         <label id="datosF">Fecha de carga inicial:</label>
@@ -1837,23 +1852,12 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Fecha de carga:</label>
                                         <label>{{p.fecha_acreditar_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Inicia Periodo:</label>
-                                        <label>{{p.fec_inicio_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Finaliza Periodo:</label>
-                                        <label>{{p.fec_final_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha última actualizacion:</label>
-                                        <label>{{p.fecha_actualizacion_}}</label>
                                     </div>
                                 </div>
                                 <div class="col-md">
@@ -1861,10 +1865,32 @@
                                         <label id="datosF">Días de vacaciones cargados:</label>
                                         <label>{{p.dias_cargados}}</label>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.anios_antiguedad != 0">
+                                        <label id="datosF">Años laborados:</label>
+                                        <label>{{p.anios_antiguedad}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start" *ngIf="p.dias_antiguedad != 0">
                                         <label id="datosF">Días cargados de antigüedad:</label>
                                         <label>{{p.dias_antiguedad}}</label>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha última actualizacion:</label>
+                                        <label>{{p.fecha_actualizacion_}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start"
                                         *ngIf="p.tomar_antiguedad === true && p.observacion_antiguedad">
                                         <label id="datosF" style="font-size: 12px;">Observación antigüedad:</label>
@@ -1891,12 +1917,57 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="text-align: right; margin-right: 1px;" *ngIf="p.estado">
-                            <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro."
-                                *ngIf="getEditarDatos()">
-                                <p>Editar</p>
-                            </i>
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-md">
+                                <div style="text-align: left; margin-left: 1px;"
+                                    *ngIf="p.estado && cerrar_periodo === false">
+                                    <i (click)="CerrarPeriodo()" class="fas fa-minus-circle" id="cerrar" matSuffix
+                                        matTooltipPosition="right" matTooltip="Cerrar periodo de vacaciones."
+                                        *ngIf="getEditarDatos()">
+                                        <p>Cerrar <br> Periodo Vacaciones</p>
+                                    </i>
+                                </div>
+                                <div style="text-align: left; margin-left: 1px;" *ngIf="p.estado && cerrar_periodo">
+                                    <i (click)="CerrarPeriodo()" class="fas fa-times-circle" id="cerrar" matSuffix
+                                        matTooltipPosition="right" matTooltip="Cerrar periodo de vacaciones."
+                                        *ngIf="getEditarDatos()">
+                                        <p>Cancelar</p>
+                                    </i>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div style="text-align: right; margin-right: 10px;"
+                                    *ngIf="cerrar_periodo === false && p.ultimo && p.cerrar_manual === false">
+                                    <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro."
+                                        *ngIf="getEditarDatos()">
+                                        <p>Editar</p>
+                                    </i>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  *************  FORMULARIO PARA CERRAR PERIODO DE VACACIONES  ************  -->
+                        <div *ngIf="p.estado && cerrar_periodo">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Fecha cerrar periodo</mat-label>
+                                    <input matInput [matDatepicker]="picker5" placeholder="dd/mm/aaaa"
+                                        [formControl]="fechaCerrar">
+                                    <mat-datepicker-toggle matSuffix [for]="picker5" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #picker5></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center"
+                                style="padding-top: 20px; margin-bottom: 2%;">
+                                <button id="btn-raised" class="btn btn-sm" value="Guardar"
+                                    (click)="GuardarPeriodoCerrado()">
+                                    Guardar
+                                </button>
+                            </div>
                         </div>
                         <mat-divider></mat-divider>
                     </div>

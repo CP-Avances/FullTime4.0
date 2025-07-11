@@ -29,4 +29,9 @@ export class PeriodoVacacionesService {
   BuscarIDPerVacaciones(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/buscar/${id}`);
   }
+
+  // METODO PARA CERRAR PERIODO DE VACACIONES
+  CerrarPeriodoVacaciones(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/cerrar-periodos`, datos);
+  }
 }

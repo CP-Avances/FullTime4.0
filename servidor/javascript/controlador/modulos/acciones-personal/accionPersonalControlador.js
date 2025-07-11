@@ -222,7 +222,7 @@ class AccionPersonalControlador {
                             datosNuevos: '',
                             ip: ip,
                             ip_local: ip_local,
-                            observacion: `Error al eliminar el detalle de tipo de acción personal con id: ${item.id}. Registro no encontrado.`
+                            observacion: `Error al eliminar el detalle de tipo de accion personal con id: ${item.id}. Registro no encontrado.`
                         });
                     }
                     // FINALIZAR TRANSACCION
