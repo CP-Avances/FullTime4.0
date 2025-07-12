@@ -645,7 +645,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.grados = [];
     this.restGrado.ConsultarGrados().subscribe((datos) => {
       this.grados = datos;
-      console.log('grados: ', this.grados);
       this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarGrado(value))
@@ -828,15 +827,15 @@ export class EditarPedidoAccionComponent implements OnInit {
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
     this.thirdFormGroup.reset();
-    console.log('e: ',e);
+
     if (e.id != undefined && e.id != null) {
       this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
         this.InfoUser = datos
-        console.log('this.InfoUser : ',this.InfoUser );
+        
         this.InfoUser.forEach(valor => {
-
-          //this.firstFormGroup.controls['funcionarioForm'].setValue(this.idUserSelect);
           this.idUserSelect = e.id
+
+          this.firstFormGroup.patchValue({funcionarioForm: e.empleado,});
           this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
           this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
@@ -972,6 +971,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.restAccion.BuscarDatosPedidoId(this.idPedido)
       .subscribe((data) => {
         this.datosPedido = data;
+
         console.log("datos", this.datosPedido);
 
         this.firstFormGroup.patchValue({
@@ -988,7 +988,11 @@ export class EditarPedidoAccionComponent implements OnInit {
 
             this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
             this.textoFijo = item.base_legal + ' ';
-            //datoOtro = item.nombre;
+            if (item.nombre == 'OTRO') {
+              this.activarOtro = false
+            } else {
+              this.activarOtro = true
+            }
           }
         });
 
@@ -1059,10 +1063,10 @@ export class EditarPedidoAccionComponent implements OnInit {
           idEmpleadoRForm: this.datosPedido[0].empleado_autoridad_delegado,
           idEmpleadoHForm: this.datosPedido[0].empleado_testigo,
           idEmpleadoGForm: this.datosPedido[0].idEmpleadoRA,
-          abrevHAForm: this.datosPedido[0].abrevHA,
-          abrevGAForm: this.datosPedido[0].abrevGA,
-          abrevHForm: this.datosPedido[0].abrevHAF,
-          abrevGForm: this.datosPedido[0].abrevG,
+          abrevHAForm: this.datosPedido[0].abreviatura_director,
+          abrevGAForm: this.datosPedido[0].abreviatura_delegado,
+          abrevHForm: this.datosPedido[0].abreviatura_empleado,
+          abrevGForm: this.datosPedido[0].abreviatura_testigo,
           fechaServidorForm: this.datosPedido[0].fecha_testigo,
           fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
           razonForm: this.datosPedido[0].razonForm,
@@ -1070,9 +1074,10 @@ export class EditarPedidoAccionComponent implements OnInit {
           idEmpleadoRNAForm: this.datosPedido[0].empleado_elaboracion,
           idEmpleadoRNForm: this.datosPedido[0].empleado_revision,
           idEmpleadoRRCForm: this.datosPedido[0].empleado_control,
-          abrevRGForm: this.datosPedido[0].abrevRGF,
-          abrevRHForm: this.datosPedido[0].abrevRHF,
-          abrevRRCForm: this.datosPedido[0].abrevRRC,
+          abrevRGForm: this.datosPedido[0].abreviatura_elaboracion,
+          abrevRHForm: this.datosPedido[0].abreviatura_revision,
+          abrevRRCForm: this.datosPedido[0].abreviatura_control
+,
         });
 
         this.btnForm1 = false

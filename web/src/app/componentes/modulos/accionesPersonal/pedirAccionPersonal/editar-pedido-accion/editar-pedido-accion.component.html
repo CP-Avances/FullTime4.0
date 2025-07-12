@@ -234,7 +234,7 @@
                                 <span>MOTIVACIÓN (Se une la base legal del tipo de acción y la adición)</span>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label style="font-size: smaller;">{{textoFijo.trim()}}</mat-label>
+                                <mat-label class="motivacion">{{textoFijo.trim()}}</mat-label>
                                 <mat-form-field style="width: 90%;">
                                     <textarea matInput placeholder="Ej: Laboratorista"
                                         [formControl]="baseLegalForm" ></textarea>
@@ -474,7 +474,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label class="letra">Unidad Administrativa propuesta</mat-label>
+                                        <mat-label>Unidad Administrativa propuesta</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="idDepaAdminPropuesta" [matAutocomplete]="auto14">
                                         <mat-autocomplete #auto14="matAutocomplete">
@@ -762,7 +762,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="subtitulo">
+                    <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
+                    <div class="subtitulo" style="padding-top: 15px;">
                         <span>RESPONSABLES DE FIRMAS</span>
                     </div>
                     <div class="row">
@@ -840,9 +841,11 @@
                                 </mat-form-field>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
-                                <mat-label>Razón</mat-label>
-                                <mat-label style="font-size:  smaller;">En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.</mat-label>
-
+                                <mat-label class="razon">
+                                    RAZÓN: En presencia del testigo se deja constancia de
+                                    que la o el servidor público tiene la negativa de recibir la comunicación de
+                                    registro de esta acción de personal.
+                                </mat-label>
                             </div>
                         </div>
 

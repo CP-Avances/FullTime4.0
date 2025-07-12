@@ -724,7 +724,8 @@ class AccionPersonalControlador {
                     $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
                     $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, 
                     $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, 
-                    $51, $52, $53, $54, $55, $56, $57, $58, $59) RETURNING *
+                    $51, $52, $53, $54, $55, $56, $57, $58, $59, $60,
+                    $61, $62, $63, $64, $65, $66, $67) RETURNING *
                 `
                 , [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion, formulario1.id_empleado_personal, formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta,
                 formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro, formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
@@ -741,7 +742,7 @@ class AccionPersonalControlador {
 
                 formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion,
                     id_empleado_comunica_cargo, fechaActual, null, null, null, formulario5.abrevia_talentoHunamo, formulario5.abrevia_delegado, formulario5.abrevia_negativa,
-                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario5.abrevCForm, formulario5.abrevia_servidorPublico
+                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario5.abrevCForm, formulario5.abrevia_servidorPublico
                     
                 ]);
 
@@ -1076,7 +1077,7 @@ class AccionPersonalControlador {
                     (SELECT cargo FROM e_cat_tipo_cargo WHERE id = ap.id_tipo_cargo_comunicacion) AS cargo_comunicacion,
 
                     ap.fecha_registro, ap.fecha_actualizacion, ap.proceso, ap.id_vacacion,
-                    ap.abreviatura_director, ap.abreviatura_delegado, ap.abreviatura_testigo, ap.abreviatura_elaborado, ap.abreviatura_revision,
+                    ap.abreviatura_director, ap.abreviatura_delegado, ap.abreviatura_testigo, ap.abreviatura_elaboracion, ap.abreviatura_revision,
                     ap.abreviatura_control, ap.abreviatura_comunicacion, ap.abreviatura_empleado
 
                 FROM map_documento_accion_personal AS ap

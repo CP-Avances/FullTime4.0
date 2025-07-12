@@ -122,7 +122,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   //Formulario 1 accion personal
   identificacionF = new FormControl("", [Validators.required, Validators.minLength(3),]);
-  fechaF = new FormControl("", [Validators.required]);
+  fechaF = new FormControl("");
   funcionarioF = new FormControl("");
   fechaRigeDesde = new FormControl("", [Validators.required]);
   fechaRigeHasta = new FormControl("", [Validators.required]);
@@ -542,7 +542,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.grados = [];
     this.restGrado.ConsultarGrados().subscribe((datos) => {
       this.grados = datos;
-      console.log('grados: ', this.grados);
+      
       this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarGrado(value))
@@ -619,16 +619,16 @@ export class CrearPedidoAccionComponent implements OnInit {
   onTipoAccionSeleccionado(e: MatAutocompleteSelectedEvent) {
     if (e.option.value != undefined && e.option.value != null) {
       this.tipos_accion.forEach(item => {
+        console.log(item,' e.option.value: ',e.option.value)
         if (item.descripcion == e.option.value) {
           this.textoFijo = item.base_legal;
+          if (item.nombre == 'OTRO') {
+            this.activarOtro = false
+          } else {
+            this.activarOtro = true
+          }
         }
       });
-
-      if (e.option.value == 'OTRO') {
-        this.activarOtro = false
-      } else {
-        this.activarOtro = true
-      }
 
       this.secondFormGroup.controls['otroAccionForm'].setValue("");
       this.secondFormGroup.controls['otroEspecificacion'].setValue("");
@@ -642,15 +642,17 @@ export class CrearPedidoAccionComponent implements OnInit {
   btnForm1: boolean = true;
   oninfoEmpleado(e: any) {
     this.thirdFormGroup.reset();
+
     if (e.id != undefined && e.id != null) {
+
       this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
         this.InfoUser = datos
 
-
         this.InfoUser.forEach(valor => {
 
-          //this.firstFormGroup.controls['funcionarioForm'].setValue(this.idUserSelect);
           this.idUserSelect = e.id
+
+          this.firstFormGroup.patchValue({funcionarioForm: e.empleado,});
           this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
           this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
@@ -721,21 +723,23 @@ export class CrearPedidoAccionComponent implements OnInit {
             fechaServidorForm: this.FechaActual,
           });
 
-          this.btnForm1 = false
-
         })
 
         this.fivethFormGroup.controls['razonForm'].setValue('En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.');
         this.ListaEmpleadosFirmas(e.id);
+
+        this.btnForm1 = false
 
       }, err => {
         this.InfoUser = null
         this.toastr.warning(err.error.text, "Advertencia.", { timeOut: 5000, });
         this.thirdFormGroup.reset();
       })
+
     } else {
       this.btnForm1 = true
     }
+
   }
 
   onSucursal(e: any) {
@@ -962,6 +966,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   cargoFirma3: any;
   cargoFirma4: any;
   cargoFirma5: any;
+  cargoFirma6: any;
   onCargo(datos: any, firma: number) {
     let info = {}
     if (firma == 1) {
@@ -984,8 +989,13 @@ export class CrearPedidoAccionComponent implements OnInit {
       info = {
         informacion: datos.empleado.toUpperCase(),
       };
-    } else {
+    } else if(firma == 5) {
       this.cargoFirma5 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    }else{
+      this.cargoFirma6 = {};
       info = {
         informacion: datos.empleado.toUpperCase(),
       };
@@ -1009,6 +1019,8 @@ export class CrearPedidoAccionComponent implements OnInit {
         this.cargoFirma4 = x
       } else if (firma == 5) {
         this.cargoFirma5 = x
+      }else if(firma == 6){
+        this.cargoFirma6 = x
       }
 
     }, err => {
@@ -1033,6 +1045,8 @@ export class CrearPedidoAccionComponent implements OnInit {
         this.cargoFirma4 = x
       } else if (firma == 5) {
         this.cargoFirma5 = x
+      }else if(firma == 6){
+        this.cargoFirma6 = x
       }
 
     })
