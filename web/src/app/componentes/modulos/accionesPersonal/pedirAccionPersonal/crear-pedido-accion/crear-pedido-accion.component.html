@@ -55,7 +55,7 @@
                                 <mat-form-field class="inputDate">
                                     <mat-label>Fecha elaboración</mat-label>
                                     <input matInput [matDatepicker]="pickerF" placeholder="dd/mm/aaaa"
-                                        formControlName="fechaForm" min="1950-01-31" max="2050-01-31" required>
+                                        formControlName="fechaForm" min="1950-01-31" max="2050-01-31">
                                     <mat-datepicker-toggle matSuffix [for]="pickerF" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Fecha en la que se realiza el registro de ingreso de acción de personal.">
@@ -129,7 +129,7 @@
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-end">
-                    <button mat-raised-button matStepperNext [disabled]="btnForm1" id="btn-raised" class="float-right">
+                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right">
                         Siguiente
                     </button>
                 </div>
@@ -385,11 +385,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="w-100">
-<<<<<<< HEAD
-                                        <mat-label class="letra">Denominacion del puesto</mat-label>
-=======
                                         <mat-label class="letra">Denominación del puesto</mat-label>
->>>>>>> ea7817bceee705d8d9810db207949756ff7f36d1
                                         <input type="text" aria-label="Number" matInput [formControl]="tipoCargoF"
                                             [matAutocomplete]="auto10" readonly>
                                         <mat-autocomplete #auto10="matAutocomplete">
@@ -404,11 +400,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-<<<<<<< HEAD
-                                        <mat-label>Remuneración</mat-label>
-=======
                                         <mat-label>Remuneración mensual</mat-label>
->>>>>>> ea7817bceee705d8d9810db207949756ff7f36d1
                                         <input matInput type="tel" [formControl]="sueldoF" style="text-align: right;"
                                             (keypress)="IngresarSoloNumeros($event)" value="0" readonly>
                                         <span matTextPrefix>$&nbsp;</span>
@@ -420,16 +412,7 @@
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Partida Presupuestaria Individual</mat-label>
-<<<<<<< HEAD
-                                        <textarea matInput #acta maxlength="200"
-                                            placeholder="Ingresar número del acta final del concurso"
-                                            formControlName="actaForm" readonly required></textarea>
-                                        <mat-hint align="start"><strong>Ingresar hasta 200
-                                                caracteres</strong></mat-hint>
-                                        <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
-=======
                                         <input type="text" matInput formControlName="actaForm">
->>>>>>> ea7817bceee705d8d9810db207949756ff7f36d1
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -575,18 +558,8 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-<<<<<<< HEAD
-                                        <mat-label>Partida presupuestaria individual propuesta</mat-label>
-                                        <textarea matInput #acta maxlength="200"
-                                            placeholder="Ingresar número del acta final del concurso"
-                                            [formControl]="actaPropuestaF"></textarea>
-                                        <mat-hint align="start"><strong>Ingresar hasta 200
-                                                caracteres</strong></mat-hint>
-                                        <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
-=======
                                         <mat-label>Partida Presupuestaria Individual</mat-label>
                                         <input type="text" matInput [formControl]="actaPropuestaF">
->>>>>>> ea7817bceee705d8d9810db207949756ff7f36d1
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -1073,7 +1046,8 @@
                                         <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoC"
                                             [matAutocomplete]="auto27">
                                         <mat-autocomplete #auto27="matAutocomplete">
-                                            <mat-option *ngFor="let g of filtroNombreNC | async" [value]="g.empleado">
+                                            <mat-option *ngFor="let g of filtroNombreNC | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 6)">
                                                 {{g.empleado.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
@@ -1082,6 +1056,10 @@
                                             person
                                         </mat-icon>
                                     </mat-form-field>
+                                    <label *ngIf="cargoFirma6?.cargo != null && cargoFirma6?.cargo != ''"
+                                        style="font-size: small; margin: auto; margin-top: -3px; margin-bottom: 2px;">
+                                        Cargo <b>{{cargoFirma6?.cargo}}</b>
+                                    </label>
                                 </div>
                             </div>
                             <div>

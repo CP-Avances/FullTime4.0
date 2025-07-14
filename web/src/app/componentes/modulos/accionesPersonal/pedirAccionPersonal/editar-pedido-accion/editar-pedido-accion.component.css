@@ -149,3 +149,23 @@ button[mat-icon-button] {
   padding: 0;
   height: auto;
 }
+
+.motivacion {
+  font-size: x-small;
+  display: block;
+  text-align: justify;
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: 100px;
+  font-style: italic;
+}
+
+.razon {
+  font-size: x-small;
+  display: block;
+  text-align: justify;
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-style: italic;
+}

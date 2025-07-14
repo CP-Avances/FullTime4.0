@@ -42,7 +42,9 @@ export class VerPedidoAccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.ObtenerTiposAccion();
     this.BuscarParametro();
+
   }
 
   /** **************************************************************************************** **
@@ -65,6 +67,15 @@ export class VerPedidoAccionComponent implements OnInit {
       });
   }
 
+  // METODO DE BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCIONES
+  tipos_accion: any = [];
+  ObtenerTiposAccion() {
+    this.tipos_accion = [];
+    this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
+      this.tipos_accion = datos; 
+    });
+  }
+
   datosPedido: any = [];
   datoEmpleado: string = '';
   datoEmpleadoH: string = '';
@@ -81,10 +92,18 @@ export class VerPedidoAccionComponent implements OnInit {
   departamentoE: string = '';
   proceso: string = '';
   identificacion: string = '';
+  textoFijo: string = '';
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
-      console.log('datosPedido: ',this.datosPedido)
+      console.log('datosPedido: ',this.datosPedido);
+
+      this.tipos_accion.forEach(item => {
+          if (item.descripcion == this.datosPedido[0].descripcion) {
+            this.textoFijo = item.base_legal + ' ';
+          }
+      });
+
     });
   }
 
