@@ -73,8 +73,6 @@ export class EditarPedidoAccionComponent implements OnInit {
   filtroNombreRC: Observable<any[]>; //Responsable control
   filtroNombreNC: Observable<any[]>; //Responsable control
 
-
-
   // FILTRO DE TIPO DE ACCION
   filtroTipoAccion: Observable<any[]>
   // FILTRO DE TIPO DE ACCION
@@ -146,7 +144,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   grupoOcupacionalF = new FormControl("", [Validators.required]);
   gradoF = new FormControl("", [Validators.required, noRegistradoValidator()]);
   sueldoF = new FormControl("", [Validators.required]);
-  actaF = new FormControl("");
+  actaF = new FormControl("", Validators.required);
 
   procesoPropuesto = new FormControl("")
   idSucursalPropues = new FormControl("");
@@ -507,9 +505,6 @@ export class EditarPedidoAccionComponent implements OnInit {
       .ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
       .subscribe((data) => {
         this.empresa = data;
-        this.secondFormGroup.patchValue({
-          //numPartidaForm: this.empresa[0].numero_partida,
-        });
       });
   }
   FiltrarDepaActua() {

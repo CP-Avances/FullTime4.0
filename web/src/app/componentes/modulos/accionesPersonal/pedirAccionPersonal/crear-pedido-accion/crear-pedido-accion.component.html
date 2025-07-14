@@ -245,11 +245,13 @@
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-label class="motivacion">{{textoFijo.trim()}}</mat-label>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field style="width: 90%;">
                                     <textarea matInput placeholder="Motivación"
                                         [formControl]="baseLegalForm"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Descripción u fundamento legal.">
+                                        matTooltip="Descripción o fundamento legal.">
                                         gavel
                                     </mat-icon>
                                 </mat-form-field>
@@ -595,7 +597,7 @@
                         <div class="col-12 col-md-5">
                             <label class="ml-3">YO,</label>
                             <mat-form-field class="contenedor-completo">
-                                <input type="text" style="font-size: small; width: 600px;" matInput
+                                <input type="text" style="font-size: small; width: 650px;" matInput
                                     [formControl]="funcionarioF" readonly>
                             </mat-form-field>
                         </div>
@@ -908,7 +910,7 @@
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Responsable de revisión de la acción de personal..">
+                                        matTooltip="Responsable de revisión de la acción de personal.">
                                         person
                                     </mat-icon>
                                 </mat-form-field>
@@ -1047,7 +1049,7 @@
                                             [matAutocomplete]="auto27">
                                         <mat-autocomplete #auto27="matAutocomplete">
                                             <mat-option *ngFor="let g of filtroNombreNC | async" [value]="g.empleado"
-                                            (click)="onCargo(g, 6)">
+                                                (click)="onCargo(g, 6)">
                                                 {{g.empleado.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>

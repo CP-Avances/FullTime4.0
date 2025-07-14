@@ -677,7 +677,7 @@ class AccionPersonalControlador {
     // TABLA SOLICITUD ACCION PERSONAL
     public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {
-            const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local } = req.body;
+            const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local, proceso } = req.body;
             let datosNuevos = req.body;
             const fechaActual = new Date();
             let id_empleado_comunicacion = null;
@@ -719,14 +719,14 @@ class AccionPersonalControlador {
                     lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
                     id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
                     fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion,
-                    abreviatura_director, abreviatura_delegado, abreviatura_testigo, abreviatura_elaboracion, abreviatura_revision, abreviatura_control, abreviatura_comunicacion, abreviatura_empleado) 
+                    abreviatura_director, abreviatura_delegado, abreviatura_testigo, abreviatura_elaboracion, abreviatura_revision, abreviatura_control, abreviatura_comunicacion, abreviatura_empleado, proceso) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
                     $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
                     $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
                     $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, 
                     $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, 
                     $51, $52, $53, $54, $55, $56, $57, $58, $59, $60,
-                    $61, $62, $63, $64, $65, $66, $67) RETURNING *
+                    $61, $62, $63, $64, $65, $66, $67, $68) RETURNING *
                 `
                 , [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion, formulario1.id_empleado_personal, formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta,
                     formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro, formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
@@ -741,7 +741,7 @@ class AccionPersonalControlador {
 
                     formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion,
                     id_empleado_comunica_cargo, fechaActual, null, null, null, formulario5.abrevia_talentoHunamo, formulario5.abrevia_delegado, formulario5.abrevia_negativa,
-                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario6.abrevCForm, formulario5.abrevia_servidorPublico
+                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario6.abrevCForm, formulario5.abrevia_servidorPublico, proceso
                 ]);
 
             delete datosNuevos.user_name;

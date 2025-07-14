@@ -24,7 +24,7 @@ import { CatTipoCargosService } from "src/app/servicios/configuracion/parametriz
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
 
- export function rangoFechasValidator(fechaInicioKey: string, fechaFinKey: string): ValidatorFn {
+export function rangoFechasValidator(fechaInicioKey: string, fechaFinKey: string): ValidatorFn {
   return (formGroup: AbstractControl): { [key: string]: any } | null => {
     const fechaInicio = formGroup.get(fechaInicioKey)?.value;
     const fechaFin = formGroup.get(fechaFinKey)?.value;
@@ -207,7 +207,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     fechaRigeDeseForm: this.fechaRigeDesde,
     fechaRigeHastaForm: this.fechaRigeHasta,
   }, {
-  validators: rangoFechasValidator('fechaRigeDeseForm', 'fechaRigeHastaForm')
+    validators: rangoFechasValidator('fechaRigeDeseForm', 'fechaRigeHastaForm')
   });
   public secondFormGroup = new FormGroup({
     idTipoAccionFom: this.idTipoAccion,
@@ -333,7 +333,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    
+
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {
@@ -393,12 +393,12 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (value != null) {
       const filterValue = value.toUpperCase().trim().split(/\s+/);
       return this.empleados.filter((info: any) => {
-        
+
         const nombreCompleto = info.empleado.toUpperCase();
         return filterValue.every(fragmento =>
           nombreCompleto.includes(fragmento)
         );
-      });  
+      });
     }
   }
 
@@ -542,7 +542,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.grados = [];
     this.restGrado.ConsultarGrados().subscribe((datos) => {
       this.grados = datos;
-      
+
       this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarGrado(value))
@@ -631,8 +631,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
       this.secondFormGroup.controls['otroAccionForm'].setValue("");
       this.secondFormGroup.controls['otroEspecificacion'].setValue("");
-    }else{ 
-       this.textoFijo = ""
+    } else {
+      this.textoFijo = ""
     }
   }
 
@@ -651,7 +651,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
           this.idUserSelect = e.id
 
-          this.firstFormGroup.patchValue({funcionarioForm: e.empleado,});
+          this.firstFormGroup.patchValue({ funcionarioForm: e.empleado, });
           this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
           this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
@@ -769,7 +769,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
       this.listaAuxiliar = this.empleados;
-    
+
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
       this.filtroNombre = this.funcionarioF.valueChanges.pipe(
         startWith(""),
@@ -892,7 +892,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   FiltrarDepaActua() {
-    
+
     this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
       startWith(""),
       map((value: any) => this._filtrarDeparta(value))
@@ -988,12 +988,12 @@ export class CrearPedidoAccionComponent implements OnInit {
       info = {
         informacion: datos.empleado.toUpperCase(),
       };
-    } else if(firma == 5) {
+    } else if (firma == 5) {
       this.cargoFirma5 = {};
       info = {
         informacion: datos.empleado.toUpperCase(),
       };
-    }else{
+    } else {
       this.cargoFirma6 = {};
       info = {
         informacion: datos.empleado.toUpperCase(),
@@ -1018,7 +1018,7 @@ export class CrearPedidoAccionComponent implements OnInit {
         this.cargoFirma4 = x
       } else if (firma == 5) {
         this.cargoFirma5 = x
-      }else if(firma == 6){
+      } else if (firma == 6) {
         this.cargoFirma6 = x
       }
 
@@ -1044,7 +1044,7 @@ export class CrearPedidoAccionComponent implements OnInit {
         this.cargoFirma4 = x
       } else if (firma == 5) {
         this.cargoFirma5 = x
-      }else if(firma == 6){
+      } else if (firma == 6) {
         this.cargoFirma6 = x
       }
 
@@ -1197,6 +1197,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
         user_name: this.user_name,
         ip: this.ip, ip_local: this.ips_locales,
+        proceso: "manual",
       };
 
       this.ValidacionesIngresos(form1, form2, datosAccion);
