@@ -2,11 +2,8 @@
 import { Validators, FormControl } from "@angular/forms";
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
-import { DateTime } from 'luxon';
 import { PageEvent } from "@angular/material/paginator";
-
-import * as FileSaver from "file-saver";
-
+import { DateTime } from 'luxon';
 
 // LLAMADO DE SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";;
@@ -198,7 +195,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // METODO PARA FORMATEAR DATOS DE FECHA
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
-    lista.forEach((data) => {
+    lista.forEach((data: any) => {
       data.fecCreacion_ = this.validar.FormatearFecha(
         data.fecha_creacion,
         formato_fecha,

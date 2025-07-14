@@ -10,7 +10,6 @@ export class ProcesoService {
     private http: HttpClient,
   ) { }
 
-
   // METODO DE CONSULTA DE PROCESOS    **USADO
   ConsultarProcesos() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso`);

@@ -75,6 +75,16 @@ export class AccionPersonalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/editar/accion/tipo/${id}`);
   }
 
+  // METODO DE BUSQUEDA DE DATOS DE DOCUMENTOS DE ACCION DE PERSONAL    **USADO
+  BuscarDatosPedidoId(id: any) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/informacion/${id}`);
+  }
+
+  // METODO PARA ACTUALIZAR DATOS DEL DOCUMENTO DE ACCION DE PERSONAL   **USADO
+  ActualizarPedidoAccion(datos: any) {
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion/editar`, datos);
+  }
+
   // METODO PARA VER IMAGEN DEL MINISTERIO DE TRABAJO     **USADO
   LogoImagenBase64() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/logo/ministerio/codificado`);
@@ -94,10 +104,6 @@ export class AccionPersonalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/lista/procesos/${id}`);
   }
 
-  ActualizarPedidoAccion(datos: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion/editar`, datos);
-  }
-
   BuscarDatosPedido() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedidos/accion`);
   }
@@ -110,8 +116,5 @@ export class AccionPersonalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedidos/ciudad/${id}`);
   }
 
-  BuscarDatosPedidoId(id: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/informacion/${id}`);
-  }
 
 }

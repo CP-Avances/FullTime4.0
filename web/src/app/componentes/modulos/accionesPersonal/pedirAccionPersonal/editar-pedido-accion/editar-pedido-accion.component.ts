@@ -1,4 +1,5 @@
 import { FormControl, Validators, FormGroup, AbstractControl, ValidatorFn } from "@angular/forms";
+import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { Component, OnInit, Input } from "@angular/core";
 import { startWith, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
@@ -7,21 +8,21 @@ import { DateTime } from 'luxon';
 import { Router } from "@angular/router";
 
 /** IMPORTACION DE SERVICIOS */
+import { CatGrupoOcupacionalService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service";
 import { AccionPersonalService } from "src/app/servicios/modulos/modulo-acciones-personal/accionPersonal/accion-personal.service";
+import { DepartamentosService } from "src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service";
+import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
 import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 import { AsignacionesService } from "src/app/servicios/usuarios/asignaciones/asignaciones.service";
 import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
+import { SucursalService } from "src/app/servicios/configuracion/localizacion/sucursales/sucursal.service";
+import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service";
 import { ProcesoService } from "src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service";
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
-import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciudad/ciudad.service";
-import { SucursalService } from "src/app/servicios/configuracion/localizacion/sucursales/sucursal.service";
-import { DepartamentosService } from "src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service";
-import { CatGrupoOcupacionalService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service";
-import { CatGradoService } from "src/app/servicios/modulos/modulo-acciones-personal/catGrado/cat-grado.service";
-import { CatTipoCargosService } from "src/app/servicios/configuracion/parametrizacion/catTipoCargos/cat-tipo-cargos.service";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario/usuario.service";
+import { CiudadService } from "src/app/servicios/configuracion/localizacion/ciudad/ciudad.service";
+
 import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedido-accion.component";
 
 export function rangoFechasValidator(fechaInicioKey: string, fechaFinKey: string): ValidatorFn {
@@ -64,14 +65,14 @@ export class EditarPedidoAccionComponent implements OnInit {
   ip: string | null;
 
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
-  filtroNombre: Observable<any[]>; //Funcionario
-  filtroNombreH: Observable<any[]>; //Talento humamo
-  filtroNombreG: Observable<any[]>; //Delegado
-  filtroNombreN: Observable<any[]>; //Negativa
-  filtroNombreRE: Observable<any[]>; //Responsable elaborado
-  filtroNombreRR: Observable<any[]>; //Responsable revicion
-  filtroNombreRC: Observable<any[]>; //Responsable control
-  filtroNombreNC: Observable<any[]>; //Responsable control
+  filtroNombre: Observable<any[]>; // FUNCIONARIO
+  filtroNombreH: Observable<any[]>; // TALENTO HUMAMO
+  filtroNombreG: Observable<any[]>; // DELEGADO
+  filtroNombreN: Observable<any[]>; // NEGATIVA
+  filtroNombreRE: Observable<any[]>; // RESPONSABLE ELABORADO
+  filtroNombreRR: Observable<any[]>; // RESPONSABLE REVISION
+  filtroNombreRC: Observable<any[]>; // RESPONSABLE CONTROL
+  filtroNombreNC: Observable<any[]>; // RESPONSABLE CONTROL
 
   // FILTRO DE TIPO DE ACCION
   filtroTipoAccion: Observable<any[]>
@@ -92,41 +93,15 @@ export class EditarPedidoAccionComponent implements OnInit {
   filtroGrado: Observable<any[]>;
   //FILTRO CARGOS
   filtroCargos: Observable<any[]>;
-  // EVENTOS RELACIONADOS A SELECCION E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
-  ingresoAcuerdo: boolean = false;
-  vistaAcuerdo: boolean = true;
 
-  // EVENTOS REALCIONADOS A SELECCION E INGRESO DE CARGOS PROPUESTOS
-  ingresoCargo: boolean = false;
-  vistaCargo: boolean = true;
-
-  // INICIACION DE CAMPOS DEL FORMULARIO
-  otroDecretoF = new FormControl("", [Validators.minLength(3)]);
-  otroCargoF = new FormControl("", [Validators.minLength(3)]);
-  numPartidaF = new FormControl("", [Validators.required]);
-  accionForm = new FormControl("");
-
-  funcionesReemp = new FormControl("");
-  numPropuestaF = new FormControl("");
-  descripcionP = new FormControl("");
-  DepartamentoForm = new FormControl("");
-  DepartamentoPropuestoForm = new FormControl("");
-
-  nombreReemp = new FormControl("");
-  puestoReemp = new FormControl("");
-  accionReemp = new FormControl("");
-  numPartidaI = new FormControl("");
-
-  fechaActaF = new FormControl("");
-
-  //Formulario 1 accion personal
+  // FORMULARIO 1 ACCION PERSONAL
   identificacionF = new FormControl("", [Validators.required, Validators.minLength(3),]);
   fechaF = new FormControl("", [Validators.required]);
   funcionarioF = new FormControl("");
   fechaRigeDesde = new FormControl("", [Validators.required]);
   fechaRigeHasta = new FormControl("", [Validators.required]);
 
-  //Formulario 2 tipo accion y motivacion
+  // FORMULARIO 2 TIPO ACCION Y MOTIVACION
   idTipoAccion = new FormControl("");
   otroAccionF = new FormControl("");
   otroEspecificacion = new FormControl("");
@@ -134,7 +109,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   observacionForm = new FormControl("");
   baseLegalForm = new FormControl("");
 
-  //Formulario 3 situacion actual
+  // FORMULARIO 3 SITUACION ACTUAL
   tipoProcesoF = new FormControl("", [Validators.required]);
   idSucursal = new FormControl("", [Validators.required]);
   idDepa = new FormControl("");
@@ -159,13 +134,13 @@ export class EditarPedidoAccionComponent implements OnInit {
 
   habilitarForm4 = new FormControl(false);
 
-  //Formulario 4 posesion
+  // FORMULARIO 4 POSESION
   cedualF = new FormControl("");
   fechaPosesionFor = new FormControl("");
   actaFinalForm = new FormControl("");
   fechaActaFinalForm = new FormControl("");
 
-  //Formulario 5 responsables aprovacion
+  // FORMULARIO 5 RESPONSABLES APROBACION
   abrevHA = new FormControl("");
   abrevGA = new FormControl("");
   abrevHF = new FormControl("");
@@ -176,7 +151,6 @@ export class EditarPedidoAccionComponent implements OnInit {
   idEmpleadoHF = new FormControl("");
   idEmpleadoGF = new FormControl("");
   idEmpleadoRF = new FormControl("");
-  razonForm = new FormControl("");
 
   idEmpleadoRNF = new FormControl("");
   idEmpleadoRNA = new FormControl("");
@@ -188,7 +162,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   fechaServidorF = new FormControl("");
   fechaNegativaF = new FormControl("");
 
-  //Formulario 6 notificaciones
+  // FORMULARIO 6 NOTIFICACIONES
   ComunicacionElectForm = new FormControl("");
   fechaComunicadoForm = new FormControl("");
   horaComunicadoForm = new FormControl("");
@@ -208,6 +182,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   }, {
     validators: rangoFechasValidator('fechaRigeDeseForm', 'fechaRigeHastaForm')
   });
+
   public secondFormGroup = new FormGroup({
     idTipoAccionFom: this.idTipoAccion,
     otroAccionForm: this.otroAccionF,
@@ -216,9 +191,8 @@ export class EditarPedidoAccionComponent implements OnInit {
     observacionForm: this.observacionForm,
     baseLegalForm: this.baseLegalForm
   });
+
   public thirdFormGroup = new FormGroup({
-    numPartidaIForm: this.numPartidaI,
-    numPropuestaForm: this.numPropuestaF,
     tipoProcesoForm: this.tipoProcesoF,
     sucursalForm: this.idSucursal,
     NivelDepaForm: this.idDepa,
@@ -243,6 +217,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     habilitarForm4: this.habilitarForm4
   });
+
   public fourthFormGroup = new FormGroup({
     funcionarioForm: this.funcionarioF,
     cedulaForm: this.cedualF,
@@ -251,6 +226,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     actaFinalForm: this.actaFinalForm,
     fechaActaFinalForm: this.fechaActaFinalForm,
   });
+
   public fivethFormGroup = new FormGroup({
 
     idEmpleadoRAForm: this.idEmpleadoRA,
@@ -263,7 +239,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     abrevGForm: this.abrevGF,
     fechaServidorForm: this.fechaServidorF,
     fechaNegativaForm: this.fechaNegativaF,
-    razonForm: this.razonForm,
 
     idEmpleadoRNAForm: this.idEmpleadoRNA,
     idEmpleadoRNForm: this.idEmpleadoRNF,
@@ -273,6 +248,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     abrevRRCForm: this.abrevRRC,
 
   });
+
   public sixthFormGroup = new FormGroup({
     ComunicacionElectForm: this.ComunicacionElectForm,
     fechaComunicadoForm: this.fechaComunicadoForm,
@@ -304,23 +280,23 @@ export class EditarPedidoAccionComponent implements OnInit {
   private timerInterval: any;
 
   constructor(
-    private asignaciones: AsignacionesService,
     public restProcesos: ProcesoService,
+    public restEmpresa: EmpresaService,
+    public componentel: ListarPedidoAccionComponent,
+    public restAccion: AccionPersonalService,
     public restGrupo: CatGrupoOcupacionalService,
     public restGrado: CatGradoService,
-    public restEmpresa: EmpresaService,
-    public restAccion: AccionPersonalService,
-    private funciones: MainNavService,
-    private validar: ValidacionesService,
-    private toastr: ToastrService,
-    public restE: EmpleadoService,
+    public restCargo: CatTipoCargosService,
     public restUsu: UsuarioService,
     public restSu: SucursalService,
     public restDe: DepartamentosService,
+    public restE: EmpleadoService,
     public restC: CiudadService,
-    public restCargo: CatTipoCargosService,
     public router: Router,
-    public componentel: ListarPedidoAccionComponent,
+    private asignaciones: AsignacionesService,
+    private funciones: MainNavService,
+    private validar: ValidacionesService,
+    private toastr: ToastrService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
@@ -343,7 +319,8 @@ export class EditarPedidoAccionComponent implements OnInit {
         url: "www.casapazmino.com.ec",
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
-    } else {
+    }
+    else {
 
       this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
       // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
@@ -364,9 +341,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.ObtenerGrados();
       this.ObtenerCargos();
       this.MostrarDatos();
-
       this.CargarInformacion();
-
     }
 
     this.firstFormGroup.statusChanges.subscribe(status => {
@@ -375,18 +350,12 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.mostrarToastError();
       }
     });
-
   }
 
   mostrarToastError() {
     this.toastr.warning('La fecha final no puede ser menor a la fecha inicial.', '', {
       timeOut: 6000,
     });
-  }
-
-  //METODO PARA VALIDAR DATOS EN LOS FORMULARIOS
-  siguiente(form: string) {
-    console.log('usuario: ', this.InfoUser)
   }
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
@@ -432,7 +401,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       const filtrados = this.departamentosact.filter((info: any) =>
         info.nombre.toUpperCase().includes(filterValue)
       );
-      // Eliminar duplicados usando Set o Map
+      // ELIMINAR DUPLICADOS USANDO SET O MAP
       const unicos = Array.from(new Map(filtrados.map(item => [item.id, item])).values());
       return unicos
     }
@@ -507,6 +476,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.empresa = data;
       });
   }
+
   FiltrarDepaActua() {
     this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
       startWith(""),
@@ -581,8 +551,6 @@ export class EditarPedidoAccionComponent implements OnInit {
 
           const horaFormateada = `${horas}:${minutos}:${segundos}`;
 
-          // Esto actualiza visualmente el campo en tiempo real
-          //this.sixthFormGroup.get('horaComunicadoForm')?.setValue(horaFormateada, { emitEvent: false });
         }, 1000);
 
         this.sixthFormGroup.controls['fechaComunicadoForm'].setValue(fecha);
@@ -596,7 +564,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         );
       }
     } else (
-      // Marca los campos como tocados para mostrar errores
+      // MARCA LOS CAMPOS COMO TOCADOS PARA MOSTRAR ERRORES
       this.fivethFormGroup.markAllAsTouched()
     )
   }
@@ -634,6 +602,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     });
   }
+
   // BUSQUEDA DE DATOS DE LA TABLA GRADO
   grados: any = [];
   ObtenerGrados() {
@@ -646,6 +615,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       );
     });
   }
+
   // BUSQUEDA DE DATOS DE LA TABLA GRADO
   cargos: any = [];
   cargoFirma1: any;
@@ -746,11 +716,8 @@ export class EditarPedidoAccionComponent implements OnInit {
       } else {
         this.cargoFirma6 = x
       }
-
     })
-
   }
-
 
   // METODO PARA OBTENER LISTA DE CIUDADES
   id_sucursal: any = 0
@@ -783,7 +750,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   onTipoAccionSeleccionado(e: MatAutocompleteSelectedEvent) {
     if (e.option.value != undefined && e.option.value != null) {
       var datoOtro = "";
-      this.tipos_accion.forEach(item => {
+      this.tipos_accion.forEach((item: any) => {
         if (item.descripcion == e.option.value) {
           this.textoFijo = item.base_legal + ' ';
           datoOtro = item.nombre;
@@ -800,6 +767,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.secondFormGroup.controls['otroEspecificacion'].setValue("");
     }
   }
+
   onInputChange(event: any) {
     const inputValue = event.target.value;
     if (!inputValue.startsWith(this.textoFijo)) {
@@ -808,6 +776,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
     this.secondFormGroup.controls['baseLegalForm'].setValue(inputValue);
   }
+
   onKeyDown(event: KeyboardEvent) {
     const input = event.target as HTMLInputElement;
     if (input.selectionStart! <= this.textoFijo.trim().length) {
@@ -818,6 +787,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       }
     }
   }
+
   onFocus() {
     if (this.baseLegalForm.value === this.textoFijo.trim()) {
       this.baseLegalForm.setValue(this.textoFijo + ' ');
@@ -836,21 +806,21 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
           this.InfoUser = datos
 
-          this.InfoUser.forEach(valor => {
+          this.InfoUser.forEach((valor: any) => {
             this.idUserSelect = e.id
 
             this.firstFormGroup.patchValue({ funcionarioForm: e.empleado, });
             this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
             this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
-            //Proceso
+            // PROCESO
             const proceso = this.procesos.find((info: any) => info.id == valor.id_proceso);
             if (proceso == undefined || proceso == null) {
               this.thirdFormGroup.controls['tipoProcesoForm'].setValue('No registrado')
             } else {
               this.thirdFormGroup.controls['tipoProcesoForm'].setValue(proceso.nombre)
             }
-            //Sucursal
+            // SUCURSAL
             const sucursal = this.sucursal.find((inf: any) => inf.id == valor.id_suc);
             if (sucursal == undefined || sucursal == null) {
               this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
@@ -864,7 +834,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
               this.FiltrarDepaActua();
             }
-            //Departamento
+            // DEPARTAMENTO
             const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
             if (departamento == undefined || departamento == null) {
               this.thirdFormGroup.controls['DepartamentoForm'].setValue('No registrado')
@@ -877,31 +847,31 @@ export class EditarPedidoAccionComponent implements OnInit {
                 this.thirdFormGroup.controls['NivelDepaForm'].setValue(departamento.departamento_padre)
               }
             }
-
-            //Lugar de trabajo
+            // LUGAR DE TRABAJO
             this.thirdFormGroup.controls['idCiudadForm'].setValue(sucursal.descripcion)
-            //Grupo ocupacion
+            // GRUPO OCUPACION
             const grupo_ocupacional = this.grupoOcupacional.find((inf: any) => inf.id == valor.id_grupo_ocupacional);
             if (grupo_ocupacional == undefined || grupo_ocupacional == null) {
               this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue('No registrado')
-            } else {
+            }
+            else {
               this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue(grupo_ocupacional.descripcion)
             }
-            //Grado
+            // GRADO
             const grado = this.grados.find((inf: any) => inf.id == valor.id_grado);
             if (grado == undefined || grado == null) {
               this.thirdFormGroup.controls['gradoForm'].setValue('No registrado')
             } else {
               this.thirdFormGroup.controls['gradoForm'].setValue(grado.descripcion)
             }
-            //Cargo actual
+            // CARGO ACTUAL
             const cargo = this.cargos.find((inf: any) => inf.id == valor.id_tipo_cargo);
             if (cargo == undefined || cargo == null) {
               this.thirdFormGroup.controls['tipoCargoForm'].setValue('No registrado')
             } else {
               this.thirdFormGroup.controls['tipoCargoForm'].setValue(cargo.cargo)
             }
-            //Remuneracion
+            // REMUNERACION
             this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
             this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
 
@@ -909,12 +879,9 @@ export class EditarPedidoAccionComponent implements OnInit {
             this.fivethFormGroup.patchValue({
               fechaServidorForm: this.FechaActual,
             });
-
             this.btnForm1 = false
-
           })
 
-          this.fivethFormGroup.controls['razonForm'].setValue('En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.');
           this.ListaEmpleadosFirmas(e.id);
 
         }, err => {
@@ -923,7 +890,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           this.btnForm1 = true;
           this.thirdFormGroup.reset();
         })
-      }else{
+      } else {
         this.CargarInformacion();
       }
 
@@ -956,7 +923,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         "El empleado debe cumplir con los datos obligatorios de su situacion actual.",
         "Advertencia.", { timeOut: 5000, }
       );
-      // Marca los campos como tocados para mostrar errores
+      // MARCA LOS CAMPOS COMO TOCADOS PARA MOSTRAR ERRORES
       this.thirdFormGroup.markAllAsTouched();
     } else {
 
@@ -1022,8 +989,6 @@ export class EditarPedidoAccionComponent implements OnInit {
         }
 
         this.thirdFormGroup.patchValue({
-          numPartidaIForm: this.datosPedido[0].partida_individual_actual,
-          numPropuestaForm: this.datosPedido[0].partida_individual_propuesta,
           tipoProcesoForm: this.datosPedido[0].proceso_actual,
           sucursalForm: this.datosPedido[0].sucursal_actual,
           NivelDepaForm: this.datosPedido[0].nivel_gestion_actual,
@@ -1078,7 +1043,6 @@ export class EditarPedidoAccionComponent implements OnInit {
           abrevGForm: this.datosPedido[0].abreviatura_testigo,
           fechaServidorForm: this.datosPedido[0].fecha_testigo,
           fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
-          razonForm: this.datosPedido[0].razonForm,
 
           idEmpleadoRNAForm: this.datosPedido[0].empleado_elaboracion,
           idEmpleadoRNForm: this.datosPedido[0].empleado_revision,
@@ -1103,29 +1067,6 @@ export class EditarPedidoAccionComponent implements OnInit {
       });
   }
 
-  // METODO PARA ACTIVAR FORMULARIO NOMBRE DE OTRA OPCIÓN
-  IngresarOtro(form3: any) {
-    if (form3.tipoDecretoForm === undefined) {
-      this.firstFormGroup.patchValue({
-        //otroDecretoForm: "",
-      });
-      this.ingresoAcuerdo = true;
-      this.toastr.info("Ingresar nombre de un nuevo tipo de proceso.", "", {
-        timeOut: 6000,
-      });
-      this.vistaAcuerdo = false;
-    }
-  }
-
-  // METODO PARA VER LISTA DE DECRETOS
-  VerDecretos() {
-    this.firstFormGroup.patchValue({
-      //otroDecretoForm: "",
-    });
-    this.ingresoAcuerdo = false;
-    this.vistaAcuerdo = true;
-  }
-
 
   // METODO DE BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCIONES
   tipos_accion: any = [];
@@ -1133,7 +1074,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-      this.filtroTipoAccion = this.accionForm.valueChanges.pipe(
+      this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
         startWith(""),
         map((value: any) => this._filtrarTipoAccion(value))
       );
@@ -1157,32 +1098,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     { nombre: "NOTIFICACIÓN" },
   ];
 
-  // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO DE CARGO PROPUESTO
-  IngresarCargo(form4: any) {
-    if (form4.tipoCargoForm === undefined) {
-      this.secondFormGroup.patchValue({
-        //otroCargoForm: "",
-      });
-      this.ingresoCargo = true;
-      this.toastr.info(
-        "Ingresar nombre de un nuevo tipo de cargo o puesto propuesto.",
-        "",
-        {
-          timeOut: 6000,
-        }
-      );
-      this.vistaCargo = false;
-    }
-  }
-
-  // METODO PARA VER LISTA DE CARGOS PROPUESTO
-  VerCargos() {
-    this.secondFormGroup.patchValue({
-      //otroCargoForm: "",
-    });
-    this.ingresoCargo = false;
-    this.vistaCargo = true;
-  }
 
   // METODO PARA OBTENER LISTA DE EMPLEADOS
   ObtenerEmpleados() {
@@ -1271,23 +1186,23 @@ export class EditarPedidoAccionComponent implements OnInit {
       var idEmpl_pedido = empl1[0].id;
       var idEmpl_pedido_cargo = empl1[0].id_cargo_;
 
-      let id_tipo_accion_personal = this.tipos_accion.find(item => item.descripcion === form2.idTipoAccionFom);
-      let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
-      let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
-      let unidad_admi_actual = this.departamentos.find(item => item.nombre === form3.DepartamentoForm)
-      let sucursal_actual = this.sucursal.find(item => item.nombre === form3.sucursalForm);
+      let id_tipo_accion_personal = this.tipos_accion.find((item: any) => item.descripcion === form2.idTipoAccionFom);
+      let procesoActual = this.procesos.find((item: any) => item.nombre === form3.tipoProcesoForm);
+      let nivel_gestion_actual = this.departamentos.find((item: any) => item.nombre === form3.NivelDepaForm)
+      let unidad_admi_actual = this.departamentos.find((item: any) => item.nombre === form3.DepartamentoForm)
+      let sucursal_actual = this.sucursal.find((item: any) => item.nombre === form3.sucursalForm);
       let lugar_trabajo_actual = this.ObtenerIdCiudadSeleccionada(form3.idCiudadForm);
-      let cargo_actual = this.cargos.find(item => item.cargo === form3.tipoCargoForm);
-      let grupo_ocupacional_actual = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalForm)
-      let grado_actual = this.grados.find(item => item.descripcion === form3.gradoForm);
-      let procesoPropuesto = this.procesos.find(item => item.nombre === form3.procesoPropuestoForm);
-      let nivel_gestion_propuesto = this.departamentos.find(item => item.nombre === form3.NivelDepaPropuestoForm)
-      let unidad_admi_propuesto = this.departamentos.find(item => item.nombre === form3.DepartamentoPropuestoForm)
-      let sucursal_propuesto = this.sucursal.find(item => item.nombre === form3.sucursalPropuestoForm);
+      let cargo_actual = this.cargos.find((item: any) => item.cargo === form3.tipoCargoForm);
+      let grupo_ocupacional_actual = this.grupoOcupacional.find((item: any) => item.descripcion === form3.grupoOcupacionalForm)
+      let grado_actual = this.grados.find((item: any) => item.descripcion === form3.gradoForm);
+      let procesoPropuesto = this.procesos.find((item: any) => item.nombre === form3.procesoPropuestoForm);
+      let nivel_gestion_propuesto = this.departamentos.find((item: any) => item.nombre === form3.NivelDepaPropuestoForm)
+      let unidad_admi_propuesto = this.departamentos.find((item: any) => item.nombre === form3.DepartamentoPropuestoForm)
+      let sucursal_propuesto = this.sucursal.find((item: any) => item.nombre === form3.sucursalPropuestoForm);
       let lugar_trabajo_propuesto = form3.idCiudadPropuestaForm != '' && form3.idCiudadPropuestaForm != null ? this.ObtenerIdCiudadSeleccionada(form3.idCiudadPropuestaForm) : null;
-      let cargo_propuesto = this.cargos.find(item => item.cargo === form3.tipoCargoPropuestoForm);
-      let grupo_ocupacional_propuesto = this.grupoOcupacional.find(item => item.descripcion === form3.grupoOcupacionalPropuestoForm)
-      let grado_propuesto = this.grados.find(item => item.descripcion === form3.gradoPropuestoForm);
+      let cargo_propuesto = this.cargos.find((item: any) => item.cargo === form3.tipoCargoPropuestoForm);
+      let grupo_ocupacional_propuesto = this.grupoOcupacional.find((item: any) => item.descripcion === form3.grupoOcupacionalPropuestoForm)
+      let grado_propuesto = this.grados.find((item: any) => item.descripcion === form3.gradoPropuestoForm);
 
       let hora_comuni = '';
 
@@ -1299,7 +1214,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       let datosAccion = {
         id: this.idPedido,
 
-        //parte formulario 1
+        // PARTE FORMULARIO 1
         formulario1: {
           numero_accion_personal: form1.identificacionForm,
           fecha_elaboracion: form1.fechaForm,
@@ -1309,7 +1224,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           fecha_rige_hasta: form1.fechaRigeHastaForm,
         },
 
-        //parte formulario 2
+        // PARTE FORMULARIO 2
         formulario2: {
           id_tipo_accion_personal: id_tipo_accion_personal.id_tipo_accion_personal,
           id_detalle_accion: id_tipo_accion_personal.id,
@@ -1320,7 +1235,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           observacion: form2.observacionForm,
         },
 
-        //parte formulario 3
+        // PARTE FORMULARIO 3
         formulario3: {
           id_proceso_actual: procesoActual != undefined ? procesoActual.id : null,
           id_nivel_gestion_actual: nivel_gestion_actual != undefined ? nivel_gestion_actual.id : null,
@@ -1345,7 +1260,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           partida_individual_propuesta: form3.actaPropuestaFom,
         },
 
-        //parte formulario 4
+        // PARTE FORMULARIO 4
         formulario4: {
           funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
           cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
@@ -1355,7 +1270,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
         },
 
-        //parte formulario 5
+        // PARTE FORMULARIO 5
         formulario5: {
           abrevia_talentoHunamo: form5.abrevHAForm,
           firma_talentoHumano: this.cargoFirma1.id_empleado,
@@ -1372,7 +1287,6 @@ export class EditarPedidoAccionComponent implements OnInit {
           abrevia_negativa: form5.abrevGForm,
           firma_negativa: form5.idEmpleadoGForm,
           fecha_negativa: form5.fechaNegativaForm == '' ? null : form5.fechaNegativaForm,
-          razon_negativa: form5.razonForm,
 
           abrevia_RespElaboracion: form5.abrevRGForm,
           firma_RespElaboracion: this.cargoFirma3 == undefined ? null : this.cargoFirma3.id_empleado,
@@ -1383,11 +1297,9 @@ export class EditarPedidoAccionComponent implements OnInit {
           abrevia_RespRegistro_control: form5.abrevRRCForm,
           firma_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_empleado,
           cargo_RespRegistro_control: this.cargoFirma5 == undefined ? null : this.cargoFirma5.id_cargo
-
-
         },
 
-        //parte formulario 6
+        // PARTE FORMULARIO 6
         formulario6: {
           ComunicacionElect: form6.ComunicacionElectForm == '' ? false : form6.ComunicacionElectForm,
           fechaComunicacion: form6.fechaComunicadoForm == '' ? null : form6.fechaComunicadoForm,
@@ -1434,12 +1346,6 @@ export class EditarPedidoAccionComponent implements OnInit {
   GuardarDatos(datosAccion: any) {
     // CAMBIAR VALOR A NULL LOS CAMPOS CON FORMATO INTEGER QUE NO SON INGRESADOS
     if (
-      datosAccion.decre_acue_resol === "" ||
-      datosAccion.decre_acue_resol === null
-    ) {
-      datosAccion.decre_acue_resol = null;
-    }
-    if (
       datosAccion.cargo_propuesto === "" ||
       datosAccion.cargo_propuesto === null
     ) {
@@ -1471,12 +1377,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     });
   }
 
-
-  // METODO PARA INGRESAR SOLO LETRAS
-  IngresarSoloLetras(e: any) {
-    return this.validar.IngresarSoloLetras(e);
-  }
-
   // METODO PARA INGRESAR SOLO NUMEROS
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
@@ -1485,7 +1385,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   CerrarVentana(opcion: number, datos: any) {
     this.componentel.ver_editar = false;
-    console.log('opcion: ', opcion, ' - ', 'datos: ', datos)
+    //console.log('opcion: ', opcion, ' - ', 'datos: ', datos)
     if (opcion === 1 && this.pagina === 'listar-pedido') {
       this.componentel.ver_lista = true;
     }

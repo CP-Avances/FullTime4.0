@@ -610,7 +610,7 @@ class AccionPersonalControlador {
     /**  *************************************************************************************** **
      **  **                      TABLA DE DOCUMENTOS DE ACCION DE PERSONAL                    ** **
      **  *************************************************************************************** **/
-    // TABLA SOLICITUD ACCION PERSONAL
+    // METODO PARA INGRESAR DATOS EN LA TABLA SOLICITUD ACCION PERSONAL   **USADO
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -635,36 +635,71 @@ class AccionPersonalControlador {
                 yield database_1.default.query('BEGIN');
                 const response_accion = yield database_1.default.query(`
                 INSERT INTO map_documento_accion_personal (
-                    numero_accion_personal, fecha_elaboracion, hora_elaboracion, id_empleado_personal, fecha_rige_desde, fecha_rige_hasta, id_tipo_accion_personal, id_detalle_tipo_accion, detalle_otro, especificacion, 
-                    declaracion_jurada, adicion_base_legal, observacion, 
-                    id_proceso_actual, id_nivel_gestion_actual, id_unidad_administrativa, id_sucursal_actual, id_lugar_trabajo_actual, id_tipo_cargo_actual, id_grupo_ocupacional_actual, 
-                    id_grado_actual, remuneracion_actual, partida_individual_actual, 
-                    id_proceso_propuesto, id_sucursal_propuesta, id_nivel_gestion_propuesto, id_unidad_adminsitrativa_propuesta, id_lugar_trabajo_propuesto, id_tipo_cargo_propuesto, 
-                    id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, partida_individual_propuesta, 
-
-                    lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final, id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
-                    id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, id_tipo_cargo_control, comunicacion_electronica,
-                    fecha_comunicacion, hora_comunicacion, medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, fecha_actualizacion, proceso, id_vacacion,
-                    abreviatura_director, abreviatura_delegado, abreviatura_testigo, abreviatura_elaboracion, abreviatura_revision, abreviatura_control, abreviatura_comunicacion, abreviatura_empleado, proceso) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 
-                    $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 
-                    $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, 
-                    $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, 
-                    $41, $42, $43, $44, $45, $46, $47, $48, $49, $50, 
-                    $51, $52, $53, $54, $55, $56, $57, $58, $59, $60,
-                    $61, $62, $63, $64, $65, $66, $67, $68) RETURNING *
-                `, [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion, formulario1.id_empleado_personal, formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta,
-                    formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro, formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
-                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual, formulario3.id_unidad_administrativa, formulario3.id_sucursal_actual, formulario3.id_lugar_trabajo_actual, formulario3.id_tipo_cargo_actual,
-                    formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual, formulario3.partida_individual_actual,
-                    formulario3.id_proceso_propuesto, formulario3.id_sucursal_propuesta, formulario3.id_nivel_gestion_propuesto, formulario3.id_unidad_administrativa_propuesta, formulario3.id_lugar_trabajo_propuesto,
-                    formulario3.id_tipo_cargo_propuesto, formulario3.id_grupo_ocupacional_propuesto, formulario3.id_grado_propuesto, formulario3.remuneracion_propuesta, formulario3.partida_individual_propuesta,
-                    formulario4.lugar_posesion, formulario4.fecha_posesion, formulario4.actaFinal, formulario4.fechaActa,
-                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado, formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
-                    formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control, formulario5.cargo_RespRegistro_control,
-                    formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion,
-                    id_empleado_comunica_cargo, fechaActual, null, null, null, formulario5.abrevia_talentoHunamo, formulario5.abrevia_delegado, formulario5.abrevia_negativa,
-                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario6.abrevCForm, formulario5.abrevia_servidorPublico, proceso
+                    numero_accion_personal, fecha_elaboracion, hora_elaboracion, id_empleado_personal, fecha_rige_desde, 
+                    fecha_rige_hasta, id_tipo_accion_personal, id_detalle_tipo_accion, detalle_otro, especificacion, 
+                    declaracion_jurada, adicion_base_legal, observacion, id_proceso_actual, id_nivel_gestion_actual, 
+                    id_unidad_administrativa, id_sucursal_actual, id_lugar_trabajo_actual, id_tipo_cargo_actual, 
+                    id_grupo_ocupacional_actual, id_grado_actual, remuneracion_actual, partida_individual_actual, 
+                    id_proceso_propuesto, id_sucursal_propuesta, id_nivel_gestion_propuesto,
+                    id_unidad_adminsitrativa_propuesta, id_lugar_trabajo_propuesto, id_tipo_cargo_propuesto, 
+                    id_grupo_ocupacional_propuesto, id_grado_propuesto, remuneracion_propuesta, 
+                    partida_individual_propuesta, lugar_posesion, fecha_posesion, numero_acta_final, fecha_acta_final,
+                    id_empleado_director, id_tipo_cargo_director, id_empleado_autoridad_delegado, 
+                    id_tipo_cargo_autoridad_delegado, id_empleado_testigo, fecha_testigo, id_empleado_elaboracion, 
+                    id_tipo_cargo_elaboracion, id_empleado_revision, id_tipo_cargo_revision, id_empleado_control, 
+                    id_tipo_cargo_control, comunicacion_electronica, fecha_comunicacion, hora_comunicacion, 
+                    medio_comunicacion, id_empleado_comunicacion, id_tipo_cargo_comunicacion, fecha_registro, 
+                    fecha_actualizacion, proceso, id_vacacion, abreviatura_director, abreviatura_delegado, 
+                    abreviatura_testigo, abreviatura_elaboracion, abreviatura_revision, abreviatura_control, 
+                    abreviatura_comunicacion, abreviatura_empleado) 
+                VALUES(
+                    $1, $2, $3, $4, $5, 
+                    $6, $7, $8, $9, $10, 
+                    $11, $12, $13, $14, $15, 
+                    $16, $17, $18, $19, 
+                    $20, $21, $22, $23, 
+                    $24, $25, $26, 
+                    $27, $28, $29, 
+                    $30, $31, $32, 
+                    $33, $34, $35, $36, $37,
+                    $38, $39, $40, 
+                    $41, $42, $43, $44, 
+                    $45, $46, $47, $48,
+                    $49, $50, $51, $52, 
+                    $53, $54, $55, $56,
+                    $57, $58, $59, $60, $61, 
+                    $62, $63, $64, $65,
+                    $66, $67
+                    ) RETURNING *
+                `, [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.hora_elaboracion,
+                    formulario1.id_empleado_personal, formulario1.fecha_rige_desde,
+                    formulario1.fecha_rige_hasta, formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion,
+                    formulario2.detalle_otro, formulario2.especificacion,
+                    formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
+                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual,
+                    formulario3.id_unidad_administrativa, formulario3.id_sucursal_actual,
+                    formulario3.id_lugar_trabajo_actual, formulario3.id_tipo_cargo_actual,
+                    formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual,
+                    formulario3.partida_individual_actual,
+                    formulario3.id_proceso_propuesto, formulario3.id_sucursal_propuesta, formulario3.id_nivel_gestion_propuesto,
+                    formulario3.id_unidad_administrativa_propuesta, formulario3.id_lugar_trabajo_propuesto,
+                    formulario3.id_tipo_cargo_propuesto,
+                    formulario3.id_grupo_ocupacional_propuesto, formulario3.id_grado_propuesto,
+                    formulario3.remuneracion_propuesta,
+                    formulario3.partida_individual_propuesta, formulario4.lugar_posesion, formulario4.fecha_posesion,
+                    formulario4.actaFinal, formulario4.fechaActa,
+                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado,
+                    formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
+                    formulario5.firma_RespElaboracion,
+                    formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision,
+                    formulario5.firma_RespRegistro_control,
+                    formulario5.cargo_RespRegistro_control, formulario6.ComunicacionElect, formulario6.fechaComunicacion,
+                    formulario6.horaComunicado,
+                    formulario6.medioComunicacionForm, id_empleado_comunicacion, id_empleado_comunica_cargo, fechaActual,
+                    null, proceso, null, formulario5.abrevia_talentoHunamo, formulario5.abrevia_delegado,
+                    formulario5.abrevia_negativa, formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision,
+                    formulario5.abrevia_RespRegistro_control,
+                    formulario6.abrevCForm, formulario5.abrevia_servidorPublico
                 ]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
@@ -706,30 +741,7 @@ class AccionPersonalControlador {
             }
         });
     }
-    // TABLA INFORMACION DE ACCION PERSONAL POR EMPLEADO
-    pedidoAccionPersonal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id } = req.body;
-                // CONSULTAR PARA OPTENER LOS DATOS DEL PEDIDO
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                
-
-            `, [id]);
-                const [datos] = response.rows;
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.status(404).jsonp({ message: 'error' });
-            }
-            catch (error) {
-                console.log('response_accion: ', error);
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
-            }
-        });
-    }
+    // METODO DE ACTUALIZACION DE DATOS DEL DOCUMENTO DE ACCION PERSONAL   **USADO
     ActualizarPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -743,7 +755,8 @@ class AccionPersonalControlador {
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                         SELECT * FROM informacion_general WHERE
-                        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1) OR ((UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
+                        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1) OR 
+                        ((UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
                     `, [formulario6.firma_Resp_Notificacion.trim().toUpperCase()]);
                     id_empleado_comunicacion = response.rows[0].id;
                     id_empleado_comunica_cargo = response.rows[0].id_cargo;
@@ -774,39 +787,55 @@ class AccionPersonalControlador {
                 }
                 yield database_1.default.query(`
                 UPDATE map_documento_accion_personal SET 
-                    numero_accion_personal = $1, fecha_elaboracion = $2, id_empleado_personal = $3, fecha_rige_desde = $4, fecha_rige_hasta = $5, id_tipo_accion_personal = $6, id_detalle_tipo_accion = $7, detalle_otro = $8, especificacion = $9, declaracion_jurada = $10, 
-                    adicion_base_legal = $11, observacion = $12, id_proceso_actual = $13, id_nivel_gestion_actual = $14, id_unidad_administrativa = $15, id_sucursal_actual = $16, id_lugar_trabajo_actual = $17, id_tipo_cargo_actual = $18, id_grupo_ocupacional_actual = $19, id_grado_actual = $20, 
-                    remuneracion_actual = $21, partida_individual_actual = $22, id_proceso_propuesto = $23, id_sucursal_propuesta = $24, id_nivel_gestion_propuesto = $25, id_unidad_adminsitrativa_propuesta = $26, id_lugar_trabajo_propuesto = $27, id_tipo_cargo_propuesto = $28, id_grupo_ocupacional_propuesto = $29, id_grado_propuesto = $30, 
-                    remuneracion_propuesta = $31, partida_individual_propuesta = $32, lugar_posesion = $33, fecha_posesion = $34, numero_acta_final = $35, fecha_acta_final = $36, id_empleado_director = $37, id_tipo_cargo_director = $38, id_empleado_autoridad_delegado = $39, id_tipo_cargo_autoridad_delegado = $40, 
-                    id_empleado_testigo = $41, fecha_testigo = $42, id_empleado_elaboracion = $43, id_tipo_cargo_elaboracion = $44, id_empleado_revision = $45, id_tipo_cargo_revision = $46, id_empleado_control = $47, id_tipo_cargo_control = $48, comunicacion_electronica = $49, fecha_comunicacion = $50, 
-                    hora_comunicacion = $51, medio_comunicacion = $52, id_empleado_comunicacion = $53, id_tipo_cargo_comunicacion = $54, fecha_actualizacion = $55, proceso = $56, id_vacacion = $57, abreviatura_director = $58, abreviatura_delegado = $59, abreviatura_testigo = $60, 
-                    abreviatura_elaboracion = $61, abreviatura_revision = $62, abreviatura_control = $63, abreviatura_comunicacion = $64, abreviatura_empleado = $65
+                    numero_accion_personal = $1, fecha_elaboracion = $2, id_empleado_personal = $3, fecha_rige_desde = $4,
+                    fecha_rige_hasta = $5, id_tipo_accion_personal = $6, id_detalle_tipo_accion = $7, detalle_otro = $8, 
+                    especificacion = $9, declaracion_jurada = $10, adicion_base_legal = $11, observacion = $12, 
+                    id_proceso_actual = $13, id_nivel_gestion_actual = $14, id_unidad_administrativa = $15, 
+                    id_sucursal_actual = $16, id_lugar_trabajo_actual = $17, id_tipo_cargo_actual = $18, 
+                    id_grupo_ocupacional_actual = $19, id_grado_actual = $20, remuneracion_actual = $21, 
+                    partida_individual_actual = $22, id_proceso_propuesto = $23, id_sucursal_propuesta = $24, 
+                    id_nivel_gestion_propuesto = $25, id_unidad_adminsitrativa_propuesta = $26, 
+                    id_lugar_trabajo_propuesto = $27, id_tipo_cargo_propuesto = $28, id_grupo_ocupacional_propuesto = $29, 
+                    id_grado_propuesto = $30, remuneracion_propuesta = $31, partida_individual_propuesta = $32, 
+                    lugar_posesion = $33, fecha_posesion = $34, numero_acta_final = $35, fecha_acta_final = $36, 
+                    id_empleado_director = $37, id_tipo_cargo_director = $38, id_empleado_autoridad_delegado = $39, 
+                    id_tipo_cargo_autoridad_delegado = $40, id_empleado_testigo = $41, fecha_testigo = $42, 
+                    id_empleado_elaboracion = $43, id_tipo_cargo_elaboracion = $44, id_empleado_revision = $45, 
+                    id_tipo_cargo_revision = $46, id_empleado_control = $47, id_tipo_cargo_control = $48, 
+                    comunicacion_electronica = $49, fecha_comunicacion = $50, hora_comunicacion = $51, 
+                    medio_comunicacion = $52, id_empleado_comunicacion = $53, id_tipo_cargo_comunicacion = $54, 
+                    fecha_actualizacion = $55, proceso = $56, id_vacacion = $57, abreviatura_director = $58, 
+                    abreviatura_delegado = $59, abreviatura_testigo = $60, abreviatura_elaboracion = $61, 
+                    abreviatura_revision = $62, abreviatura_control = $63, abreviatura_comunicacion = $64, 
+                    abreviatura_empleado = $65
                 WHERE id = $66
-                `, [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.id_empleado_personal, formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta,
-                    formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro, formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal, formulario2.observacion,
-                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual, formulario3.id_unidad_administrativa, formulario3.id_sucursal_actual, formulario3.id_lugar_trabajo_actual, formulario3.id_tipo_cargo_actual,
-                    formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual, formulario3.partida_individual_actual,
-                    formulario3.id_proceso_propuesto, formulario3.id_sucursal_propuesta, formulario3.id_nivel_gestion_propuesto, formulario3.id_unidad_administrativa_propuesta, formulario3.id_lugar_trabajo_propuesto,
-                    formulario3.id_tipo_cargo_propuesto, formulario3.id_grupo_ocupacional_propuesto, formulario3.id_grado_propuesto, formulario3.remuneracion_propuesta, formulario3.partida_individual_propuesta,
+                `, [formulario1.numero_accion_personal, formulario1.fecha_elaboracion, formulario1.id_empleado_personal,
+                    formulario1.fecha_rige_desde, formulario1.fecha_rige_hasta,
+                    formulario2.id_tipo_accion_personal, formulario2.id_detalle_accion, formulario2.detalle_otro,
+                    formulario2.especificacion, formulario2.declaracion_jurada, formulario2.adicion_base_legal,
+                    formulario2.observacion,
+                    formulario3.id_proceso_actual, formulario3.id_nivel_gestion_actual, formulario3.id_unidad_administrativa,
+                    formulario3.id_sucursal_actual, formulario3.id_lugar_trabajo_actual, formulario3.id_tipo_cargo_actual,
+                    formulario3.id_grupo_ocupacional_actual, formulario3.id_grado_actual, formulario3.remuneracion_actual,
+                    formulario3.partida_individual_actual, formulario3.id_proceso_propuesto, formulario3.id_sucursal_propuesta,
+                    formulario3.id_nivel_gestion_propuesto, formulario3.id_unidad_administrativa_propuesta, formulario3.id_lugar_trabajo_propuesto,
+                    formulario3.id_tipo_cargo_propuesto, formulario3.id_grupo_ocupacional_propuesto,
+                    formulario3.id_grado_propuesto, formulario3.remuneracion_propuesta,
+                    formulario3.partida_individual_propuesta,
                     formulario4.lugar_posesion, formulario4.fecha_posesion, formulario4.actaFinal, formulario4.fechaActa,
-                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado, formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
-                    formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control, formulario5.cargo_RespRegistro_control,
-                    formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado, formulario6.medioComunicacionForm, id_empleado_comunicacion,
-                    id_empleado_comunica_cargo, fechaActualizacion, null, null, formulario5.abrevia_talentoHunamo, formulario5.abrevia_delegado, formulario5.abrevia_negativa,
-                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision, formulario5.abrevia_RespRegistro_control, formulario6.abrevCForm, formulario5.abrevia_servidorPublico, id
+                    formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado,
+                    formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
+                    formulario5.firma_RespElaboracion, formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision,
+                    formulario5.cargo_RespRevision, formulario5.firma_RespRegistro_control,
+                    formulario5.cargo_RespRegistro_control,
+                    formulario6.ComunicacionElect, formulario6.fechaComunicacion, formulario6.horaComunicado,
+                    formulario6.medioComunicacionForm, id_empleado_comunicacion,
+                    id_empleado_comunica_cargo, fechaActualizacion, null, null, formulario5.abrevia_talentoHunamo,
+                    formulario5.abrevia_delegado, formulario5.abrevia_negativa,
+                    formulario5.abrevia_RespElaboracion, formulario5.abrevia_RespRevision,
+                    formulario5.abrevia_RespRegistro_control, formulario6.abrevCForm, formulario5.abrevia_servidorPublico,
+                    id
                 ]);
-                // delete datosNuevos.user_name;
-                // delete datosNuevos.ip;
-                // var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
-                // var fecha_rige_desdeN = await FormatearFecha2(fec_rige_desde, 'ddd');
-                // var fecha_rige_hastaN = await FormatearFecha2(fec_rige_hasta, 'ddd');
-                // var primera_fecha_reemplazoN = await FormatearFecha2(primera_fecha_reemp, 'ddd');
-                // var fecha_acta_final_concursoN = await FormatearFecha2(fec_act_final_concurso, 'ddd');
-                // var fechaCreacionO = await FormatearFecha2(datos.fecha_creacion, 'ddd');
-                // var fecha_rige_desdeO = await FormatearFecha2(datos.fecha_rige_desde, 'ddd');
-                // var fecha_rige_hastaO = await FormatearFecha2(datos.fecha_rige_hasta, 'ddd');
-                // var primera_fecha_reemplazoO = await FormatearFecha2(datos.primera_fecha_reemplazo, 'ddd');
-                // var fecha_acta_final_concursoO = await FormatearFecha2(datos.fecha_acta_final_concurso, 'ddd');
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_solicitud_accion_personal',
@@ -860,38 +889,7 @@ class AccionPersonalControlador {
             }
         });
     }
-    // CONSULTAS GENERACIÓN DE PDF
-    EncontrarDatosEmpleados(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const EMPLEADO = yield database_1.default.query(`
-            SELECT d.id, d.nombre, d.apellido, d.identificacion, d.codigo, d.id_cargo, 
-                ec.sueldo, d.name_cargo AS cargo, d.name_dep AS departamento 
-            FROM informacion_general AS d, eu_empleado_cargos AS ec
-            WHERE d.id_cargo = ec.id AND d.id = $1
-            `, [id]);
-            if (EMPLEADO.rowCount != 0) {
-                return res.jsonp(EMPLEADO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    EncontrarDatosCiudades(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM e_ciudades where id = $1
-            `, [id]);
-            if (CIUDAD.rowCount != 0) {
-                return res.json(CIUDAD.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
+    // METODO DE BUSQUEDA DE DATOS DE DOCUMENTOS DE ACCION DE PERSONAL    **USADO
     EncontrarPedidoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -1021,28 +1019,60 @@ class AccionPersonalControlador {
     ListarPedidoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ACCION = yield database_1.default.query(`
-                SELECT 
-                    ap.id, 
-	                ap.numero_accion_personal, 
-	                ap.fecha_elaboracion, 
-                    CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
-                    ap.fecha_rige_desde, ap.fecha_rige_hasta, 
-                    ap.id_tipo_accion_personal, 
-	                tp.descripcion AS accion_personal, 
-                    ap.id_detalle_tipo_accion, 
-	                dtp.descripcion, 
-	                ap.proceso, 
-	                ap.id_vacacion
-                FROM map_documento_accion_personal AS ap
-                    INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
-                    INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
-                    INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
+            SELECT 
+                ap.id, 
+                ap.numero_accion_personal, 
+                ap.fecha_elaboracion, 
+                CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
+                ap.fecha_rige_desde, ap.fecha_rige_hasta, 
+                ap.id_tipo_accion_personal, 
+                tp.descripcion AS accion_personal, 
+                ap.id_detalle_tipo_accion, 
+                dtp.descripcion, 
+                ap.proceso, 
+                ap.id_vacacion
+            FROM map_documento_accion_personal AS ap
+                INNER JOIN informacion_general AS inf ON inf.id = ap.id_empleado_personal
+                INNER JOIN map_tipo_accion_personal AS tp ON tp.id = ap.id_tipo_accion_personal
+                INNER JOIN map_detalle_tipo_accion_personal AS dtp ON dtp.id = ap.id_detalle_tipo_accion
             `);
             if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros' });
+            }
+        });
+    }
+    // CONSULTAS GENERACION DE PDF
+    EncontrarDatosEmpleados(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const EMPLEADO = yield database_1.default.query(`
+            SELECT d.id, d.nombre, d.apellido, d.identificacion, d.codigo, d.id_cargo, 
+                ec.sueldo, d.name_cargo AS cargo, d.name_dep AS departamento 
+            FROM informacion_general AS d, eu_empleado_cargos AS ec
+            WHERE d.id_cargo = ec.id AND d.id = $1
+            `, [id]);
+            if (EMPLEADO.rowCount != 0) {
+                return res.jsonp(EMPLEADO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    EncontrarDatosCiudades(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const CIUDAD = yield database_1.default.query(`
+            SELECT * FROM e_ciudades where id = $1
+            `, [id]);
+            if (CIUDAD.rowCount != 0) {
+                return res.json(CIUDAD.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

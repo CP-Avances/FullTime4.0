@@ -72,7 +72,7 @@ export class VerPedidoAccionComponent implements OnInit {
   ObtenerTiposAccion() {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
-      this.tipos_accion = datos; 
+      this.tipos_accion = datos;
     });
   }
 
@@ -96,12 +96,12 @@ export class VerPedidoAccionComponent implements OnInit {
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
-      console.log('datosPedido: ',this.datosPedido);
+      console.log('datosPedido: ', this.datosPedido);
 
-      this.tipos_accion.forEach(item => {
-          if (item.descripcion == this.datosPedido[0].descripcion) {
-            this.textoFijo = item.base_legal + ' ';
-          }
+      this.tipos_accion.forEach((item: any) => {
+        if (item.descripcion == this.datosPedido[0].descripcion) {
+          this.textoFijo = item.base_legal + ' ';
+        }
       });
 
     });
