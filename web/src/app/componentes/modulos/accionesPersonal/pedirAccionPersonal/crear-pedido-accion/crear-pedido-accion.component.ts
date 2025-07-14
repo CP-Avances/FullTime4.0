@@ -619,7 +619,6 @@ export class CrearPedidoAccionComponent implements OnInit {
   onTipoAccionSeleccionado(e: MatAutocompleteSelectedEvent) {
     if (e.option.value != undefined && e.option.value != null) {
       this.tipos_accion.forEach(item => {
-        console.log(item,' e.option.value: ',e.option.value)
         if (item.descripcion == e.option.value) {
           this.textoFijo = item.base_legal;
           if (item.nombre == 'OTRO') {
@@ -1200,7 +1199,6 @@ export class CrearPedidoAccionComponent implements OnInit {
         ip: this.ip, ip_local: this.ips_locales,
       };
 
-      console.log("informacion", datosAccion);
       this.ValidacionesIngresos(form1, form2, datosAccion);
 
     })

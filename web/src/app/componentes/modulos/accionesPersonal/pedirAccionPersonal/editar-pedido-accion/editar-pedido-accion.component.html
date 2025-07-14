@@ -270,7 +270,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label class="letra">Proceso</mat-label>
+                                        <mat-label>Proceso</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="tipoProcesoF"
                                             [matAutocomplete]="auto3" readonly required>
                                         <mat-autocomplete #auto3="matAutocomplete">
@@ -315,7 +315,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label class="letra">Unidad Administrativa</mat-label>
+                                        <mat-label>Unidad Administrativa</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idDepaActual"
                                             [matAutocomplete]="auto6" readonly>
                                         <mat-autocomplete #auto6="matAutocomplete">
@@ -330,7 +330,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label class="letra">Lugar de trabajo</mat-label>
+                                        <mat-label>Lugar de trabajo</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="idCiudad"
                                             [matAutocomplete]="auto7" readonly>
                                         <mat-autocomplete #auto7="matAutocomplete">
@@ -382,7 +382,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="w-100">
-                                        <mat-label class="letra">Denominación del puesto propuesto</mat-label>
+                                        <mat-label>Denominación del puesto propuesto</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="tipoCargoF"
                                             [matAutocomplete]="auto10" readonly>
                                         <mat-autocomplete #auto10="matAutocomplete">
@@ -429,7 +429,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label class="letra">Proceso propuesto</mat-label>
+                                        <mat-label>Proceso propuesto</mat-label>
                                         <input type="text" aria-label="Number" matInput [formControl]="procesoPropuesto"
                                             [matAutocomplete]="auto11">
                                         <mat-autocomplete #auto11="matAutocomplete">
@@ -489,7 +489,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
-                                        <mat-label class="letra">Lugar de trabajo</mat-label>
+                                        <mat-label>Lugar de trabajo</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="idCiudadPropuesta" [matAutocomplete]="auto15">
                                         <mat-autocomplete #auto15="matAutocomplete">
@@ -535,7 +535,7 @@
                             <div class="col-md">
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="w-100">
-                                        <mat-label class="letra">Denominación del puesto propuesto</mat-label>
+                                        <mat-label>Denominación del puesto propuesto</mat-label>
                                         <input type="text" aria-label="Number" matInput
                                             [formControl]="tipoCargoPropuestoF" [matAutocomplete]="auto18">
                                         <mat-autocomplete #auto18="matAutocomplete">
@@ -575,19 +575,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <div class="declaracion-radio-group ml-3">
-                                    <mat-label class="letra">HABILITAR EL FORMULARIO DE POSESIÓN DEL PUESTO </mat-label>
-                                    <mat-checkbox class="example-margin" [formControl]="habilitarForm4"></mat-checkbox>
-                                </div>
-                            </div>
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <div class="declaracion-radio-group ml-3">
+                            <mat-label class="letra">HABILITAR EL FORMULARIO DE POSESIÓN DEL PUESTO </mat-label>
+                            <mat-checkbox class="example-margin" [formControl]="habilitarForm4"></mat-checkbox>
                         </div>
                     </div>
                 </form>
                 <br><br>
-                <div class="d-flex flex-wrap justify-content-between w-75 m-auto">
+                <div class="d-flex flex-wrap justify-content-between w-75 m-auto mt-3">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
                     <button mat-raised-button id="btn-raised" class="float-right"
                         (click)="validarForm(thirdFormGroup.value, stepper)">Siguiente</button>
@@ -852,7 +848,7 @@
                     </div>
                     <div class="row mt-4 w-100">
                         <hr style="width: 90%; margin: auto; margin-top: 5px; margin-bottom: 5px;">
-                        <div class="col-12 col-md-5">
+                        <div class="col-12 col-md-6">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
                                     Elaboración</mat-label>
@@ -882,7 +878,7 @@
                     </div>
 
                     <div class="row mt-1 w-100">
-                        <div class="col-12 col-md-5">
+                        <div class="col-12 col-md-6">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
                                     Revisión</mat-label>
@@ -911,7 +907,7 @@
                     </div>
 
                     <div class="row mt-1 w-100">
-                        <div class="col-12 col-md-5">
+                        <div class="col-12 col-md-6">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-label style="width: 100%; font-size: small; margin-top: 5px;">Responsable de
                                     Registro y Control</mat-label>
@@ -1041,10 +1037,17 @@
                                             person
                                         </mat-icon>
                                     </mat-form-field>
+                                    <label *ngIf="cargoFirma6?.cargo != null && cargoFirma6?.cargo != ''"
+                                        style="font-size: small; margin: auto; margin-top: -3px; margin-bottom: 2px;">
+                                        Cargo <b>{{cargoFirma6?.cargo}}</b>
+                                    </label>
                                 </div>
                             </div>
-                            <div><label class="ml-3">**Si la comunicación fue electrónica se deberá colocar el medio por
-                                    el cual se notificó al servidor: así como, el número del documento</label></div>
+                            <div>
+                                <label class="ml-3">**Si la comunicación fue electrónica se deberá colocar el medio por
+                                    el cual se notificó al servidor: así como, el número del documento
+                                </label>
+                            </div>
                         </div>
                     </div>
 

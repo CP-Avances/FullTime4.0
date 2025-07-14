@@ -391,17 +391,17 @@ export class EditarPedidoAccionComponent implements OnInit {
     console.log('usuario: ', this.InfoUser)
   }
 
-   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase().trim().split(/\s+/);
       return this.empleados.filter((info: any) => {
-        
+
         const nombreCompleto = info.empleado.toUpperCase();
         return filterValue.every(fragmento =>
           nombreCompleto.includes(fragmento)
         );
-      });  
+      });
     }
   }
 
@@ -658,6 +658,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   cargoFirma3: any;
   cargoFirma4: any;
   cargoFirma5: any;
+  cargoFirma6: any;
   ObtenerCargos() {
     this.cargos = [];
     this.restCargo.ListaCargos().subscribe((datos) => {
@@ -691,8 +692,13 @@ export class EditarPedidoAccionComponent implements OnInit {
       info = {
         informacion: datos.empleado.toUpperCase(),
       };
-    } else {
+    } else if (firma == 5) {
       this.cargoFirma5 = {};
+      info = {
+        informacion: datos.empleado.toUpperCase(),
+      };
+    } else {
+      this.cargoFirma6 = {};
       info = {
         informacion: datos.empleado.toUpperCase(),
       };
@@ -716,6 +722,8 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.cargoFirma4 = x
       } else if (firma == 5) {
         this.cargoFirma5 = x
+      } else {
+        this.cargoFirma6 = x
       }
 
     }, err => {
@@ -740,12 +748,14 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.cargoFirma4 = x
       } else if (firma == 5) {
         this.cargoFirma5 = x
+      } else {
+        this.cargoFirma6 = x
       }
 
     })
 
   }
-  
+
 
   // METODO PARA OBTENER LISTA DE CIUDADES
   id_sucursal: any = 0
@@ -780,9 +790,6 @@ export class EditarPedidoAccionComponent implements OnInit {
       var datoOtro = "";
       this.tipos_accion.forEach(item => {
         if (item.descripcion == e.option.value) {
-          console.log('item: ', item);
-
-          this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
           this.textoFijo = item.base_legal + ' ';
           datoOtro = item.nombre;
         }
@@ -829,95 +836,103 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.thirdFormGroup.reset();
 
     if (e.id != undefined && e.id != null) {
-      this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
-        this.InfoUser = datos
-        
-        this.InfoUser.forEach(valor => {
-          this.idUserSelect = e.id
 
-          this.firstFormGroup.patchValue({funcionarioForm: e.empleado,});
-          this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
-          this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
+      if (e.id != this.datosPedido[0].id_empleado_personal) {
+        this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
+          this.InfoUser = datos
 
-          //Proceso
-          const proceso = this.procesos.find((info: any) => info.id == valor.id_proceso);
-          if (proceso == undefined || proceso == null) {
-            this.thirdFormGroup.controls['tipoProcesoForm'].setValue('No registrado')
-          } else {
-            this.thirdFormGroup.controls['tipoProcesoForm'].setValue(proceso.nombre)
-          }
-          //Sucursal
-          const sucursal = this.sucursal.find((inf: any) => inf.id == valor.id_suc);
-          if (sucursal == undefined || sucursal == null) {
-            this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
-          } else {
-            this.thirdFormGroup.controls['sucursalForm'].setValue(sucursal.nombre)
-            this.departamentos.forEach(item => {
-              if (item.id_sucursal == sucursal.id) {
-                this.departamentosact.push(item);
-              }
-            });
+          this.InfoUser.forEach(valor => {
+            this.idUserSelect = e.id
 
-            this.FiltrarDepaActua();
-          }
-          //Departamento
-          const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
-          if (departamento == undefined || departamento == null) {
-            this.thirdFormGroup.controls['DepartamentoForm'].setValue('No registrado')
-            this.thirdFormGroup.controls['NivelDepaForm'].setValue('No registrado')
-          } else {
-            this.thirdFormGroup.controls['DepartamentoForm'].setValue(departamento.nombre)
-            if (departamento.departamento_padre == null || departamento.departamento_padre == undefined) {
+            this.firstFormGroup.patchValue({ funcionarioForm: e.empleado, });
+            this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
+            this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
+
+            //Proceso
+            const proceso = this.procesos.find((info: any) => info.id == valor.id_proceso);
+            if (proceso == undefined || proceso == null) {
+              this.thirdFormGroup.controls['tipoProcesoForm'].setValue('No registrado')
+            } else {
+              this.thirdFormGroup.controls['tipoProcesoForm'].setValue(proceso.nombre)
+            }
+            //Sucursal
+            const sucursal = this.sucursal.find((inf: any) => inf.id == valor.id_suc);
+            if (sucursal == undefined || sucursal == null) {
+              this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
+            } else {
+              this.thirdFormGroup.controls['sucursalForm'].setValue(sucursal.nombre)
+              this.departamentos.forEach(item => {
+                if (item.id_sucursal == sucursal.id) {
+                  this.departamentosact.push(item);
+                }
+              });
+
+              this.FiltrarDepaActua();
+            }
+            //Departamento
+            const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
+            if (departamento == undefined || departamento == null) {
+              this.thirdFormGroup.controls['DepartamentoForm'].setValue('No registrado')
               this.thirdFormGroup.controls['NivelDepaForm'].setValue('No registrado')
             } else {
-              this.thirdFormGroup.controls['NivelDepaForm'].setValue(departamento.departamento_padre)
+              this.thirdFormGroup.controls['DepartamentoForm'].setValue(departamento.nombre)
+              if (departamento.departamento_padre == null || departamento.departamento_padre == undefined) {
+                this.thirdFormGroup.controls['NivelDepaForm'].setValue('No registrado')
+              } else {
+                this.thirdFormGroup.controls['NivelDepaForm'].setValue(departamento.departamento_padre)
+              }
             }
-          }
 
-          //Lugar de trabajo
-          this.thirdFormGroup.controls['idCiudadForm'].setValue(sucursal.descripcion)
-          //Grupo ocupacion
-          const grupo_ocupacional = this.grupoOcupacional.find((inf: any) => inf.id == valor.id_grupo_ocupacional);
-          if (grupo_ocupacional == undefined || grupo_ocupacional == null) {
-            this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue('No registrado')
-          } else {
-            this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue(grupo_ocupacional.descripcion)
-          }
-          //Grado
-          const grado = this.grados.find((inf: any) => inf.id == valor.id_grado);
-          if (grado == undefined || grado == null) {
-            this.thirdFormGroup.controls['gradoForm'].setValue('No registrado')
-          } else {
-            this.thirdFormGroup.controls['gradoForm'].setValue(grado.descripcion)
-          }
-          //Cargo actual
-          const cargo = this.cargos.find((inf: any) => inf.id == valor.id_tipo_cargo);
-          if (cargo == undefined || cargo == null) {
-            this.thirdFormGroup.controls['tipoCargoForm'].setValue('No registrado')
-          } else {
-            this.thirdFormGroup.controls['tipoCargoForm'].setValue(cargo.cargo)
-          }
-          //Remuneracion
-          this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
-          this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
+            //Lugar de trabajo
+            this.thirdFormGroup.controls['idCiudadForm'].setValue(sucursal.descripcion)
+            //Grupo ocupacion
+            const grupo_ocupacional = this.grupoOcupacional.find((inf: any) => inf.id == valor.id_grupo_ocupacional);
+            if (grupo_ocupacional == undefined || grupo_ocupacional == null) {
+              this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue('No registrado')
+            } else {
+              this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue(grupo_ocupacional.descripcion)
+            }
+            //Grado
+            const grado = this.grados.find((inf: any) => inf.id == valor.id_grado);
+            if (grado == undefined || grado == null) {
+              this.thirdFormGroup.controls['gradoForm'].setValue('No registrado')
+            } else {
+              this.thirdFormGroup.controls['gradoForm'].setValue(grado.descripcion)
+            }
+            //Cargo actual
+            const cargo = this.cargos.find((inf: any) => inf.id == valor.id_tipo_cargo);
+            if (cargo == undefined || cargo == null) {
+              this.thirdFormGroup.controls['tipoCargoForm'].setValue('No registrado')
+            } else {
+              this.thirdFormGroup.controls['tipoCargoForm'].setValue(cargo.cargo)
+            }
+            //Remuneracion
+            this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
+            this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
 
-          this.fivethFormGroup.controls['idEmpleadoHForm'].setValue(e.empleado);
-          this.fivethFormGroup.patchValue({
-            fechaServidorForm: this.FechaActual,
-          });
+            this.fivethFormGroup.controls['idEmpleadoHForm'].setValue(e.empleado);
+            this.fivethFormGroup.patchValue({
+              fechaServidorForm: this.FechaActual,
+            });
 
-          this.btnForm1 = false
+            this.btnForm1 = false
 
+          })
+
+          this.fivethFormGroup.controls['razonForm'].setValue('En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.');
+          this.ListaEmpleadosFirmas(e.id);
+
+        }, err => {
+          this.InfoUser = null
+          this.toastr.warning(err.error.text, "Advertencia.", { timeOut: 5000, });
+          this.btnForm1 = true;
+          this.thirdFormGroup.reset();
         })
+      }else{
+        this.CargarInformacion();
+      }
 
-        this.fivethFormGroup.controls['razonForm'].setValue('En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.');
-        this.ListaEmpleadosFirmas(e.id);
 
-      }, err => {
-        this.InfoUser = null
-        this.toastr.warning(err.error.text, "Advertencia.", { timeOut: 5000, });
-        this.thirdFormGroup.reset();
-      })
     } else {
       this.btnForm1 = true
     }
@@ -957,11 +972,11 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
-  CargarInfoCargos(id_empleado: any, id_cargo: any, cargo: any ){
+  CargarInfoCargos(id_empleado: any, id_cargo: any, cargo: any) {
     const x = {
-        id_empleado: id_empleado,
-        id_cargo: id_cargo,
-        cargo: cargo
+      id_empleado: id_empleado,
+      id_cargo: id_cargo,
+      cargo: cargo
     }
     return x;
   }
@@ -984,8 +999,6 @@ export class EditarPedidoAccionComponent implements OnInit {
 
         this.tipos_accion.forEach(item => {
           if (item.descripcion == this.datosPedido[0].descripcion) {
-           console.log('item: ', item);
-
             this.secondFormGroup.controls['baseLegalForm'].setValue(item.base_legal);
             this.textoFijo = item.base_legal + ' ';
             if (item.nombre == 'OTRO') {
@@ -1052,12 +1065,13 @@ export class EditarPedidoAccionComponent implements OnInit {
           fechaActaFinalForm: this.datosPedido[0].fecha_acta_final,
         });
 
-        this.cargoFirma1 = this.CargarInfoCargos(this.datosPedido[0].empleado_director, this.datosPedido[0].id_tipo_cargo_director, this.datosPedido[0].cargo_director)
-        this.cargoFirma2 = this.CargarInfoCargos(this.datosPedido[0].empleado_autoridad_delegado, this.datosPedido[0].id_tipo_cargo_autoridad_delegado, this.datosPedido[0].cargo_autoridad_delegado)
-        this.cargoFirma3 = this.CargarInfoCargos(this.datosPedido[0].empleado_elaboracion, this.datosPedido[0].id_tipo_cargo_elaboracion, this.datosPedido[0].tipo_cargo_elaboracion)
-        this.cargoFirma4 = this.CargarInfoCargos(this.datosPedido[0].empleado_revision, this.datosPedido[0].id_tipo_cargo_revision, this.datosPedido[0].tipo_cargo_revision)
-        this.cargoFirma5 = this.CargarInfoCargos(this.datosPedido[0].empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
-        
+        this.cargoFirma1 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_director, this.datosPedido[0].id_tipo_cargo_director, this.datosPedido[0].cargo_director)
+        this.cargoFirma2 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_autoridad_delegado, this.datosPedido[0].id_tipo_cargo_autoridad_delegado, this.datosPedido[0].cargo_autoridad_delegado)
+        this.cargoFirma3 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_elaboracion, this.datosPedido[0].id_tipo_cargo_elaboracion, this.datosPedido[0].tipo_cargo_elaboracion)
+        this.cargoFirma4 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_revision, this.datosPedido[0].id_tipo_cargo_revision, this.datosPedido[0].tipo_cargo_revision)
+        this.cargoFirma5 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
+        this.cargoFirma6 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
+
         this.fivethFormGroup.patchValue({
           idEmpleadoRAForm: this.datosPedido[0].empleado_director,
           idEmpleadoRForm: this.datosPedido[0].empleado_autoridad_delegado,
@@ -1077,7 +1091,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           abrevRGForm: this.datosPedido[0].abreviatura_elaboracion,
           abrevRHForm: this.datosPedido[0].abreviatura_revision,
           abrevRRCForm: this.datosPedido[0].abreviatura_control
-,
+          ,
         });
 
         this.btnForm1 = false
@@ -1087,7 +1101,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           fechaComunicadoForm: this.datosPedido[0].fecha_comunicacion,
           horaComunicadoForm: this.datosPedido[0].hora_comunicacion,
           medioComunicacionForm: this.datosPedido[0].medio_comunicacion,
-          abrevCForm: this.datosPedido[0].abrevRRC,
+          abrevCForm: this.datosPedido[0].abreviatura_comunicacion,
           idEmpleadoCForm: this.datosPedido[0].empleado_comunicacion
         })
 
@@ -1132,7 +1146,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     });
   }
 
-    // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarTipoAccion(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
@@ -1256,14 +1270,12 @@ export class EditarPedidoAccionComponent implements OnInit {
     const ahora = new Date();
     const horaActual = ahora.toTimeString().split(' ')[0];
 
-    console.log('datos1: ',datos1);
-
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA EL PEDIDO DE ACCIÓN DE PERSONAL
     this.restE.BuscarEmpleadoNombre(datos1).subscribe((empl1) => {
 
       var idEmpl_pedido = empl1[0].id;
       var idEmpl_pedido_cargo = empl1[0].id_cargo_;
-      
+
       let id_tipo_accion_personal = this.tipos_accion.find(item => item.descripcion === form2.idTipoAccionFom);
       let procesoActual = this.procesos.find(item => item.nombre === form3.tipoProcesoForm);
       let nivel_gestion_actual = this.departamentos.find(item => item.nombre === form3.NivelDepaForm)
@@ -1290,6 +1302,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
       // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
       let datosAccion = {
+        id: this.idPedido,
 
         //parte formulario 1
         formulario1: {
@@ -1393,8 +1406,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         ip: this.ip, ip_local: this.ips_locales,
       };
 
-      console.log("informacion", datosAccion);
-      //this.ValidacionesIngresos(form1, form2, datosAccion);
+      this.ValidacionesIngresos(form1, form2, datosAccion);
 
     });
   }
@@ -1416,12 +1428,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       form2.tipoCargoForm === undefined
     ) {
       console.log("INGRESA 3", datosAccion);
-    } else if (
-      form1.tipoDecretoForm === undefined &&
-      form2.tipoCargoForm === undefined
-    ) {
-      console.log("INGRESA 5", datosAccion);
-
+      this.GuardarDatos(datosAccion);
     } else {
       console.log("INGRESA 9", datosAccion);
       this.GuardarDatos(datosAccion);
@@ -1456,6 +1463,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       datosAccion.salario_propuesto = null;
     }
     console.log("DATOS FINALES", datosAccion);
+
     this.restAccion.ActualizarPedidoAccion(datosAccion).subscribe((res) => {
       this.toastr.success(
         "Operación exitosa.",
@@ -1482,7 +1490,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   CerrarVentana(opcion: number, datos: any) {
     this.componentel.ver_editar = false;
-    console.log('opcion: ',opcion,' - ','datos: ',datos)
+    console.log('opcion: ', opcion, ' - ', 'datos: ', datos)
     if (opcion === 1 && this.pagina === 'listar-pedido') {
       this.componentel.ver_lista = true;
     }

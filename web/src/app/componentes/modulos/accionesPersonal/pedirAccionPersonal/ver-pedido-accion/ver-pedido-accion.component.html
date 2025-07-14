@@ -15,7 +15,7 @@
             </div>
             <div class="col-5 col-md-2 mb-2 mb-md-0 mb-2 mb-md-0 order-3 order-md-2">
                 <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                    (click)="AbrirEditar(datosPedido[0].id)">
+                    (click)="AbrirEditar(datosPedido[0]?.id)">
                     Editar
                 </button>
             </div>
@@ -30,33 +30,33 @@
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Número acción de personal:</b>
-                                {{datosPedido[0].numero_accion_personal}}
+                                {{datosPedido[0]?.numero_accion_personal}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Fecha pedido:</b>
-                                {{datosPedido[0].fecha_elaboracion | date:'dd/MM/yyyy' }}
+                                {{datosPedido[0]?.fecha_elaboracion | date:'dd/MM/yyyy' }}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Empleado:</b>
-                                {{datosPedido[0].nombres.toUpperCase()}}
+                                {{datosPedido[0]?.nombres.toUpperCase()}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Rige desde:</b>
-                                {{datosPedido[0].fecha_elaboracion | date:'dd/MM/yyyy' }}
+                                {{datosPedido[0]?.fecha_elaboracion | date:'dd/MM/yyyy' }}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Rige hasta:</b>
-                                {{datosPedido[0].fecha_elaboracion | date:'dd/MM/yyyy' }}
+                                {{datosPedido[0]?.fecha_elaboracion | date:'dd/MM/yyyy' }}
                             </label>
                         </div>
                     </div>
@@ -67,42 +67,49 @@
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Tipo de acción personal:</b>
-                                {{datosPedido[0].accion_personal}}
+                                {{datosPedido[0]?.accion_personal}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Detalle:</b>
-                                {{datosPedido[0].descripcion}}
+                                {{datosPedido[0]?.descripcion}}
                             </label>
                         </div>
                     </div>
-                    <div class="row" *ngIf="datosPedido[0].detalle_otro != '' && datosPedido[0].detalle_otro != null">
+                    <div class="row" *ngIf="datosPedido[0]?.detalle_otro != '' && datosPedido[0]?.detalle_otro != null">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Otro:</b>
-                                {{datosPedido[0].detalle_otro}}
+                                {{datosPedido[0]?.detalle_otro}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Especificación:</b>
-                                {{datosPedido[0].especificacion}}
+                                {{datosPedido[0]?.especificacion}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Observación:</b>
-                                {{datosPedido[0].observacion}}
+                                {{datosPedido[0]?.observacion}}
                             </label>
                         </div>
                     </div>
                      <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Decreto:</b>
-                                {{datosPedido[0].observacion}}
+                                {{datosPedido[0]?.observacion}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm" id="verticalLine">
+                            <label class="col-sm col-form-label">
+                                {{textoFijo}}
                             </label>
                         </div>
                     </div>
@@ -113,116 +120,150 @@
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Proceso actual:</b>
-                                {{datosPedido[0].proceso_actual}}
+                                {{datosPedido[0]?.proceso_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Proceso propuesto:</b>
-                                {{datosPedido[0].proceso_propuesto}}
+                                {{datosPedido[0]?.proceso_propuesto}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Nivel de gestión actual:</b>
-                                {{datosPedido[0].nivel_gestion_actual}}
+                                {{datosPedido[0]?.nivel_gestion_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Nivel de gestión propuesto:</b>
-                                {{datosPedido[0].nivel_gestion_propuesto}}
+                                {{datosPedido[0]?.nivel_gestion_propuesto}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Unidad administrativa actual:</b>
-                                {{datosPedido[0].unidad_administrativa}}
+                                {{datosPedido[0]?.unidad_administrativa}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Unidad administrativa propuesto:</b>
-                                {{datosPedido[0].unidad_administrativa_propuesta}}
+                                {{datosPedido[0]?.unidad_administrativa_propuesta}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Lugar de trabajo:</b>
-                                {{datosPedido[0].lugar_trabajo_actual}}
+                                {{datosPedido[0]?.lugar_trabajo_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Lugar de trabajo propuesto:</b>
-                                {{datosPedido[0].lugar_trabajo_propuesto}}
+                                {{datosPedido[0]?.lugar_trabajo_propuesto}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Denominación del puesto:</b>
-                                {{datosPedido[0].cargo_actual}}
+                                {{datosPedido[0]?.cargo_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Denominación del puesto propuesto:</b>
-                                {{datosPedido[0].cargo_propuesto}}
+                                {{datosPedido[0]?.cargo_propuesto}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Grupo ocupacional actual:</b>
-                                {{datosPedido[0].grupo_ocupacional_actual}}
+                                {{datosPedido[0]?.grupo_ocupacional_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Grupo ocupacional propuesto:</b>
-                                {{datosPedido[0].grupo_ocupacional_propuesto}}
+                                {{datosPedido[0]?.grupo_ocupacional_propuesto}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Grado actual:</b>
-                                {{datosPedido[0].grado_actual}}
+                                {{datosPedido[0]?.grado_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Grado propuesto:</b>
-                                {{datosPedido[0].grado_propuesto}}
+                                {{datosPedido[0]?.grado_propuesto}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Remuneracion mensual actual:</b>
-                                {{datosPedido[0].remuneracion_actual | currency:'USD':'symbol':'1.2-2'}}
+                                {{datosPedido[0]?.remuneracion_actual | currency:'USD':'symbol':'1.2-2'}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Remuneracion mensual propuesto:</b>
-                                {{datosPedido[0].remuneracion_propuesta | currency:'USD':'symbol':'1.2-2'}}
+                                {{datosPedido[0]?.remuneracion_propuesta | currency:'USD':'symbol':'1.2-2'}}
                             </label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Partida actual:</b>
-                                {{datosPedido[0].partida_individual_actual}}
+                                {{datosPedido[0]?.partida_individual_actual}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Partida propuesto:</b>
-                                {{datosPedido[0].partida_individual_propuesta}}
+                                {{datosPedido[0]?.partida_individual_propuesta}}
                             </label>
                         </div>
                     </div>
                     <hr style="width: 100%; margin: auto; margin-top: 10px; margin-bottom: 5px;">
+                    <div class="row">
+                        <div class="subtitulo">
+                            <span>POSESIÓN DEL PUESTO</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm" id="verticalLine">
+                            <label class="col-sm col-form-label"><b>Empleado:</b>
+                                {{datosPedido[0]?.nombres.toUpperCase()}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm" id="verticalLine">
+                            <label class="col-sm col-form-label"><b>Cédula:</b>
+                                {{datosPedido[0]?.cedula_empleado}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm" id="verticalLine">
+                            <label class="col-sm col-form-label"><b>Lugar de trabajo:</b>
+                                {{datosPedido[0]?.lugar_trabajo_propuesto}}
+                            </label>
+                        </div>
+                        <div class="col-sm" id="verticalLine">
+                            <label class="col-sm col-form-label"><b>Fecha:</b>
+                                {{datosPedido[0]?.fecha_posesion | date:'dd/MM/yyyy'}}
+                            </label>
+                        </div>
+                    </div>
+                    
+
+                    <hr style="width: 100%; margin: auto; margin-top: 10px; margin-bottom: 5px;">
                     <div class="row mb-4">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Creado junto con solicitud de vacaciones:</b>
-                                {{datosPedido[0].id_vacacion != null ? 'SI - '+datosPedido[0].id_vacacion : 'NO'}}
+                                {{datosPedido[0]?.id_vacacion != null ? 'SI - '+datosPedido[0].id_vacacion : 'NO'}}
                             </label>
                         </div>
                     </div>
