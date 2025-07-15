@@ -466,6 +466,16 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarTipoAccion(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.tipos_accion.filter((info: any) =>
+        info.descripcion.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
   // BUSQUEDA DE DATOS DE EMPRESA
   empresa: any = [];
   MostrarDatos() {
@@ -475,64 +485,6 @@ export class EditarPedidoAccionComponent implements OnInit {
       .subscribe((data) => {
         this.empresa = data;
       });
-  }
-
-  FiltrarDepaActua() {
-    this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDeparta(value))
-    );
-  }
-
-  FiltrarDepaPro() {
-    this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDepaPro(value))
-    );
-
-    this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDepaPro(value))
-    );
-  }
-
-  filtrosEmpleados() {
-
-    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
   }
 
   datosForm6(formValue: any, stepper: any) {
@@ -582,11 +534,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.procesos = [];
     this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
-      this.filtroProceso = this.procesoPropuesto.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarProceso(value))
-      );
-
     });
   }
   // BUSQUEDA DE DATOS DE LA TABLA GRUPO OCUPACIONAL
@@ -595,11 +542,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.grupoOcupacional = [];
     this.restGrupo.ConsultarGrupoOcupacion().subscribe((datos) => {
       this.grupoOcupacional = datos;
-      this.filtroGrupoOcupacional = this.grupoOcupacionalPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarGrupoOcupacional(value))
-      );
-
     });
   }
 
@@ -609,10 +551,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.grados = [];
     this.restGrado.ConsultarGrados().subscribe((datos) => {
       this.grados = datos;
-      this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarGrado(value))
-      );
     });
   }
 
@@ -628,10 +566,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.cargos = [];
     this.restCargo.ListaCargos().subscribe((datos) => {
       this.cargos = datos;
-      this.filtroCargos = this.tipoCargoPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCargo(value))
-      );
     });
   }
 
@@ -725,15 +659,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.sucursal = [];
     this.restSu.BuscarSucursal().subscribe((data) => {
       this.sucursal = data;
-      this.filtroSucursal = this.idSucursal.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarSucursal(value))
-      );
-
-      this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarSucursal(value))
-      );
     });
   }
 
@@ -883,6 +808,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           })
 
           this.ListaEmpleadosFirmas(e.id);
+          this.filtrosTipoAcciones();
 
         }, err => {
           this.InfoUser = null
@@ -917,7 +843,9 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado' || formValue.NivelDepaForm == 'No registrado'
       || formValue.DepartamentoForm == 'No registrado' || formValue.grupoOcupacionalForm == 'No registrado' || formValue.gradoForm == 'No registrado'
-      || formValue.tipoCargoForm == 'No registrado'
+      || formValue.tipoCargoForm == 'No registrado' || formValue.idCiudadForm == 'No registrado' || formValue.tipoProcesoForm == '' || formValue.sucursalForm == '' || formValue.NivelDepaForm == ''
+      || formValue.DepartamentoForm == '' || formValue.grupoOcupacionalForm == '' || formValue.gradoForm == ''
+      || formValue.tipoCargoForm == '' || formValue.idCiudadForm == ''
     ) {
       this.toastr.warning(
         "El empleado debe cumplir con los datos obligatorios de su situacion actual.",
@@ -1030,7 +958,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.cargoFirma3 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_elaboracion, this.datosPedido[0].id_tipo_cargo_elaboracion, this.datosPedido[0].tipo_cargo_elaboracion)
         this.cargoFirma4 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_revision, this.datosPedido[0].id_tipo_cargo_revision, this.datosPedido[0].tipo_cargo_revision)
         this.cargoFirma5 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
-        this.cargoFirma6 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
+        this.cargoFirma6 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_comunicacion, this.datosPedido[0].id_tipo_cargo_comunicacion, this.datosPedido[0].cargo_comunicacion)
 
         this.fivethFormGroup.patchValue({
           idEmpleadoRAForm: this.datosPedido[0].empleado_director,
@@ -1064,9 +992,12 @@ export class EditarPedidoAccionComponent implements OnInit {
           idEmpleadoCForm: this.datosPedido[0].empleado_comunicacion
         })
 
+        this.FiltrarDepaActua();
+        this.ListaEmpleadosFirmas(this.datosPedido[0].id_empleado);
+        this.filtrosTipoAcciones();
+
       });
   }
-
 
   // METODO DE BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCIONES
   tipos_accion: any = [];
@@ -1074,22 +1005,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-      this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarTipoAccion(value))
-      );
-
     });
-  }
-
-  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
-  private _filtrarTipoAccion(value: string): any {
-    if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.tipos_accion.filter((info: any) =>
-        info.descripcion.toUpperCase().includes(filterValue)
-      );
-    }
   }
 
   // LISTA DE POSESIONES Y NOTIFICACIONES
@@ -1115,25 +1031,137 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     });
   }
-
   // METODO PARA OBTENER LISTA DE CIUDADES
   ObtenerCiudades() {
     this.ciudades = [];
     this.restC.ConsultarCiudades().subscribe((data) => {
       this.ciudades = data;
-      //console.log("ciudades", this.ciudades);
-      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCiudad(value))
-      );
     });
   }
-
   ObtenerIdCiudadSeleccionada(nombreCiudad: String) {
     var results = this.ciudades.filter(function (ciudad) {
       return ciudad.descripcion == nombreCiudad;
     });
     return results[0].id;
+  }
+
+
+  //FILTROS PARA LOS FORMULARIOS
+  filtroCiudades() {
+    this.filtroCiudad = this.idCiudad.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarCiudad(value))
+    );
+  }
+  filtrosTipoAcciones() {
+    this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarTipoAccion(value))
+    );
+  }
+  filtroSucursalActual() {
+    this.filtroSucursal = this.idSucursal.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarSucursal(value))
+    );
+  }
+  filtroSucursalPropuestas() {
+    this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarSucursal(value))
+    );
+  }
+  filtrosCargos() {
+    this.filtroCargos = this.tipoCargoPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarCargo(value))
+    );
+  }
+  FiltrarDepaActua() {
+    this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDeparta(value))
+    );
+  }
+  FiltrarDepaPro() {
+    this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDepaPro(value))
+    );
+
+    this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDepaPro(value))
+    );
+  }
+  filtrosEmpleados() {
+
+    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+  }
+  filtroProcesos() {
+    this.filtroProceso = this.procesoPropuesto.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarProceso(value))
+    );
+  }
+  filtroGrupoOcupacionales() {
+    this.filtroGrupoOcupacional = this.grupoOcupacionalPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarGrupoOcupacional(value))
+    );
+  }
+  filtroGrados() {
+    this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarGrado(value))
+    );
+  }
+
+  datosForm3() {
+    this.filtroProcesos();
+    this.FiltrarDepaActua();
+    this.FiltrarDepaPro();
+    this.filtroProcesos();
+    this.filtroSucursalActual();
+    this.filtroSucursalPropuestas();
+    this.filtroCiudades();
+    this.filtrosCargos();
+    this.filtroGrados();
+    this.filtroGrupoOcupacionales();
   }
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
