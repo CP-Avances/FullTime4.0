@@ -1195,16 +1195,16 @@ export class CrearPedidoAccionComponent implements OnInit {
       datosAccion.salario_propuesto = null;
     }
     console.log("DATOS FINALES", datosAccion);
-    this.restAccion.IngresarPedidoAccion(datosAccion).subscribe((res) => {
-      this.toastr.success(
-        "Operación exitosa.",
-        "Acción de Personal Registrada",
-        {
-          timeOut: 6000,
-        }
-      );
-      this.router.navigate(["/listaPedidos/"]);
-    });
+    // this.restAccion.IngresarPedidoAccion(datosAccion).subscribe((res) => {
+    //   this.toastr.success(
+    //     "Operación exitosa.",
+    //     "Acción de Personal Registrada",
+    //     {
+    //       timeOut: 6000,
+    //     }
+    //   );
+    //   this.router.navigate(["/listaPedidos/"]);
+    // });
   }
 
   habilitarformPosesion: boolean = false
