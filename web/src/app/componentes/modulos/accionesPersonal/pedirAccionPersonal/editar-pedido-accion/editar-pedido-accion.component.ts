@@ -851,6 +851,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.thirdFormGroup.markAllAsTouched();
     } else {
 
+      console.log('this.idUserSelect: ',this.idUserSelect)
       this.ListaEmpleadosFirmas(this.idUserSelect);
       this.habilitarformPosesion = formValue.habilitarForm4
       stepper.next();
@@ -970,8 +971,6 @@ export class EditarPedidoAccionComponent implements OnInit {
           fechaActaFinalForm: this.datosPedido[0].fecha_acta_final,
         });
 
-        console.log('this.fourthFormGroup: ',this.fourthFormGroup.value);
-
         this.cargoFirma1 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_director, this.datosPedido[0].id_tipo_cargo_director, this.datosPedido[0].cargo_director)
         this.cargoFirma2 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_autoridad_delegado, this.datosPedido[0].id_tipo_cargo_autoridad_delegado, this.datosPedido[0].cargo_autoridad_delegado)
         this.cargoFirma3 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_elaboracion, this.datosPedido[0].id_tipo_cargo_elaboracion, this.datosPedido[0].tipo_cargo_elaboracion)
@@ -982,14 +981,15 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.fivethFormGroup.patchValue({
           idEmpleadoRAForm: this.datosPedido[0].empleado_director,
           idEmpleadoRForm: this.datosPedido[0].empleado_autoridad_delegado,
-          idEmpleadoHForm: this.datosPedido[0].empleado_testigo,
-          idEmpleadoGForm: this.datosPedido[0].idEmpleadoRA,
+          idEmpleadoHForm: this.datosPedido[0].nombres.toUpperCase(),
+          idEmpleadoGForm: this.datosPedido[0].empleado_testigo,
+
           abrevHAForm: this.datosPedido[0].abreviatura_director,
           abrevGAForm: this.datosPedido[0].abreviatura_delegado,
           abrevHForm: this.datosPedido[0].abreviatura_empleado,
           abrevGForm: this.datosPedido[0].abreviatura_testigo,
           fechaServidorForm: this.datosPedido[0].fecha_testigo,
-          fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
+          fechaNegativaForm: this.datosPedido[0].fecha_testigo,
 
           idEmpleadoRNAForm: this.datosPedido[0].empleado_elaboracion,
           idEmpleadoRNForm: this.datosPedido[0].empleado_revision,
@@ -1012,7 +1012,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         })
 
 
-        this.ListaEmpleadosFirmas(this.datosPedido[0].id_empleado);
+        this.idUserSelect = this.datosPedido[0].id_empleado_personal
         this.filtrosTipoAcciones();
 
       });

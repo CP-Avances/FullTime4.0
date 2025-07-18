@@ -1105,8 +1105,8 @@ export class CrearPedidoAccionComponent implements OnInit {
           cargo_servidorPublico: idEmpl_pedido_cargo,
           fecha_servidorPublico: form5.fechaServidorForm == '' ? null : form5.fechaServidorForm,
 
-          abrevia_negativa: form5.abrevGForm,
-          firma_negativa: form5.idEmpleadoGForm,
+          abrevia_negativa: form5.abrevGForm == '' ? null : form5.abrevGForm,
+          firma_negativa: form5.idEmpleadoGForm == '' ? null : form5.idEmpleadoGForm,
           fecha_negativa: form5.fechaNegativaForm == '' ? null : form5.fechaNegativaForm,
 
           abrevia_RespElaboracion: form5.abrevRGForm,
@@ -1195,16 +1195,16 @@ export class CrearPedidoAccionComponent implements OnInit {
       datosAccion.salario_propuesto = null;
     }
     console.log("DATOS FINALES", datosAccion);
-    // this.restAccion.IngresarPedidoAccion(datosAccion).subscribe((res) => {
-    //   this.toastr.success(
-    //     "Operación exitosa.",
-    //     "Acción de Personal Registrada",
-    //     {
-    //       timeOut: 6000,
-    //     }
-    //   );
-    //   this.router.navigate(["/listaPedidos/"]);
-    // });
+    this.restAccion.IngresarPedidoAccion(datosAccion).subscribe((res) => {
+      this.toastr.success(
+        "Operación exitosa.",
+        "Acción de Personal Registrada",
+        {
+          timeOut: 6000,
+        }
+      );
+      this.router.navigate(["/listaPedidos/"]);
+    });
   }
 
   habilitarformPosesion: boolean = false
