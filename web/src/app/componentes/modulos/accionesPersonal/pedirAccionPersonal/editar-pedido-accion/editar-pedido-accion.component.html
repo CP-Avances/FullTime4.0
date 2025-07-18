@@ -251,7 +251,7 @@
                 <br>
                 <div class="d-flex flex-wrap justify-content-between">
                     <button mat-raised-button matStepperPrevious id="btn-raised" class="float-left">Atrás</button>
-                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right">Siguiente</button>
+                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right" (click)="datosForm3()">Siguiente</button>
                 </div>
             </mat-step>
             <!-- ****************************** TERCER FORMULARIO ******************************************* -->
@@ -302,7 +302,7 @@
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <mat-form-field class="contenedor-completo w-100">
                                         <mat-label>Nivel o unidad de gestión</mat-label>
-                                        <input type="text" aria-label="Number" matInput [formControl]="idDepa"
+                                        <input type="text" aria-label="Number" matInput formControlName="NivelDepaForm"
                                             [matAutocomplete]="auto5">
                                         <mat-autocomplete #auto5="matAutocomplete">
                                             <mat-option *ngFor="let option of filtroDepartamentos | async"
@@ -610,8 +610,8 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Lugar de trabajo</mat-label>
-                                    <input type="text" aria-label="Number" matInput [formControl]="idCiudad"
-                                        [matAutocomplete]="auto19" readonly>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idCiudadPosecion"
+                                        [matAutocomplete]="auto19">
                                     <mat-autocomplete #auto19="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroCiudad | async"
                                             [value]="option.descripcion">

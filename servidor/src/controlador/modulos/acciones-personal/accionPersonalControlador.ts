@@ -680,8 +680,30 @@ class AccionPersonalControlador {
                 ip_local, proceso } = req.body;
             let datosNuevos = req.body;
             const fechaActual = new Date();
+
+            let id_empleado_negativa = null;
             let id_empleado_comunicacion = null;
             let id_empleado_comunica_cargo = null;
+
+            if (formulario5.firma_negativa != '' && formulario5.firma_negativa != null) {
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+                const response: QueryResult = await pool.query(
+                    `
+                        SELECT * FROM eu_empleados WHERE
+                        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1 OR 
+                         (UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
+                    `
+                    , [formulario5.firma_negativa.trim().toUpperCase()]);
+
+                    console.log('id_empleado_negativa: ',response.rows)
+                id_empleado_negativa = response.rows[0].id;
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+            }
 
             if (formulario6.firma_Resp_Notificacion != '' && formulario6.firma_Resp_Notificacion != null) {
 
@@ -691,7 +713,7 @@ class AccionPersonalControlador {
                 const response: QueryResult = await pool.query(
                     `
                         SELECT * FROM informacion_general WHERE
-                        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+                        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1 OR (UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
                     `
                     , [formulario6.firma_Resp_Notificacion.trim().toUpperCase()]);
 
@@ -774,7 +796,7 @@ class AccionPersonalControlador {
 
                 formulario5.firma_talentoHumano, formulario5.cargo_talentoHumano, formulario5.firma_delegado,
 
-                formulario5.cargo_delegado, formulario5.firma_servidorPublico, formulario5.fecha_servidorPublico,
+                formulario5.cargo_delegado, id_empleado_negativa, formulario5.fecha_negativa,
                 formulario5.firma_RespElaboracion,
 
                 formulario5.cargo_RespElaboracion, formulario5.firma_RespRevision, formulario5.cargo_RespRevision,
@@ -842,8 +864,28 @@ class AccionPersonalControlador {
                 ip_local } = req.body;
             let datosNuevos = req.body;
             const fechaActualizacion = new Date();
+            let id_empleado_negativa = null;
             let id_empleado_comunicacion = null;
             let id_empleado_comunica_cargo = null;
+
+            if (formulario5.firma_negativa != '' && formulario5.firma_negativa != null) {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+                const response: QueryResult = await pool.query(
+                    `
+                        SELECT * FROM eu_empleados WHERE
+                        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1 OR 
+                         (UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
+                    `
+                    , [formulario5.firma_negativa.trim().toUpperCase()]);
+
+                    console.log('id_empleado_negativa: ',response.rows)
+                id_empleado_negativa = response.rows[0].id;
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+            }
 
             if (formulario6.firma_Resp_Notificacion != '' && formulario6.firma_Resp_Notificacion != null) {
 

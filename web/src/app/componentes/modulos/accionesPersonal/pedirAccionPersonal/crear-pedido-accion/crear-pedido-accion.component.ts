@@ -39,7 +39,7 @@ export function rangoFechasValidator(fechaInicioKey: string, fechaFinKey: string
 export function noRegistradoValidator(): ValidatorFn {
   return (control: AbstractControl) => {
     const value = control.value;
-    if (!value || value === 'NO REGISTRADO') {
+    if (!value || value === 'NO REGISTRADO' || value === '') {
       return { noRegistrado: true };
     }
     return null;
@@ -108,8 +108,8 @@ export class CrearPedidoAccionComponent implements OnInit {
   // FORMULARIO 3 SITUACION ACTUAL
   tipoProcesoF = new FormControl("", [Validators.required]);
   idSucursal = new FormControl("", [Validators.required]);
-  idDepa = new FormControl("");
-  idDepaActual = new FormControl("");
+  idDepa = new FormControl("", [Validators.required]);
+  idDepaActual = new FormControl("", [Validators.required]);
   idCiudad = new FormControl("", [Validators.required]);
   tipoCargoF = new FormControl("", [Validators.required]);
   grupoOcupacionalF = new FormControl("", [Validators.required]);
@@ -477,67 +477,186 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.procesos = [];
     this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
-      //console.log('procesos ', this.procesos)
-      this.filtroProceso = this.procesoPropuesto.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarProceso(value))
-      );
     });
   }
-
   // BUSQUEDA DE DATOS DE LA TABLA GRUPO OCUPACIONAL
   grupoOcupacional: any = [];
   ObtenerGrupoOcupacional() {
     this.grupoOcupacional = [];
     this.restGrupo.ConsultarGrupoOcupacion().subscribe((datos) => {
       this.grupoOcupacional = datos;
-      this.filtroGrupoOcupacional = this.grupoOcupacionalPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarGrupoOcupacional(value))
-      );
     });
   }
-
   // BUSQUEDA DE DATOS DE LA TABLA GRADO
   grados: any = [];
   ObtenerGrados() {
     this.grados = [];
     this.restGrado.ConsultarGrados().subscribe((datos) => {
       this.grados = datos;
-      this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarGrado(value))
-      );
     });
   }
-
   // BUSQUEDA DE DATOS DE LA TABLA GRADO
   cargos: any = [];
   ObtenerCargos() {
     this.cargos = [];
     this.restCargo.ListaCargos().subscribe((datos) => {
       this.cargos = datos;
-      this.filtroCargos = this.tipoCargoPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCargo(value))
-      );
     });
   }
-
   // METODO DE BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCIONES
   tipos_accion: any = [];
   ObtenerTiposAccion() {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-      this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarTipoAccion(value))
-      );
     });
   }
+    // METODO PARA OBTENER LISTA DE CIUDADES
+  id_sucursal: any = 0
+  ObtenerSucursal() {
+    this.sucursal = [];
+    this.restSu.BuscarSucursal().subscribe((data) => {
+      this.sucursal = data;
+    });
+  }
+  onSucursal(e: any) {
+    if (e.id != undefined && e.id != null) {
+      this.departamentosPro = [];
+      const filtrados = this.departamentos.filter(item => item.id_sucursal == e.id);
+      this.departamentosPro = filtrados;
 
-  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+      this.idDepaPropues.setValue("");
+      this.idDepaAdminPropuesta.setValue("");
+      this.FiltrarDepaPro();
+    }
+  }
+  // METODO PARA OBTENER LISTA DE CIUDADES
+  ObtenerDepartamentos() {
+    this.departamentos = [];
+    this.restDe.ConsultarDepartamentos().subscribe((data) => {
+      this.departamentos = data;
+    });
+  }
+  // METODO PARA OBTENER LISTA DE CIUDADES
+  ObtenerCiudades() {
+    this.ciudades = [];
+    this.restC.ConsultarCiudades().subscribe((data) => {
+      this.ciudades = data;
+    });
+  }
+  // BUSCAR CIUDAD SELECCIONADA
+  ObtenerIdCiudadSeleccionada(nombreCiudad: String) {
+    var results = this.ciudades.filter(function (ciudad) {
+      return ciudad.descripcion == nombreCiudad;
+    });
+    return results[0].id;
+  }
+
+
+
+  //FILTROS PARA LOS FORMULARIOS
+  filtroProcesos() {
+    this.filtroProceso = this.procesoPropuesto.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarProceso(value))
+    );
+  }
+  filtroGrupoOcupacionales() {
+    this.filtroGrupoOcupacional = this.grupoOcupacionalPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarGrupoOcupacional(value))
+    );
+  }
+  filtroGrados() {
+    this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarGrado(value))
+    );
+  }
+  filtrosCargos() {
+    this.filtroCargos = this.tipoCargoPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarCargo(value))
+    );
+  }
+  filtrosTipoAcciones() {
+    this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarTipoAccion(value))
+    );
+  }
+  FiltrarDepaActua() {
+    this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDeparta(value))
+    );
+  }
+  FiltrarDepaPro() {
+    this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDepaPro(value))
+    );
+
+    this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDepaPro(value))
+    );
+  }
+  filtrosEmpleados() {
+    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+  }
+  filtroSucursalActual() {
+    this.filtroSucursal = this.idSucursal.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarSucursal(value))
+    );
+  }
+  filtroSucursalPropuestas() {
+    this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarSucursal(value))
+    );
+  }
+  filtroCiudades() {
+    this.filtroCiudad = this.idCiudadPropuesta.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarCiudad(value))
+    );
+  }
   private _filtrarTipoAccion(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
@@ -546,6 +665,11 @@ export class CrearPedidoAccionComponent implements OnInit {
       );
     }
   }
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+  }
+
 
   // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO DE CARGO PROPUESTO
   activarOtro = true;
@@ -663,6 +787,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
         this.ListaEmpleadosFirmas(e.id);
         this.btnForm1 = false
+        this.filtrosTipoAcciones();
 
       }, err => {
         this.InfoUser = null
@@ -675,19 +800,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     }
 
   }
-
-  onSucursal(e: any) {
-    if (e.id != undefined && e.id != null) {
-      this.departamentosPro = [];
-      const filtrados = this.departamentos.filter(item => item.id_sucursal == e.id);
-      this.departamentosPro = filtrados;
-
-      this.idDepaPropues.setValue("");
-      this.idDepaAdminPropuesta.setValue("");
-      this.FiltrarDepaPro();
-    }
-  }
-
   // METODO PARA OBTENER LISTA DE EMPLEADOS
   ObtenerEmpleados() {
     this.empleados = [];
@@ -702,44 +814,6 @@ export class CrearPedidoAccionComponent implements OnInit {
       );
 
     });
-  }
-
-  filtrosEmpleados() {
-    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
   }
 
   datosForm6(formValue: any, stepper: any) {
@@ -783,78 +857,6 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.filtrosEmpleados();
   }
 
-  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
-  FiltrarEmpleadosAsignados(data: any) {
-    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
-  }
-
-  // METODO PARA OBTENER LISTA DE CIUDADES
-  id_sucursal: any = 0
-  ObtenerSucursal() {
-    this.sucursal = [];
-    this.restSu.BuscarSucursal().subscribe((data) => {
-      this.sucursal = data;
-      this.filtroSucursal = this.idSucursal.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarSucursal(value))
-      );
-
-      this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarSucursal(value))
-      );
-    });
-  }
-
-  // METODO PARA OBTENER LISTA DE CIUDADES
-  ObtenerDepartamentos() {
-    this.departamentos = [];
-    this.restDe.ConsultarDepartamentos().subscribe((data) => {
-      this.departamentos = data;
-    });
-  }
-
-  FiltrarDepaActua() {
-
-    this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDeparta(value))
-    );
-  }
-
-  FiltrarDepaPro() {
-    this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDepaPro(value))
-    );
-
-    this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDepaPro(value))
-    );
-  }
-
-  // METODO PARA OBTENER LISTA DE CIUDADES
-  ObtenerCiudades() {
-    this.ciudades = [];
-    this.restC.ConsultarCiudades().subscribe((data) => {
-      this.ciudades = data;
-      //console.log("ciudades", this.ciudades);
-      this.filtroCiudad = this.idCiudadPropuesta.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCiudad(value))
-      );
-    });
-  }
-
-  // BUSCAR CIUDAD SELECCIONADA
-  ObtenerIdCiudadSeleccionada(nombreCiudad: String) {
-    var results = this.ciudades.filter(function (ciudad) {
-      return ciudad.descripcion == nombreCiudad;
-    });
-    return results[0].id;
-  }
-
   CapitalizarNombre(nombre: any) {
     // REALIZAR UN CAPITAL LETTER A LOS NOMBRES
     let NombreCapitalizado: any;
@@ -881,6 +883,19 @@ export class CrearPedidoAccionComponent implements OnInit {
       NombreCapitalizado = NombreCapitalizado = name1;
     }
     return NombreCapitalizado;
+  }
+
+  datosForm3() {
+    this.filtroProcesos();
+    this.FiltrarDepaActua();
+    this.FiltrarDepaPro();
+    this.filtroProcesos();
+    this.filtroSucursalActual();
+    this.filtroSucursalPropuestas();
+    this.filtroCiudades();
+    this.filtrosCargos();
+    this.filtroGrados();
+    this.filtroGrupoOcupacionales();
   }
 
   cargoFirma1: any;
@@ -1090,8 +1105,8 @@ export class CrearPedidoAccionComponent implements OnInit {
           cargo_servidorPublico: idEmpl_pedido_cargo,
           fecha_servidorPublico: form5.fechaServidorForm == '' ? null : form5.fechaServidorForm,
 
-          abrevia_negativa: form5.abrevGForm,
-          firma_negativa: form5.idEmpleadoGForm,
+          abrevia_negativa: form5.abrevGForm == '' ? null : form5.abrevGForm,
+          firma_negativa: form5.idEmpleadoGForm == '' ? null : form5.idEmpleadoGForm,
           fecha_negativa: form5.fechaNegativaForm == '' ? null : form5.fechaNegativaForm,
 
           abrevia_RespElaboracion: form5.abrevRGForm,
@@ -1196,7 +1211,9 @@ export class CrearPedidoAccionComponent implements OnInit {
   validarForm(formValue: any, stepper: any) {
     if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado' || formValue.NivelDepaForm == 'No registrado'
       || formValue.DepartamentoForm == 'No registrado' || formValue.grupoOcupacionalForm == 'No registrado' || formValue.gradoForm == 'No registrado'
-      || formValue.tipoCargoForm == 'No registrado'
+      || formValue.tipoCargoForm == 'No registrado' || formValue.tipoProcesoForm == '' || formValue.sucursalForm == '' || formValue.NivelDepaForm == ''
+      || formValue.DepartamentoForm == '' || formValue.grupoOcupacionalForm == '' || formValue.gradoForm == ''
+      || formValue.tipoCargoForm == ''
     ) {
       this.toastr.warning(
         "El empleado debe cumplir con los datos obligatorios de su situacion actual.",

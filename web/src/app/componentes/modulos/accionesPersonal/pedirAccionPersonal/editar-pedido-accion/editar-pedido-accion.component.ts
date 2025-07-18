@@ -137,6 +137,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   // FORMULARIO 4 POSESION
   cedualF = new FormControl("");
   fechaPosesionFor = new FormControl("");
+  idCiudadPosecion = new FormControl("");
   actaFinalForm = new FormControl("");
   fechaActaFinalForm = new FormControl("");
 
@@ -221,7 +222,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   public fourthFormGroup = new FormGroup({
     funcionarioForm: this.funcionarioF,
     cedulaForm: this.cedualF,
-    lugar_trabajo: this.idCiudad,
+    lugar_trabajo: this.idCiudadPosecion,
     fechaPosesionForm: this.fechaPosesionFor,
     actaFinalForm: this.actaFinalForm,
     fechaActaFinalForm: this.fechaActaFinalForm,
@@ -466,6 +467,16 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
+  private _filtrarTipoAccion(value: string): any {
+    if (value != null) {
+      const filterValue = value.toUpperCase();
+      return this.tipos_accion.filter((info: any) =>
+        info.descripcion.toUpperCase().includes(filterValue)
+      );
+    }
+  }
+
   // BUSQUEDA DE DATOS DE EMPRESA
   empresa: any = [];
   MostrarDatos() {
@@ -475,64 +486,6 @@ export class EditarPedidoAccionComponent implements OnInit {
       .subscribe((data) => {
         this.empresa = data;
       });
-  }
-
-  FiltrarDepaActua() {
-    this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDeparta(value))
-    );
-  }
-
-  FiltrarDepaPro() {
-    this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDepaPro(value))
-    );
-
-    this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarDepaPro(value))
-    );
-  }
-
-  filtrosEmpleados() {
-
-    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
-
-    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleadoR(value))
-    );
   }
 
   datosForm6(formValue: any, stepper: any) {
@@ -582,11 +535,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.procesos = [];
     this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
-      this.filtroProceso = this.procesoPropuesto.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarProceso(value))
-      );
-
     });
   }
   // BUSQUEDA DE DATOS DE LA TABLA GRUPO OCUPACIONAL
@@ -595,11 +543,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.grupoOcupacional = [];
     this.restGrupo.ConsultarGrupoOcupacion().subscribe((datos) => {
       this.grupoOcupacional = datos;
-      this.filtroGrupoOcupacional = this.grupoOcupacionalPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarGrupoOcupacional(value))
-      );
-
     });
   }
 
@@ -609,10 +552,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.grados = [];
     this.restGrado.ConsultarGrados().subscribe((datos) => {
       this.grados = datos;
-      this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarGrado(value))
-      );
     });
   }
 
@@ -628,10 +567,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.cargos = [];
     this.restCargo.ListaCargos().subscribe((datos) => {
       this.cargos = datos;
-      this.filtroCargos = this.tipoCargoPropuestoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCargo(value))
-      );
     });
   }
 
@@ -725,15 +660,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.sucursal = [];
     this.restSu.BuscarSucursal().subscribe((data) => {
       this.sucursal = data;
-      this.filtroSucursal = this.idSucursal.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarSucursal(value))
-      );
-
-      this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarSucursal(value))
-      );
     });
   }
 
@@ -801,99 +727,95 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.thirdFormGroup.reset();
 
     if (e.id != undefined && e.id != null) {
+      this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
+        this.InfoUser = datos
 
-      if (e.id != this.datosPedido[0].id_empleado_personal) {
-        this.restUsu.BuscarInfoUsuarioAccion(e.id).subscribe((datos) => {
-          this.InfoUser = datos
+        this.InfoUser.forEach((valor: any) => {
+          this.idUserSelect = e.id
 
-          this.InfoUser.forEach((valor: any) => {
-            this.idUserSelect = e.id
+          this.firstFormGroup.patchValue({ funcionarioForm: e.empleado, });
+          this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
+          this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
 
-            this.firstFormGroup.patchValue({ funcionarioForm: e.empleado, });
-            this.fourthFormGroup.controls['funcionarioForm'].setValue(e.empleado)
-            this.fourthFormGroup.controls['cedulaForm'].setValue(valor.identificacion)
+          // PROCESO
+          const proceso = this.procesos.find((info: any) => info.id == valor.id_proceso);
+          if (proceso == undefined || proceso == null) {
+            this.thirdFormGroup.controls['tipoProcesoForm'].setValue('No registrado')
+          } else {
+            this.thirdFormGroup.controls['tipoProcesoForm'].setValue(proceso.nombre)
+          }
+          // SUCURSAL
+          const sucursal = this.sucursal.find((inf: any) => inf.id == valor.id_suc);
+          if (sucursal == undefined || sucursal == null) {
+            this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
+          } else {
+            this.thirdFormGroup.controls['sucursalForm'].setValue(sucursal.nombre)
+            this.departamentos.forEach(item => {
+              if (item.id_sucursal == sucursal.id) {
+                this.departamentosact.push(item);
+              }
+            });
 
-            // PROCESO
-            const proceso = this.procesos.find((info: any) => info.id == valor.id_proceso);
-            if (proceso == undefined || proceso == null) {
-              this.thirdFormGroup.controls['tipoProcesoForm'].setValue('No registrado')
-            } else {
-              this.thirdFormGroup.controls['tipoProcesoForm'].setValue(proceso.nombre)
-            }
-            // SUCURSAL
-            const sucursal = this.sucursal.find((inf: any) => inf.id == valor.id_suc);
-            if (sucursal == undefined || sucursal == null) {
-              this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
-            } else {
-              this.thirdFormGroup.controls['sucursalForm'].setValue(sucursal.nombre)
-              this.departamentos.forEach(item => {
-                if (item.id_sucursal == sucursal.id) {
-                  this.departamentosact.push(item);
-                }
-              });
-
-              this.FiltrarDepaActua();
-            }
-            // DEPARTAMENTO
-            const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
-            if (departamento == undefined || departamento == null) {
-              this.thirdFormGroup.controls['DepartamentoForm'].setValue('No registrado')
+            this.FiltrarDepaActua();
+          }
+          // DEPARTAMENTO
+          const departamento = this.departamentos.find((inf: any) => inf.id == valor.id_departamento);
+          if (departamento == undefined || departamento == null) {
+            this.thirdFormGroup.controls['DepartamentoForm'].setValue('No registrado')
+            this.thirdFormGroup.controls['NivelDepaForm'].setValue('No registrado')
+          } else {
+            this.thirdFormGroup.controls['DepartamentoForm'].setValue(departamento.nombre)
+            if (departamento.departamento_padre == null || departamento.departamento_padre == undefined) {
               this.thirdFormGroup.controls['NivelDepaForm'].setValue('No registrado')
             } else {
-              this.thirdFormGroup.controls['DepartamentoForm'].setValue(departamento.nombre)
-              if (departamento.departamento_padre == null || departamento.departamento_padre == undefined) {
-                this.thirdFormGroup.controls['NivelDepaForm'].setValue('No registrado')
-              } else {
-                this.thirdFormGroup.controls['NivelDepaForm'].setValue(departamento.departamento_padre)
-              }
+              this.thirdFormGroup.controls['NivelDepaForm'].setValue(departamento.departamento_padre)
             }
-            // LUGAR DE TRABAJO
-            this.thirdFormGroup.controls['idCiudadForm'].setValue(sucursal.descripcion)
-            // GRUPO OCUPACION
-            const grupo_ocupacional = this.grupoOcupacional.find((inf: any) => inf.id == valor.id_grupo_ocupacional);
-            if (grupo_ocupacional == undefined || grupo_ocupacional == null) {
-              this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue('No registrado')
-            }
-            else {
-              this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue(grupo_ocupacional.descripcion)
-            }
-            // GRADO
-            const grado = this.grados.find((inf: any) => inf.id == valor.id_grado);
-            if (grado == undefined || grado == null) {
-              this.thirdFormGroup.controls['gradoForm'].setValue('No registrado')
-            } else {
-              this.thirdFormGroup.controls['gradoForm'].setValue(grado.descripcion)
-            }
-            // CARGO ACTUAL
-            const cargo = this.cargos.find((inf: any) => inf.id == valor.id_tipo_cargo);
-            if (cargo == undefined || cargo == null) {
-              this.thirdFormGroup.controls['tipoCargoForm'].setValue('No registrado')
-            } else {
-              this.thirdFormGroup.controls['tipoCargoForm'].setValue(cargo.cargo)
-            }
-            // REMUNERACION
-            this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
-            this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
+          }
+          // LUGAR DE TRABAJO
+          this.thirdFormGroup.controls['idCiudadForm'].setValue(sucursal.descripcion)
+        
+          // GRUPO OCUPACION
+          const grupo_ocupacional = this.grupoOcupacional.find((inf: any) => inf.id == valor.id_grupo_ocupacional);
+          if (grupo_ocupacional == undefined || grupo_ocupacional == null) {
+            this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue('No registrado')
+          }
+          else {
+            this.thirdFormGroup.controls['grupoOcupacionalForm'].setValue(grupo_ocupacional.descripcion)
+          }
+          // GRADO
+          const grado = this.grados.find((inf: any) => inf.id == valor.id_grado);
+          if (grado == undefined || grado == null) {
+            this.thirdFormGroup.controls['gradoForm'].setValue('No registrado')
+          } else {
+            this.thirdFormGroup.controls['gradoForm'].setValue(grado.descripcion)
+          }
+          // CARGO ACTUAL
+          const cargo = this.cargos.find((inf: any) => inf.id == valor.id_tipo_cargo);
+          if (cargo == undefined || cargo == null) {
+            this.thirdFormGroup.controls['tipoCargoForm'].setValue('No registrado')
+          } else {
+            this.thirdFormGroup.controls['tipoCargoForm'].setValue(cargo.cargo)
+          }
+          // REMUNERACION
+          this.thirdFormGroup.controls['sueldoForm'].setValue(valor.sueldo.split(".")[0])
+          this.thirdFormGroup.controls['actaForm'].setValue(valor.numero_partida_individual)
 
-            this.fivethFormGroup.controls['idEmpleadoHForm'].setValue(e.empleado);
-            this.fivethFormGroup.patchValue({
-              fechaServidorForm: this.FechaActual,
-            });
-            this.btnForm1 = false
-          })
-
-          this.ListaEmpleadosFirmas(e.id);
-
-        }, err => {
-          this.InfoUser = null
-          this.toastr.warning(err.error.text, "Advertencia.", { timeOut: 5000, });
-          this.btnForm1 = true;
-          this.thirdFormGroup.reset();
+          this.fivethFormGroup.controls['idEmpleadoHForm'].setValue(e.empleado);
+          this.fivethFormGroup.patchValue({
+            fechaServidorForm: this.FechaActual,
+          });
+          this.btnForm1 = false
         })
-      } else {
-        this.CargarInformacion();
-      }
 
+        this.ListaEmpleadosFirmas(e.id);
+        this.filtrosTipoAcciones();
+
+      }, err => {
+        this.InfoUser = null
+        this.toastr.warning(err.error.text, "Advertencia.", { timeOut: 5000, });
+        this.btnForm1 = true;
+        this.thirdFormGroup.reset();
+      })
 
     } else {
       this.btnForm1 = true
@@ -917,7 +839,9 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     if (formValue.tipoProcesoForm == 'No registrado' || formValue.sucursalForm == 'No registrado' || formValue.NivelDepaForm == 'No registrado'
       || formValue.DepartamentoForm == 'No registrado' || formValue.grupoOcupacionalForm == 'No registrado' || formValue.gradoForm == 'No registrado'
-      || formValue.tipoCargoForm == 'No registrado'
+      || formValue.tipoCargoForm == 'No registrado' || formValue.idCiudadForm == 'No registrado' || formValue.tipoProcesoForm == '' || formValue.sucursalForm == '' || formValue.NivelDepaForm == ''
+      || formValue.DepartamentoForm == '' || formValue.grupoOcupacionalForm == '' || formValue.gradoForm == ''
+      || formValue.tipoCargoForm == '' || formValue.idCiudadForm == ''
     ) {
       this.toastr.warning(
         "El empleado debe cumplir con los datos obligatorios de su situacion actual.",
@@ -927,10 +851,10 @@ export class EditarPedidoAccionComponent implements OnInit {
       this.thirdFormGroup.markAllAsTouched();
     } else {
 
+      console.log('this.idUserSelect: ',this.idUserSelect)
       this.ListaEmpleadosFirmas(this.idUserSelect);
       this.habilitarformPosesion = formValue.habilitarForm4
       stepper.next();
-      console.log('stepper.next(): ', stepper);
     }
   }
 
@@ -988,16 +912,17 @@ export class EditarPedidoAccionComponent implements OnInit {
           activarForm4 = false
         }
 
+        
         this.thirdFormGroup.patchValue({
-          tipoProcesoForm: this.datosPedido[0].proceso_actual,
-          sucursalForm: this.datosPedido[0].sucursal_actual,
-          NivelDepaForm: this.datosPedido[0].nivel_gestion_actual,
-          DepartamentoForm: this.datosPedido[0].unidad_administrativa,
-          idCiudadForm: this.datosPedido[0].lugar_trabajo_actual,
-          tipoCargoForm: this.datosPedido[0].cargo_actual,
-          grupoOcupacionalForm: this.datosPedido[0].grupo_ocupacional_actual,
-          gradoForm: this.datosPedido[0].grado_actual,
-          sueldoForm: this.datosPedido[0].remuneracion_actual,
+          tipoProcesoForm: this.datosPedido[0].proceso_actual != null ? this.datosPedido[0].proceso_actual : 'No registrado',
+          sucursalForm: this.datosPedido[0].sucursal_actual != null ? this.datosPedido[0].sucursal_actual : 'No registrado',
+          NivelDepaForm: this.datosPedido[0].nivel_gestion_actual != null ? this.datosPedido[0].nivel_gestion_actual : 'No registrado',
+          DepartamentoForm: this.datosPedido[0].unidad_administrativa != null ? this.datosPedido[0].unidad_administrativa : 'No registrado',
+          idCiudadForm: this.datosPedido[0].lugar_trabajo_actual != null ? this.datosPedido[0].lugar_trabajo_actual : 'No registrado',
+          tipoCargoForm: this.datosPedido[0].cargo_actual != null ? this.datosPedido[0].cargo_actual : 'No registrado',
+          grupoOcupacionalForm: this.datosPedido[0].grupo_ocupacional_actual != null ? this.datosPedido[0].grupo_ocupacional_actual : 'No registrado',
+          gradoForm: this.datosPedido[0].grado_actual != null ? this.datosPedido[0].grado_actual : 'No registrado',
+          sueldoForm: this.datosPedido[0].remuneracion_actual != null ? this.datosPedido[0].remuneracion_actual : 'No registrado',
           actaForm: this.datosPedido[0].partida_individual_actual,
 
           procesoPropuestoForm: this.datosPedido[0].proceso_propuesto,
@@ -1013,6 +938,27 @@ export class EditarPedidoAccionComponent implements OnInit {
 
           habilitarForm4: false
         });
+
+        // SUCURSAL
+        const sucursal = this.sucursal.find((inf: any) => inf.id == this.datosPedido[0].id_sucursal_actual);
+        if (sucursal == undefined || sucursal == null) {
+          this.thirdFormGroup.controls['sucursalForm'].setValue('No registrado')
+        } else {
+          this.departamentos.forEach(item => {
+            if (item.id_sucursal == this.datosPedido[0].id_sucursal_actual) {
+              this.departamentosact.push(item);
+            }
+          });
+          this.FiltrarDepaActua();
+        }
+
+        // LUGAR DE TRABAJO
+        if (this.datosPedido[0].lugar_trabajo_actual != null){
+           this.thirdFormGroup.controls['idCiudadForm'].setValue(this.datosPedido[0].lugar_trabajo_actual)
+        }else{ 
+           this.thirdFormGroup.controls['idCiudadForm'].setValue('No registrado')
+        }
+       
 
         this.thirdFormGroup.controls['habilitarForm4'].setValue(activarForm4);
 
@@ -1030,19 +976,20 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.cargoFirma3 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_elaboracion, this.datosPedido[0].id_tipo_cargo_elaboracion, this.datosPedido[0].tipo_cargo_elaboracion)
         this.cargoFirma4 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_revision, this.datosPedido[0].id_tipo_cargo_revision, this.datosPedido[0].tipo_cargo_revision)
         this.cargoFirma5 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
-        this.cargoFirma6 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_control, this.datosPedido[0].id_tipo_cargo_control, this.datosPedido[0].tipo_cargo_control)
+        this.cargoFirma6 = this.CargarInfoCargos(this.datosPedido[0].id_empleado_comunicacion, this.datosPedido[0].id_tipo_cargo_comunicacion, this.datosPedido[0].cargo_comunicacion)
 
         this.fivethFormGroup.patchValue({
           idEmpleadoRAForm: this.datosPedido[0].empleado_director,
           idEmpleadoRForm: this.datosPedido[0].empleado_autoridad_delegado,
-          idEmpleadoHForm: this.datosPedido[0].empleado_testigo,
-          idEmpleadoGForm: this.datosPedido[0].idEmpleadoRA,
+          idEmpleadoHForm: this.datosPedido[0].nombres.toUpperCase(),
+          idEmpleadoGForm: this.datosPedido[0].empleado_testigo,
+
           abrevHAForm: this.datosPedido[0].abreviatura_director,
           abrevGAForm: this.datosPedido[0].abreviatura_delegado,
           abrevHForm: this.datosPedido[0].abreviatura_empleado,
           abrevGForm: this.datosPedido[0].abreviatura_testigo,
           fechaServidorForm: this.datosPedido[0].fecha_testigo,
-          fechaNegativaForm: this.datosPedido[0].idEmpleadoRA,
+          fechaNegativaForm: this.datosPedido[0].fecha_testigo,
 
           idEmpleadoRNAForm: this.datosPedido[0].empleado_elaboracion,
           idEmpleadoRNForm: this.datosPedido[0].empleado_revision,
@@ -1064,9 +1011,12 @@ export class EditarPedidoAccionComponent implements OnInit {
           idEmpleadoCForm: this.datosPedido[0].empleado_comunicacion
         })
 
+
+        this.idUserSelect = this.datosPedido[0].id_empleado_personal
+        this.filtrosTipoAcciones();
+
       });
   }
-
 
   // METODO DE BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCIONES
   tipos_accion: any = [];
@@ -1074,22 +1024,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.tipos_accion = [];
     this.restAccion.ConsultarTipoAccionPersonal().subscribe((datos) => {
       this.tipos_accion = datos;
-      this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarTipoAccion(value))
-      );
-
     });
-  }
-
-  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
-  private _filtrarTipoAccion(value: string): any {
-    if (value != null) {
-      const filterValue = value.toUpperCase();
-      return this.tipos_accion.filter((info: any) =>
-        info.descripcion.toUpperCase().includes(filterValue)
-      );
-    }
   }
 
   // LISTA DE POSESIONES Y NOTIFICACIONES
@@ -1115,25 +1050,137 @@ export class EditarPedidoAccionComponent implements OnInit {
 
     });
   }
-
   // METODO PARA OBTENER LISTA DE CIUDADES
   ObtenerCiudades() {
     this.ciudades = [];
     this.restC.ConsultarCiudades().subscribe((data) => {
       this.ciudades = data;
-      //console.log("ciudades", this.ciudades);
-      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCiudad(value))
-      );
     });
   }
-
   ObtenerIdCiudadSeleccionada(nombreCiudad: String) {
     var results = this.ciudades.filter(function (ciudad) {
       return ciudad.descripcion == nombreCiudad;
     });
     return results[0].id;
+  }
+
+
+  //FILTROS PARA LOS FORMULARIOS
+  filtroCiudades() {
+    this.filtroCiudad = this.idCiudadPropuesta.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarCiudad(value))
+    );
+  }
+  filtrosTipoAcciones() {
+    this.filtroTipoAccion = this.idTipoAccion.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarTipoAccion(value))
+    );
+  }
+  filtroSucursalActual() {
+    this.filtroSucursal = this.idSucursal.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarSucursal(value))
+    );
+  }
+  filtroSucursalPropuestas() {
+    this.filtroSucursalPropuesta = this.idSucursalPropues.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarSucursal(value))
+    );
+  }
+  filtrosCargos() {
+    this.filtroCargos = this.tipoCargoPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarCargo(value))
+    );
+  }
+  FiltrarDepaActua() {
+    this.filtroDepartamentos = this.idDepa.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDeparta(value))
+    );
+  }
+  FiltrarDepaPro() {
+    this.filtroDepartamentosProuesta = this.idDepaPropues.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDepaPro(value))
+    );
+
+    this.filtroDeparAdministrativaProuesta = this.idDepaAdminPropuesta.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarDepaPro(value))
+    );
+  }
+  filtrosEmpleados() {
+
+    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+    this.filtroNombreH = this.idEmpleadoRA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreG = this.idEmpleadoRF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreN = this.idEmpleadoGF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRE = this.idEmpleadoRNA.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRR = this.idEmpleadoRNF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreRC = this.idEmpleadoRRC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+
+    this.filtroNombreNC = this.idEmpleadoC.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarEmpleadoR(value))
+    );
+  }
+  filtroProcesos() {
+    this.filtroProceso = this.procesoPropuesto.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarProceso(value))
+    );
+  }
+  filtroGrupoOcupacionales() {
+    this.filtroGrupoOcupacional = this.grupoOcupacionalPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarGrupoOcupacional(value))
+    );
+  }
+  filtroGrados() {
+    this.filtroGrado = this.gradoPropuestoF.valueChanges.pipe(
+      startWith(""),
+      map((value: any) => this._filtrarGrado(value))
+    );
+  }
+
+  datosForm3() {
+    this.filtroProcesos();
+    this.FiltrarDepaActua();
+    this.FiltrarDepaPro();
+    this.filtroProcesos();
+    this.filtroSucursalActual();
+    this.filtroSucursalPropuestas();
+    this.filtroCiudades();
+    this.filtrosCargos();
+    this.filtroGrados();
+    this.filtroGrupoOcupacionales();
   }
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
