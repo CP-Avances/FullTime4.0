@@ -179,7 +179,7 @@ class VacacionesControlador {
                 const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -237,7 +237,7 @@ class VacacionesControlador {
                 let { id_vacacion } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -269,7 +269,7 @@ class VacacionesControlador {
                     ip_local: ip_local,
                     observacion: null
                 });
-                // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+                // CONSULTAR DATOS ORIGINALES AUTORIZACIONES
                 const consultaAutorizaciones = yield database_1.default.query('SELECT * FROM ecm_autorizaciones WHERE id_vacacion = $1', [id_vacacion]);
                 const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
                 if (!datosOriginalesAutorizaciones) {
@@ -298,7 +298,7 @@ class VacacionesControlador {
                     ip_local: ip_local,
                     observacion: null
                 });
-                // CONSULTAR DATOSORIGINALESVACACIONES
+                // CONSULTAR DATOS ORIGINALES VACACIONES
                 const consultaVacaciones = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id_vacacion]);
                 const [datosOriginalesVacaciones] = consultaVacaciones.rows;
                 if (!datosOriginalesVacaciones) {
@@ -372,7 +372,7 @@ class VacacionesControlador {
                 console.log('estado', id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

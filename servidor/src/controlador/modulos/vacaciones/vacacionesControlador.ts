@@ -190,7 +190,7 @@ class VacacionesControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -261,7 +261,7 @@ class VacacionesControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
       const [datosOriginales] = consulta.rows;
 
@@ -300,7 +300,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+      // CONSULTAR DATOS ORIGINALES AUTORIZACIONES
       const consultaAutorizaciones = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_vacacion = $1', [id_vacacion]);
       const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
 
@@ -335,7 +335,7 @@ class VacacionesControlador {
         observacion: null
       });
 
-      // CONSULTAR DATOSORIGINALESVACACIONES
+      // CONSULTAR DATOS ORIGINALES VACACIONES
       const consultaVacaciones = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id_vacacion]);
       const [datosOriginalesVacaciones] = consultaVacaciones.rows;
 
@@ -420,7 +420,7 @@ class VacacionesControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 

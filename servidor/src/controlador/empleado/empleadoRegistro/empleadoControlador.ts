@@ -101,7 +101,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const codigo = await pool.query(
         `
         SELECT * FROM e_codigo WHERE id = $1
@@ -163,7 +163,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const codigo = await pool.query(
         `
         SELECT * FROM e_codigo WHERE id = $1
@@ -306,7 +306,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(
         `
           SELECT * FROM eu_empleados WHERE id = $1
@@ -510,7 +510,7 @@ class EmpleadoControlador {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
-          // CONSULTAR DATOSORIGINALES
+          // CONSULTAR DATOS ORIGINALES
           const empleado = await pool.query(
             `SELECT * FROM eu_empleados WHERE id = $1`, [obj]);
           const [datosOriginales] = empleado.rows;
@@ -2353,7 +2353,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(
         `
         SELECT * FROM eu_empleados WHERE id = $1
@@ -2504,7 +2504,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = empleado.rows;
 
@@ -2563,7 +2563,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = empleado.rows;
 

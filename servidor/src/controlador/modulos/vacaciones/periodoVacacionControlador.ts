@@ -75,7 +75,7 @@ class PeriodoVacacionControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const periodo = await pool.query(
         `SELECT * FROM mv_periodo_vacacion WHERE id = $1`,
         [id]

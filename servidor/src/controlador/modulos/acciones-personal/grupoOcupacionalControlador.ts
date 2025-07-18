@@ -217,7 +217,7 @@ class GrupoOcupacionalControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const proceso = await pool.query('SELECT * FROM map_empleado_grupo_ocupacional WHERE id = $1', [id]);
 
       const [datosOriginales] = proceso.rows;
@@ -1167,7 +1167,7 @@ class GrupoOcupacionalControlador {
       }
 
       if (estado == true) {
-        // CONSULTAR DATOSORIGINALES
+        // CONSULTAR DATOS ORIGINALES
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
         const grupo = await pool.query(

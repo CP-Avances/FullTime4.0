@@ -71,7 +71,6 @@ import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPerso
 import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
 import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
 import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/ingresar-registros/ingresar-registros.component';
-
 // MODULO  --GEOLOCALIZACION
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 // MODULO  --TIMBRE VIRTUAL
@@ -120,6 +119,7 @@ import { ReportePermisosComponent } from './componentes/reportes/modulos/reporte
 // REPORTE  --MODULO VACACIONES
 import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { SolicitudVacacionComponent } from './componentes/reportes/modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
+import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
 // REPORTE  --MODULO HORAS EXTRAS
 import { ReporteHorasPedidasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
@@ -213,6 +213,7 @@ const routes: Routes = [
 
   // MODULO  --VACACIONES
   { path: 'vacaciones-solicitados', component: ListarVacacionesComponent, canActivate: [AuthGuard] },
+  { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
 
   // MODULO  --HORAS EXTRAS
   { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard] },

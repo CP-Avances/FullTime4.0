@@ -371,7 +371,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
@@ -433,7 +433,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES REALTIME_NOTI
+      // CONSULTAR DATOS ORIGINALES REALTIME_NOTI
       const datosOriginalesRealTime = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id_hora_extra = $1', [id_hora_extra]);
       const [objetoRealTime] = datosOriginalesRealTime.rows;
 
@@ -472,7 +472,7 @@ class HorasExtrasPedidasControlador {
         observacion: null
       });
 
-      // CONSULTAR DATOSORIGINALES AUTORIZACIONES
+      // CONSULTAR DATOS ORIGINALES AUTORIZACIONES
       const datosOriginalesAutorizaciones = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_hora_extra = $1', [id_hora_extra]);
       const [objetoAutorizaciones] = datosOriginalesAutorizaciones.rows;
 
@@ -606,7 +606,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id_hora]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
@@ -677,7 +677,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
@@ -746,7 +746,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
@@ -839,7 +839,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
@@ -896,7 +896,7 @@ class HorasExtrasPedidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 

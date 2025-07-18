@@ -335,7 +335,7 @@ class HorasExtrasPedidasControlador {
                 const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
@@ -389,7 +389,7 @@ class HorasExtrasPedidasControlador {
                 const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES REALTIME_NOTI
+                // CONSULTAR DATOS ORIGINALES REALTIME_NOTI
                 const datosOriginalesRealTime = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id_hora_extra = $1', [id_hora_extra]);
                 const [objetoRealTime] = datosOriginalesRealTime.rows;
                 if (!objetoRealTime) {
@@ -421,7 +421,7 @@ class HorasExtrasPedidasControlador {
                     ip_local: ip_local,
                     observacion: null
                 });
-                // CONSULTAR DATOSORIGINALES AUTORIZACIONES
+                // CONSULTAR DATOS ORIGINALES AUTORIZACIONES
                 const datosOriginalesAutorizaciones = yield database_1.default.query('SELECT * FROM ecm_autorizaciones WHERE id_hora_extra = $1', [id_hora_extra]);
                 const [objetoAutorizaciones] = datosOriginalesAutorizaciones.rows;
                 if (!objetoAutorizaciones) {
@@ -538,7 +538,7 @@ class HorasExtrasPedidasControlador {
                 const { hora, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id_hora]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
@@ -597,7 +597,7 @@ class HorasExtrasPedidasControlador {
                 const { estado, usser_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
@@ -656,7 +656,7 @@ class HorasExtrasPedidasControlador {
                 const { observacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
@@ -737,7 +737,7 @@ class HorasExtrasPedidasControlador {
                 const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
@@ -787,7 +787,7 @@ class HorasExtrasPedidasControlador {
                 let { documento, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {

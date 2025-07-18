@@ -114,7 +114,7 @@ class DetalleCatalogoHorarioControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // OBTENER DATOSORIGINALES
+            // OBTENER DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM eh_detalle_horarios WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
@@ -223,7 +223,7 @@ class DetalleCatalogoHorarioControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // OBTENER DATOSORIGINALES
+            // OBTENER DATOS ORIGINALES
             const consulta = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
             const [datosOriginales] = consulta.rows;
 

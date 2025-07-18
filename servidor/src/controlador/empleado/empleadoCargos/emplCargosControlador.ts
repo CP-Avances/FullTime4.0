@@ -89,7 +89,7 @@ class EmpleadoCargosControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const cargoConsulta = await pool.query(
         `
           SELECT * FROM eu_empleado_cargos WHERE id = $1
@@ -317,7 +317,7 @@ class EmpleadoCargosControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const cargoConsulta = await pool.query(
         `
         SELECT * FROM eu_empleado_cargos WHERE id = $1

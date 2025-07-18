@@ -169,7 +169,7 @@ class NotificacionTiempoRealControlador {
                 const id_empleado = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -518,7 +518,7 @@ class NotificacionTiempoRealControlador {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // OBTENER DATOSORIGINALES
+                        // OBTENER DATOS ORIGINALES
                         const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [obj]);
                         const [datosOriginales] = consulta.rows;
                         if (!datosOriginales) {
@@ -663,7 +663,7 @@ class NotificacionTiempoRealControlador {
                 console.log("ver parametros", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

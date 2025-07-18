@@ -205,7 +205,7 @@ class GradoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const proceso = await pool.query('SELECT * FROM map_empleado_grado WHERE id = $1', [id]);
       const [datosOriginales] = proceso.rows;
 
@@ -1198,7 +1198,7 @@ class GradoControlador {
       const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
 
       if (estado == true) {
-        // CONSULTAR DATOSORIGINALES
+        // CONSULTAR DATOS ORIGINALES
         const grado = await pool.query(
           `
           SELECT * FROM map_empleado_grado WHERE id_empleado = $1 AND estado = true

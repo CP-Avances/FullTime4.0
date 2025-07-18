@@ -30,7 +30,7 @@ class TipoPermisosControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query('SELECT * FROM mp_cat_tipo_permisos WHERE id = $1', [id]);
       const [datosOriginales] = rol.rows;
 
@@ -113,7 +113,7 @@ class TipoPermisosControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const tipo = await pool.query('SELECT * FROM mp_cat_tipo_permisos WHERE id = $1', [id]);
       const [datosOriginales] = tipo.rows;
 

@@ -94,7 +94,7 @@ class HorarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
 
       const horario = await pool.query(
         `
@@ -176,7 +176,7 @@ class HorarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const horario = await pool.query(
         `
         SELECT * FROM eh_cat_horarios WHERE id = $1
@@ -258,7 +258,7 @@ class HorarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const horario = await pool.query(
         `
         SELECT * FROM eh_cat_horarios WHERE id = $1
@@ -380,7 +380,7 @@ class HorarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const horario = await pool.query(
         `
         SELECT * FROM eh_cat_horarios WHERE id = $1
@@ -459,7 +459,7 @@ class HorarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const horario = await pool.query(
         `
         SELECT * FROM eh_cat_horarios WHERE id = $1

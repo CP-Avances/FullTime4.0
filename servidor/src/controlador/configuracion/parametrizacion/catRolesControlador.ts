@@ -28,7 +28,7 @@ class RolesControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query('SELECT * FROM ero_cat_roles WHERE id = $1', [id]);
       const [datosOriginales] = rol.rows;
 

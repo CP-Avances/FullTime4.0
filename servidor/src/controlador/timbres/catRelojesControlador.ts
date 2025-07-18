@@ -40,7 +40,7 @@ class RelojesControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const reloj = await pool.query(`SELECT * FROM ed_relojes WHERE id = $1`, [id]);
             const [datosOriginales] = reloj.rows;
 
@@ -195,7 +195,7 @@ class RelojesControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const reloj = await pool.query(
                 `
                 SELECT * FROM ed_relojes WHERE id = $1

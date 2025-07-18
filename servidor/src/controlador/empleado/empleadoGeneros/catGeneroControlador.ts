@@ -93,7 +93,7 @@ class GeneroControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
@@ -154,7 +154,7 @@ class GeneroControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 

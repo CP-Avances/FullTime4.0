@@ -91,7 +91,7 @@ class GeneroControlador {
                 const { genero, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
@@ -144,7 +144,7 @@ class GeneroControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM e_genero WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

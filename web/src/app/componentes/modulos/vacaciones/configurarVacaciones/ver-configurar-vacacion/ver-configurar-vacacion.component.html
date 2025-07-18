@@ -1,0 +1,61 @@
+<div class="container" *ngFor="let cv of datosConfiguracion" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo" class="row w-100 m-auto align-items-center">
+            <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-1">
+                <button class="btn btn-outline-light btn-sm" style="float: left;" (click)="VerListaConfiguracion()">
+                    Listar configuración de vacaciones
+                </button>
+            </div>
+            <div class="col-12 col-md-4 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+                <span>CONFIGURACIÓN <br> {{cv.descripcion.toUpperCase()}}</span>
+            </div>
+            <div class="col-6 col-md-4 mb-2 mb-md-0 order-2 order-md-3">
+                <button class="btn btn-outline-light btn-sm" style="float: right;" (click)="VerFormularioEditar(cv.id)">
+                    Editar
+                </button>
+            </div>
+        </div>
+
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col-md" id="verticalLine">
+                        <label class="col-sm col-form-label" *ngIf="cv.minimo_dias != 0">
+                            <b>Días mínimos de vacaciones:</b> {{cv.minimo_dias}} días
+                        </label>
+                        <br *ngIf="cv.minimo_dias != 0">
+                        <label class="col-sm col-form-label" *ngIf="cv.incluir_feriados == true">
+                            <b>En la solicitud se incluira:</b> Feriados
+                        </label>
+                        <label class="col-sm col-form-label" *ngIf="cv.incluir_feriados == false">
+                            <b>En la solicitud se no incluira:</b> Feriados
+                        </label>
+                        <br>
+                        <label class="col-sm col-form-label" *ngIf="cv.documento === true">
+                            <b>Cargar documento de respaldo junto con la solicitud:</b> Obligatorio
+                        </label>
+                        <label class="col-sm col-form-label" *ngIf="cv.documento === false">
+                            <b>Cargar documento de respaldo junto con la solicitud:</b> Opcional
+                        </label>
+                    </div>
+                    <div class="col-md custom-disabled-checkbox" id="verticalLine">
+                        <label class="col-sm col-form-label">
+                            <b>Permitir solicitudes con mínimo de horas:</b>
+                        </label>
+                        <div class="espacio d-flex justify-content-start"
+                            style="position: relative; left: 40px; font-size: 12px;">
+                            <mat-checkbox disabled [checked]="cv.permite_horas">
+                                <span id="color_fuente">
+                                    <label id="textoradiobtn">Permitir horas</label>
+                                </span>
+                            </mat-checkbox>
+                        </div>
+                        <label class="col-sm col-form-label" *ngIf="cv.permite_horas">
+                            <b>Noras mínimas de vacaciones:</b> {{cv.minimo_horas}} horas
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

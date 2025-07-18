@@ -785,7 +785,7 @@ class TimbresControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // OBTENER DATOSORIGINALES
+            // OBTENER DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
             const datosOriginales = consulta.rows;
             const idsEncontrados = datosOriginales.map((row: any) => row.id_empleado);
@@ -1044,7 +1044,7 @@ class TimbresControlador {
 
             await pool.query('BEGIN');
 
-            // OBTENER DATOSORIGINALES
+            // OBTENER DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
             const datosOriginales = consulta.rows;
             // OBTENER LOS IDS ENCONTRADOS
@@ -1150,7 +1150,7 @@ class TimbresControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
             const [datosOriginales] = consulta.rows;
 

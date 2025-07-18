@@ -90,7 +90,7 @@ class UbicacionControlador {
                 return res.jsonp({ message: 'error_duplicidad' });
             }
             else {
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const coordenada = await pool.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
                 const [datosOriginales] = coordenada.rows;
 
@@ -199,7 +199,7 @@ class UbicacionControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const coordenada = await pool.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
             const [datosOriginales] = coordenada.rows;
 
@@ -387,7 +387,7 @@ class UbicacionControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const ubicacion = await pool.query(`SELECT * FROM mg_empleado_ubicacion  WHERE id = ANY($1)`,
                 [ids]);
 

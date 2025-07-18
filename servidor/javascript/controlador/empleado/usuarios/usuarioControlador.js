@@ -94,7 +94,7 @@ class UsuarioControlador {
                 const { usuario, id_rol, id_empleado, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -147,7 +147,7 @@ class UsuarioControlador {
                 let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -235,7 +235,7 @@ class UsuarioControlador {
                 const { frase, id_empleado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -289,7 +289,7 @@ class UsuarioControlador {
                 const id_empleado = payload._id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTA DATOSORIGINALES
+                // CONSULTA DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -592,7 +592,7 @@ class UsuarioControlador {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTA DATOSORIGINALES
+                        // CONSULTA DATOS ORIGINALES
                         const consulta = yield database_1.default.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
                         const [datosOriginales] = consulta.rows;
                         if (!datosOriginales) {
@@ -722,7 +722,7 @@ class UsuarioControlador {
                 const { id, id_departamento, principal, personal, administra, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTA DATOSORIGINALES
+                // CONSULTA DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -774,7 +774,7 @@ class UsuarioControlador {
                 const { user_name, ip, id, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTA DATOSORIGINALES
+                // CONSULTA DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -1020,7 +1020,7 @@ class UsuarioControlador {
                 const adminComida = (yield admin_comida.toLowerCase()) === 'si' ? true : false;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -1138,7 +1138,7 @@ function EditarUsuarioDepartamento(datos) {
             const { id_empleado, id_departamento, principal, personal, administra, user_name, ip, ip_local } = datos;
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
-            // CONSULTA DATOSORIGINALES
+            // CONSULTA DATOS ORIGINALES
             const consulta = yield database_1.default.query(`
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2
       `, [id_empleado, id_departamento]);
