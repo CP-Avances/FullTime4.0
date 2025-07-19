@@ -1038,7 +1038,8 @@
                                         <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoC"
                                             [matAutocomplete]="auto27">
                                         <mat-autocomplete #auto27="matAutocomplete">
-                                            <mat-option *ngFor="let g of filtroNombreNC | async" [value]="g.empleado">
+                                            <mat-option *ngFor="let g of filtroNombreNC | async" [value]="g.empleado"
+                                            (click)="onCargo(g, 6)">
                                                 {{g.empleado.toUpperCase()}}
                                             </mat-option>
                                         </mat-autocomplete>
