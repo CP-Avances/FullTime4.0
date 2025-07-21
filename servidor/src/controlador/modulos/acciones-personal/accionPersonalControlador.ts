@@ -1038,6 +1038,7 @@ class AccionPersonalControlador {
             return res.jsonp({ message: 'Registro actualizado.' });
 
         } catch (error) {
+            console.log('error ', error);
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: error });
 
