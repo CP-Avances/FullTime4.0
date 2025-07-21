@@ -27,6 +27,7 @@ class EmpresaControlador {
 
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA   **USADO
     public async ListarEmpresaId(req: Request, res: Response) {
+        console.log("ENTRA A SERVIDOR PARA BUSCAR DATOS DE LA EMPRESA")
         const { id } = req.params;
         const EMPRESA = await pool.query(
             `
@@ -284,6 +285,7 @@ class EmpresaControlador {
 
     // METODO DE BUSQUEDA DE IMAGEN DE EMPRESA EN BASE64    **USADO
     public async ConvertirImagenBase64_(req: Request, res: Response): Promise<any> {
+        console.log("ENTRA A METODO DE LOGO EN EL SERVIDOR");
         const file_name = await pool.query(
             `
                 SELECT nombre, logo FROM e_empresa WHERE id = $1

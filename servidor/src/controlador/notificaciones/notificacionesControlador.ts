@@ -808,7 +808,7 @@ class NotificacionTiempoRealControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {

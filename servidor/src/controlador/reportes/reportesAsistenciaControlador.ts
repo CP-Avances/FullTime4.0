@@ -5,6 +5,7 @@ class ReportesAsistenciaControlador {
 
     // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO     
     public async ReporteTimbresMultiple(req: Request, res: Response) {
+        console.log("ENTRA A METODO PARA CONSULTAR ")
         let { desde, hasta } = req.params;
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {

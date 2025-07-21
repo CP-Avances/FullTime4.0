@@ -39,6 +39,7 @@ class EmpresaControlador {
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA   **USADO
     ListarEmpresaId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("ENTRA A SERVIDOR PARA BUSCAR DATOS DE LA EMPRESA");
             const { id } = req.params;
             const EMPRESA = yield database_1.default.query(`
                 SELECT * FROM e_empresa WHERE id = $1
@@ -258,6 +259,7 @@ class EmpresaControlador {
     // METODO DE BUSQUEDA DE IMAGEN DE EMPRESA EN BASE64    **USADO
     ConvertirImagenBase64_(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("ENTRA A METODO DE LOGO EN EL SERVIDOR");
             const file_name = yield database_1.default.query(`
                 SELECT nombre, logo FROM e_empresa WHERE id = $1
             `, [req.params.id_empresa])

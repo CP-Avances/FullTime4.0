@@ -1562,21 +1562,6 @@ class TimbresControlador {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // METODO DE BUSQUEDA DE AVISOS GENERALES POR EMPLEADO
     public async ObtenerAvisosColaborador(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;

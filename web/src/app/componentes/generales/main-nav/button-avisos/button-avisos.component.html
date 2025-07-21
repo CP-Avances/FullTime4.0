@@ -11,7 +11,6 @@
     </div>
     <div *ngIf="avisos.message !== 'No se encuentran registros'">
         <div *ngFor="let n of avisos">
-
             <!-- MENSAJE DE COMUNICADOS -->
             <div *ngIf="n.tipo === 6"
                 [ngStyle]="{ 'background': n.visto ? 'rgb(226, 226, 226)' : 'rgb(245, 202, 252)' }">
@@ -64,24 +63,6 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             <!-- FORMA DE AVISO PARA 'TE FALTA TIMBRE DE ENTRADA' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Te falta timbre de entrada'"
