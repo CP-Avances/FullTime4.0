@@ -641,7 +641,7 @@ class AccionPersonalControlador {
                         ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1 OR (UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
                     `, [formulario6.firma_Resp_Notificacion.trim().toUpperCase()]);
                     id_empleado_comunicacion = response.rows[0].id;
-                    id_empleado_comunica_cargo = response.rows[0].id_cargo;
+                    id_empleado_comunica_cargo = response.rows[0].id_cargo_;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                 }
@@ -773,7 +773,6 @@ class AccionPersonalControlador {
                         ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1 OR 
                          (UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
                     `, [formulario5.firma_negativa.trim().toUpperCase()]);
-                    console.log('id_empleado_negativa: ', response.rows);
                     id_empleado_negativa = response.rows[0].id;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
@@ -787,7 +786,7 @@ class AccionPersonalControlador {
                         ((UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
                     `, [formulario6.firma_Resp_Notificacion.trim().toUpperCase()]);
                     id_empleado_comunicacion = response.rows[0].id;
-                    id_empleado_comunica_cargo = response.rows[0].id_cargo;
+                    id_empleado_comunica_cargo = response.rows[0].id_cargo_;
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                 }

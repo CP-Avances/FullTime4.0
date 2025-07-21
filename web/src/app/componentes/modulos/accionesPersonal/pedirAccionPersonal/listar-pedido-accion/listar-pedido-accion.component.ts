@@ -16,6 +16,7 @@ import { EmplCargosService } from "src/app/servicios/usuarios/empleado/empleadoC
 import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ExcelService } from "src/app/servicios/generarDocumentos/excel.service";
 
 @Component({
   selector: "app-listar-pedido-accion",
@@ -77,6 +78,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private asignaciones: AsignacionesService,
+    private documentosExcel: ExcelService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -262,6 +264,9 @@ export class ListarPedidoAccionComponent implements OnInit {
   idCargo: any = [];
   contador: number = 0;
   MostrarInformacion(id: number, tipo: string) {
+    console.log("id", id);
+    console.log("tipo", tipo);
+
     this.texto_color_cargo = "white";
     this.texto_color_numero = "white";
     this.texto_color_proceso = "white";
@@ -281,10 +286,11 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.contador = 0;
     this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
       this.datosPedido = data;
-      console.log("data pedido", this.datosPedido);
-      this.BuscarPedidoEmpleado(this.datosPedido, tipo);
-      this.ObtenerDecreto();
-      this.ObtenerTipoAccion();
+      this.documentosExcel.generarExcel(this.datosPedido);
+      //this.ObtenerDecreto();
+      //this.ObtenerTipoAccion();
+      //this.BuscarPedidoEmpleado(this.datosPedido, tipo);
+      
     });
   }
 
