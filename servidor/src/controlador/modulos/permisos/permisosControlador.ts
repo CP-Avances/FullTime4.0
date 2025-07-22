@@ -238,7 +238,7 @@ class PermisosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
@@ -459,7 +459,7 @@ class PermisosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
@@ -600,7 +600,7 @@ class PermisosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM ecm_realtime_notificacion WHERE id_permiso = $1`, [id_permiso]);
             const [datosOriginalesRealTime] = consulta.rows;
 
@@ -635,7 +635,7 @@ class PermisosControlador {
                 });
             }
 
-            // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+            // CONSULTAR DATOS ORIGINALES AUTORIZACIONES
             const consultaAutorizaciones = await pool.query(`SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1`, [id_permiso]);
             const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
 
@@ -674,7 +674,7 @@ class PermisosControlador {
                 observacion: null
             });
 
-            // CONSULTAR DATOSORIGINALESPERMISOS
+            // CONSULTAR DATOS ORIGINALES PERMISOS
             const consultaPermisos = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id_permiso]);
             const [datosOriginalesPermisos] = consultaPermisos.rows;
 
@@ -1430,7 +1430,7 @@ class PermisosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = await pool.query(`SELECT estado FROM mp_solicitud_permiso WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
@@ -2044,7 +2044,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
-        // CONSULTAR DATOSORIGINALES
+        // CONSULTAR DATOS ORIGINALES
         const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
         const [datosOriginales] = consulta.rows;
 

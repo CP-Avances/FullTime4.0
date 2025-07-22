@@ -90,7 +90,7 @@ class NacionalidadControlador {
                 const { nacionalidad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
@@ -143,7 +143,7 @@ class NacionalidadControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

@@ -1,0 +1,120 @@
+<!--  LISTA DE CONFIGURACION DE VACACIONES  -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+        <div id="titulo">
+            <span>CONFIGURACIÓN DE VACACIONES</span>
+        </div>
+        <mat-card class="example-card mat-elevation-z9">
+            <div class="d-flex justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                <button id="btn-raised" class="btn btn-sm" (click)="VerFormularioRegistrar()">
+                    Crear configuración
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                    Mostrar lista
+                </button>
+            </div>
+        </mat-card>
+    </div>
+
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">LISTA DE CONFIGURACIÓN DE VACACIONES</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col" rowspan="2" id="centrado">Descripción</th>
+                            <th scope="col" colspan="2">Solicitud por horas</th>
+                            <th scope="col" rowspan="2" id="centrado">Solicitud por días</th>
+                            <th scope="col" rowspan="2" id="centrado">Cargar documento</th>
+                            <th scope="col" rowspan="2" id="centrado">Acción</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Permitido</th>
+                            <th scope="col">Horas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de la configuración de vacaciones.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let cv of configuracion | filtroDescripcion: nombreF.value | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{cv.descripcion}}</td>
+                            <td *ngIf="cv.permite_horas === false">No</td>
+                            <td *ngIf="cv.permite_horas === true">Si</td>
+                            <td *ngIf="cv.permite_horas === true">{{cv.minimo_horas}}</td>
+                            <td *ngIf="cv.permite_horas === false"></td>
+                            <td>{{cv.minimo_dias}}</td>
+                            <td *ngIf="cv.documento === false">Opcional</td>
+                            <td *ngIf="cv.documento === true">Requerido</td>
+                            <td class="justify-content-center">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                    (click)="VerDatosConfiguracion(cv.id)">
+                                    <p>Ver</p>
+                                </i>
+                                <i id="t-editar" class="fas fa-edit" matSuffix matTooltipPosition="right"
+                                    (click)="VerFormularioEditar(cv.id)"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(cv)" id="t-eliminar" class="far fa-trash-alt" matSuffix
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="configuracion.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista Configuración de Vacaciones en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Configuración de Vacaciones en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Configuración de Vacaciones en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de configuración de vacaciones. </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  ********************** FORMULARIO REGISTRO DE CONFIGURACION DE VACACIONES  ****************************** -->
+<app-registrar-configurar-vacacion *ngIf="ver_registrar"></app-registrar-configurar-vacacion>
+
+<!--  ********************** PANTALLA VISTA DATOS DE TIPO DE PERMISO  ****************************** -->
+<app-ver-configurar-vacacion *ngIf="ver_datos" [idConfiguracion]="configuracion_id"></app-ver-configurar-vacacion>

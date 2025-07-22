@@ -93,7 +93,7 @@ class RegimenControlador {
                 const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const regimen = yield database_1.default.query(`
         SELECT * FROM ere_cat_regimenes WHERE id = $1
         `, [id]);
@@ -240,7 +240,7 @@ class RegimenControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const regimen = yield database_1.default.query(`
         SELECT * FROM ere_cat_regimenes WHERE id = $1
         `, [id]);
@@ -335,7 +335,7 @@ class RegimenControlador {
                 const { descripcion, dias_vacacion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const periodo = yield database_1.default.query(`
         SELECT * FROM ere_dividir_vacaciones WHERE id = $1
         `, [id]);
@@ -405,7 +405,7 @@ class RegimenControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const periodo = yield database_1.default.query(`
         SELECT * FROM ere_dividir_vacaciones WHERE id = $1
         `, [id]);
@@ -498,7 +498,7 @@ class RegimenControlador {
                 const { anio_desde, anio_hasta, dias_antiguedad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATO SORIGINALES
                 const antiguedad = yield database_1.default.query(`
         SELECT * FROM ere_antiguedad WHERE id = $1
         `, [id]);
@@ -567,7 +567,7 @@ class RegimenControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const antiguedad = yield database_1.default.query(`
         SELECT * FROM ere_antiguedad WHERE id = $1
         `, [id]);

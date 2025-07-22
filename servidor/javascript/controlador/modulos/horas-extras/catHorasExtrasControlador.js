@@ -93,7 +93,7 @@ class HorasExtrasControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horaExtra = yield database_1.default.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
                 const [datosOriginales] = horaExtra.rows;
                 if (!datosOriginales) {
@@ -143,7 +143,7 @@ class HorasExtrasControlador {
                 const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horaExtra = yield database_1.default.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
                 const [datosOriginales] = horaExtra.rows;
                 if (!datosOriginales) {

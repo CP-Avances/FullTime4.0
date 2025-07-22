@@ -252,7 +252,7 @@ class PlanGeneralControlador {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan]);
                     const [datosOriginales] = consulta.rows;
                     if (!datosOriginales) {
@@ -570,7 +570,7 @@ class PlanGeneralControlador {
                 `, [fecha, codigo]);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

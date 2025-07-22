@@ -146,7 +146,7 @@ class RegimenControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const regimen = await pool.query(
         `
         SELECT * FROM ere_cat_regimenes WHERE id = $1
@@ -307,7 +307,7 @@ class RegimenControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const regimen = await pool.query(
         `
         SELECT * FROM ere_cat_regimenes WHERE id = $1
@@ -420,7 +420,7 @@ class RegimenControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const periodo = await pool.query(
         `
         SELECT * FROM ere_dividir_vacaciones WHERE id = $1
@@ -504,7 +504,7 @@ class RegimenControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const periodo = await pool.query(
         `
         SELECT * FROM ere_dividir_vacaciones WHERE id = $1
@@ -617,7 +617,7 @@ class RegimenControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATO SORIGINALES
       const antiguedad = await pool.query(
         `
         SELECT * FROM ere_antiguedad WHERE id = $1
@@ -698,7 +698,7 @@ class RegimenControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const antiguedad = await pool.query(
         `
         SELECT * FROM ere_antiguedad WHERE id = $1

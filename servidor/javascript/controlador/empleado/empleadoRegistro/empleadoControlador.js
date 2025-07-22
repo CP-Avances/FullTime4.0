@@ -105,7 +105,7 @@ class EmpleadoControlador {
                 const { valor, automatico, manual, identificacion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const codigo = yield database_1.default.query(`
         SELECT * FROM e_codigo WHERE id = $1
         `, [id]);
@@ -157,7 +157,7 @@ class EmpleadoControlador {
                 const { valor, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const codigo = yield database_1.default.query(`
         SELECT * FROM e_codigo WHERE id = $1
         `, [id]);
@@ -276,7 +276,7 @@ class EmpleadoControlador {
                 const partidaFinal = numero_partida_individual === '' ? null : numero_partida_individual;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const empleado = yield database_1.default.query(`
           SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
@@ -461,7 +461,7 @@ class EmpleadoControlador {
                     try {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
-                        // CONSULTAR DATOSORIGINALES
+                        // CONSULTAR DATOS ORIGINALES
                         const empleado = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE id = $1`, [obj]);
                         const [datosOriginales] = empleado.rows;
                         const usuario = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [obj]);
@@ -2022,7 +2022,7 @@ class EmpleadoControlador {
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const empleado = yield database_1.default.query(`
         SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
@@ -2150,7 +2150,7 @@ class EmpleadoControlador {
                 const { observacion, id_titulo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
@@ -2201,7 +2201,7 @@ class EmpleadoControlador {
                 const id = req.params.id_empleado_titulo;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const empleado = yield database_1.default.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {

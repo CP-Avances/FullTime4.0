@@ -227,7 +227,7 @@ class PermisosControlador {
                 console.log("ver datos a editar", req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -416,7 +416,7 @@ class PermisosControlador {
                 let separador = path_1.default.sep;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -543,7 +543,7 @@ class PermisosControlador {
                 let separador = path_1.default.sep;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM ecm_realtime_notificacion WHERE id_permiso = $1`, [id_permiso]);
                 const [datosOriginalesRealTime] = consulta.rows;
                 if (!datosOriginalesRealTime) {
@@ -574,7 +574,7 @@ class PermisosControlador {
                         observacion: null
                     });
                 }
-                // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+                // CONSULTAR DATOS ORIGINALES AUTORIZACIONES
                 const consultaAutorizaciones = yield database_1.default.query(`SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1`, [id_permiso]);
                 const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
                 if (!datosOriginalesAutorizaciones) {
@@ -606,7 +606,7 @@ class PermisosControlador {
                     ip_local: ip_local,
                     observacion: null
                 });
-                // CONSULTAR DATOSORIGINALESPERMISOS
+                // CONSULTAR DATOS ORIGINALES PERMISOS
                 const consultaPermisos = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id_permiso]);
                 const [datosOriginalesPermisos] = consultaPermisos.rows;
                 if (!datosOriginalesPermisos) {
@@ -1284,7 +1284,7 @@ class PermisosControlador {
                 const { estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT estado FROM mp_solicitud_permiso WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -1846,7 +1846,7 @@ function RegistrarDocumentoPermiso(datos) {
             const dia = fecha.toFormat('dd');
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {

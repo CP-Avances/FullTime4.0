@@ -37,7 +37,7 @@ class RolesControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query('SELECT * FROM ero_cat_roles WHERE id = $1', [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {

@@ -30,7 +30,7 @@ class EmpleadoProcesoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const proceso = await pool.query('SELECT * FROM map_empleado_procesos WHERE id = $1', [id]);
       const [datosOriginales] = proceso.rows;
 

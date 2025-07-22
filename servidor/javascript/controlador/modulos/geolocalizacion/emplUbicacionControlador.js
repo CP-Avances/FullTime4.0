@@ -82,7 +82,7 @@ class UbicacionControlador {
                     return res.jsonp({ message: 'error_duplicidad' });
                 }
                 else {
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const coordenada = yield database_1.default.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
                     const [datosOriginales] = coordenada.rows;
                     if (!datosOriginales) {
@@ -179,7 +179,7 @@ class UbicacionControlador {
                 const { id } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const coordenada = yield database_1.default.query(`SELECT * FROM mg_cat_ubicaciones WHERE id = $1`, [id]);
                 const [datosOriginales] = coordenada.rows;
                 if (!datosOriginales) {
@@ -340,7 +340,7 @@ class UbicacionControlador {
                 }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const ubicacion = yield database_1.default.query(`SELECT * FROM mg_empleado_ubicacion  WHERE id = ANY($1)`, [ids]);
                 const datosOriginales = ubicacion.rows;
                 // OBTENER LOS IDS ENCONTRADOS

@@ -96,7 +96,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
@@ -159,7 +159,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
@@ -260,7 +260,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
@@ -321,7 +321,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTA DATOSORIGINALES
+      // CONSULTA DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
@@ -673,7 +673,7 @@ class UsuarioControlador {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
-          // CONSULTA DATOSORIGINALES
+          // CONSULTA DATOS ORIGINALES
           const consulta = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
           const [datosOriginales] = consulta.rows;
 
@@ -824,7 +824,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTA DATOSORIGINALES
+      // CONSULTA DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -885,7 +885,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTA DATOSORIGINALES
+      // CONSULTA DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -1156,7 +1156,7 @@ class UsuarioControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
@@ -1293,7 +1293,7 @@ async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
     // INICIAR TRANSACCION
     await pool.query('BEGIN');
 
-    // CONSULTA DATOSORIGINALES
+    // CONSULTA DATOS ORIGINALES
     const consulta = await pool.query(
       `
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2

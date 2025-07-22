@@ -298,7 +298,7 @@ class LoginControlador {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    // OBTENER DATOSORIGINALES
+                    // OBTENER DATOS ORIGINALES
                     const consulta = yield database_1.default.query(`
           SELECT * FROM eu_usuarios WHERE id_empleado = $1
           `, [id_empleado]);

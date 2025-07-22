@@ -39,7 +39,7 @@ const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip, ip
         try {
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = yield database_1.default.query(`SELECT * FROM mv_periodo_vacacion WHERE id = $1`, [vacacion.id_peri_vacacion]);
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {

@@ -132,7 +132,7 @@ class TipoComidasControlador {
                 const { nombre, tipo_comida, hora_inicio, hora_fin, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query("SELECT * FROM ma_horario_comidas WHERE id = $1", [id]);
                 const [datos] = datosOriginales.rows;
                 if (!datos) {
@@ -189,7 +189,7 @@ class TipoComidasControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query("SELECT * FROM ma_horario_comidas WHERE id = $1", [id]);
                 const [datos] = datosOriginales.rows;
                 if (!datos) {
@@ -292,7 +292,7 @@ class TipoComidasControlador {
                 const { nombre, valor, observacion, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query("SELECT * FROM ma_detalle_comida WHERE id = $1", [id]);
                 const [datos] = datosOriginales.rows;
                 if (!datos) {
@@ -344,7 +344,7 @@ class TipoComidasControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query("SELECT * FROM ma_detalle_comida WHERE id = $1", [id]);
                 const [datos] = datosOriginales.rows;
                 if (!datos) {

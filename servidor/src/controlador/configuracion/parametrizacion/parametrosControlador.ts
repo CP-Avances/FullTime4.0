@@ -98,7 +98,7 @@ class ParametrosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // OBTENER DATOSORIGINALES
+            // OBTENER DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
@@ -205,7 +205,7 @@ class ParametrosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // OBTENER DATOSORIGINALES
+            // OBTENER DATOS ORIGINALES
             const consulta = await pool.query(
                 `
                 SELECT * FROM ep_detalle_parametro WHERE id = $1

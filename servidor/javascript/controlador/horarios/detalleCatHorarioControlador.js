@@ -119,7 +119,7 @@ class DetalleCatalogoHorarioControlador {
                 const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eh_detalle_horarios WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -208,7 +208,7 @@ class DetalleCatalogoHorarioControlador {
                 const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

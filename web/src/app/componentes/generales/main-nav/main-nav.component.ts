@@ -110,6 +110,7 @@ export class MainNavComponent implements OnInit {
   subItemModulosVacaciones: boolean = false;
   childrenVacaciones: any = [];
   vistaModulosVacacionesVacacionesSolicitadas: boolean = false;
+  vistaModulosVacacionesConfigurarVacacion: boolean = false;
   subItemModulosHorasExtras: boolean = false;
   childrenHorasExtras: any = [];
   vistaModulosHorasExtrasListaHorasExtras: boolean = false;
@@ -581,7 +582,7 @@ export class MainNavComponent implements OnInit {
           complete: () => {
             //Control de vistas activas
             this.paginasMG.forEach((row: any) => {
-              // console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
+              console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
               switch (row.link) {
                 case 'vistaEmpresa':
                   this.itemConfiguracion = true;
@@ -925,6 +926,18 @@ export class MainNavComponent implements OnInit {
                   }
                   if (!this.vistaModulosPermisosPermisosSolicitados) {
                     this.childrenPermisos.push({ name: 'Aprobación Múltiple P.', url: '/permisos-solicitados', color: true, ver: true });
+                  }
+                  break;
+                case 'configurar-vacacion':
+                  this.itemModulos = true;
+                  this.subItemModulosVacaciones = true;
+                  for (const parametrizacion of this.childrenVacaciones) {
+                    if (parametrizacion.url === '/configurar-vacacion') {
+                      this.vistaModulosVacacionesConfigurarVacacion = true;
+                    }
+                  }
+                  if (!this.vistaModulosVacacionesConfigurarVacacion) {
+                    this.childrenVacaciones.push({ name: 'Configurar Vacaciones', url: '/configurar-vacacion', color: true, ver: true });
                   }
                   break;
                 case 'vacaciones-solicitados':

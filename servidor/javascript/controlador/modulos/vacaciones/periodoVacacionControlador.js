@@ -67,7 +67,7 @@ class PeriodoVacacionControlador {
                 const { observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion, dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida, estado, user_name, ip, ip_local, fecha_acreditar, transferido, dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad, id } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const periodo = yield database_1.default.query(`SELECT * FROM mv_periodo_vacacion WHERE id = $1`, [id]);
                 const [datosOriginales] = periodo.rows;
                 if (!datosOriginales) {

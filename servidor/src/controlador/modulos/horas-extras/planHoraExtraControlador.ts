@@ -107,7 +107,7 @@ class PlanHoraExtraControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -166,7 +166,7 @@ class PlanHoraExtraControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -378,7 +378,7 @@ class PlanHoraExtraControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query('SELECT * FROM mhe_detalle_plan_hora_extra WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -444,7 +444,7 @@ class PlanHoraExtraControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 

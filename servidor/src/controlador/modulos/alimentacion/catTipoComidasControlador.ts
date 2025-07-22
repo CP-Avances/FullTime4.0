@@ -138,7 +138,7 @@ class TipoComidasControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query("SELECT * FROM ma_horario_comidas WHERE id = $1", [id]);
       const [datos] = datosOriginales.rows;
 
@@ -209,7 +209,7 @@ class TipoComidasControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query("SELECT * FROM ma_horario_comidas WHERE id = $1", [id]);
       const [datos] = datosOriginales.rows;
 
@@ -332,7 +332,7 @@ class TipoComidasControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(
         "SELECT * FROM ma_detalle_comida WHERE id = $1",
         [id]
@@ -395,7 +395,7 @@ class TipoComidasControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const datosOriginales = await pool.query(
         "SELECT * FROM ma_detalle_comida WHERE id = $1",
         [id]

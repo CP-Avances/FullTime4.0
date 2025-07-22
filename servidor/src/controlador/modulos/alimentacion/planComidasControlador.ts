@@ -385,7 +385,7 @@ class PlanComidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
       const [datosOriginales] = planComida.rows;
 
@@ -467,7 +467,7 @@ class PlanComidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
       const [datosOriginales] = planComida.rows;
 
@@ -536,7 +536,7 @@ class PlanComidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
       const [datosOriginales] = planComida.rows;
 
@@ -659,7 +659,7 @@ class PlanComidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const planComida = await pool.query(
         `
         SELECT * FROM ma_empleado_plan_comida_general WHERE id_solicitud_comida = $1 AND fecha = $2 AND id_empleado = $3
@@ -734,7 +734,7 @@ class PlanComidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const planComida = await pool.query('SELECT * FROM ma_detalle_plan_comida WHERE id = $1', [id]);
       const [datosOriginales] = planComida.rows;
 
@@ -794,7 +794,7 @@ class PlanComidasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const planComida = await pool.query(
         `
         SELECT * FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2

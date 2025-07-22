@@ -79,7 +79,7 @@ class SucursalControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM e_sucursales WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 

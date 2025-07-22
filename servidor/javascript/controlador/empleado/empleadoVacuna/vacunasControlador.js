@@ -160,7 +160,7 @@ class VacunasControlador {
                 `, [id_empleado]);
                 const [vacuna] = response.rows;
                 let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const vacuna1 = yield database_1.default.query(`
                 SELECT * FROM eu_empleado_vacunas WHERE id = $1
                 `, [id]);
@@ -240,7 +240,7 @@ class VacunasControlador {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const vacuna = yield database_1.default.query(`
                     SELECT * FROM eu_empleado_vacunas WHERE id = $1
                     `, [id]);
@@ -322,7 +322,7 @@ class VacunasControlador {
                 let { documento, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const vacunaconsulta = yield database_1.default.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
                 const [datosOriginales] = vacunaconsulta.rows;
                 if (!datosOriginales) {
@@ -387,7 +387,7 @@ class VacunasControlador {
                 const { id, documento } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const vacunaconsulta = yield database_1.default.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
                 const [datosOriginales] = vacunaconsulta.rows;
                 if (!datosOriginales) {
