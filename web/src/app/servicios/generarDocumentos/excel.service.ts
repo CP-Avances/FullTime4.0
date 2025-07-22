@@ -570,7 +570,7 @@ export class ExcelService {
     worksheet.getCell("F104").value = "NOMBRE:"
     worksheet.getCell("G104").value = " "+this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "";
     worksheet.getCell("F105").value = "PUESTO:"
-    worksheet.getCell("G105").value = " "+this.datosPedido.cargo_comunicacion != null ? this.datosPedido.cargo_comunicacion.toUpperCase() : "";
+    worksheet.getCell("G105").value = " "+(this.datosPedido?.cargo_comunicacion != null ? this.datosPedido.cargo_comunicacion.toUpperCase() : "");
 
     worksheet.getCell("A107").value = "** Si la comunicación fue electrónica se deberá colocar el medio por el cual se notificó al servidor; así como, el número del documento."
     worksheet.getCell("A109").value = " Elaborado por el Ministerio del Trabajo  "
