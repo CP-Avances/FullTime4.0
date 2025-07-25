@@ -98,15 +98,19 @@ export class ExcelService {
 
     //APLICAR ESTILOS DE WIDTH (ANCHO) A LA COLUMNAS
     worksheet.getColumn('A').width = 2;
-    worksheet.getColumn('B').width = 10;
+    worksheet.getColumn('B').width = 8;
     worksheet.getColumn('C').width = 10;
-    worksheet.getColumn('D').width = 7;
-    worksheet.getColumn('F').width = 7;
-    worksheet.getColumn('G').width = 10;
+    worksheet.getColumn('D').width = 5;
+    worksheet.getColumn('K').width = 8;
+    worksheet.getColumn('F').width = 8;
+    worksheet.getColumn('G').width = 5;
     worksheet.getColumn('H').width = 5;
     worksheet.getColumn('I').width = 1;
     worksheet.getColumn('J').width = 7;
-    worksheet.getColumn('L').width = 7;
+    worksheet.getColumn('J').width = 10;
+    worksheet.getColumn('L').width = 8;
+    worksheet.getColumn('N').width = 10;
+    worksheet.getColumn('O').width = 5;
     worksheet.getColumn('P').width = 2;
 
     worksheet.getRow(1).height = 70;
@@ -126,6 +130,7 @@ export class ExcelService {
     worksheet.getRow(25).height = 15;
     worksheet.getRow(45).height = 40;
     worksheet.getRow(46).height = 20;
+    worksheet.getRow(49).height = 35;
     worksheet.getRow(54).height = 20;
     worksheet.getRow(55).height = 40;
     worksheet.getRow(56).height = 40;
@@ -285,9 +290,9 @@ export class ExcelService {
     worksheet.mergeCells("I57:P57");
     worksheet.mergeCells("A58:H58");
     worksheet.mergeCells("I58:P58");
-    worksheet.mergeCells("A59:B59");
-    worksheet.mergeCells("A60:B60");
-    worksheet.mergeCells("A61:B61");
+    
+    
+    
     worksheet.mergeCells("C59:G59");
     worksheet.mergeCells("C60:G60");
     worksheet.mergeCells("C61:G61");
@@ -298,7 +303,8 @@ export class ExcelService {
     worksheet.mergeCells("K60:O60");
     worksheet.mergeCells("K61:O61");
 
-    worksheet.mergeCells("A62:P62");
+    worksheet.mergeCells("A62:H62");
+    worksheet.mergeCells("I62:P62");
     worksheet.mergeCells("A63:H63");
     worksheet.mergeCells("I63:P63");
 
@@ -358,12 +364,11 @@ export class ExcelService {
 
     worksheet.mergeCells("C93:E93");
     worksheet.mergeCells("A94:P94");
-    worksheet.mergeCells("D95:F95");
-    worksheet.mergeCells("K95:M95");
+    worksheet.mergeCells("D95:E95");
+    worksheet.mergeCells("K95:L95");
     worksheet.mergeCells("A96:P96");
-    worksheet.mergeCells("D97:F97");
-    worksheet.mergeCells("D98:F98");
-    worksheet.mergeCells("D99:F99");
+    worksheet.mergeCells("D97:M99");
+
     worksheet.mergeCells("F101:K101");
     worksheet.mergeCells("F102:K102");
     worksheet.mergeCells("G104:K104");
@@ -403,59 +408,59 @@ export class ExcelService {
     worksheet.getCell("A11").value = "Escoja una opción (según lo estipulado en el artículo 21 del Reglamento General a la Ley Orgánica del Servicio Público)"
 
     worksheet.getCell("B13").value = "ingreso".toUpperCase()
-    worksheet.getCell("D13").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'INGRESO' ? "X" : "";
+    worksheet.getCell("D13").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'INGRESO' ? "X" : "");
     worksheet.getCell("B14").value = "reingreso".toUpperCase()
-    worksheet.getCell("D14").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'REINGRESO' ? "X" : "";
+    worksheet.getCell("D14").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'REINGRESO' ? "X" : "");
     worksheet.getCell("B15").value = "restitución".toUpperCase()
-    worksheet.getCell("D15").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'RESTITUCIÓN' ? "X" : "";
+    worksheet.getCell("D15").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'RESTITUCIÓN' ? "X" : "");
     worksheet.getCell("B16").value = "reintegro".toUpperCase()
-    worksheet.getCell("D16").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'REINTEGRO' ? "X" : "";
+    worksheet.getCell("D16").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'REINTEGRO' ? "X" : "");
     worksheet.getCell("B17").value = "ascenso".toUpperCase()
-    worksheet.getCell("D17").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'ASCENSO' ? "X" : "";
+    worksheet.getCell("D17").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'ASCENSO' ? "X" : "");
     worksheet.getCell("B18").value = "traslado".toUpperCase()
-    worksheet.getCell("D18").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'TRASLADO' ? "X" : "";
+    worksheet.getCell("D18").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'TRASLADO' ? "X" : "");
 
     worksheet.getCell("E13").value = "traspaso".toUpperCase()
-    worksheet.getCell("H13").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'TRASPASO' ? "X" : "";
+    worksheet.getCell("H13").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'TRASPASO' ? "X" : "");
     worksheet.getCell("E14").value = "cambio administrativo".toUpperCase()
-    worksheet.getCell("H14").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'CAMBIO ADMINISTRATIVO' ? "X" : "";
+    worksheet.getCell("H14").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'CAMBIO ADMINISTRATIVO' ? "X" : "");
     worksheet.getCell("E15").value = "itercambio voluntario".toUpperCase()
-    worksheet.getCell("H15").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'INTERCAMBIO VOLUNTARIO' ? "X" : "";
+    worksheet.getCell("H15").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'INTERCAMBIO VOLUNTARIO' ? "X" : "");
     worksheet.getCell("E16").value = "licencia".toUpperCase()
-    worksheet.getCell("H16").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'LICENCIA' ? "X" : "";
+    worksheet.getCell("H16").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'LICENCIA' ? "X" : "");
     worksheet.getCell("E17").value = "comisión de servicios".toUpperCase()
-    worksheet.getCell("H17").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'COMISIÓN DE SERVICIOS' ? "X" : "";
+    worksheet.getCell("H17").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'COMISIÓN DE SERVICIOS' ? "X" : "");
     worksheet.getCell("E18").value = "sanciones".toUpperCase()
-    worksheet.getCell("H18").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'SANCIONES' ? "X" : "";
+    worksheet.getCell("H18").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'SANCIONES' ? "X" : "");
 
     worksheet.getCell("J13").value = "incremento rmu".toUpperCase()
-    worksheet.getCell("L13").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'INCREMENTO RMU' ? "X" : "";
+    worksheet.getCell("L13").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'INCREMENTO RMU' ? "X" : "");
     worksheet.getCell("J14").value = "subrogación".toUpperCase()
-    worksheet.getCell("L14").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'SUBROGACIÓN' ? "X" : "";
+    worksheet.getCell("L14").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'SUBROGACIÓN' ? "X" : "");
     worksheet.getCell("J15").value = "encargo".toUpperCase()
-    worksheet.getCell("L15").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'ENCARGO' ? "X" : "";
+    worksheet.getCell("L15").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'ENCARGO' ? "X" : "");
     worksheet.getCell("J16").value = "cesación de funciones".toUpperCase()
-    worksheet.getCell("L16").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'CESACIÓN DE FUNCIONES' ? "X" : "";
+    worksheet.getCell("L16").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'CESACIÓN DE FUNCIONES' ? "X" : "");
     worksheet.getCell("J17").value = "destitución".toUpperCase()
-    worksheet.getCell("L17").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'DESTITUCIÓN' ? "X" : "";
+    worksheet.getCell("L17").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'DESTITUCIÓN' ? "X" : "");
     worksheet.getCell("J18").value = "vacaciones".toUpperCase()
-    worksheet.getCell("L18").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'VACACIONES' ? "X" : "";
+    worksheet.getCell("L18").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'VACACIONES' ? "X" : "");
 
     worksheet.getCell("M13").value = "revisión clasi. puesto".toUpperCase()
-    worksheet.getCell("O13").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'REVISIÓN CLASI. PUESTO' ? "X" : "";
+    worksheet.getCell("O13").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'REVISIÓN CLASI. PUESTO' ? "X" : "");
     worksheet.getCell("M14").value = "otro (detallar)".toUpperCase()
-    worksheet.getCell("O14").value = this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'OTRO' ? "X" : "";
+    worksheet.getCell("O14").value = (this.datosPedido.accion_personal != null && this.datosPedido.accion_personal.toUpperCase() == 'OTRO' ? "X" : "");
     worksheet.getCell("M15").value = this.datosPedido.detalle_otro;
 
     worksheet.getCell("B19").value = "EN CASO DE REQUERIR ESPECIFICACIÓN DE LO SELECCIONADO: ".toUpperCase()
     worksheet.getCell("G19").value = this.datosPedido.especificacion
     worksheet.getCell("B20").value = " * PRESENTÓ LA DECLARACIÓN JURADA (número 2 del art. 3 RLOSEP) "
     worksheet.getCell("H20").value = "SI"
-    worksheet.getCell("J20").value = this.datosPedido.declaracion_jurada == true ? "X" : "";
+    worksheet.getCell("J20").value = (this.datosPedido.declaracion_jurada == true ? "X" : "");
     worksheet.getCell("K20").value = "NO APLICA"
-    worksheet.getCell("L20").value = this.datosPedido.declaracion_jurada == false ? "X" : "";
+    worksheet.getCell("L20").value = (this.datosPedido.declaracion_jurada == false ? "X" : "");
     worksheet.getCell("B22").value = "   MOTIVACIÓN: (adjuntar anexo si lo posee) "
-    worksheet.getCell("A23").value = this.datosPedido.adicion_base_legal != null || this.textoFijo != '' ? this.textoFijo + '\n' + this.datosPedido.adicion_base_legal : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)";
+    worksheet.getCell("A23").value = (this.datosPedido.adicion_base_legal != null || this.textoFijo != '' ? this.textoFijo + '\n' + this.datosPedido.adicion_base_legal : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)");
 
     worksheet.getCell("A24").value = "SITUACION ACTUAL"
     worksheet.getCell("I24").value = "SITUACION PROPUESTA"
@@ -520,16 +525,16 @@ export class ExcelService {
     worksheet.getCell("A56").value = "DIRECTOR (A) O RESPONSABLE DE TALENTO HUMANO"
     worksheet.getCell("I56").value = "AUTORIDAD NOMINADORA O SU DELEGADO"
 
-    worksheet.getCell("A59").value = "FIRMA:"
-    worksheet.getCell("A60").value = "NOMBRE:"
+    worksheet.getCell("B59").value = "FIRMA:"
+    worksheet.getCell("B60").value = "NOMBRE:"
     worksheet.getCell("C60").value = " " + this.datosPedido.empleado_director != null ? this.datosPedido.abreviatura_director + ". " + this.datosPedido.empleado_director.toUpperCase() : "";
-    worksheet.getCell("A61").value = "PUESTO:"
+    worksheet.getCell("B61").value = "PUESTO:"
     worksheet.getCell("C61").value = " " + this.datosPedido.cargo_director != null ? this.datosPedido.cargo_director : "";
 
-    worksheet.getCell("I59").value = "FIRMA:"
-    worksheet.getCell("I60").value = "NOMBRE:"
+    worksheet.getCell("J59").value = "FIRMA:"
+    worksheet.getCell("J60").value = "NOMBRE:"
     worksheet.getCell("K60").value = " " + this.datosPedido.empleado_autoridad_delegado != null ? this.datosPedido.abreviatura_delegado + ". " + this.datosPedido.empleado_autoridad_delegado.toUpperCase() : "";
-    worksheet.getCell("I61").value = "PUESTO:"
+    worksheet.getCell("J61").value = "PUESTO:"
     worksheet.getCell("K61").value = " " + this.datosPedido.cargo_autoridad_delegado != null ? this.datosPedido.cargo_autoridad_delegado : "";
 
     worksheet.getCell("A63").value = "Elaborado por el Ministerio del Trabajo"
@@ -541,13 +546,17 @@ export class ExcelService {
 
     worksheet.getCell("B71").value = "FIRMA."
     worksheet.getCell("B72").value = "NOMBRE:"
-    worksheet.getCell("C72").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? apellido + " " + nombres : ""
+    worksheet.getCell("C72").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.abreviatura_empleado + ". "+apellido + " " + nombres : ""
     worksheet.getCell("B73").value = "FECHA:"
+    const fecha_servidor = DateTime.fromISO(this.datosPedido.fecha_elaboracion, { zone: 'utc' }).setZone('America/Guayaquil');
+    worksheet.getCell("C73").value = " " + fecha_servidor .toFormat('yyyy-MM-dd')
     worksheet.getCell("B74").value = "HORA:"
+    const hora_servidor = DateTime.fromISO(this.datosPedido.hora_elaboracion, { zone: 'utc' }).setZone('America/Guayaquil');
+    worksheet.getCell("C74").value = " " + hora_servidor.toFormat('hh:mm:ss')
 
     worksheet.getCell("J71").value = "FIRMA."
     worksheet.getCell("J72").value = "NOMBRE:"
-    worksheet.getCell("K72").value = " " + this.datosPedido.empleado_testigo != null ? this.datosPedido.empleado_testigo.toUpperCase() : "";
+    worksheet.getCell("K72").value = this.datosPedido.abreviatura_testigo+". "+ (this.datosPedido.empleado_testigo != null ? this.datosPedido.empleado_testigo.toUpperCase() : "");
     worksheet.getCell("J73").value = "FECHA:"
     const fecha_negativa = DateTime.fromISO(this.datosPedido.fecha_testigo, { zone: 'utc' }).setZone('America/Guayaquil');
     worksheet.getCell("K73").value = " " + fecha_negativa.toFormat('yyyy-MM-dd')
@@ -560,24 +569,24 @@ export class ExcelService {
 
     worksheet.getCell("B83").value = "FIRMA:"
     worksheet.getCell("B84").value = "NOMBRE:"
-    worksheet.getCell("C84").value = " " + this.datosPedido.empleado_elaboracion != null ? this.datosPedido.empleado_elaboracion.toUpperCase() : "";
+    worksheet.getCell("C84").value = this.datosPedido.abreviatura_elaboracion+". "+ (this.datosPedido.empleado_elaboracion != null ? this.datosPedido.empleado_elaboracion.toUpperCase() : "");
     worksheet.getCell("B85").value = "PUESTO:"
-    worksheet.getCell("C85").value = " " + this.datosPedido.tipo_cargo_elaboracion != null ? this.datosPedido.tipo_cargo_elaboracion.toUpperCase() : "";
+    worksheet.getCell("C85").value = " " + (this.datosPedido.tipo_cargo_elaboracion != null ? this.datosPedido.tipo_cargo_elaboracion.toUpperCase() : "");
     worksheet.getCell("F83").value = "FIRMA:"
     worksheet.getCell("F84").value = "NOMBRE:"
-    worksheet.getCell("G84").value = " " + this.datosPedido.empleado_control != null ? this.datosPedido.empleado_control.toUpperCase() : "";
+    worksheet.getCell("G84").value = this.datosPedido.abreviatura_control+". "+ (this.datosPedido.empleado_control != null ? this.datosPedido.empleado_control.toUpperCase() : "");
     worksheet.getCell("F85").value = "PUESTO:"
-    worksheet.getCell("G85").value = " " + this.datosPedido.tipo_cargo_control != null ? this.datosPedido.tipo_cargo_control.toUpperCase() : "";
+    worksheet.getCell("G85").value = " " + (this.datosPedido.tipo_cargo_control != null ? this.datosPedido.tipo_cargo_control.toUpperCase() : "");
     worksheet.getCell("L83").value = "FIRMA:"
     worksheet.getCell("L84").value = "NOMBRE:"
-    worksheet.getCell("M84").value = " " + this.datosPedido.empleado_revision != null ? this.datosPedido.empleado_revision.toUpperCase() : "";
+    worksheet.getCell("M84").value = this.datosPedido.abreviatura_revision+". "+ (this.datosPedido.empleado_revision != null ? this.datosPedido.empleado_revision.toUpperCase() : "");
     worksheet.getCell("L85").value = "PUESTO:"
-    worksheet.getCell("M85").value = " " + this.datosPedido.tipo_cargo_revision != null ? this.datosPedido.tipo_cargo_revision.toUpperCase() : "";
+    worksheet.getCell("M85").value = " " + (this.datosPedido.tipo_cargo_revision != null ? this.datosPedido.tipo_cargo_revision.toUpperCase() : "");
 
     worksheet.getCell("A89").value = "** USO EXCLUSIVO PARA TALENTO HUMANO"
     worksheet.getCell("A91").value = "REGISTRO DE NOTIFICACIÓN AL SERVIDOR PÚBLICO DE LA ACCIÓN DE PERSONAL (primer inciso del art. 22 RGLOSEP, art. 101 COA , art. 66 y 126 ERJAFE) "
     worksheet.getCell("C93").value = "COMUNICACIÓN ELECTRÓNICA:"
-    worksheet.getCell("F93").value = this.datosPedido.comunicacion_electronica == true ? "X" : "";
+    worksheet.getCell("F93").value = (this.datosPedido.comunicacion_electronica == true ? "X" : "");
     worksheet.getCell("C95").value = "FECHA:"
     const fecha_comunicacion = DateTime.fromISO(this.datosPedido.fecha_comunicacion, { zone: 'utc' }).setZone('America/Guayaquil');
     worksheet.getCell("D95").value = " " + fecha_comunicacion.toFormat('yyyy-MM-dd')
@@ -585,10 +594,10 @@ export class ExcelService {
     const hora_comunicacion = DateTime.fromISO(this.datosPedido.hora_comunicacion, { zone: 'utc' }).setZone('America/Guayaquil');
     worksheet.getCell("K95").value = " " + hora_comunicacion.toFormat('hh:mm:ss')
     worksheet.getCell("C97").value = "** MEDIO:"
-    worksheet.getCell("D97").value = " " + this.datosPedido.medio_comunicacion != null && this.datosPedido.medio_comunicacion != "" ? this.datosPedido.medio_comunicacion : "";
+    worksheet.getCell("D97").value = " " + (this.datosPedido.medio_comunicacion != null && this.datosPedido.medio_comunicacion != "" ? this.datosPedido.medio_comunicacion : "");
     worksheet.getCell("F102").value = "FIRMA DEL RESPONSABLE QUE NOTIFICÓ"
     worksheet.getCell("F104").value = "NOMBRE:"
-    worksheet.getCell("G104").value = " " + this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "";
+    worksheet.getCell("G104").value = this.datosPedido.abreviatura_comunicacion+". "+ (this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "");
     worksheet.getCell("F105").value = "PUESTO:"
     worksheet.getCell("G105").value = " " + (this.datosPedido?.cargo_comunicacion != null ? this.datosPedido.cargo_comunicacion.toUpperCase() : "");
 
@@ -724,7 +733,7 @@ export class ExcelService {
           cell.border = borderRightStyle
         } else if (i >= 92 && i <= 109) {
 
-          if (i == 95 && ((j >= 4 && j <= 6) || (j >= 11 && j <= 13))) {
+          if (i == 95 && ((j >= 4 && j <= 5) || (j >= 11 && j <= 12))) {
             cell.border = borderbottomStyle
           } else if ((i >= 97 && i <= 99) && (j >= 4 && j <= 6)) {
             cell.border = borderbottomStyle
@@ -780,14 +789,17 @@ export class ExcelService {
     }
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["A1", "K1", "K3", "K4", "A6", "A7", "I6", "A8", "A9", "E8", "E9", "I8", "I9", "M3", "M9", "A11", "A22", "A23", "A24", "I24",
-      "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "E13", "E14", "E15", "E16", "E17", "E18", "J13", "J14",
+    ["A1", "K1", "K3", "K4", "A6", "A7", "I6", "A8", "A9", "A10","E8", "E9", "I8", "I9", "M3", "M9", "A11", "A22", "A23", 
+      "A24", "I24", "E10", "I10", "M10", "D13", "D14", "D15", "D16", "D17", "D18", "H13", "H14", "H15", "H16", "H17", "H18",
+      "L13", "L14", "L15", "L16", "L17", "L18", "O13", "O14", "J20", "L20", "B52", "F52", "F93", "C47", "N47", "C49",
+      "F49", "C60", "C61", "K60", "K61", "C72", "C73", "C74", "K72", "K73", "C84", "C85", "G84", "G85", "M84", "M85", "D95", "K95",
+      "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "E13", "E14", "E15", "E16", "E17", "E18", "J13", "J14", "D97",
       "J15", "J16", "J17", "J18", "M13", "M14", "H20", "K5", "K20", "A26", "I26", "A27",  "I7", "I27", "A28", "I28", "A29", "I29",
       "A30", "I30", "A32", "I32", "A34", "I34", "A36", "I36", "A38", "I38", "A40", "I40", "A42", "I42", "A44", "I44",
-      "A45", "B47", "I47", "B48", "B49", "E49", "B51", "J52", "B53", "F53", "K53", "A55", "A56", "I56", "A59", "A60",
-      "A61", "I59", "I60", "I61", "A63", "I63", "A65", "A67", "I67", "B71", "B72", "B73", "B73", "B74", "J71", "J72", "J73",
+      "A45", "B47", "I47", "B48", "B49", "E49", "B51", "J52", "B53", "F53", "K53", "A55", "A56", "I56", "B59", "B60",
+      "B61", "J59", "J60", "J61", "A63", "I63", "A65", "A67", "I67", "B71", "B72", "B73", "B73", "B74", "J71", "J72", "J73",
       "J75", "K74", "A80", "F80", "L80", "B83", "B84", "B85", "L83", "L84", "L85", "F83", "F84", "F85", "A89", "A91",
-      "C93", "C95", "C97", "J95", "F102", "F104", "F105", "A107", "A109", "I109"
+      "C93", "C95", "C97", "J95", "F102", "F104", "F105", "A107", "A109", "I109", "G104", "G105"
     ].forEach((cell) => {
       if (
         cell != 'B13' && cell != 'B14' && cell != 'B15' && cell != 'B16' && cell != 'B17' && cell != 'B18' &&
@@ -805,7 +817,7 @@ export class ExcelService {
           vertical: "middle",
         };
 
-        if (cell == 'A23') {
+        if (cell == 'A23' || cell == 'D97') {
           worksheet.getCell(cell).alignment = {
             vertical: "middle",
             wrapText: true
@@ -839,16 +851,10 @@ export class ExcelService {
       }
 
       if (cell == 'B49' || cell == 'E49' || cell == 'J52' ||
-        cell == 'A59' || cell == 'A60' || cell == 'A61' ||
+        cell == 'A60' || cell == 'A61' ||
         cell == 'I59' || cell == 'I60' || cell == 'I61' ||
-        cell == 'B71' || cell == 'B72' || cell == 'B73' ||
-        cell == 'B74' || cell == 'J71' || cell == 'J72' ||
-        cell == 'J73' || cell == 'J75' || cell == 'B83' ||
-        cell == 'B84' || cell == 'B85' || cell == 'F83' ||
-        cell == 'F84' || cell == 'F85' || cell == 'L83' ||
-        cell == 'L84' || cell == 'L85' || cell == 'C93' ||
-        cell == 'C95' || cell == 'J95' || cell == 'C97' ||
-        cell == 'F104' || cell == 'F105'
+        cell == 'C93' ||
+        cell == 'C95' || cell == 'J95' || cell == 'C97'
       ) {
         worksheet.getCell(cell).alignment = {
           horizontal: "right",
@@ -872,6 +878,36 @@ export class ExcelService {
         };
 
         worksheet.getCell(cell).font = { bold: true, size: 7 };
+      }else if(cell == 'B59' || cell == 'B60' || cell == 'B61' ||
+        cell == 'J59' || cell == 'J60' || cell == 'J61' ||
+        cell == 'B71' || cell == 'B72' || cell == 'B73' ||
+        cell == 'B74' || cell == 'J71' || cell == 'J72' ||
+        cell == 'J73' || cell == 'J75' || cell == 'B83' ||
+        cell == 'B84' || cell == 'B85' || cell == 'F83' ||
+        cell == 'F84' || cell == 'F85' || cell == 'L83' ||
+        cell == 'F104' || cell == 'F105' ||
+        cell == 'L84' || cell == 'L85' 
+      ){
+         worksheet.getCell(cell).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+
+
+        worksheet.getCell(cell).font = { bold: true, size: 9 };
+      }else if(cell == 'C47' || cell == 'C49' || cell == 'F49' ||
+        cell == 'C74' || cell == 'C72' || cell == 'C73' ||
+        cell == 'C60' || cell == 'C61' || cell == 'K60' ||
+        cell == 'K61' || cell == 'K72' || cell == 'K73' ||
+        cell == 'C84' || cell == 'C85' || cell == 'G84' || 
+        cell == 'G85' || cell == 'M84' || cell == 'M85' || 
+        cell == 'D95' || cell == 'K95' ||
+        cell == 'G104' || cell == 'G105'){
+        worksheet.getCell(cell).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+        worksheet.getCell(cell).font = {size: 9 };
       }
 
       if (cell == "K74") {
