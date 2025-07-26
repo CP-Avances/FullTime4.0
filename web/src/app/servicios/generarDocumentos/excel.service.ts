@@ -503,21 +503,21 @@ export class ExcelService {
     worksheet.getCell("I43").value = " " + (this.datosPedido.partida_individual_propuesta ? this.datosPedido.partida_individual_propuesta : "")
     worksheet.getCell("A45").value = "  POSESIÓN DEL PUESTO"
     worksheet.getCell("B47").value = "  YO,  "
-    worksheet.getCell("C47").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? apellido + " " + nombres : ""
+    worksheet.getCell("C47").value = " " + (this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? apellido + " " + nombres : "")
     worksheet.getCell("I47").value = " CON NRO. DE DOCUMENTO DE IDENTIFICACIÓN: "
-    worksheet.getCell("N47").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.cedula_empleado : ""
+    worksheet.getCell("N47").value = " " + (this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.cedula_empleado : "")
     worksheet.getCell("B48").value = "          JURO LEALTAD AL ESTADO ECUATORIANO."
     worksheet.getCell("B49").value = "LUGAR:"
-    worksheet.getCell("C49").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.descripcion_lugar_posesion : ""
+    worksheet.getCell("C49").value = " " + (this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.descripcion_lugar_posesion : "")
     worksheet.getCell("E49").value = "FECHA:"
     const fecha_posesion = DateTime.fromISO(this.datosPedido.fecha_posesion, { zone: 'utc' }).setZone('America/Guayaquil');
-    worksheet.getCell("F49").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? fecha_posesion.toFormat('yyyy-MM-dd') : ""
+    worksheet.getCell("F49").value = " " + (this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? fecha_posesion.toFormat('yyyy-MM-dd') : "")
     worksheet.getCell("B51").value = "** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)"
     worksheet.getCell("J52").value = "FIRMA:"
-    worksheet.getCell("B52").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.numero_acta_final : ""
+    worksheet.getCell("B52").value = " " + (this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.numero_acta_final : "")
     worksheet.getCell("B53").value = "NRO. ACTA FINAL"
     const fecha_acta_final = DateTime.fromISO(this.datosPedido.fecha_acta_final, { zone: 'utc' }).setZone('America/Guayaquil');
-    worksheet.getCell("F52").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? fecha_acta_final.toFormat('yyyy-MM-dd') : ""
+    worksheet.getCell("F52").value = " " + (this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? fecha_acta_final.toFormat('yyyy-MM-dd') : "")
     worksheet.getCell("F53").value = "FECHA"
     worksheet.getCell("K53").value = "SERVIDOR PÚBLICO"
 
@@ -527,15 +527,15 @@ export class ExcelService {
 
     worksheet.getCell("B59").value = "FIRMA:"
     worksheet.getCell("B60").value = "NOMBRE:"
-    worksheet.getCell("C60").value = " " + this.datosPedido.empleado_director != null ? this.datosPedido.abreviatura_director + ". " + this.datosPedido.empleado_director.toUpperCase() : "";
+    worksheet.getCell("C60").value = " " + (this.datosPedido.empleado_director != null ? this.datosPedido.abreviatura_director + ". " + this.datosPedido.empleado_director.toUpperCase() : "");
     worksheet.getCell("B61").value = "PUESTO:"
-    worksheet.getCell("C61").value = " " + this.datosPedido.cargo_director != null ? this.datosPedido.cargo_director : "";
+    worksheet.getCell("C61").value = " " + (this.datosPedido.cargo_director != null ? this.datosPedido.cargo_director : "");
 
     worksheet.getCell("J59").value = "FIRMA:"
     worksheet.getCell("J60").value = "NOMBRE:"
-    worksheet.getCell("K60").value = " " + this.datosPedido.empleado_autoridad_delegado != null ? this.datosPedido.abreviatura_delegado + ". " + this.datosPedido.empleado_autoridad_delegado.toUpperCase() : "";
+    worksheet.getCell("K60").value = " " + (this.datosPedido.empleado_autoridad_delegado != null ? this.datosPedido.abreviatura_delegado + ". " + this.datosPedido.empleado_autoridad_delegado.toUpperCase() : "");
     worksheet.getCell("J61").value = "PUESTO:"
-    worksheet.getCell("K61").value = " " + this.datosPedido.cargo_autoridad_delegado != null ? this.datosPedido.cargo_autoridad_delegado : "";
+    worksheet.getCell("K61").value = " " + (this.datosPedido.cargo_autoridad_delegado != null ? this.datosPedido.cargo_autoridad_delegado : "");
 
     worksheet.getCell("A63").value = "Elaborado por el Ministerio del Trabajo"
     worksheet.getCell("I63").value = "Fecha de actualización de formato: 2024-08-23    /    Versión: 01.1    /    Página 1 de 2  "
@@ -556,10 +556,10 @@ export class ExcelService {
 
     worksheet.getCell("J71").value = "FIRMA."
     worksheet.getCell("J72").value = "NOMBRE:"
-    worksheet.getCell("K72").value = this.datosPedido.abreviatura_testigo+". "+ (this.datosPedido.empleado_testigo != null ? this.datosPedido.empleado_testigo.toUpperCase() : "");
+    worksheet.getCell("K72").value = (this.datosPedido.abreviatura_testigo != null ? this.datosPedido.abreviatura_testigo+'. ' : '' )+ (this.datosPedido.empleado_testigo != null ? this.datosPedido.empleado_testigo.toUpperCase() : "");
     worksheet.getCell("J73").value = "FECHA:"
     const fecha_negativa = DateTime.fromISO(this.datosPedido.fecha_testigo, { zone: 'utc' }).setZone('America/Guayaquil');
-    worksheet.getCell("K73").value = " " + fecha_negativa.toFormat('yyyy-MM-dd')
+    worksheet.getCell("K73").value = " " + ( this.datosPedido.fecha_testigo != null ? fecha_negativa.toFormat('yyyy-MM-dd') : '')
     worksheet.getCell("J75").value = "RAZÓN:"
     worksheet.getCell("K74").value = "En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal."
 
@@ -569,17 +569,17 @@ export class ExcelService {
 
     worksheet.getCell("B83").value = "FIRMA:"
     worksheet.getCell("B84").value = "NOMBRE:"
-    worksheet.getCell("C84").value = this.datosPedido.abreviatura_elaboracion+". "+ (this.datosPedido.empleado_elaboracion != null ? this.datosPedido.empleado_elaboracion.toUpperCase() : "");
+    worksheet.getCell("C84").value = (this.datosPedido.abreviatura_elaboracion != null ? this.datosPedido.abreviatura_elaboracion+'. ' : '')+ (this.datosPedido.empleado_elaboracion != null ? this.datosPedido.empleado_elaboracion.toUpperCase() : "");
     worksheet.getCell("B85").value = "PUESTO:"
     worksheet.getCell("C85").value = " " + (this.datosPedido.tipo_cargo_elaboracion != null ? this.datosPedido.tipo_cargo_elaboracion.toUpperCase() : "");
     worksheet.getCell("F83").value = "FIRMA:"
     worksheet.getCell("F84").value = "NOMBRE:"
-    worksheet.getCell("G84").value = this.datosPedido.abreviatura_control+". "+ (this.datosPedido.empleado_control != null ? this.datosPedido.empleado_control.toUpperCase() : "");
+    worksheet.getCell("G84").value = (this.datosPedido.abreviatura_control != null ? this.datosPedido.abreviatura_control+'. ' : '')+ (this.datosPedido.empleado_control != null ? this.datosPedido.empleado_control.toUpperCase() : "");
     worksheet.getCell("F85").value = "PUESTO:"
     worksheet.getCell("G85").value = " " + (this.datosPedido.tipo_cargo_control != null ? this.datosPedido.tipo_cargo_control.toUpperCase() : "");
     worksheet.getCell("L83").value = "FIRMA:"
     worksheet.getCell("L84").value = "NOMBRE:"
-    worksheet.getCell("M84").value = this.datosPedido.abreviatura_revision+". "+ (this.datosPedido.empleado_revision != null ? this.datosPedido.empleado_revision.toUpperCase() : "");
+    worksheet.getCell("M84").value = (this.datosPedido.abreviatura_revision != null ? this.datosPedido.abreviatura_revision+'. ' : '')+ (this.datosPedido.empleado_revision != null ? this.datosPedido.empleado_revision.toUpperCase() : "");
     worksheet.getCell("L85").value = "PUESTO:"
     worksheet.getCell("M85").value = " " + (this.datosPedido.tipo_cargo_revision != null ? this.datosPedido.tipo_cargo_revision.toUpperCase() : "");
 
@@ -597,7 +597,7 @@ export class ExcelService {
     worksheet.getCell("D97").value = " " + (this.datosPedido.medio_comunicacion != null && this.datosPedido.medio_comunicacion != "" ? this.datosPedido.medio_comunicacion : "");
     worksheet.getCell("F102").value = "FIRMA DEL RESPONSABLE QUE NOTIFICÓ"
     worksheet.getCell("F104").value = "NOMBRE:"
-    worksheet.getCell("G104").value = this.datosPedido.abreviatura_comunicacion+". "+ (this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "");
+    worksheet.getCell("G104").value = (this.datosPedido.abreviatura_comunicacion != null ? this.datosPedido.abreviatura_comunicacion+'. ' : '')+ (this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "");
     worksheet.getCell("F105").value = "PUESTO:"
     worksheet.getCell("G105").value = " " + (this.datosPedido?.cargo_comunicacion != null ? this.datosPedido.cargo_comunicacion.toUpperCase() : "");
 
