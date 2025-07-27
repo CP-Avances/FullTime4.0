@@ -17,6 +17,7 @@ import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoReg
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { ExcelService } from "src/app/servicios/generarDocumentos/excel.service";
+import { PdfServicesService } from "src/app/servicios/generarDocumentos/pdf.services.service";
 
 @Component({
   selector: "app-listar-pedido-accion",
@@ -79,6 +80,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private asignaciones: AsignacionesService,
     private documentosExcel: ExcelService,
+    private documentosPdf: PdfServicesService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -284,14 +286,19 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.empleadoProcesos = [];
     this.idCargo = [];
     this.contador = 0;
-    this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
-      this.datosPedido = data;
-      this.documentosExcel.generarExcel(this.datosPedido);
-      //this.ObtenerDecreto();
-      //this.ObtenerTipoAccion();
-      //this.BuscarPedidoEmpleado(this.datosPedido, tipo);
-      
-    });
+
+    if(tipo == 'excel'){
+      this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
+        this.datosPedido = data;
+        this.documentosExcel.generarExcel(this.datosPedido);  
+      });
+    }else{
+      this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
+        this.datosPedido = data;
+        this.documentosPdf.GenerarPdf('open', this.datosPedido);  
+      });
+    }
+
   }
 
   // METODO PARA MOSTRAR DATOS DE LOS EMPLEADOS SELECCIONADOS EN EL PEDIDO

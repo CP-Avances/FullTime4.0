@@ -16,6 +16,7 @@ import { AccionPersonalService } from '../modulos/modulo-acciones-personal/accio
 export class ExcelService {
 
   private imagen: any;
+  private imagenMinisterio: any;
 
   // VARIABLES PARA AUDITORIA
   ips_locales: any = '';
@@ -38,7 +39,7 @@ export class ExcelService {
     this.ObtenerTipoAccionesPersonal();
     this.ObtenerLogo();
     this.ObtenerColores();
-
+    this.ObtenerLogoMinisterio();
   }
 
   // METODO PARA OBTENER TIPOS DE ACCIONES
@@ -54,6 +55,15 @@ export class ExcelService {
   ObtenerLogo() {
     this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
+    });
+  }
+
+    // OBTENER LOGO DEL MINISTERIO DE TRABAJO
+  logoMinisterios: any = String;
+  ObtenerLogoMinisterio() {
+    this.rest.LogoImagenBase64().subscribe((res) => {
+      this.logoMinisterios = "data:image/jpeg;base64," + res.imagen;
+      
     });
   }
 
@@ -95,6 +105,12 @@ export class ExcelService {
       base64: this.logo,
       extension: "png",
     });
+
+    this.imagenMinisterio = workbook.addImage({
+      base64: this.logoMinisterios,
+      extension: "png",
+    })
+
 
     //APLICAR ESTILOS DE WIDTH (ANCHO) A LA COLUMNAS
     worksheet.getColumn('A').width = 2;
@@ -605,9 +621,15 @@ export class ExcelService {
     worksheet.getCell("A109").value = " Elaborado por el Ministerio del Trabajo  "
     worksheet.getCell("I109").value = " Fecha de actualización de formato: 2024-08-23    /    Versión: 01.1    /    Página 1 de 2    "
 
+    
+    worksheet.addImage(this.imagenMinisterio, {
+      tl:  { col: 0, row: 0 },
+      ext: { width: 250, height: 100 }
+    })
+
     worksheet.addImage(this.imagen, {
       tl: { col: 0, row: 0 },
-      ext: { width: 250, height: 100 },
+      ext: { width: 100, height: 50 },
     });
 
 
