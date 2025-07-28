@@ -20,8 +20,10 @@ class DepartamentoRutas {
         this.router.get('/infoPeriodo/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarPerVacaciones);
         // METODO PARA BUSCAR PERIODO DE VACACIONES   **USADO
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarIdPerVacaciones);
-        // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL
+        // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
         this.router.post('/cerrar-periodos', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CerrarPeriodoVacaciones);
+        // METODO PARA CREAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
+        this.router.post('/periodo-crear-manual', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.GenerarPeriodoManual);
     }
 }
 const PERIODO_VACACION__RUTAS = new DepartamentoRutas();

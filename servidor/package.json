@@ -40,7 +40,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "ngx-socket-io": "^4.8.2",
-    "node-cron": "^4.0.5",
+    "node-cron": "^4.2.1", 
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.7",

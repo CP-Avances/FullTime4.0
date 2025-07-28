@@ -111,6 +111,7 @@ export class MainNavComponent implements OnInit {
   childrenVacaciones: any = [];
   vistaModulosVacacionesVacacionesSolicitadas: boolean = false;
   vistaModulosVacacionesConfigurarVacacion: boolean = false;
+  vistaModulosVacacionesGenerarPeriodo: boolean = false;
   subItemModulosHorasExtras: boolean = false;
   childrenHorasExtras: any = [];
   vistaModulosHorasExtrasListaHorasExtras: boolean = false;
@@ -938,6 +939,18 @@ export class MainNavComponent implements OnInit {
                   }
                   if (!this.vistaModulosVacacionesConfigurarVacacion) {
                     this.childrenVacaciones.push({ name: 'Configurar Vacaciones', url: '/configurar-vacacion', color: true, ver: true });
+                  }
+                  break;
+                case 'generar-periodo':
+                  this.itemModulos = true;
+                  this.subItemModulosVacaciones = true;
+                  for (const parametrizacion of this.childrenVacaciones) {
+                    if (parametrizacion.url === '/generar-periodo') {
+                      this.vistaModulosVacacionesGenerarPeriodo = true;
+                    }
+                  }
+                  if (!this.vistaModulosVacacionesGenerarPeriodo) {
+                    this.childrenVacaciones.push({ name: 'Generar Periodo Vacación', url: '/generar-periodo', color: true, ver: true });
                   }
                   break;
                 case 'vacaciones-solicitados':

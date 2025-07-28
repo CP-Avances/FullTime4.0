@@ -23,8 +23,11 @@ class DepartamentoRutas {
         // METODO PARA BUSCAR PERIODO DE VACACIONES   **USADO
         this.router.get('/buscar/:id_empleado', TokenValidation, PERIODO_VACACION_CONTROLADOR.EncontrarIdPerVacaciones);
 
-        // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL
+        // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
         this.router.post('/cerrar-periodos', TokenValidation, PERIODO_VACACION_CONTROLADOR.CerrarPeriodoVacaciones);
+
+        // METODO PARA CREAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
+        this.router.post('/periodo-crear-manual', TokenValidation, PERIODO_VACACION_CONTROLADOR.GenerarPeriodoManual);
 
     }
 }

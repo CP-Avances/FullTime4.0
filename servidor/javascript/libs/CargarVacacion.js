@@ -12,9 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RestarPeriodoVacacionAutorizada = void 0;
-const database_1 = __importDefault(require("../database"));
+exports.RestarPeriodoVacacionAutorizada = exports.generar_periodo = void 0;
 const auditoriaControlador_1 = __importDefault(require("../controlador/reportes/auditoriaControlador"));
+const luxon_1 = require("luxon");
+const database_1 = __importDefault(require("../database"));
+// METODO PARA GENERAR PERIODO DE VACACIONES
+const generar_periodo = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        // OBTENER FECHA
+        const fecha = luxon_1.DateTime.now().toFormat('yyyy-MM-dd');
+        console.log('Fecha usada para generar periodo:', fecha);
+        try {
+            const PERIODOS = yield database_1.default.query(`SELECT fn_test_nuevos_periodos($1);`, [fecha]);
+            console.log('Resultado de fn_test_nuevos_periodos:', PERIODOS.rows);
+        }
+        catch (error) {
+            console.error('Error al generar el periodo de vacaciones:', error);
+        }
+    });
+};
+exports.generar_periodo = generar_periodo;
 const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip, ip_local) {
     return __awaiter(this, void 0, void 0, function* () {
         let vacacion = yield ConsultarVacacion(id_vacacion);

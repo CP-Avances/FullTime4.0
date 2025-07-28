@@ -20,6 +20,7 @@ const sendFaltas_1 = require("./sendFaltas");
 const sendSalidasAnticipadas_1 = require("./sendSalidasAnticipadas");
 const sendBirthday_1 = require("./sendBirthday");
 const sendAniversario_1 = require("./sendAniversario");
+const CargarVacacion_1 = require("./CargarVacacion");
 // ENUMERACION DE IDS DE PARAMETROS
 var IDParametros;
 (function (IDParametros) {
@@ -60,6 +61,10 @@ var IDParametros;
      ** *************************************************************************************** **/
     IDParametros[IDParametros["ENVIA_ANIVERSARIO"] = 24] = "ENVIA_ANIVERSARIO";
     IDParametros[IDParametros["HORA_ANIVERSARIO"] = 25] = "HORA_ANIVERSARIO";
+    /** *************************************************************************************** **
+     **                  PARAMETROS DE GENERACION DE PERIODO DE VACACIONES                   ** **
+     ** *************************************************************************************** **/
+    IDParametros[IDParametros["HORA_GENERAR_PERIODO"] = 37] = "HORA_GENERAR_PERIODO";
 })(IDParametros || (exports.IDParametros = IDParametros = {}));
 const dias = [
     "Domingo",
@@ -72,17 +77,31 @@ const dias = [
 ];
 // FUNCION PARA DAR FORMATO AL CRON (PROGRAMADOR DE TAREAS)
 function toCron(horaRegistrada, nombreDia) {
-    const [hora, minuto = "0"] = horaRegistrada.split(":");
-    const horaCron = +hora, minutosCron = +minuto;
-    if (horaCron < 0 || horaCron > 23 || minutosCron < 0 || minutosCron > 59)
+    if (!horaRegistrada)
+        return null;
+    const partes = horaRegistrada.split(":");
+    if (partes.length < 1 || partes.length > 2)
+        return null;
+    const [horaStr, minutoStr = "0"] = partes;
+    const hora = parseInt(horaStr, 10);
+    const minuto = parseInt(minutoStr, 10);
+    // Validación estricta
+    if (isNaN(hora) || isNaN(minuto))
+        return null;
+    if (hora < 0 || hora > 23 || minuto < 0 || minuto > 59)
+        return null;
+    // Nueva validación: evitar que se intente usar como Date en algún lado
+    const pruebaFecha = new Date();
+    pruebaFecha.setHours(hora, minuto, 0, 0);
+    if (isNaN(pruebaFecha.getTime()))
         return null;
     if (nombreDia) {
         const diaIndex = dias.indexOf(nombreDia);
         if (diaIndex === -1)
             return null;
-        return `${minutosCron} ${horaCron} * * ${diaIndex}`;
+        return `${minuto} ${hora} * * ${diaIndex}`;
     }
-    return `${minutosCron} ${horaCron} * * *`;
+    return `${minuto} ${hora} * * *`;
 }
 // DECLARACION DE LAS TAREAS AUTOMATICAS
 exports.TAREAS = [
@@ -152,6 +171,11 @@ exports.TAREAS = [
         horaId: IDParametros.HORA_ANIVERSARIO,
         task: sendAniversario_1.aniversario,
     },
+    {
+        clave: "GENERAR_PERIODO",
+        horaId: IDParametros.HORA_GENERAR_PERIODO,
+        task: CargarVacacion_1.generar_periodo,
+    },
 ];
 // CLASE PRINCIPAL DE TAREAS
 class TareasAutomaticas {
@@ -197,28 +221,43 @@ class TareasAutomaticas {
     // METODO PARA PROGRAMAR TAREAS
     ProgramarTareas(configurar) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (configurar.envioId && (yield this.param(configurar.envioId)) !== "Si")
-                return;
-            const tiempoRegistrado = yield this.param(configurar.horaId);
-            if (!tiempoRegistrado)
-                return;
-            const diaRegistrado = configurar.diaId ? yield this.param(configurar.diaId) : undefined;
-            const diaEnvio = diaRegistrado !== null && diaRegistrado !== void 0 ? diaRegistrado : undefined;
-            const expr = toCron(tiempoRegistrado, diaEnvio);
-            if (!expr || !node_cron_1.default.validate(expr)) {
-                console.error(`Cron inválido para ${configurar.clave}: ${expr}`);
-                return;
+            try {
+                if (configurar.envioId && (yield this.param(configurar.envioId)) !== "Si")
+                    return;
+                const tiempoRegistrado = yield this.param(configurar.horaId);
+                if (!tiempoRegistrado) {
+                    console.warn(`No se encontró hora para la tarea ${configurar.clave}`);
+                    return;
+                }
+                const diaRegistrado = configurar.diaId ? yield this.param(configurar.diaId) : undefined;
+                const diaEnvio = diaRegistrado !== null && diaRegistrado !== void 0 ? diaRegistrado : undefined;
+                console.log(`[DEBUG] Tarea: ${configurar.clave}, hora registrada: '${tiempoRegistrado}', día registrada: '${diaEnvio}'`);
+                const expr = toCron(tiempoRegistrado, diaEnvio);
+                console.log(`[DEBUG] Cron expr generado: '${expr}'`);
+                if (!expr) {
+                    console.error(`Cron expression inválido para ${configurar.clave}: '${expr}'`);
+                    return;
+                }
+                if (!node_cron_1.default.validate(expr)) {
+                    console.error(`Cron inválido para ${configurar.clave}: '${expr}'`);
+                    return;
+                }
+                console.log(`Programando tarea ${configurar.clave} a cron: ${expr}`);
+                const tarea = node_cron_1.default.schedule(expr, () => __awaiter(this, void 0, void 0, function* () {
+                    console.log(`Ejecutando tarea ${configurar.clave} a las ${new Date().toISOString()}`);
+                    try {
+                        yield configurar.task();
+                    }
+                    catch (e) {
+                        console.error(`Error ejecutando tarea ${configurar.clave}:`, e);
+                    }
+                }));
+                console.log(`Tarea ${configurar.clave} programada correctamente`);
+                this.tareas.set(configurar.clave, tarea);
             }
-            console.log(`${configurar.clave} → ${expr}`);
-            const tarea = node_cron_1.default.schedule(expr, () => __awaiter(this, void 0, void 0, function* () {
-                try {
-                    yield configurar.task();
-                }
-                catch (e) {
-                    console.error(`Error ejecutando ${configurar.clave}:`, e);
-                }
-            }));
-            this.tareas.set(configurar.clave, tarea);
+            catch (error) {
+                console.error(`Error al programar tarea ${configurar.clave}:`, error);
+            }
         });
     }
 }

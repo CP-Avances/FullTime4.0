@@ -28,6 +28,7 @@
                             <th scope="col" rowspan="2" id="centrado">Descripción</th>
                             <th scope="col" colspan="2">Solicitud por horas</th>
                             <th scope="col" rowspan="2" id="centrado">Solicitud por días</th>
+                            <th scope="col" rowspan="2" id="centrado">Incluir feriados</th>
                             <th scope="col" rowspan="2" id="centrado">Cargar documento</th>
                             <th scope="col" rowspan="2" id="centrado">Acción</th>
                         </tr>
@@ -47,6 +48,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td>
                                 <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de la configuración de vacaciones.">
@@ -57,13 +59,11 @@
                         <tr
                             *ngFor="let cv of configuracion | filtroDescripcion: nombreF.value | paginate:tamanio_pagina:numero_pagina">
                             <td>{{cv.descripcion}}</td>
-                            <td *ngIf="cv.permite_horas === false">No</td>
-                            <td *ngIf="cv.permite_horas === true">Si</td>
-                            <td *ngIf="cv.permite_horas === true">{{cv.minimo_horas}}</td>
-                            <td *ngIf="cv.permite_horas === false"></td>
+                            <td>{{ cv.permite_horas ? 'Sí' : 'No' }}</td>
+                            <td>{{ cv.permite_horas ? cv.minimo_horas : '' }}</td>
                             <td>{{cv.minimo_dias}}</td>
-                            <td *ngIf="cv.documento === false">Opcional</td>
-                            <td *ngIf="cv.documento === true">Requerido</td>
+                            <td>{{ cv.incluir_feriados ? 'Sí' : 'No' }}</td>
+                            <td>{{ cv.documento ? 'Requerido' : 'Opcional' }}</td>
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
@@ -116,5 +116,9 @@
 <!--  ********************** FORMULARIO REGISTRO DE CONFIGURACION DE VACACIONES  ****************************** -->
 <app-registrar-configurar-vacacion *ngIf="ver_registrar"></app-registrar-configurar-vacacion>
 
-<!--  ********************** PANTALLA VISTA DATOS DE TIPO DE PERMISO  ****************************** -->
+<!--  ********************** PANTALLA VISTA DATOS DE CONFIGURACION DE VACACIONES ****************************** -->
 <app-ver-configurar-vacacion *ngIf="ver_datos" [idConfiguracion]="configuracion_id"></app-ver-configurar-vacacion>
+
+<!--  ********************** FORMULARIO EDITAR TIPO DE CONFIGURACION DE VACACIONES  ****************************** -->
+<app-editar-configurar-vacacion *ngIf="ver_editar" [idConfiguracion]="configuracion_id" [pagina]="pagina">
+</app-editar-configurar-vacacion>

@@ -82,8 +82,6 @@ import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
-import { MatCheckboxChange } from '@angular/material/checkbox';
-
 
 @Component({
   selector: 'app-ver-empleado',
@@ -352,6 +350,11 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       }
     }
     else if (event.tab.textLabel === 'periodo_vacaciones') {
+      if (this.contrato_cargo === 0) {
+        this.VerDatosActuales(this.formato_fecha);
+        this.ObtenerContratosEmpleado(this.formato_fecha);
+        this.contrato_cargo = 1;
+      }
       if (this.habilitarVacaciones === true && this.periodo_vacciones === 0) {
         this.ObtenerVacaciones(this.formato_fecha);
         this.periodo_vacciones = 1;
@@ -573,10 +576,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         );
       }
       // this.MapGeolocalizar(this.latitud, this.longitud, this.nombreMarcador);
-
-      if (this.habilitarVacaciones === true) {
-        this.ObtenerPeriodoVacaciones(formato_fecha);
-      }
     })
   }
 
@@ -1143,10 +1142,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = [];
       this.cargoEmpleado = datos;
+      console.log('cargo empleado ', this.cargoEmpleado);
       this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
       })
+
+      if (this.habilitarVacaciones === true) {
+        this.ObtenerPeriodoVacaciones(formato_fecha);
+      }
     });
   }
 
@@ -2323,6 +2327,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA IMPRIMIR DATOS DEL PERIODO DE VACACIONES
   peridoVacaciones: any;
   ObtenerPeriodoVacaciones(formato_fecha: string) {
+    console.log('ingresa a periodo', this.empleadoUno[0].id)
     this.peridoVacaciones = [];
     let contador = 0;
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
@@ -2339,6 +2344,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         v.fecha_desde_ = this.validar.FormatearFecha(v.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_ultima_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fecha_acreditar_ = this.validar.FormatearFecha(v.fecha_acreditar_vacaciones, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        console.log('revisar ', this.cargoEmpleado[0].hora_trabaja)
+        v.total_formato = this.validar.convertirDiasAHorasMinutos(v.dias_vacacion, this.cargoEmpleado[0].hora_trabaja, '08:00');
         if (v.ultimo === true && (v.estado === false || v.cerrar_manual === true)) {
           this.ver_agregar_periodo = true;
         }

@@ -432,6 +432,15 @@ export class VerParametroComponent implements OnInit {
         `
         ;
     }
+    // HORA DE GENERACION DE PERIODOS DE VACACIONES
+    if (this.idParametro === '37') {
+      this.horas = true;
+      this.nota_parametro =
+        `
+          NOTA: Hora en la que se genera automáticamente el nuevo periodo de vacaciones del personal. Por ejemplo: 23:30.
+        `
+        ;
+    }
     // TIPO CARGA VACACIONES
     if (this.idParametro === '97') {
       this.carga = true;
@@ -487,6 +496,7 @@ export class VerParametroComponent implements OnInit {
       || this.idParametro === '33'  // ----> HORA ENVIO NOTIFICACION FALTAS INDIVIDUAL
       || this.idParametro === '34'  // ----> HORA ENVIO NOTIFICACION ATRASOS INDIVIDUAL
       || this.idParametro === '35'  // ----> HORA ENVIO NOTIFICACION SALIDAS ANTICIPADAS INDIVIDUAL
+      || this.idParametro === '37'  // ----> HORA GENERACION DE PERIODO DE VACACIONES
       || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
     ) {
       this.ver_editar = true;
@@ -608,6 +618,7 @@ export class VerParametroComponent implements OnInit {
         || this.idParametro === '33'  // ----> HORA ENVIO NOTIFICACION FALTAS INDIVIDUAL
         || this.idParametro === '34'  // ----> HORA ENVIO NOTIFICACION ATRASOS INDIVIDUAL
         || this.idParametro === '35'  // ----> HORA ENVIO NOTIFICACION SALIDAS ANTICIPADAS INDIVIDUAL
+        || this.idParametro === '37'  // ----> HORA GENERACION DE PERIODO DE VACACIONES
         || this.idParametro === '100' // ----> URL HERRAMIENTA DE ANALISIS
       ) {
         this.boton_registrar = false;

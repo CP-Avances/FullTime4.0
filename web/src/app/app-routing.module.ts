@@ -120,6 +120,7 @@ import { ReportePermisosComponent } from './componentes/reportes/modulos/reporte
 import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { SolicitudVacacionComponent } from './componentes/reportes/modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
 import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
+import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
 // REPORTE  --MODULO HORAS EXTRAS
 import { ReporteHorasPedidasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
@@ -296,6 +297,7 @@ const routes: Routes = [
   // REPORTE  --MODULO VACACIONES
   { path: 'reporteKardex', component: ReporteKardexComponent, canActivate: [AuthGuard] },
   { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard] },
+  { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
 
   // REPORTE  --MODULO HORAS EXTRAS
   { path: 'horas/extras', component: ReporteHorasPedidasComponent, canActivate: [AuthGuard] },

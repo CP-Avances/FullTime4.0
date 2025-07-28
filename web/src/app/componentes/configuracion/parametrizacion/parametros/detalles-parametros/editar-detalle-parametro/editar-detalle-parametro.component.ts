@@ -80,9 +80,10 @@ export class EditarDetalleParametroComponent implements OnInit {
       || this.data.parametros.id_tipo === 25   // ----> MENSAJE ANIVERSARIO
       || this.data.parametros.id_tipo === 27   // ----> REPORTE SALIDAS ANTICIPADAS DIARIO
       || this.data.parametros.id_tipo === 30   // ----> REPORTE SALIDAS ANTICIPADAS SEMANAL
-      || this.data.parametros.id_tipo === 33  // ----> NOTIFICACION FALTAS INDIVIDUAL
-      || this.data.parametros.id_tipo === 34  // ----> NOTIFICACION ATRASOS INDIVIDUAL
-      || this.data.parametros.id_tipo === 35  // ----> NOTIFICACION SALIDAS ANTICIPADAS INDIVIDUAL 
+      || this.data.parametros.id_tipo === 33   // ----> NOTIFICACION FALTAS INDIVIDUAL
+      || this.data.parametros.id_tipo === 34   // ----> NOTIFICACION ATRASOS INDIVIDUAL
+      || this.data.parametros.id_tipo === 35   // ----> NOTIFICACION SALIDAS ANTICIPADAS INDIVIDUAL 
+      || this.data.parametros.id_tipo === 37   // ----> GENERACION DE PERIODOS DE VACACION 
     ) {
       this.hora = true;
       this.especificacion = 'Registrar la hora en la que se enviará la notificación (formato de 24 horas).';
@@ -120,6 +121,9 @@ export class EditarDetalleParametroComponent implements OnInit {
       }
       else if (this.data.parametros.id_tipo === 35) {
         this.observacion = 'Hora en la que se enviará de forma automática notificaciones de salidas anticipadas individuales del personal.';
+      }
+      else if (this.data.parametros.id === 37) {
+        this.observacion = 'Hora en la que se genera automáticamente el nuevo periodo de vacaciones del personal.';
       }
     }
     else if (

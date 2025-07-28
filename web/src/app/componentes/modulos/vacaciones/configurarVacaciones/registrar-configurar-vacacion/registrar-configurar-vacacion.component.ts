@@ -60,6 +60,16 @@ export class RegistrarConfigurarVacacionComponent implements OnInit {
       this.ips_locales = ips;
     });
     this.ValidarFormulario();
+    this.ObtenerConfiguraciones();
+  }
+
+  // METODO DE BUSQUEDA DE TIPOS DE PERMISOS
+  listaConfiguraciones: any = [];
+  ObtenerConfiguraciones() {
+    this.listaConfiguraciones = [];
+    this.rest.BuscarConfiguracionVacaciones().subscribe(datos => {
+      this.listaConfiguraciones = datos;
+    });
   }
 
   // METODO PARA VALIDAR FORMULARIO
@@ -111,7 +121,7 @@ export class RegistrarConfigurarVacacionComponent implements OnInit {
       }
       else {
         datos.minimo_horas = '00:00';
-        this.IngresarDatos(datos);
+        this.VerificarDuplicidad(datos);
       }
     }
     else if (form.diasHorasForm === 'Horas') {
@@ -123,7 +133,7 @@ export class RegistrarConfigurarVacacionComponent implements OnInit {
       }
       else {
         datos.minimo_dias = 0;
-        this.IngresarDatos(datos);
+        this.VerificarDuplicidad(datos);
       }
     }
   }
@@ -170,6 +180,25 @@ export class RegistrarConfigurarVacacionComponent implements OnInit {
       });
     });
   }
+
+
+  VerificarDuplicidad(datos: any) {
+    let contador = 0;
+    this.listaConfiguraciones.forEach((obj: any) => {
+      if (obj.descripcion.toUpperCase() === datos.descripcion.toUpperCase()) {
+        contador = 1;
+      }
+    })
+    if (contador === 0) {
+      this.IngresarDatos(datos);
+    }
+    else {
+      this.toastr.warning('Descripción ya se encuentra registrada.', 'Ups! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }
+  }
+
 
   // METODO PARA INGRESAR SOLO NUMEROS
   IngresarSoloNumeros(evt: any) {

@@ -24,7 +24,7 @@ class PeriodoVacacionControlador {
             dias_vacacion, usados_dias_vacacion, dias_antiguedad, usados_antiguedad, dias_perdidos, 
             fecha_inicio_perdida, id_empleado, estado, fecha_acreditar_vacaciones, creado_manual, saldo_transferido,
             dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad, anios_antiguedad)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20 $21) RETURNING *
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) RETURNING *
         `,
         [observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion,
           dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida,
@@ -56,6 +56,7 @@ class PeriodoVacacionControlador {
       await pool.query("COMMIT");
       res.jsonp({ message: "Registro guardado." });
     } catch (error) {
+      console.log('error periodo ', error)
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
       res.status(500).jsonp({ message: "Error al guardar período de vacación." });
@@ -180,7 +181,7 @@ class PeriodoVacacionControlador {
     res.status(404).jsonp({ text: 'Registro no encontrado' });
   }
 
-  // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL
+  // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
   public async CerrarPeriodoVacaciones(req: Request, res: Response): Promise<any> {
     const { empleados, fecha } = req.body;
 
@@ -205,6 +206,34 @@ class PeriodoVacacionControlador {
       });
 
     }
+  }
+
+
+  // METODO PARA GENERAR PERIODOS DESDE EL SISTEMA 
+  public async GenerarPeriodoManual(req: Request, res: Response): Promise<any> {
+
+    console.log('ingresa ', req.body)
+
+    try {
+      const { fecha_inicio, fecha_fin } = req.body;
+
+      // INICIAR TRANSACCION
+
+      const datosNuevos = await pool.query(
+        `
+          SELECT * FROM public.fn_generar_periodos_rango($1::DATE, $2::DATE)
+        `
+        , [fecha_inicio, fecha_fin]);
+
+      // FINALIZAR TRANSACCION
+      res.jsonp({ message: 'Registro guardado.', estado: 'OK', id: datosNuevos.rows[0].id });
+
+    } catch (error) {
+      console.log('error ', error)
+      // FINALIZAR TRANSACCION
+      res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+    }
+
   }
 
 

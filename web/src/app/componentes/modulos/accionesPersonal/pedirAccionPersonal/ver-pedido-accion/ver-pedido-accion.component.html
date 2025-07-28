@@ -136,7 +136,7 @@
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
-                            <label class="col-sm col-form-label"><b>Sucursal propuesto:</b>
+                            <label class="col-sm col-form-label"><b>Sucursal propuesta:</b>
                                 {{datosPedido[0]?.sucursal_propuesto}}
                             </label>
                         </div>
@@ -160,7 +160,7 @@
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
-                            <label class="col-sm col-form-label"><b>Unidad administrativa propuesto:</b>
+                            <label class="col-sm col-form-label"><b>Unidad administrativa propuesta:</b>
                                 {{datosPedido[0]?.unidad_administrativa_propuesta}}
                             </label>
                         </div>
@@ -215,12 +215,12 @@
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
-                            <label class="col-sm col-form-label"><b>Remuneracion mensual actual:</b>
+                            <label class="col-sm col-form-label"><b>Remuneración mensual actual:</b>
                                 {{datosPedido[0]?.remuneracion_actual | currency:'USD':'symbol':'1.2-2'}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
-                            <label class="col-sm col-form-label"><b>Remuneracion mensual propuesto:</b>
+                            <label class="col-sm col-form-label"><b>Remuneración mensual propuesta:</b>
                                 {{datosPedido[0]?.remuneracion_propuesta | currency:'USD':'symbol':'1.2-2'}}
                             </label>
                         </div>
@@ -232,7 +232,7 @@
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
-                            <label class="col-sm col-form-label"><b>Partida propuesto:</b>
+                            <label class="col-sm col-form-label"><b>Partida propuesta:</b>
                                 {{datosPedido[0]?.partida_individual_propuesta}}
                             </label>
                         </div>
@@ -274,7 +274,7 @@
                             <label>** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)</label>
                         </div>
                         <div class="col-sm" id="verticalLine">
-                            <label class="col-sm col-form-label"><b>Numero de acta:</b>
+                            <label class="col-sm col-form-label"><b>Número de acta:</b>
                                 {{datosPedido[0]?.numero_acta_final}}
                             </label>
                         </div>
@@ -293,7 +293,8 @@
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Director(a): {{datosPedido[0]?.abreviatura_director}}</b></label>
+                                <label class="item-start"><b>Director(a):
+                                        {{datosPedido[0]?.abreviatura_director}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_director}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_director}}</label>
                             </div>
@@ -302,34 +303,40 @@
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Autoridad: {{datosPedido[0]?.abreviatura_delegado}}</b></label>
-                                <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_autoridad_delegado}}</label>
+                                <label class="item-start"><b>Autoridad:
+                                        {{datosPedido[0]?.abreviatura_delegado}}</b></label>
+                                <label class="item-middle">&nbsp;
+                                    {{datosPedido[0]?.empleado_autoridad_delegado}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_autoridad_delegado}}</label>
                             </div>
                         </div>
                     </div>
-                     <div class="row">
+                    <div class="row">
                         <div id="verticalLine" class="mt-3">
                             <label><b>RESPONSABLES DE FIRMAS</b></label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Aceptación: {{datosPedido[0]?.abreviatura_empleado}}</b></label>
+                                <label class="item-start"><b>Aceptación:
+                                        {{datosPedido[0]?.abreviatura_empleado}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.nombres.toUpperCase()}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_actual}}</label>
                             </div>
                         </div>
                         <div class="col-sm" id="verticalLine" *ngIf="datosPedido[0]?.empleado_testigo">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Negativa: {{datosPedido[0]?.abreviatura_testigo}}</b></label>
-                                <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_testigo.toUpperCase()}}</label>
+                                <label class="item-start"><b>Negativa:
+                                        {{datosPedido[0]?.abreviatura_testigo}}</b></label>
+                                <label class="item-middle">&nbsp;
+                                    {{datosPedido[0]?.empleado_testigo.toUpperCase()}}</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Responsable elaboración: {{datosPedido[0]?.abreviatura_elaboracion}}</b></label>
+                                <label class="item-start"><b>Responsable elaboración:
+                                        {{datosPedido[0]?.abreviatura_elaboracion}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_elaboracion}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.tipo_cargo_elaboracion}}</label>
                             </div>
@@ -338,7 +345,8 @@
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Responsable control: {{datosPedido[0]?.abreviatura_control}}</b></label>
+                                <label class="item-start"><b>Responsable control:
+                                        {{datosPedido[0]?.abreviatura_control}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_control}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.tipo_cargo_control}}</label>
                             </div>
@@ -347,7 +355,8 @@
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Responsable revisión: {{datosPedido[0]?.abreviatura_revision}}</b></label>
+                                <label class="item-start"><b>Responsable revisión:
+                                        {{datosPedido[0]?.abreviatura_revision}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_revision}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.tipo_cargo_revision}}</label>
                             </div>
@@ -362,7 +371,7 @@
                     <div class="row" *ngIf="datosPedido[0]?.comunicacion_electronica">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                 <label style="font-size: small;">
+                                <label style="font-size: small;">
                                     REGISTRO DE NOTIFICACIÓN AL SERVIDOR PÚBLICO DE LA ACCIÓN DE PERSONAL (primer inciso
                                     del art. 22 RGLOSEP, art. 101 COA art. 66 y 126 ERJAFE)
                                 </label>
@@ -398,13 +407,14 @@
                     <div class="row" *ngIf="datosPedido[0]?.comunicacion_electronica">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Responsable revisión: {{datosPedido[0]?.abreviatura_comunicacion}}</b></label>
+                                <label class="item-start"><b>Responsable revisión:
+                                        {{datosPedido[0]?.abreviatura_comunicacion}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_comunicacion}}</label>
                                 <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_comunicacion}}</label>
                             </div>
                         </div>
                     </div>
-                    
+
                     <hr style="width: 100%; margin: auto; margin-top: 10px; margin-bottom: 5px;">
                     <div class="row mb-4">
                         <div class="col-sm" id="verticalLine">

@@ -1574,9 +1574,7 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
-
 
                 <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;" *ngIf="ver_detalle">
                     <button id="btn-raised" class="btn btn-sm" (click)="ObtenerDetallesPlanificacion()">
@@ -1914,6 +1912,11 @@
                                         <label id="datosF">Días de vacaciones totales:</label>
                                         <label>{{p.dias_vacacion}}</label>
                                     </div>
+                                    <div class="espacio d-flex justify-content-start"
+                                    *ngIf="p.dias_cargados && p.dias_cargados != 0">
+                                    <label id="datosF">Vacaciones totales:</label>
+                                    <label>{{p.total_formato}}</label>
+                                </div>
                                 </div>
                             </div>
                         </div>

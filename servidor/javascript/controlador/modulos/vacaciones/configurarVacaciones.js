@@ -77,7 +77,7 @@ class ConfigurarVacacioneControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-                    UPDATE mv_configurar_vacaciones SET descripcion = $1, permite_horas = $2 
+                    UPDATE mv_configurar_vacaciones SET descripcion = $1, permite_horas = $2, 
                         minimo_horas = $3, minimo_dias = $4, documento = $5, estado = $6,
                         incluir_feriados = $7    
                     WHERE id = $8
@@ -100,6 +100,7 @@ class ConfigurarVacacioneControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('ver error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });

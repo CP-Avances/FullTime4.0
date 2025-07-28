@@ -1,0 +1,54 @@
+<div class="container" style="padding-bottom: 15px; padding-top: 15px;">
+    <div id="titulo">
+        <span>CONFIGURACIÓN DE VACACIONES</span>
+    </div>
+    <mat-card class="example-card mat-elevation-z8">
+        <mat-card-content>
+            <div class="row">
+                <div class="nota" style="margin-left: 15px; padding-bottom: 15px;">
+                    <span>
+                        NOTA: Al presionar Generar se generará manualmente el período de vacaciones del personal que
+                        cumpla su periodo en las fechas seleccionadas.
+                    </span>
+                </div>
+
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Fecha Desde</mat-label>
+                                    <input matInput [matDatepicker]="pickerDesde" placeholder="dd/mm/aaaa"
+                                        [formControl]="fechaInicialF" (dateChange)="onFechaDesdeSeleccionada()"
+                                        [max]="fechaActual.toISODate()">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+                                    <mat-datepicker #pickerDesde></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Fecha Hasta</mat-label>
+                                    <input matInput [matDatepicker]="pickerHasta" placeholder="dd/mm/aaaa"
+                                        [formControl]="fechaFinalF" (dateChange)="onFechaHastaSeleccionada()"
+                                        [max]="fechaMaximaHasta.toISODate()">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+                                    <mat-datepicker #pickerHasta></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <div style="margin: 0 auto;">
+                                <button id="btn-raised" class="btn btn-sm" (click)="GenerarPeriodo()">
+                                    Generar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -30,8 +30,14 @@ export class PeriodoVacacionesService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/buscar/${id}`);
   }
 
-  // METODO PARA CERRAR PERIODO DE VACACIONES
+  // METODO PARA CERRAR PERIODO DE VACACIONES   **USADO
   CerrarPeriodoVacaciones(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/cerrar-periodos`, datos);
   }
+
+  // METODO PARA CREAR PERIODO DE VACACIONES DESDE EL SISTEMA **USADO
+  GenerarPeriodoManual(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/periodo-crear-manual`, datos);
+  }
+
 }

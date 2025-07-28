@@ -199,6 +199,9 @@ import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacac
 import { RegistrarPeriodoVComponent } from './componentes/modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPeriodoVacacionesComponent } from './componentes/modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
 import { RegistrarVacacionesComponent } from './componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
+import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/ver-configurar-vacacion/ver-configurar-vacacion.component';
+import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
+
 // MODULO  --HORAS EXTRAS
 import { HorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/registrar-horas-extras/horas-extras.component';
 import { EditarHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/editar-horas-extras/editar-horas-extras.component';
@@ -346,7 +349,6 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
-import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/ver-configurar-vacacion/ver-configurar-vacacion.component';
 
 @NgModule({
   declarations: [
@@ -516,6 +518,8 @@ import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones
     RegistrarPeriodoVComponent,
     EditarPeriodoVacacionesComponent,
     RegistrarVacacionesComponent,
+    VerConfigurarVacacionComponent,
+    GenerarPeriodoManualComponent,
 
     HorasExtrasComponent,
     EditarHorasExtrasComponent,
@@ -653,7 +657,6 @@ import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
-    VerConfigurarVacacionComponent,
   ],
 
   imports: [
