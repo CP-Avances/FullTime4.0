@@ -802,7 +802,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
           this.fivethFormGroup.controls['idEmpleadoHForm'].setValue(e.empleado);
           this.fivethFormGroup.patchValue({
-            fechaServidorForm: this.FechaActual,
+            fechaServidorForm: this.firstFormGroup.controls['fechaForm'].value,
           });
           this.btnForm1 = false
         })
@@ -988,7 +988,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           abrevGAForm: this.datosPedido[0].abreviatura_delegado,
           abrevHForm: this.datosPedido[0].abreviatura_empleado,
           abrevGForm: this.datosPedido[0].abreviatura_testigo,
-          fechaServidorForm: this.datosPedido[0].fecha_testigo,
+          fechaServidorForm: this.datosPedido[0].fecha_elaboracion,
           fechaNegativaForm: this.datosPedido[0].fecha_testigo,
 
           idEmpleadoRNAForm: this.datosPedido[0].empleado_elaboracion,

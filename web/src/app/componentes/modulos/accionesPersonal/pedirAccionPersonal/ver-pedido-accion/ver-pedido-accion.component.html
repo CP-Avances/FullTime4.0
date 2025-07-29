@@ -37,7 +37,7 @@
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Fecha pedido:</b>
-                                {{datosPedido[0]?.fecha_elaboracion | date:'dd/MM/yyyy' }}
+                                {{datosPedido[0]?.fecha_elaboracion ? datosPedido[0]?.fecha_elaboracion : ""}}
                             </label>
                         </div>
                     </div>
@@ -51,12 +51,12 @@
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Rige desde:</b>
-                                {{datosPedido[0]?.fecha_rige_desde | date:'dd/MM/yyyy' }}
+                                {{datosPedido[0]?.fecha_rige_desde ? datosPedido[0]?.fecha_rige_desde : ""}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Rige hasta:</b>
-                                {{datosPedido[0]?.fecha_rige_hasta | date:'dd/MM/yyyy' }}
+                                {{datosPedido[0]?.fecha_rige_hasta ? datosPedido[0]?.fecha_rige_hasta : ""}}
                             </label>
                         </div>
                     </div>
@@ -265,7 +265,7 @@
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Fecha:</b>
-                                {{datosPedido[0]?.fecha_posesion | date:'dd/MM/yyyy'}}
+                                {{datosPedido[0]?.fecha_posesion ? datosPedido[0]?.fecha_posesion : ""}}
                             </label>
                         </div>
                     </div>
@@ -280,7 +280,7 @@
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Fecha:</b>
-                                {{datosPedido[0]?.fecha_acta_final | date:'dd/MM/yyyy'}}
+                                {{datosPedido[0]?.fecha_acta_final ? datosPedido[0]?.fecha_acta_final : ""}}
                             </label>
                         </div>
                     </div>
@@ -296,18 +296,21 @@
                                 <label class="item-start"><b>Director(a):
                                         {{datosPedido[0]?.abreviatura_director}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_director}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_director}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.cargo_director}}</label>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-sm" id="verticalLine">
                             <div class="col-sm col-form-label item-container">
-                                <label class="item-start"><b>Autoridad:
-                                        {{datosPedido[0]?.abreviatura_delegado}}</b></label>
-                                <label class="item-middle">&nbsp;
-                                    {{datosPedido[0]?.empleado_autoridad_delegado}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_autoridad_delegado}}</label>
+                                <label class="item-start"><b>Autoridad: {{datosPedido[0]?.abreviatura_delegado}}</b></label>
+                                <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_autoridad_delegado}}</label>
+                            </div>
+                             <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.cargo_autoridad_delegado}}</label>
                             </div>
                         </div>
                     </div>
@@ -320,7 +323,12 @@
                                 <label class="item-start"><b>Aceptación:
                                         {{datosPedido[0]?.abreviatura_empleado}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.nombres.toUpperCase()}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_actual}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.cargo_actual}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Fecha: </b>{{datosPedido[0]?.fecha_elaboracion}}</label>
                             </div>
                         </div>
                         <div class="col-sm" id="verticalLine" *ngIf="datosPedido[0]?.empleado_testigo">
@@ -330,6 +338,9 @@
                                 <label class="item-middle">&nbsp;
                                     {{datosPedido[0]?.empleado_testigo.toUpperCase()}}</label>
                             </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Fecha: </b>{{datosPedido[0]?.fecha_testigo}}</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -338,7 +349,9 @@
                                 <label class="item-start"><b>Responsable elaboración:
                                         {{datosPedido[0]?.abreviatura_elaboracion}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_elaboracion}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.tipo_cargo_elaboracion}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.tipo_cargo_elaboracion}}</label>
                             </div>
                         </div>
                     </div>
@@ -348,7 +361,9 @@
                                 <label class="item-start"><b>Responsable control:
                                         {{datosPedido[0]?.abreviatura_control}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_control}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.tipo_cargo_control}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.tipo_cargo_control}}</label>
                             </div>
                         </div>
                     </div>
@@ -358,7 +373,9 @@
                                 <label class="item-start"><b>Responsable revisión:
                                         {{datosPedido[0]?.abreviatura_revision}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_revision}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.tipo_cargo_revision}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.tipo_cargo_revision}}</label>
                             </div>
                         </div>
                     </div>
@@ -388,12 +405,12 @@
                     <div class="row" *ngIf="datosPedido[0]?.comunicacion_electronica">
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Fecha:</b>
-                                {{datosPedido[0]?.fecha_comunicacion | date:'dd/MM/yyyy'}}
+                                {{datosPedido[0]?.fecha_comunicacion ? datosPedido[0]?.fecha_comunicacion : "" }}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
                             <label class="col-sm col-form-label"><b>Hora:</b>
-                                {{datosPedido[0]?.hora_comunicacion}}
+                                {{datosPedido[0]?.hora_comunicacion ? datosPedido[0]?.hora_comunicacion : ""}}
                             </label>
                         </div>
                     </div>
@@ -410,7 +427,9 @@
                                 <label class="item-start"><b>Responsable revisión:
                                         {{datosPedido[0]?.abreviatura_comunicacion}}</b></label>
                                 <label class="item-middle">&nbsp; {{datosPedido[0]?.empleado_comunicacion}}</label>
-                                <label class="item-end">&nbsp; {{datosPedido[0]?.cargo_comunicacion}}</label>
+                            </div>
+                            <div class="col-12" style="margin-top: -10px;">
+                                <label class="item-start"><b>Cargo: </b>{{datosPedido[0]?.cargo_comunicacion}}</label>
                             </div>
                         </div>
                     </div>

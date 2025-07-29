@@ -765,8 +765,6 @@ class EmpresaControlador {
 
 
 
-
-
 }
 
 export const EMPRESA_CONTROLADOR = new EmpresaControlador();

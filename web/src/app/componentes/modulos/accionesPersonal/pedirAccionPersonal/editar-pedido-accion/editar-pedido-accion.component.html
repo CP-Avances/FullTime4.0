@@ -790,10 +790,10 @@
                                 <mat-form-field class="contenedor-completo w-90">
                                     <mat-label>Fecha</mat-label>
                                     <input matInput [matDatepicker]="pickerfechaS" placeholder="dd/mm/aaaa"
-                                        formControlName="fechaServidorForm">
+                                        formControlName="fechaServidorForm" [disabled]="true">
                                     <mat-datepicker-toggle matSuffix [for]="pickerfechaS" id="i-cursor"
                                         matTooltipPosition="right"
-                                        matTooltip="Ingresar la fecha. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                        [disabled]="true">
                                     </mat-datepicker-toggle>
                                     <mat-datepicker touchUi #pickerfechaS></mat-datepicker>
                                 </mat-form-field>

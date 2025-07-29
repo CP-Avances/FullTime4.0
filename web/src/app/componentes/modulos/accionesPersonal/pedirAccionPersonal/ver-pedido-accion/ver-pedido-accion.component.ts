@@ -96,13 +96,23 @@ export class VerPedidoAccionComponent implements OnInit {
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
-      console.log('datosPedido: ', this.datosPedido);
-
+      
       this.tipos_accion.forEach((item: any) => {
         if (item.descripcion == this.datosPedido[0].descripcion) {
           this.textoFijo = item.base_legal + ' ';
         }
       });
+
+      this.datosPedido.forEach((valor: any) => {
+        valor.fecha_elaboracion =  this.validar.FormatearFecha(valor.fecha_elaboracion, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        valor.fecha_rige_desde =  this.validar.FormatearFecha(valor.fecha_rige_desde, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        valor.fecha_rige_hasta =  this.validar.FormatearFecha(valor.fecha_rige_hasta, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+        valor.fecha_posesion =  valor.fecha_posesion ? this.validar.FormatearFecha(valor.fecha_posesion, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) : "";
+        valor.fecha_acta_final =  valor.fecha_acta_final ? this.validar.FormatearFecha(valor.fecha_acta_final, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) : "";
+        valor.fecha_testigo = valor.fecha_testigo ? this.validar.FormatearFecha(valor.fecha_testigo, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) : "";
+        valor.fecha_comunicacion = valor.fecha_comunicacion ? this.validar.FormatearFecha(valor.fecha_comunicacion, formato_fecha, this.validar.dia_abreviado, this.idioma_fechas) : "";
+        valor.hora_comunicacion = valor.hora_comunicacion ? this.validar.FormatearHora(valor.hora_comunicacion, this.formato_hora) : "";
+      })
 
     });
   }
