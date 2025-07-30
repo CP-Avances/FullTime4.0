@@ -222,7 +222,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   public fourthFormGroup = new FormGroup({
     funcionarioForm: this.funcionarioF,
     cedulaForm: this.cedualF,
-    lugar_trabajo: this.idCiudadPosecion,
+    lugar_posecion: this.idCiudadPosecion,
     fechaPosesionForm: this.fechaPosesionFor,
     actaFinalForm: this.actaFinalForm,
     fechaActaFinalForm: this.fechaActaFinalForm,
@@ -965,7 +965,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         this.fourthFormGroup.patchValue({
           funcionarioForm: this.datosPedido[0].nombres,
           cedulaForm: this.datosPedido[0].cedula_empleado,
-          lugar_trabajo: this.datosPedido[0].descripcion_lugar_posesion,
+          lugar_posecion: this.datosPedido[0].descripcion_lugar_posesion,
           fechaPosesionForm: this.datosPedido[0].fecha_posesion,
           actaFinalForm: this.datosPedido[0].numero_acta_final,
           fechaActaFinalForm: this.datosPedido[0].fecha_acta_final,
@@ -1251,6 +1251,8 @@ export class EditarPedidoAccionComponent implements OnInit {
       let grupo_ocupacional_propuesto = this.grupoOcupacional.find((item: any) => item.descripcion === form3.grupoOcupacionalPropuestoForm)
       let grado_propuesto = this.grados.find((item: any) => item.descripcion === form3.gradoPropuestoForm);
 
+      let lugar_posesion = this.ObtenerIdCiudadSeleccionada(form4.lugar_posecion);
+
       let hora_comuni = '';
 
       if (form6.horaComunicadoForm != '') {
@@ -1311,7 +1313,7 @@ export class EditarPedidoAccionComponent implements OnInit {
         formulario4: {
           funcionario: form3.habilitarForm4 ? idEmpl_pedido : null,
           cedual: form3.habilitarForm4 ? form4.cedulaForm : null,
-          lugar_posesion: form3.habilitarForm4 ? lugar_trabajo_actual : null,
+          lugar_posesion: form3.habilitarForm4 ? lugar_posesion : null,
           fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
           actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
           fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
