@@ -374,16 +374,110 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print'),
+        empresa: localStorage.getItem('name_empresa'),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        fechaInicio: this.rangoFechas.fec_inico,
+        fechaFin: this.rangoFechas.fec_final,
+        opcionBusqueda: this.opcionBusqueda,
+
+        resumen: this.bool,
+
+        totales: this.data_pdf.map(grupo => {
+          let totalMinutos = 0;
+
+          grupo.empleados.forEach(emp => {
+            emp.atrasos.forEach(reg => {
+              const minutos = this.SegundosAMinutosConDecimales(Number(reg.diferencia));
+              totalMinutos += Number(minutos);
+            });
+          });
+
+          const nombre = this.bool.bool_dep ? grupo.departamento : grupo.nombre;
+
+          return {
+            sucursal: grupo.sucursal,
+            nombre,
+            formato_general: this.MinutosAHorasMinutosSegundos(Number(totalMinutos.toFixed(2))),
+            formato_decimal: totalMinutos.toFixed(2),
+          };
+        }),
+
+        grupos: this.data_pdf.map(grupo => ({
+          sucursal: grupo.sucursal,
+          ciudad: grupo.ciudad,
+          departamento: grupo.departamento,
+          nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
+
+          empleados: grupo.empleados.map(emp => ({
+            identificacion: emp.identificacion,
+            codigo: emp.codigo,
+            nombre: emp.nombre,
+            apellido: emp.apellido,
+            regimen: emp.regimen,
+            departamento: emp.departamento,
+            cargo: emp.cargo,
+
+            atrasos: emp.atrasos.map(reg => {
+              const fechaHorario = reg.fecha_hora_horario.split(' ')[0];
+              const horaHorario = reg.fecha_hora_horario.split(' ')[1];
+              const fechaTimbre = reg.fecha_hora_timbre.split(' ')[0];
+              const horaTimbre = reg.fecha_hora_timbre.split(' ')[1];
+              const tolerancia = this.tolerancia !== '1'
+                ? this.MinutosAHorasMinutosSegundos(Number(reg.tolerancia))
+                : '00:00:00';
+              const minutos = this.SegundosAMinutosConDecimales(Number(reg.diferencia));
+              const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
+
+              return {
+                fechaHorario,
+                horaHorario,
+                fechaTimbre,
+                horaTimbre,
+                tipo_permiso: reg.tipo_permiso ?? null,
+                desde: reg.desde ?? null,
+                hasta: reg.hasta ?? null,
+                permiso: reg.permiso ?? null,
+                descripcion_permiso: reg.descripcion_permiso ?? null,
+                tolerancia,
+                tiempoAtraso: tiempo,
+                minutosAtraso: minutos.toFixed(2)
+              };
+            })
+          }))
+        }))
+      };
+
+      console.log("ENVIANDO AL MICROSERVICIO", data);
+      this.validar.generarReporteAtrasos(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+        FileSaver.saveAs(pdfBlob, doc_name);
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'Error'
+        );
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

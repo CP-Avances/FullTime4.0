@@ -363,16 +363,83 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        // Información general del encabezado del reporte
+        usuario: localStorage.getItem('fullname_print'),
+        empresa: localStorage.getItem('name_empresa'),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        fechaInicio: this.rangoFechas.fec_inico,
+        fechaFin: this.rangoFechas.fec_final,
+        opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
+
+        // Filtros aplicados para agrupar la información
+        resumen: {
+          bool_reg: this.bool.bool_reg,
+          bool_dep: this.bool.bool_dep,
+          bool_cargo: this.bool.bool_cargo,
+          bool_suc: this.bool.bool_suc,
+          bool_emp: this.bool.bool_emp
+        },
+
+        // Información agrupada para presentar el detalle
+        grupos: this.data_pdf.map(grupo => ({
+          sucursal: grupo.sucursal,
+          ciudad: grupo.ciudad,
+          departamento: grupo.departamento,
+          nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
+
+          empleados: grupo.empleados.map(emp => ({
+            identificacion: emp.identificacion,
+            codigo: emp.codigo,
+            nombre: emp.nombre,
+            apellido: emp.apellido,
+            regimen: emp.regimen,
+            departamento: emp.departamento,
+            cargo: emp.cargo,
+
+            salidas: emp.salidas.map(salida => ({
+              fecha_hora_horario: salida.fecha_hora_horario,     // Ej: '2025-07-03 17:00:00'
+              fecha_hora_timbre: salida.fecha_hora_timbre,       // Ej: '2025-07-03 16:35:00'
+              diferencia: salida.diferencia,                     // en segundos
+
+              // Estos campos aparecen como columnas vacías visualmente, pero se reservan:
+              tipo_permiso: salida.tipo_permiso ?? null,
+              desde: salida.desde ?? null,
+              hasta: salida.hasta ?? null
+            }))
+          }))
+        }))
+      };
+
+      console.log("ENVIANDO AL MICROSERVCIO", data);
+      this.validar.generarReporteSalidasAnticipadas(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+        FileSaver.saveAs(pdfBlob, doc_name);
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'Error'
+        );
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

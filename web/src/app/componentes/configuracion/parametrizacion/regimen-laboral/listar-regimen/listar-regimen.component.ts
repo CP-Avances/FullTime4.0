@@ -283,67 +283,97 @@ export class ListarRegimenComponent implements OnInit {
 
 
   // METODO PARA GENERAR ARCHIVO PDF
-  async GenerarPdf(action = "open") {
+  async GenerarPDF(action: any) {
     this.OrdenarDatos(this.regimen);
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
 
-    if (action === "download") {
+    if (action === 'download') {
       const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        regimen: this.regimen.map((r: any) => ({
-          id: r.id,
-          descripcion: r.descripcion,
-          pais: r.pais,
-          mes_periodo: r.mes_periodo,
-          dias_mes: r.dias_mes,
-          vacacion_dias_laboral: r.vacacion_dias_laboral,
-          vacacion_dias_libre: r.vacacion_dias_libre,
-          vacacion_dias_calendario: r.vacacion_dias_calendario,
-          dias_maximo_acumulacion: r.dias_maximo_acumulacion,
-          anio_antiguedad: r.anio_antiguedad,
-          dias_antiguedad: r.dias_antiguedad
-        }))
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido, // Usuario que imprime
+        empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(), // Empresa en mayúsculas
+        fraseMarcaAgua: this.frase,         // Marca de agua
+        logoBase64: this.logo,              // Logo en base64
+        colorPrincipal: this.p_color,       // Color de fondo de los encabezados de bloque
+        colorSecundario: this.s_color,      // Color de fondo de encabezados de tabla
+
+        regimenes: this.regimen.map((reg: any) => {
+          const rangos = this.rangos_antiguedad.find(r => r.id_regimen === reg.id)?.rangos || [];
+          const periodos = this.periodos_vacacionales.find(p => p.id_regimen === reg.id)?.periodos || [];
+
+          return {
+            id: reg.id,
+            descripcion: reg.descripcion,
+            pais: reg.pais,
+            continuidad_laboral: reg.continuidad_laboral,
+            mes_periodo: reg.mes_periodo,
+            dias_mes: reg.dias_mes,
+            trabajo_minimo_mes: reg.trabajo_minimo_mes,
+            trabajo_minimo_horas: reg.trabajo_minimo_horas,
+            antiguedad: reg.antiguedad,
+
+            // CONFIGURACIÓN DE VACACIONES
+            vacacion_dias_laboral: reg.vacacion_dias_laboral,
+            vacacion_dias_libre: reg.vacacion_dias_libre,
+            vacacion_dias_calendario: reg.vacacion_dias_calendario,
+            acumular: reg.acumular,
+            dias_maximo_acumulacion: reg.acumular ? reg.dias_maximo_acumulacion : null,
+            vacacion_divisible: reg.vacacion_divisible,
+            periodos_vacacionales: reg.vacacion_divisible ? (
+              periodos.length > 0 ? periodos.map(p => ({
+                descripcion: p.descripcion,
+                dias_vacacion: p.dias_vacacion
+              })) : []
+            ) : [],
+
+            // VACACIONES GANADAS
+            vacacion_dias_laboral_mes: reg.vacacion_dias_laboral_mes,
+            vacacion_dias_calendario_mes: reg.vacacion_dias_calendario_mes,
+            laboral_dias: reg.laboral_dias,
+            calendario_dias: reg.calendario_dias,
+
+            // CONFIGURACIÓN DE ANTIGÜEDAD
+            antiguedad_fija: reg.antiguedad_fija,
+            anio_antiguedad: reg.antiguedad_fija ? reg.anio_antiguedad : null,
+            dias_antiguedad: reg.antiguedad_fija ? reg.dias_antiguedad : null,
+
+            antiguedad_variable: reg.antiguedad_variable,
+            rangos_antiguedad: reg.antiguedad_variable ? (
+              rangos.length > 0 ? rangos.map(r => ({
+                anio_desde: r.anio_desde,
+                anio_hasta: r.anio_hasta,
+                dias_antiguedad: r.dias_antiguedad
+              })) : []
+            ) : []
+          };
+        })
       };
 
-      this.validar.generarReporteRegimenLaboral(data).subscribe((pdf: Blob) => {
-        const blob = new Blob([pdf], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'Regimen_laboral.pdf';
-        link.click();
-        window.URL.revokeObjectURL(url);
+      console.log("ENVIANDO AL MICROSERVICIO", data);
+      this.validar.generarReporteRegimenLaboral(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = 'Regimen_laboral.pdf';
+        FileSaver.saveAs(pdfBlob, doc_name);
       }, error => {
         console.error("Error al generar PDF desde el microservicio:", error);
-
         this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
           'Error'
         );
-
       });
+
     } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = 'Regimen_laboral.pdf';
+
       switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
       }
     }
 
     this.ObtenerRegimen();
   }
+
 
   DefinirInformacionPDF() {
 
@@ -422,7 +452,7 @@ export class ListarRegimenComponent implements OnInit {
       const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
       const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
 
-      // BLOQUE 1 – INFORMACION GENERAL
+      // CABEZERA DE REGIMEN
       bloques.push({
         style: 'tableMarginCabeceraHorario',
         table: {
@@ -451,7 +481,7 @@ export class ListarRegimenComponent implements OnInit {
       // BLOQUES 
       bloques.push({
         columns: [
-          // BLOQUE 2 – CONFIGURACION DE VACACIONES
+          // BLOQUE 1 – CONFIGURACION DE VACACIONES
           {
             width: '33%',
             stack: [
@@ -497,7 +527,7 @@ export class ListarRegimenComponent implements OnInit {
             ]
           },
 
-          // BLOQUE 3 – VACACIONES GANADAS
+          // BLOQUE 2 – VACACIONES GANADAS
           {
             width: '34%',
             stack: [
@@ -528,7 +558,7 @@ export class ListarRegimenComponent implements OnInit {
             ]
           },
 
-          // BLOQUE 4 – CONDIGURACION DE ANTIGUEDAD
+          // BLOQUE 3 – CONDIGURACION DE ANTIGUEDAD
           {
             width: '33%',
             stack: [

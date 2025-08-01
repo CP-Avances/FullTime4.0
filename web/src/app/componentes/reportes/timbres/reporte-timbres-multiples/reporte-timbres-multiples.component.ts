@@ -370,16 +370,77 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Timbres_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print') as string,      // Nombre del usuario que imprime
+        empresa: (localStorage.getItem('name_empresa') as string).toUpperCase(),  // Empresa en mayúsculas
+        fraseMarcaAgua: this.frase,         // Marca de agua visible (ej: "FullTime")
+        logoBase64: this.logo,              // Logo en formato base64
+        colorPrincipal: this.p_color,       // Color principal para encabezados
+        colorSecundario: this.s_color,      // Color secundario para bloques de información
+        opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
+        periodo: {
+          inicio: this.rangoFechas.fec_inico,  // Fecha inicial del filtro
+          fin: this.rangoFechas.fec_final      // Fecha final del filtro
+        },
+        filtrosAplicados: {                 // Bandera de los filtros activos
+          bool_reg: this.bool.bool_reg,
+          bool_dep: this.bool.bool_dep,
+          bool_cargo: this.bool.bool_cargo,
+          bool_suc: this.bool.bool_suc,
+          bool_emp: this.bool.bool_emp
+        },
+        timbreDispositivo: this.timbreDispositivo, // true = mostrar columnas de dispositivo
+        data_pdf: this.data_pdf.map((selec: any) => ({
+          sucursal: selec.sucursal,
+          ciudad: selec.ciudad,
+          nombre: selec.nombre,                // Puede representar régimen, cargo, etc. según filtro
+          departamento: selec.departamento,
+          empleados: selec.empleados.map((empl: any) => ({
+            identificacion: empl.identificacion,
+            apellido: empl.apellido,
+            nombre: empl.nombre,
+            codigo: empl.codigo,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
+            cargo: empl.cargo,
+            timbres: empl.timbres.map((t: any) => ({
+              fecha_hora_timbre_validado: t.fecha_hora_timbre_validado, // puede ser null
+              fecha_hora_timbre: t.fecha_hora_timbre,
+              id_reloj: t.id_reloj,
+              accion: t.accion,
+              observacion: t.observacion,
+              longitud: t.longitud,
+              latitud: t.latitud
+            }))
+          }))
+        }))
+      };
+
+      console.log("Enviando al microservicio:", data);
+      this.validar.generarReporteTimbresUsuarios(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = `Timbres_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+        FileSaver.saveAs(pdfBlob, doc_name);
+        console.log("PDF generado correctamente desde el microservicio.")
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'Error'
+        );
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     // DEFINIR ORIENTACION DE LA PAGINA

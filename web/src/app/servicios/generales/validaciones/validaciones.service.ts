@@ -612,6 +612,14 @@ export class ValidacionesService {
   }
 
   //MICROSERVICIO
+
+
+  generarReporteParametrosGenerales(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/parametros/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
   generarReporteGeneros(data: any) {
     return this.http.post('http://localhost:8080/api/reportes/generos/pdf', data, {
       responseType: 'blob'
@@ -763,15 +771,58 @@ export class ValidacionesService {
   }
 
   generarReporteTimbreIncompleto(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/faltas/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reportes/timbres-incompletos/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTimbresUsuarios(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/timbres-usuarios/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTimbresVirtualesMovil(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/timbres-virtuales-movil/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTimbresVirtuales(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/timbres-virtuales/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+  generarReporteAuditoria(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/auditoria/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteSalidasAnticipadas(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/salidas-anticipadas/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTiempoAlimentacion(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/tiempo-alimentacion/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTiempoLaborado(data: any) {
+    return this.http.post('http://localhost:8080/api/reportes/tiempo-laborado/pdf', data, {
       responseType: 'blob'
     });
   }
 
 
-
-
-
+  generarReporteAtrasos(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/atrasos/pdf', data, {
+      responseType: 'blob'
+    });
+  }
 
 
 

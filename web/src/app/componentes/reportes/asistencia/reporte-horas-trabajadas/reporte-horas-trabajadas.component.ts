@@ -357,14 +357,120 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print'),
+        empresa: localStorage.getItem('name_empresa'),
+        fraseMarcaAgua: this.frase,
+        logoBase64: this.logo,
+        colorPrincipal: this.p_color,
+        colorSecundario: this.s_color,
+        fechaInicio: this.rangoFechas.fec_inico,
+        fechaFin: this.rangoFechas.fec_final,
+        opcionBusqueda: this.opcionBusqueda,
+
+        resumen: this.bool,
+
+        totales: this.data_pdf.map(grupo => {
+          let totalPlanificado = 0;
+          let totalLaborado = 0;
+
+          grupo.empleados.forEach(emp => {
+            emp.tLaborado.forEach(reg => {
+              const [minPlan, minLab] = this.CalcularDiferenciaFechas(reg);
+              totalPlanificado += minPlan;
+              totalLaborado += minLab;
+            });
+          });
+
+          const nombre = this.bool.bool_dep ? grupo.departamento : grupo.nombre;
+
+          return {
+            sucursal: grupo.sucursal,
+            nombre,
+            formato_general_planificado: this.MinutosAHorasMinutosSegundos(Number(totalPlanificado.toFixed(2))),
+            formato_decimal_planifiado: totalPlanificado.toFixed(2),
+            formato_general_laborado: this.MinutosAHorasMinutosSegundos(Number(totalLaborado.toFixed(2))),
+            formato_decimal_laborado: totalLaborado.toFixed(2),
+          };
+        }),
+
+        grupos: this.data_pdf.map(grupo => ({
+          sucursal: grupo.sucursal,
+          ciudad: grupo.ciudad,
+          departamento: grupo.departamento,
+          nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
+
+          empleados: grupo.empleados.map(emp => ({
+            identificacion: emp.identificacion,
+            codigo: emp.codigo,
+            nombre: emp.nombre,
+            apellido: emp.apellido,
+            regimen: emp.regimen,
+            departamento: emp.departamento,
+            cargo: emp.cargo,
+
+            tLaborado: emp.tLaborado.map(reg => {
+              const [minPlan, minLab] = this.CalcularDiferenciaFechas(reg);
+
+              return {
+                tipo: reg.tipo,           // Ej: "EAS"
+                origen: reg.origen,       // Ej: "FD", "L", etc.
+                control: reg.control,     // boolean
+
+                entrada: {
+                  fecha_horario: reg.entrada?.fecha_horario,
+                  fecha_hora_horario: reg.entrada?.fecha_hora_horario,
+                  fecha_hora_timbre: reg.entrada?.fecha_hora_timbre
+                },
+                salida: {
+                  fecha_horario: reg.salida?.fecha_horario,
+                  fecha_hora_horario: reg.salida?.fecha_hora_horario,
+                  fecha_hora_timbre: reg.salida?.fecha_hora_timbre
+                },
+                inicioAlimentacion: {
+                  fecha_horario: reg.inicioAlimentacion?.fecha_horario,
+                  fecha_hora_horario: reg.inicioAlimentacion?.fecha_hora_horario,
+                  fecha_hora_timbre: reg.inicioAlimentacion?.fecha_hora_timbre
+                },
+                finAlimentacion: {
+                  fecha_horario: reg.finAlimentacion?.fecha_horario,
+                  fecha_hora_horario: reg.finAlimentacion?.fecha_hora_horario,
+                  fecha_hora_timbre: reg.finAlimentacion?.fecha_hora_timbre
+                },
+
+                minPlanificados: minPlan.toFixed(2),
+                minLaborados: minLab.toFixed(2),
+                tiempoPlanificado: this.MinutosAHorasMinutosSegundos(minPlan),
+                tiempoLaborado: this.MinutosAHorasMinutosSegundos(minLab)
+              };
+            })
+          }))
+        }))
+      };
+
+      console.log("ENVIANDO AL MICROSERVICIO", data);
+      this.validar.generarReporteTiempoLaborado(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+        FileSaver.saveAs(pdfBlob, doc_name);
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'Error'
+        );
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
 

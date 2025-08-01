@@ -117,7 +117,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroRolEmp() { return this.reporteService.filtroRolEmp};
+  get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
   constructor(
     private reporteService: ReportesService,
@@ -356,14 +356,75 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
 
   async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print') as string,      // Nombre del usuario que imprime
+        empresa: (localStorage.getItem('name_empresa') as string).toUpperCase(),  // Empresa en mayúsculas
+        fraseMarcaAgua: this.frase,         // Marca de agua visible (ej: "FullTime")
+        logoBase64: this.logo,              // Logo en formato base64
+        colorPrincipal: this.p_color,       // Color principal para encabezados
+        colorSecundario: this.s_color,      // Color secundario para bloques de información
+        opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
+        periodo: {
+          inicio: this.rangoFechas.fec_inico,  // Fecha inicial del filtro
+          fin: this.rangoFechas.fec_final      // Fecha final del filtro
+        },
+        filtrosAplicados: {                 
+          bool_reg: this.bool.bool_reg,
+          bool_dep: this.bool.bool_dep,
+          bool_cargo: this.bool.bool_cargo,
+          bool_suc: this.bool.bool_suc,
+          bool_emp: this.bool.bool_emp
+        },
+        timbreDispositivo: this.timbreDispositivo, 
+        data_pdf: this.data_pdf.map((selec: any) => ({
+          sucursal: selec.sucursal,
+          ciudad: selec.ciudad,
+          nombre: selec.nombre,               
+          departamento: selec.departamento,
+          empleados: selec.empleados.map((empl: any) => ({
+            identificacion: empl.identificacion,
+            apellido: empl.apellido,
+            nombre: empl.nombre,
+            codigo: empl.codigo,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
+            cargo: empl.cargo,
+            timbres: empl.timbres.map((t: any) => ({
+              fecha_hora_timbre_validado: t.fecha_hora_timbre_validado, 
+              fecha_hora_timbre: t.fecha_hora_timbre,
+              id_reloj: t.id_reloj,
+              accion: t.accion,
+              observacion: t.observacion,
+              longitud: t.longitud,
+              latitud: t.latitud
+            }))
+          }))
+        }))
+      };
+
+      console.log("Enviando al microservicio:", data);
+      this.validar.generarReporteTimbresVirtualesMovil(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+        FileSaver.saveAs(pdfBlob, doc_name);
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'Error'
+        );
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
 
@@ -634,7 +695,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
- 
+
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -731,7 +792,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       worksheet.mergeCells("B3:R3");
       worksheet.mergeCells("B4:R4");
       worksheet.mergeCells("B5:R5");
-  
+
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
       worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
       worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
@@ -746,7 +807,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         };
         worksheet.getCell(cell).font = { bold: true, size: 14 };
       });
-  
+
       worksheet.columns = [
         { key: "n", width: 10 },
         { key: "identificacion", width: 20 },
@@ -767,7 +828,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         { key: "fecha_timbre_dispositivo", width: 40 },
         { key: "hora_timbre_dispositivo", width: 40 },
       ]
-  
+
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
         { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
@@ -788,7 +849,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         { name: "FECHA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
         { name: "HORA TIMBRE DISPOSITIVO", totalsRowLabel: "", filterButton: true },
       ]
-  
+
       worksheet.addTable({
         name: "TimbresMovilReporteTabla",
         ref: "A6",
@@ -801,7 +862,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         columns: columnas,
         rows: datos,
       });
-  
+
       const numeroFilas = datos.length;
       for (let i = 0; i <= numeroFilas; i++) {
         for (let j = 1; j <= 18; j++) {
@@ -818,13 +879,13 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         }
       }
 
-    }else{
+    } else {
       worksheet.mergeCells("B1:P1");
       worksheet.mergeCells("B2:P2");
       worksheet.mergeCells("B3:P3");
       worksheet.mergeCells("B4:P4");
       worksheet.mergeCells("B5:P5");
-  
+
       // AGREGAR LOS VALORES A LAS CELDAS COMBINADAS
       worksheet.getCell("B1").value = localStorage.getItem('name_empresa');
       worksheet.getCell("B2").value = 'Lista de Timbres Virtuales Movil';
@@ -839,7 +900,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         };
         worksheet.getCell(cell).font = { bold: true, size: 14 };
       });
-  
+
 
       worksheet.columns = [
         { key: "n", width: 10 },
@@ -859,7 +920,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         { key: "latitud", width: 20 },
         { key: "longitud", width: 20 },
       ]
-  
+
       const columnas = [
         { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
         { name: "IDENTIFICACIÓN", totalsRowLabel: "Total:", filterButton: true },
@@ -878,7 +939,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         { name: "LATITUD", totalsRowLabel: "", filterButton: true },
         { name: "LONGITUD", totalsRowLabel: "", filterButton: true },
       ]
-  
+
       worksheet.addTable({
         name: "TimbresMovilReporteTabla",
         ref: "A6",
@@ -891,7 +952,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         columns: columnas,
         rows: datos,
       });
-  
+
       const numeroFilas = datos.length;
       for (let i = 0; i <= numeroFilas; i++) {
         for (let j = 1; j <= 16; j++) {
@@ -909,9 +970,9 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       }
 
     }
-    
 
- 
+
+
 
     worksheet.getRow(6).font = this.fontTitulo;
     try {
