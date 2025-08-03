@@ -117,7 +117,7 @@ export class ExcelService {
     worksheet.getColumn('B').width = 7;
     worksheet.getColumn('C').width = 7;
     worksheet.getColumn('D').width = 5;
-    worksheet.getColumn('K').width = 7;
+    worksheet.getColumn('K').width = 8;
     worksheet.getColumn('F').width = 8;
     worksheet.getColumn('G').width = 5;
     worksheet.getColumn('H').width = 4;
