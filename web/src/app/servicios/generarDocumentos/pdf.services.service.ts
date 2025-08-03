@@ -343,7 +343,7 @@ export class PdfServicesService {
               alignment: 'center',
               bold: true,
               fontSize: 8,
-              margin: [0, 4, 0, 4],
+              margin: [0, 5, 0, 5],
               border: [true, true, true, true]
             },
             {
@@ -351,7 +351,7 @@ export class PdfServicesService {
               alignment: 'center',
               bold: true,
               fontSize: 8,
-              margin: [0, 4, 0, 4],
+              margin: [0, 5, 0, 5],
               border: [false, false, true, true]
             },
           ]
