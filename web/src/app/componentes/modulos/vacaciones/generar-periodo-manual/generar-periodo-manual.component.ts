@@ -3,7 +3,6 @@ import { FormControl } from '@angular/forms';
 import { DateTime } from 'luxon';
 import { ToastrService } from 'ngx-toastr';
 import { PeriodoVacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/periodoVacaciones/periodo-vacaciones.service';
-import { error } from 'console';
 
 @Component({
   selector: 'app-generar-periodo-manual',
@@ -92,25 +91,44 @@ export class GenerarPeriodoManualComponent {
   // METODO PARA GENERAR PERIODO DE VACACIONES DESDE EL SISTEMA
   GenerarPeriodo() {
     if (!this.fechaInicialF || !this.fechaFinalF) {
-      this.toastr.warning('Debes seleccionar ambas fechas');
+      this.toastr.info('Debe seleccionar un rango de fechas.', '', {
+        timeOut: 6000,
+      });
       return;
     }
 
     let datos = {
-      fecha_inicio: this.fechaInicialF,
-      fecha_fin: this.fechaFinalF
+      fecha_inicio: this.fechaInicialF.value,
+      fecha_fin: this.fechaFinalF.value
     }
 
-    this.periodo.GenerarPeriodoManual(datos).subscribe(res => {
-      console.log('respuesta ', res)
-
-    }, error => {
-      console.log('respuesta ', error)
-      this.toastr.error('Intente más tarde.', 'Ups! algo salio mal.', {
-        timeOut: 6000,
+    this.periodo.GenerarPeriodoManual(datos).subscribe(
+      res => {
+        //console.log('res ', res)
+        if (res.status === 'OK') {
+          this.toastr.success('Fechas procesadas exitosamente.', '', {
+            timeOut: 6000,
+          });
+          this.LimpiarCampos();
+        }
+        else {
+          this.toastr.success('Ups!!! algo salio mal.', 'Intentalo más tarde.', {
+            timeOut: 6000,
+          });
+        }
+      },
+      error => {
+        //console.log('res ', error);
+        this.toastr.success('Ups!!! se ha producido un error.', '', {
+          timeOut: 6000,
+        });
       });
-    });
 
+  }
+
+  LimpiarCampos() {
+    this.fechaInicialF.reset();
+    this.fechaFinalF.reset();
   }
 
 

@@ -153,8 +153,6 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     return this.reporteService.filtroRolEmp;
   }
 
-
-
   constructor(
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
@@ -227,7 +225,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.departamentos = [];
-    this.sucursales = [];;
+    this.sucursales = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];

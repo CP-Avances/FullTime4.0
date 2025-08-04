@@ -24,6 +24,8 @@ class DepartamentoRutas {
         this.router.post('/cerrar-periodos', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CerrarPeriodoVacaciones);
         // METODO PARA CREAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
         this.router.post('/periodo-crear-manual', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.GenerarPeriodoManual);
+        // METODO PARA CONSULTAR LISTA DE PERIODOS DE VACACIONES DEL USUARIO    **USADO    
+        this.router.post('/buscar-periodos/:estado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ReportePeriodosVacaciones);
     }
 }
 const PERIODO_VACACION__RUTAS = new DepartamentoRutas();

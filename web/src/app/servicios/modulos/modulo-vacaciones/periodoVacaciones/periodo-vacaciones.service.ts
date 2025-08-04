@@ -40,4 +40,9 @@ export class PeriodoVacacionesService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/periodo-crear-manual`, datos);
   }
 
+  // METODO PARA CONSULTAR LISTA DE PERIODO DE VACACIONES DEL USUARIO    **USADO
+  ReportePeriodoVacaciones(data: any, estado: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/buscar-periodos/${estado}`, data);
+  }
+
 }

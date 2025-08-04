@@ -180,23 +180,96 @@ class PeriodoVacacionControlador {
     // METODO PARA GENERAR PERIODOS DESDE EL SISTEMA 
     GenerarPeriodoManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('ingresa ', req.body);
+            //console.log('ingresa ------ ', req.body)
             try {
                 const { fecha_inicio, fecha_fin } = req.body;
-                // INICIAR TRANSACCION
-                const datosNuevos = yield database_1.default.query(`
+                const response = yield database_1.default.query(`
           SELECT * FROM public.fn_generar_periodos_rango($1::DATE, $2::DATE)
         `, [fecha_inicio, fecha_fin]);
-                // FINALIZAR TRANSACCION
-                res.jsonp({ message: 'Registro guardado.', estado: 'OK', id: datosNuevos.rows[0].id });
+                const [periodo] = response.rows;
+                if (periodo) {
+                    return res.status(200).jsonp({ message: 'Registro guardado.', status: 'OK', datos: periodo });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'No se pudo guardar', status: 'error', datos: periodo });
+                }
             }
             catch (error) {
                 console.log('error ', error);
-                // FINALIZAR TRANSACCION
-                res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+                return res.status(500).jsonp({ message: 'error', status: 'error' });
             }
+        });
+    }
+    // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO     
+    ReportePeriodosVacaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { estado } = req.params;
+            let verificar_estado = false;
+            if (estado === 'activo') {
+                verificar_estado = true;
+            }
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    if (estado === 'todos') {
+                        o.periodos = yield BuscarPeriodos(o.id);
+                    }
+                    else {
+                        o.periodos = yield BuscarPeriodosEstado(o.id, verificar_estado);
+                    }
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.periodos.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
+            return res.status(200).jsonp(nuevo);
         });
     }
 }
 const PERIODO_VACACION_CONTROLADOR = new PeriodoVacacionControlador();
 exports.default = PERIODO_VACACION_CONTROLADOR;
+// FUNCION DE BUSQUEDA DE PERIODOS DE VACACIONES     **USADO
+const BuscarPeriodos = function (id_empleado) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield database_1.default.query(`
+      SELECT 
+        mv.fecha_inicio, mv.fecha_final, mv.fecha_desde, mv.fecha_ultima_actualizacion, mv.fecha_acreditar_vacaciones,
+        mv.dias_iniciales, mv.dias_cargados, mv.dias_antiguedad, mv.saldo_transferido,
+        mv.dias_vacacion, mv.dias_perdidos, mv.usados_dias_vacacion, mv.usados_antiguedad,
+        mv.observacion, mv.tomar_antiguedad, mv.observacion_antiguedad,
+        mv.estado, mv.anios_antiguedad
+      FROM 
+        mv_periodo_vacacion AS mv
+      WHERE
+        mv.id_empleado = $1
+    `, [id_empleado])
+            .then(res => {
+            return res.rows;
+        });
+    });
+};
+// FUNCION DE BUSQUEDA DE PERIODOS DE VACACIONES DE ACUERDO AL ESTADO    **USADO
+const BuscarPeriodosEstado = function (id_empleado, estado) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield database_1.default.query(`
+      SELECT 
+        mv.fecha_inicio, mv.fecha_final, mv.fecha_desde, mv.fecha_ultima_actualizacion, mv.fecha_acreditar_vacaciones,
+        mv.dias_iniciales, mv.dias_cargados, mv.dias_antiguedad, mv.saldo_transferido,
+        mv.dias_vacacion, mv.dias_perdidos, mv.usados_dias_vacacion, mv.usados_antiguedad,
+        mv.observacion, mv.tomar_antiguedad, mv.observacion_antiguedad,
+        mv.estado, mv.anios_antiguedad
+      FROM 
+        mv_periodo_vacacion AS mv
+      WHERE
+        mv.id_empleado = $1 AND mv.estado = $2
+    `, [id_empleado, estado])
+            .then(res => {
+            return res.rows;
+        });
+    });
+};

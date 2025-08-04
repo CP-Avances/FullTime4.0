@@ -52,6 +52,8 @@ import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permi
 // MODULO  --VACACIONES
 import { ListarVacacionesComponent } from './componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
 import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
+import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
+import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
 // MODULO  --HORAS EXTRAS
 import { ListaHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/lista-horas-extras/lista-horas-extras.component';
 import { ListaEmplePlanHoraEComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/empleados-planificar/lista-emple-plan-hora-e.component';
@@ -119,8 +121,7 @@ import { ReportePermisosComponent } from './componentes/reportes/modulos/reporte
 // REPORTE  --MODULO VACACIONES
 import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { SolicitudVacacionComponent } from './componentes/reportes/modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
-import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
-import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
+import { ReportePeriodosComponent } from './componentes/reportes/modulos/vacaciones/reporte-periodos/reporte-periodos.component';
 // REPORTE  --MODULO HORAS EXTRAS
 import { ReporteHorasPedidasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
@@ -215,6 +216,7 @@ const routes: Routes = [
   // MODULO  --VACACIONES
   { path: 'vacaciones-solicitados', component: ListarVacacionesComponent, canActivate: [AuthGuard] },
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
+  { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
 
   // MODULO  --HORAS EXTRAS
   { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard] },
@@ -297,7 +299,7 @@ const routes: Routes = [
   // REPORTE  --MODULO VACACIONES
   { path: 'reporteKardex', component: ReporteKardexComponent, canActivate: [AuthGuard] },
   { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard] },
-  { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
+  { path: 'reporte-periodos', component: ReportePeriodosComponent, canActivate: [AuthGuard] },
 
   // REPORTE  --MODULO HORAS EXTRAS
   { path: 'horas/extras', component: ReporteHorasPedidasComponent, canActivate: [AuthGuard] },

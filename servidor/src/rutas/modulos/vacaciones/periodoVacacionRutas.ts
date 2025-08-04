@@ -29,6 +29,9 @@ class DepartamentoRutas {
         // METODO PARA CREAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
         this.router.post('/periodo-crear-manual', TokenValidation, PERIODO_VACACION_CONTROLADOR.GenerarPeriodoManual);
 
+        // METODO PARA CONSULTAR LISTA DE PERIODOS DE VACACIONES DEL USUARIO    **USADO    
+        this.router.post('/buscar-periodos/:estado', TokenValidation, PERIODO_VACACION_CONTROLADOR.ReportePeriodosVacaciones);
+
     }
 }
 

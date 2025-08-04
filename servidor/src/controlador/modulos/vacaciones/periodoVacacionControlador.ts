@@ -2,6 +2,7 @@ import AUDITORIA_CONTROLADOR from "../../reportes/auditoriaControlador";
 import { Request, Response } from "express";
 import { FormatearFecha2 } from "../../../libs/settingsMail";
 import pool from "../../../database";
+import { QueryResult } from "pg";
 
 class PeriodoVacacionControlador {
 
@@ -212,27 +213,58 @@ class PeriodoVacacionControlador {
   // METODO PARA GENERAR PERIODOS DESDE EL SISTEMA 
   public async GenerarPeriodoManual(req: Request, res: Response): Promise<any> {
 
-    console.log('ingresa ', req.body)
-
+    //console.log('ingresa ------ ', req.body)
     try {
       const { fecha_inicio, fecha_fin } = req.body;
 
-      // INICIAR TRANSACCION
-
-      const datosNuevos = await pool.query(
+      const response: QueryResult = await pool.query(
         `
           SELECT * FROM public.fn_generar_periodos_rango($1::DATE, $2::DATE)
         `
         , [fecha_inicio, fecha_fin]);
 
-      // FINALIZAR TRANSACCION
-      res.jsonp({ message: 'Registro guardado.', estado: 'OK', id: datosNuevos.rows[0].id });
+      const [periodo] = response.rows;
 
-    } catch (error) {
-      console.log('error ', error)
-      // FINALIZAR TRANSACCION
-      res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+      if (periodo) {
+        return res.status(200).jsonp({ message: 'Registro guardado.', status: 'OK', datos: periodo })
+      } else {
+        return res.status(404).jsonp({ message: 'No se pudo guardar', status: 'error', datos: periodo })
+      }
     }
+    catch (error) {
+      console.log('error ', error)
+      return res.status(500).jsonp({ message: 'error', status: 'error' });
+    }
+  }
+
+  // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO     
+  public async ReportePeriodosVacaciones(req: Request, res: Response) {
+    let { estado } = req.params;
+    let verificar_estado: boolean = false;
+    if (estado === 'activo') {
+      verificar_estado = true;
+    }
+    let datos: any[] = req.body;
+    let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
+      obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
+        if (estado === 'todos') {
+          o.periodos = await BuscarPeriodos(o.id);
+        }
+        else {
+          o.periodos = await BuscarPeriodosEstado(o.id, verificar_estado);
+        }
+        return o;
+      }));
+      return obj;
+    }));
+    let nuevo = n.map((e: any) => {
+      e.empleados = e.empleados.filter((t: any) => { return t.periodos.length > 0 })
+      return e
+    }).filter(e => { return e.empleados.length > 0 })
+
+    if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
+
+    return res.status(200).jsonp(nuevo)
 
   }
 
@@ -242,3 +274,45 @@ class PeriodoVacacionControlador {
 const PERIODO_VACACION_CONTROLADOR = new PeriodoVacacionControlador();
 
 export default PERIODO_VACACION_CONTROLADOR;
+
+// FUNCION DE BUSQUEDA DE PERIODOS DE VACACIONES     **USADO
+const BuscarPeriodos = async function (id_empleado: string | number) {
+  return await pool.query(
+    `
+      SELECT 
+        mv.fecha_inicio, mv.fecha_final, mv.fecha_desde, mv.fecha_ultima_actualizacion, mv.fecha_acreditar_vacaciones,
+        mv.dias_iniciales, mv.dias_cargados, mv.dias_antiguedad, mv.saldo_transferido,
+        mv.dias_vacacion, mv.dias_perdidos, mv.usados_dias_vacacion, mv.usados_antiguedad,
+        mv.observacion, mv.tomar_antiguedad, mv.observacion_antiguedad,
+        mv.estado, mv.anios_antiguedad
+      FROM 
+        mv_periodo_vacacion AS mv
+      WHERE
+        mv.id_empleado = $1
+    `
+    , [id_empleado])
+    .then(res => {
+      return res.rows;
+    })
+}
+
+// FUNCION DE BUSQUEDA DE PERIODOS DE VACACIONES DE ACUERDO AL ESTADO    **USADO
+const BuscarPeriodosEstado = async function (id_empleado: string | number, estado: any) {
+  return await pool.query(
+    `
+      SELECT 
+        mv.fecha_inicio, mv.fecha_final, mv.fecha_desde, mv.fecha_ultima_actualizacion, mv.fecha_acreditar_vacaciones,
+        mv.dias_iniciales, mv.dias_cargados, mv.dias_antiguedad, mv.saldo_transferido,
+        mv.dias_vacacion, mv.dias_perdidos, mv.usados_dias_vacacion, mv.usados_antiguedad,
+        mv.observacion, mv.tomar_antiguedad, mv.observacion_antiguedad,
+        mv.estado, mv.anios_antiguedad
+      FROM 
+        mv_periodo_vacacion AS mv
+      WHERE
+        mv.id_empleado = $1 AND mv.estado = $2
+    `
+    , [id_empleado, estado])
+    .then(res => {
+      return res.rows;
+    })
+}

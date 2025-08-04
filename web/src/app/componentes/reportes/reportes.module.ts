@@ -18,6 +18,7 @@ import { ReporteTimbresMultiplesComponent } from './timbres/reporte-timbres-mult
 
 import { ReporteEmpleadosComponent } from './generales/reporte-empleados/reporte-empleados.component';
 import { ReporteKardexComponent } from './modulos/vacaciones/reporte-kardex/reporte-kardex.component';
+import { ReportePeriodosComponent } from './modulos/vacaciones/reporte-periodos/reporte-periodos.component';
 import { ReporteHorasPedidasComponent } from './modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
 import { AlimentosGeneralComponent } from './modulos/alimentacion/alimentos-general/alimentos-general.component';
@@ -60,6 +61,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     ReporteAuditoriaComponent,
     ReporteEmpleadosComponent,
     ReporteKardexComponent,
+    ReportePeriodosComponent,
     ReporteHorasPedidasComponent,
     ReporteHorasExtrasComponent,
     AlimentosGeneralComponent,

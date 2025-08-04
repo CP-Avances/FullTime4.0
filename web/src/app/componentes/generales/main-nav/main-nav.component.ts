@@ -189,6 +189,7 @@ export class MainNavComponent implements OnInit {
   childrenReportesVacaciones: any = [];
   vistaReportesVacacionesReporteKardex: boolean = false;
   vistaReportesVacacionesSolicitudVacacion: boolean = false;
+  vistaReportesVacacionesPeriodos: boolean = false;
   subItemReportesHorasExtras: boolean = false;
   childrenReportesHorasExtras: any = [];
   vistaReportesHorasExtrasHorasExtras: boolean = false;
@@ -1507,6 +1508,18 @@ export class MainNavComponent implements OnInit {
                   }
                   if (!this.vistaReportesVacacionesSolicitudVacacion) {
                     this.childrenReportesVacaciones.push({ name: 'Vacaciones Solicitadas', url: '/solicitud-vacacion', color: true, ver: true });
+                  }
+                  break;
+                case 'reporte-periodos':
+                  this.itemReportes = true;
+                  this.subItemReportesVacaciones = true;
+                  for (const parametrizacion of this.childrenReportesVacaciones) {
+                    if (parametrizacion.url === '/reporte-periodos') {
+                      this.vistaReportesVacacionesPeriodos = true;
+                    }
+                  }
+                  if (!this.vistaReportesVacacionesPeriodos) {
+                    this.childrenReportesVacaciones.push({ name: 'Periodo Vacaciones', url: '/reporte-periodos', color: true, ver: true });
                   }
                   break;
                 case 'horas/extras':
