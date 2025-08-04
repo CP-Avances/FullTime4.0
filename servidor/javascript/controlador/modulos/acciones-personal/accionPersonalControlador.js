@@ -1051,7 +1051,7 @@ class AccionPersonalControlador {
                 ap.id, 
                 ap.numero_accion_personal, 
                 ap.fecha_elaboracion, 
-                CONCAT(inf.nombre, ' ', inf.apellido) AS nombres, 
+                CONCAT(inf.nombre, ' ', inf.apellido) AS nombre, 
                 ap.fecha_rige_desde, ap.fecha_rige_hasta, 
                 ap.id_tipo_accion_personal, 
                 tp.descripcion AS accion_personal, 

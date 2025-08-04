@@ -44,7 +44,11 @@
                     <tbody>
                         <tr>
                             <td></td>
-                            <td></td>
+                            <td>
+                                <mat-form-field id="t-inputs" style="width: 130px;">
+                                    <input matInput placeholder="Buscar" [formControl]="numero_accion" type="text">
+                                </mat-form-field>
+                            </td>
                             <td></td>
                             <td></td>
                             <td>
@@ -64,12 +68,12 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let a of listaPedidos  | filtrosNombres: nombre.value | nombreCompleto: apellido.value  | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let a of listaPedidos  | filtrosNombres: nombre.value | nombreCompleto: apellido.value | filtroNumeroAccionPersonal: numero_accion.value | paginate:tamanio_pagina:numero_pagina">
                             <td>{{a.id}}</td>
                             <td>{{a.numero_accion_personal}}</td>
                             <td>{{a.accion_personal}}</td>
                             <td>{{a.descripcion}}</td>
-                            <td>{{a.nombres}}</td>
+                            <td>{{a.nombre}}</td>
                             <td>{{a.fecDesde_}}</td>
                             <td>{{a.fecHasta_}}</td>
                             <td>{{a.id_vacacion}}</td>

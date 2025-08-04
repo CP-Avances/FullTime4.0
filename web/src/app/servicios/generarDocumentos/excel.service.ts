@@ -113,21 +113,21 @@ export class ExcelService {
 
 
     //APLICAR ESTILOS DE WIDTH (ANCHO) A LA COLUMNAS
-    worksheet.getColumn('A').width = 2;
-    worksheet.getColumn('B').width = 8;
-    worksheet.getColumn('C').width = 10;
+    worksheet.getColumn('A').width = 1;
+    worksheet.getColumn('B').width = 7;
+    worksheet.getColumn('C').width = 7;
     worksheet.getColumn('D').width = 5;
     worksheet.getColumn('K').width = 8;
     worksheet.getColumn('F').width = 8;
     worksheet.getColumn('G').width = 5;
-    worksheet.getColumn('H').width = 5;
+    worksheet.getColumn('H').width = 4;
     worksheet.getColumn('I').width = 1;
     worksheet.getColumn('J').width = 7;
-    worksheet.getColumn('J').width = 10;
-    worksheet.getColumn('L').width = 8;
-    worksheet.getColumn('N').width = 10;
-    worksheet.getColumn('O').width = 5;
-    worksheet.getColumn('P').width = 2;
+    worksheet.getColumn('J').width = 7;
+    worksheet.getColumn('L').width = 7;
+    worksheet.getColumn('N').width = 7;
+    worksheet.getColumn('O').width = 4;
+    worksheet.getColumn('P').width = 1;
 
     worksheet.getRow(1).height = 70;
     worksheet.getRow(2).height = 13;
@@ -239,7 +239,7 @@ export class ExcelService {
 
     worksheet.mergeCells("H20:I20");
     worksheet.mergeCells("M20:P20");
-    worksheet.mergeCells("A23:P23");
+    worksheet.mergeCells("B23:O23");
     worksheet.mergeCells("A24:H24");
     worksheet.mergeCells("I24:P24");
     worksheet.mergeCells("A25:P25");
@@ -312,9 +312,9 @@ export class ExcelService {
     worksheet.mergeCells("C59:G59");
     worksheet.mergeCells("C60:G60");
     worksheet.mergeCells("C61:G61");
-    worksheet.mergeCells("I59:J59");
-    worksheet.mergeCells("I60:J60");
-    worksheet.mergeCells("I61:J61");
+    worksheet.mergeCells("J59:J59");
+    worksheet.mergeCells("J60:J60");
+    worksheet.mergeCells("J61:J61");
     worksheet.mergeCells("K59:O59");
     worksheet.mergeCells("K60:O60");
     worksheet.mergeCells("K61:O61");
@@ -476,7 +476,7 @@ export class ExcelService {
     worksheet.getCell("K20").value = "NO APLICA"
     worksheet.getCell("L20").value = (this.datosPedido.declaracion_jurada == false ? "X" : "");
     worksheet.getCell("B22").value = "   MOTIVACIÓN: (adjuntar anexo si lo posee) "
-    worksheet.getCell("A23").value = (this.datosPedido.adicion_base_legal != null || this.textoFijo != '' ? this.textoFijo + '\n' + this.datosPedido.adicion_base_legal : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)");
+    worksheet.getCell("B23").value = (this.datosPedido.adicion_base_legal != null || this.textoFijo != '' ? this.textoFijo + '\n' + this.datosPedido.adicion_base_legal + '\n' + (this.datosPedido.observacion != null && this.datosPedido.observacion != '' ? +'Observación: '+this.datosPedido.observacion : '' ): "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)");
 
     worksheet.getCell("A24").value = "SITUACION ACTUAL"
     worksheet.getCell("I24").value = "SITUACION PROPUESTA"
@@ -645,6 +645,10 @@ export class ExcelService {
       right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
     };
 
+    const borderLeftStyle: Partial<ExcelJS.Borders> = {
+      left: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+    };
+
     const borderTopStyle: Partial<ExcelJS.Borders> = {
       top: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
     };
@@ -686,7 +690,7 @@ export class ExcelService {
       for (let j = 1; j <= totalColumnas; j++) {
         const cell = worksheet.getRow(i).getCell(j);
 
-        if (i <= 11 || i == 22 || i == 23 || i == 24 || i == 25 || i == 45 || i == 55 || i == 64 ||
+        if (i <= 11 || i == 22 || i == 24 || i == 25 || i == 45 || i == 55 || i == 64 ||
           i == 65 || i == 66 || i == 67 || i == 79 || i == 80 || i == 91 || (i == 13 && j == 4) ||
           (i == 14 && j == 4) || (i == 15 && j == 4) || (i == 16 && j == 4) || (i == 17 && j == 4) ||
           (i == 18 && j == 4) || (i == 13 && j == 8) || (i == 14 && j == 8) || (i == 15 && j == 8) ||
@@ -695,9 +699,9 @@ export class ExcelService {
           (i == 18 && j == 12) || (i == 13 && j == 15) || (i == 14 && j == 15) || (i == 20 && (j == 10 || j == 12))
           || (i == 93 && j == 6)
         ) {
-          cell.border = borderStyle; // APLICAR BORDES NEGROS
+          cell.border = borderStyle; // APLICAR BORDJES NEGROS
         } else if ((i >= 12 && i <= 21 && j == 16) || (i >= 26 && i <= 44) || (i >= 46 && i <= 54 && j == 16) ||
-          (i >= 56 && i <= 62 && j == 8) || (i >= 56 && i <= 61 && j == 16) || (i == 62)
+          (i >= 56 && i <= 62 && j == 8) || (i >= 56 && i <= 61 && j == 16) || (i == 62) || (i == 23 && j == 16)
         ) {
           cell.border = borderRightStyle
         } else if (i >= 15 && i <= 18 && j >= 13 && j <= 15) {
@@ -799,6 +803,13 @@ export class ExcelService {
           cell.fill = backgroundColorStyleWhite
         }
 
+        if(i == 12 || i == 21 ){
+          cell.border = borderLeftStyle
+          cell.border = borderRightStyle
+        }else if (j == 1 && (i >= 13 && i <= 20) ){
+          cell.border = borderLeftStyle
+        }
+
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
         } else {
@@ -817,11 +828,12 @@ export class ExcelService {
       "F49", "C60", "C61", "K60", "K61", "C72", "C73", "C74", "K72", "K73", "C84", "C85", "G84", "G85", "M84", "M85", "D95", "K95",
       "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "E13", "E14", "E15", "E16", "E17", "E18", "J13", "J14", "D97",
       "J15", "J16", "J17", "J18", "M13", "M14", "H20", "K5", "K20", "A26", "I26", "A27",  "I7", "I27", "A28", "I28", "A29", "I29",
-      "A30", "I30", "A32", "I32", "A34", "I34", "A36", "I36", "A38", "I38", "A40", "I40", "A42", "I42", "A44", "I44",
-      "A45", "B47", "I47", "B48", "B49", "E49", "B51", "J52", "B53", "F53", "K53", "A55", "A56", "I56", "B59", "B60",
+      "A30", "A31", "A33", "A35", "A37", "I30", "A32", "I32", "A34", "I34", "A36", "I36", "A38", "I38", "A39", "A40", "I40", "A41", "A42", "I42", 
+      "A44", "I44", "A45", "B47", "I47", "B48", "B49", "E49", "B51", "J52", "B53", "F53", "K53", "A55", "A56", "I56", "B59", "B60",
       "B61", "J59", "J60", "J61", "A63", "I63", "A65", "A67", "I67", "B71", "B72", "B73", "B73", "B74", "J71", "J72", "J73",
       "J75", "K74", "A80", "F80", "L80", "B83", "B84", "B85", "L83", "L84", "L85", "F83", "F84", "F85", "A89", "A91",
-      "C93", "C95", "C97", "J95", "F102", "F104", "F105", "A107", "A109", "I109", "G104", "G105"
+      "C93", "C95", "C97", "J95", "F102", "F104", "F105", "A107", "A109", "I109", "G104", "G105", "G19", "M15",
+      "I31", "I33", "I35", "I37", "I39", "I41"
     ].forEach((cell) => {
       if (
         cell != 'B13' && cell != 'B14' && cell != 'B15' && cell != 'B16' && cell != 'B17' && cell != 'B18' &&
@@ -832,7 +844,10 @@ export class ExcelService {
         cell != 'A28' && cell != 'I28' && cell != 'A29' && cell != 'I29' && cell != 'A30' && cell != 'I30' &&
         cell != 'A32' && cell != 'I32' && cell != 'A34' && cell != 'I34' && cell != 'A36' && cell != 'I36' &&
         cell != 'A38' && cell != 'I38' && cell != 'A40' && cell != 'I40' && cell != 'A42' && cell != 'I42' &&
-        cell != 'A44' && cell != 'I44' && cell != 'A45' && cell != 'B48' && cell != 'A89'
+        cell != 'A31' && cell != 'I31' && cell != 'A33' && cell != 'I33' && cell != 'A35' && cell != 'I35' &&
+        cell != 'A37' && cell != 'I37' && cell != 'A39' && cell != 'I39' && cell != 'A41' && cell != 'I41' &&
+        cell != 'A44' && cell != 'I44' && cell != 'A45' && cell != 'B48' && cell != 'A89' 
+
       ) {
         worksheet.getCell(cell).alignment = {
           horizontal: "center",
@@ -849,7 +864,7 @@ export class ExcelService {
       }
 
       if (cell == 'K1' || cell == 'A89') {
-        worksheet.getCell(cell).font = { bold: true, size: 18 };
+        worksheet.getCell(cell).font = { bold: true, size: 17 };
       } else if (
         cell == "A8" || cell == 'A9' || cell == "K3" || cell == 'K4' ||
         cell == 'A6' || cell == 'I6' || cell == 'I8' || cell == 'I9' ||
@@ -859,6 +874,9 @@ export class ExcelService {
         cell == "I28" || cell == 'A29' || cell == "I29" || cell == 'A30' ||
         cell == "I30" || cell == 'A32' || cell == "I32" || cell == 'A34' ||
         cell == "I34" || cell == 'A36' || cell == "I36" || cell == 'A38' ||
+        cell == 'A33' || cell == "I33" || cell == 'A35' || cell == 'A31' || cell == "I31"||
+        cell == "I35" || cell == 'A37' || cell == "I37" || cell == 'A39' ||
+        cell == "I39" || cell == 'A41' || cell == "I41" ||
         cell == "I38" || cell == 'A40' || cell == "I40" || cell == 'A42' ||
         cell == "I42" || cell == 'A44' || cell == "I44" || cell == 'A45' ||
         cell == "I47" || cell == "B51" || cell == 'B53' || cell == "F53" ||
@@ -867,14 +885,14 @@ export class ExcelService {
         cell == 'F80' || cell == "L80" || cell == 'A91' || cell == "A107" ||
         cell == 'F102'
       ) {
-        worksheet.getCell(cell).font = { bold: true, size: 9 };
+        worksheet.getCell(cell).font = { bold: true, size: 8 };
       } else {
-        worksheet.getCell(cell).font = { size: 9 };
+        worksheet.getCell(cell).font = { size: 8 };
       }
 
       if (cell == 'B49' || cell == 'E49' || cell == 'J52' ||
         cell == 'A60' || cell == 'A61' ||
-        cell == 'I59' || cell == 'I60' || cell == 'I61' ||
+        cell == 'J59' || cell == 'J60' || cell == 'J61' ||
         cell == 'C93' ||
         cell == 'C95' || cell == 'J95' || cell == 'C97'
       ) {
@@ -883,7 +901,7 @@ export class ExcelService {
           vertical: "middle",
         };
 
-        worksheet.getCell(cell).font = { bold: true, size: 9 };
+        worksheet.getCell(cell).font = { bold: true, size: 8 };
       }
 
       if (cell == "A63" || cell == "A109") {
@@ -916,20 +934,20 @@ export class ExcelService {
         };
 
 
-        worksheet.getCell(cell).font = { bold: true, size: 9 };
+        worksheet.getCell(cell).font = { bold: true, size: 8 };
       }else if(cell == 'C47' || cell == 'C49' || cell == 'F49' ||
         cell == 'C74' || cell == 'C72' || cell == 'C73' ||
         cell == 'C60' || cell == 'C61' || cell == 'K60' ||
         cell == 'K61' || cell == 'K72' || cell == 'K73' ||
         cell == 'C84' || cell == 'C85' || cell == 'G84' || 
         cell == 'G85' || cell == 'M84' || cell == 'M85' || 
-        cell == 'D95' || cell == 'K95' ||
-        cell == 'G104' || cell == 'G105'){
+        cell == 'D95' || cell == 'K95' || cell == 'M15' ||
+        cell == 'G104' || cell == 'G105' || cell == 'G19'){
         worksheet.getCell(cell).alignment = {
           horizontal: "left",
           vertical: "middle",
         };
-        worksheet.getCell(cell).font = {size: 9 };
+        worksheet.getCell(cell).font = {size: 8 };
       }
 
       if (cell == "K74") {

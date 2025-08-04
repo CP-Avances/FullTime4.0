@@ -35,6 +35,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
   codigo = new FormControl("");
+  numero_accion = new FormControl("", [Validators.minLength(2)]);
   cedula = new FormControl("", [Validators.minLength(2)]);
   nombre = new FormControl("", [Validators.minLength(2)]);
   apellido = new FormControl("", [Validators.minLength(2)]);
