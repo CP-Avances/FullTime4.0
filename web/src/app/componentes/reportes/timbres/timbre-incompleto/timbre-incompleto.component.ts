@@ -364,17 +364,73 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-  async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Timbres_incompleto_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+  async GenerarPDF(action = 'open') {
+    if (action === 'download') {
+      const data = {
+        usuario: localStorage.getItem('fullname_print') as string,      // Nombre del usuario que imprime
+        empresa: (localStorage.getItem('name_empresa') as string).toUpperCase(),  // Empresa en mayúsculas
+        fraseMarcaAgua: this.frase,         // Marca de agua visible
+        logoBase64: this.logo,              // Imagen en base64
+        colorPrincipal: this.p_color,       // Color para encabezados de tabla
+        colorSecundario: this.s_color,      // Color para bloques de información
+        opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos (afecta título del reporte)
+        periodo: {
+          inicio: this.rangoFechas.fec_inico,  // Fecha de inicio del filtro
+          fin: this.rangoFechas.fec_final      // Fecha final del filtro
+        },
+        filtrosAplicados: {                 // Bandera de los filtros activos
+          bool_reg: this.bool.bool_reg,
+          bool_dep: this.bool.bool_dep,
+          bool_cargo: this.bool.bool_cargo,
+          bool_suc: this.bool.bool_suc,
+          bool_emp: this.bool.bool_emp
+        },
+        data_pdf: this.data_pdf.map((selec: any) => ({
+          sucursal: selec.sucursal,        // Para establecimiento
+          ciudad: selec.ciudad,
+          nombre: selec.nombre,            // Puede ser régimen, cargo o departamento según el filtro
+          departamento: selec.departamento,
+          empleados: selec.empleados.map((empl: any) => ({
+            identificacion: empl.identificacion,
+            nombre: empl.nombre,
+            apellido: empl.apellido,
+            codigo: empl.codigo,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
+            cargo: empl.cargo,
+            timbres: empl.timbres.map((t: any) => ({
+              fechaHora: t.fecha_hora_horario, // Ej: '2025-07-01 08:00:00'
+              accion: t.accion                 // Ej: 'E', 'S', 'I/A', etc.
+            }))
+          }))
+        }))
+      };
+
+      console.log("Enviando al microservicio:", data);
+
+      this.validar.generarReporteTimbreIncompleto(data).subscribe((pdfBlob: Blob) => {
+        FileSaver.saveAs(pdfBlob, 'Timbres_incompleto_usuarios.pdf');
+        console.log("PDF generado correctamente desde el microservicio.");
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
+          'Error'
+        );
+      });
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
+
 
   DefinirInformacionPDF() {
     return {

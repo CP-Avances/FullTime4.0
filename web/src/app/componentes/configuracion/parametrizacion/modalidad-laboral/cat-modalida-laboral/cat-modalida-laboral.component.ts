@@ -429,7 +429,7 @@ export class CatModalidaLaboralComponent implements OnInit {
         console.log("PDF generado correctamente desde el microservicio.");
       }, error => {
         console.error('Error al generar PDF desde el microservicio:', error);
-                this.toastr.error(
+        this.toastr.error(
           'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
           'Error'
         );

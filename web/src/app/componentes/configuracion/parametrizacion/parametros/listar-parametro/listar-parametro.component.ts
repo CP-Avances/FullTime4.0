@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
+import { ToastrService } from 'ngx-toastr';
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -56,7 +57,6 @@ export class ListarParametroComponent implements OnInit {
   public formulario = new FormGroup({
     descripcionForm: this.descripcionF,
   });
-  toastr: any;
 
   constructor(
     public restE: EmpleadoService,
@@ -64,6 +64,7 @@ export class ListarParametroComponent implements OnInit {
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
     private restP: ParametrosService,
+    private toastr: ToastrService,
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -71,10 +72,10 @@ export class ListarParametroComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerParametros();
@@ -187,51 +188,50 @@ export class ListarParametroComponent implements OnInit {
    ** ************************************************************************************************** **/
 
 
-async GenerarPdf(action = 'open') {
-  if (action === 'download') {
-const data = {
-  nombreUsuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-  nombreEmpresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-  fraseMarcaAgua: this.frase,
-  logoBase64: this.logo,
-  colorPrincipal: this.p_color,
-  colorSecundario: this.s_color,
-  parametros: this.parametros.map((param: any) => ({
-    id: param.id,
-    descripcion: param.descripcion,
-    detalles: param.detalles.map((detalle: any) => ({
-      id: detalle.id,
-      descripcion: detalle.descripcion,
-      observacion: detalle.observacion
-    }))
-  }))
-};
+  async GenerarPDF(action: any) {
+    if (action === 'download') {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido, 
+        empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(), 
+        fraseMarcaAgua: this.frase,         
+        logoBase64: this.logo,              
+        colorPrincipal: this.p_color,       
+        colorSecundario: this.s_color,     
+        parametros: this.parametros.map((param: any) => ({
+          id: param.id,                    
+          descripcion: param.descripcion,   
+          detalles: param.detalles.map((d: any) => ({
+            id: d.id,                       
+            descripcion: d.descripcion,    
+            observacion: d.observacion    
+          }))
+        }))
+      };
 
+      console.log("ENVIANDO AL MICROSERVICIO", data);
+      this.validar.generarReporteParametrosGenerales(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = 'Parametros_generales.pdf';
+        FileSaver.saveAs(pdfBlob, doc_name);
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
+        this.toastr.error(
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+          'Error'
+        );
+      });
 
-    console.log("Enviando al microservicio:", data);
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = 'Parametros_generales.pdf';
 
-    this.validar.generarReporteParametrosGenerales(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'Parametros_Generales.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-      console.error("Error al generar PDF desde el microservicio:", error);
-      const mensaje = error?.error?.message || 'Error desconocido al generar el reporte.';
-      this.toastr.error(mensaje, 'Error');
-    });
-
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Parametros_Generales.pdf'); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
   }
-}
-
-
 
   DefinirInformacionPDF() {
     return {
@@ -288,16 +288,16 @@ const data = {
           headerRows: 1,
           body: [
             [
-              { 
-                text: `PARÁMETRO: ${obj.descripcion}`, 
-                style: 'itemsTableInfo', 
-                border: [true, true, false, true] 
+              {
+                text: `PARÁMETRO: ${obj.descripcion}`,
+                style: 'itemsTableInfo',
+                border: [true, true, false, true]
               },
-              { 
-                text: `CÓDIGO PARÁMETRO: ${obj.id}`, 
-                style: 'itemsTableInfo', 
-                alignment: 'right', 
-                border: [false, true, true, true] 
+              {
+                text: `CÓDIGO PARÁMETRO: ${obj.id}`,
+                style: 'itemsTableInfo',
+                alignment: 'right',
+                border: [false, true, true, true]
               }
             ],
           ]
@@ -360,8 +360,8 @@ const data = {
           n++,
           obj.id,
           obj.descripcion,
-          "", 
-          ""  
+          "",
+          ""
         ]);
       }
     });
@@ -502,8 +502,8 @@ const data = {
           n: n++,
           codigo: obj.id,
           parametro: obj.descripcion,
-          detalle: "",       
-          descripcion: ""     
+          detalle: "",
+          descripcion: ""
         }).commit();
       }
     });
@@ -586,23 +586,23 @@ const data = {
     }
   }
 
-  getCrearParametro(){
+  getCrearParametro() {
     return this.tienePermiso('Crear Parámetro');
   }
 
-  getEditarParametros(){
+  getEditarParametros() {
     return this.tienePermiso('Editar Parámetro');
   }
 
-  getEliminarParametros(){
+  getEliminarParametros() {
     return this.tienePermiso('Eliminar Parámetro');
   }
 
-  getDescargarReportesParametros(){
+  getDescargarReportesParametros() {
     return this.tienePermiso('Descargar Reportes Parámetro');
   }
 
-  getVerParametro(){
+  getVerParametro() {
     return this.tienePermiso('Ver Parámetro');
   }
 

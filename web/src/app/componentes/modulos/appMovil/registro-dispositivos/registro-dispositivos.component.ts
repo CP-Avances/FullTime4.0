@@ -335,7 +335,7 @@ export class RegistroDispositivosComponent implements OnInit {
    ** **                        GENERACION DE PDFs                                   ** **
    ** ********************************************************************************* **/
 
-
+ 
   async GenerarPdf(action = 'open') {
     if (!this.dispositivosRegistrados || this.dispositivosRegistrados.length === 0) {
       this.toastr.info('No hay datos para mostrar en el reporte.');
@@ -346,7 +346,7 @@ export class RegistroDispositivosComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Dispositivos_Registrados.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }

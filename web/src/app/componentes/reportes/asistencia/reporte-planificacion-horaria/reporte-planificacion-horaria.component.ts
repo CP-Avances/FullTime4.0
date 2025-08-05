@@ -588,7 +588,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         periodoFin: this.mes_fin,
 
       };
-
+      console.log("ENVIANDO AL MICROSERVICIO: ",data)
       this.validar.generarReportePlanificacion(data).subscribe(blob => {
         FileSaver.saveAs(blob, doc_name);
       });

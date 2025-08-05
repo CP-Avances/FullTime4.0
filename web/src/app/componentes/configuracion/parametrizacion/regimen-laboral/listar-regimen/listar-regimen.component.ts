@@ -61,7 +61,7 @@ export class ListarRegimenComponent implements OnInit {
   empleado: any = [];
   regimen: any = [];
   rangos_antiguedad: any = [];
-  periodos_vacacionales: any =[];
+  periodos_vacacionales: any = [];
 
   idEmpleado: number; // VARIABLE QUE ALMACENA EL ID DEL EMPELADO QUE INICIA SESIÓN
 
@@ -102,10 +102,10 @@ export class ListarRegimenComponent implements OnInit {
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
@@ -283,66 +283,97 @@ export class ListarRegimenComponent implements OnInit {
 
 
   // METODO PARA GENERAR ARCHIVO PDF
-async GenerarPdf(action = "open") {
-  this.OrdenarDatos(this.regimen);
-  const pdfMake = await this.validar.ImportarPDF();
-  const documentDefinition = this.DefinirInformacionPDF();
+  async GenerarPDF(action: any) {
+    this.OrdenarDatos(this.regimen);
 
-  if (action === "download") {
-    const data = {
-      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-      fraseMarcaAgua: this.frase,
-      logoBase64: this.logo,
-      colorPrincipal: this.p_color,
-      colorSecundario: this.s_color,
-      regimen: this.regimen.map((r: any) => ({
-        id: r.id,
-        descripcion: r.descripcion,
-        pais: r.pais,
-        mes_periodo: r.mes_periodo,
-        dias_mes: r.dias_mes,
-        vacacion_dias_laboral: r.vacacion_dias_laboral,
-        vacacion_dias_libre: r.vacacion_dias_libre,
-        vacacion_dias_calendario: r.vacacion_dias_calendario,
-        dias_maximo_acumulacion: r.dias_maximo_acumulacion,
-        anio_antiguedad: r.anio_antiguedad,
-        dias_antiguedad: r.dias_antiguedad
-      }))
-    };
+    if (action === 'download') {
+      const data = {
+        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido, // Usuario que imprime
+        empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(), // Empresa en mayúsculas
+        fraseMarcaAgua: this.frase,         // Marca de agua
+        logoBase64: this.logo,              // Logo en base64
+        colorPrincipal: this.p_color,       // Color de fondo de los encabezados de bloque
+        colorSecundario: this.s_color,      // Color de fondo de encabezados de tabla
 
-    this.validar.generarReporteRegimenLaboral(data).subscribe((pdf: Blob) => {
-      const blob = new Blob([pdf], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'Regimen_laboral.pdf';
-      link.click();
-      window.URL.revokeObjectURL(url);
-    }, error => {
-              console.error("Error al generar PDF desde el microservicio:", error);
+        regimenes: this.regimen.map((reg: any) => {
+          const rangos = this.rangos_antiguedad.find(r => r.id_regimen === reg.id)?.rangos || [];
+          const periodos = this.periodos_vacacionales.find(p => p.id_regimen === reg.id)?.periodos || [];
 
+          return {
+            id: reg.id,
+            descripcion: reg.descripcion,
+            pais: reg.pais,
+            continuidad_laboral: reg.continuidad_laboral,
+            mes_periodo: reg.mes_periodo,
+            dias_mes: reg.dias_mes,
+            trabajo_minimo_mes: reg.trabajo_minimo_mes,
+            trabajo_minimo_horas: reg.trabajo_minimo_horas,
+            antiguedad: reg.antiguedad,
+
+            // CONFIGURACIÓN DE VACACIONES
+            vacacion_dias_laboral: reg.vacacion_dias_laboral,
+            vacacion_dias_libre: reg.vacacion_dias_libre,
+            vacacion_dias_calendario: reg.vacacion_dias_calendario,
+            acumular: reg.acumular,
+            dias_maximo_acumulacion: reg.acumular ? reg.dias_maximo_acumulacion : null,
+            vacacion_divisible: reg.vacacion_divisible,
+            periodos_vacacionales: reg.vacacion_divisible ? (
+              periodos.length > 0 ? periodos.map(p => ({
+                descripcion: p.descripcion,
+                dias_vacacion: p.dias_vacacion
+              })) : []
+            ) : [],
+
+            // VACACIONES GANADAS
+            vacacion_dias_laboral_mes: reg.vacacion_dias_laboral_mes,
+            vacacion_dias_calendario_mes: reg.vacacion_dias_calendario_mes,
+            laboral_dias: reg.laboral_dias,
+            calendario_dias: reg.calendario_dias,
+
+            // CONFIGURACIÓN DE ANTIGÜEDAD
+            antiguedad_fija: reg.antiguedad_fija,
+            anio_antiguedad: reg.antiguedad_fija ? reg.anio_antiguedad : null,
+            dias_antiguedad: reg.antiguedad_fija ? reg.dias_antiguedad : null,
+
+            antiguedad_variable: reg.antiguedad_variable,
+            rangos_antiguedad: reg.antiguedad_variable ? (
+              rangos.length > 0 ? rangos.map(r => ({
+                anio_desde: r.anio_desde,
+                anio_hasta: r.anio_hasta,
+                dias_antiguedad: r.dias_antiguedad
+              })) : []
+            ) : []
+          };
+        })
+      };
+
+      console.log("ENVIANDO AL MICROSERVICIO", data);
+      this.validar.generarReporteRegimenLaboral(data).subscribe((pdfBlob: Blob) => {
+        const doc_name = 'Regimen_laboral.pdf';
+        FileSaver.saveAs(pdfBlob, doc_name);
+      }, error => {
+        console.error("Error al generar PDF desde el microservicio:", error);
         this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
+          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
           'Error'
         );
-    });
-  } else {
-    switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
+      });
+
+    } else {
+      const pdfMake = await this.validar.ImportarPDF();
+      const documentDefinition = this.DefinirInformacionPDF();
+      const doc_name = 'Regimen_laboral.pdf';
+
+      switch (action) {
+        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+        default: pdfMake.createPdf(documentDefinition).open(); break;
+      }
     }
+
+    this.ObtenerRegimen();
   }
 
-  this.ObtenerRegimen();
-}
 
   DefinirInformacionPDF() {
 
@@ -420,8 +451,8 @@ async GenerarPdf(action = "open") {
     this.regimen.forEach((obj: any) => {
       const rangos = this.rangos_antiguedad.find(r => r.id_regimen === obj.id)?.rangos || [];
       const periodos = this.periodos_vacacionales.find(p => p.id_regimen === obj.id)?.periodos || [];
-      
-      // BLOQUE 1 – INFORMACION GENERAL
+
+      // CABEZERA DE REGIMEN
       bloques.push({
         style: 'tableMarginCabeceraHorario',
         table: {
@@ -434,7 +465,7 @@ async GenerarPdf(action = "open") {
               { text: `CÓDIGO: ${obj.id}`, style: 'itemsTableInfoHorario', border: [false, true, true, false] }
             ],
             [
-              { text: `PERIODO LABORAL: ${obj.mes_periodo}`+' Meses', style: 'itemsTableInfoHorario', border: [true, false, false, true] },
+              { text: `PERIODO LABORAL: ${obj.mes_periodo}` + ' Meses', style: 'itemsTableInfoHorario', border: [true, false, false, true] },
               { text: `DÍAS POR MES: ${obj.dias_mes}`, style: 'itemsTableInfoHorario', border: [false, false, false, true] },
               {
                 text: `TIEMPO MÍNIMO: ${obj.trabajo_minimo_mes > 0 ? obj.trabajo_minimo_mes + ' Meses' : obj.trabajo_minimo_horas + ' Horas'}`,
@@ -446,11 +477,11 @@ async GenerarPdf(action = "open") {
           ]
         }
       });
-  
+
       // BLOQUES 
       bloques.push({
         columns: [
-          // BLOQUE 2 – CONFIGURACION DE VACACIONES
+          // BLOQUE 1 – CONFIGURACION DE VACACIONES
           {
             width: '33%',
             stack: [
@@ -478,15 +509,15 @@ async GenerarPdf(action = "open") {
                     [{ text: 'VACACIONES POR PERÍODOS', style: 'tableHeader' }, { text: obj.vacacion_divisible ? 'SI' : 'NO', style: 'itemsTableCentrado' }],
                     ...(obj.vacacion_divisible
                       ? (
-                          periodos.length > 0
+                        periodos.length > 0
                           ? periodos.map((p: any) => [
-                              { text: p.descripcion, style: 'tableHeader' },
-                              { text: `${p.dias_vacacion} días`, style: 'itemsTableCentrado' }
-                            ])
+                            { text: p.descripcion, style: 'tableHeader' },
+                            { text: `${p.dias_vacacion} días`, style: 'itemsTableCentrado' }
+                          ])
                           : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]]
-                        )
+                      )
                       : [])
-                    
+
                   ]
                 },
                 layout: {
@@ -495,8 +526,8 @@ async GenerarPdf(action = "open") {
               }
             ]
           },
-  
-          // BLOQUE 3 – VACACIONES GANADAS
+
+          // BLOQUE 2 – VACACIONES GANADAS
           {
             width: '34%',
             stack: [
@@ -527,7 +558,7 @@ async GenerarPdf(action = "open") {
             ]
           },
 
-          // BLOQUE 4 – CONDIGURACION DE ANTIGUEDAD
+          // BLOQUE 3 – CONDIGURACION DE ANTIGUEDAD
           {
             width: '33%',
             stack: [
@@ -545,23 +576,23 @@ async GenerarPdf(action = "open") {
                 table: {
                   widths: ['60%', '40%'],
                   body:
-                  obj.antiguedad_fija
-                    ? [
+                    obj.antiguedad_fija
+                      ? [
                         [{ text: 'TIPO', style: 'tableHeader' }, { text: 'FIJA', style: 'itemsTableCentrado' }],
                         [{ text: 'AÑOS ANTIGÜEDAD', style: 'tableHeader' }, { text: obj.anio_antiguedad, style: 'itemsTableCentrado' }],
                         [{ text: 'DÍAS ADICIONALES', style: 'tableHeader' }, { text: obj.dias_antiguedad, style: 'itemsTableCentrado' }]
                       ]
-                    : obj.antiguedad_variable
-                      ? [
+                      : obj.antiguedad_variable
+                        ? [
                           [{ text: 'TIPO', style: 'tableHeader' }, { text: 'VARIABLE', style: 'itemsTableCentrado' }],
                           ...(rangos.length > 0
                             ? rangos.map((r: any) => [
-                                { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta} años`, style: 'tableHeader' },
-                                { text: `${r.dias_antiguedad} días`, style: 'itemsTableCentrado' }
-                              ])
+                              { text: `Desde ${r.anio_desde} hasta ${r.anio_hasta} años`, style: 'tableHeader' },
+                              { text: `${r.dias_antiguedad} días`, style: 'itemsTableCentrado' }
+                            ])
                             : [[{ colSpan: 2, text: 'NO DEFINIDO', style: 'itemsTableCentrado' }, {}]])
                         ]
-                      : [[{ colSpan: 2, text: 'NO APLICA', style: 'itemsTableCentrado' }, {}]]
+                        : [[{ colSpan: 2, text: 'NO APLICA', style: 'itemsTableCentrado' }, {}]]
 
                 },
                 layout: {
@@ -573,7 +604,7 @@ async GenerarPdf(action = "open") {
         ]
       });
     });
-  
+
     return bloques;
   }
 
@@ -591,14 +622,14 @@ async GenerarPdf(action = "open") {
 
       const textoPeriodos = obj.vacacion_divisible
         ? (periodos.length > 0
-            ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       const textoRangos = obj.antiguedad_variable
         ? (rangos.length > 0
-            ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       // Tipo antigüedad
@@ -775,7 +806,7 @@ async GenerarPdf(action = "open") {
       let tipoAntiguedad = 'NO APLICA';
       if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
       if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';
-  
+
       const objeto = {
         regimen_laboral: {
           $: { id: obj.id },
@@ -802,23 +833,23 @@ async GenerarPdf(action = "open") {
           dias_adicionales: obj.dias_antiguedad,
           detalle_vacaciones_periodos: obj.vacacion_divisible
             ? (periodos.length > 0
-                ? { periodo: periodos.map(p => ({ descripcion: p.descripcion, dias: p.dias_vacacion })) }
-                : 'NO DEFINIDO')
+              ? { periodo: periodos.map(p => ({ descripcion: p.descripcion, dias: p.dias_vacacion })) }
+              : 'NO DEFINIDO')
             : 'NO APLICA',
           detalle_rangos_antiguedad_variable: obj.antiguedad_variable
             ? (rangos.length > 0
-                ? { rango: rangos.map(r => ({ desde: r.anio_desde, hasta: r.anio_hasta, dias: r.dias_antiguedad })) }
-                : 'NO DEFINIDO')
+              ? { rango: rangos.map(r => ({ desde: r.anio_desde, hasta: r.anio_hasta, dias: r.dias_antiguedad })) }
+              : 'NO DEFINIDO')
             : 'NO APLICA',
         },
       };
       arregloRegimen.push(objeto);
     });
-  
+
     const xmlBuilder = new xml2js.Builder({ rootName: 'Regimen_laboral_listado', xmldec: { version: '1.0', encoding: 'UTF-8' } });
     const xml = xmlBuilder.buildObject({ regimen: arregloRegimen });
     if (!xml) return;
-  
+
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
     const newTab = window.open(xmlUrl, '_blank');
@@ -833,7 +864,7 @@ async GenerarPdf(action = "open") {
     a.download = 'Regimen_laboral.xml';
     a.click();
     this.ObtenerRegimen();
-  }  
+  }
 
   /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
@@ -850,14 +881,14 @@ async GenerarPdf(action = "open") {
 
       const textoPeriodos = obj.vacacion_divisible
         ? (periodos.length > 0
-            ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? periodos.map((p: any) => `${p.descripcion}: ${p.dias_vacacion} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       const textoRangos = obj.antiguedad_variable
         ? (rangos.length > 0
-            ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
-            : 'NO DEFINIDO')
+          ? rangos.map((r: any) => `De ${r.anio_desde} a ${r.anio_hasta} años: ${r.dias_antiguedad} días`).join(' | ')
+          : 'NO DEFINIDO')
         : 'NO APLICA';
 
       let tipoAntiguedad = 'NO APLICA';
@@ -1082,23 +1113,23 @@ async GenerarPdf(action = "open") {
     }
   }
 
-  getCrearRegimenLaboral(){
+  getCrearRegimenLaboral() {
     return this.tienePermiso('Crear Régimen Laboral');
   }
 
-  getVerRegimenLaboral(){
+  getVerRegimenLaboral() {
     return this.tienePermiso('Ver Régimen Laboral');
   }
 
-  getEditarRegimenLaboral(){
+  getEditarRegimenLaboral() {
     return this.tienePermiso('Editar Régimen Laboral');
   }
 
-  getEliminarRegimenLaboral(){
+  getEliminarRegimenLaboral() {
     return this.tienePermiso('Eliminar Régimen Laboral');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Régimen Laboral', 5);
   }
 

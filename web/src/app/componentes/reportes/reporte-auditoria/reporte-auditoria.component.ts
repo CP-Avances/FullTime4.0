@@ -14,6 +14,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { FormControl } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
+import FileSaver from 'file-saver';
 
 interface Tablas {
     nombre: string;
@@ -47,11 +48,11 @@ export class ReporteAuditoriaComponent implements OnInit {
     tabla_ = new FormControl('');
     modulo_ = new FormControl('');
 
-     // VARIABLES PROGRESS SPINNER
-     habilitarprogress: boolean = false;
-     mode: ProgressSpinnerMode = 'indeterminate';
-     color: ThemePalette = 'primary';
-     value = 10;
+    // VARIABLES PROGRESS SPINNER
+    habilitarprogress: boolean = false;
+    mode: ProgressSpinnerMode = 'indeterminate';
+    color: ThemePalette = 'primary';
+    value = 10;
 
     // VARIABLES  
     formato_fecha: string = 'dd/MM/yyyy';
@@ -235,12 +236,12 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
-        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' ) return this.toastr.error('Ingresar fechas de búsqueda.');
+        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Ingresar fechas de búsqueda.');
         if (this.accionesSeleccionadas.length == 0) return this.toastr.error('Ingresar acciones.');
-        if (this.tablasSolicitadas.length == 0)  return this.toastr.error(
+        if (this.tablasSolicitadas.length == 0) return this.toastr.error(
             'No a seleccionado ninguna.',
             'Seleccione tablas.'
-          );
+        );
 
         this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
     }
@@ -322,7 +323,7 @@ export class ReporteAuditoriaComponent implements OnInit {
 
     // METODO PARA MODELAR DATOS EN LAS TABLAS AUDITORIA
     async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
-        
+
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
         // ARRAY PARA ALMACENAR TODAS LAS PROMESAS DE CONSULTA
@@ -372,14 +373,14 @@ export class ReporteAuditoriaComponent implements OnInit {
             this.data_pdf.forEach(d => {
                 d.action = this.transformAction(d.action);
                 d.fecha_hora_format = this.validar.FormatearFechaAuditoria(d.fecha_hora,
-                this.formato_fecha,this.validar.dia_abreviado, this.idioma_fechas);
+                    this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 d.solo_hora = this.validar.FormatearHoraAuditoria(d.fecha_hora.split(' ')[1],
-                this.formato_hora);
+                    this.formato_hora);
             })
             console.log("quiero ver los datos", this.data_pdf);
             this.datosPdF = this.data_pdf;
-            
-            if( this.datosPdF.length != 0){
+
+            if (this.datosPdF.length != 0) {
                 switch (accion) {
                     case 'ver':
                         this.VerDatos();
@@ -388,11 +389,11 @@ export class ReporteAuditoriaComponent implements OnInit {
                         this.GenerarPDF(this.datosPdF, accion);
                         break;
                 }
-            }else{
+            } else {
                 this.toastr.error("No existen registros de auditoría.")
             }
             // REALIZAR LA ACCIÓN CORRESPONDIENTE
-         
+
         } finally {
             this.habilitarprogress = false
         }
@@ -455,17 +456,52 @@ export class ReporteAuditoriaComponent implements OnInit {
      ** **                                             PDF                                      ** **
      ** ****************************************************************************************** **/
     async GenerarPDF(data: any, action: any) {
-        const pdfMake = await this.validar.ImportarPDF();
-        let documentDefinition: any;
-        documentDefinition = this.DefinirInformacionPDF(data);
-        let doc_name = `Auditoría.pdf`;
-        switch (action) {
-            case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-            case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-            case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
-            default: pdfMake.createPdf(documentDefinition).open(); break;
+        if (action === 'download') {
+            const dataEnvio = {
+                usuario: localStorage.getItem('fullname_print'),
+                empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
+                fraseMarcaAgua: this.frase,
+                logoBase64: this.logo,
+                colorPrincipal: this.p_color,
+                colorSecundario: this.s_color,
+                auditorias: data.map((audi: any) => ({
+                    plataforma: audi.plataforma,
+                    user_name: audi.user_name,
+                    ip_address: audi.ip_address,
+                    table_name: audi.table_name,
+                    action: this.transformAction(audi.action),
+                    fecha_hora_format: audi.fecha_hora_format,
+                    solo_hora: audi.solo_hora,
+                    original_data: audi.original_data,
+                    new_data: audi.new_data
+                }))
+            };
+
+            console.log("ENVIANDO AL MICROSERVICIO", dataEnvio);
+            this.validar.generarReporteAuditoria(dataEnvio).subscribe((pdfBlob: Blob) => {
+                const doc_name = `Auditoría.pdf`;
+                FileSaver.saveAs(pdfBlob, doc_name);
+            }, error => {
+                console.error("Error al generar PDF desde el microservicio:", error);
+                this.toastr.error(
+                    'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
+                    'Error'
+                );
+            });
+
+        } else {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF(data);
+            const doc_name = `Auditoría.pdf`;
+
+            switch (action) {
+                case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+                case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+                default: pdfMake.createPdf(documentDefinition).open(); break;
+            }
         }
     }
+
 
     DefinirInformacionPDF(data: any) {
         return {
