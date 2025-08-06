@@ -277,7 +277,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DETALLES DE TIMBRES - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
+            <span>DETALLES DE PERIODOS DE VACACIONES - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
@@ -290,7 +290,7 @@
                     (keypress)="IngresarSoloNumeros($event)">
             </mat-form-field>
 
-            <mat-form-field class="input-tables cedula" style="width: 200px;">
+            <mat-form-field class="input-tables cedula" style="width: 300px;">
                 <input matInput placeholder="Buscar empleado" [formControl]="nombre" type="text"
                     (keypress)="IngresarSoloLetras($event)">
             </mat-form-field>
@@ -305,64 +305,50 @@
                                 <th class="t_horarios" scope="col" rowspan="2">N°</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
-                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">
-                                    DISPOSITIVO
-                                </th>
-                                <th class="t_horarios" scope="col" rowspan="2">RELOJ</th>
-                                <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
-                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACIÓN</th>
-                                <th class="t_horarios" scope="col" rowspan="2">LONGITUD</th>
-                                <th class="t_horarios" scope="col" rowspan="2">LATITUD</th>
-                                <th class="t_horarios" scope="col" rowspan="2">MAPS</th>
+                                <th class="t_horarios" scope="col" rowspan="2">DESCRIPCIÓN</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">PERIODO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">CARGA INICIAL</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">CARGAR VACACIONES</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">ANTIGUEDAD</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="4">VACACIONES TOTALES</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ESTADO</th>
                             </tr>
                             <tr style="text-align: center">
+                                <th class="t_horarios" scope="col" rowspan="1">INICIO</th>
+                                <th class="t_horarios" scope="col" rowspan="1">FIN</th>
                                 <th class="t_horarios" scope="col" rowspan="1">FECHA</th>
-                                <th class="t_horarios" scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">DÍAS INICIALES/ TRANSFERIDOS</th>
                                 <th class="t_horarios" scope="col" rowspan="1">FECHA</th>
-                                <th class="t_horarios" scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">DÍAS CARGADOS</th>
+                                <th class="t_horarios" scope="col" rowspan="1">AÑOS TRANSCURRIDOS</th>
+                                <th class="t_horarios" scope="col" rowspan="1">DÍAS ADICIONALES</th>
+                                <th class="t_horarios" scope="col" rowspan="1">DÍAS PERDIDOS</th>
+                                <th class="t_horarios" scope="col" rowspan="1">DÍAS USADOS</th>
+                                <th class="t_horarios" scope="col" rowspan="1">GENERAL</th>
+                                <th class="t_horarios" scope="col" rowspan="1">DD:HH:MM</th>
                             </tr>
                         </thead>
                         <tbody>
                             <ng-container
                                 *ngFor="let t of periodos | filtroCodigo: codigo.value | nombreCompleto: nombre.value | paginate: tamanio_pagina : numero_pagina">
                                 <tr>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.n }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.codigo }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.empleado }}</td>
-                                    <td [attr.colspan]="2" class="t_horarios" style="font-size: xx-small;">
-                                        <i id="comentarios" class="fa fa-eye"
-                                            *ngIf="t.zona_servidor != t.zona_dispositivo || t.hora_diferente === true">
-                                        </i>
-                                        {{t.zona_horaria_dispositivo }}
-                                    </td>
-                                    <td [attr.colspan]="2" class="t_horarios" style="font-size: xx-small;">
-                                        {{t.zona_horaria_dispositivo }}
-                                    </td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.reloj }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.accion }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.observacion }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.longitud }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">{{ t.latitud }}</td>
-                                    <td [attr.rowspan]="2" class="t_horarios">
-                                        <mat-icon id="accion" matSuffix matTooltipPtosition="right"
-                                            matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."
-                                            *ngIf="t.longitud && t.latitud">
-                                            location_on
-                                        </mat-icon>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="t_horarios">
-                                        {{ t.fechaTimbreServidor }}
-                                    </td>
-                                    <td class="t_horarios">{{ t.horaTimbreServidor }}</td>
-                                    <td class="t_horarios">
-                                        {{ t.fechaTimbre }}
-                                    </td>
-                                    <td class="t_horarios">
-                                        {{ t.horaTimbre }}
-                                    </td>
+                                    <td class="t_horarios">{{ t.item }}</td>
+                                    <td class="t_horarios">{{ t.codigo }}</td>
+                                    <td class="t_horarios">{{ t.empleado }}</td>
+                                    <td class="t_horarios">{{t.observacion }}</td>
+                                    <td class="t_horarios">{{ t.fecha_inicio}} </td>
+                                    <td class="t_horarios">{{ t.fecha_final }}</td>
+                                    <td class="t_horarios">{{ t.fecha_inicial }}</td>
+                                    <td class="t_horarios">{{ t.dias_iniciales }}</td>
+                                    <td class="t_horarios">{{ t.fecha_acreditar }}</td>
+                                    <td class="t_horarios">{{ t.dias_cargados }}</td>
+                                    <td class="t_horarios">{{ t.anios_antiguedad }}</td>
+                                    <td class="t_horarios">{{ t.dias_antiguedad }}</td>
+                                    <td class="t_horarios">{{ t.dias_perdidos }}</td>
+                                    <td class="t_horarios">{{ t.usados_vacaciones }}</td>
+                                    <td class="t_horarios">{{ t.dias_vacacion }}</td>
+                                    <td class="t_horarios">{{ t.formato_hora }}</td>
+                                    <td class="t_horarios">{{ t.estado }}</td>
                                 </tr>
                             </ng-container>
                         </tbody>

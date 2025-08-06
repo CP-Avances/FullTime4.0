@@ -46,6 +46,10 @@ export class DatosGeneralesService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/empleadoAutoriza/${id_empleado}`);
   }
 
+  // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS CON REGIMEN LABORAL    **USADO
+  ObtenerInformacionGeneralRegimen(estado: any) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-regimen/${estado}`);
+  }
 
 
 
@@ -54,7 +58,6 @@ export class DatosGeneralesService {
 
 
 
-  
 
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO
   ListarInformacionActual() {

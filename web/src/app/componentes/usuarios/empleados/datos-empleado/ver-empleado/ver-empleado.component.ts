@@ -2440,6 +2440,16 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // ITEMS DE PAGINACION DE LA TABLA
+  pageSizeOptionsP = [5, 10, 20, 50];
+  tamanio_paginaP: number = 5;
+  numero_paginaP: number = 1;
+
+  // EVENTO PARA MOSTRAR NUMERO DE FILAS EN TABLA
+  ManejarPaginaPeriodos(e: PageEvent) {
+    this.numero_paginaP = e.pageIndex + 1;
+    this.tamanio_paginaP = e.pageSize;
+  }
 
   /** **************************************************************************************** **
    ** **                 METODO DE PRESENTACION DE DATOS DE VACACIONES                      ** **

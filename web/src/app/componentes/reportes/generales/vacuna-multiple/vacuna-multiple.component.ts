@@ -695,7 +695,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
-    this.data_pdf.forEach((selec) => {
+    this.data_pdf.forEach((selec: any) => {
       selec.empleados.map((empl: any) => {
         let generoObj = this.generos.find((g: any) => g.id === empl.genero);
         let nombreGenero = generoObj ? generoObj.genero : "No especificado";

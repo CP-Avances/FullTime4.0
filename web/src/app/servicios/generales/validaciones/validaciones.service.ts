@@ -478,6 +478,7 @@ export class ValidacionesService {
         id_cargo_: obj.id_cargo_, // TIPO DE CARGO
         ciudad: obj.ciudad,
         regimen: obj.name_regimen,
+        hora_estandar: obj.dia_hora_estandar,
         departamento: obj.name_dep,
         cargo: obj.name_cargo,
         hora_trabaja: obj.hora_trabaja,
@@ -692,30 +693,30 @@ export class ValidacionesService {
   ): string {
     //console.log('ver datos: ', diasGanados, ' - ', horaTrabaja, ' - ', diaHoraEstandar)
     if (!horaTrabaja || !diaHoraEstandar) return '';
-  
+
     const [hEmp, mEmp] = horaTrabaja.split(':').map(Number);
     const [hStd, mStd] = diaHoraEstandar.split(':').map(Number);
-  
+
     const minutosEmp = hEmp * 60 + mEmp;
     const minutosStd = hStd * 60 + mStd;
-  
+
     if (minutosEmp === 0) return '';
-  
+
     const minutosPorDia = (minutosStd / minutosEmp) * minutosEmp;
     const totalMinutos = diasGanados * minutosPorDia;
-  
+
     const dias = Math.floor(totalMinutos / minutosEmp);
     const minutosRestantes = totalMinutos % minutosEmp;
-  
+
     const horas = Math.floor(minutosRestantes / 60);
     const minutos = Math.round(minutosRestantes % 60);
-  
+
     const partes: string[] = [];  // SE DEFINE COMO ARREGLO DE STRINGS
-  
+
     if (dias > 0) partes.push(`${dias} día${dias !== 1 ? 's' : ''}`);
     if (horas > 0) partes.push(`${horas} hora${horas !== 1 ? 's' : ''}`);
     if (minutos > 0) partes.push(`${minutos} minuto${minutos !== 1 ? 's' : ''}`);
-  
+
     return partes.length ? partes.join(', ') : '0 minutos';
   }
 

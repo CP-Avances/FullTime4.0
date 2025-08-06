@@ -12,6 +12,8 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { DateTime } from 'luxon';
+import ExcelJS from "exceljs";
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-reporte-periodos',
@@ -102,6 +104,11 @@ export class ReportePeriodosComponent implements OnInit {
   get filtroCedula() { return this.reporteService.filtroCedula };
   get filtroRolEmp() { return this.reporteService.filtroRolEmp };
 
+  // ESTILOS PARA FORMATO EXCEL
+  private bordeCompleto!: Partial<ExcelJS.Borders>;
+  private fontTitulo!: Partial<ExcelJS.Font>;
+  private imagen: any;
+
   constructor(
     private reporteService: ReportesService,
     private reporteP: PeriodoVacacionesService,
@@ -120,6 +127,15 @@ export class ReportePeriodosComponent implements OnInit {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.BuscarInformacionGeneral(this.opcionBusqueda);
     this.BuscarParametro();
+    // ESTILOS DE FORMATO EXCEL
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
   }
 
   ngOnDestroy() {
@@ -165,7 +181,7 @@ export class ReportePeriodosComponent implements OnInit {
 
   // METODO DE BUSQUEDA DE DATOS GENERALES
   BuscarInformacionGeneral(opcion: any) {
-    this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionGeneralRegimen(opcion).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
       this.toastr.error(err.error.message)
@@ -276,8 +292,8 @@ export class ReportePeriodosComponent implements OnInit {
       this.data_pdf = res;
       console.log('ver ', this.data_pdf, ' estado ', this.estado_periodo)
       switch (accion) {
-        //case 'excel': this.generarExcel(); break;
-        // case 'ver': this.VerDatos(); break;
+        case 'excel': this.generarExcel(); break;
+        case 'ver': this.VerDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
     }, err => {
@@ -303,6 +319,47 @@ export class ReportePeriodosComponent implements OnInit {
 
   ExtraerDatos() {
     this.periodos = [];
+    this.data_pdf.forEach((selec: any, index: number) => {
+      selec.empleados.map((empl: any) => {
+        empl.periodos.map((per: any) => {
+          const fecha_inicio = this.validar.FormatearFecha(per.fecha_inicio.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha_final = this.validar.FormatearFecha(per.fecha_final.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha_inicial = this.validar.FormatearFecha(per.fecha_desde.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha_acreditar_vacaciones = this.validar.FormatearFecha(per.fecha_acreditar_vacaciones.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const formato_hora = this.validar.convertirDiasAHorasMinutos(per.dias_vacacion, empl.hora_trabaja, empl.hora_estandar);
+          let datos = {
+            item:  index + 1,
+            ciudad: empl.ciudad,
+            sucursal: empl.sucursal,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
+            cargo: empl.cargo,
+            empleado: empl.apellido + ' ' + empl.nombre,
+            identificacion: empl.identificacion,
+            codigo: empl.codigo,
+            rol: empl.rol,
+            observacion: per.observacion,
+            fecha_inicio: fecha_inicio,
+            fecha_final: fecha_final,
+            fecha_inicial: fecha_inicial,
+            dias_iniciales: (per.dias_iniciales !== 0)
+              ? per.dias_iniciales
+              : (per.saldo_transferido !== 0 ? per.saldo_transferido : 0),
+            fecha_acreditar: fecha_acreditar_vacaciones,
+            dias_cargados: per.dias_cargados,
+            anios_antiguedad: per.anios_antiguedad,
+            dias_antiguedad: per.dias_antiguedad,
+            dias_perdidos: per.dias_perdidos,
+            usados_vacaciones: per.usados_dias_vacacion + per.usados_antiguedad,
+            dias_vacacion: per.dias_vacacion,
+            formato_hora: formato_hora,
+            estado: per.estado ? 'ACTIVO' : 'INACTIVO',
+          }
+          this.periodos.push(datos);
+        });
+      })
+    });
+
   }
 
   /** ****************************************************************************************** **
@@ -333,7 +390,174 @@ export class ReportePeriodosComponent implements OnInit {
    ** ****************************************************************************************** **/
 
   async generarExcel() {
-    console.log('pdf ', this.data_pdf);
+    const listaPeriodos: any[] = [];
+    this.data_pdf.forEach((selec: any, index: number) => {
+      selec.empleados.map((empl: any) => {
+        empl.periodos.map((per: any) => {
+          const fecha_inicio = this.validar.FormatearFecha(per.fecha_inicio.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha_final = this.validar.FormatearFecha(per.fecha_final.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha_inicial = this.validar.FormatearFecha(per.fecha_desde.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const fecha_acreditar_vacaciones = this.validar.FormatearFecha(per.fecha_acreditar_vacaciones.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
+          const formato_hora = this.validar.convertirDiasAHorasMinutos(per.dias_vacacion, empl.hora_trabaja, empl.hora_estandar);
+          listaPeriodos.push([
+            index + 1,
+            empl.ciudad,
+            empl.sucursal,
+            empl.regimen,
+            empl.departamento,
+            empl.cargo,
+            empl.apellido + ' ' + empl.nombre,
+            empl.identificacion,
+            empl.codigo,
+            empl.rol,
+            per.observacion,
+            fecha_inicio,
+            fecha_final,
+            fecha_inicial,
+            (per.dias_iniciales !== 0)
+              ? per.dias_iniciales
+              : (per.saldo_transferido !== 0 ? per.saldo_transferido : 0),
+            fecha_acreditar_vacaciones,
+            per.dias_cargados,
+            per.anios_antiguedad,
+            per.dias_antiguedad,
+            per.dias_perdidos,
+            per.usados_dias_vacacion + per.usados_antiguedad,
+            per.dias_vacacion,
+            formato_hora,
+            per.estado ? 'ACTIVO' : 'INACTIVO',
+          ])
+        });
+      })
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Periodo_Vacaciones");
+
+    // LOGO
+    this.imagen = workbook.addImage({
+      base64: this.logo,
+      extension: "png",
+    });
+
+    worksheet.addImage(this.imagen, {
+      tl: { col: 0, row: 0 },
+      ext: { width: 220, height: 105 },
+    });
+
+    // COLUMNAS
+    const columnas = [
+      { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
+      { name: "CIUDAD", totalsRowLabel: "", filterButton: true },
+      { name: "SUCURSAL", totalsRowLabel: "", filterButton: true },
+      { name: "REGIMEN", totalsRowLabel: "", filterButton: true },
+      { name: "DEPARTAMENTO", totalsRowLabel: "", filterButton: true },
+      { name: "CARGO", totalsRowLabel: "", filterButton: true },
+      { name: "EMPLEADO", totalsRowLabel: "", filterButton: true },
+      { name: "IDENTIFICACION", totalsRowLabel: "", filterButton: true },
+      { name: "CODIGO", totalsRowLabel: "", filterButton: true },
+      { name: "ROL", totalsRowLabel: "", filterButton: true },
+      { name: "DESCRIPCION", totalsRowLabel: "", filterButton: true },
+      { name: "INICIO PERIODO", totalsRowLabel: "", filterButton: true },
+      { name: "FIN PERIODO", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA CARGA INICIAL", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS INICIALES / TRANSFERIDOS", totalsRowLabel: "", filterButton: true },
+      { name: "FECHA CARGAR VACACIONES", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS CARGADOS", totalsRowLabel: "", filterButton: true },
+      { name: "AÑOS TRANSCURRIDOS", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS ANTIGUEDDA", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS PERDIDOS", totalsRowLabel: "", filterButton: true },
+      { name: "DIAS USADOS", totalsRowLabel: "", filterButton: true },
+      { name: "TOTAL", totalsRowLabel: "", filterButton: true },
+      { name: "TOTAL (dd/hh/mm)", totalsRowLabel: "", filterButton: true },
+      { name: "ESTADO", totalsRowLabel: "", filterButton: true },
+    ];
+
+    worksheet.columns = columnas.map((col) => ({
+      key: col.name.toLowerCase().replace(/\s+/g, '_'),
+      width: 25,
+    }));
+
+    // OBTENER ULTIMA LETRA DE COLUMNA DINAMICAMENTE
+    const totalColumnas = columnas.length;
+    const ultimaColumnaLetra = this.obtenerLetraColumnaExcel(totalColumnas);
+
+    // COMBINAR CELDAS DESDE A1 HASTA ULTIMA COLUMNA (EJ: G1, H1...)
+    for (let fila = 1; fila <= 5; fila++) {
+      worksheet.mergeCells(`A${fila}:${ultimaColumnaLetra}${fila}`);
+    }
+
+    // INSERTAR VALORES CENTRADOS EN FILAS ESPECIFICAS
+    worksheet.getCell("A1").value = localStorage.getItem('name_empresa')?.toUpperCase() || '';
+    worksheet.getCell("A2").value = "PERIODO DE VACACIONES";
+
+    ["A1", "A2"].forEach((cellRef) => {
+      worksheet.getCell(cellRef).alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+      worksheet.getCell(cellRef).font = { bold: true, size: 14 };
+    });
+
+    // CREAR TABLA
+    worksheet.addTable({
+      name: "ConfiguracionTabla",
+      ref: "A6",
+      headerRow: true,
+      totalsRow: false,
+      style: {
+        theme: "TableStyleMedium16",
+        showRowStripes: true,
+      },
+      columns: columnas,
+      rows: listaPeriodos,
+    });
+
+    // COLUMNAS QUE NO QUIERES CENTRAR HORIZONTALMENTE (BASADO EN INDICE 1-BASED)
+    const columnasExcluidasCentrado: number[] = [7, 11, 23];
+
+    // APLICAR ESTILOS A CELDAS DE LA TABLA
+    const numeroFilas = listaPeriodos.length;
+
+    for (let i = 0; i <= numeroFilas; i++) {
+      for (let j = 1; j <= totalColumnas; j++) {
+        const cell = worksheet.getRow(i + 6).getCell(j);
+
+        if (i === 0) {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        } else {
+          const horizontal = columnasExcluidasCentrado.includes(j) ? "left" : "center";
+          cell.alignment = { vertical: "middle", horizontal };
+        }
+
+        cell.border = this.bordeCompleto;
+      }
+    }
+
+    // ESTILOS A LA FILA DE ENCABEZADOS
+    worksheet.getRow(6).font = this.fontTitulo;
+
+    // EXPORTAR ARCHIVO
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      FileSaver.saveAs(blob, "Periodo_Vacaciones.xlsx");
+    } catch (error) {
+      console.error("Error al generar el archivo Excel:", error);
+    }
+  }
+
+
+
+  // FUNCION AUXILIAR PARA CONVERTIR INDICE DE COLUMNA A LETRA
+  private obtenerLetraColumnaExcel(colIndex: number): string {
+    let letra = '';
+    while (colIndex > 0) {
+      const mod = (colIndex - 1) % 26;
+      letra = String.fromCharCode(65 + mod) + letra;
+      colIndex = Math.floor((colIndex - 1) / 26);
+    }
+    return letra;
   }
 
   /** ****************************************************************************************** **
@@ -422,11 +646,11 @@ export class ReportePeriodosComponent implements OnInit {
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
         tableHeader_secundario: { fontSize: 6, bold: true, alignment: 'center', fillColor: this.p_color },
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
-        itemsTable: { fontSize: 8 },
+        itemsTable: { fontSize: 7 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         derecha: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color, alignment: 'rigth' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
-        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableCentrado: { fontSize: 7, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
         tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
@@ -490,7 +714,6 @@ export class ReportePeriodosComponent implements OnInit {
 
       // PRESENTACION DE LA INFORMACION
       selec.empleados.forEach((empl: any) => {
-
         // CABECERA INFORMACION REGIMEN
         n.push({
           style: 'tableMarginCabeceraEmpleado',
@@ -581,7 +804,7 @@ export class ReportePeriodosComponent implements OnInit {
         n.push({
           style: 'tableMargin',
           table: {
-            widths: ['auto', '*', 'auto', 'auto', '*', 'auto', '*', '*', '*', '*', 'auto', '*', 'auto', 'auto'],
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto'],
             headerRows: 2,
             body: [
               [
@@ -595,7 +818,8 @@ export class ReportePeriodosComponent implements OnInit {
                 {},
                 { rowSpan: 1, colSpan: 2, text: 'ANTIGUEDAD', style: 'tableHeader' },
                 {},
-                { rowSpan: 1, colSpan: 3, text: 'VACACIONES TOTALES', style: 'tableHeader' },
+                { rowSpan: 1, colSpan: 4, text: 'VACACIONES TOTALES', style: 'tableHeader' },
+                {},
                 {},
                 {},
                 { rowSpan: 2, text: 'ESTADO', style: 'centrado' },
@@ -613,7 +837,8 @@ export class ReportePeriodosComponent implements OnInit {
                 { rowSpan: 1, text: 'DÍAS ADICIONALES', style: 'tableHeader_secundario' },
                 { rowSpan: 1, text: 'DÍAS PERDIDOS', style: 'tableHeader_secundario' },
                 { rowSpan: 1, text: 'DÍAS USADOS', style: 'tableHeader_secundario' },
-                { rowSpan: 1, text: 'TOTAL', style: 'tableHeader_secundario' },
+                { rowSpan: 1, colSpan: 2, text: 'TOTAL', style: 'tableHeader_secundario' },
+                {},
                 {},
               ],
               ...empl.periodos.map((per: any) => {
@@ -621,7 +846,8 @@ export class ReportePeriodosComponent implements OnInit {
                 const fecha_final = this.validar.FormatearFecha(per.fecha_final.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 const fecha_inicial = this.validar.FormatearFecha(per.fecha_desde.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
                 const fecha_acreditar_vacaciones = this.validar.FormatearFecha(per.fecha_acreditar_vacaciones.split('T')[0], this.formato_fecha, this.validar.dia_abreviado, this.idioma_fechas);
-
+                const formato_hora = this.validar.convertirDiasAHorasMinutos(per.dias_vacacion, empl.hora_trabaja, empl.hora_estandar);
+                console.log('hora formato ', formato_hora);
                 return [
                   {
                     style: 'itemsTableCentrado',
@@ -631,7 +857,12 @@ export class ReportePeriodosComponent implements OnInit {
                   { style: 'itemsTableCentrado', text: fecha_inicio },
                   { style: 'itemsTableCentrado', text: fecha_final },
                   { style: 'itemsTableCentrado', text: fecha_inicial },
-                  { style: 'itemsTableCentrado', text: per.dias_iniciales },
+                  {
+                    style: 'itemsTableCentrado',
+                    text: per.dias_iniciales !== 0
+                      ? per.dias_iniciales
+                      : (per.saldo_transferido !== 0 ? per.saldo_transferido : per.dias_iniciales)
+                  },
                   { style: 'itemsTableCentrado', text: fecha_acreditar_vacaciones },
                   { style: 'itemsTableCentrado', text: per.dias_cargados },
                   { style: 'itemsTableCentrado', text: per.anios_antiguedad },
@@ -639,6 +870,7 @@ export class ReportePeriodosComponent implements OnInit {
                   { style: 'itemsTableCentrado', text: per.dias_perdidos },
                   { style: 'itemsTableCentrado', text: per.usados_dias_vacacion },
                   { style: 'itemsTableCentrado', text: per.dias_vacacion },
+                  { style: 'itemsTableCentrado', text: formato_hora },
                   { style: 'itemsTableCentrado', text: per.estado },
                 ];
               }),

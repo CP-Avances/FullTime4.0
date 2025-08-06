@@ -33,6 +33,8 @@ class CiudadRutas {
         // METODO DE BUSQUEDA DE DATOS DE USUARIO QUE APRUEBA SOLICITUDES    **USADO
         this.router.get('/empleadoAutoriza/:empleado_id', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarDatosEmpleadoAutoriza);
 
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON REGIMEN LABORAL   **USADO
+        this.router.get('/informacion-data-regimen/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneralPeriodos);
 
 
 
@@ -45,7 +47,7 @@ class CiudadRutas {
 
 
 
-        
+
         // METODO PARA LISTAR INFORMACION ACTUAL DEL USUARIO  
         this.router.get('/info_actual', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarDatosActualesEmpleado);
         // METODO DE BUSQUEDA DE INFORMACION DE CONFIGURACIONES DE NOTIFICACIONES

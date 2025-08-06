@@ -139,6 +139,25 @@ class DatosGeneralesControlador {
         }
     }
 
+    // METODO PARA LEER DATOS DEL USUARIO CON DATOS DEL REGIMEN LABORAL    **USADO
+    public async BuscarDataGeneralPeriodos(req: Request, res: Response) {
+        let estado = req.params.estado;
+        let informacion = await pool.query(
+            `
+                SELECT ig.*, u.usuario, r.dia_hora_estandar
+                FROM informacion_general AS ig
+                LEFT JOIN eu_usuarios AS u ON ig.id = u.id_empleado
+                LEFT JOIN ere_cat_regimenes AS r ON r.id = ig.id_regimen
+                WHERE ig.estado = $1
+                ORDER BY ig.name_suc ASC;
+            `
+            , [estado]
+        ).then((result: any) => { return result.rows });
+
+        if (informacion.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
+
+        return res.status(200).jsonp(informacion);
+    }
 
 
 
@@ -158,7 +177,6 @@ class DatosGeneralesControlador {
 
 
 
-    
 
     // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO  
     public async ListarDatosActualesEmpleado(req: Request, res: Response) {
