@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { TokenValidation } from '../../libs/verificarToken'
+import { upload } from '../../middlewares/uploadMiddleware';
+import { TokenValidation } from '../../libs/verificarToken';
 import TIMBRES_CONTROLADOR from '../../controlador/timbres/timbresControlador';
 
 class TimbresRutas {
@@ -76,7 +77,7 @@ class TimbresRutas {
         /** *************************************************************************************************************** **
          ** **                 M E T O D O S    U S A D O S     E N    L A    A P L I C A C I O N    M O V I L           ** **
          ** *************************************************************************************************************** **/
-        this.router.post('/timbre', TokenValidation, TIMBRES_CONTROLADOR.crearTimbre);
+        this.router.post('/timbre', TokenValidation, upload.single("imagen"), TIMBRES_CONTROLADOR.crearTimbre);
         this.router.post('/timbreSinConexion', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreDesconectado);
         this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);

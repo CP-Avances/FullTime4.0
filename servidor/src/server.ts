@@ -296,9 +296,9 @@ export const io = SERVIDOR.io;
 DesactivarFinContratoEmpleado();
 
 // INICIO DE TAREAS AUTOMATICAS
-(async () => {
-    await tareasAutomaticas.IniciarTarea();
-})();
+// (async () => {
+//     await tareasAutomaticas.IniciarTarea();
+// })();
 
 
 //generarTimbres('1', '2023-11-01', '2023-11-02');//

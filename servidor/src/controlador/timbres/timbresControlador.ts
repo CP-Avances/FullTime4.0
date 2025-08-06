@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
 import pool from '../../database';
+import { archivoService } from '../../services/archivoService';
 
 class TimbresControlador {
 
@@ -1346,6 +1347,17 @@ class TimbresControlador {
                 timbre.hora_timbre_diferente = true;
             } else {
                 timbre.hora_timbre_diferente = false;
+            }
+
+            if (req.file) {
+                const filePath = req.file.path;
+                const archivoBinario = await archivoService.leerArchivo(filePath);
+
+                timbre.imagen = archivoBinario;
+
+                await archivoService.eliminarArchivo(filePath);
+            } else {
+                timbre.imagen = null;
             }
 
             const response = await pool.query(

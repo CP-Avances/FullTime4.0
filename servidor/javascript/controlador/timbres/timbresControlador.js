@@ -18,6 +18,7 @@ const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaCon
 const settingsMail_1 = require("../../libs/settingsMail");
 const luxon_1 = require("luxon");
 const database_1 = __importDefault(require("../../database"));
+const archivoService_1 = require("../../services/archivoService");
 class TimbresControlador {
     // METODO PARA LISTAR MARCACIONES    **USADO
     ObtenerTimbres(req, res) {
@@ -1213,6 +1214,15 @@ class TimbresControlador {
                 }
                 else {
                     timbre.hora_timbre_diferente = false;
+                }
+                if (req.file) {
+                    const filePath = req.file.path;
+                    const archivoBinario = yield archivoService_1.archivoService.leerArchivo(filePath);
+                    timbre.imagen = archivoBinario;
+                    yield archivoService_1.archivoService.eliminarArchivo(filePath);
+                }
+                else {
+                    timbre.imagen = null;
                 }
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +

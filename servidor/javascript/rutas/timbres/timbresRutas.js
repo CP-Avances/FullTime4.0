@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const uploadMiddleware_1 = require("../../middlewares/uploadMiddleware");
 const verificarToken_1 = require("../../libs/verificarToken");
 const timbresControlador_1 = __importDefault(require("../../controlador/timbres/timbresControlador"));
 class TimbresRutas {
@@ -68,7 +69,7 @@ class TimbresRutas {
         /** *************************************************************************************************************** **
          ** **                 M E T O D O S    U S A D O S     E N    L A    A P L I C A C I O N    M O V I L           ** **
          ** *************************************************************************************************************** **/
-        this.router.post('/timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbre);
+        this.router.post('/timbre', verificarToken_1.TokenValidation, uploadMiddleware_1.upload.single("imagen"), timbresControlador_1.default.crearTimbre);
         this.router.post('/timbreSinConexion', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreDesconectado);
         this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
