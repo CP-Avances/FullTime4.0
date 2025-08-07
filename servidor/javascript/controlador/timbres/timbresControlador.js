@@ -1196,7 +1196,7 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const hoy = new Date();
-                const timbre = req.body;
+                const timbre = JSON.parse(req.body.timbre);
                 yield database_1.default.query('BEGIN');
                 const pad = (num) => num.toString().padStart(2, '0');
                 timbre.fecha_hora_timbre_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
@@ -1270,13 +1270,22 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const hoy = new Date();
-                const timbre = req.body;
+                const timbre = JSON.parse(req.body.timbre);
                 yield database_1.default.query('BEGIN');
                 console.log("ver req.body", req.body);
                 const pad = (num) => num.toString().padStart(2, '0');
                 timbre.fecha_subida_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
                 const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
                 timbre.hora_timbre_diferente = false;
+                if (req.file) {
+                    const filePath = req.file.path;
+                    const archivoBinario = yield archivoService_1.archivoService.leerArchivo(filePath);
+                    timbre.imagen = archivoBinario;
+                    yield archivoService_1.archivoService.eliminarArchivo(filePath);
+                }
+                else {
+                    timbre.imagen = null;
+                }
                 const response = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                     'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
                     'dispositivo_timbre, fecha_hora_timbre_servidor, hora_timbre_diferente, ubicacion, conexion, fecha_subida_servidor, novedades_conexion, imagen, fecha_hora_timbre_validado, zona_horaria_servidor) ' +
@@ -1297,7 +1306,7 @@ class TimbresControlador {
                     usuario: timbre.user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
+                    datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${imagen_existe} }`,
                     ip: timbre.ip,
                     ip_local: timbre.ip_local,
                     observacion: null

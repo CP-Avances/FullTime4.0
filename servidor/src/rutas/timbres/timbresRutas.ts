@@ -78,7 +78,7 @@ class TimbresRutas {
          ** **                 M E T O D O S    U S A D O S     E N    L A    A P L I C A C I O N    M O V I L           ** **
          ** *************************************************************************************************************** **/
         this.router.post('/timbre', TokenValidation, upload.single("imagen"), TIMBRES_CONTROLADOR.crearTimbre);
-        this.router.post('/timbreSinConexion', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreDesconectado);
+        this.router.post('/timbreSinConexion', TokenValidation, upload.single("imagen"), TIMBRES_CONTROLADOR.crearTimbreDesconectado);
         this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);
         this.router.get('/timbreEmpleado/:idUsuario', TokenValidation, TIMBRES_CONTROLADOR.getTimbreByCodigo);

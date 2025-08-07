@@ -1329,7 +1329,7 @@ class TimbresControlador {
     public async crearTimbre(req: Request, res: Response) {
         try {
             const hoy: Date = new Date();
-            const timbre: any = req.body;
+            const timbre: any = JSON.parse(req.body.timbre);
             await pool.query('BEGIN');
             const pad = (num: number) => num.toString().padStart(2, '0');
             timbre.fecha_hora_timbre_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
@@ -1410,7 +1410,7 @@ class TimbresControlador {
     public async crearTimbreDesconectado(req: Request, res: Response) {
         try {
             const hoy: Date = new Date();
-            const timbre: any = req.body;
+            const timbre: any = JSON.parse(req.body.timbre);
             await pool.query('BEGIN');
             console.log("ver req.body", req.body)
 
@@ -1418,6 +1418,17 @@ class TimbresControlador {
             timbre.fecha_subida_servidor = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())} ${pad(hoy.getHours())}:${pad(hoy.getMinutes())}:${pad(hoy.getSeconds())}`;
             const zonaHorariaServidor = DateTime.local().zoneName;
             timbre.hora_timbre_diferente = false;
+
+            if (req.file) {
+                const filePath = req.file.path;
+                const archivoBinario = await archivoService.leerArchivo(filePath);
+
+                timbre.imagen = archivoBinario;
+
+                await archivoService.eliminarArchivo(filePath);
+            } else {
+                timbre.imagen = null;
+            }
 
             const response = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, ' +
                 'observacion, latitud, longitud, codigo, id_reloj, tipo_autenticacion, ' +
@@ -1445,7 +1456,7 @@ class TimbresControlador {
                 usuario: timbre.user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${timbre.imagen} }`,
+                datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${timbre.accion}, tecla_funcion: ${timbre.tecla_funcion}, observacion: ${timbre.observacion}, latitud: ${timbre.latitud}, longitud: ${timbre.longitud}, codigo: ${timbre.codigo}, fecha_hora_timbre_servidor: ${fechaTimbre + ' ' + fechaHora}, id_reloj: ${timbre.id_reloj}, ubicacion: ${timbre.ubicacion}, dispositivo_timbre: ${timbre.dispositivo_timbre}, fecha_subida_servidor :  ${fechaTimbreSubida + ' ' + fechaHoraSubida}, imagen: ${imagen_existe} }`,
                 ip: timbre.ip,
                 ip_local: timbre.ip_local,
                 observacion: null
