@@ -71,7 +71,7 @@ class TimbresRutas {
          ** *************************************************************************************************************** **/
         this.router.post('/timbre', verificarToken_1.TokenValidation, uploadMiddleware_1.upload.single("imagen"), timbresControlador_1.default.crearTimbre);
         this.router.post('/timbreSinConexion', verificarToken_1.TokenValidation, uploadMiddleware_1.upload.single("imagen"), timbresControlador_1.default.crearTimbreDesconectado);
-        this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
+        this.router.post('/timbre/admin', verificarToken_1.TokenValidation, uploadMiddleware_1.upload.single("documento"), timbresControlador_1.default.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
         this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreByCodigo);
         // METODO DE BUSQUEDA DE AVISOS GENERALES

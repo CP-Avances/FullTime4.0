@@ -1377,11 +1377,8 @@ class TimbresControlador {
             const fechaHoraServidor = await FormatearHora(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
             const fechaTimbreServidor = await FormatearFecha2(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
 
-            let imagen_existe = false
+            let imagen_existe: boolean = !!timbre.imagen;
 
-            if (timbre.imagen) {
-                imagen_existe = true;
-            }
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_timbres',
                 usuario: timbre.user_name,
@@ -1479,14 +1476,25 @@ class TimbresControlador {
     //METODO PARA CREAR TIMBRE POR EL ADMINISTRADOR
     public async crearTimbreJustificadoAdmin(req: Request, res: Response) {
         try {
+
+            const timbre: any = JSON.parse(req.body.timbre);
+            
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj,
-                user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente, ip_local } = req.body
-            console.log(req.body);
+                user_name, ip, dispositivo_timbre, conexion, hora_timbre_diferente, ip_local } = timbre;
+            
+            let documento = null;
+
+            if (req.file) {
+                const filePath = req.file.path;
+                documento = await archivoService.leerArchivo(filePath);
+                await archivoService.eliminarArchivo(filePath);
+            }
+
             await pool.query('BEGIN');
             const zonaHorariaServidor = DateTime.local().zoneName;
 
 
-            const [timbre] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id',
+            const [insercion] = await pool.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id',
                 [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente, zonaHorariaServidor])
                 .then(result => {
                     return result.rows;
@@ -1494,12 +1502,7 @@ class TimbresControlador {
             const fechaHora = await FormatearHora(fec_hora_timbre.toLocaleString().split(' ')[1]);
             const fechaTimbre = await FormatearFecha2(fec_hora_timbre.toLocaleString(), 'ddd');
 
-            let documento_existe = false
-
-            if (documento) {
-                documento_existe = true;
-            }
-
+            let documento_existe: boolean =  !!documento;
 
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_timbres',
@@ -1515,7 +1518,7 @@ class TimbresControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            if (!timbre) return res.status(400).jsonp({ message: "No se inserto timbre" });
+            if (!insercion) return res.status(400).jsonp({ message: "No se inserto timbre" });
 
             return res.status(200).jsonp({ message: "Tímbre creado exitosamente" });
         } catch (error) {

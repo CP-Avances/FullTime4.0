@@ -79,7 +79,7 @@ class TimbresRutas {
          ** *************************************************************************************************************** **/
         this.router.post('/timbre', TokenValidation, upload.single("imagen"), TIMBRES_CONTROLADOR.crearTimbre);
         this.router.post('/timbreSinConexion', TokenValidation, upload.single("imagen"), TIMBRES_CONTROLADOR.crearTimbreDesconectado);
-        this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
+        this.router.post('/timbre/admin', TokenValidation, upload.single("documento"), TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);
         this.router.get('/timbreEmpleado/:idUsuario', TokenValidation, TIMBRES_CONTROLADOR.getTimbreByCodigo);
 

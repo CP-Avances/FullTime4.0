@@ -1237,10 +1237,7 @@ class TimbresControlador {
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre.toLocaleString(), 'ddd');
                 const fechaHoraServidor = yield (0, settingsMail_1.FormatearHora)(timbre.fecha_hora_timbre_servidor.toLocaleString().split(' ')[1]);
                 const fechaTimbreServidor = yield (0, settingsMail_1.FormatearFecha2)(timbre.fecha_hora_timbre_servidor.toLocaleString(), 'ddd');
-                let imagen_existe = false;
-                if (timbre.imagen) {
-                    imagen_existe = true;
-                }
+                let imagen_existe = !!timbre.imagen;
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: timbre.user_name,
@@ -1329,20 +1326,23 @@ class TimbresControlador {
     crearTimbreJustificadoAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, documento, dispositivo_timbre, conexion, hora_timbre_diferente, ip_local } = req.body;
-                console.log(req.body);
+                const timbre = JSON.parse(req.body.timbre);
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, user_name, ip, dispositivo_timbre, conexion, hora_timbre_diferente, ip_local } = timbre;
+                let documento = null;
+                if (req.file) {
+                    const filePath = req.file.path;
+                    documento = yield archivoService_1.archivoService.leerArchivo(filePath);
+                    yield archivoService_1.archivoService.eliminarArchivo(filePath);
+                }
                 yield database_1.default.query('BEGIN');
                 const zonaHorariaServidor = luxon_1.DateTime.local().zoneName;
-                const [timbre] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente, zonaHorariaServidor])
+                const [insercion] = yield database_1.default.query('INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, codigo, id_reloj, fecha_hora_timbre_servidor, documento, dispositivo_timbre,conexion, hora_timbre_diferente, fecha_hora_timbre_validado, zona_horaria_servidor) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $1, $14) RETURNING id', [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo, id_reloj, fec_hora_timbre, documento, dispositivo_timbre, conexion, hora_timbre_diferente, zonaHorariaServidor])
                     .then(result => {
                     return result.rows;
                 });
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.toLocaleString().split(' ')[1]);
                 const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
-                let documento_existe = false;
-                if (documento) {
-                    documento_existe = true;
-                }
+                let documento_existe = !!documento;
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_timbres',
                     usuario: user_name,
@@ -1355,7 +1355,7 @@ class TimbresControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                if (!timbre)
+                if (!insercion)
                     return res.status(400).jsonp({ message: "No se inserto timbre" });
                 return res.status(200).jsonp({ message: "Tímbre creado exitosamente" });
             }
