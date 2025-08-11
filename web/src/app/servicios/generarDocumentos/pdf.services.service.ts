@@ -218,7 +218,7 @@ export class PdfServicesService {
         widths: [8], // ancho del cuadrito
         heights: [8], // alto del cuadrito
         body: [[{
-          text: (valor == true && tipo == 'SI' ? 'x' : (valor == false && tipo == 'NO' ? 'x':'')),
+          text: (valor == true && tipo == 'Si' ? 'x' : (valor == false && tipo == 'No' ? 'x':'')),
           alignment: 'center',
           fontSize: 6,
         }]]
@@ -782,10 +782,7 @@ export class PdfServicesService {
                         body: [
                           [{ text: 'REVISIÓN CLASI. PUESTO', fontSize: 7 }, this.getCheckBoxCell('REVISIÓN CLASI. PUESTO', this.datosPedido.accion_personal)],
                           [{ text: 'OTRO (DETALLAR)', fontSize: 7 }, this.getCheckBoxCell('OTRO (DETALLAR)', this.datosPedido.accion_personal)],
-                          ["", ''],
-                          ["", ''],
-                          ["", ''],
-                          ["", ''],
+                          [this.getCellText(this.datosPedido.detalle_otro), '']
                         ]
                       },
                       layout: 'noBorders'
