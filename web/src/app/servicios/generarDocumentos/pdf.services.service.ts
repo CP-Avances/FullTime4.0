@@ -110,7 +110,7 @@ export class PdfServicesService {
       content: [
         this.PresentarHoja1_Parte_1(),
         this.PresentarHoja1_Parte_2(),
-        // this.PresentarHoja1_Parte_3(),
+        this.PresentarHoja1_Parte_3(),
         // this.PresentarHoja1_Parte_4(),
         // this.PresentarHoja1_Parte_5(),
         // this.PresentarHoja1_Parte_6(),
@@ -212,13 +212,13 @@ export class PdfServicesService {
   }
 
   getCheckBoxCellDeclaracio(tipo: any, valor: boolean) {
-    console.log('valor: ',valor, ' tipo: ',tipo)
+    console.log('valor: ', valor, ' tipo: ', tipo)
     return {
       table: {
         widths: [8], // ancho del cuadrito
         heights: [8], // alto del cuadrito
         body: [[{
-          text: (valor == true && tipo == 'Si' ? 'x' : (valor == false && tipo == 'No' ? 'x':'')),
+          text: (valor == true && tipo == 'Si' ? 'x' : (valor == false && tipo == 'No' ? 'x' : '')),
           alignment: 'center',
           fontSize: 6,
         }]]
@@ -822,7 +822,7 @@ export class PdfServicesService {
                     this.getCellText(this.datosPedido.especificacion)
                     ,
                   ],
-                  [                   
+                  [
                     {
                       table: {
                         widths: ['*'],
@@ -855,7 +855,7 @@ export class PdfServicesService {
                     },
                     {
                       table: {
-                        widths: [40, 10, 40, 10,'*'],
+                        widths: [40, 10, 40, 10, '*'],
                         body: [
                           [
                             {
@@ -873,7 +873,8 @@ export class PdfServicesService {
                               }
                             },
                             this.getCheckBoxCellDeclaracio('SI', this.datosPedido.declaracion_jurada),
-                            {text: 'NO',
+                            {
+                              text: 'NO',
                               fontSize: 7,
                               alignment: 'center',
                               fillColor: '#f2f2f2',
@@ -916,7 +917,7 @@ export class PdfServicesService {
             {
               text: ' MOTIVACIÓN: (adjuntar anexo si lo posee)',
               bold: true,
-              fontSize: 8,
+              fontSize: 7,
               fillColor: '#f2f2f2',
               margin: [5, 2, 0, 2],
               border: [true, false, true, true],
@@ -931,11 +932,12 @@ export class PdfServicesService {
           ],
           [
             {
-              
+
               text: this.datosPedido.adicion_base_legal,
               bold: true,
               fontSize: 7,
-              margin: [5, 2, 0, 2],
+              margin: [5, 20, 0, 20],
+              noWrap: false, // permite salto de línea automático
               border: [true, false, true, true],
               layout: {
                 defaultBorder: false, // desactiva cualquier borde por defecto
@@ -964,83 +966,235 @@ export class PdfServicesService {
     };
   }
 
-
-  /*
-    PresentarHoja1_Parte_3() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*", "auto"],
-          heights: [5],
-          body: [
-            [
-              {
-                border: [true, false, false, true],
-                margin: [90, 4, 0, 0],
-                text: [{ text: "No.", style: "itemsTable_c" }],
-              },
-              {
-                border: [false, false, false, true],
-                margin: [0, 0, 0, 5],
-                table: {
-                  body: [
-                    [{ text: "-------------------------------", color: "white" }],
-                  ],
-                },
-                layout: {
-                  hLineWidth: function (i, node) {
-                    if (i === node.table.body.length) {
-                      return 1; // GROSOR DEL BORDE INFERIOR
-                    } else {
-                      return 0; // SIN BORDES EN LAS DEMAS LINEAS
+  PresentarHoja1_Parte_3() {
+    return {
+      table: {
+        widths: ["*"],
+        body: [
+          [
+            {
+              table: {
+                widths: ['*', '*'],
+                body: [
+                  [
+                    {
+                      text: 'SITUACION ACTUAL',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [0, 0, 0, 0],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      alignment: 'center', // centra horizontalmente
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'SITUACION PROPUESTA',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [0, 0, 0, 0],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      alignment: 'center', // centra horizontalmente
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
                     }
-                  },
-                  vLineWidth: function (i) {
-                    return 0; // SIN BORDES VERTICALES
-                  },
-                },
-              },
-              {
-                border: [false, false, false, true],
-                margin: [0, 4, 0, 0],
-                text: [{ text: "FECHA:", style: "itemsTable_c" }],
-              },
-              {
-                border: [false, false, false, true],
-                margin: [0, 0, 0, 0],
-                table: {
-                  body: [
-                    [{ text: "-------------------------------", color: "white" }],
-                  ],
-                },
-                layout: {
-                  hLineWidth: function (i, node) {
-                    if (i === node.table.body.length) {
-                      return 1; // GROSOR DEL BORDE INFERIOR
-                    } else {
-                      return 0; // SIN BORDES EN LAS DEMAS LINEAS
-                    }
-                  },
-                  vLineWidth: function (i) {
-                    return 0; // SIN BORDES VERTICALES
-                  },
-                },
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  heights: [9],
-                  body: [
-                    [{ text: `` },],
                   ]
-                },
-                layout: "lightHorizontalLines",
+                ]
               },
-            ],
+              border: [true, false, true, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              },
+              styles: {
+                itemsTable: { fontSize: 8 },
+                itemsTable_c: { fontSize: 9, fillColor: '#d9d9d9', bold: true, },
+                itemsTable_d: { fontSize: 9, alignment: "right" },
+                itemsTable_e: { fontSize: 7 },
+              }
+            }
           ],
-        },
-      };
-    }
-  
+          [
+            {
+
+              text: '',
+              bold: true,
+              fontSize: 7,
+              margin: [0, 3, 0, 3],
+              border: [false, true, false, true],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+
+            }
+          ],
+          [
+            {
+              table: {
+                widths: ['*', '*'],
+                body: [
+                  [
+                    {
+                      text: 'PROCESO INSTITUCIONAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'PROCESO INSTITUCIONAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 0, 0, 0],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.proceso_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.proceso_propuesto,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'NIVEL DE GESTIÓN:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'NIVEL DE GESTIÓN:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ]
+                ]
+              },
+              border: [true, false, true, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              },
+              styles: {
+                itemsTable: { fontSize: 8 },
+                itemsTable_c: { fontSize: 9, fillColor: '#d9d9d9', bold: true, },
+                itemsTable_d: { fontSize: 9, alignment: "right" },
+                itemsTable_e: { fontSize: 7 },
+              }
+            }
+          ]
+        ],
+      },layout: {
+        defaultBorder: false, // desactiva cualquier borde por defecto
+        paddingLeft: () => 0,
+        paddingRight: () => 0,
+        paddingTop: () => 0,
+        paddingBottom: () => 0
+      },
+      styles: {
+        itemsTable: { fontSize: 8 },
+        itemsTable_c: { fontSize: 9, fillColor: '#d9d9d9', bold: true, },
+        itemsTable_d: { fontSize: 9, alignment: "right" },
+        itemsTable_e: { fontSize: 7 },
+      }
+    };
+  }
+
+  /* 
     PresentarHoja1_Parte_4() {
       return {
         table: {

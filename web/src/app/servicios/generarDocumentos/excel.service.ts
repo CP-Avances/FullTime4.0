@@ -484,7 +484,7 @@ export class ExcelService {
     worksheet.getCell("A26").value = "  PROCESO INSTITUCIONAL: (ESCOGER DE LA LISTA DESPLEGABLE)"
     worksheet.getCell("A27").value = " " + this.datosPedido.proceso_actual
     worksheet.getCell("I26").value = "  PROCESO INSTITUCIONAL: (ESCOGER DE LA LISTA DESPLEGABLE)"
-    worksheet.getCell("I27").value = " " + (this.datosPedido.proceso_propuesto ? this.datosPedido.fecha_elaboracion : "")
+    worksheet.getCell("I27").value = " " + (this.datosPedido.proceso_propuesto ? this.datosPedido.proceso_propuesto : "")
     worksheet.getCell("A28").value = "  NIVEL DE GESTIÓN: (VICEMINISTERIO, SUBSECRETARÍA, COORDINACIÓN, ETC)"
     worksheet.getCell("A29").value = " " + this.datosPedido.nivel_gestion_actual
     worksheet.getCell("I28").value = "  NIVEL DE GESTIÓN: (VICEMINISTERIO, SUBSECRETARÍA, COORDINACIÓN, ETC)"
@@ -554,7 +554,7 @@ export class ExcelService {
     worksheet.getCell("K61").value = " " + (this.datosPedido.cargo_autoridad_delegado != null ? this.datosPedido.cargo_autoridad_delegado : "");
 
     worksheet.getCell("A63").value = "Elaborado por el Ministerio del Trabajo"
-    worksheet.getCell("I63").value = "Fecha de actualización de formato: 2024-08-23    /    Versión: 01.1    /    Página 1 de 2  "
+    worksheet.getCell("I63").value = "Fecha de actualización de formato: 2024-08-23  / Versión: 01.1"
 
     worksheet.getCell("A65").value = "  RESPONSABLES DE FIRMAS"
     worksheet.getCell("A67").value = "ACEPTACIÓN Y/O RECEPCIÓN DEL SERVIDOR PÚBLICO"
@@ -662,6 +662,11 @@ export class ExcelService {
       right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
     };
 
+    const borderTopLeftStyle: Partial<ExcelJS.Borders> = {
+      left: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+      top: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+    };
+
     const borderTopRightStyle: Partial<ExcelJS.Borders> = {
       top: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
       right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
@@ -670,6 +675,12 @@ export class ExcelService {
     const borderbottomRightStyle: Partial<ExcelJS.Borders> = {
       bottom: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
       right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+    };
+
+    const borderbottomRighLefttStyle: Partial<ExcelJS.Borders> = {
+      bottom: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
+      right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+      left: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
     };
 
     // DAMOS EL ESTILO DE BACKGROUND COLOR A LAS CELDAS
@@ -730,7 +741,7 @@ export class ExcelService {
           cell.border = borderbottomStyle
         } else if ((i >= 59 && i <= 61) && ((j >= 3 && j <= 7) || (j >= 11 && j <= 15))) {
           cell.border = borderbottomStyle
-        } else if ((i == 63) || (i == 87) || (i == 110 && (j >= 8 && j <= 16)) || (i == 109 && j == 16)) {
+        } else if ((i == 63) || (i == 110 && (j >= 8 && j <= 16)) || (i == 109 && j == 16)) {
           cell.border = borderTopStyle
           if (j == 16) {
             cell.border = borderTopRightStyle
@@ -813,10 +824,24 @@ export class ExcelService {
           cell.fill = backgroundColorStyleWhite
         }
 
-        if(i == 12 || i == 21 || (i >= 26 && i <= 44) || i == 46 || i == 54 || (i >= 56 && i <= 58) || i == 62){
+        if(i == 12 || i == 21 || (i >= 26 && i <= 44) || i == 46 || i == 54 || (i >= 56 && i <= 58) || i == 62
+        || i == 68 || i == 69 || i == 70 || i == 81 || i == 82 || i == 88 || i == 89 || i == 94 || i == 96
+        || i == 107
+       ){
           cell.border = borderTopLeftRightStyle
-        }else if ((j == 1 && (i >= 13 && i <= 20)) || (j == 1 && (i >= 47 && i <= 53)) || (j == 1 && (i >= 59 && i <= 61))){
+        }else if ((j == 1 && (i >= 13 && i <= 20)) || (j == 1 && (i >= 47 && i <= 53)) || (j == 1 && (i >= 59 && i <= 61)) ||
+          (j == 1 && (i >= 71 && i <= 78)) || (j == 1 && (i >= 83 && i <= 85)) || (j == 1 && i == 90)
+          || (j == 1 && (i >= 97 && i <= 106)) || (j == 1 && (i >= 92 && i <= 93)) || (j == 1 && i == 95) || (j == 1 && i == 108)
+        ){
           cell.border = borderLeftStyle
+        }
+
+        if ((j == 5 && i == 87)){
+          cell.border = borderTopLeftStyle
+        }else if((j == 5 && i == 86) || (j == 11 && i == 86) || (j == 16 && i == 86)){
+          cell.border = borderbottomRighLefttStyle
+        }else if((j == 16 && i == 87)){
+          cell.border = borderRightStyle
         }
 
         if (i === 0) {
