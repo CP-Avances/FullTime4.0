@@ -49,6 +49,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   minimoMesF = new FormControl('');
   nombrePaisF = new FormControl('');
   minimoHorasF = new FormControl('');
+  horaEstandarF = new FormControl('');
   continuidadF = new FormControl(false);
 
   // SEGUNDO FORMULARIO
@@ -65,6 +66,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   // TERCER FORMULARIO
   vacaciones_cuatroF = new FormControl('');
   antiguedadActivaF = new FormControl(false);
+  maximoAntiguedadF = new FormControl(0);
   aniosAntiguedadF = new FormControl('');
   vacaciones_tresF = new FormControl('');
   diasAdicionalesF = new FormControl('');
@@ -109,10 +111,9 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       this.ips_locales = ips;
     });
 
-    this.ObtenerPaises();
-    this.ObtenerRegimen();
     this.ValidarFormulario();
-    this.ObtenerRegimenEditar();
+    this.ObtenerRegimen();
+    this.ObtenerPaises();
   }
 
   ngAfterViewInit() {
@@ -135,6 +136,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       nombrePaisForm: this.nombrePaisF,
       minimoHorasForm: this.minimoHorasF,
       continuidadForm: this.continuidadF,
+      horaEstandarForm: this.horaEstandarF,
     });
 
     this.segundoFormulario = this.formulario.group({
@@ -152,6 +154,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     this.tercerFormulario = this.formulario.group({
       vacaciones_cuatroForm: this.vacaciones_cuatroF,
       antiguedadActivaForm: this.antiguedadActivaF,
+      maximoAntiguedadForm: this.maximoAntiguedadF,
       vacaciones_tresForm: this.vacaciones_tresF,
       aniosAntiguedadForm: this.aniosAntiguedadF,
       diasAdicionalesForm: this.diasAdicionalesF,
@@ -195,6 +198,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
           startWith(''),
           map((value: any) => this._filter(value))
         );
+      this.ObtenerRegimenEditar();
     })
   }
 
@@ -313,6 +317,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     this.mesesF.setValue(this.data.mes_periodo);
     this.nombreF.setValue(this.data.descripcion);
     this.continuidadF.setValue(this.data.continuidad_laboral);
+    this.horaEstandarF.setValue(this.data.dia_hora_estandar);
     // OBTENER NOMBRE DEL PAIS REGISTRADO
     this.paises.forEach((obj: any) => {
       if (obj.id === this.data.id_pais) {
@@ -374,6 +379,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         this.antiguedadF.setValue('fija');
         this.aniosAntiguedadF.setValue(this.data.anio_antiguedad);
         this.diasAdicionalesF.setValue(this.data.dias_antiguedad);
+        this.maximoAntiguedadF.setValue(this.data.maximo_dias_antiguedad);
       }
       else {
         this.variableF = true;
@@ -386,6 +392,19 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     // ACTIVAR FORMULARIO
     this.activar_guardar = false;
 
+  }
+
+  // METODO PARA VALIDAR INGRESO DE MESES
+  validarMeses() {
+    const valor = this.mesesF.value;
+
+    if (valor == null) return; // NO HACE NADA SI NO HAY VALOR AUN
+
+    if (parseInt(valor) < 1) {
+      this.mesesF.setValue('1');
+    } else if (parseInt(valor) > 12) {
+      this.mesesF.setValue('12');
+    }
   }
 
   /** *********************************************************************************************** **
@@ -1403,6 +1422,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         trabajo_minimo_mes: 0,
         trabajo_minimo_horas: 0,
         continuidad_laboral: form1.continuidadForm,
+        horaEstandar: form1.horaEstandarForm,
 
         vacacion_dias_laboral: parseFloat(form2.diasLaborablesForm),
         vacacion_dias_libre: parseFloat(form2.diasLibresForm),
@@ -1415,6 +1435,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         antiguedad_fija: this.fija,
         anio_antiguedad: 0,
         dias_antiguedad: 0,
+        maximo_antiguedad: 0,
         antiguedad_variable: this.variableF,
 
         vacacion_dias_calendario_mes: form3.diasMesCalendarioForm,
@@ -1423,7 +1444,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         laboral_dias: form3.dias_LaborableForm,
         meses_calculo: form3.meses_calculoForm,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales,
+        ip: this.ip, 
+        ip_local: this.ips_locales,
       };
 
       this.ValidarInformacion(form1, form2, form3, regimen);
@@ -1459,6 +1481,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     if (this.fija === true) {
       regimen.anio_antiguedad = parseFloat(form3.aniosAntiguedadForm);
       regimen.dias_antiguedad = parseFloat(form3.diasAdicionalesForm);
+      regimen.maximo_antiguedad = parseInt(form3.maximoAntiguedadForm);
     }
 
   }
@@ -1639,7 +1662,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       dias_antiguedad: 0,
       id_regimen: regimen,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     this.RegistrarBDDAntiguedad(antiguedad, form3);
   }
@@ -1805,7 +1829,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   EliminarBDDAntiguedad(id: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
 
     this.rest.EliminarAntiguedad(id, datos).subscribe(registro => {

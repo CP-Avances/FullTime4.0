@@ -22,7 +22,7 @@ class RegimenControlador {
     CrearRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, user_name, ip, ip_local } = req.body;
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, horaEstandar, maximo_antiguedad, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
@@ -30,9 +30,9 @@ class RegimenControlador {
           continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, 
           dias_maximo_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, 
           dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, 
-          laboral_dias, meses_calculo)
+          laboral_dias, meses_calculo, dia_hora_estandar, maximo_dias_antiguedad)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, 
-          $23) RETURNING *
+          $23, $24, $25) RETURNING *
         `, [
                     id_pais,
                     descripcion,
@@ -56,7 +56,9 @@ class RegimenControlador {
                     vacacion_dias_laboral_mes,
                     calendario_dias,
                     laboral_dias,
-                    meses_calculo
+                    meses_calculo,
+                    horaEstandar,
+                    maximo_antiguedad,
                 ]);
                 const [regimen] = response.rows;
                 // AUDITORIA
@@ -90,7 +92,7 @@ class RegimenControlador {
     ActualizarRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, user_name, ip, ip_local } = req.body;
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, horaEstandar, maximo_antiguedad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOS ORIGINALES
@@ -120,8 +122,8 @@ class RegimenControlador {
         vacacion_dias_calendario = $10, acumular = $11, dias_maximo_acumulacion = $12, 
         vacacion_divisible = $13, antiguedad = $14, antiguedad_fija = $15, anio_antiguedad = $16, dias_antiguedad = $17, 
         antiguedad_variable = $18, vacacion_dias_calendario_mes = $19, vacacion_dias_laboral_mes = $20, calendario_dias = $21,
-        laboral_dias = $22, meses_calculo = $23 
-      WHERE id = $24 RETURNING *
+        laboral_dias = $22, meses_calculo = $23, dia_hora_estandar = $24, maximo_dias_antiguedad = $25
+      WHERE id = $26 RETURNING *
       `, [
                     id_pais,
                     descripcion,
@@ -146,6 +148,8 @@ class RegimenControlador {
                     calendario_dias,
                     laboral_dias,
                     meses_calculo,
+                    horaEstandar,
+                    maximo_antiguedad,
                     id,
                 ]);
                 // AUDITORIA

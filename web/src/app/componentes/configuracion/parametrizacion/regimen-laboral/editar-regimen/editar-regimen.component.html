@@ -41,6 +41,8 @@
                                         public
                                     </mat-icon>
                                 </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <mat-label id="letras_4">Nombre</mat-label>
                                     <input matInput [formControl]="nombreF" required>
@@ -50,23 +52,28 @@
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start">
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field id="periodo">
-                                    <mat-label id="letras_2">Meses período</mat-label>
+                                    <mat-label id="letras_2">Acreditar vacaciones</mat-label>
                                     <input matInput type="tel" [formControl]="mesesF"
-                                        (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
+                                        (keypress)="IngresarSoloNumeros($event)" min="1" max="12" required
+                                        (click)="LimpiarCalcular()" (input)="validarMeses()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses de duración del período laboral.">
                                         date_range
                                     </mat-icon>
                                 </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field id="periodo">
-                                    <mat-label id="letras_2">Días por mes</mat-label>
-                                    <input matInput type="tel" [formControl]="diasF"
-                                        (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
+                                    <mat-label id="letras_2">No. de Horas Estandar</mat-label>
+                                    <input matInput type="time" [formControl]="horaEstandarF" required
+                                        (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Indicar el número de días totales dentro de un mes.">
-                                        today
+                                        matTooltip="Indicar el número de horas totales dentro de un día laboral.">
+                                        access_time
                                     </mat-icon>
                                 </mat-form-field>
                             </div>
@@ -75,56 +82,95 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label
                                     style="padding-top: 15px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
-                                    Tiempo mínimo de servicio:
+                                    Días por mes*:
                                 </label>
-                                <mat-icon *ngIf="cancelar" id="cerrar" matSuffix matTooltipPosition="right"
-                                    matTooltip="Cancelar registro."
-                                    style="margin-top: 13px; position: relative; left:20px; height: max-content"
-                                    (click)="CancelarLimite()">
-                                    cancel
-                                </mat-icon>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:30px;">
-                                <mat-radio-group aria-label="Select an option" [formControl]="servicioF">
-                                    <div class="d-flex flex-wrap justify-content-around">
-                                        <mat-radio-button value="meses" (change)="SelecionarLimite($event)" matSuffix
+                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 15px;">
+                                <mat-radio-group aria-label="Select an option" [formControl]="diasF" required>
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-radio-button [value]="30" (click)="LimpiarCalcular()" matSuffix
                                             matTooltipPosition="right"
-                                            matTooltip="Indicar tiempo mínimo de servicios en meses.">
-                                            Meses
+                                            matTooltip="Se consideran todos los meses de 30 días.">
+                                            <label id="textoradiobtn">Meses comerciales (30)</label>
                                         </mat-radio-button>
-                                        <mat-radio-button value="horas" (change)="SelecionarLimite($event)" matSuffix
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start">
+                                        <mat-radio-button [value]="31" (click)="LimpiarCalcular()" matSuffix
                                             matTooltipPosition="right"
-                                            matTooltip="Indicar tiempo mínimo de servicios en horas.">
-                                            Horas
+                                            matTooltip="Se considera que cada mes incluye todos sus días reales.">
+                                            <label id="textoradiobtn">Meses calendario</label>
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start">
-                                <div class="row">
-                                    <div class="col-md" *ngIf="meses_">
-                                        <mat-form-field id="campos">
-                                            <mat-label id="letras_2">No. de Meses</mat-label>
-                                            <input matInput type="tel" [formControl]="minimoMesF" [required]="meses_"
-                                                (keypress)="IngresarSoloNumeros($event)">
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-md" *ngIf="horas_">
-                                        <mat-form-field id="campos">
-                                            <mat-label id="letras_2">No. de Horas</mat-label>
-                                            <input matInput type="tel" [formControl]="minimoHorasF" [required]="horas_"
-                                                (keypress)="IngresarSoloNumeros($event)">
-                                        </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!--  METODOS QUE FUERON COLOCADOS PARA OTROS PAISES DIFERENTES A ECUADOR / VERIFICAR CON EL TIEMPO SU FUNCIONAMIENTO  -->
+                    <div style="padding-top: 20px;" hidden>
+                        <mat-divider></mat-divider>
+                        <div class="subtitulo" style="padding-top: 10px; font-size: 12px;">
+                            <span>Información adicional</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <label
+                                        style="padding-top: 15px; padding-bottom: 5px; position: relative; left:10px; font-size: 14px;">
+                                        Tiempo mínimo de servicio:
+                                    </label>
+                                    <mat-icon *ngIf="cancelar" id="cerrar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Cancelar registro."
+                                        style="margin-top: 13px; position: relative; left:20px; height: max-content"
+                                        (click)="CancelarLimite()">
+                                        cancel
+                                    </mat-icon>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start"
+                                    style="position: relative; left:30px;">
+                                    <mat-radio-group aria-label="Select an option" [formControl]="servicioF">
+                                        <div class="d-flex flex-wrap justify-content-around">
+                                            <mat-radio-button value="meses" (change)="SelecionarLimite($event)"
+                                                matSuffix matTooltipPosition="right"
+                                                matTooltip="Indicar tiempo mínimo de servicios en meses.">
+                                                Meses
+                                            </mat-radio-button>
+                                            <mat-radio-button value="horas" (change)="SelecionarLimite($event)"
+                                                matSuffix matTooltipPosition="right"
+                                                matTooltip="Indicar tiempo mínimo de servicios en horas.">
+                                                Horas
+                                            </mat-radio-button>
+                                        </div>
+                                    </mat-radio-group>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <div class="row">
+                                        <div class="col-md" *ngIf="meses_">
+                                            <mat-form-field id="campos">
+                                                <mat-label id="letras_2">No. de Meses</mat-label>
+                                                <input matInput type="tel" [formControl]="minimoMesF"
+                                                    [required]="meses_" (keypress)="IngresarSoloNumeros($event)">
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md" *ngIf="horas_">
+                                            <mat-form-field id="campos">
+                                                <mat-label id="letras_2">No. de Horas</mat-label>
+                                                <input matInput type="tel" [formControl]="minimoHorasF"
+                                                    [required]="horas_" (keypress)="IngresarSoloNumeros($event)">
+                                            </mat-form-field>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start"
-                                style="position: relative; left:3px; width: 350px;">
-                                <mat-checkbox id="check" matSuffix matTooltipPosition="right"
-                                    [formControl]="continuidadF"
-                                    matTooltip="Indicar si se requiere control de continuidad laboral.">
-                                    Requiere continuidad laboral
-                                </mat-checkbox>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-start"
+                                    style="position: relative; left:3px; width: 350px;">
+                                    <mat-checkbox id="check" matSuffix matTooltipPosition="right"
+                                        [formControl]="continuidadF"
+                                        matTooltip="Indicar si se requiere control de continuidad laboral.">
+                                        Requiere continuidad laboral
+                                    </mat-checkbox>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -158,7 +204,13 @@
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
-                                <label style="top:10px; position: relative; left:10px;">Días de Vacaciones:</label>
+                                <div style="padding-bottom: 15px;">
+                                    <label style="top:15px; position: relative; left:10px;">
+                                        Días de Vacaciones:
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="d-flex flex-wrap justify-content-start">
@@ -174,6 +226,8 @@
                                                     (keypress)="IngresarSoloNumeros($event)"
                                                     [readonly]="escritura_dias">
                                             </mat-form-field>
+                                        </div>
+                                        <div class="d-flex flex-wrap justify-content-start">
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días Calendario</mat-label>
                                                 <input matInput type="tel" [formControl]="diasCalendarioF"
@@ -194,7 +248,6 @@
                                                 matTooltip="Editar días de vacaciones ingresados.">
                                                 <p>Validado</p>
                                             </i>
-
                                         </div>
                                     </div>
                                 </div>
@@ -207,7 +260,8 @@
                                     matTooltip="Activar acumulación de días de vacaciones.">
                                     Acumular vacaciones
                                 </mat-checkbox>
-
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start" style="padding-bottom: 20px;">
                                 <mat-form-field *ngIf="acumular" id="Máximo_días">
                                     <mat-label id="letras_2">Máximo de días acumulables</mat-label>
                                     <input matInput type="tel" [formControl]="diasAcumulacionF"
@@ -215,7 +269,8 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-md">
+                        <!--  LOGICA QUE SE COLOCARA EN LA PROGRAMACION DE VACACIONES  -->
+                        <div class="col-md" *ngIf="nuevo_periodo">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-checkbox class="check" [formControl]="periodosF" (change)="ActivarPeriodos($event)"
                                     matSuffix matTooltipPosition="right"
@@ -338,7 +393,7 @@
                                     </div>
                                 </mat-radio-group>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="variable"
-                                    style="position: relative; left:40px"
+                                    style="position: relative; left:40px; color:blue;"
                                     (click)="RegistrarAntiguedad(tercerFormulario.value)"
                                     matTooltip="Registrar antiguedad para vacaciones.">
                                     add_box
@@ -357,6 +412,15 @@
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días adicionales</mat-label>
                                                 <input matInput type="tel" [formControl]="diasAdicionalesF"
+                                                    [required]="fija" (keypress)="IngresarSoloNumeros($event)">
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="d-flex flex-wrap justify-content-start">
+                                            <mat-form-field id="Vacacion_periodo">
+                                                <mat-label id="letras_1">
+                                                    Máximo de días adicionales antigüedad
+                                                </mat-label>
+                                                <input matInput type="tel" [formControl]="maximoAntiguedadF"
                                                     [required]="fija" (keypress)="IngresarSoloNumeros($event)">
                                             </mat-form-field>
                                         </div>
@@ -383,7 +447,7 @@
                                     <input matInput type="tel" [formControl]="vacaciones_unoF" [required]="antiguo_uno"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_uno"
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_uno"
                                     matTooltipPosition="right" matTooltip="Eliminar Registro."
                                     (click)="EliminarAntiguedad(1)">
                                     cancel
@@ -411,7 +475,7 @@
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)" required
                                         type="number">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_dos"
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_dos"
                                     matTooltipPosition="right" matTooltip="Eliminar Registro."
                                     (click)="EliminarAntiguedad(2)">
                                     cancel
@@ -438,7 +502,7 @@
                                     <input matInput [formControl]="vacaciones_tresF" [required]="antiguo_tres"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_tres"
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_tres"
                                     matTooltipPosition="right" matTooltip="Eliminar Registro."
                                     (click)="EliminarAntiguedad(3)">
                                     cancel
@@ -466,7 +530,7 @@
                                         [required]="antiguo_cuatro" [readonly]="escritura_antiguo"
                                         (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_cuatro"
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_cuatro"
                                     matTooltipPosition="right" matTooltip="Eliminar Registro."
                                     (click)="EliminarAntiguedad(4)">
                                     cancel
@@ -522,16 +586,6 @@
                                     </div>
                                     <div class="d-flex flex-wrap justify-content-start">
                                         <mat-form-field id="periodo_calculo">
-                                            <mat-label id="letras_3">Hábiles:</mat-label>
-                                            <input matInput [formControl]="diasMesLaborableF" readonly>
-                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                                matTooltip="Días laborables de vacaciones ganados por mes.">
-                                                event
-                                            </mat-icon>
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="d-flex flex-wrap justify-content-start">
-                                        <mat-form-field id="periodo_calculo">
                                             <mat-label id="letras_3">Calendario:</mat-label>
                                             <input matInput [formControl]="diasMesCalendarioF" readonly>
                                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -544,17 +598,8 @@
                                 <div class="col-md">
                                     <div class="d-flex flex-wrap justify-content-start">
                                         <label style="padding-top: 10px; position: relative; left:10px;">
-                                            Vacaciones ganadas por días:</label>
-                                    </div>
-                                    <div class="d-flex flex-wrap justify-content-start">
-                                        <mat-form-field id="periodo_calculo">
-                                            <mat-label id="letras_3">Hábiles:</mat-label>
-                                            <input matInput [formControl]="dias_LaborableF" readonly>
-                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                                matTooltip="Días labaorables de vacaciones ganados por día.">
-                                                event
-                                            </mat-icon>
-                                        </mat-form-field>
+                                            Vacaciones ganadas por días:
+                                        </label>
                                     </div>
                                     <div class="d-flex flex-wrap justify-content-start">
                                         <mat-form-field id="periodo_calculo">

@@ -1974,7 +1974,10 @@
                         </div>
                         <mat-divider></mat-divider>
                     </div>
-                    
+                    <mat-paginator id="pagina" [length]="peridoVacaciones.length" [pageSize]="tamanio_paginaP"
+                        [pageSizeOptions]="pageSizeOptionsP" (page)="ManejarPaginaPeriodos($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
                 </mat-card-content>
             </mat-card>
         </div>

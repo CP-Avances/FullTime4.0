@@ -1,5 +1,5 @@
+import { FormGroup, FormControl, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
@@ -35,7 +35,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   // BUSQUEDA DE PAISES AL INGRESAR INFORMACION
   filtro: Observable<any[]>;
 
-
   /** *************************************************************************************************** **
    ** **                               VALIDACIONES DE FORMULARIOS                                     ** **
    ** *************************************************************************************************** **/
@@ -48,6 +47,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   minimoMesF = new FormControl('');
   nombrePaisF = new FormControl('');
   minimoHorasF = new FormControl('');
+  horaEstandarF = new FormControl('');
   continuidadF = new FormControl(false);
 
   // SEGUNDO FORMULARIO
@@ -62,23 +62,12 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   acumularF = new FormControl(false);
 
   // TERCER FORMULARIO
-  vacaciones_cuatroF = new FormControl('');
   antiguedadActivaF = new FormControl(false);
   aniosAntiguedadF = new FormControl('');
-  vacaciones_tresF = new FormControl('');
+  maximoAntiguedadF = new FormControl(0);
   diasAdicionalesF = new FormControl('');
-  vacaciones_dosF = new FormControl('');
-  vacaciones_unoF = new FormControl('');
   meses_calculoF = new FormControl('');
-  desde_cuatroF = new FormControl('');
-  hasta_cuatroF = new FormControl('');
   antiguedadF = new FormControl('');
-  hasta_tresF = new FormControl('');
-  desde_tresF = new FormControl('');
-  desde_unoF = new FormControl('');
-  desde_dosF = new FormControl('');
-  hasta_unoF = new FormControl('');
-  hasta_dosF = new FormControl('');
   calculoF = new FormControl(false);
   variableF: boolean = false;
 
@@ -88,22 +77,33 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   dias_CalendarioF = new FormControl('');
   dias_LaborableF = new FormControl('');
 
+  // TRATAMIENTO DE FORMULARIO DE ANTIGUEDAD
+  antiguedadForm: FormGroup;
+  get rangosAntiguedad(): FormArray {
+    return this.antiguedadForm.get('rangosAntiguedad') as FormArray;
+  }
+
+
   constructor(
     private rest: RegimenService,
     private pais: ProvinciaService,
     private toastr: ToastrService,
     private formulario: FormBuilder,
+    private antiguedadFormulario: FormBuilder,
     public cambio: ChangeDetectorRef,
     public validar: ValidacionesService,
     public componentl: ListarRegimenComponent,
-  ) { }
+  ) {
+
+
+  }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
 
     this.ObtenerPaises();
     this.ObtenerRegimen();
@@ -127,6 +127,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
       nombrePaisForm: this.nombrePaisF,
       minimoHorasForm: this.minimoHorasF,
       continuidadForm: this.continuidadF,
+      horaEstandarForm: this.horaEstandarF,
     });
 
     this.segundoFormulario = this.formulario.group({
@@ -142,23 +143,12 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     });
 
     this.tercerFormulario = this.formulario.group({
-      vacaciones_cuatroForm: this.vacaciones_cuatroF,
       antiguedadActivaForm: this.antiguedadActivaF,
-      vacaciones_tresForm: this.vacaciones_tresF,
+      maximoAntiguedadForm: this.maximoAntiguedadF,
       aniosAntiguedadForm: this.aniosAntiguedadF,
       diasAdicionalesForm: this.diasAdicionalesF,
-      vacaciones_dosForm: this.vacaciones_dosF,
-      vacaciones_unoForm: this.vacaciones_unoF,
       meses_calculoForm: this.meses_calculoF,
-      desde_cuatroForm: this.desde_cuatroF,
-      hasta_cuatroForm: this.hasta_cuatroF,
       antiguedadForm: this.antiguedadF,
-      hasta_tresForm: this.hasta_tresF,
-      desde_tresForm: this.desde_tresF,
-      desde_unoForm: this.desde_unoF,
-      desde_dosForm: this.desde_dosF,
-      hasta_unoForm: this.hasta_unoF,
-      hasta_dosForm: this.hasta_dosF,
       calculoForm: this.calculoF,
 
       diasMesCalendarioForm: this.diasMesCalendarioF,
@@ -197,6 +187,20 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     this.rest.ConsultarNombresRegimen().subscribe(datos => {
       this.regimen = datos;
     })
+  }
+
+  // METODO PARA VALIDAR INGRESO DE MESES
+  validarMeses() {
+    const valor = this.mesesF.value;
+
+    if (valor == null) return; // NO HACE NADA SI NO HAY VALOR AUN
+
+    if (parseInt(valor) < 1) {
+      this.mesesF.setValue('1');
+    } 
+    else if (parseInt(valor) > 12) {
+      this.mesesF.setValue('12');
+    }
   }
 
   /** *********************************************************************************************** **
@@ -689,6 +693,87 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   // BOTON GUARDAR DE FROMULARIO ANTIGUEDAD
   activar_guardar: boolean = true; // ------------------ Boton inactivo (true)
 
+  // METODO PARA CREAR INPUTS PARA INGRESAR ANTIGUEDAD
+  CrearRango(): FormGroup {
+    return this.antiguedadFormulario.group({
+      anio_desde: [null, Validators.required],
+      anio_hasta: [null, Validators.required],
+      dias_adicionales: [null, Validators.required]
+    });
+  }
+
+  // METODO PARA AGREGAR UN NUEVO REGISTRO DE ANTIGUEDAD VARIABLE
+  AgregarRango(): void {
+    this.rangosAntiguedad.push(this.CrearRango());
+  }
+
+  // METODO PARA ELIMINAR UNO DE LOS RANGOS DE ANTIGUEDAD INGRESADOS
+  eliminarRango(index: number): void {
+    this.correcto_antiguo = false;
+    this.escritura_antiguo = false;
+    this.rangosAntiguedad.removeAt(index);
+  }
+
+  // METODO PARA VERIFICAR RANGOS DE ANTIGUEDAD
+  verificarRangos(): boolean {
+    const rangos = this.rangosAntiguedad.controls.map(control => control.value);
+
+    for (let i = 0; i < rangos.length; i++) {
+      const r = {
+        anio_desde: Number(rangos[i].anio_desde),
+        anio_hasta: Number(rangos[i].anio_hasta),
+        dias_adicionales: Number(rangos[i].dias_adicionales)
+      };
+
+      if (
+        isNaN(r.anio_desde) || isNaN(r.anio_hasta) || isNaN(r.dias_adicionales)
+      ) {
+        this.toastr.warning(`Completa todos los campos en el rango ${i + 1}.`);
+        return false;
+      }
+
+      if (r.anio_hasta <= r.anio_desde) {
+        this.toastr.warning(`"Años hasta" debe ser mayor que "desde" en el rango ${i + 1}.`);
+        return false;
+      }
+
+      // VERIFICAR CRUCE CON OTROS RANGOS
+      for (let j = 0; j < rangos.length; j++) {
+        if (i === j) continue;
+
+        const otro = {
+          anio_desde: Number(rangos[j].anio_desde),
+          anio_hasta: Number(rangos[j].anio_hasta)
+        };
+
+        // SI SE CRUZAN LOS RANGOS
+        const seCruzan =
+          (r.anio_desde >= otro.anio_desde && r.anio_desde <= otro.anio_hasta) ||
+          (r.anio_hasta >= otro.anio_desde && r.anio_hasta <= otro.anio_hasta) ||
+          (r.anio_desde <= otro.anio_desde && r.anio_hasta >= otro.anio_hasta);
+
+        if (seCruzan) {
+          this.toastr.warning(`El rango ${i + 1} se cruza con el rango ${j + 1}.`);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // METODO PARA VALIDAR LA INFORMACION INGRESADA
+  datosAntiguedad: any = [];
+  ValidarAntiguedad(): void {
+    this.validar_antiguo = true;
+    this.correcto_antiguo = false;
+    this.escritura_antiguo = false;
+    if (this.verificarRangos()) {
+      this.datosAntiguedad = this.antiguedadForm.value.rangosAntiguedad;
+      //console.log('Datos válidos:', this.datosAntiguedad);
+      this.AgregarRango();
+    }
+  }
+
   // METODO DE ACTIVACION DE REGISTRO DE ANTIGUEDDA
   ActivarAntiguedad(ob: MatCheckboxChange, form3: any) {
     if (ob.checked === true) {
@@ -740,194 +825,20 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     }
     else {
       this.fija = false;
+      this.antiguedadForm = this.antiguedadFormulario.group({
+        rangosAntiguedad: this.antiguedadFormulario.array([this.CrearRango()])
+      });
       this.variable = true;
       this.variableF = true;
-      this.antiguo_uno = true;
-      this.delete_antiguo_uno = true;
       this.validar_antiguo = true;
       this.escritura_antiguo = false;
-      this.LimpiarFormAntiguedad(this.desde_unoF, this.hasta_unoF, this.vacaciones_unoF, '');
-    }
-  }
-
-  // CAMPOS DE REGISTRO DE ANTIGUEDAD
-  antiguo_uno: boolean = false; // --------------------- Campos de formulario inactivos (false)
-  antiguo_dos: boolean = false;
-  antiguo_tres: boolean = false;
-  antiguo_cuatro: boolean = false;
-  // METODO PARA MOSTRAR CAMPOS DE REGISTRO DE ANTIGUEDAD
-  RegistrarAntiguedad(fomr3: any) {
-    this.activar_guardar = true;
-    // BOTONES DE VALIDACION DE REGISTROS
-    this.validar_antiguo = true;
-    this.correcto_antiguo = false;
-    this.escritura_antiguo = false;
-
-    if (this.antiguo_uno === false) {
-      this.antiguo_uno = true;
-      this.delete_antiguo_uno = true;
-      this.LimpiarFormAntiguedad(this.desde_unoF, this.hasta_unoF, this.vacaciones_unoF, '');
-    }
-
-    else if (this.antiguo_dos === false) {
-      // VALIDAR QUE LA INFORMACIÓN REQUERIDA SEA INGRESADA
-      if (fomr3.desde_unoForm != '' && fomr3.hasta_unoForm != '' && fomr3.vacaciones_unoForm != '') {
-        this.antiguo_dos = true;
-        this.delete_antiguo_dos = true;
-        this.delete_antiguo_uno = false;
-        this.LimpiarFormAntiguedad(this.desde_dosF, this.hasta_dosF, this.vacaciones_dosF, '');
-      }
-      else {
-        this.toastr.warning('Primero registrar datos de antiguedad de vacaciones solicitados.', '', {
-          timeOut: 6000
-        })
-      }
-    }
-
-    else if (this.antiguo_tres === false) {
-      if (fomr3.desde_dosForm != '' && fomr3.hasta_dosForm != '' && fomr3.vacaciones_dosForm != '') {
-        this.antiguo_tres = true;
-        this.delete_antiguo_tres = true;
-        this.delete_antiguo_dos = false;
-        this.LimpiarFormAntiguedad(this.desde_tresF, this.hasta_tresF, this.vacaciones_tresF, '');
-      }
-      else {
-        this.toastr.warning('Primero registrar datos de antiguedad de vacaciones solicitados.', '', {
-          timeOut: 6000
-        })
-      }
-    }
-
-    else if (this.antiguo_cuatro === false) {
-      if (fomr3.desde_tresForm != '' && fomr3.hasta_tresForm != '' && fomr3.vacaciones_tresForm != '') {
-        this.variable = false;
-        this.antiguo_cuatro = true;
-        this.delete_antiguo_tres = false;
-        this.delete_antiguo_cuatro = true;
-        this.LimpiarFormAntiguedad(this.desde_cuatroF, this.hasta_cuatroF, this.vacaciones_cuatroF, '');
-      }
-      else {
-        this.toastr.warning('Primero registrar datos de antiguedad de vacaciones solicitados.', '', {
-          timeOut: 6000
-        })
-      }
-    }
-  }
-
-  // BOTONES DE ELIMINACION DE REGISTRO DE ANTIGUEDAD
-  delete_antiguo_uno: boolean = false; // ------------------ Botones de eliminar registro inactivo (false)
-  delete_antiguo_dos: boolean = false;
-  delete_antiguo_tres: boolean = false;
-  delete_antiguo_cuatro: boolean = false;
-  // METODO PARA OCULTAR CAMPOS DE REGISTRO DE ANTIGUEDAD
-  EliminarAntiguedad(opcion: number) {
-    this.correcto_antiguo = false;
-    this.escritura_antiguo = false;
-    if (opcion === 1) {
-
-      this.activar_guardar = true;
-      this.antiguedad = true;
-      this.fija = false;
-      this.variable = false;
-      this.variableF = false;
-
-      this.antiguo_uno = false;
-      this.validar_antiguo = false;
-
-      this.hasta_uno = false;
-
-      this.antiguedadF.reset();
-      this.LimpiarFormAntiguedad(this.desde_unoF, this.hasta_unoF, this.vacaciones_unoF, ' ');
-    }
-    if (opcion === 2) {
-      this.delete_antiguo_uno = true;
-      this.antiguo_dos = false;
-      this.validar_antiguo = true;
-      this.hasta_dos = false;
-      this.LimpiarFormAntiguedad(this.desde_dosF, this.hasta_dosF, this.vacaciones_dosF, ' ');
-    }
-    if (opcion === 3) {
-      this.delete_antiguo_dos = true;
-      this.antiguo_tres = false;
-      this.validar_antiguo = true;
-      this.hasta_tres = false;
-      this.LimpiarFormAntiguedad(this.desde_tresF, this.hasta_tresF, this.vacaciones_tresF, ' ');
-    }
-    if (opcion === 4) {
-      this.delete_antiguo_tres = true;
-      this.antiguo_cuatro = false;
-      this.variable = true;
-      this.validar_antiguo = true;
-      this.hasta_cuatro = false;
-      this.LimpiarFormAntiguedad(this.desde_cuatroF, this.hasta_cuatroF, this.vacaciones_cuatroF, ' ');
+      this.LimpiarAntiguedad();
     }
   }
 
   // METODO PARA RESTABLECER SELECCION DE ANTIGUEDAD
   LimpiarAntiguedad() {
-    this.antiguo_uno = false;
-    this.antiguo_dos = false;
-    this.antiguo_tres = false;
-    this.antiguo_cuatro = false;
-    this.hasta_uno = false;
-    this.hasta_dos = false;
-    this.hasta_tres = false;
-    this.hasta_cuatro = false;
-    this.LimpiarFormAntiguedad(this.desde_unoF, this.hasta_unoF, this.vacaciones_unoF, ' ');
-    this.LimpiarFormAntiguedad(this.desde_dosF, this.hasta_dosF, this.vacaciones_dosF, ' ');
-    this.LimpiarFormAntiguedad(this.desde_tresF, this.hasta_tresF, this.vacaciones_tresF, ' ');
-    this.LimpiarFormAntiguedad(this.desde_cuatroF, this.hasta_cuatroF, this.vacaciones_cuatroF, ' ');
-  }
-
-  // METODO PARA LIMPIAR CAMPOS DE FORMULARIO DE ANTIGUEDAD DE VACACIONES
-  LimpiarFormAntiguedad(campo1: any, campo2: any, campo3: any, limpiar: string) {
-    campo1.setValue(limpiar);
-    campo2.setValue(limpiar);
-    campo3.setValue(limpiar);
-  }
-
-  // MENSAJES DE ERRORES
-  hasta_uno: boolean = false; // ----------------------- Mensajes de error inactivos (false)
-  hasta_dos: boolean = false;
-  hasta_tres: boolean = false;
-  hasta_cuatro: boolean = false;
-
-  // VALIDACIONES DE REGISTROS DE ANTIGUEDAD
-  ValidarRegistrosAntiguedad(desde: any, hasta: any, vacaciones: any, alerta: any) {
-    if (desde != '' && hasta != '' && vacaciones != '') {
-      if (parseFloat(hasta) > parseFloat(desde)) {
-        if (alerta === 1) {
-          this.hasta_uno = false;
-        }
-        if (alerta === 2) {
-          this.hasta_dos = false;
-        }
-        if (alerta === 3) {
-          this.hasta_tres = false;
-        }
-        if (alerta === 4) {
-          this.hasta_cuatro = false;
-        }
-        return true; // ------ Si cumple las condiciones retorna true
-      }
-      else {
-        if (alerta === 1) {
-          this.hasta_uno = true; // --------------------- Mensajes de error activos (true)
-        }
-        if (alerta === 2) {
-          this.hasta_dos = true;
-        }
-        if (alerta === 3) {
-          this.hasta_tres = true;
-        }
-        if (alerta === 4) {
-          this.hasta_cuatro = true;
-        }
-      }
-    }
-    else {
-      return ''; // ------ Si los campos estan vacios retorna vacio
-    }
+    this.datosAntiguedad = [];
   }
 
   // METODO PARA EDITAR REGISTRO DE ANTIGUEDAD
@@ -939,157 +850,10 @@ export class RegimenComponent implements AfterViewInit, OnInit {
 
   // VERIFICAR QUE LOS REGISTROS DE ANTIGUEDAD CUMPLAN CON LAS CONDICIONES
   VerificarAntiguedad(form3: any) {
-    var uno = this.ValidarRegistrosAntiguedad(form3.desde_unoForm, form3.hasta_unoForm, form3.vacaciones_unoForm, 1);
-    var dos = this.ValidarRegistrosAntiguedad(form3.desde_dosForm, form3.hasta_dosForm, form3.vacaciones_dosForm, 2);
-    var tres = this.ValidarRegistrosAntiguedad(form3.desde_tresForm, form3.hasta_tresForm, form3.vacaciones_tresForm, 3);
-    var cuatro = this.ValidarRegistrosAntiguedad(form3.desde_cuatroForm, form3.hasta_cuatroForm, form3.vacaciones_cuatroForm, 4);
-
-    if (this.antiguo_uno === true && this.antiguo_dos === false &&
-      this.antiguo_tres === false && this.antiguo_cuatro === false) {
-      if (uno === '') {
-        this.toastr.warning('Ingresar la información requerida.', '', {
-          timeOut: 6000
-        });
-      }
-      else if (uno === true) {
-        this.AsignarValidaciones(form3);
-      }
-      else {
-        this.toastr.warning('Datos ingresados presentan errores.', '', {
-          timeOut: 6000
-        });
-      }
-    }
-    else if (this.antiguo_uno === true && this.antiguo_dos === true &&
-      this.antiguo_tres === false && this.antiguo_cuatro === false) {
-      if (uno === '') {
-        this.toastr.warning('Ingresar la información requerida.', '', {
-          timeOut: 6000
-        });
-      }
-      else if (uno === true) {
-        if (dos === '') {
-          this.toastr.warning('Ingresar la información requerida.', '', {
-            timeOut: 6000
-          });
-        }
-        else if (dos === true) {
-          this.AsignarValidaciones(form3);
-        }
-        else {
-          this.toastr.warning('Datos ingresados presentan errores.', '', {
-            timeOut: 6000
-          });
-        }
-      }
-      else {
-        this.toastr.warning('Datos ingresados presentan errores.', '', {
-          timeOut: 6000
-        });
-      }
-    }
-    else if (this.antiguo_uno === true && this.antiguo_dos === true &&
-      this.antiguo_tres === true && this.antiguo_cuatro === false) {
-      if (uno === '') {
-        this.toastr.warning('Ingresar la información requerida.', '', {
-          timeOut: 6000
-        });
-      }
-      else if (uno === true) {
-
-        if (dos === '') {
-          this.toastr.warning('Ingresar la información requerida.', '', {
-            timeOut: 6000
-          });
-        }
-        else if (dos === true) {
-
-          if (tres === '') {
-            this.toastr.warning('Ingresar la información requerida.', '', {
-              timeOut: 6000
-            });
-          }
-          else if (tres === true) {
-            this.AsignarValidaciones(form3);
-          }
-          else {
-            this.toastr.warning('Datos ingresados presentan errores.', '', {
-              timeOut: 6000
-            });
-          }
-
-        }
-        else {
-          this.toastr.warning('Datos ingresados presentan errores.', '', {
-            timeOut: 6000
-          });
-        }
-
-      }
-      else {
-        this.toastr.warning('Datos ingresados presentan errores.', '', {
-          timeOut: 6000
-        });
-      }
-
-    }
-    else if (this.antiguo_uno === true && this.antiguo_dos === true &&
-      this.antiguo_tres === true && this.antiguo_cuatro === true) {
-      if (uno === '') {
-        this.toastr.warning('Ingresar la información requerida.', '', {
-          timeOut: 6000
-        });
-      }
-      else if (uno === true) {
-
-        if (dos === '') {
-          this.toastr.warning('Ingresar la información requerida.', '', {
-            timeOut: 6000
-          });
-        }
-        else if (dos === true) {
-
-          if (tres === '') {
-            this.toastr.warning('Ingresar la información requerida.', '', {
-              timeOut: 6000
-            });
-          }
-          else if (tres === true) {
-
-            if (cuatro === '') {
-              this.toastr.warning('Ingresar la información requerida.', '', {
-                timeOut: 6000
-              });
-            }
-            else if (cuatro === true) {
-              this.AsignarValidaciones(form3);
-            }
-            else {
-              this.toastr.warning('Datos ingresados presentan errores.', '', {
-                timeOut: 6000
-              });
-            }
-
-          }
-          else {
-            this.toastr.warning('Datos ingresados presentan errores.', '', {
-              timeOut: 6000
-            });
-          }
-
-        }
-        else {
-          this.toastr.warning('Datos ingresados presentan errores.', '', {
-            timeOut: 6000
-          });
-        }
-
-      }
-      else {
-        this.toastr.warning('Datos ingresados presentan errores.', '', {
-          timeOut: 6000
-        });
-      }
+    if (this.verificarRangos()) {
+      this.datosAntiguedad = this.antiguedadForm.value.rangosAntiguedad;
+      //console.log('Datos válidos:', this.datosAntiguedad);
+      this.AsignarValidaciones(form3);
     }
   }
 
@@ -1164,7 +928,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     this.dias_CalendarioF.setValue(String(dias_calendario));
   }
 
-
   LimpiarCalcular() {
     this.limpiar_calcular = false;
     this.activar_guardar = true;
@@ -1236,6 +999,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         trabajo_minimo_mes: 0,
         trabajo_minimo_horas: 0,
         continuidad_laboral: form1.continuidadForm,
+        horaEstandar: form1.horaEstandarForm,
 
         vacacion_dias_laboral: parseFloat(form2.diasLaborablesForm),
         vacacion_dias_libre: parseFloat(form2.diasLibresForm),
@@ -1248,6 +1012,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         antiguedad_fija: this.fija,
         anio_antiguedad: 0,
         dias_antiguedad: 0,
+        maximo_antiguedad: 0,
         antiguedad_variable: this.variableF,
 
         vacacion_dias_calendario_mes: form3.diasMesCalendarioForm,
@@ -1255,8 +1020,10 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         calendario_dias: form3.dias_CalendarioForm,
         laboral_dias: form3.dias_LaborableForm,
         meses_calculo: form3.meses_calculoForm,
+
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip,
+        ip_local: this.ips_locales
       };
 
       this.ValidarInformacion(form1, form2, form3, regimen);
@@ -1292,6 +1059,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     if (this.fija === true) {
       regimen.anio_antiguedad = parseFloat(form3.aniosAntiguedadForm);
       regimen.dias_antiguedad = parseFloat(form3.diasAdicionalesForm);
+      regimen.maximo_antiguedad = parseInt(form3.maximoAntiguedadForm);
     }
 
   }
@@ -1316,7 +1084,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         }
         // VALIDAR INGRESO DE DATOS DE ANTIGUEDAD DE VACACIONES
         if (this.correcto_antiguo === true) {
-          this.LeerDatosAntiguedad(form3, registro.id);
+          this.LeerDatosAntiguedad(registro.id);
         }
         this.CerrarVentana(2, registro.id);
       }
@@ -1339,7 +1107,8 @@ export class RegimenComponent implements AfterViewInit, OnInit {
       descripcion: '',
       dias_vacacion: 0,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
 
     if (this.periodo_uno === true) {
@@ -1376,40 +1145,23 @@ export class RegimenComponent implements AfterViewInit, OnInit {
    ** ***************************************************************************************************** **/
 
   // METODO PARA LEER DATOS DE ANTIGUEDAD DE VACACIONES
-  LeerDatosAntiguedad(form3: any, regimen: number) {
+  LeerDatosAntiguedad(regimen: number) {
     var antiguedad = {
       anio_desde: 0,
       anio_hasta: 0,
       dias_antiguedad: 0,
       id_regimen: regimen,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     }
-
-    if (this.antiguo_uno === true) {
-      antiguedad.anio_desde = parseFloat(form3.desde_unoForm);
-      antiguedad.anio_hasta = parseFloat(form3.hasta_unoForm);
-      antiguedad.dias_antiguedad = parseFloat(form3.vacaciones_unoForm);
+    this.datosAntiguedad.forEach((a: any) => {
+      //console.log('ver -- ', a.anio_desde)
+      antiguedad.anio_desde = parseInt(a.anio_desde);
+      antiguedad.anio_hasta = parseInt(a.anio_hasta);
+      antiguedad.dias_antiguedad = parseInt(a.dias_adicionales);
       this.GuardarAntiguedad(antiguedad);
-    }
-    if (this.antiguo_dos === true) {
-      antiguedad.anio_desde = parseFloat(form3.desde_dosForm);
-      antiguedad.anio_hasta = parseFloat(form3.hasta_dosForm);
-      antiguedad.dias_antiguedad = parseFloat(form3.vacaciones_dosForm);
-      this.GuardarAntiguedad(antiguedad);
-    }
-    if (this.antiguo_tres === true) {
-      antiguedad.anio_desde = parseFloat(form3.desde_tresForm);
-      antiguedad.anio_hasta = parseFloat(form3.hasta_tresForm);
-      antiguedad.dias_antiguedad = parseFloat(form3.vacaciones_tresForm);
-      this.GuardarAntiguedad(antiguedad);
-    }
-    if (this.antiguo_cuatro === true) {
-      antiguedad.anio_desde = parseFloat(form3.desde_cuatroForm);
-      antiguedad.anio_hasta = parseFloat(form3.hasta_cuatroForm);
-      antiguedad.dias_antiguedad = parseFloat(form3.vacaciones_cuatroForm);
-      this.GuardarAntiguedad(antiguedad);
-    }
+    })
   }
 
   // METODO PARA GUARDAR EN BASE DE DATOS REGISTRO DE ANTIGUEDAD DE VACACIONES
