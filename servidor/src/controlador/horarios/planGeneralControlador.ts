@@ -239,7 +239,7 @@ class PlanGeneralControlador {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan]);
                 const [datosOriginales] = consulta.rows;
 
@@ -590,7 +590,7 @@ class PlanGeneralControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 

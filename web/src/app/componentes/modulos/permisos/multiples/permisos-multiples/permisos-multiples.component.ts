@@ -705,7 +705,6 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA CERRAR FORMULARIO DE PERMISOS
   CerrarVentana() {
-    console.log('ingresa')
     this.LimpiarCampos();
     this.componente.activar_busqueda = true;
     this.componente.activar_permisos = false;

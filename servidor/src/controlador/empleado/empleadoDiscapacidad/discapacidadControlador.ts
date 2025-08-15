@@ -78,7 +78,7 @@ class DiscapacidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
@@ -134,7 +134,7 @@ class DiscapacidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 

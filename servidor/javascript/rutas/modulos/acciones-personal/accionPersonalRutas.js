@@ -48,15 +48,18 @@ class DepartamentoRutas {
         this.router.get('/editar/accion/tipo/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccionEdicion);
         // METODO DE REGISTRO DE DOCUMENTO ACCION DE PERSONAL     **USADO
         this.router.post('/pedido/accion', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearPedidoAccionPersonal);
+        // METODO DE ACTUALIZACION DE DATOS DEL DOCUMENTO DE ACCION PERSONAL   **USADO
+        this.router.put('/pedido/accion/editar', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ActualizarPedidoAccionPersonal);
+        // METODO DE BUSQUEDA DE DATOS DE DOCUMENTOS DE ACCION DE PERSONAL    **USADO
+        this.router.get('/pedido/informacion/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarPedidoAccion);
+        // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
+        this.router.get('/pedidos/accion', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarPedidoAccion);
         // VER LOGO DE MINISTERIO TRABAJO     **USADO
         this.router.get('/logo/ministerio/codificado', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.verLogoMinisterio);
         // CONSULTAS PEDIDOS ACCIONES DE PERSONAL
         this.router.get('/lista/procesos/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarProcesosRecursivos);
-        this.router.put('/pedido/accion/editar', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ActualizarPedidoAccionPersonal);
-        this.router.get('/pedidos/accion', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarPedidoAccion);
         this.router.get('/pedidos/datos/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarDatosEmpleados);
         this.router.get('/pedidos/ciudad/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarDatosCiudades);
-        this.router.get('/pedido/informacion/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarPedidoAccion);
     }
 }
 const ACCION_PERSONAL_RUTAS = new DepartamentoRutas();

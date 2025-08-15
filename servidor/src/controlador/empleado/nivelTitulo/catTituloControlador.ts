@@ -47,7 +47,7 @@ class TituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
@@ -107,7 +107,7 @@ class TituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 

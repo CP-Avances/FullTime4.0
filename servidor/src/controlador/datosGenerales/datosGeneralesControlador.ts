@@ -9,7 +9,7 @@ class DatosGeneralesControlador {
         let estado = req.params.estado;
         let informacion = await pool.query(
             `
-            SELECT ig.*, u.usuario
+            SELECT ig.*, u.usuario, u.id_empleado
             FROM informacion_general AS ig
             LEFT JOIN eu_usuarios AS u ON ig.id = u.id_empleado
             WHERE ig.estado = $1

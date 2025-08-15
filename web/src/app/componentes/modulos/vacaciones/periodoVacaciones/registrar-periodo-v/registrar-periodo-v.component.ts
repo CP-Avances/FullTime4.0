@@ -1,6 +1,7 @@
 
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { DateTime } from 'luxon';
 
@@ -15,7 +16,6 @@ import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/dat
   standalone: false,
   templateUrl: './registrar-periodo-v.component.html',
   styleUrls: ['./registrar-periodo-v.component.css'],
-
 })
 
 export class RegistrarPeriodoVComponent implements OnInit {
@@ -24,37 +24,48 @@ export class RegistrarPeriodoVComponent implements OnInit {
   @Input() datoEmpleado: any;
   @Input() pagina: string = '';
 
-  // Datos del empleado
-  empleados: any = [];
-
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
-  nombreEmpleadoF = new FormControl('', [Validators.required]);
-  descripcionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
-  diaVacacionF = new FormControl(0, [Validators.required]);
-  horaVacacionF = new FormControl(0, [Validators.required]);
-  minVacacionF = new FormControl(0, [Validators.required]);
-  diaAntiguedadF = new FormControl(0, [Validators.required]);
-  estadoF = new FormControl('', [Validators.required]);
-  fechaFinF = new FormControl();
+  observacionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
+  fechaAcreditarF = new FormControl();
   fechaInicioF = new FormControl('', [Validators.required]);
-  diaPerdidoF = new FormControl(0, [Validators.required]);
+  fechaFinF = new FormControl();
+  fechaCargaF = new FormControl();  // FECHA DESDE LA QUE SE TIENE QUE EMPEZAR HACER LOS CALCULOS
+  fechaActualizacionF = new FormControl();
+  diasIncialesF = new FormControl(0);
+  diasVacacionF = new FormControl(0, [Validators.required, Validators.pattern(/^[-]?\d+(\.\d+)?$/)]);
+  diasUsadosVacacionF = new FormControl(0);
+  diasCargadosF = new FormControl(0);
+  saldoTransferidoF = new FormControl(0);
+  fechaPerdidaF = new FormControl();
+  diaPerdidoF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
+  diaAntiguedadF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
+  diasUsadosAntiguedadF = new FormControl(0, Validators.pattern(/^[-]?\d+(\.\d+)?$/));
+  observacionAntiguedadF = new FormControl('');
+  estadoF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public PerVacacionesForm = new FormGroup({
-    nombreEmpleadoForm: this.nombreEmpleadoF,
-    descripcionForm: this.descripcionF,
-    diaVacacionForm: this.diaVacacionF,
-    horaVacacionForm: this.horaVacacionF,
-    minVacacionForm: this.minVacacionF,
-    diaAntiguedadForm: this.diaAntiguedadF,
-    estadoForm: this.estadoF,
-    fechaFinForm: this.fechaFinF,
+    observacionForm: this.observacionF,
     fechaInicioForm: this.fechaInicioF,
-    diaPerdidoForm: this.diaPerdidoF
+    fechaFinForm: this.fechaFinF,
+    fechaCargaForm: this.fechaCargaF,
+    fechaActualizacionForm: this.fechaActualizacionF,
+    fechaAcreditarForm: this.fechaAcreditarF,
+    diasCargadosForm: this.diasCargadosF,
+    diasInicialesForm: this.diasIncialesF,
+    diasVacacionForm: this.diasVacacionF,
+    diasUsadosVacacionForm: this.diasUsadosVacacionF,
+    fechaPerdidaForm: this.fechaPerdidaF,
+    diaPerdidoForm: this.diaPerdidoF,
+    diaAntiguedadForm: this.diaAntiguedadF,
+    diasUsadosAntiguedadForm: this.diasUsadosAntiguedadF,
+    observacionAntiguedadForm: this.observacionAntiguedadF,
+    saldoTransferidoForm: this.saldoTransferidoF,
+    estadoForm: this.estadoF,
   });
 
   constructor(
@@ -72,29 +83,23 @@ export class RegistrarPeriodoVComponent implements OnInit {
       this.ips_locales = ips;
     });
 
-    this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
+    // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
+    var f = DateTime.now();
+    var FechaActual = f.toFormat("yyyy-MM-dd");
+
     this.ObtenerContrato();
     this.PerVacacionesForm.patchValue({
-      diaVacacionForm: 0,
-      horaVacacionForm: 0,
-      minVacacionForm: 0,
+      fechaActualizacionForm: FechaActual,
+      diasUsadosAntiguedadForm: 0,
+      diasUsadosVacacionForm: 0,
+      saldoTransferidoForm: 0,
       diaAntiguedadForm: 0,
-      diaPerdidoForm: 0
+      diasInicialesForm: 0,
+      diasVacacionForm: 0,
+      diasCargadosForm: 0,
+      diaPerdidoForm: 0,
     })
   }
-
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO
-  ObtenerEmpleados(idemploy: any) {
-    this.empleados = [];
-    this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
-      this.empleados = data;
-      console.log(this.empleados)
-      this.PerVacacionesForm.patchValue({
-        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-      })
-    })
-  }
-
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
   datosContrato: any = [];
@@ -102,13 +107,74 @@ export class RegistrarPeriodoVComponent implements OnInit {
     this.datosContrato = [];
     this.rest.BuscarDatosContrato(this.datoEmpleado.idContrato).subscribe(data => {
       this.datosContrato = data;
-      var fecha = new Date(String(data[0].fec_ingreso));
-      this.PerVacacionesForm.patchValue({ fechaInicioForm: data[0].fec_ingreso });
-      fecha.setMonth(fecha.getMonth() + parseInt(data[0].meses_periodo));
-      this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
+      //console.log(' contrato ', this.datosContrato)
+      var fecha = new Date(String(data[0].fecha_ingreso));
+      // METODO PARA OBTENER FECHAS PERIODO
+      this.ObtenerFechaPeriodo(fecha, parseInt(data[0].meses_calculo), parseInt(data[0].mes_periodo), 1);
     })
   }
 
+  // METODO PARA VERIFICAR FECHAS DE PERIODO
+  ObtenerFechaPeriodo(fecha: any, meses_calculo: any, mes_periodo: any, opcion: number) {
+    //console.log('fecha ', fecha)
+    var fecha_inicio = fecha;
+    if (opcion === 1) {
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: fecha });
+      fecha_inicio = DateTime.fromJSDate(fecha);
+    }
+
+    const fecha_actual = DateTime.now();
+
+    // EXTRAEMOS SOLO MES Y DÍA
+    const diaInicio = fecha_inicio.day;
+    const mesInicio = fecha_inicio.month;
+    const anioInicio = fecha_inicio.year;
+
+    const diaHoy = fecha_actual.day;
+    const mesHoy = fecha_actual.month;
+    const anioHoy = fecha_actual.year;
+
+    let fecha_fin: any;
+    let acreditar: any;
+    let nuevo_inicio: any;
+
+    if (mesInicio === mesHoy && diaInicio === diaHoy && anioInicio === anioHoy) {
+      // ES HOY
+      console.log('ES HOY');
+      fecha_fin = fecha_inicio.plus({ months: meses_calculo });
+      acreditar = fecha_inicio.plus({ months: mes_periodo });
+    }
+    else if (mesInicio === mesHoy && diaInicio === diaHoy) {
+      // MISMO DIA Y MES
+      console.log('MISMO DIA Y MES');
+      nuevo_inicio = fecha_actual;
+      fecha_fin = nuevo_inicio.plus({ months: meses_calculo });
+      acreditar = nuevo_inicio.plus({ months: mes_periodo });
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: nuevo_inicio });
+    }
+    else if (mesInicio < mesHoy || (mesInicio === mesHoy && diaInicio < diaHoy)) {
+      // YA PASO
+      console.log('YA PASO')
+      nuevo_inicio = fecha_inicio.set({ year: anioHoy });
+      fecha_fin = nuevo_inicio.plus({ months: (meses_calculo) });
+      acreditar = nuevo_inicio.plus({ months: (mes_periodo) });
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: nuevo_inicio });
+    }
+    else {
+      // AUN NO PASA
+      console.log('AUN NO PASA')
+      var anio_actual = fecha_inicio.set({ year: anioHoy });
+      nuevo_inicio = anio_actual.minus({ years: 1 });
+      fecha_fin = nuevo_inicio.plus({ months: meses_calculo });
+      acreditar = nuevo_inicio.plus({ months: mes_periodo });
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: nuevo_inicio });
+    }
+    this.PerVacacionesForm.patchValue({ fechaFinForm: fecha_fin, fechaAcreditarForm: acreditar });
+
+    //console.log('fecha ', fecha_fin, 'acreditar ', acreditar)
+  }
+
+  // METODO PARA VALIDAR LAS FECHAS DE INICIO Y FIN DE PERIODO
   ValidarDatosPerVacacion(form: any) {
     if (form.fechaFinForm === '') {
       form.fechaFinForm = null;
@@ -125,51 +191,75 @@ export class RegistrarPeriodoVComponent implements OnInit {
     }
   }
 
+  // METODO PARA INSERTAR LOS DATOS EN LA BASE DE DATOS
   InsertarPerVacacion(form: any) {
-    let datosPerVacaciones = {
-      id_empl_contrato: this.datoEmpleado.idContrato,
-      descripcion: form.descripcionForm,
-      dia_vacacion: form.diaVacacionForm,
-      dia_antiguedad: form.diaAntiguedadForm,
-      estado: form.estadoForm,
-      fec_inicio: form.fechaInicioForm,
-      fec_final: form.fechaFinForm,
-      dia_perdido: form.diaPerdidoForm,
-      horas_vacaciones: form.horaVacacionForm,
-      min_vacaciones: form.minVacacionForm,
-      id_empleado: this.empleados[0].id,
+    let periodo = {
+      id_empleado: this.datoEmpleado.idEmpleado,
+      observacion: form.observacionForm,
+      fecha_inicio: form.fechaInicioForm,
+      fecha_final: form.fechaFinForm,
+      fecha_carga: form.fechaCargaForm,
+      fecha_actualizacion: form.fechaActualizacionForm,
+      fecha_acreditar: form.fechaAcreditarForm,
+      dias_cargados: form.diasCargadosForm,
+      dias_iniciales: form.diasInicialesForm,
+      dias_vacacion: form.diasVacacionForm,
+      dias_usados_vacacion: form.diasUsadosVacacionForm,
+      fecha_perdida: form.fechaPerdidaForm,
+      dias_perdido: form.diaPerdidoForm,
+      tomar_antiguedad: false,
+      dias_antiguedad: form.diaAntiguedadForm,
+      dias_usados_antiguedad: form.diasUsadosAntiguedadForm,
+      observacion_antiguedad: form.observacionAntiguedadForm,
+      transferido: form.saldoTransferidoForm,
+      estado: true,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip_local: this.ips_locales,
+      ip: this.ip,
     };
-    this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {
+    if (this.adicionales === true) {
+      periodo.dias_iniciales = periodo.dias_vacacion;
+    }
+    if (periodo.dias_usados_antiguedad != 0) {
+      periodo.tomar_antiguedad = true;
+    }
+    console.log('ver periodo de vacaciones ', periodo);
+    this.restV.CrearPerVacaciones(periodo).subscribe(response => {
+      this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado.', {
         timeOut: 6000,
       })
       this.CerrarVentana();
     }, error => {
-      this.toastr.error('Ups! algo salio mal.', 'Período de Vacaciones no fue registrado', {
+      this.toastr.error('Ups! algo salio mal.', 'Período de Vacaciones no fue registrado.', {
         timeOut: 6000,
       })
     });
+
   }
 
+  // METODO PARA MARCAR COMO DIAS ADICIONALES
+  adicionales: boolean = false;
+  MarcarDiasAdicionales(evento: MatCheckboxChange) {
+    if (evento.checked === true) {
+      this.adicionales = true;
+    }
+    else {
+      this.adicionales = false;
+    }
+  }
+
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.PerVacacionesForm.reset();
   }
 
+  // METODO PARA CERRAR EL FORMULARIO
   CerrarVentana() {
     this.LimpiarCampos();
     if (this.pagina === 'ver-empleado') {
       this.componentev.ObtenerPeriodoVacaciones(this.componentev.formato_fecha);
       this.componentev.registrar_periodo = false;
       this.componentev.ver_periodo = true;
-    }
-
-  }
-
-  ObtenerMensajeErrorNombre() {
-    if (this.descripcionF.hasError('required')) {
-      return 'Campo obligatorio';
     }
   }
 
@@ -178,37 +268,24 @@ export class RegistrarPeriodoVComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  dInicio: any;
+  // METODO PARA VALIDAR FECHAS CON EL CONTRATO DEL EMPLEADO
   validarFecha(event: any) {
     this.PerVacacionesForm.patchValue({
       fechaFinForm: ''
     });
-    this.dInicio = event.value._i;
-    var fecha = this.dInicio.toISOString();
-    var ingreso = DateTime.fromFormat(fecha, 'yyyy/MM/dd').toFormat('yyyy-MM-dd');
-    this.rest.BuscarDatosContrato(this.datoEmpleado.idContrato).subscribe(data => {
-      //console.log('ver data ', data)
-      if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(ingreso)) {
-        if (data[0].descripcion === 'CODIGO DE TRABAJO') {
-          fecha.setMonth(fecha.getMonth() + 12);
-          this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
-        }
-        else if (data[0].descripcion === 'LOSEP') {
-          fecha.setMonth(fecha.getMonth() + 11);
-          this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
-        }
-        else if (data[0].descripcion === 'LOES') {
-          fecha.setMonth(fecha.getMonth() + 11);
-          this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
-        }
-      }
-      else {
-        this.PerVacacionesForm.patchValue({ fechaInicioForm: '' });
-        this.toastr.info('La fecha de inicio de periodo no puede ser anterior a la fecha de ingreso de contrato.', '', {
-          timeOut: 6000,
-        });
-      }
-    })
+    // FORMATO ISO: "2025-06-11"
+    const fecha = event.value.toISODate();
+    // console.log('Fecha:', fecha);
+    if (Date.parse(this.datosContrato[0].fecha_ingreso.split('T')[0]) <= Date.parse(fecha)) {
+      // VERIFICAR FECHAS DE PERIODO
+      this.ObtenerFechaPeriodo(event.value, this.datosContrato[0].meses_calculo, this.datosContrato[0].mes_periodo, 2);
+    }
+    else {
+      this.PerVacacionesForm.patchValue({ fechaInicioForm: '' });
+      this.toastr.info('La fecha de inicio de periodo no puede ser anterior a la fecha de ingreso de contrato.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
 }

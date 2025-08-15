@@ -92,7 +92,7 @@ class NacionalidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
@@ -153,7 +153,7 @@ class NacionalidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 

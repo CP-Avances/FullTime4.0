@@ -101,7 +101,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const codigo = await pool.query(
         `
         SELECT * FROM e_codigo WHERE id = $1
@@ -163,7 +163,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const codigo = await pool.query(
         `
         SELECT * FROM e_codigo WHERE id = $1
@@ -306,7 +306,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(
         `
           SELECT * FROM eu_empleados WHERE id = $1
@@ -510,7 +510,7 @@ class EmpleadoControlador {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
-          // CONSULTAR DATOSORIGINALES
+          // CONSULTAR DATOS ORIGINALES
           const empleado = await pool.query(
             `SELECT * FROM eu_empleados WHERE id = $1`, [obj]);
           const [datosOriginales] = empleado.rows;
@@ -1015,10 +1015,12 @@ class EmpleadoControlador {
   // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
   public async BuscarEmpleadoNombre(req: Request, res: Response): Promise<any> {
     const { informacion } = req.body;
+    console.log('informacion: ',informacion)
     const EMPLEADO = await pool.query(
       `
         SELECT * FROM informacion_general WHERE
-        (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+        ((UPPER (apellido) || \' \' || UPPER (nombre)) = $1) OR
+        ((UPPER (nombre) || \' \' || UPPER (apellido)) = $1)
       `
       , [informacion]);
     if (EMPLEADO.rowCount != 0) {
@@ -2351,7 +2353,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(
         `
         SELECT * FROM eu_empleados WHERE id = $1
@@ -2502,7 +2504,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = empleado.rows;
 
@@ -2561,7 +2563,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const empleado = await pool.query(`SELECT * FROM eu_empleado_titulos WHERE id = $1`, [id]);
       const [datosOriginales] = empleado.rows;
 

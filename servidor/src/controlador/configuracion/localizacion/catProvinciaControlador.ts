@@ -78,7 +78,7 @@ class ProvinciaControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const provincia = await pool.query(`SELECT * FROM e_provincias WHERE id = $1`, [id]);
       const [datosOriginales] = provincia.rows;
 

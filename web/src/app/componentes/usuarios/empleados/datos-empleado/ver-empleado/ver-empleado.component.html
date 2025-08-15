@@ -48,8 +48,9 @@
                                         <div class="d-flex flex-wrap justify-content-around"
                                             style="text-align: center; justify-content: center;">
                                             <form method="post" enctype="multipart/form-data">
-                                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
-                                                    id="file" accept="image/png, image/jpeg">
+                                                <input (change)="FileChange($event)" type="file"
+                                                    [formControl]="archivoForm" id="file"
+                                                    accept="image/png, image/jpeg">
                                                 <label for="file" class="btn-2">{{textoBoton}}</label>
                                             </form>
                                         </div>
@@ -112,8 +113,8 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <i type="submit" id="edit" *ngIf="!editar_empleado" (click)="AbirVentanaEditarEmpleado(e)" matSuffix
-                                        matTooltipPosition="right"
+                                    <i type="submit" id="edit" *ngIf="!editar_empleado"
+                                        (click)="AbirVentanaEditarEmpleado(e)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
                                         <p>Editar</p>
                                     </i>
@@ -182,13 +183,13 @@
                                 </mat-grid-tile>
                                 <mat-grid-tile *ngIf="activar_frase">
                                     <button *ngIf="frase"
-                                        class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
-                                        (click)="IngresarFrase()">
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector" (click)="IngresarFrase()">
                                         Frase Seguridad
                                     </button>
                                     <button *ngIf="cambiar_frase"
-                                        class="btn btn-block d-flex align-items-center justify-content-center" id="Selector"
-                                        (click)="CambiarFrase()">
+                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                        id="Selector" (click)="CambiarFrase()">
                                         Cambiar Frase
                                     </button>
                                 </mat-grid-tile>
@@ -313,7 +314,8 @@
                                     <div class="col" style="text-align: right;">
                                         <i type="submit" style="margin-left: 2%;" class="far fa-trash-alt"
                                             (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)" matSuffix
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
+                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro"
+                                            *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -390,7 +392,8 @@
                                             <p>Editar</p>
                                         </i>
                                         <i class="far fa-trash-alt" id="delete" (click)="ConfirmarEliminarVacuna(dv)"
-                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarDatos()">
+                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
+                                            *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -421,7 +424,8 @@
                 </app-registro-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="editar_contrato">
-                <app-editar-contrato [contrato]="contrato_editar" [fecha]="fecha_seleccionada" [pagina]="pagina_contrato">
+                <app-editar-contrato [contrato]="contrato_editar" [fecha]="fecha_seleccionada"
+                    [pagina]="pagina_contrato">
                 </app-editar-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="crear_cargo">
@@ -445,8 +449,9 @@
                                     </span>
                                 </div>
                                 <div class="col-6 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
-                                    <button *ngIf="!editar_contrato && getCrearDatos()" type="submit" class="btn btn-outline-light btn-sm"
-                                        style="float: right;" (click)="AbrirVentanaCrearContrato()">
+                                    <button *ngIf="!editar_contrato && getCrearDatos()" type="submit"
+                                        class="btn btn-outline-light btn-sm" style="float: right;"
+                                        (click)="AbrirVentanaCrearContrato()">
                                         Añadir
                                     </button>
                                 </div>
@@ -797,15 +802,17 @@
                                 <div style="text-align: right; margin-top: 5px;"
                                     *ngIf="ce.id != datoActual.id_contrato">
                                     <i type="submit" id="edit" style="margin-right: 6px;"
-                                        (click)="AbrirVentanaEditarContrato(ce, contratoForm.value)" matSuffix matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
+                                        (click)="AbrirVentanaEditarContrato(ce, contratoForm.value)" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit"
+                                        *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
                                     <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                         (click)="ConfirmarEliminacionDatos(ce, 'contrato', '')" matSuffix
                                         matTooltipPosition="right"
-                                        matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
-                                        class="far fa-trash-alt">
+                                        matTooltip="Elimina los datos generales de este registro"
+                                        *ngIf="getEliminarDatos()" class="far fa-trash-alt">
                                         <p>Eliminar</p>
                                     </i>
                                 </div>
@@ -920,7 +927,8 @@
                                                     autorenew
                                                 </mat-icon></label>
                                         </div>
-                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado" *ngIf="getEditarDatos()">
+                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado"
+                                            *ngIf="getEditarDatos()">
                                             <div class="row">
                                                 <div class="col-md">
                                                     <div class="d-flex flex-wrap justify-content-start">
@@ -947,15 +955,15 @@
                                         <div style="text-align: right; margin-top: 5px;">
                                             <i type="submit" id="edit" style="margin-right: 6px;"
                                                 (click)="VerCargoEdicion(c.id)" matSuffix matTooltipPosition="right"
-                                                matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()"
-                                                class="fas fa-edit">
+                                                matTooltip="Modificar los datos generales de este registro"
+                                                *ngIf="getEditarDatos()" class="fas fa-edit">
                                                 <p>Editar</p>
                                             </i>
                                             <i type="submit" id="t-eliminar" style="margin-right: 3px;"
                                                 (click)="ConfirmarEliminacionDatos(c.id, 'cargo', c.estado)" matSuffix
                                                 matTooltipPosition="right"
-                                                matTooltip="Elimina los datos generales de este registro" *ngIf="getEliminarDatos()"
-                                                class="far fa-trash-alt">
+                                                matTooltip="Elimina los datos generales de este registro"
+                                                *ngIf="getEliminarDatos()" class="far fa-trash-alt">
                                                 <p>Eliminar</p>
                                             </i>
                                         </div>
@@ -1629,8 +1637,8 @@
                         </span>
                     </div>
                     <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;" *ngIf="getCrearDatos()"
-                            (click)="AbrirVentanaPermiso()">
+                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+                            *ngIf="getCrearDatos()" (click)="AbrirVentanaPermiso()">
                             {{btnTitulo}}
                         </button>
                     </div>
@@ -1730,9 +1738,9 @@
                                 matTooltip="Descargar solicitud de permiso.">
                                 <p>Descargar</p>
                             </i>
-                            <i *ngIf="pt.estado === 1 && getEditarDatos()" class="fas fa-edit" id="edit" style="margin-right: 5px;"
-                                (click)="EditarPermiso(pt)" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar los datos generales de este registro.">
+                            <i *ngIf="pt.estado === 1 && getEditarDatos()" class="fas fa-edit" id="edit"
+                                style="margin-right: 5px;" (click)="EditarPermiso(pt)" matSuffix
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
                             <i *ngIf="pt.estado === 1 && getEliminarDatos()" class="fas fa-trash-alt" id="delete"
@@ -1785,7 +1793,7 @@
                     </div>
                     <div class="col-3 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
-                            (click)="AbrirVentanaPerVacaciones()" *ngIf="getCrearDatos()">Añadir
+                            (click)="AbrirVentanaPerVacaciones()" *ngIf="getCrearDatos() && ver_agregar_periodo">Añadir
                         </button>
                     </div>
                 </div>
@@ -1794,56 +1802,172 @@
                     <div *ngFor="let p of peridoVacaciones" style="padding-top: 15px;">
                         <div class="container">
                             <div class="row">
+                                <div class="espacio d-flex w-100">
+                                    <div class="ms-auto text-end">
+                                        <label id="datosF" [ngClass]="p.estado ? 'text-danger fw-bold' : ''">
+                                            {{ p.estado ? 'ACTIVO' : 'Cerrado' }}
+                                        </label>
+                                    </div>
+                                </div>
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Descripción:</label>
-                                        <label>{{p.descripcion}}</label>
+                                        <label>{{p.observacion}}</label>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Inicia Periodo:</label>
                                         <label>{{p.fec_inicio_}}</label>
                                     </div>
+                                </div>
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Finaliza Periodo:</label>
                                         <label>{{p.fec_final_}}</label>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="row" style="padding-top: 10px;">
                                 <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Vacaciones usadas:</label>
-                                        <label *ngIf="p.estado == 1">Sí</label>
-                                        <label *ngIf="p.estado == 2">No</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días por Antiguedad:</label>
-                                        <label>{{p.dia_antiguedad}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días Perdidos:</label>
-                                        <label>{{p.dia_perdido}}</label>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.dias_iniciales && p.dias_iniciales != 0">
+                                        <label id="datosF">Fecha de carga inicial:</label>
+                                        <label>{{p.fecha_desde_}}</label>
                                     </div>
                                 </div>
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días de Vacaciones:</label>
-                                        <label>{{p.dia_vacacion}}</label>
+                                        <label id="datosF">
+                                            {{ p.dias_iniciales > 0 ? 'Vacaciones iniciales:' : 'Vacaciones
+                                            transferidas:' }}
+                                        </label>
+                                        <label>
+                                            {{ p.dias_iniciales > 0 ? p.dias_iniciales : p.saldo_transferido }}
+                                        </label>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Horas de Vacaciones:</label>
-                                        <label>{{p.horas_vacaciones}}</label>
+                                        <label id="datosF">Fecha de carga:</label>
+                                        <label>{{p.fecha_acreditar_}}</label>
                                     </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.dias_cargados != 0">
+                                        <label id="datosF">Días de vacaciones cargados:</label>
+                                        <label>{{p.dias_cargados}}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.anios_antiguedad != 0">
+                                        <label id="datosF">Años laborados:</label>
+                                        <label>{{p.anios_antiguedad}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.dias_antiguedad != 0">
+                                        <label id="datosF">Días cargados de antigüedad:</label>
+                                        <label>{{p.dias_antiguedad}}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Minutos de Vacaciones:</label>
-                                        <label>{{p.minutos_vacaciones}}</label>
+                                        <label id="datosF">Fecha última actualizacion:</label>
+                                        <label>{{p.fecha_actualizacion_}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.tomar_antiguedad === true && p.observacion_antiguedad">
+                                        <label id="datosF" style="font-size: 12px;">Observación antigüedad:</label>
+                                        <label style="font-size: 12px;">{{p.observacion_antiguedad}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.tomar_antiguedad">
+                                        <label id="datosF" style="font-size: 12px;">Días de antigüedad tomados:</label>
+                                        <label style="font-size: 12px;">{{p.usados_antiguedad}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start" *ngIf="p.dias_perdidos != 0">
+                                        <label id="datosF">Días perdidos:</label>
+                                        <label>{{p.dias_perdidos}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.usados_dias_vacacion != 0">
+                                        <label id="datosF">Días usados de vacaciones:</label>
+                                        <label>{{p.usados_dias_vacacion}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="p.dias_cargados && p.dias_cargados != 0">
+                                        <label id="datosF">Días de vacaciones totales:</label>
+                                        <label>{{p.dias_vacacion}}</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div style="text-align: right; margin-right: 1px;">
-                            <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDatos()">
-                                <p>Editar</p>
-                            </i>
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-md">
+                                <div style="text-align: left; margin-left: 1px;"
+                                    *ngIf="p.estado && cerrar_periodo === false">
+                                    <i (click)="CerrarPeriodo()" class="fas fa-minus-circle" id="cerrar" matSuffix
+                                        matTooltipPosition="right" matTooltip="Cerrar periodo de vacaciones."
+                                        *ngIf="getEditarDatos()">
+                                        <p>Cerrar <br> Periodo Vacaciones</p>
+                                    </i>
+                                </div>
+                                <div style="text-align: left; margin-left: 1px;" *ngIf="p.estado && cerrar_periodo">
+                                    <i (click)="CerrarPeriodo()" class="fas fa-times-circle" id="cerrar" matSuffix
+                                        matTooltipPosition="right" matTooltip="Cerrar periodo de vacaciones."
+                                        *ngIf="getEditarDatos()">
+                                        <p>Cancelar</p>
+                                    </i>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div style="text-align: right; margin-right: 10px;"
+                                    *ngIf="cerrar_periodo === false && p.ultimo && p.cerrar_manual === false">
+                                    <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Modificar los datos generales de este registro."
+                                        *ngIf="getEditarDatos()">
+                                        <p>Editar</p>
+                                    </i>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  *************  FORMULARIO PARA CERRAR PERIODO DE VACACIONES  ************  -->
+                        <div *ngIf="p.estado && cerrar_periodo">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Fecha cerrar periodo</mat-label>
+                                    <input matInput [matDatepicker]="picker5" placeholder="dd/mm/aaaa"
+                                        [formControl]="fechaCerrar">
+                                    <mat-datepicker-toggle matSuffix [for]="picker5" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #picker5></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center"
+                                style="padding-top: 20px; margin-bottom: 2%;">
+                                <button id="btn-raised" class="btn btn-sm" value="Guardar"
+                                    (click)="GuardarPeriodoCerrado()">
+                                    Guardar
+                                </button>
+                            </div>
                         </div>
                         <mat-divider></mat-divider>
                     </div>
@@ -1870,71 +1994,100 @@
                     </div>
                 </div>
 
-
                 <mat-card-content>
-                    <div *ngFor="let v of vacaciones" style="padding-top: 15px;">
+                    <div *ngFor="let v of vacaciones" style="padding-top: 10px;">
                         <div class="container">
                             <div class="row">
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha Desde:</label>
-                                        <label>{{v.fecha_inicio_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha Hasta:</label>
-                                        <label>{{v.fecha_final_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha Ingreso:</label>
-                                        <label>{{v.fecha_ingreso_}}</label>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días Laborables:</label>
-                                        <label>{{v.dia_laborable}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días Libres:</label>
-                                        <label>{{v.dia_libre}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Legalizado:</label>
-                                        <label *ngIf="v.legalizado == true">Sí</label>
-                                        <label *ngIf="v.legalizado == false">No</label>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Estado:</label>
-                                        <label *ngIf="v.estado === 1">Pendiente</label>
-                                        <label *ngIf="v.estado === 2">Pre-autorizado</label>
-                                        <label *ngIf="v.estado === 3">Autorizado</label>
-                                        <label *ngIf="v.estado === 4">Negado</label>
+                                <div class="espacio d-flex w-100">
+                                    <div class="ms-auto text-end">
+                                        <span class="badge" [ngClass]="{
+                                            'text-bg-secondary': v.estado === 1,
+                                            'text-bg-warning':   v.estado === 2,
+                                            'text-bg-success':   v.estado === 3,
+                                            'text-bg-danger':    v.estado === 4
+                                        }">
+                                            {{
+                                            v.estado === 1 ? 'PENDIENTE' :
+                                            v.estado === 2 ? 'PREAUTORIZADO' :
+                                            v.estado === 3 ? 'AUTORIZADO' :
+                                            v.estado === 4 ? 'DENEGADO' : '—'
+                                            }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Inicio de vacaciones:</label>
+                                        <label>{{ v.fecha_inicio_ || '—' }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fin de vacaciones:</label>
+                                        <label>{{ v.fecha_final_ || '—' }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Cantidad solicitada:</label>
+                                        <label>
+                                            <ng-container *ngIf="esPorDias(v); else porHoras">
+                                                {{ formatearDias(v.numero_dias_totales) }}
+                                            </ng-container>
+                                            <ng-template #porHoras>
+                                                {{ formatearHorasDesdeMin(v.minutos_totales) }}
+                                            </ng-template>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Incluye feriados:</label>
+                                        <label>{{ v.incluir_feriados ? 'Sí' : 'No' }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha de registro:</label>
+                                        <label>{{ v.fecha_registro_ || '—' }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha de actualización:</label>
+                                        <label>{{ v.fecha_actualizacion_ || '—' }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Documento:</label>
+                                        <label>{{ (v.documento?.trim()?.length ? v.documento : '—') }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <mat-divider></mat-divider>
                         </div>
-                        <div class="float-right" *ngIf="v.estado === 1">
-                            <i class="fas fa-edit" id="edit" style="margin-right: 20px;" (click)="EditarVacaciones(v)"
-                                matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
-                                <p>Editar</p>
-                            </i>
-                            <i class="fas fa-backspace" id="cancel" (click)="CancelarVacaciones(v)" matSuffix
-                                matTooltipPosition="right" matTooltip="Cancelar solicitud de vacaciones">
-                                <p>Cancelar</p>
-                            </i>
-                        </div>
-                        <br><br>
-                        <mat-divider></mat-divider>
                     </div>
-                    <mat-paginator id="pagina" [length]="vacaciones.length" [pageSize]="tamanio_pagina"
-                        [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
-                    </mat-paginator>
                 </mat-card-content>
+
+
             </mat-card>
         </div>
+        <!-- *** REGISTRO DE VACACIONES INDIVIDUALES *** -->
+        <div style="padding-top: 20px;" *ngIf="activar_vacacion_individual">
+            <app-registrar-vacaciones [data]="empleadoUno">
+            </app-registrar-vacaciones>
+        </div>
+
+
     </mat-tab>
 
     <!-- HORAS EXTRAS -->
@@ -2121,7 +2274,7 @@
     <mat-tab *ngIf="HabilitarAlimentacion" label="alimentacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">local_dining</mat-icon>
-            <h6 id="items"> Alimentación</h6>
+            <h6 id="items">Alimentación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="solicita_comida">
             <mat-card class="mat-elevation-z8">
@@ -2202,7 +2355,8 @@
                     <div style="text-align: right;"
                         *ngIf="(pc.aprobada === false || pc.aprobada === null) && pc.fec_comida > FechaActual">
                         <i class="fas fa-edit" id="edit" (click)="AbrirEditarPlanComidas(pc)" matSuffix
-                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
+                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro"
+                            *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                     </div>
@@ -2292,7 +2446,8 @@
                     </div>
                     <div style="text-align: right;" *ngIf="pc.fec_final > FechaActual">
                         <i class="fas fa-edit" id="edit" (click)="AbrirEditarPlanComidas(pc)" matSuffix
-                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
+                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro"
+                            *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                         <i style="color:red; margin-left: 15px;" (click)="ConfirmarDeletePlanComidas(pc)"
@@ -2399,7 +2554,8 @@
                                             <td class="justify-content-center">
                                                 <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
                                                     matSuffix matTooltipPosition="right"
-                                                    matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
+                                                    matTooltip="Modificar los datos generales de este registro"
+                                                    *ngIf="getEditarDatos()">
                                                     <p>Editar</p>
                                                 </i>
                                                 <i style="color:red; margin-left: 15px;"
@@ -2514,4 +2670,3 @@
     </mat-tab>
 
 </mat-tab-group>
-

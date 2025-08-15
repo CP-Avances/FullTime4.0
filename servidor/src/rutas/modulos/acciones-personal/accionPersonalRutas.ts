@@ -51,7 +51,13 @@ class DepartamentoRutas {
 
         // METODO DE REGISTRO DE DOCUMENTO ACCION DE PERSONAL     **USADO
         this.router.post('/pedido/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearPedidoAccionPersonal);
-
+        // METODO DE ACTUALIZACION DE DATOS DEL DOCUMENTO DE ACCION PERSONAL   **USADO
+        this.router.put('/pedido/accion/editar', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ActualizarPedidoAccionPersonal);
+        // METODO DE BUSQUEDA DE DATOS DE DOCUMENTOS DE ACCION DE PERSONAL    **USADO
+        this.router.get('/pedido/informacion/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarPedidoAccion);
+          // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
+          this.router.get('/pedidos/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarPedidoAccion);
+          
         // VER LOGO DE MINISTERIO TRABAJO     **USADO
         this.router.get('/logo/ministerio/codificado', TokenValidation, ACCION_PERSONAL_CONTROLADOR.verLogoMinisterio);
 
@@ -65,11 +71,10 @@ class DepartamentoRutas {
 
         // CONSULTAS PEDIDOS ACCIONES DE PERSONAL
         this.router.get('/lista/procesos/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarProcesosRecursivos);
-        this.router.put('/pedido/accion/editar', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ActualizarPedidoAccionPersonal);
-        this.router.get('/pedidos/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarPedidoAccion);
+
         this.router.get('/pedidos/datos/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarDatosEmpleados);
         this.router.get('/pedidos/ciudad/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarDatosCiudades);
-        this.router.get('/pedido/informacion/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarPedidoAccion);
+
 
 
     }

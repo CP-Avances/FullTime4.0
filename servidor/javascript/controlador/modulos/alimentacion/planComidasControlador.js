@@ -344,7 +344,7 @@ class PlanComidasControlador {
                 const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, id_departamento, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const planComida = yield database_1.default.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
                 const [datosOriginales] = planComida.rows;
                 if (!datosOriginales) {
@@ -409,7 +409,7 @@ class PlanComidasControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const planComida = yield database_1.default.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
                 const [datosOriginales] = planComida.rows;
                 if (!datosOriginales) {
@@ -469,7 +469,7 @@ class PlanComidasControlador {
                 const { aprobada, verificar, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const planComida = yield database_1.default.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
                 const [datosOriginales] = planComida.rows;
                 if (!datosOriginales) {
@@ -571,7 +571,7 @@ class PlanComidasControlador {
                 const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const planComida = yield database_1.default.query(`
         SELECT * FROM ma_empleado_plan_comida_general WHERE id_solicitud_comida = $1 AND fecha = $2 AND id_empleado = $3
         `, [id, fecha, id_empleado]);
@@ -635,7 +635,7 @@ class PlanComidasControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const planComida = yield database_1.default.query('SELECT * FROM ma_detalle_plan_comida WHERE id = $1', [id]);
                 const [datosOriginales] = planComida.rows;
                 if (!datosOriginales) {
@@ -687,7 +687,7 @@ class PlanComidasControlador {
                 const id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const planComida = yield database_1.default.query(`
         SELECT * FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
         `, [id, id_empleado]);

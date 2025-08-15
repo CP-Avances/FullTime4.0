@@ -715,7 +715,7 @@ class TimbresControlador {
                 }
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mrv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
                 const datosOriginales = consulta.rows;
                 const idsEncontrados = datosOriginales.map((row) => row.id_empleado);
@@ -944,7 +944,7 @@ class TimbresControlador {
                     return res.status(400).jsonp({ message: 'Debe proporcionar un array de IDs válido.' });
                 }
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mtv_opciones_marcacion WHERE id_empleado = ANY($1)`, [ids]);
                 const datosOriginales = consulta.rows;
                 // OBTENER LOS IDS ENCONTRADOS
@@ -1040,7 +1040,7 @@ class TimbresControlador {
                 const { visto, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

@@ -95,7 +95,7 @@ class HorarioControlador {
                 let separador = path_1.default.sep;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horario = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE id = $1
         `, [id]);
@@ -164,7 +164,7 @@ class HorarioControlador {
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horario = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE id = $1
         `, [id]);
@@ -235,7 +235,7 @@ class HorarioControlador {
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horario = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE id = $1
         `, [id]);
@@ -343,7 +343,7 @@ class HorarioControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horario = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE id = $1
         `, [id]);
@@ -412,7 +412,7 @@ class HorarioControlador {
             try {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const horario = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE id = $1
         `, [id]);

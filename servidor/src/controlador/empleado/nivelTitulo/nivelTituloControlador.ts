@@ -33,7 +33,7 @@ class NivelTituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -136,7 +136,7 @@ class NivelTituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 

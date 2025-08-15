@@ -39,7 +39,7 @@ class EmpleadoProcesoControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const proceso = yield database_1.default.query('SELECT * FROM map_empleado_procesos WHERE id = $1', [id]);
                 const [datosOriginales] = proceso.rows;
                 if (!datosOriginales) {

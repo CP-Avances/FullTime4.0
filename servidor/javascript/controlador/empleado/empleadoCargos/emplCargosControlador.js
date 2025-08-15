@@ -87,7 +87,7 @@ class EmpleadoCargosControlador {
                 const { id_cargo, estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const cargoConsulta = yield database_1.default.query(`
           SELECT * FROM eu_empleado_cargos WHERE id = $1
         `, [id_cargo]);
@@ -278,7 +278,7 @@ class EmpleadoCargosControlador {
                 const { id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const cargoConsulta = yield database_1.default.query(`
         SELECT * FROM eu_empleado_cargos WHERE id = $1
         `, [id]);

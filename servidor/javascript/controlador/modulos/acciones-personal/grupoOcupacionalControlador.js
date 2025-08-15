@@ -189,7 +189,7 @@ class GrupoOcupacionalControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const proceso = yield database_1.default.query('SELECT * FROM map_empleado_grupo_ocupacional WHERE id = $1', [id]);
                 const [datosOriginales] = proceso.rows;
                 if (!datosOriginales) {
@@ -970,7 +970,7 @@ class GrupoOcupacionalControlador {
                     }
                 }
                 if (estado == true) {
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const grupo = yield database_1.default.query(`

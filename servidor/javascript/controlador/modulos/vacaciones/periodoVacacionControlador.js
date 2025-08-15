@@ -16,39 +16,26 @@ const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoria
 const settingsMail_1 = require("../../../libs/settingsMail");
 const database_1 = __importDefault(require("../../../database"));
 class PeriodoVacacionControlador {
-    // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES   **USADO
-    EncontrarIdPerVacaciones(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const VACACIONES = yield database_1.default.query(`
-      SELECT pv.id, pv.id_empleado_cargo
-      FROM mv_periodo_vacacion AS pv
-      WHERE pv.id = (SELECT MAX(pv.id) AS id 
-        FROM mv_periodo_vacacion AS pv 
-        WHERE pv.id_empleado = $1 )
-      `, [id_empleado]);
-            if (VACACIONES.rowCount != 0) {
-                return res.jsonp(VACACIONES.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado' });
-        });
-    }
+    // METODO PARA CREAR PERIODO DE VACACIONES   **USADO
     CrearPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, ip_local } = req.body;
+                const { observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion, dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida, id_empleado, estado, user_name, ip, ip_local, fecha_acreditar, transferido, dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const datosNuevos = yield database_1.default.query(`
-          INSERT INTO mv_periodo_vacacion (id_empleado_cargo., descripcion, dia_vacacion,
-              dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, id_empleado)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
-        `, [id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado,
-                    fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
-                    id_empleado,]);
+          INSERT INTO mv_periodo_vacacion (observacion, fecha_inicio, fecha_final, fecha_desde, fecha_ultima_actualizacion, 
+            dias_vacacion, usados_dias_vacacion, dias_antiguedad, usados_antiguedad, dias_perdidos, 
+            fecha_inicio_perdida, id_empleado, estado, fecha_acreditar_vacaciones, creado_manual, saldo_transferido,
+            dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad, anios_antiguedad)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20 $21) RETURNING *
+        `, [observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion,
+                    dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida,
+                    id_empleado, estado, fecha_acreditar, true, transferido, dias_iniciales, dias_cargados,
+                    tomar_antiguedad, observacion_antiguedad, 0]);
                 const [periodo] = datosNuevos.rows;
-                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final, 'ddd');
                 periodo.fecha_inicio = fechaInicioN;
                 periodo.fecha_final = fechaFinalN;
                 // AUDITORIA
@@ -64,7 +51,7 @@ class PeriodoVacacionControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query("COMMIT");
-                res.jsonp({ message: "Período de Vacación guardado" });
+                res.jsonp({ message: "Registro guardado." });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -73,26 +60,14 @@ class PeriodoVacacionControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION    **USADO
-    EncontrarPerVacaciones(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const PERIODO_VACACIONES = yield database_1.default.query(`
-      SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
-      `, [id_empleado]);
-            if (PERIODO_VACACIONES.rowCount != 0) {
-                return res.jsonp(PERIODO_VACACIONES.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        });
-    }
+    // METODO PARA ACTUALIZAR PERIODO DE VACACIONES    **USADO
     ActualizarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip, ip_local } = req.body;
+                const { observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion, dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida, estado, user_name, ip, ip_local, fecha_acreditar, transferido, dias_iniciales, dias_cargados, tomar_antiguedad, observacion_antiguedad, id } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const periodo = yield database_1.default.query(`SELECT * FROM mv_periodo_vacacion WHERE id = $1`, [id]);
                 const [datosOriginales] = periodo.rows;
                 if (!datosOriginales) {
@@ -111,15 +86,19 @@ class PeriodoVacacionControlador {
                     return res.status(404).jsonp({ message: "Error al actualizar período de vacaciones." });
                 }
                 const periodoNuevo = yield database_1.default.query(`
-        UPDATE mv_periodo_vacacion SET id_empleado_cargo = $1, descripcion = $2, dia_vacacion = $3 ,
-            dia_antiguedad = $4, estado = $5, fecha_inicio = $6, fecha_final = $7, dia_perdido = $8, 
-            horas_vacaciones = $9, minutos_vacaciones = $10 
-        WHERE id = $11 RETURNING *
-        `, [id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado,
-                    fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]);
+        UPDATE mv_periodo_vacacion SET observacion = $1, fecha_inicio = $2, fecha_final = $3 ,
+            fecha_desde = $4, fecha_ultima_actualizacion = $5, dias_vacacion = $6, usados_dias_vacacion = $7,
+            dias_antiguedad = $8, usados_antiguedad = $9, dias_perdidos = $10, fecha_inicio_perdida = $11,
+            estado = $12, fecha_acreditar_vacaciones = $13, saldo_transferido = $14, dias_iniciales = $15,
+            dias_cargados = $16, tomar_antiguedad = $17, observacion_antiguedad = $18  
+        WHERE id = $19 RETURNING *
+        `, [observacion, fecha_inicio, fecha_final, fecha_carga, fecha_actualizacion, dias_vacacion,
+                    dias_usados_vacacion, dias_antiguedad, dias_usados_antiguedad, dias_perdido, fecha_perdida,
+                    estado, fecha_acreditar, transferido, dias_iniciales, dias_cargados, tomar_antiguedad,
+                    observacion_antiguedad, id]);
                 const [datosNuevos] = periodoNuevo.rows;
-                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fecha_final, 'ddd');
                 const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
                 const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
                 datosOriginales.fecha_inicio = fechaInicioO;
@@ -146,6 +125,54 @@ class PeriodoVacacionControlador {
                 console.log('error ', error);
                 yield database_1.default.query("ROLLBACK");
                 return res.status(500).jsonp({ message: "Error al actualizar período de vacaciones." });
+            }
+        });
+    }
+    // METODO PARA BUSCAR DATOS DE PERIODO DE VACACION    **USADO
+    EncontrarPerVacaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const PERIODO_VACACIONES = yield database_1.default.query(`
+        SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1 ORDER BY id ASC
+      `, [id_empleado]);
+            if (PERIODO_VACACIONES.rowCount != 0) {
+                return res.jsonp(PERIODO_VACACIONES.rows);
+            }
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        });
+    }
+    // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES   **USADO
+    EncontrarIdPerVacaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            const VACACIONES = yield database_1.default.query(`
+      SELECT pv.id
+      FROM mv_periodo_vacacion AS pv
+      WHERE pv.estado = true AND pv.id_empleado = $1;
+      `, [id_empleado]);
+            if (VACACIONES.rowCount != 0) {
+                return res.jsonp(VACACIONES.rows);
+            }
+            res.status(404).jsonp({ text: 'Registro no encontrado' });
+        });
+    }
+    // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL
+    CerrarPeriodoVacaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { empleados, fecha } = req.body;
+            console.log('ver datos cerrar ', req.body);
+            try {
+                const resultado = yield database_1.default.query(`
+        SELECT public.fn_cierre_masivo_periodos($1, $2) AS resumen;
+        `, [empleados, fecha]);
+                res.status(200).json({ mensaje: resultado.rows });
+            }
+            catch (error) {
+                console.error('Error al cerrar periodos:', error.message);
+                res.status(500).json({
+                    error: 'Error',
+                    detalle: error.message
+                });
             }
         });
     }

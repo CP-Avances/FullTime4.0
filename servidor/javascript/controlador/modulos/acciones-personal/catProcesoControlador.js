@@ -93,7 +93,7 @@ class ProcesoControlador {
                 const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const proceso = yield database_1.default.query(`
           SELECT * FROM map_cat_procesos WHERE id = $1
         `, [id]);
@@ -196,7 +196,7 @@ class ProcesoControlador {
                     }
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const proce = yield database_1.default.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1) AND id != $2', [nombre, id]);
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
@@ -778,7 +778,7 @@ class ProcesoControlador {
             try {
                 const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
                 if (estado == true) {
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const proceso = yield database_1.default.query(`
             SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true
           `, [id_empleado]);

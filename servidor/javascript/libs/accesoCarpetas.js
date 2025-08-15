@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaMensajeNotificacion = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaMensajeNotificacion = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaHorasExtra = exports.ObtenerRutaHorasExtraGeneral = exports.ObtenerRutaHorasExtraIdEmpleado = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacacion = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA OBTENER RUTAS ORIGINALES
@@ -51,6 +51,19 @@ const ObtenerRutaVacuna = function (id) {
     });
 };
 exports.ObtenerRutaVacuna = ObtenerRutaVacuna;
+//METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE VACACIONES
+const ObtenerRutaVacacion = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let ruta = '';
+        let separador = path_1.default.sep;
+        const usuario = yield database_1.default.query(`
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
+        `, [id]);
+        ruta = path_1.default.join(__dirname, `..${separador}..`);
+        return ruta + separador + 'vacaciones' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
+    });
+};
+exports.ObtenerRutaVacacion = ObtenerRutaVacacion;
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE PERMISOS
 const ObtenerRutaPermisos = function (codigo) {
     return __awaiter(this, void 0, void 0, function* () {

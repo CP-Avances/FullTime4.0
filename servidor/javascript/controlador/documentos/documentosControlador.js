@@ -113,7 +113,7 @@ class DocumentosControlador {
                 let { id, documento } = req.params;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const doc = yield database_1.default.query(`SELECT * FROM e_documentacion WHERE id = $1`, [id]);
                 const [datosOriginales] = doc.rows;
                 if (!datosOriginales) {

@@ -30,6 +30,11 @@ label {
     letter-spacing: 0.1px;
 }
 
-#fechas {
-    width: 150px;
+.observar {
+    width: 400px;
+}
+
+#check{
+    margin-top: 15px;
+    margin-bottom: 15px;
 }

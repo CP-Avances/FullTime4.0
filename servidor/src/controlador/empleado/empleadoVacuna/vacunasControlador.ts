@@ -173,7 +173,7 @@ class VacunasControlador {
 
             let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const vacuna1 = await pool.query(
                 `
                 SELECT * FROM eu_empleado_vacunas WHERE id = $1
@@ -267,7 +267,7 @@ class VacunasControlador {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const vacuna = await pool.query(
                     `
                     SELECT * FROM eu_empleado_vacunas WHERE id = $1
@@ -361,7 +361,7 @@ class VacunasControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const vacunaconsulta = await pool.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 
@@ -437,7 +437,7 @@ class VacunasControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const vacunaconsulta = await pool.query(`SELECT * FROM eu_empleado_vacunas WHERE id = $1`, [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 

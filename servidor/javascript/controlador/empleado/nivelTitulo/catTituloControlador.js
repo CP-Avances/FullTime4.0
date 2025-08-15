@@ -55,7 +55,7 @@ class TituloControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
@@ -106,7 +106,7 @@ class TituloControlador {
                 const { nombre, id_nivel, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {

@@ -76,6 +76,7 @@ const permisosRutas_1 = __importDefault(require("./rutas/modulos/permisos/permis
 const periodoVacacionRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/periodoVacacionRutas"));
 const vacacionesRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/vacacionesRutas"));
 const kardexVacacionesRutas_1 = __importDefault(require("./rutas/reportes/kardexVacacionesRutas"));
+const configurarVacacionesRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/configurarVacacionesRutas"));
 // MODULO HORAS EXTRA
 const catHorasExtrasRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/catHorasExtrasRutas"));
 const horaExtraRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/horaExtraRutas"));
@@ -198,6 +199,7 @@ class Servidor {
         // MODULO VACACIONES
         this.app.use(`/${ruta}/perVacacion`, periodoVacacionRutas_1.default);
         this.app.use(`/${ruta}/vacaciones`, vacacionesRutas_1.default);
+        this.app.use(`/${ruta}/configurarVacacion`, configurarVacacionesRutas_1.default);
         // MODULO HORAS EXTRAS
         this.app.use(`/${ruta}/horas-extras-pedidas`, horaExtraRutas_1.default);
         this.app.use(`/${ruta}/horasExtras`, catHorasExtrasRutas_1.default);

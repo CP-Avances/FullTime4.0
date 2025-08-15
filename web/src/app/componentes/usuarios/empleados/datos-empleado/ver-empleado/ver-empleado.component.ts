@@ -56,6 +56,7 @@ import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.serv
 import { ScriptService } from 'src/app/servicios/usuarios/empleado/script.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
+
 // IMPORTAR COMPONENTES
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
@@ -82,6 +83,7 @@ import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 
 @Component({
@@ -136,6 +138,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   imagenEmpleado: any;
+
+  //VARIABLES PARA VACACIONES
+  activar_vacacion_individual: boolean = false;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -192,6 +197,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.ObtenerSolicitudesVacaciones(this.idEmpleado);
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
@@ -411,6 +417,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
 
     this.restF.ListarFunciones(funcionesSistema).subscribe(datos => {
+      console.log('ver datos de funciones ', datos)
       if (datos[0].hora_extra === true) {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
@@ -429,20 +436,20 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.HabilitarPermisos = true;
         this.VerRegistroAutorizar();
       }
-      if (this.funcionalidades.vacaciones === true) {
+      if (datos[0].vacaciones === true) {
         this.habilitarVacaciones = true;
         this.VerRegistroAutorizar();
       }
-      if (this.funcionalidades.hora_extra === true) {
+      if (datos[0].hora_extra === true) {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
         }
       }
-      if (this.funcionalidades.alimentacion === true) {
+      if (datos[0].alimentacion === true) {
         this.HabilitarAlimentacion = true;
         this.autorizar = true;
       }
-      if (this.funcionalidades.accion_personal === true) {
+      if (datos[0].accion_personal === true) {
         this.HabilitarAccion = true;
       }
       // METODOS DE CONSULTAS GENERALES
@@ -2322,38 +2329,55 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   peridoVacaciones: any;
   ObtenerPeriodoVacaciones(formato_fecha: string) {
     this.peridoVacaciones = [];
+    let contador = 0;
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
       this.peridoVacaciones = datos;
-
       this.peridoVacaciones.forEach((v: any) => {
+        v.ultimo = false;
+        contador++;
         // TRATAMIENTO DE FECHAS Y HORAS
+        if (contador === this.peridoVacaciones.length) {
+          v.ultimo = true;
+        }
         v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
         v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fecha_desde_ = this.validar.FormatearFecha(v.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_ultima_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        v.fecha_acreditar_ = this.validar.FormatearFecha(v.fecha_acreditar_vacaciones, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+        if (v.ultimo === true && (v.estado === false || v.cerrar_manual === true)) {
+          this.ver_agregar_periodo = true;
+        }
+        else {
+          this.ver_agregar_periodo = false;
+        }
       })
+      console.log('ver periodo ', this.peridoVacaciones)
     })
   }
 
   // VENTANA PARA INGRESAR PERIODO DE VACACIONES
+  ver_agregar_periodo: boolean = true;
   registrar_periodo: boolean = false;
   data_registrar_periodo: any = [];
   pagina_registrar_periodo: string = '';
   ver_periodo: boolean = true;
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_cargo != undefined) {
-      this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
-        this.idPerVacacion = datos;
-        this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
-          timeOut: 6000,
-        })
-      }, error => {
-        this.ver_periodo = false;
-        this.registrar_periodo = true;
-        this.pagina_registrar_periodo = 'ver-empleado';
-        this.data_registrar_periodo = {
-          idEmpleado: this.idEmpleado,
-          idContrato: this.datoActual.id_contrato
-        };
-      });
+      // COMENTADO SOLO POR PRUEBAS -- EL CODIGO ES VALIDO
+      // this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
+      //  this.idPerVacacion = datos;
+      //  this.toastr.info('El empleado ya tiene registrado un periodo de vacaciones y este se actualiza automáticamente', '', {
+      //    timeOut: 6000,
+      //  })
+      // }, error => {
+      this.ver_periodo = false;
+      this.registrar_periodo = true;
+      this.pagina_registrar_periodo = 'ver-empleado';
+      this.data_registrar_periodo = {
+        idEmpleado: this.idEmpleado,
+        idContrato: this.datoActual.id_contrato
+      };
+      //});
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
@@ -2367,10 +2391,51 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   data_periodo: any = [];
   pagina_periodo: string = '';
   AbrirEditarPeriodoVacaciones(datoSeleccionado: any): void {
-    this.data_periodo = { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado };
+    this.data_periodo = { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado, idContrato: this.datoActual.id_contrato };
     this.ver_periodo = false;
     this.editar_periodo = true;
     this.pagina_periodo = 'ver-empleado';
+  }
+
+
+  // CERRAR PERIODO DE VACACIONES
+  cerrar_periodo: boolean = false;
+  fechaCerrar = new FormControl();
+  CerrarPeriodo() {
+    if (this.cerrar_periodo) {
+      this.cerrar_periodo = false;
+      console.log('fecha cerrar ', this.fechaCerrar.value);
+      this.fechaCerrar.setValue('');
+    }
+    else {
+      this.cerrar_periodo = true;
+    }
+  }
+
+  // GUARDAR LOS DATOS DEL PERIODO QUE ESTA CERRADO
+  GuardarPeriodoCerrado() {
+    if (this.fechaCerrar.value) {
+      let cerrar = {
+        empleados: [parseInt(this.idEmpleado)],
+        fecha: this.fechaCerrar.value
+      }
+      this.restPerV.CerrarPeriodoVacaciones(cerrar).subscribe(datos => {
+        console.log('ver cerrar ', datos.mensaje[0])
+        this.ObtenerPeriodoVacaciones(this.formato_fecha);
+        this.toastr.info(datos.mensaje[0].resumen, '', {
+          timeOut: 6000,
+        })
+      }, error => {
+        this.toastr.error('Verifique los datos ingresados.', 'Ups!!! se ha producido un error.', {
+          timeOut: 6000,
+        })
+      })
+    }
+    else {
+      this.toastr.warning('Ingrese la fecha de cierre de periodo.', '', {
+        timeOut: 6000,
+      })
+    }
   }
 
 
@@ -2385,44 +2450,96 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.idPerVacacion = datos;
       this.restVacaciones.ObtenerVacacionesPorIdPeriodo(this.idPerVacacion[0].id).subscribe(res => {
         this.vacaciones = res;
+        console.log("VACACIONES DEL EMPLEADO CON PERIODO ACTIVO:", this.vacaciones);
         this.vacaciones.forEach((v: any) => {
           // TRATAMIENTO DE FECHAS Y HORAS
-          v.fecha_ingreso_ = this.validar.FormatearFecha(v.fecha_ingreso, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
           v.fecha_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
           v.fecha_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+          v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+          v.fecha_registro_ = this.validar.FormatearFecha(v.fecha_registro, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
+          v.fecha_actualizacion_ = v.fecha_actualizacion
+            ? this.validar.FormatearFecha(v.fecha_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas)
+            : null;
         })
       });
     });
   }
 
+  //METODOS AUXILIARES PARA VISUALIZACION DE SOLICITUD DE VACACION
+  esPorDias(s: any): boolean {
+    const nd = Number(s?.numero_dias_totales ?? 0);
+    return nd >= 1;
+  }
+
+  formatearDias(nd: any): string {
+    const d = Number(nd ?? 0);
+    return `${d} día${d === 1 ? '' : 's'}`;
+  }
+
+  formatearHorasDesdeMin(min: any): string {
+    const m = Number(min ?? 0);
+    const h = Math.floor(m / 60);
+    const r = m % 60;
+    return r === 0
+      ? `${h} hora${h === 1 ? '' : 's'}`
+      : `${h}:${r.toString().padStart(2, '0')} horas`;
+  }
+
+
   // VENTANA PARA REGISTRAR VACACIONES DEL EMPLEADO
   AbrirVentanaVacaciones(): void {
+    console.log("dato actual ", this.datoActual);
+
     if (this.datoActual.id_contrato != undefined && this.datoActual.id_cargo != undefined) {
-      this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
-        this.idPerVacacion = datos[0];
-        this.ventana.open(RegistrarVacacionesComponent,
-          {
-            width: '900px', data: {
-              idEmpleado: this.idEmpleado, idPerVacacion: this.idPerVacacion.id,
-              idContrato: this.idPerVacacion.idcontrato, idCargo: this.datoActual.id_cargo,
-              idContratoActual: this.datoActual.id_contrato
-            }
-          })
-          .afterClosed().subscribe(item => {
-            this.ObtenerVacaciones(this.formato_fecha);
+      this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(
+        datos => {
+          this.idPerVacacion = datos[0];
+          this.activar_vacacion_individual = true;
+          this.ver_periodo = false;
+        },
+        error => {
+          this.toastr.info('El empleado no tiene registrado Periodo de Vacaciones.', '', {
+            timeOut: 6000,
           });
-      }, error => {
-        this.toastr.info('El empleado no tiene registrado Periodo de Vacaciones.', '', {
-          timeOut: 6000,
-        })
-      });
-    }
-    else {
+        }
+      );
+    } else {
       this.toastr.info('El usuario no tiene registrado Cargo.', '', {
         timeOut: 6000,
-      })
+      });
     }
   }
+
+  // METODO PARA OBTENER VACACIONES DE UN EMPLEADO
+  solicitudesVacaciones: any;
+  ObtenerSolicitudesVacaciones(formato_fecha: string) {
+    this.solicitudesVacaciones = [];
+
+    this.restVacaciones.BuscarDatosSolicitud(parseInt(this.idEmpleado)).subscribe(datos => {
+      this.solicitudesVacaciones = datos;
+
+      this.solicitudesVacaciones.forEach((v: any) => {
+        v.fecha_inicio_ = this.validar.FormatearFecha(
+          v.fecha_inicio,
+          formato_fecha,
+          this.validar.dia_completo,
+          this.idioma_fechas
+        );
+        v.fecha_final_ = this.validar.FormatearFecha(
+          v.fecha_final,
+          formato_fecha,
+          this.validar.dia_completo,
+          this.idioma_fechas
+        );
+      });
+
+      console.log('Solicitudes vacaciones', this.solicitudesVacaciones);
+    });
+  }
+
+
+
+
 
   // METODO PARA EDITAR REGISTRO DE VACACION
   EditarVacaciones(v: any) {

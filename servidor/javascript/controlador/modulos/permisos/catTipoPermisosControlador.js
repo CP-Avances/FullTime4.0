@@ -39,7 +39,7 @@ class TipoPermisosControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query('SELECT * FROM mp_cat_tipo_permisos WHERE id = $1', [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
@@ -110,7 +110,7 @@ class TipoPermisosControlador {
                 const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const tipo = yield database_1.default.query('SELECT * FROM mp_cat_tipo_permisos WHERE id = $1', [id]);
                 const [datosOriginales] = tipo.rows;
                 if (!datosOriginales) {

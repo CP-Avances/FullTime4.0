@@ -209,7 +209,7 @@ class NotificacionTiempoRealControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
@@ -638,7 +638,7 @@ class NotificacionTiempoRealControlador {
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
-          // OBTENER DATOSORIGINALES
+          // OBTENER DATOS ORIGINALES
           const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [obj]);
           const [datosOriginales] = consulta.rows;
 
@@ -807,9 +807,10 @@ class NotificacionTiempoRealControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
+      // OBTENER DATOS ORIGINALES
+      const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
+      
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({

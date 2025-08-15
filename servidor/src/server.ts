@@ -64,6 +64,7 @@ import PERMISOS_RUTAS from './rutas/modulos/permisos/permisosRutas';
 import PERIODO_VACACION__RUTAS from './rutas/modulos/vacaciones/periodoVacacionRutas';
 import VACACIONES__RUTAS from './rutas/modulos/vacaciones/vacacionesRutas';
 import KARDEX_VACACION_RUTAS from './rutas/reportes/kardexVacacionesRutas';
+import CONFIGURAR_VACACIONES_RUTAS from './rutas/modulos/vacaciones/configurarVacacionesRutas';
 // MODULO HORAS EXTRA
 import HORAS_EXTRAS_RUTAS from './rutas/modulos/horas-extras/catHorasExtrasRutas';
 import HORA_EXTRA_PEDIDA_RUTAS from './rutas/modulos/horas-extras/horaExtraRutas';
@@ -200,6 +201,7 @@ class Servidor {
         // MODULO VACACIONES
         this.app.use(`/${ruta}/perVacacion`, PERIODO_VACACION__RUTAS);
         this.app.use(`/${ruta}/vacaciones`, VACACIONES__RUTAS);
+        this.app.use(`/${ruta}/configurarVacacion`, CONFIGURAR_VACACIONES_RUTAS)
         // MODULO HORAS EXTRAS
         this.app.use(`/${ruta}/horas-extras-pedidas`, HORA_EXTRA_PEDIDA_RUTAS);
         this.app.use(`/${ruta}/horasExtras`, HORAS_EXTRAS_RUTAS);

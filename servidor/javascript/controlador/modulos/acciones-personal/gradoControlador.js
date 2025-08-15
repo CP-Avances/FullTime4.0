@@ -178,7 +178,7 @@ class GradoControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const proceso = yield database_1.default.query('SELECT * FROM map_empleado_grado WHERE id = $1', [id]);
                 const [datosOriginales] = proceso.rows;
                 if (!datosOriginales) {
@@ -1011,7 +1011,7 @@ class GradoControlador {
             try {
                 const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
                 if (estado == true) {
-                    // CONSULTAR DATOSORIGINALES
+                    // CONSULTAR DATOS ORIGINALES
                     const grado = yield database_1.default.query(`
           SELECT * FROM map_empleado_grado WHERE id_empleado = $1 AND estado = true
           `, [id_empleado]);

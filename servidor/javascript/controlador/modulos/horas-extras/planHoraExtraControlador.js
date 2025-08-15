@@ -110,7 +110,7 @@ class PlanHoraExtraControlador {
                 const { hora, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -160,7 +160,7 @@ class PlanHoraExtraControlador {
                 const { estado, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -338,7 +338,7 @@ class PlanHoraExtraControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM mhe_detalle_plan_hora_extra WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -395,7 +395,7 @@ class PlanHoraExtraControlador {
                 const id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

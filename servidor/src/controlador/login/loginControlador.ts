@@ -326,7 +326,7 @@ class LoginControlador {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
-        // OBTENER DATOSORIGINALES
+        // OBTENER DATOS ORIGINALES
         const consulta = await pool.query(
           `
           SELECT * FROM eu_usuarios WHERE id_empleado = $1

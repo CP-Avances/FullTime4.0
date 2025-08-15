@@ -91,7 +91,7 @@ class HorasExtrasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const horaExtra = await pool.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
       const [datosOriginales] = horaExtra.rows;
 
@@ -150,7 +150,7 @@ class HorasExtrasControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const horaExtra = await pool.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
       const [datosOriginales] = horaExtra.rows;
 

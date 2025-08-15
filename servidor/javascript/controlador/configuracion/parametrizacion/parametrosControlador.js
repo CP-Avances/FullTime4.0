@@ -102,7 +102,7 @@ class ParametrosControlador {
                 console.log("id eliminar detalle parametro: ", id);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -190,7 +190,7 @@ class ParametrosControlador {
                 const { id, descripcion, observacion, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`
                 SELECT * FROM ep_detalle_parametro WHERE id = $1
                 `, [id]);

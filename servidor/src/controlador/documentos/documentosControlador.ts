@@ -95,7 +95,7 @@ class DocumentosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const doc = await pool.query(`SELECT * FROM e_documentacion WHERE id = $1`, [id]);
             const [datosOriginales] = doc.rows;
 

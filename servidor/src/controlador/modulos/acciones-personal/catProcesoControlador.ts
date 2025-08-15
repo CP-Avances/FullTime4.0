@@ -103,7 +103,7 @@ class ProcesoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const proceso = await pool.query(
         `
           SELECT * FROM map_cat_procesos WHERE id = $1
@@ -221,7 +221,7 @@ class ProcesoControlador {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
-        // CONSULTAR DATOSORIGINALES
+        // CONSULTAR DATOS ORIGINALES
         const proce = await pool.query('SELECT * FROM map_cat_procesos WHERE UPPER(nombre) = UPPER($1) AND id != $2'
           , [nombre, id]);
         // FINALIZAR TRANSACCION
@@ -930,7 +930,7 @@ class ProcesoControlador {
       const { id_empleado, id, id_accion, estado, user_name, ip, ip_local } = req.body;
 
       if (estado == true) {
-        // CONSULTAR DATOSORIGINALES
+        // CONSULTAR DATOS ORIGINALES
         const proceso = await pool.query(
           `
             SELECT * FROM map_empleado_procesos WHERE id_empleado = $1 AND estado = true

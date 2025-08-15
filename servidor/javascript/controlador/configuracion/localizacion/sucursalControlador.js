@@ -80,7 +80,7 @@ class SucursalControlador {
                 const { nombre, id_ciudad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM e_sucursales WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

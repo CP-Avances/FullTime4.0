@@ -44,8 +44,8 @@ export class VacacionesService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/fechasFeriado`, datos);
   }
 
-  BuscarDatosSolicitud(id_emple_vacacion: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/datosSolicitud/${id_emple_vacacion}`);
+  BuscarDatosSolicitud(id_empleado: number) {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/datosSolicitud/${id_empleado}`);
   }
 
   BuscarDatosAutorizacion(id_vacaciones: number) {
@@ -58,6 +58,29 @@ export class VacacionesService {
       body: datos
     };
     return this.http.request('delete', url, httpOptions);
+  }
+
+  //METODO PARA LISTAR TIPOS DE VACACIONES
+  ListarTodasConfiguraciones() {
+    return this.http.get(`${localStorage.getItem('empresaURL') as string}/vacaciones/lista-todas-configuraciones`);
+  }
+
+  //METODO PARA VERIFICAR VACACIONES MULTIPLE
+  VerificarVacacionesMultiples(datosVerificacion: {empleados: number[],fechaInicio: string, fechaFin: string, incluirFeriados: boolean}) {
+    const url = `${localStorage.getItem('empresaURL') as string}/vacaciones/verificar-empleados`;
+    return this.http.post(url, datosVerificacion);
+  }
+
+  //SERVICIO PARA BUSCAR VACACIONES POR ID_EMPELADO Y FECHAS
+  BuscarSolicitudExistente(verificacion: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/vacaciones/verificar-solicitud/${verificacion.id_empleado}/${verificacion.fecha_inicio}/${verificacion.fecha_final}`;
+    return this.http.get<any>(url);
+  }
+
+  //METODO PARA SUBIR UN DOCUMENTO
+  SubirDocumento(formData: FormData, id_solicitud: number, id_empleado: number) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/vacaciones/${id_solicitud}/documento/${id_empleado}`;
+    return this.http.put<any>(url, formData);
   }
 
   // REPORTE DE VACACIONES DE FORMA MÚLTIPLE

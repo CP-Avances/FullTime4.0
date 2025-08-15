@@ -418,7 +418,7 @@ class ContratoEmpleadoControlador {
             const CONTRATO = yield database_1.default.query(`
             SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fecha_ingreso, ec.fecha_salida, ec.controlar_vacacion,
                 ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion,
-                cr.mes_periodo, mt.descripcion AS nombre_contrato 
+                cr.mes_periodo, mt.descripcion AS nombre_contrato, cr.meses_calculo 
             FROM eu_empleado_contratos AS ec, ere_cat_regimenes AS cr, e_cat_modalidad_trabajo AS mt 
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral
             `, [id]);
