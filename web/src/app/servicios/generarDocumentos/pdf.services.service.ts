@@ -418,7 +418,7 @@ export class PdfServicesService {
                           text: 'APELLIDOS',
                           alignment: 'center',
                           bold: true,
-                          fontSize: 9,
+                          fontSize: 8,
                           fillColor: '#f2f2f2',
                           margin: [0, 2, 0, 2],
                           border: [false, false, true, false]
@@ -427,7 +427,7 @@ export class PdfServicesService {
                           text: 'NOMBRES',
                           alignment: 'center',
                           bold: true,
-                          fontSize: 9,
+                          fontSize: 8,
                           fillColor: '#f2f2f2',
                           margin: [0, 2, 0, 2],
                           border: [false, false, false, false]
@@ -1158,7 +1158,515 @@ export class PdfServicesService {
                         paddingBottom: () => 0
                       }
                     }
-                  ]
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.nivel_gestion_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.nivel_gestion_propuesto,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'UNIDAD ADMINISTRATIVA:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'UNIDAD ADMINISTRATIVA:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.unidad_administrativa,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.unidad_administrativa_propuesta,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'LUGAR DE TRABAJO:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'LUGAR DE TRABAJO:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.lugar_trabajo_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.lugar_trabajo_propuesto,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'DENOMINACIÓN DEL PUESTO:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'DENOMINACIÓN DEL PUESTO:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.cargo_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.cargo_propuesto,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'GRUPO OCUPACIONAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'GRUPO OCUPACIONAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.grupo_ocupacional_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.grupo_ocupacional_propuesto,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'GRADO:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'GRADO:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.grado_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.grado_propuesto,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'REMUNERACIÓN MENSUAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'REMUNERACIÓN MENSUAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.remuneracion_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.remuneracion_propuesta,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: 'PARTIDA INDIVIDUAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: 'PARTIDA INDIVIDUAL:',
+                      bold: true,
+                      fontSize: 7,
+                      fillColor: '#f2f2f2',
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      text: this.datosPedido.partida_individual_actual,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, true, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    },
+                    {
+                      text: this.datosPedido.partida_individual_propuesta,
+                      fontSize: 8,
+                      margin: [5, 2, 0, 2],
+                      border: [false, false, false, false],
+                      noWrap: false,
+                      valign: 'middle',     // centra verticalmente
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ],
                 ]
               },
               border: [true, false, true, false],
@@ -1176,7 +1684,24 @@ export class PdfServicesService {
                 itemsTable_e: { fontSize: 7 },
               }
             }
-          ]
+          ],
+          [
+            {
+              text: ' POSESIÓN DEL PUESTO',
+              bold: true,
+              fontSize: 7,
+              fillColor: '#f2f2f2',
+              margin: [5, 2, 0, 2],
+              border: [true, true, true, true],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 10,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+            }
+          ],
         ],
       },layout: {
         defaultBorder: false, // desactiva cualquier borde por defecto
