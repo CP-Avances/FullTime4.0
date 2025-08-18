@@ -243,9 +243,37 @@ export class PdfServicesService {
         body: [[{
           text: valor,
           alignment: 'left',
-          fontSize: 7,
+          fontSize: 8,
         }]]
       },
+      border: [false, false, false, false],
+      layout: {
+        hLineWidth: function (i, node) {
+          // i = índice de línea horizontal (0 = arriba, node.table.body.length = última)
+          return (i === node.table.body.length) ? 0.5 : 0; // solo la última línea
+        },
+        vLineWidth: () => 0,
+        hLineColor: () => '#999999', // color gris
+        paddingLeft: () => 0,
+        paddingRight: () => 3,
+        paddingTop: () => 0,
+        paddingBottom: () => 0
+      }
+    };
+  }
+
+  getCellPosecionText(valor: string) {
+    return {
+      table: {
+        widths: ['*'], // ancho del cuadrito
+        body: [[{
+          text: valor,
+          alignment: 'left',
+          margin: [0, 5, 0, 0],
+          fontSize: 8,
+        }]]
+      },
+      border: [false, false, false, false],
       layout: {
         hLineWidth: function (i, node) {
           // i = índice de línea horizontal (0 = arriba, node.table.body.length = última)
@@ -1702,8 +1730,135 @@ export class PdfServicesService {
               }
             }
           ],
+          [
+            {
+              table: {
+                widths: ['*'],
+                body: [
+                  [
+                    {
+                      table: {
+                        widths: [220, '*'],
+                        body: [
+                          [
+                            {
+                              table: {
+                                widths: [20, '*'],
+                                body: [
+                                  [{
+                                    text: 'YO,   ',
+                                    fontSize: 8,
+                                    margin: [10, 5, 0, 0],
+                                    border: [false, false, false, false],
+                                    noWrap: false,
+                                    valign: 'middle',     // centra verticalmente
+                                    layout: {
+                                      defaultBorder: false, // desactiva cualquier borde por defecto
+                                      paddingLeft: () => 0,
+                                      paddingRight: () => 0,
+                                      paddingTop: () => 0,
+                                      paddingBottom: () => 0
+                                    }
+                                  }, this.getCellPosecionText(this.datosPedido.nombres)],
+                                ]
+                              },
+                              border: [false, false, false, false],
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            }, {
+                              table: {
+                                widths: ['*', 100],
+                                body: [
+                                  [{
+                                    text: 'CON NRO. DE DOCUMENTO DE IDENTIFICACIÓN:  ',
+                                    fontSize: 8,
+                                    margin: [10, 5, 0, 0],
+                                    border: [false, false, false, false],
+                                    noWrap: false,
+                                    valign: 'middle',     // centra verticalmente
+                                    layout: {
+                                      defaultBorder: false, // desactiva cualquier borde por defecto
+                                      paddingLeft: () => 0,
+                                      paddingRight: () => 0,
+                                      paddingTop: () => 0,
+                                      paddingBottom: () => 0
+                                    }
+                                  }, this.getCellPosecionText(this.datosPedido.cedula_empleado)
+                                  ]
+                                ]
+                              },
+                              border: [false, false, false, false],
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            }
+                          ],
+                          [
+                            {
+                              text: 'JURO LEALTAD AL ESTADO ECUATORIANO.',
+                              fontSize: 8,
+                              margin: [10, 0, 0, 0],
+                              border: [false, false, false, false],
+                              noWrap: false,
+                              valign: 'middle',     // centra verticalmente
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            }, {
+                              text: '',
+                              fontSize: 8,
+                              margin: [0, 0, 0, 0],
+                              border: [false, false, false, false],
+                              noWrap: false,
+                              valign: 'middle',     // centra verticalmente
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            }
+                          ]
+                        ]
+                      },
+                      border: [false, false, false, false],
+                      layout: {
+                        defaultBorder: false, // desactiva cualquier borde por defecto
+                        paddingLeft: () => 0,
+                        paddingRight: () => 0,
+                        paddingTop: () => 0,
+                        paddingBottom: () => 0
+                      }
+                    }
+                  ]
+                ]
+              },
+              border: [true, false, true, true],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+            }
+          ],
         ],
-      },layout: {
+      }, layout: {
         defaultBorder: false, // desactiva cualquier borde por defecto
         paddingLeft: () => 0,
         paddingRight: () => 0,
