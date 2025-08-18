@@ -190,16 +190,32 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   }
 
   // METODO PARA VALIDAR INGRESO DE MESES
-  validarMeses() {
-    const valor = this.mesesF.value;
+  validarMeses(formulario: any) {
+    var valor: any = '1';
+
+    if (formulario === 1) {
+      valor = this.mesesF.value;
+    }
+    else {
+      valor = this.meses_calculoF.value;
+    }
 
     if (valor == null) return; // NO HACE NADA SI NO HAY VALOR AUN
-
     if (parseInt(valor) < 1) {
-      this.mesesF.setValue('1');
-    } 
+      if (formulario === 1) {
+        this.mesesF.setValue('1');
+      }
+      else {
+        this.meses_calculoF.setValue('1');
+      }
+    }
     else if (parseInt(valor) > 12) {
-      this.mesesF.setValue('12');
+      if (formulario === 1) {
+        this.mesesF.setValue('12');
+      }
+      else {
+        this.meses_calculoF.setValue('12');
+      }
     }
   }
 

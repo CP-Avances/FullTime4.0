@@ -59,7 +59,7 @@
                                     <mat-label id="letras_2">Acreditar vacaciones</mat-label>
                                     <input matInput type="tel" [formControl]="mesesF" placeholder="Meses"
                                         (keypress)="IngresarSoloNumeros($event)" min="1" max="12" required
-                                        (input)="validarMeses()" (click)="LimpiarCalcular()">
+                                        (input)="validarMeses(1)" (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses de duración del período laboral.">
                                         date_range
@@ -489,7 +489,8 @@
                                 <mat-form-field id="campos_calculos">
                                     <mat-label id="letras_2">Meses período</mat-label>
                                     <input matInput type="tel" [formControl]="meses_calculoF"
-                                        (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
+                                        (keypress)="IngresarSoloNumeros($event)" min="1" max="12" required
+                                        (input)="validarMeses(3)" (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses considerados para el cálculo.">
                                         date_range
