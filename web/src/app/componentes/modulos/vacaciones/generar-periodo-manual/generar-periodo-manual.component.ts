@@ -71,7 +71,7 @@ export class GenerarPeriodoManualComponent {
       return;
     }
 
-    if (hasta < desde) {
+    if (hasta && hasta < desde) {
       this.toastr.info('La fecha hasta no puede ser menor a la fecha desde.', '', {
         timeOut: 6000,
       });
@@ -79,7 +79,7 @@ export class GenerarPeriodoManualComponent {
       return;
     }
 
-    if (hasta > this.fechaMaximaHasta) {
+    if (hasta && hasta > this.fechaMaximaHasta) {
       this.toastr.info(`La fecha hasta no puede superar el límite permitido (${this.fechaMaximaHasta.toFormat('dd/MM/yyyy')}).`, '', {
         timeOut: 6000,
       });
