@@ -267,10 +267,12 @@ export class PdfServicesService {
       table: {
         widths: ['*'], // ancho del cuadrito
         body: [[{
-          text: valor,
+          text: valor || '',
           alignment: 'left',
-          margin: [0, 5, 0, 0],
+          margin: [0, 7, 3, 0],
           fontSize: 8,
+          noWrap: false,
+          valign: 'bottom'
         }]]
       },
       border: [false, false, false, false],
@@ -282,7 +284,7 @@ export class PdfServicesService {
         vLineWidth: () => 0,
         hLineColor: () => '#999999', // color gris
         paddingLeft: () => 0,
-        paddingRight: () => 3,
+        paddingRight: () => 30,
         paddingTop: () => 0,
         paddingBottom: () => 0
       }
@@ -1064,7 +1066,6 @@ export class PdfServicesService {
             {
 
               text: '',
-              bold: true,
               fontSize: 7,
               margin: [0, 3, 0, 3],
               border: [false, true, false, true],
@@ -1738,17 +1739,17 @@ export class PdfServicesService {
                   [
                     {
                       table: {
-                        widths: [220, '*'],
+                        widths: [250, '*'],
                         body: [
                           [
                             {
                               table: {
-                                widths: [20, '*'],
+                                widths: [40, 180],
                                 body: [
                                   [{
-                                    text: 'YO,   ',
+                                    text: 'YO, ',
                                     fontSize: 8,
-                                    margin: [10, 5, 0, 0],
+                                    margin: [20, 7, 0, 0],
                                     border: [false, false, false, false],
                                     noWrap: false,
                                     valign: 'middle',     // centra verticalmente
@@ -1759,7 +1760,7 @@ export class PdfServicesService {
                                       paddingTop: () => 0,
                                       paddingBottom: () => 0
                                     }
-                                  }, this.getCellPosecionText(this.datosPedido.nombres)],
+                                  }, this.getCellPosecionText(this.datosPedido.nombres)]
                                 ]
                               },
                               border: [false, false, false, false],
@@ -1772,12 +1773,12 @@ export class PdfServicesService {
                               }
                             }, {
                               table: {
-                                widths: ['*', 100],
+                                widths: [200, 79],
                                 body: [
                                   [{
                                     text: 'CON NRO. DE DOCUMENTO DE IDENTIFICACIÓN:  ',
                                     fontSize: 8,
-                                    margin: [10, 5, 0, 0],
+                                    margin: [20, 7, 1, 0],
                                     border: [false, false, false, false],
                                     noWrap: false,
                                     valign: 'middle',     // centra verticalmente
@@ -1788,8 +1789,7 @@ export class PdfServicesService {
                                       paddingTop: () => 0,
                                       paddingBottom: () => 0
                                     }
-                                  }, this.getCellPosecionText(this.datosPedido.cedula_empleado)
-                                  ]
+                                  }, this.getCellPosecionText(this.datosPedido.cedula_empleado)]
                                 ]
                               },
                               border: [false, false, false, false],
@@ -1806,7 +1806,7 @@ export class PdfServicesService {
                             {
                               text: 'JURO LEALTAD AL ESTADO ECUATORIANO.',
                               fontSize: 8,
-                              margin: [10, 0, 0, 0],
+                              margin: [20, 0, 0, 0],
                               border: [false, false, false, false],
                               noWrap: false,
                               valign: 'middle',     // centra verticalmente
@@ -1832,6 +1832,217 @@ export class PdfServicesService {
                                 paddingBottom: () => 0
                               }
                             }
+                          ],
+                          [
+                            {
+                              table: {
+                                widths: ['*', '*'],
+                                body: [
+                                  [{
+                                    table: {
+                                      widths: [40, 80],
+                                      body: [
+                                        [{
+                                          text: 'Lugar: ',
+                                          fontSize: 8,
+                                          bold: true,
+                                          margin: [15, 7, 0, 0],
+                                          border: [false, false, false, false],
+                                          noWrap: false,
+                                          valign: 'middle',     // centra verticalmente
+                                          layout: {
+                                            defaultBorder: false, // desactiva cualquier borde por defecto
+                                            paddingLeft: () => 0,
+                                            paddingRight: () => 0,
+                                            paddingTop: () => 0,
+                                            paddingBottom: () => 0
+                                          }
+                                        }, this.getCellPosecionText(this.datosPedido.lugar_posesion)]
+                                      ]
+                                    },
+                                    border: [false, false, false, false],
+                                    layout: {
+                                      defaultBorder: false, // desactiva cualquier borde por defecto
+                                      paddingLeft: () => 0,
+                                      paddingRight: () => 0,
+                                      paddingTop: () => 0,
+                                      paddingBottom: () => 0
+                                    }
+                                  }, {
+                                    table: {
+                                      widths: [40, 95],
+                                      body: [
+                                        [{
+                                          text: 'Fecha: ',
+                                          fontSize: 8,
+                                          bold: true,
+                                          margin: [5, 7, 0, 0],
+                                          border: [false, false, false, false],
+                                          noWrap: false,
+                                          valign: 'middle',     // centra verticalmente
+                                          layout: {
+                                            defaultBorder: false, // desactiva cualquier borde por defecto
+                                            paddingLeft: () => 0,
+                                            paddingRight: () => 0,
+                                            paddingTop: () => 0,
+                                            paddingBottom: () => 0
+                                          }
+                                        }, this.getCellPosecionText(this.datosPedido.fecha_posesion)]
+                                      ]
+                                    },
+                                    border: [false, false, false, false],
+                                    layout: {
+                                      defaultBorder: false, // desactiva cualquier borde por defecto
+                                      paddingLeft: () => 0,
+                                      paddingRight: () => 0,
+                                      paddingTop: () => 0,
+                                      paddingBottom: () => 0
+                                    }
+                                  }
+                                  ]
+
+                                ]
+                              },
+                              border: [false, false, false, false],
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            },
+                            {
+
+                            }
+                          ],
+                          [
+                            {
+                              text: '** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)',
+                              fontSize: 7,
+                              margin: [26, 7, 0, 0],
+                              bold: true,
+                              border: [false, false, false, false],
+                              noWrap: false,
+                              valign: 'middle',     // centra verticalmente
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            }, {
+
+                            }
+                          ],
+                          [
+                            {
+                              table: {
+                                widths: [90, 90],
+                                body: [
+                                  [
+                                    this.getCellPosecionText(''),
+                                    this.getCellPosecionText('')
+                                  ],
+                                  [
+                                    {
+                                      text: 'NRO. ACTA FINAL',
+                                          fontSize: 7,
+                                          bold: true,
+                                          margin: [25, 7, 0, 4],
+                                          border: [false, false, false, false],
+                                          noWrap: false,
+                                          alignment: 'center',     // centra verticalmente
+                                          layout: {
+                                            defaultBorder: false, // desactiva cualquier borde por defecto
+                                            paddingLeft: () => 0,
+                                            paddingRight: () => 0,
+                                            paddingTop: () => 0,
+                                            paddingBottom: () => 0
+                                          }
+                                    },
+                                    {
+                                      text: 'Fecha',
+                                          fontSize: 7,
+                                          bold: true,
+                                          margin: [10, 7, 0, 4],
+                                          border: [false, false, false, false],
+                                          noWrap: false,
+                                          alignment: 'center',     // centra verticalmente
+                                          layout: {
+                                            defaultBorder: false, // desactiva cualquier borde por defecto
+                                            paddingLeft: () => 0,
+                                            paddingRight: () => 0,
+                                            paddingTop: () => 0,
+                                            paddingBottom: () => 0
+                                          }
+                                    }
+                                  ]
+                                ]
+                              },
+                              border: [false, false, false, false],
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            },
+                            {
+                              table: {
+                                widths: [40, 200],
+                                body: [
+                                  [
+                                    {
+                                      text: 'Firma: ',
+                                          fontSize: 8,
+                                          bold: true,
+                                          margin: [10, 7, 0, 0],
+                                          border: [false, false, false, false],
+                                          noWrap: false,
+                                          alignment: 'center',     // centra verticalmente
+                                          layout: {
+                                            defaultBorder: false, // desactiva cualquier borde por defecto
+                                            paddingLeft: () => 0,
+                                            paddingRight: () => 0,
+                                            paddingTop: () => 0,
+                                            paddingBottom: () => 0
+                                          }
+                                    },
+                                    this.getCellPosecionText('')
+                                  ],
+                                  [
+                                    {},
+                                    {
+                                      text: 'SERVIDOR PÚBLICO',
+                                          fontSize: 7,
+                                          bold: true,
+                                          margin: [25, 7, 0, 4],
+                                          border: [false, false, false, false],
+                                          noWrap: false,
+                                          alignment: 'center',     // centra verticalmente
+                                          layout: {
+                                            defaultBorder: false, // desactiva cualquier borde por defecto
+                                            paddingLeft: () => 0,
+                                            paddingRight: () => 0,
+                                            paddingTop: () => 0,
+                                            paddingBottom: () => 0
+                                          }
+                                    }
+                                  ]
+                                ]
+                              },
+                              border: [false, false, false, false],
+                              layout: {
+                                defaultBorder: false, // desactiva cualquier borde por defecto
+                                paddingLeft: () => 0,
+                                paddingRight: () => 0,
+                                paddingTop: () => 0,
+                                paddingBottom: () => 0
+                              }
+                            }
                           ]
                         ]
                       },
@@ -1844,7 +2055,7 @@ export class PdfServicesService {
                         paddingBottom: () => 0
                       }
                     }
-                  ]
+                  ],
                 ]
               },
               border: [true, false, true, true],
