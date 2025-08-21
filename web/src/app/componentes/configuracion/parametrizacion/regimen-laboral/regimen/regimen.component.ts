@@ -78,11 +78,10 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   dias_LaborableF = new FormControl('');
 
   // TRATAMIENTO DE FORMULARIO DE ANTIGUEDAD
-  antiguedadForm: FormGroup;
+  antiguedadFormu: FormGroup;
   get rangosAntiguedad(): FormArray {
-    return this.antiguedadForm.get('rangosAntiguedad') as FormArray;
+    return this.antiguedadFormu.get('rangosAntiguedad') as FormArray;
   }
-
 
   constructor(
     private rest: RegimenService,
@@ -784,7 +783,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     this.correcto_antiguo = false;
     this.escritura_antiguo = false;
     if (this.verificarRangos()) {
-      this.datosAntiguedad = this.antiguedadForm.value.rangosAntiguedad;
+      this.datosAntiguedad = this.antiguedadFormu.value.rangosAntiguedad;
       //console.log('Datos válidos:', this.datosAntiguedad);
       this.AgregarRango();
     }
@@ -841,7 +840,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
     }
     else {
       this.fija = false;
-      this.antiguedadForm = this.antiguedadFormulario.group({
+      this.antiguedadFormu = this.antiguedadFormulario.group({
         rangosAntiguedad: this.antiguedadFormulario.array([this.CrearRango()])
       });
       this.variable = true;
@@ -867,7 +866,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   // VERIFICAR QUE LOS REGISTROS DE ANTIGUEDAD CUMPLAN CON LAS CONDICIONES
   VerificarAntiguedad(form3: any) {
     if (this.verificarRangos()) {
-      this.datosAntiguedad = this.antiguedadForm.value.rangosAntiguedad;
+      this.datosAntiguedad = this.antiguedadFormu.value.rangosAntiguedad;
       //console.log('Datos válidos:', this.datosAntiguedad);
       this.AsignarValidaciones(form3);
     }

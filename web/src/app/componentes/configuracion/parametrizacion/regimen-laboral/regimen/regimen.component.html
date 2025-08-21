@@ -259,7 +259,7 @@
                                 <mat-checkbox id="check_" matSuffix matTooltipPosition="right" [formControl]="acumularF"
                                     style="position: relative; left:0px;" (change)="ActivarAcumular($event)"
                                     matTooltip="Activar acumulación de días de vacaciones.">
-                                    Acumular vacaciones
+                                    <label id="textoradiobtn">Acumular vacaciones</label>
                                 </mat-checkbox>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start" style="padding-bottom: 20px;">
@@ -378,7 +378,7 @@
                                     [formControl]="antiguedadActivaF" style="position: relative; left:10px;"
                                     (change)="ActivarAntiguedad($event, tercerFormulario.value)"
                                     matTooltip="Activar vacaciones por antiguedad laboral.">
-                                    Antigüedad laboral
+                                    <label id="textoradiobtn">Antigüedad laboral</label>
                                 </mat-checkbox>
                             </div>
 
@@ -388,11 +388,11 @@
                                     <div class="d-flex flex-wrap justify-content-around">
                                         <mat-radio-button value="fija"
                                             (change)="SelecionarAntiguo($event, tercerFormulario.value)">
-                                            Fija
+                                            <label id="textoradiobtn">Fija</label>
                                         </mat-radio-button>
                                         <mat-radio-button value="variable"
                                             (change)="SelecionarAntiguo($event, tercerFormulario.value)">
-                                            Variable
+                                            <label id="textoradiobtn">Variable</label>
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
@@ -432,7 +432,7 @@
                             </div>
 
                             <div class="d-flex flex-wrap justify-content-start" *ngIf="variable">
-                                <form [formGroup]="antiguedadForm">
+                                <form [formGroup]="antiguedadFormu">
                                     <div formArrayName="rangosAntiguedad">
                                         <div *ngFor="let rango of rangosAntiguedad.controls; let i = index"
                                             [formGroupName]="i">
@@ -503,7 +503,7 @@
                                     (change)="ValidarRequerido($event, primerFormulario.value, segundoFormulario.value, tercerFormulario.value)"
                                     [formControl]="calculoF"
                                     matTooltip="Dar click para realizar cálculo y completar todos los datos.">
-                                    Realizar cálculos *
+                                    <label id="textoradiobtn">Realizar cálculos *</label>
                                 </mat-checkbox>
                                 <mat-icon *ngIf="limpiar_calcular" id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar cálculos realizados."

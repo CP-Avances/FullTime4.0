@@ -1,7 +1,7 @@
 <div class="container" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>REGISTRAR REGIMEN LABORAL</span>
+            <span>MODIFICAR REGIMEN LABORAL</span>
             <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">highlight_off</mat-icon>
         </div>
 
@@ -59,7 +59,7 @@
                                     <mat-label id="letras_2">Acreditar vacaciones</mat-label>
                                     <input matInput type="tel" [formControl]="mesesF"
                                         (keypress)="IngresarSoloNumeros($event)" min="1" max="12" required
-                                        (click)="LimpiarCalcular()" (input)="validarMeses()">
+                                        (click)="LimpiarCalcular()" (input)="validarMeses(1)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses de duración del período laboral.">
                                         date_range
@@ -133,12 +133,12 @@
                                             <mat-radio-button value="meses" (change)="SelecionarLimite($event)"
                                                 matSuffix matTooltipPosition="right"
                                                 matTooltip="Indicar tiempo mínimo de servicios en meses.">
-                                                Meses
+                                                <label id="textoradiobtn">Meses</label>
                                             </mat-radio-button>
                                             <mat-radio-button value="horas" (change)="SelecionarLimite($event)"
                                                 matSuffix matTooltipPosition="right"
                                                 matTooltip="Indicar tiempo mínimo de servicios en horas.">
-                                                Horas
+                                                <label id="textoradiobtn">Horas</label>
                                             </mat-radio-button>
                                         </div>
                                     </mat-radio-group>
@@ -168,7 +168,7 @@
                                     <mat-checkbox id="check" matSuffix matTooltipPosition="right"
                                         [formControl]="continuidadF"
                                         matTooltip="Indicar si se requiere control de continuidad laboral.">
-                                        Requiere continuidad laboral
+                                        <label id="textoradiobtn">Requiere continuidad laboral</label>
                                     </mat-checkbox>
                                 </div>
                             </div>
@@ -258,7 +258,7 @@
                                 <mat-checkbox id="check_" matSuffix matTooltipPosition="right" [formControl]="acumularF"
                                     style="position: relative; left:0px;" (change)="ActivarAcumular($event)"
                                     matTooltip="Activar acumulación de días de vacaciones.">
-                                    Acumular vacaciones
+                                    <label id="textoradiobtn">Acumular vacaciones</label>
                                 </mat-checkbox>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start" style="padding-bottom: 20px;">
@@ -374,7 +374,7 @@
                                     [formControl]="antiguedadActivaF" style="position: relative; left:10px;"
                                     (change)="ActivarAntiguedad($event, tercerFormulario.value)"
                                     matTooltip="Activar vacaciones por antiguedad laboral.">
-                                    Antigüedad laboral
+                                    <label id="textoradiobtn">Antigüedad laboral</label>
                                 </mat-checkbox>
                             </div>
 
@@ -384,17 +384,16 @@
                                     <div class="d-flex flex-wrap justify-content-around">
                                         <mat-radio-button value="fija"
                                             (change)="SelecionarAntiguo($event, tercerFormulario.value)">
-                                            Fija
+                                            <label id="textoradiobtn">Fija</label>
                                         </mat-radio-button>
                                         <mat-radio-button value="variable"
                                             (change)="SelecionarAntiguo($event, tercerFormulario.value)">
-                                            Variable
+                                            <label id="textoradiobtn">Variable</label>
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="variable"
-                                    style="position: relative; left:40px; color:blue;"
-                                    (click)="RegistrarAntiguedad(tercerFormulario.value)"
+                                    style="position: relative; left:40px; color:blue;" (click)="ValidarAntiguedad()"
                                     matTooltip="Registrar antiguedad para vacaciones.">
                                     add_box
                                 </mat-icon>
@@ -428,113 +427,43 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_uno">
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput type="tel" [formControl]="desde_unoF" [required]="antiguo_uno"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput type="tel" [formControl]="hasta_unoF" [required]="antiguo_uno"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-hint align="start" id="error_" *ngIf="hasta_uno">
-                                        <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
-                                    </mat-hint>
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput type="tel" [formControl]="vacaciones_unoF" [required]="antiguo_uno"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_uno"
-                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
-                                    (click)="EliminarAntiguedad(1)">
-                                    cancel
-                                </mat-icon>
-                            </div>
+                            <div class="d-flex flex-wrap justify-content-start" *ngIf="variable">
+                                <form [formGroup]="antiguedadFormu">
+                                    <div formArrayName="rangosAntiguedad">
+                                        <div *ngFor="let rango of rangosAntiguedad?.controls; let i = index"
+                                            [formGroupName]="i">
 
-                            <hr *ngIf="antiguo_dos">
-                            <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_dos">
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput [formControl]="desde_dosF" [required]="antiguo_dos"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput type="tel" [formControl]="hasta_dosF" [required]="antiguo_dos"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-hint align="start" id="error_" *ngIf="hasta_dos">
-                                        <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
-                                    </mat-hint>
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput [formControl]="vacaciones_dosF" [required]="antiguo_dos"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)" required
-                                        type="number">
-                                </mat-form-field>
-                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_dos"
-                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
-                                    (click)="EliminarAntiguedad(2)">
-                                    cancel
-                                </mat-icon>
-                            </div>
+                                            <mat-form-field id="campos_antiguedad">
+                                                <mat-label id="letras_2">Años desde</mat-label>
+                                                <input matInput type="tel" formControlName="anio_desde" required
+                                                    [readonly]="escritura_antiguo"
+                                                    (keypress)="IngresarSoloNumeros($event)">
+                                            </mat-form-field>
 
-                            <hr *ngIf="antiguo_tres">
-                            <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_tres">
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput [formControl]="desde_tresF" [required]="antiguo_tres"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput type="tel" [formControl]="hasta_tresF" [required]="antiguo_tres"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-hint align="start" id="error_" *ngIf="hasta_tres">
-                                        <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
-                                    </mat-hint>
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput [formControl]="vacaciones_tresF" [required]="antiguo_tres"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_tres"
-                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
-                                    (click)="EliminarAntiguedad(3)">
-                                    cancel
-                                </mat-icon>
-                            </div>
+                                            <mat-form-field id="campos_antiguedad">
+                                                <mat-label id="letras_2">Años hasta</mat-label>
+                                                <input matInput type="tel" formControlName="anio_hasta" required
+                                                    [readonly]="escritura_antiguo"
+                                                    (keypress)="IngresarSoloNumeros($event)">
+                                            </mat-form-field>
 
-                            <hr *ngIf="antiguo_cuatro">
-                            <div class="d-flex flex-wrap justify-content-start" *ngIf="antiguo_cuatro">
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años desde</mat-label>
-                                    <input matInput type="tel" [formControl]="desde_cuatroF" [required]="antiguo_cuatro"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Años hasta</mat-label>
-                                    <input matInput [formControl]="hasta_cuatroF" [required]="antiguo_cuatro"
-                                        [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-hint align="start" id="error_" *ngIf="hasta_cuatro">
-                                        <strong>Debe ser mayor al campo <i>"años desde"</i></strong>
-                                    </mat-hint>
-                                </mat-form-field>
-                                <mat-form-field id="campos_antiguedad">
-                                    <mat-label id="letras_2">Vacaciones</mat-label>
-                                    <input matInput type="tel" [formControl]="vacaciones_cuatroF"
-                                        [required]="antiguo_cuatro" [readonly]="escritura_antiguo"
-                                        (keypress)="IngresarSoloNumeros($event)">
-                                </mat-form-field>
-                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_cuatro"
-                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
-                                    (click)="EliminarAntiguedad(4)">
-                                    cancel
-                                </mat-icon>
+                                            <div class="d-flex flex-wrap justify-content-start">
+                                                <mat-form-field id="campos_antiguedad">
+                                                    <mat-label id="letras_2">Vacaciones</mat-label>
+                                                    <input matInput type="tel" formControlName="dias_adicionales"
+                                                        required [readonly]="escritura_antiguo"
+                                                        (keypress)="IngresarSoloNumeros($event)">
+                                                </mat-form-field>
+
+                                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix
+                                                    *ngIf="rangosAntiguedad.length > 1" matTooltipPosition="right"
+                                                    matTooltip="Eliminar Registro." (click)="eliminarRango(i)">
+                                                    cancel
+                                                </mat-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <i id="validar" class="fa fa-check-square-o" matSuffix *ngIf="validar_antiguo"
@@ -555,7 +484,8 @@
                                 <mat-form-field id="campos_calculos">
                                     <mat-label id="letras_2">Meses período</mat-label>
                                     <input matInput type="tel" [formControl]="meses_calculoF"
-                                        (keypress)="IngresarSoloNumeros($event)" required (click)="LimpiarCalcular()">
+                                        (keypress)="IngresarSoloNumeros($event)" required (input)="validarMeses(3)"
+                                        (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses considerados para el cálculo.">
                                         date_range
@@ -568,7 +498,7 @@
                                     (change)="ValidarRequerido($event, primerFormulario.value, segundoFormulario.value, tercerFormulario.value)"
                                     [formControl]="calculoF"
                                     matTooltip="Dar click para realizar cálculo y completar todos los datos.">
-                                    Realizar cálculos *
+                                    <label id="textoradiobtn">Realizar cálculos *</label>
                                 </mat-checkbox>
                                 <mat-icon *ngIf="limpiar_calcular" id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar cálculos realizados."
