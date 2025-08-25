@@ -3066,7 +3066,7 @@ export class PdfServicesService {
                       paddingTop: () => 0,
                       paddingBottom: () => 0
                     }
-                  }, this.getCheckBoxCellTalentoHumano(this.datosPedido.accion_personal),
+                  }, this.getCheckBoxCellTalentoHumano(this.datosPedido.comunicacion_electronica),
                   {
                     text: '',
                     border: [false, false, false, false],
@@ -3115,7 +3115,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText("")]
+                      }, this.getCellPosecionFirmasText(this.datosPedido.fecha_comunicacion)]
                     ]
                   },
                   border: [false, false, false, false],
@@ -3140,7 +3140,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText("")]
+                      }, this.getCellPosecionFirmasText(this.datosPedido.hora_comunicacion)]
                     ]
                   },
                   border: [false, false, false, false],
@@ -3180,7 +3180,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText("")]
+                      }, this.getCellPosecionFirmasText(this.datosPedido.medio_comunicacion)]
                     ]
                   },
                   border: [false, false, false, false],
