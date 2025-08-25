@@ -132,47 +132,55 @@ export class ExcelService {
     worksheet.getColumn('O').width = 3;
     worksheet.getColumn('P').width = 1;
 
-    worksheet.getRow(1).height = 60;
-    worksheet.getRow(2).height = 10;
+    worksheet.getRow(1).height = 30;
+    worksheet.getRow(2).height = 1;
     worksheet.getRow(3).height = 30;
-    worksheet.getRow(5).height = 30;
-    worksheet.getRow(6).height = 35;
-    worksheet.getRow(7).height = 35;
-    worksheet.getRow(8).height = 25;
-    worksheet.getRow(10).height = 35;
-    worksheet.getRow(11).height = 35;
-    worksheet.getRow(12).height = 15;
-    worksheet.getRow(21).height = 14;
-    worksheet.getRow(22).height = 35;
-    worksheet.getRow(23).height = 230;
-    worksheet.getRow(24).height = 35;
-    worksheet.getRow(25).height = 15;
-    worksheet.getRow(44).height = 10;
-    worksheet.getRow(45).height = 40;
-    worksheet.getRow(46).height = 20;
-    worksheet.getRow(49).height = 35;
-    worksheet.getRow(54).height = 20;
-    worksheet.getRow(55).height = 40;
+    worksheet.getRow(4).height = 28;
+    worksheet.getRow(5).height = 28;
+    worksheet.getRow(6).height = 28;
+    worksheet.getRow(7).height = 30;
+    worksheet.getRow(8).height = 22;
+    worksheet.getRow(9).height = 24;
+    worksheet.getRow(10).height = 28;
+    worksheet.getRow(11).height = 28;
+    worksheet.getRow(12).height = 5;
+    worksheet.getRow(21).height = 1;
+    worksheet.getRow(22).height = 28;
+    worksheet.getRow(23).height = 200;
+    worksheet.getRow(24).height = 30;
+    worksheet.getRow(25).height = 1;
+    for(var i=26; i<=43; i++){
+      worksheet.getRow(i).height = 20;
+    }
+    worksheet.getRow(44).height = 5;
+    worksheet.getRow(45).height = 30;
+    worksheet.getRow(46).height = 5;
+    worksheet.getRow(48).height = 20;
+    worksheet.getRow(49).height = 30;
+    worksheet.getRow(50).height = 5;
+    worksheet.getRow(53).height = 20;
+    worksheet.getRow(54).height = 5;
+    worksheet.getRow(55).height = 30;
     worksheet.getRow(56).height = 40;
     worksheet.getRow(57).height = 20;
     worksheet.getRow(58).height = 90;
     worksheet.getRow(62).height = 20;
     worksheet.getRow(63).height = 40;
-    worksheet.getRow(64).height = 15;
-    worksheet.getRow(65).height = 40;
-    worksheet.getRow(66).height = 15;
-    worksheet.getRow(67).height = 40;
+    worksheet.getRow(64).height = 1;
+    worksheet.getRow(65).height = 30;
+    worksheet.getRow(66).height = 1;
+    worksheet.getRow(67).height = 30;
     worksheet.getRow(69).height = 80;
     worksheet.getRow(70).height = 80;
     worksheet.getRow(77).height = 15;
     worksheet.getRow(78).height = 15;
-    worksheet.getRow(79).height = 20;
+    worksheet.getRow(79).height = 1;
     worksheet.getRow(80).height = 40;
     worksheet.getRow(81).height = 80;
     worksheet.getRow(82).height = 80;
     worksheet.getRow(87).height = 100;
     worksheet.getRow(88).height = 20;
-    worksheet.getRow(89).height = 70;
+    worksheet.getRow(89).height = 50;
     worksheet.getRow(90).height = 20;
     worksheet.getRow(91).height = 40;
     worksheet.getRow(92).height = 50;
@@ -180,7 +188,7 @@ export class ExcelService {
     worksheet.getRow(100).height = 70;
     worksheet.getRow(101).height = 70;
     worksheet.getRow(102).height = 30;
-    worksheet.getRow(108).height = 70;
+    worksheet.getRow(108).height = 50;
     worksheet.getRow(109).height = 50;
 
     // COMBINAR CELDAS
@@ -491,39 +499,39 @@ export class ExcelService {
 
     worksheet.getCell("A26").value = "  PROCESO INSTITUCIONAL: (ESCOGER DE LA LISTA DESPLEGABLE)"
     worksheet.getCell("A27").value = " " + this.datosPedido.proceso_actual
-    worksheet.getCell("I26").value = "  PROCESO INSTITUCIONAL: (ESCOGER DE LA LISTA DESPLEGABLE)"
+    worksheet.getCell("I26").value = " PROCESO INSTITUCIONAL: (ESCOGER DE LA LISTA DESPLEGABLE)"
     worksheet.getCell("I27").value = " " + (this.datosPedido.proceso_propuesto ? this.datosPedido.proceso_propuesto : "")
-    worksheet.getCell("A28").value = "  NIVEL DE GESTIÓN: (VICEMINISTERIO, SUBSECRETARÍA, COORDINACIÓN, ETC)"
+    worksheet.getCell("A28").value = "  NIVEL DE GESTIÓN: (VICEMINISTERIO,SUBSECRETARÍA,COORDINACIÓN,ETC)"
     worksheet.getCell("A29").value = " " + this.datosPedido.nivel_gestion_actual
-    worksheet.getCell("I28").value = "  NIVEL DE GESTIÓN: (VICEMINISTERIO, SUBSECRETARÍA, COORDINACIÓN, ETC)"
+    worksheet.getCell("I28").value = " NIVEL DE GESTIÓN: (VICEMINISTERIO,SUBSECRETARÍA,COORDINACIÓN,ETC)"
     worksheet.getCell("I29").value = " " + (this.datosPedido.nivel_gestion_propuesto ? this.datosPedido.nivel_gestion_propuesto : "")
     worksheet.getCell("A30").value = "  UNIDAD ADMINISTRATIVA: (UNIDAD, GESTIÓN INTERNA)"
     worksheet.getCell("A31").value = " " + this.datosPedido.unidad_administrativa
-    worksheet.getCell("I30").value = "  UNIDAD ADMINISTRATIVA: (UNIDAD, GESTIÓN INTERNA)"
+    worksheet.getCell("I30").value = " UNIDAD ADMINISTRATIVA: (UNIDAD, GESTIÓN INTERNA)"
     worksheet.getCell("I31").value = " " + (this.datosPedido.unidad_administrativa_propuesta ? this.datosPedido.unidad_administrativa_propuesta : "")
     worksheet.getCell("A32").value = "  LUGAR DE TRABAJO: (CIUDAD)"
     worksheet.getCell("A33").value = " " + this.datosPedido.lugar_trabajo_actual
-    worksheet.getCell("I32").value = "  LUGAR DE TRABAJO: (CIUDAD)"
+    worksheet.getCell("I32").value = " LUGAR DE TRABAJO: (CIUDAD)"
     worksheet.getCell("I33").value = " " + (this.datosPedido.lugar_trabajo_propuesto ? this.datosPedido.lugar_trabajo_propuesto : "")
     worksheet.getCell("A34").value = "  DENOMINACIÓN DEL PUESTO:"
     worksheet.getCell("A35").value = " " + this.datosPedido.cargo_actual
-    worksheet.getCell("I34").value = "  DENOMINACIÓN DEL PUESTO:"
+    worksheet.getCell("I34").value = " DENOMINACIÓN DEL PUESTO:"
     worksheet.getCell("I35").value = " " + (this.datosPedido.cargo_propuesto ? this.datosPedido.cargo_propuesto : "")
     worksheet.getCell("A36").value = "  GRUPO OCUPACIONAL:"
     worksheet.getCell("A37").value = " " + this.datosPedido.grupo_ocupacional_actual
-    worksheet.getCell("I36").value = "  GRUPO OCUPACIONAL:"
+    worksheet.getCell("I36").value = " GRUPO OCUPACIONAL:"
     worksheet.getCell("I37").value = " " + (this.datosPedido.grupo_ocupacional_propuesto ? this.datosPedido.grupo_ocupacional_propuesto : "")
     worksheet.getCell("A38").value = "  GRADO:"
     worksheet.getCell("A39").value = " " + this.datosPedido.grado_actual
-    worksheet.getCell("I38").value = "  GRADO:"
+    worksheet.getCell("I38").value = " GRADO:"
     worksheet.getCell("I39").value = " " + (this.datosPedido.grado_propuesto ? this.datosPedido.grado_propuesto : "")
     worksheet.getCell("A40").value = "  REMUNERACIÓN MENSUAL:"
     worksheet.getCell("A41").value = " " + this.datosPedido.remuneracion_actual
-    worksheet.getCell("I40").value = "  REMUNERACIÓN MENSUAL:"
+    worksheet.getCell("I40").value = " REMUNERACIÓN MENSUAL:"
     worksheet.getCell("I41").value = " " + (this.datosPedido.remuneracion_propuesta ? this.datosPedido.remuneracion_propuesta : "")
     worksheet.getCell("A42").value = "  PARTIDA INDIVIDUAL:"
     worksheet.getCell("A43").value = " " + this.datosPedido.partida_individual_actual
-    worksheet.getCell("I42").value = "  PARTIDA INDIVIDUAL:"
+    worksheet.getCell("I42").value = " PARTIDA INDIVIDUAL:"
     worksheet.getCell("I43").value = " " + (this.datosPedido.partida_individual_propuesta ? this.datosPedido.partida_individual_propuesta : "")
     worksheet.getCell("A45").value = "  POSESIÓN DEL PUESTO"
     worksheet.getCell("B47").value = "  YO,  "
@@ -627,7 +635,7 @@ export class ExcelService {
 
     worksheet.addImage(this.imagen, {
       tl: { col: 1, row: 0},
-      ext: { width: 120, height: 60},
+      ext: { width: 140, height: 60},
     });
 
     worksheet.addImage(this.imagenMinisterio, {
@@ -689,6 +697,11 @@ export class ExcelService {
     const borderbottomRightStyle: Partial<ExcelJS.Borders> = {
       bottom: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
       right: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
+    };
+
+    const borderbottomLeftStyle: Partial<ExcelJS.Borders> = {
+      bottom: { style: "thin", color: { argb: "000000" } }, // Borde superior negro
+      left: { style: "thin", color: { argb: "000000" } }, // Borde derecho negro
     };
 
     const borderbottomRighLefttStyle: Partial<ExcelJS.Borders> = {
@@ -762,7 +775,9 @@ export class ExcelService {
           cell.border = borderbottomStyle
         } else if ((i == 63) || (i == 110 && (j >= 8 && j <= 16)) || (i == 109 && j == 16)) {
           cell.border = borderTopStyle
-          if (j == 16) {
+          if(j==7){
+            cell.border = borderTopLeftStyle
+          }else if (j == 16) {
             cell.border = borderTopRightStyle
           }
         } else if (i >= 68 && i <= 78) {
@@ -809,9 +824,12 @@ export class ExcelService {
             cell.border = borderbottomStyle
           } else if (i == 108) {
             cell.border = borderbottomStyle
+            if(j==1){
+              cell.border = borderbottomLeftStyle
+            }
           } else if (i == 109) {
-            if (j == 16) {
-
+            if (j == 7) {
+              cell.border = borderbottomLeftStyle
             } else {
               cell.border = borderbottomStyle
             }
@@ -914,29 +932,27 @@ export class ExcelService {
 
       }
 
-      if (cell == 'K1' || cell == 'A89') {
-        worksheet.getCell(cell).font = { bold: true, size: 17 };
+      if (cell == 'K1') {
+        worksheet.getCell(cell).font = { bold: true, size: 10 };
+      }else if(cell == 'A89'){
+        worksheet.getCell(cell).font = { bold: true, size: 16 };
       } else if (
         cell == "A8" || cell == 'A9' || cell == "K3" || cell == 'K4' ||
         cell == 'A6' || cell == 'I6' || cell == 'I8' || cell == 'I9' ||
         cell == 'E8' || cell == 'E9' || cell == 'M9' || cell == "A11" ||
         cell == 'A22' || cell == 'A24' || cell == "I24" || cell == 'A26' ||
-        cell == "I26" || cell == 'A27' || cell == "I27" || cell == 'A28' ||
-        cell == "I28" || cell == 'A29' || cell == "I29" || cell == 'A30' ||
+        cell == "I26" || cell == 'A28' || cell == "I28" || cell == 'A30' ||
         cell == "I30" || cell == 'A32' || cell == "I32" || cell == 'A34' ||
         cell == "I34" || cell == 'A36' || cell == "I36" || cell == 'A38' ||
-        cell == 'A33' || cell == "I33" || cell == 'A35' || cell == 'A31' || cell == "I31"||
-        cell == "I35" || cell == 'A37' || cell == "I37" || cell == 'A39' ||
-        cell == "I39" || cell == 'A41' || cell == "I41" ||
         cell == "I38" || cell == 'A40' || cell == "I40" || cell == 'A42' ||
-        cell == "I42" || cell == 'A44' || cell == "I44" || cell == 'A45' ||
+        cell == "I42" || cell == 'A45' ||
         cell == "I47" || cell == "B51" || cell == 'B53' || cell == "F53" ||
         cell == 'K53' || cell == "A55" || cell == 'A56' || cell == "I56" ||
         cell == 'A65' || cell == "A67" || cell == 'I67' || cell == "A80" ||
         cell == 'G80' || cell == "L80" || cell == 'A91' || cell == "A107" ||
         cell == 'F102'
       ) {
-        worksheet.getCell(cell).font = { bold: true, size: 7 };
+        worksheet.getCell(cell).font = { bold: true, size: 8 };
       } else {
         worksheet.getCell(cell).font = { size: 8 };
       }

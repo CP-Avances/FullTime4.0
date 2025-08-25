@@ -96,9 +96,7 @@ export class VerPedidoAccionComponent implements OnInit {
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
-      
       console.log('datos pedido: ',this.datosPedido)
-
       this.tipos_accion.forEach((item: any) => {
         if (item.descripcion == this.datosPedido[0].descripcion) {
           this.textoFijo = item.base_legal + ' ';

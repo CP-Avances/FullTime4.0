@@ -53,9 +53,7 @@ export class PdfServicesService {
   }
 
   CargarInformacion(formato_fecha: string, datosPedidoSelected) {
-
     console.log('datos tipo accion personal: ', this.tipos_accion);
-
     this.tipos_accion.forEach((item: any) => {
       if (item.descripcion == datosPedidoSelected[0].descripcion) {
         this.textoFijo = item.base_legal + ' ';
@@ -92,7 +90,6 @@ export class PdfServicesService {
 
   async crearArchivo(action = 'open') {
     console.log('datos del pedido selecionado: ', this.datosPedido);
-    this.ObtenerDecreto()
     const pdfMake = await this.validar.ImportarPDF();
     const documentDefinition = this.DefinirInformacionPDF();
     switch (action) {
@@ -111,33 +108,12 @@ export class PdfServicesService {
         this.PresentarHoja1_Parte_1(),
         this.PresentarHoja1_Parte_2(),
         this.PresentarHoja1_Parte_3(),
-        // this.PresentarHoja1_Parte_4(),
-        // this.PresentarHoja1_Parte_5(),
-        // this.PresentarHoja1_Parte_6(),
-        // this.PresentarHoja1_Parte_7(),
-        // this.PresentarHoja1_Parte_8(),
-        // this.PresentarHoja1_Parte_8_1(),
-        // this.PresentarHoja1_Parte_9(),
-        // this.PresentarHoja1_Parte_10(),
-        // this.PresentarHoja1_Parte_11_1(),
-        // this.PresentarHoja1_Parte_11_2(),
-        // this.PresentarHoja1_Parte_12(),
-        // this.PresentarHoja1_Parte_13_1(),
-        // this.PresentarHoja1_Parte_13_2(),
-        { text: "", pageBreak: "before", style: "subheader" },
-        // this.PresentarHoja2_Parte_1(),
-        // this.PresentarHoja2_Parte_2(),
-        // this.PresentarHoja2_Parte_3_1(),
-        // this.PresentarHoja2_Parte_3_2(),
-        // this.PresentarHoja2_Parte_3_3(),
-        // this.PresentarHoja2_Parte_3_4(),
-        // this.PresentarHoja2_Parte_3_5(),
-        // this.PresentarHoja2_Parte_4_1(),
-        // this.PresentarHoja2_Parte_4_2(),
-        // this.PresentarHoja2_Parte_4_3(),
-        // this.PresentarHoja2_Parte_4_4(),
-        // this.PresentarHoja2_Parte_4_5(),
-        // this.PresentarHoja2_Parte_4_6(),
+        this.PresentarHoja1_Parte_4(),
+        //{ text: "", pageBreak: "before", style: "subheader" }, --> Se usa para asignar contenido a una nueva hoja
+        this.PresentarHoja1_Parte_5(),
+        this.PresentarHoja1_Parte_6(),
+        this.PresentarHoja1_Parte_7(),
+        
       ],
       styles: {
         itemsTable: { fontSize: 8 },
@@ -146,40 +122,6 @@ export class PdfServicesService {
         itemsTable_e: { fontSize: 7 },
       },
     };
-  }
-
-  // METODO PARA MOSTRAR EL TIPO DE DECRETO-ACUERDO-RESOLUCION
-  ObtenerDecreto() {
-    this.decreto = ["", "", "", "_______________", "", "white"];
-    let decretoTexto: string = "";
-    if (this.datosPedido.accion_personal !== null) {
-      decretoTexto = '';
-      let texto: string = decretoTexto.toUpperCase();
-      this.decreto[3] = texto;
-      this.decreto[4] = "X";
-      this.decreto[5] = "black";
-    }
-  }
-
-  // METODO PARA OBTENER MOSTRAR EL TIPO DE ACCION
-  ObtenerTipoAccion() {
-    let tipoAccion: string = this.datosPedido.accion_personal.toUpperCase();
-    let cadena = this.RemoveAccents(tipoAccion);
-    this.tipoAccion = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
-    let acciones: string[] = ['INGRESO', 'NOMBRAMIENTO', 'ASCENSO', 'SUBROGACION', 'ENCARGO:',
-      'VACACIONES', 'TRASLADO', 'TRASPASO', 'CAMBIO ADMINISTRATIVO', 'INTERCAMBIO',
-      'COMISION DE SERVICIOS', 'LICENCIA', 'REVALORIZACION', 'RECLASIFICACION', 'UBICACION',
-      'REINTEGRO', 'REINSTITUCIONAL', 'RENUNCIA', 'SUPRESION', 'DESTITUCION', 'REMOCION', 'JUBILACION'];
-    let indice = acciones.indexOf(cadena);
-    if (indice !== -1) {
-      this.tipoAccion[indice] = 'X';
-    } else {
-      this.tipoAccion[22] = tipoAccion;
-      this.tipoAccion[24] = 'X';
-    }
-    console.log("Obtener tipo de accion")
-    console.log(tipoAccion);
-    console.log(cadena);
   }
 
   // METODO PARA QUITAR LAS TILDES
@@ -207,6 +149,31 @@ export class PdfServicesService {
         paddingRight: () => 0,
         paddingTop: () => 0,
         paddingBottom: () => 0
+      }
+    };
+  }
+
+  getCheckBoxCellTalentoHumano(valor: string) {
+    return {
+      table: {
+        widths: [8], // ancho del cuadrito
+        heights: [8], // alto del cuadrito
+        body: [[{
+          text: valor.toLocaleLowerCase() ? 'X' : '',
+          alignment: 'center',
+          fontSize: 7,
+        }]]
+      },
+      margin: [0, 20, 0, 0], // espacio entre texto y cuadro
+      layout: {
+        hLineWidth: () => 0.5, // grosor del borde
+        vLineWidth: () => 0.5,
+        hLineColor: () => '#999999', // color gris
+        vLineColor: () => '#999999',
+        paddingLeft: () => 0,
+        paddingRight: () => 0,
+        paddingTop: () => 0,
+        paddingBottom: () => 0,
       }
     };
   }
@@ -269,12 +236,12 @@ export class PdfServicesService {
         body: [[{
           text: valor || '',
           alignment: 'left',
-          margin: [0, 7, 3, 0],
           fontSize: 8,
           noWrap: false,
           valign: 'bottom'
         }]]
       },
+      margin: [1, 7, 3, 0],
       border: [false, false, false, false],
       layout: {
         hLineWidth: function (i, node) {
@@ -285,6 +252,64 @@ export class PdfServicesService {
         hLineColor: () => '#999999', // color gris
         paddingLeft: () => 0,
         paddingRight: () => 30,
+        paddingTop: () => 0,
+        paddingBottom: () => 0
+      }
+    };
+  }
+
+  getCellPosecionPosecionText(valor: string) {
+    return {
+      table: {
+        widths: [100], // ancho del cuadrito
+        body: [[{
+          text: valor || '',
+          alignment: 'center',
+          fontSize: 8,
+          noWrap: false,
+          valign: 'bottom'
+        }]]
+      },
+      margin: [15, 7, 0, 0],
+      border: [false, false, false, false],
+      layout: {
+        hLineWidth: function (i, node) {
+          // i = índice de línea horizontal (0 = arriba, node.table.body.length = última)
+          return (i === node.table.body.length) ? 0.5 : 0; // solo la última línea
+        },
+        vLineWidth: () => 0,
+        hLineColor: () => '#999999', // color gris
+        paddingLeft: () => 0,
+        paddingRight: () => 0,
+        paddingTop: () => 0,
+        paddingBottom: () => 0
+      }
+    };
+  }
+
+  getCellPosecionFirmasText(valor: string) {
+    return {
+      table: {
+        widths: ['*'], // ancho del cuadrito
+        body: [[{
+          text: valor ? valor : '',
+          alignment: 'left',
+          fontSize: 8,
+          noWrap: false,
+          valign: 'bottom'
+        }]]
+      },
+      margin: [1, 2, 0, 0],
+      border: [false, false, false, true],
+      layout: {
+        hLineWidth: function (i, node) {
+          // i = índice de línea horizontal (0 = arriba, node.table.body.length = última)
+          return (i === node.table.body.length) ? 0 : 0; // solo la última línea
+        },
+        vLineWidth: () => 0,
+        hLineColor: () => '#999999', // color gris
+        paddingLeft: () => 0,
+        paddingRight: () => 0,
         paddingTop: () => 0,
         paddingBottom: () => 0
       }
@@ -319,9 +344,9 @@ export class PdfServicesService {
                                   text: 'ACCIÓN DE PERSONAL',
                                   alignment: 'center',
                                   bold: true,
-                                  fontSize: 13,
+                                  fontSize: 11,
                                   fillColor: '#f2f2f2',
-                                  margin: [0, 10, 0, 10],
+                                  margin: [0, 5, 0, 5],
                                   border: [false, false, false, true],
                                 }
                               ],
@@ -495,14 +520,14 @@ export class PdfServicesService {
                       text: this.datosPedido.nombres.split(' ')[2].toUpperCase() + ' ' + this.datosPedido.nombres.split(' ')[3].toUpperCase(),
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 5, 0, 5],
+                      margin: [0, 3, 0, 3],
                       border: [false, false, true, false]
                     },
                     {
                       text: this.datosPedido.nombres.split(' ')[0].toUpperCase() + ' ' + this.datosPedido.nombres.split(' ')[1].toUpperCase(),
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 5, 0, 5],
+                      margin: [0, 3, 0, 3],
                       border: [false, false, false, false]
                     },
                   ]
@@ -647,7 +672,7 @@ export class PdfServicesService {
                       text: "CÉDULA",
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 4, 0, 3],
+                      margin: [0, 3, 0, 3],
                       border: [false, false, true, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -662,7 +687,7 @@ export class PdfServicesService {
                       text: this.datosPedido.cedula_empleado,
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 4, 0, 3],
+                      margin: [0, 3, 0, 3],
                       border: [false, false, true, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -677,7 +702,7 @@ export class PdfServicesService {
                       text: this.datosPedido.fecha_rige_desde,
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 4, 0, 3],
+                      margin: [0, 3, 0, 3],
                       border: [false, false, true, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -692,7 +717,7 @@ export class PdfServicesService {
                       text: this.datosPedido.fecha_rige_hasta,
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 4, 0, 3],
+                      margin: [0, 3, 0, 3],
                       border: [false, false, false, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -966,7 +991,7 @@ export class PdfServicesService {
               text: this.datosPedido.adicion_base_legal,
               bold: true,
               fontSize: 7,
-              margin: [5, 20, 0, 20],
+              margin: [5, 5, 0, 5],
               noWrap: false, // permite salto de línea automático
               border: [true, false, true, true],
               layout: {
@@ -1012,7 +1037,7 @@ export class PdfServicesService {
                       bold: true,
                       fontSize: 7,
                       fillColor: '#f2f2f2',
-                      margin: [0, 0, 0, 0],
+                      margin: [0, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       alignment: 'center', // centra horizontalmente
@@ -1030,7 +1055,7 @@ export class PdfServicesService {
                       bold: true,
                       fontSize: 7,
                       fillColor: '#f2f2f2',
-                      margin: [0, 0, 0, 0],
+                      margin: [0, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       alignment: 'center', // centra horizontalmente
@@ -1752,7 +1777,7 @@ export class PdfServicesService {
                                     margin: [20, 7, 0, 0],
                                     border: [false, false, false, false],
                                     noWrap: false,
-                                    valign: 'middle',     // centra verticalmente
+                                    valign: 'middle',// centra verticalmente
                                     layout: {
                                       defaultBorder: false, // desactiva cualquier borde por defecto
                                       paddingLeft: () => 0,
@@ -1857,7 +1882,7 @@ export class PdfServicesService {
                                             paddingTop: () => 0,
                                             paddingBottom: () => 0
                                           }
-                                        }, this.getCellPosecionText(this.datosPedido.lugar_posesion)]
+                                        }, this.getCellPosecionText(this.datosPedido.descripcion_lugar_posesion)]
                                       ]
                                     },
                                     border: [false, false, false, false],
@@ -1939,44 +1964,44 @@ export class PdfServicesService {
                           [
                             {
                               table: {
-                                widths: [90, 90],
+                                widths: [120, 120],
                                 body: [
                                   [
-                                    this.getCellPosecionText(''),
-                                    this.getCellPosecionText('')
+                                    this.getCellPosecionPosecionText(this.datosPedido.numero_acta_final),
+                                    this.getCellPosecionPosecionText(this.datosPedido.fecha_acta_final)
                                   ],
                                   [
                                     {
-                                      text: 'NRO. ACTA FINAL',
-                                          fontSize: 7,
-                                          bold: true,
-                                          margin: [25, 7, 0, 4],
-                                          border: [false, false, false, false],
-                                          noWrap: false,
-                                          alignment: 'center',     // centra verticalmente
-                                          layout: {
-                                            defaultBorder: false, // desactiva cualquier borde por defecto
-                                            paddingLeft: () => 0,
-                                            paddingRight: () => 0,
-                                            paddingTop: () => 0,
-                                            paddingBottom: () => 0
-                                          }
+                                      text: 'N°. Acta final',
+                                      fontSize: 7,
+                                      bold: true,
+                                      margin: [20, 2, 0, 5],
+                                      border: [false, false, false, false],
+                                      noWrap: false,
+                                      alignment: 'center',     // centra verticalmente
+                                      layout: {
+                                        defaultBorder: false, // desactiva cualquier borde por defecto
+                                        paddingLeft: () => 0,
+                                        paddingRight: () => 0,
+                                        paddingTop: () => 0,
+                                        paddingBottom: () => 0
+                                      }
                                     },
                                     {
                                       text: 'Fecha',
-                                          fontSize: 7,
-                                          bold: true,
-                                          margin: [10, 7, 0, 4],
-                                          border: [false, false, false, false],
-                                          noWrap: false,
-                                          alignment: 'center',     // centra verticalmente
-                                          layout: {
-                                            defaultBorder: false, // desactiva cualquier borde por defecto
-                                            paddingLeft: () => 0,
-                                            paddingRight: () => 0,
-                                            paddingTop: () => 0,
-                                            paddingBottom: () => 0
-                                          }
+                                      fontSize: 7,
+                                      bold: true,
+                                      margin: [10, 2, 0, 5],
+                                      border: [false, false, false, false],
+                                      noWrap: false,
+                                      alignment: 'center',     // centra verticalmente
+                                      layout: {
+                                        defaultBorder: false, // desactiva cualquier borde por defecto
+                                        paddingLeft: () => 0,
+                                        paddingRight: () => 0,
+                                        paddingTop: () => 0,
+                                        paddingBottom: () => 0
+                                      }
                                     }
                                   ]
                                 ]
@@ -1997,39 +2022,39 @@ export class PdfServicesService {
                                   [
                                     {
                                       text: 'Firma: ',
-                                          fontSize: 8,
-                                          bold: true,
-                                          margin: [10, 7, 0, 0],
-                                          border: [false, false, false, false],
-                                          noWrap: false,
-                                          alignment: 'center',     // centra verticalmente
-                                          layout: {
-                                            defaultBorder: false, // desactiva cualquier borde por defecto
-                                            paddingLeft: () => 0,
-                                            paddingRight: () => 0,
-                                            paddingTop: () => 0,
-                                            paddingBottom: () => 0
-                                          }
+                                      fontSize: 8,
+                                      bold: true,
+                                      margin: [10, 7, 0, 0],
+                                      border: [false, false, false, false],
+                                      noWrap: false,
+                                      alignment: 'center',     // centra verticalmente
+                                      layout: {
+                                        defaultBorder: false, // desactiva cualquier borde por defecto
+                                        paddingLeft: () => 0,
+                                        paddingRight: () => 0,
+                                        paddingTop: () => 0,
+                                        paddingBottom: () => 0
+                                      }
                                     },
-                                    this.getCellPosecionText('')
+                                    this.getCellPosecionFirmasText('')
                                   ],
                                   [
                                     {},
                                     {
-                                      text: 'SERVIDOR PÚBLICO',
-                                          fontSize: 7,
-                                          bold: true,
-                                          margin: [25, 7, 0, 4],
-                                          border: [false, false, false, false],
-                                          noWrap: false,
-                                          alignment: 'center',     // centra verticalmente
-                                          layout: {
-                                            defaultBorder: false, // desactiva cualquier borde por defecto
-                                            paddingLeft: () => 0,
-                                            paddingRight: () => 0,
-                                            paddingTop: () => 0,
-                                            paddingBottom: () => 0
-                                          }
+                                      text: 'Servidor público',
+                                      fontSize: 7,
+                                      bold: true,
+                                      margin: [15, 2, 0, 5],
+                                      border: [false, false, false, false],
+                                      noWrap: false,
+                                      alignment: 'center',     // centra verticalmente
+                                      layout: {
+                                        defaultBorder: false, // desactiva cualquier borde por defecto
+                                        paddingLeft: () => 0,
+                                        paddingRight: () => 0,
+                                        paddingTop: () => 0,
+                                        paddingBottom: () => 0
+                                      }
                                     }
                                   ]
                                 ]
@@ -2068,6 +2093,50 @@ export class PdfServicesService {
               }
             }
           ],
+          [
+            {
+              table: {
+                widths: [200, '*'],
+                body: [
+                  [{
+                    text: 'Elaborado por el Ministerio del Trabajo',
+                    fontSize: 5,
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 5, 0, 5],
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 10,
+                      paddingBottom: () => 10
+                    }
+                  }, {
+                    text: 'Fecha de actualización de formato: 2024-08-23 / Versión: 01.1 / Página 1 de 2',
+                    fontSize: 5,
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 5, 0, 5],
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 10,
+                      paddingBottom: () => 10
+                    }
+                  }]
+                ]
+              },
+              border: [false, false, false, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 10
+              }
+            }
+          ],
         ],
       }, layout: {
         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -2085,2700 +2154,1270 @@ export class PdfServicesService {
     };
   }
 
-  /* 
-    PresentarHoja1_Parte_4() {
-      return {
-        table: {
-          widths: ["*", "*"],
-          heights: [30],
-  
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.empleado_elaboracion.toUpperCase(),
-                        style: "itemsTable_c",
-                        margin: [0, 6, 0, 0],
-                        alignment: 'center',
-                      },
-                    ],
-                    [
-                      {
-                        text: "APELLIDO",
-                        style: "itemsTable_c",
-                        alignment: 'center',
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.nombres.toUpperCase(),
-                        style: "itemsTable_c",
-                        margin: [0, 6, 0, 0],
-                        alignment: 'center',
-                      },
-                    ],
-                    [
-                      {
-                        text: "NOMBRE",
-                        style: "itemsTable_c",
-                        alignment: 'center',
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_5() {
-      return {
-        table: {
-          widths: ["*", "*", "*"],
-          heights: [15],
-  
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: "No. de identificación",
-                        style: "itemsTable_c",
-                        alignment: 'center',
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: "No. de Afilicación IESS",
-                        style: "itemsTable_c",
-                        alignment: 'center',
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: "Rige a partir de:",
-                        style: "itemsTable_c",
-                        alignment: 'center',
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_6() {
-      return {
-        table: {
-          widths: ["*", "*", "*"],
-          heights: [15],
-  
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: [
-                          {
-                            text: this.datosPedido.cedula_empleado,
-                            style: "itemsTable_c",
-                            alignment: 'center',
-                          },
-                        ],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: [{ text: "", style: "itemsTable_c" }],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.fecha_rige_desde,
-                        style: "itemsTable_c",
-                        alignment: 'center',
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_7() {
-      return {
-        table: {
-          widths: ["*"],
-          heights: [15],
-  
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: [
-                          {
-                            text: "EXPLICACIÓN: (Opcional: adjuntar Anexo)",
-                            style: "itemsTable_c",
-                          },
-                        ],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_8() {
-      return {
-        table: {
-          widths: ["*"],
-          heights: [30],
-  
-          body: [
-            [
-              {
-                border: [true, false, true, false],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: [
-                          { text: "BASE LEGAL: ", style: "itemsTable_c" },
-                          {
-                            text: this.datosPedido.base_legal,
-                            style: "itemsTable",
-                          },
-                        ],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_8_1() {
-      return {
-        table: {
-          widths: ["*"],
-          heights: [20],
-  
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: [
-                          {
-                            text: this.datosPedido.base_legal,
-                            style: "itemsTable",
-                          },
-                        ],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_9() {
-      return {
-        table: {
-          widths: [110, 10, 120, 10, 100, 10, 100, 10, "*"],
-          heights: [9],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "INGRESO: ", style: "itemsTable",
-                        margin: [25, 5, 0, 0],
-                      }
-                    ],
-                    [
-                      {
-                        text: "NOMBRAMIENTO: ", style: "itemsTable",
-                        margin: [25, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "ASCENSO: ", style: "itemsTable",
-                        margin: [25, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "SUBROGACIÓN: ", style: "itemsTable",
-                        margin: [25, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "ENCARGO: ", style: "itemsTable",
-                        margin: [25, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "VACACIONES: ", style: "itemsTable",
-                        margin: [25, 5, 0, 0],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              // CASILLAS DE VERIFICACION 1
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.datosPedido.accion_personal}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[0].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[2].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [7],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[3].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [7],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[4].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-  
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "TRASLADO: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "TRASPASO: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "CAMBIO ADMINISTRATIVO: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "INTERCAMBIO: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "COMISIÓN DE SERVICIOS: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "LICENCIA: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              // CASILLAS DE VERIFICACION 2
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[5].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [7],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [7],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-  
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "REVALORIZACIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "RECLASIFICACIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "UBICACIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "REINTEGRO: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "REINSTITUCIONAL: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "RENUNCIA: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              // CASILLAS DE VERIFICACION 3
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [7],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [7],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-  
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "SUPRESIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "DESTITUCIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "REMOCIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "JUBILACIÓN: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: "OTRO: ", style: "itemsTable",
-                        margin: [20, 5, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        text: this.tipos_accion[1], style: "itemsTable",
-                        margin: [20, 0, 0, 0],
-                      },
-                    ]
-                  ],
-                },
-                layout: "noBorders",
-              },
-              //Casillas de verificacion 4
-              {
-                border: [false, false, false, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [true, true, true, true],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        border: [false, false, false, false],
-  
-                        table: {
-                          widths: [6],
-                          heights: [9],
-                          body: [
-                            [{ text: `${this.tipos_accion[1].nombre}`, style: "itemsTable_e", alignment: 'center' },]
-                          ]
-                        },
-                        layout: {
-                          defaultBorder: true,
-                          cellPadding: [0, 0, 0, 0],
-                        },
-                      },
-                    ],
-  
-  
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [false, false, true, true],
-                table: {
-                  body: [[]],
-                },
-                layout: "noBorders",
+  PresentarHoja1_Parte_4() {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              text: 'RESPONSABLES DE APROBACIÓN',
+              bold: true,
+              fontSize: 8,
+              fillColor: '#f2f2f2',
+              alignment: 'center',// centra verticalmente
+              margin: [5, 2, 0, 2],
+              border: [true, true, true, true],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
               }
-            ],
+            }
           ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_10() {
-      return {
-        table: {
-          widths: ["*", "*"],
-          heights: [10],
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: [
-                          { text: "SITUACIÓN ACTUAL", style: "itemsTable_c" },
-                        ],
-                        alignment: 'center',
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "PROCESO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, 0, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [15, 0, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.proceso_actual,
-                                        style: "itemsTable",
-                                        color: this.texto_color,
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "-------------------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "-----------",
-                                            color: "white",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "SUBPROCESO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -25, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-  
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.proceso_actual,
-                                        style: "itemsTable",
-                                        margin: [0, -30, 0, 0],
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "-------------------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "PUESTO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -18, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [19, -18, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.cargo_actual.toUpperCase(),
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "-------------------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "LUGAR DE TRABAJO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -18, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [0, -18, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.nombres.toUpperCase(),
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "--------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "REMUNERACIÓN MENSUAL:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -18, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [0, -18, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.remuneracion_actual,
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "---------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        text: [
+          [
+            {
+              table: {
+                widths: ['*', '*'],
+                body: [
+                  [{
+                    text: 'DIRECTOR (A) O RESPONSABLE DE TALENTO HUMANO',
+                    bold: true,
+                    fontSize: 7,
+                    fillColor: '#f2f2f2',
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 2, 0, 2],
+                    border: [false, false, false, true],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 0,
+                      paddingBottom: () => 0
+                    }
+                  },
+                  {
+                    text: 'AUTORIDAD NOMINADORA O SU DELEGADO',
+                    bold: true,
+                    fontSize: 7,
+                    fillColor: '#f2f2f2',
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 2, 0, 2],
+                    border: [true, false, false, true],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 0,
+                      paddingBottom: () => 0
+                    }
+                  }],
+                  [{
+                    table: {
+                      widths: [50, 200],
+                      body: [
+                        [{text: '',
+                          margin: [0, 30, 0, 0]},
                           {
-                            text:
-                              "PARTIDA PRESUPUESTARIA: " +
-                              "\n" +
-                              this.datosPedido.numero_acta_final,
-                            style: "itemsTable",
-                          },
-                        ],
-                        margin: [20, -12, 0, 0],
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["*"],
-                  body: [
-                    [
-                      {
-                        text: [
-                          { text: "SITUACIÓN PROPUESTA", style: "itemsTable_c" },
-                        ],
-                        alignment: 'center',
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "PROCESO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, 0, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [15, 0, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.proceso_actual,
-                                        style: "itemsTable",
-                                        color: this.texto_color,
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "-------------------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "-----------",
-                                            color: "white",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "SUBPROCESO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -25, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-  
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: "\n" +this.datosPedido.proceso_actual,
-                                        style: "itemsTable",
-                                        margin: [0, -30, 0, 0],
-                                        color: this.texto_color,
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "-------------------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "PUESTO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -18, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [19, -18, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.cargo_actual,
-                                        style: "itemsTable",
-                                        color: this.texto_color,
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "-------------------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "LUGAR DE TRABAJO:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -18, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [0, -18, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.nombres.toUpperCase(),
-                                        style: "itemsTable",
-                                        color: this.texto_color,
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "--------------------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          widths: ["auto", "*"],
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: [
-                                          {
-                                            text: "REMUNERACIÓN MENSUAL:",
-                                            style: "itemsTable",
-                                          },
-                                        ],
-                                        margin: [15, -18, 0, 0],
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                              {
-                                border: [false, false, false, false],
-                                margin: [0, -18, 0, 0],
-                                table: {
-                                  body: [
-                                    [
-                                      {
-                                        text: this.datosPedido.remuneracion_propuesta,
-                                        style: "itemsTable",
-                                        color: this.texto_color,
-                                      },
-                                    ],
-                                    [
-                                      {
-                                        text: "---------------------------------------------------------------",
-                                        color: "white",
-                                        style: "itemsTable",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "lightHorizontalLines",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                    [
-                      {
-                        text: [
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                        [{
+                          text: 'FIRMA:  ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 2, 0, 0],
+                          border: [false, false, false, false],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionFirmasText("")],
+                        [{
+                          text: 'NOMBRE:  ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 2, 0, 0],
+                          border: [false, false, false, false],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_director+'. '+this.datosPedido.empleado_director)],
+                        [{
+                          text: 'PUESTO:  ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 2, 0, 0],
+                          border: [false, false, false, false],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_director)],
+                        [{
+                          text: '',
+                          margin: [0, 0, 0, 5],
+                          border: [false, false, false, false],
+                        },{
+                          text: '',
+                          margin: [0, 0, 0, 5],
+                          border: [false, false, false, false],
+                        }]
+                      ]
+                    },
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 0,
+                      paddingBottom: () => 0
+                    }
+                  },
+                  {
+                    table: {
+                      widths: [50, 200],
+                      body: [
+                        [{text: '',
+                          margin: [0, 30, 0, 0]},
                           {
-                            text:
-                              "PARTIDA PRESUPUESTARIA: " +
-                              "\n" +
-                              this.datosPedido.partida_individual_propuesta,
-                            style: "itemsTable",
-                          },
-                        ],
-                        margin: [20, -12, 0, 0],
-                      },
-                    ],
-                  ],
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                        [{
+                          text: 'FIRMA:  ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 2, 0, 0],
+                          border: [false, false, false, false],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          valign: 'middle',     // centra verticalmente
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionFirmasText("")],
+                        [{
+                          text: 'NOMBRE:  ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 2, 0, 0],
+                          border: [false, false, false, false],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          valign: 'middle',     // centra verticalmente
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_delegado+'. '+this.datosPedido.empleado_autoridad_delegado)],
+                        [{
+                          text: 'PUESTO:  ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 2, 0,0],
+                          border: [false, false, false, false],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          valign: 'middle',     // centra verticalmente
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_autoridad_delegado)],
+                        [{
+                          text: '',
+                          margin: [0, 0, 0, 5],
+                          border: [false, false, false, false],
+                        },{
+                          text: '',
+                          margin: [0, 0, 0, 5],
+                          border: [false, false, false, false],
+                        }]
+                      ]
+                    },
+                    border: [true, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 0,
+                      paddingBottom: () => 0
+                    }
+                  }],
+                ]
+              },
+              border: [true, true, true, true],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 10,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+            }
+          ],
+          [{
+            text: 'RESPONSABLES DE FIRMAS',
+            bold: true,
+            fontSize: 8,
+            fillColor: '#f2f2f2',
+            margin: [0, 3, 0, 3],
+            border: [true, true, true, true],
+            noWrap: false,
+            alignment: 'center', // centra horizontalmente
+            valign: 'middle',     // centra verticalmente
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [{
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [{
+                  text: 'ACEPTACIÓN Y/O RECEPCIÓN DEL SERVIDOR PÚBLICO',
+                  bold: true,
+                  fontSize: 7,
+                  fillColor: '#f2f2f2',
+                  alignment: 'center',// centra verticalmente
+                  margin: [0, 2, 0, 2],
+                  border: [false, false, false, true],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
                 },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_11_1() {
-      return {
-        table: {
-          widths: ["*", "*"],
-          heights: [10],
-          body: [
-            [
-              {
-                border: [true, false, true, false],
-                margin: [90, 0, 0, 0],
-                text: [
-                  { text: "ACTA FINAL DEL CONCURSO", style: "itemsTable_c" },
-                ],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [90, 0, 0, 0],
-                text: [
-                  { text: "PROCESO DE RECURSOS HUMANOS", style: "itemsTable_c" },
-                ],
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_11_2() {
-      return {
-        table: {
-          widths: ["*", "*"],
-          heights: [15],
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["auto", "*", "auto", "*"],
-                  heights: [20],
-                  body: [
-                    [
-                      {
-                        border: [true, false, false, true],
-                        margin: [15, 0, 0, 0],
-                        text: [{ text: "No.", style: "itemsTable" }],
-                      },
-                      {
-                        border: [false, false, false, true],
-                        margin: [0, -5, 0, 0],
-                        table: {
-                          body: [
-                            [
-                              {
-                                text: this.datosPedido.numero_acta_final,
-                                color: "black",
-                                style: "itemsTable",
-                              },
-                            ],
-                            [
-                              {
-                                text: "-------------------------------",
-                                color: "white",
-                                style: "itemsTable",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: "lightHorizontalLines",
-                      },
-                      {
-                        border: [false, false, false, true],
+                {
+                  text: 'EN CASO DE NEGATIVA DE LA RECEPCIÓN (TESTIGO)',
+                  bold: true,
+                  fontSize: 7,
+                  fillColor: '#f2f2f2',
+                  alignment: 'center',// centra verticalmente
+                  margin: [0, 2, 0, 2],
+                  border: [true, false, false, true],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }],
+                [{
+                  table: {
+                    widths: [50, 200],
+                    heights: [70],
+                    body: [
+                       [{text: '',
+                          margin: [0, 30, 0, 0]},
+                          {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                      [{
+                        text: 'FIRMA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText("")],
+                      [{
+                        text: 'NOMBRE:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                      [{
+                        text: 'FECHA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                      [{
+                        text: 'HORA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                    ]
+                  },
+                  border: [false, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                },
+                {
+                  table: {
+                    widths: [50, 200],
+                    heights: [70],
+                    body: [
+                       [{text: '',
+                          margin: [0, 30, 0, 0]},
+                          {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                      [{
+                        text: 'FIRMA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText("")],
+                      [{
+                        text: 'NOMBRE:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                      [{
+                        text: 'PUESTO:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 2, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                      [{
+                        text: 'RAZÓN:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 10, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',// centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, {
+                        text: 'En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal.',
+                        fontSize: 8,
+                        margin: [1, 3, 0, 4],
+                        border: [false, false, false, false],
+                        alignment: 'left',// centra derecha
+                        valign: 'middle',// centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 1,
+                          paddingBottom: () => 0
+                        }
+                      }],
+                    ]
+                  },
+                  border: [true, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }],
+              ]
+            },
+            border: [true, false, true, true],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [{
+            table: {
+              widths: ['*', '*', '*'],
+              body: [
+                [{
+                  text: 'RESPONSABLE DE ELABORACIÓN',
+                  bold: true,
+                  fontSize: 7,
+                  fillColor: '#f2f2f2',
+                  alignment: 'center',// centra verticalmente
+                  margin: [0, 2, 0, 2],
+                  border: [false, false, false, true],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }, {
+                  text: 'RESPONSABLE DE REVISIÓN',
+                  bold: true,
+                  fontSize: 7,
+                  fillColor: '#f2f2f2',
+                  alignment: 'center',// centra verticalmente
+                  margin: [0, 2, 0, 2],
+                  border: [true, false, false, true],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }, {
+                  text: 'RESPONSABLE DE REGISTRO Y CONTROL',
+                  bold: true,
+                  fontSize: 7,
+                  fillColor: '#f2f2f2',
+                  alignment: 'center',// centra verticalmente
+                  margin: [0, 2, 0, 2],
+                  border: [true, false, false, true],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }],
+                [{
+                  table: {
+                    widths: [50, 120],
+                    heights: [65],
+                    body: [
+                      [{text: '',
+                          margin: [0, 30, 0, 0]},
+                          {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                      [{
+                        text: 'FIRMA:  ',
+                        bold: true,
+                        fontSize: 7,
                         margin: [0, 0, 0, 0],
-                        text: [{ text: "FECHA:", style: "itemsTable" }],
-                      },
-                      {
-                        border: [false, false, true, true],
-                        margin: [0, -5, 0, 0],
-                        table: {
-                          body: [
-                            [
-                              {
-                                text: this.datosPedido.fecha_acta_final,
-                                color: "black",
-                                style: "itemsTable",
-                              },
-                            ],
-                            [
-                              {
-                                text: "------------------------------",
-                                color: "white",
-                                style: "itemsTable",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: "lightHorizontalLines",
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["auto", "*"],
-                  body: [
-                    [
-                      {
-                        border: [true, false, false, true],
-                        margin: [15, 0, 0, 0],
-                        text: [{ text: "f.", style: "itemsTable" }],
-                      },
-                      {
-                        border: [false, false, false, true],
-                        margin: [0, -8, 0, 0],
-                        table: {
-                          body: [
-                            [
-                              {
-                                text: "------------------------------------------------------------------------",
-                                color: "white",
-                              },
-                            ],
-                            [
-                              {
-                                text:
-                                  this.datosPedido.abreviatura_elaboracion.toUpperCase() +
-                                  " " +
-                                  this.datosPedido.empleado_elaboracion.toUpperCase() +
-                                  "\n" +
-                                  this.datosPedido.tipo_cargo_elaboracion.toUpperCase(),
-                                style: "itemsTable",
-                                alignment: "center",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: "lightHorizontalLines",
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_12() {
-      return {
-        table: {
-          widths: ["*"],
-          heights: [10],
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: [
-                          {
-                            text: "DIOS, PATRIA Y LIBERTAD",
-                            style: "itemsTable_c",
-                          },
-                        ],
-                        margin: [235, 0, 0, 0],
-                      },
-                    ],
-                    [
-                      {
-                        table: {
-                          body: [
-                            [
-                              {
-                                border: [false, false, false, false],
-                                table: {
-                                  widths: ["auto", "*"],
-                                  body: [
-                                    [
-                                      {
-                                        border: [false, false, false, false],
-                                        margin: [150, -5, 0, 0],
-                                        text: [
-                                          { text: "f.", style: "itemsTable" },
-                                        ],
-                                      },
-                                      {
-                                        border: [false, false, false, false],
-                                        margin: [0, -10, 0, 0],
-                                        table: {
-                                          body: [
-                                            [
-                                              {
-                                                text: "------------------------------------------------------------------------",
-                                                color: "white",
-                                              },
-                                            ],
-                                            [
-                                              {
-                                                text:
-                                                  this.datosPedido.abreviatura_elaboracion.toUpperCase() +
-                                                  " " +
-                                                  this.datosPedido.empleado_elaboracion.toUpperCase() +
-                                                  "\n" +
-                                                  this.datosPedido.tipo_cargo_elaboracion.toUpperCase(),
-                                                style: "itemsTable",
-                                                alignment: "center",
-                                              },
-                                            ],
-                                          ],
-                                        },
-                                        layout: "lightHorizontalLines",
-                                      },
-                                    ],
-                                  ],
-                                },
-                                layout: "noBorders",
-                              },
-                            ],
-                          ],
-                        },
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
                         layout: {
-                          defaultBorder: false,
-                        },
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_13_1() {
-      return {
-        table: {
-          widths: ["*", "*"],
-          heights: [10],
-          body: [
-            [
-              {
-                border: [true, false, true, false],
-                margin: [90, 0, 0, 0],
-                text: [{ text: "RECURSOS HUMANOS", style: "itemsTable_c" }],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [90, 0, 0, 0],
-                text: [{ text: "REGISTRO Y CONTROL", style: "itemsTable_c" }],
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja1_Parte_13_2() {
-      return {
-        table: {
-          widths: ["*", "*"],
-          heights: [15],
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["auto", "*", "auto", "*"],
-                  heights: [20],
-                  body: [
-                    [
-                      {
-                        border: [true, false, false, true],
-                        margin: [15, 0, 0, 0],
-                        text: [{ text: "No.", style: "itemsTable" }],
-                      },
-                      {
-                        border: [false, false, false, true],
-                        margin: [0, -5, 0, 0],
-                        table: {
-                          body: [
-                            [
-                              {
-                                text: this.datosPedido.cedula_empleado,
-                                style: "itemsTable",
-                              },
-                            ],
-                            [
-                              {
-                                text: "-------------------------------",
-                                color: "white",
-                                style: "itemsTable",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: "lightHorizontalLines",
-                      },
-                      {
-                        border: [false, false, false, true],
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionText("")],
+                      [{
+                        text: 'NOMBRE:  ',
+                        bold: true,
+                        fontSize: 7,
                         margin: [0, 0, 0, 0],
-                        text: [{ text: "FECHA:", style: "itemsTable" }],
-                      },
-                      {
-                        border: [false, false, true, true],
-                        margin: [0, -5, 0, 0],
-                        table: {
-                          body: [
-                            [
-                              {
-                                text: this.datosPedido.fecha_elaboracion,
-                                style: "itemsTable",
-                              },
-                            ],
-                            [
-                              {
-                                text: "------------------------------",
-                                color: "white",
-                                style: "itemsTable",
-                              },
-                            ],
-                          ],
-                        },
-                        layout: "lightHorizontalLines",
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-              {
-                border: [true, false, true, true],
-                table: {
-                  widths: ["auto", "*"],
-                  body: [
-                    [
-                      {
-                        border: [true, false, false, true],
-                        margin: [45, -5, 0, 0],
-                        text: [{ text: "f.", style: "itemsTable" }],
-                      },
-                      {
-                        border: [false, false, false, true],
-                        margin: [0, -8, 0, 0],
-                        table: {
-                          body: [
-                            [
-                              {
-                                text: "---------------------------------------------------------------------------------------",
-                                color: "white",
-                                style: "itemsTable",
-                              },
-                            ],
-                            [
-                              {
-                                text: `${this.datosPedido.empleado_elaboracion.toUpperCase()}
-                                      RESPONSABLE DEL REGISTRO`,
-                                style: "itemsTable",
-                                alignment: "center",
-                              }
-                            ],
-                          ],
-                        },
-                        layout: "lightHorizontalLines",
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_1() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [75.5],
-          body: [
-            [
-              {
-                border: [true, true, false, true],
-                margin: [19, 20, 0, 0],
-                text: [
-                  { text: "CAUCIÓN REGISTRADA CON No.", style: "itemsTable" },
-                ],
-              },
-              {
-                border: [false, true, false, true],
-                margin: [12, 15, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "--------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "--------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, true, false, true],
-                margin: [19, 20, 0, 0],
-                text: [{ text: "FECHA:", style: "itemsTable" }],
-              },
-              {
-                border: [false, true, true, true],
-                margin: [12, 15, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "--------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "--------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_2() {
-      return {
-        table: {
-          widths: [565.28],
-          heights: [45.3],
-          body: [
-            [
-              {
-                border: [true, false, true, true],
-                text: "",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_3_1() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [40],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, 30, 0, 0],
-                text: [{ text: "LA PERSONA REEMPLAZA A:", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, false, false],
-                margin: [8, 25, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.empleado_elaboracion.toUpperCase(),
-                        color: "black",
-                        style: "itemsTable"
-                      },
-                    ],
-                    [
-                      {
-                        text: "--------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, false],
-                margin: [0, 30, 0, 0],
-                text: [{ text: "EN EL PUESTO DE:", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [8, 25, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.empleado_control.toUpperCase(),
-                        color: "black",
-                        style: "itemsTable"
-                      },
-                    ],
-                    [
-                      {
-                        text: "--------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_3_2() {
-      return {
-        table: {
-          widths: ["auto", "*"],
-          heights: [40],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, -15, 0, 0],
-                text: [
-                  { text: "QUIEN CESO EN FUNCIONES POR:", style: "itemsTable" },
-                ],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [0, -21, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "-----------------------------------------------------------------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "-----------------------------------------------------------------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_3_3() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [40],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, -35, 0, 0],
-                text: [
-                  {
-                    text: "ACCIÓN DE PERSONAL REGISTRADA CON No.",
-                    style: "itemsTable",
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                      [{
+                        text: 'PUESTO:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
+                      [{text: '',
+                          margin: [0, 0, 0, 10]},
+                          {
+                          text: '',
+                          margin: [0, 0, 0, 10]
+                          }],
+                    ]
                   },
-                ],
-              },
-              {
-                border: [false, false, false, false],
-                margin: [0, -40, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.numero_accion_personal,
-                        color: "black",
-                        style: "itemsTable"
-                      },
-                    ],
-                    [
-                      {
-                        text: "----------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
+                  border: [false, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
                 },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, false],
-                margin: [0, -35, 0, 0],
-                text: [{ text: "FECHA:", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [0, -40, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.fecha_acta_final,
-                        color: "black",
-                        style: "itemsTable"
-                      },
-                    ],
-                    [
-                      {
-                        text: "-------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_3_4() {
-      return {
-        table: {
-          widths: ["auto", "*"],
-          heights: [60.8],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, -15, 0, 0],
-                text: [
-                  {
-                    text: "AFILIACIÓN AL COLEGIO DE PROFESIONALES DE:",
-                    style: "itemsTable",
+                {
+                  table: {
+                    widths: [50, 120],
+                    heights: [65],
+                    body: [
+                      [{text: '',
+                          margin: [0, 30, 0, 0]},
+                          {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                      [{
+                        text: 'FIRMA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionText('')],
+                      [{
+                        text: 'NOMBRE:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText('')],
+                      [{
+                        text: 'PUESTO:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText('')],
+                      [{text: '',
+                          margin: [0, 0, 0, 10]},
+                          {
+                          text: '',
+                          margin: [0, 0, 0, 10]
+                          }],
+                    ]
                   },
-                ],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [0, -21, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "-------------------------------------------------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "-------------------------------------------------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_3_5() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [50.8],
-          body: [
-            [
-              {
-                border: [true, false, false, true],
-                margin: [19, -5, 0, 0],
-                text: [{ text: "No.", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, false, true],
-                margin: [12, -12, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "-----------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "-----------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, true],
-                margin: [19, -5, 0, 0],
-                text: [{ text: "FECHA:", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, true, true],
-                margin: [12, -12, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_4_1() {
-      return {
-        table: {
-          widths: ["*"],
-          heights: [40],
-          body: [
-            [
-              {
-                border: [true, false, true, false],
-                margin: [19, 30, 0, 0],
-                text: [{ text: "POSESIÓN DEL CARGO", style: "itemsTable" }],
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_4_2() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [40],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, 30, 0, 0],
-                text: [{ text: "YO", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, false, false],
-                margin: [8, 25, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: `${this.datosPedido.empleado_elaboracion.toUpperCase()}`,
-                        color: "black",
-                        style: "itemsTable",
-                      },
-                    ],
-                    [
-                      {
-                        text: "------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, false],
-                margin: [0, 30, 0, 0],
-                text: [
-                  { text: "CON IDENTIFICACIÓN DE CIUDADANÍA No.", style: "itemsTable" },
-                ],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [8, 25, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.datosPedido.empleado_elaboracion.toUpperCase(),
-                        color: "black",
-                        style: "itemsTable",
-                      },
-                    ],
-                    [
-                      {
-                        text: "------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_4_3() {
-      return {
-        table: {
-          widths: ["*"],
-          heights: [40],
-          body: [
-            [
-              {
-                border: [true, false, true, false],
-                margin: [19, -12, 0, 0],
-                text: [
-                  {
-                    text: "JURO LEALTAD AL ESTADO ECUATORIANO.",
-                    style: "itemsTable",
+                  border: [true, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }, {
+                  table: {
+                    widths: [50, 120],
+                    heights: [65],
+                    body: [
+                      [{text: '',
+                          margin: [0, 30, 0, 0]},
+                          {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                          }],
+                      [{
+                        text: 'FIRMA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionText('')],
+                      [{
+                        text: 'NOMBRE:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText('')],
+                      [{
+                        text: 'PUESTO:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 0, 0, 0],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText('')],
+                      [{text: '',
+                          margin: [0, 0, 0, 10]},
+                          {
+                          text: '',
+                          margin: [0, 0, 0, 10]
+                          }],
+                    ]
                   },
-                ],
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_4_4() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [40],
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, -20, 0, 0],
-                text: [{ text: "LUGAR.", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, false, false],
-                margin: [12, -25, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "-----------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "-----------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, false],
-                margin: [19, -20, 0, 0],
-                text: [{ text: "-----", style: "itemsTable", color: "white" }],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [12, -25, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_4_5() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [40],
-          body: [
-            [
-              {
-                border: [true, false, false, false],
-                margin: [19, -30, 0, 0],
-                text: [{ text: "FECHA.", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, false, false],
-                margin: [12, -36, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "-----------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "-----------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, false],
-                margin: [19, -30, 0, 0],
-                text: [{ text: "-----", style: "itemsTable", color: "white" }],
-              },
-              {
-                border: [false, false, true, false],
-                margin: [12, -36, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "------------------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                  ],
-                },
-                layout: "noBorders",
-              },
-            ],
-          ],
-        },
-      };
-    }
-  
-    PresentarHoja2_Parte_4_6() {
-      return {
-        table: {
-          widths: ["auto", "*", "auto", "*"],
-          heights: [86.3],
-  
-          body: [
-            [
-              {
-                border: [true, false, false, true],
-                margin: [70, 30, 0, 0],
-                text: [{ text: "f.", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, false, true],
-                margin: [0, 18, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "Funcionario",
-                        style: "itemsTable",
-                        alignment: "center",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-              {
-                border: [false, false, false, true],
-                margin: [0, 30, 0, 0],
-                text: [{ text: "f.", style: "itemsTable" }],
-              },
-              {
-                border: [false, false, true, true],
-                margin: [0, 18, 0, 0],
-                table: {
-                  body: [
-                    [
-                      {
-                        text: "------------------------------------------------",
-                        color: "white",
-                      },
-                    ],
-                    [
-                      {
-                        text: "Responsable de Recursos Humanos",
-                        style: "itemsTable",
-                        alignment: "center",
-                      },
-                    ],
-                  ],
-                },
-                layout: "lightHorizontalLines",
-              },
-            ],
-          ],
-        },
-        layout: {
-          defaultBorder: false,
-        },
-      };
-    }
-      */
+                  border: [true, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }]
+              ]
+            },
+            border: [true, true, true, true],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }]
+        ]
+      }, layout: {
+        defaultBorder: false, // desactiva cualquier borde por defecto
+        paddingLeft: () => 0,
+        paddingRight: () => 0,
+        paddingTop: () => 0,
+        paddingBottom: () => 0
+      },
+      styles: {
+        itemsTable: { fontSize: 8 },
+        itemsTable_c: { fontSize: 9, fillColor: '#d9d9d9', bold: true, },
+        itemsTable_d: { fontSize: 9, alignment: "right" },
+        itemsTable_e: { fontSize: 7 },
+      }
+    };
+  }
 
+  PresentarHoja1_Parte_5() {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              canvas: [
+                {
+                  type: 'line',
+                  x1: 0,
+                  y1: 0,
+                  x2: 550, // ancho de la línea
+                  y2: 0,
+                  lineWidth: 1,
+                  dash: { length: 5, space: 3 }, // línea entrecortada
+                }
+              ],
+              border: [false, false, false, false],
+              margin: [0, 40, 0, 5],
+            }
+          ],
+          [{
+            text: '**USO EXCLUSIVO PARA TALENTO HUMANO',
+            bold: true,
+            fontSize: 13,
+            margin: [7, 2, 0, 2],
+            border: [false, false, false, false],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [
+            {
+              canvas: [
+                {
+                  type: 'line',
+                  x1: 0,
+                  y1: 0,
+                  x2: 550, // ancho de la línea
+                  y2: 0,
+                  lineWidth: 1,
+                  dash: { length: 5, space: 3 }, // línea entrecortada
+                }
+              ],
+              border: [false, false, false, false],
+              margin: [0, 5, 0, 5],
+            }
+          ]
+        ]
+      },
+      layout: 'noBorders',
+      styles: {
+        itemsTable: { fontSize: 8 },
+        itemsTable_c: { fontSize: 9, fillColor: '#d9d9d9', bold: true, },
+        itemsTable_d: { fontSize: 9, alignment: "right" },
+        itemsTable_e: { fontSize: 7 },
+      }
+    }
+  }
 
+  PresentarHoja1_Parte_6() {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [{
+            text: [
+              { text: 'REGISTRO DE NOTIFICACIÓN AL SERVIDOR PÚBLICO DE LA ACCIÓN DE PERSONAL ', bold: true, fontSize: 8, },
+              { text: '(primer inciso del art. 22 RGLOSEP, art. 101 COA, art. 66 y 126 ERJAFE)', bold: false, fontSize: 6, }
+            ], bold: true,
+            fillColor: '#f2f2f2',
+            margin: [0, 3, 0, 3],
+            border: [true, true, true, true],
+            noWrap: false,
+            alignment: 'center', // centra horizontalmente
+            valign: 'middle',     // centra verticalmente
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [
+            {
+              table: {
+                widths: [200, 20, '*'],
+                body: [
+                  [{
+                    text: 'COMUNICACIÓNELECTRÓNICA: ',
+                    bold: true,
+                    fontSize: 8,
+                    margin: [0, 20, 10, 7],
+                    border: [false, false, false, false],
+                    alignment: 'right', // centra horizontalmente
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 0,
+                      paddingBottom: () => 0
+                    }
+                  }, this.getCheckBoxCellTalentoHumano(this.datosPedido.accion_personal),
+                  {
+                    text: '',
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 0,
+                      paddingBottom: () => 0
+                    }
+                  }
+                  ]
+                ]
+              },
+              border: [true, false, true, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+            }
+          ],
+          [{
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [{
+                  table: {
+                    widths: [90, 120],
+                    body: [
+                      [{
+                        text: 'FECHA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 8, 0, 3],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText("")]
+                    ]
+                  },
+                  border: [false, false, false, false],
+                },
+                {
+                  table: {
+                    widths: [60, 120],
+                    body: [
+                      [{
+                        text: 'HORA:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 8, 0, 3],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText("")]
+                    ]
+                  },
+                  border: [false, false, false, false],
+                }]
+              ]
+            },
+            border: [true, false, true, false],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [{
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [{
+                  table: {
+                    widths: [90, '*'],
+                    body: [
+                      [{
+                        text: '** MEDIO:  ',
+                        bold: true,
+                        fontSize: 7,
+                        margin: [0, 8, 0, 3],
+                        border: [false, false, false, false],
+                        noWrap: false,
+                        alignment: 'right',// centra derecha
+                        valign: 'middle',     // centra verticalmente
+                        layout: {
+                          defaultBorder: false, // desactiva cualquier borde por defecto
+                          paddingLeft: () => 0,
+                          paddingRight: () => 0,
+                          paddingTop: () => 0,
+                          paddingBottom: () => 0
+                        }
+                      }, this.getCellPosecionFirmasText("")]
+                    ]
+                  },
+                  border: [false, false, false, false],
+                },
+                {
+
+                }]
+              ]
+            },
+            border: [true, false, true, false],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [{
+            table: {
+              widths: ['*', '*', '*'],
+              body: [
+                [{text: '',
+                  margin: [0, 30, 0, 0],},
+                {text: '',
+                  margin: [0, 30, 0, 0],},
+                {text: '',
+                  margin: [0, 30, 0, 0],}
+                ],
+                [{},
+                this.getCellPosecionFirmasText(''),
+                {}
+                ],
+                [{},
+                {
+                  text: 'FIRMA DEL RESPONSABLE QUE NOTIFICÓ',
+                  fontSize: 7,
+                  bold: true,
+                  margin: [10, 3, 0, 10],
+                  border: [false, false, false, false],
+                  noWrap: false,
+                  alignment: 'center',     // centra verticalmente
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                },
+                {}
+                ]
+              ]
+            },
+            border: [true, false, true, false],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+          [{
+            table: {
+              widths: ['*', '*', '*'],
+              body: [
+                [{},
+                {
+                  table: {
+                    widths: [50, '*'],
+                    body: [
+                      [
+                        {
+                          text: 'NOMBRE: ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 0, 0, 0],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          valign: 'middle',     // centra verticalmente
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionText("")
+                      ],
+                      [
+                        {
+                          text: 'PUESTO: ',
+                          bold: true,
+                          fontSize: 7,
+                          margin: [0, 0, 0, 0],
+                          noWrap: false,
+                          alignment: 'right',// centra derecha
+                          valign: 'middle',     // centra verticalmente
+                          layout: {
+                            defaultBorder: false, // desactiva cualquier borde por defecto
+                            paddingLeft: () => 0,
+                            paddingRight: () => 0,
+                            paddingTop: () => 0,
+                            paddingBottom: () => 0
+                          }
+                        }, this.getCellPosecionText("")
+                      ]
+                    ]
+                  },
+                  border: [false, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                },
+                {}
+                ],
+              ]
+            },
+            border: [true, false, true, false],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 10
+            }
+          }],
+          [{
+            table: {
+              widths: ['*'],
+              body: [
+                [{
+                  text: '**Si la comunicación fue electrónica, se deberá colocar el medio por el cual se notificóal servidor: así como el numero de documento.',
+                  bold: true,
+                  fontSize: 7,
+                  margin: [0, 0, 0, 0],
+                  border: [false, false, false, false],
+                  noWrap: false,
+                  alignment: 'center', // centra horizontalmente
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }],
+                [{
+                  text: '**Si la comunicación fue electrónica, se registrará la notificación manualmente, de conformidad a lo establecido en el Art. 7, segundo inciso de la LEY DE COMERCIO ELECTRÓNICO, FIRMAS ELECTRÓNICAS Y MENSAJES DE DATOS.',
+                  bold: true,
+                  fontSize: 7,
+                  margin: [0, 0, 0, 5],
+                  border: [false, false, false, false],
+                  noWrap: false,
+                  alignment: 'center', // centra horizontalmente
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
+                }]
+              ]
+            },
+            border: [true, false, true, true],
+            layout: {
+              defaultBorder: false, // desactiva cualquier borde por defecto
+              paddingLeft: () => 0,
+              paddingRight: () => 0,
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            }
+          }],
+        ]
+      }
+    }
+  }
+
+  PresentarHoja1_Parte_7() {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              table: {
+                widths: [200, '*'],
+                body: [
+                  [{
+                    text: 'Elaborado por el Ministerio del Trabajo',
+                    fontSize: 5,
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 5, 0, 5],
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 10,
+                      paddingBottom: () => 10
+                    }
+                  }, {
+                    text: 'Fecha de actualización de formato: 2024-08-23 / Versión: 01.1 / Página 2 de 2',
+                    fontSize: 5,
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 5, 0, 5],
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 10,
+                      paddingBottom: () => 10
+                    }
+                  }]
+                ]
+              },
+              border: [false, false, false, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+            }
+          ]
+        ]
+      }
+    }
+  }
 
 
 }
