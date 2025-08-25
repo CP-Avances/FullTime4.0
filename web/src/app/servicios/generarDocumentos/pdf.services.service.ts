@@ -113,7 +113,7 @@ export class PdfServicesService {
         this.PresentarHoja1_Parte_5(),
         this.PresentarHoja1_Parte_6(),
         this.PresentarHoja1_Parte_7(),
-        
+
       ],
       styles: {
         itemsTable: { fontSize: 8 },
@@ -159,7 +159,7 @@ export class PdfServicesService {
         widths: [8], // ancho del cuadrito
         heights: [8], // alto del cuadrito
         body: [[{
-          text: valor.toLocaleLowerCase() ? 'X' : '',
+          text: valor ? 'X' : '',
           alignment: 'center',
           fontSize: 7,
         }]]
@@ -2218,12 +2218,14 @@ export class PdfServicesService {
                     table: {
                       widths: [50, 200],
                       body: [
-                        [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
+                        [{
                           text: '',
                           margin: [0, 30, 0, 0]
-                          }],
+                        },
+                        {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                        }],
                         [{
                           text: 'FIRMA:  ',
                           bold: true,
@@ -2255,7 +2257,7 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_director+'. '+this.datosPedido.empleado_director)],
+                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_director + '. ' + this.datosPedido.empleado_director)],
                         [{
                           text: 'PUESTO:  ',
                           bold: true,
@@ -2276,7 +2278,7 @@ export class PdfServicesService {
                           text: '',
                           margin: [0, 0, 0, 5],
                           border: [false, false, false, false],
-                        },{
+                        }, {
                           text: '',
                           margin: [0, 0, 0, 5],
                           border: [false, false, false, false],
@@ -2296,12 +2298,14 @@ export class PdfServicesService {
                     table: {
                       widths: [50, 200],
                       body: [
-                        [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
+                        [{
                           text: '',
                           margin: [0, 30, 0, 0]
-                          }],
+                        },
+                        {
+                          text: '',
+                          margin: [0, 30, 0, 0]
+                        }],
                         [{
                           text: 'FIRMA:  ',
                           bold: true,
@@ -2335,12 +2339,12 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_delegado+'. '+this.datosPedido.empleado_autoridad_delegado)],
+                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_delegado + '. ' + this.datosPedido.empleado_autoridad_delegado)],
                         [{
                           text: 'PUESTO:  ',
                           bold: true,
                           fontSize: 7,
-                          margin: [0, 2, 0,0],
+                          margin: [0, 2, 0, 0],
                           border: [false, false, false, false],
                           noWrap: false,
                           alignment: 'right',// centra derecha
@@ -2357,7 +2361,7 @@ export class PdfServicesService {
                           text: '',
                           margin: [0, 0, 0, 5],
                           border: [false, false, false, false],
-                        },{
+                        }, {
                           text: '',
                           margin: [0, 0, 0, 5],
                           border: [false, false, false, false],
@@ -2444,12 +2448,14 @@ export class PdfServicesService {
                     widths: [50, 200],
                     heights: [70],
                     body: [
-                       [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
-                          text: '',
-                          margin: [0, 30, 0, 0]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      }],
                       [{
                         text: 'FIRMA:  ',
                         bold: true,
@@ -2534,12 +2540,14 @@ export class PdfServicesService {
                     widths: [50, 200],
                     heights: [70],
                     body: [
-                       [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
-                          text: '',
-                          margin: [0, 30, 0, 0]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      }],
                       [{
                         text: 'FIRMA:  ',
                         bold: true,
@@ -2699,12 +2707,14 @@ export class PdfServicesService {
                     widths: [50, 120],
                     heights: [65],
                     body: [
-                      [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
-                          text: '',
-                          margin: [0, 30, 0, 0]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      }],
                       [{
                         text: 'FIRMA:  ',
                         bold: true,
@@ -2756,12 +2766,14 @@ export class PdfServicesService {
                           paddingBottom: () => 0
                         }
                       }, this.getCellPosecionFirmasText(this.datosPedido.cedula_empleado)],
-                      [{text: '',
-                          margin: [0, 0, 0, 10]},
-                          {
-                          text: '',
-                          margin: [0, 0, 0, 10]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 0, 0, 10]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 0, 0, 10]
+                      }],
                     ]
                   },
                   border: [false, false, false, false],
@@ -2778,12 +2790,14 @@ export class PdfServicesService {
                     widths: [50, 120],
                     heights: [65],
                     body: [
-                      [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
-                          text: '',
-                          margin: [0, 30, 0, 0]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      }],
                       [{
                         text: 'FIRMA:  ',
                         bold: true,
@@ -2835,12 +2849,14 @@ export class PdfServicesService {
                           paddingBottom: () => 0
                         }
                       }, this.getCellPosecionFirmasText('')],
-                      [{text: '',
-                          margin: [0, 0, 0, 10]},
-                          {
-                          text: '',
-                          margin: [0, 0, 0, 10]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 0, 0, 10]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 0, 0, 10]
+                      }],
                     ]
                   },
                   border: [true, false, false, false],
@@ -2856,12 +2872,14 @@ export class PdfServicesService {
                     widths: [50, 120],
                     heights: [65],
                     body: [
-                      [{text: '',
-                          margin: [0, 30, 0, 0]},
-                          {
-                          text: '',
-                          margin: [0, 30, 0, 0]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 30, 0, 0]
+                      }],
                       [{
                         text: 'FIRMA:  ',
                         bold: true,
@@ -2913,12 +2931,14 @@ export class PdfServicesService {
                           paddingBottom: () => 0
                         }
                       }, this.getCellPosecionFirmasText('')],
-                      [{text: '',
-                          margin: [0, 0, 0, 10]},
-                          {
-                          text: '',
-                          margin: [0, 0, 0, 10]
-                          }],
+                      [{
+                        text: '',
+                        margin: [0, 0, 0, 10]
+                      },
+                      {
+                        text: '',
+                        margin: [0, 0, 0, 10]
+                      }],
                     ]
                   },
                   border: [true, false, false, false],
@@ -3103,7 +3123,7 @@ export class PdfServicesService {
                         text: 'FECHA:  ',
                         bold: true,
                         fontSize: 7,
-                        margin: [0, 8, 0, 3],
+                        margin: [0, 4, 0, 0],
                         border: [false, false, false, false],
                         noWrap: false,
                         alignment: 'right',// centra derecha
@@ -3128,7 +3148,7 @@ export class PdfServicesService {
                         text: 'HORA:  ',
                         bold: true,
                         fontSize: 7,
-                        margin: [0, 8, 0, 3],
+                        margin: [0, 4, 0, 0],
                         border: [false, false, false, false],
                         noWrap: false,
                         alignment: 'right',// centra derecha
@@ -3168,7 +3188,7 @@ export class PdfServicesService {
                         text: '** MEDIO:  ',
                         bold: true,
                         fontSize: 7,
-                        margin: [0, 8, 0, 3],
+                        margin: [0, 4, 0, 0],
                         border: [false, false, false, false],
                         noWrap: false,
                         alignment: 'right',// centra derecha
@@ -3184,6 +3204,13 @@ export class PdfServicesService {
                     ]
                   },
                   border: [false, false, false, false],
+                  layout: {
+                    defaultBorder: false, // desactiva cualquier borde por defecto
+                    paddingLeft: () => 0,
+                    paddingRight: () => 0,
+                    paddingTop: () => 0,
+                    paddingBottom: () => 0
+                  }
                 },
                 {
 
@@ -3203,12 +3230,18 @@ export class PdfServicesService {
             table: {
               widths: ['*', '*', '*'],
               body: [
-                [{text: '',
-                  margin: [0, 30, 0, 0],},
-                {text: '',
-                  margin: [0, 30, 0, 0],},
-                {text: '',
-                  margin: [0, 30, 0, 0],}
+                [{
+                  text: '',
+                  margin: [0, 30, 0, 0],
+                },
+                {
+                  text: '',
+                  margin: [0, 30, 0, 0],
+                },
+                {
+                  text: '',
+                  margin: [0, 30, 0, 0],
+                }
                 ],
                 [{},
                 this.getCellPosecionFirmasText(''),
