@@ -147,27 +147,9 @@ export class TimbresService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-multiples/avisos`, Seleccionados);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   // METODO DE CONSULTA DE AVISOS GENERALES   ** USADO
   BuscarAvisosGenerales(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/avisos-generales/${id_empleado}`);
   }
-
-
 
 }

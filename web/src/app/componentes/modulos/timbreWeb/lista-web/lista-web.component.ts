@@ -1285,11 +1285,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   getActivarUsuarios(){
-    return this.tienePermiso('Activar Usuarios', 48);
+    return this.tienePermiso('Activar Usuarios', 50);
   }
 
   getDesactivarUsuarios(){
-    return this.tienePermiso('Inactivar Usuarios', 48);
+    return this.tienePermiso('Inactivar Usuarios', 50);
   }
 
 }

@@ -35,6 +35,19 @@ export const ObtenerRutaVacuna = async function (id: any) {
     return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
 }
 
+//METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE VACACIONES
+export const ObtenerRutaVacacion = async function (id: any) {
+    let ruta = '';
+    let separador = path.sep;
+    const usuario = await pool.query(
+        `
+        SELECT codigo, identificacion FROM eu_empleados WHERE id = $1
+        `
+        , [id]);
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'vacaciones' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].identificacion;
+}
+
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE PERMISOS
 export const ObtenerRutaPermisos = async function (codigo: any) {
     let ruta = '';

@@ -1293,11 +1293,11 @@ export class ListaAppComponent implements OnInit {
   }
 
   getActivarUsuarios(){
-    return this.tienePermiso('Activar Usuarios', 51);
+    return this.tienePermiso('Activar Usuarios', 53);
   }
 
   getDesactivarUsuarios(){
-    return this.tienePermiso('Inactivar Usuarios', 51);
+    return this.tienePermiso('Inactivar Usuarios', 53);
   }
 
 }

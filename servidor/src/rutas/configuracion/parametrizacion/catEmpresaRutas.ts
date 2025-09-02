@@ -40,7 +40,7 @@ class DepartamentoRutas {
         // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA **USADO
         this.router.put('/doble/seguridad', TokenValidation, EMPRESA_CONTROLADOR.ActualizarSeguridad);
         // BUSQUEDA DE LOGO **USADO
-        this.router.get('/logo/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.ConvertirImagenBase64_);
+        this.router.get('/logo/codificado/:id_empresa',TokenValidation, EMPRESA_CONTROLADOR.ConvertirImagenBase64_);
         // METODO PARA EDITAR LOGO DE EMPRESA **USADO
         this.router.put('/logo/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarLogoEmpresa);
         // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO

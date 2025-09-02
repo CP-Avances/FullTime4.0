@@ -81,7 +81,9 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     });
-    this.usuarios = this.datosSeleccionados.usuarios;
+    console.log('mirar usuarios----- ', this.datosSeleccionados);
+    this.usuarios = this.datosSeleccionados.usuariosSeleccionados;
+    console.log('mirar usuarios ', this.usuarios);
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -353,7 +355,9 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
 
     // AGREGAR FILAS DE USUARIOS
     for (const usuario of usuarios) {
-      const fila = [usuario.identificacion, usuario.nombre];
+      var empleado = usuario.apellido + ' ' + usuario.nombre;
+      console.log('empleado ', empleado);
+      const fila = [usuario.identificacion, empleado];
       filas.push(fila);
     }
 
@@ -373,7 +377,8 @@ export class CargarPlantillaPlanificacionComponent implements OnInit {
       },
       columns: encabezados.map(titulo => ({ name: titulo })),
       rows: usuarios.map(usuario => {
-        const fila = [usuario.identificacion, usuario.nombre];
+        var empleado = usuario.apellido + ' ' + usuario.nombre;
+        const fila = [usuario.identificacion, empleado];
         // AGREGAR COLUMNAS VACIAS PARA CADA DIA
         for (let i = 2; i < encabezados.length; i++) {
           fila.push(''); // PUEDES RELLENAR CON DATOS SI LOS TIENES

@@ -562,6 +562,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else {
       usuarios = this.validar.ModelarEmpleados_(this.empleados, this.selectionEmp);
     }
+    console.log('usuarios ', usuarios);
     this.SeleccionarProceso(tipo, usuarios);
   }
 

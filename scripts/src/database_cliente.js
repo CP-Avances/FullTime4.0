@@ -2,10 +2,10 @@ var Pool = require('pg-pool');
 
 const db_cliente = new Pool({
     user: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    database: 'VacaOrtiz',
-    password: 'fulltime'
+    host: '192.168.0.144',
+    port: 5438,
+    database: 'ft_mag',
+    password: 'postgres'
 });
 
 db_cliente.query('SELECT NOW()', (err, res) => {

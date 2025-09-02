@@ -630,6 +630,8 @@ export class ListaEmpleadosComponent implements OnInit {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
 
+      console.log('res: ',res)
+
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,

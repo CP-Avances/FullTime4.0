@@ -1806,12 +1806,15 @@ class EmpleadoControlador {
                             }
                             // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                             if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                                //console.log('ingresa bien numbre')
                                 // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                                 if (item.fila == filaDuplicada) {
+                                    //console.log('ingresa error fila duplicada', item.fila, ' ver fila duplicada ', filaDuplicada)
                                     mensaje = 'error';
                                 }
                             }
                             else {
+                                //console.log('ingresa error fila numero ---', item)
                                 return mensaje = 'error';
                             }
                             filaDuplicada = item.fila;

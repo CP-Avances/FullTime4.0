@@ -17,6 +17,7 @@ class ReportesAsistenciaControlador {
     // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO     
     ReporteTimbresMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("ENTRA A METODO PARA CONSULTAR ");
             let { desde, hasta } = req.params;
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {

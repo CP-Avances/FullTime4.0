@@ -810,6 +810,7 @@ class NotificacionTiempoRealControlador {
       // OBTENER DATOS ORIGINALES
       const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
+      
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({

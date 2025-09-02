@@ -2001,71 +2001,100 @@
                     </div>
                 </div>
 
-
                 <mat-card-content>
-                    <div *ngFor="let v of vacaciones" style="padding-top: 15px;">
+                    <div *ngFor="let v of vacaciones" style="padding-top: 10px;">
                         <div class="container">
                             <div class="row">
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha Desde:</label>
-                                        <label>{{v.fecha_inicio_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha Hasta:</label>
-                                        <label>{{v.fecha_final_}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Fecha Ingreso:</label>
-                                        <label>{{v.fecha_ingreso_}}</label>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días Laborables:</label>
-                                        <label>{{v.dia_laborable}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Días Libres:</label>
-                                        <label>{{v.dia_libre}}</label>
-                                    </div>
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Legalizado:</label>
-                                        <label *ngIf="v.legalizado == true">Sí</label>
-                                        <label *ngIf="v.legalizado == false">No</label>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="espacio d-flex justify-content-start">
-                                        <label id="datosF">Estado:</label>
-                                        <label *ngIf="v.estado === 1">Pendiente</label>
-                                        <label *ngIf="v.estado === 2">Pre-autorizado</label>
-                                        <label *ngIf="v.estado === 3">Autorizado</label>
-                                        <label *ngIf="v.estado === 4">Negado</label>
+                                <div class="espacio d-flex w-100">
+                                    <div class="ms-auto text-end">
+                                        <span class="badge" [ngClass]="{
+                                            'text-bg-secondary': v.estado === 1,
+                                            'text-bg-warning':   v.estado === 2,
+                                            'text-bg-success':   v.estado === 3,
+                                            'text-bg-danger':    v.estado === 4
+                                        }">
+                                            {{
+                                            v.estado === 1 ? 'PENDIENTE' :
+                                            v.estado === 2 ? 'PREAUTORIZADO' :
+                                            v.estado === 3 ? 'AUTORIZADO' :
+                                            v.estado === 4 ? 'DENEGADO' : '—'
+                                            }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Inicio de vacaciones:</label>
+                                        <label>{{ v.fecha_inicio_ || '—' }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fin de vacaciones:</label>
+                                        <label>{{ v.fecha_final_ || '—' }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Cantidad solicitada:</label>
+                                        <label>
+                                            <ng-container *ngIf="esPorDias(v); else porHoras">
+                                                {{ formatearDias(v.numero_dias_totales) }}
+                                            </ng-container>
+                                            <ng-template #porHoras>
+                                                {{ formatearHorasDesdeMin(v.minutos_totales) }}
+                                            </ng-template>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Incluye feriados:</label>
+                                        <label>{{ v.incluir_feriados ? 'Sí' : 'No' }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha de registro:</label>
+                                        <label>{{ v.fecha_registro_ || '—' }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha de actualización:</label>
+                                        <label>{{ v.fecha_actualizacion_ || '—' }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Documento:</label>
+                                        <label>{{ (v.documento?.trim()?.length ? v.documento : '—') }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <mat-divider></mat-divider>
                         </div>
-                        <div class="float-right" *ngIf="v.estado === 1">
-                            <i class="fas fa-edit" id="edit" style="margin-right: 20px;" (click)="EditarVacaciones(v)"
-                                matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
-                                <p>Editar</p>
-                            </i>
-                            <i class="fas fa-backspace" id="cancel" (click)="CancelarVacaciones(v)" matSuffix
-                                matTooltipPosition="right" matTooltip="Cancelar solicitud de vacaciones">
-                                <p>Cancelar</p>
-                            </i>
-                        </div>
-                        <br><br>
-                        <mat-divider></mat-divider>
                     </div>
-                    <mat-paginator id="pagina" [length]="vacaciones.length" [pageSize]="tamanio_pagina"
-                        [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
-                    </mat-paginator>
                 </mat-card-content>
+
+
             </mat-card>
         </div>
+        <!-- *** REGISTRO DE VACACIONES INDIVIDUALES *** -->
+        <div style="padding-top: 20px;" *ngIf="activar_vacacion_individual">
+            <app-registrar-vacaciones [data]="empleadoUno">
+            </app-registrar-vacaciones>
+        </div>
+
+
     </mat-tab>
 
     <!-- HORAS EXTRAS -->

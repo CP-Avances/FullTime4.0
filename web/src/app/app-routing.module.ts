@@ -54,6 +54,7 @@ import { ListarVacacionesComponent } from './componentes/modulos/vacaciones/list
 import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
 import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
 import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
+import { ConfigurarVacacionMultipleComponent } from './componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
 // MODULO  --HORAS EXTRAS
 import { ListaHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/lista-horas-extras/lista-horas-extras.component';
 import { ListaEmplePlanHoraEComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/empleados-planificar/lista-emple-plan-hora-e.component';
@@ -217,6 +218,7 @@ const routes: Routes = [
   { path: 'vacaciones-solicitados', component: ListarVacacionesComponent, canActivate: [AuthGuard] },
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
+  { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
 
   // MODULO  --HORAS EXTRAS
   { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard] },
@@ -235,10 +237,10 @@ const routes: Routes = [
   { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard] },
   { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard] },
   { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard] },
-  { path: 'listaGrados', component: GradosComponent, canActivate: [AuthGuard]},
-  { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard]},
+  { path: 'listaGrados', component: GradosComponent, canActivate: [AuthGuard] },
+  { path: 'grupo-ocupacional', component: GrupoOcupacionalComponent, canActivate: [AuthGuard] },
   { path: 'IngresarRegistros', component: IngresarRegistrosComponent, canActivate: [AuthGuard] },
-  
+
   // MODULO  --GEOLOCALIZACION
   { path: 'coordenadas', component: ListarCoordenadasComponent, canActivate: [AuthGuard] },
 
