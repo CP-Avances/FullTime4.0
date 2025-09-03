@@ -53,7 +53,7 @@ export class RegistrarVacacionesComponent implements OnInit {
     private rest: FeriadosService,
     private vacaServ: VacacionesService,
     private toastr: ToastrService,
-    @Optional() private componente?: VerEmpleadoComponent,
+    @Optional() private verEmpleadoComponente?: VerEmpleadoComponent,
     @Optional() private configuracion?: ConfigurarVacacionMultipleComponent,
   ) { }
 
@@ -199,7 +199,7 @@ export class RegistrarVacacionesComponent implements OnInit {
 
     if (!fecha || !inicio || !fin) return;
 
-    const dia = new Date(fecha).getDay(); 
+    const dia = new Date(fecha).getDay();
     const dias = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
     this.diaSemanaSeleccionado = dias[dia];
     const [h1, m1] = inicio.split(':').map(Number);
@@ -341,9 +341,12 @@ export class RegistrarVacacionesComponent implements OnInit {
 
   // METODO PARA CERRAR FORMULARIO DE PERMISOS
   CerrarVentana() {
-    if (this.componente) {
-      this.componente.ver_periodo = true;
-      this.componente.activar_vacacion_individual = false;
+    if (this.verEmpleadoComponente) {
+      //this.verEmpleadoComponente.ObtenerVacaciones(this.verEmpleadoComponente.formato_fecha);
+      const solicitudes = this.verEmpleadoComponente.ObtenerVacaciones(this.verEmpleadoComponente.formato_fecha);
+      console.log("solicitudes: ", solicitudes)
+      this.verEmpleadoComponente.ver_periodo = true;
+      this.verEmpleadoComponente.activar_vacacion_individual = false;
     }
 
     if (this.configuracion) {

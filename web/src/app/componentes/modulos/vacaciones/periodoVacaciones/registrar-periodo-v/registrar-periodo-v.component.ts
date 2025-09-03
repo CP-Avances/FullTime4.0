@@ -10,6 +10,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
+import { log } from 'console';
 
 @Component({
   selector: 'app-registrar-periodo-v',

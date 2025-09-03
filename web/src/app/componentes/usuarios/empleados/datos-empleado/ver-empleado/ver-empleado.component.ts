@@ -361,7 +361,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.contrato_cargo = 1;
       }
       if (this.habilitarVacaciones === true && this.periodo_vacciones === 0) {
-        //this.ObtenerVacaciones(this.formato_fecha);
+        this.ObtenerVacaciones(this.formato_fecha);
         this.periodo_vacciones = 1;
       }
     }
