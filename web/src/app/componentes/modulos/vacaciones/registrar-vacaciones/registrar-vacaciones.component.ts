@@ -53,7 +53,7 @@ export class RegistrarVacacionesComponent implements OnInit {
     private rest: FeriadosService,
     private vacaServ: VacacionesService,
     private toastr: ToastrService,
-    @Optional() private verEmpleadoComponente?: VerEmpleadoComponent,
+    public verEmpleadoComponente: VerEmpleadoComponent,
     @Optional() private configuracion?: ConfigurarVacacionMultipleComponent,
   ) { }
 
@@ -341,9 +341,10 @@ export class RegistrarVacacionesComponent implements OnInit {
 
   // METODO PARA CERRAR FORMULARIO DE PERMISOS
   CerrarVentana() {
+
     if (this.verEmpleadoComponente) {
-      //this.verEmpleadoComponente.ObtenerVacaciones(this.verEmpleadoComponente.formato_fecha);
       const solicitudes = this.verEmpleadoComponente.ObtenerVacaciones(this.verEmpleadoComponente.formato_fecha);
+      //this.verEmpleadoComponente.ObtenerSolicitudesVacaciones(this.verEmpleadoComponente.formato_fecha);
       console.log("solicitudes: ", solicitudes)
       this.verEmpleadoComponente.ver_periodo = true;
       this.verEmpleadoComponente.activar_vacacion_individual = false;
