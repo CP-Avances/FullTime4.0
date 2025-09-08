@@ -202,7 +202,7 @@ import { RegistrarVacacionesComponent } from './componentes/modulos/vacaciones/r
 import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/ver-configurar-vacacion/ver-configurar-vacacion.component';
 import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
 import { ConfigurarVacacionMultipleComponent } from './componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
-
+import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
 // MODULO  --HORAS EXTRAS
 import { HorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/registrar-horas-extras/horas-extras.component';
 import { EditarHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/editar-horas-extras/editar-horas-extras.component';
@@ -659,7 +659,7 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
-
+    SolicitudesVacacionesComponent
   ],
 
   imports: [

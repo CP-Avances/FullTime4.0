@@ -2089,25 +2089,31 @@
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Documento:</label>
-                                        <label>{{ (v.documento?.trim()?.length ? v.documento : '—') }}</label>
+                                        <a matSuffix matTooltipPosition="right"
+                                            mattooltip="Dar click para descargar documento."
+                                            href="{{hipervinculo}}/vacaciones/documentos/{{v.documento}}/{{v.id_empleado}}"
+                                            target="blank">
+                                            <label>{{ v.documento }}</label>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            <div style="text-align: left; margin-left: 1px;">
-                                <i class="fas fa-times-circle" id="cerrar" matSuffix matTooltipPosition="right"
-                                    matTooltip="Cerrar periodo de vacaciones.">
-                                    <p>Cancelar</p>
-                                </i>
-                            </div>
+
                             <div class="col-md">
                                 <div style="text-align: right; margin-right: 10px;">
                                     <i class="fas fa-edit" id="edit" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro.">
                                         <p>Editar</p>
                                     </i>
+                                    <i class="fas fa-times-circle" id="cerrar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar solicitudes de vacaciones.">
+                                        <p>Eliminar</p>
+                                    </i>
                                 </div>
                             </div>
                             <mat-divider></mat-divider>
+                            <solicitudes-vacaciones />
+                            <!--<app-registrar-vacaciones />-->
                         </div>
                     </div>
                 </mat-card-content>
@@ -2290,8 +2296,13 @@
                             <p>Cancelar</p>
                         </i>
                     </div>
-                    <mat-divider></mat-divider>
+
                 </div>
+
+                <mat-divider></mat-divider>
+
+
+
                 <mat-paginator id="pagina" [length]="hora_extra_plan.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
