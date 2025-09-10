@@ -813,8 +813,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
         }
       });
+      console.log("aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
   }
-
 
   /** ********************************************************************************************* **
    ** **               BUSQUEDA DE DATOS DE ASIGNACIONES: DISCAPACIDAD                           ** **                        *
