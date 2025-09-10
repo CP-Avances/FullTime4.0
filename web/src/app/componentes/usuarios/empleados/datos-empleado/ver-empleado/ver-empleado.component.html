@@ -2081,21 +2081,23 @@
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Fecha de actualización:</label>
-                                        <label>{{ v.fecha_actualizacion_ || '—' }}</label>
+                                        <label>{{ v.fecha_actualizacion_ || '02/09/2025' }}</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md">
+                                    @for (v of vacaciones; track $index) {
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Documento:</label>
                                         <a matSuffix matTooltipPosition="right"
                                             mattooltip="Dar click para descargar documento."
-                                            href="{{hipervinculo}}/vacaciones/documentos/{{v.documento}}/{{v.id_empleado}}"
+                                            href="{{hipervinculo}}/vacaciones/documentos/{{ v.documento }}"
                                             target="blank">
-                                            <label>{{ v.documento }}</label>
+                                            <label>{{v.documento}}</label>
                                         </a>
                                     </div>
+                                    }
                                 </div>
                             </div>
 
@@ -2112,8 +2114,71 @@
                                 </div>
                             </div>
                             <mat-divider></mat-divider>
-                            <solicitudes-vacaciones />
-                            <!--<app-registrar-vacaciones />-->
+                            <div class="text-center mt-4 mb-2">
+                                <strong class="fs-8 text-secondary">
+                                    {{ permiteHoras
+                                    ? 'Horas seleccionadas por día de la semana'
+                                    : 'Número de días (por día de la semana) en el periodo seleccionado' }}
+                                </strong>
+                            </div>
+                            <div class="row justify-content-center">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm text-center align-middle" style="width: 100%;">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th class="col-total-compacta">Lunes</th>
+                                                    <th class="col-total-compacta">Martes</th>
+                                                    <th class="col-total-compacta">Miércoles</th>
+                                                    <th class="col-total-compacta">Jueves</th>
+                                                    <th class="col-total-compacta">Viernes</th>
+                                                    <th class="col-total-compacta">Sábado</th>
+                                                    <th class="col-total-compacta">Domingo</th>
+                                                    <th class="col-total-compacta">
+                                                        {{ permiteHoras ? 'Horas totales' : 'Días totales' }}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'L' }">
+                                                        {{ v.numero_dias_lunes}}
+                                                    </td>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'M' }">
+                                                        {{ v.numero_dias_martes }}
+                                                    </td>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'X' }">
+                                                        {{ v.numero_dias_miercoles }}
+                                                    </td>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'J' }">
+                                                        {{ v.numero_dias_jueves }}
+                                                    </td>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'V' }">
+                                                        {{v.numero_dias_viernes }}
+                                                    </td>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'S' }">
+                                                        {{ v.numero_dias_sabado }}
+                                                    </td>
+                                                    <td class="col-total-compacta"
+                                                        [ngClass]="{ 'dia-seleccionado': permiteHoras && diaSemanaSeleccionado === 'D' }">
+                                                        {{ v.numero_dias_domingo }}
+                                                    </td>
+                                                    <td class="col-total-compacta text-bold">
+                                                        {{ v.numero_dias_totales }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </mat-card-content>

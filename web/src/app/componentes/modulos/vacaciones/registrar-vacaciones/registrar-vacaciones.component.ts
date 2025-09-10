@@ -10,6 +10,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { VerEmpleadoComponent } from 'src/app/componentes/usuarios/empleados/datos-empleado/ver-empleado/ver-empleado.component';
 import { ConfigurarVacacionMultipleComponent } from 'src/app/componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
+import { ConteoDiasSemana } from 'src/app/interfaces/ConteoDiasSemana';
 
 
 @Component({
@@ -32,7 +33,7 @@ export class RegistrarVacacionesComponent implements OnInit {
   ip: string | null;
 
   //VARIABLES PARA SOLICITUD DE VACACIONES
-  conteoDiasSemana = {
+  conteoDiasSemana: ConteoDiasSemana = {
     L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0
   };
   diasTotales: number = 0;
@@ -47,6 +48,7 @@ export class RegistrarVacacionesComponent implements OnInit {
   permiteHoras: boolean = false;
   diaSemanaSeleccionado: string | null = null;
   horasTotales: string = '00:00';
+  saldo: number = 0;
 
   constructor(
     public validar: ValidacionesService,

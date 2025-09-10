@@ -14,7 +14,7 @@
         </div>
 
         <div class="container mt-3">
-            <form >
+            <form>
                 <div class="row g-3">
                     <div class="col-md-4">
                         <mat-form-field appearance="fill" class="w-100">
@@ -71,7 +71,7 @@
                             <mat-form-field appearance="fill" class="w-100">
                                 <mat-label>Hora Inicio de Vacaciones</mat-label>
                                 <input matInput type="time" [formControl]="horaInicio" required
-                                (keypress)="IngresarSoloNumerosEnteros($event)">
+                                    (keypress)="IngresarSoloNumerosEnteros($event)">
                             </mat-form-field>
                         </div>
 
@@ -79,7 +79,7 @@
                             <mat-form-field appearance="fill" class="w-100">
                                 <mat-label>Hora Fin de Vacaciones</mat-label>
                                 <input matInput type="time" [formControl]="horaFinal" required
-                                (keypress)="IngresarSoloNumerosEnteros($event)">
+                                    (keypress)="IngresarSoloNumerosEnteros($event)">
                                 <mat-error *ngIf="horaFinal.hasError('horaInvalida')">
                                     La hora final debe ser posterior a la hora de inicio.
                                 </mat-error>
@@ -138,6 +138,16 @@
                             <input matInput [value]="diasFeriados" readonly>
                             <mat-icon matSuffix
                                 matTooltip="Días de feriado en las fechas seleccionadas.">help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-4">
+                        <mat-form-field appearance="fill" class="w-100">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Saldo de vacaciones del empleado.">
+                                beach_access
+                            </mat-icon>
+                            <mat-label>Saldo de vacaciones:</mat-label>
+                            <input matInput [value]="saldo" readonly>
                         </mat-form-field>
                     </div>
                     <div class="col-md-4">
@@ -318,7 +328,8 @@
                                         <i class="fa fa-circle" style="color: rgba(174, 49, 242, 1);"></i>
                                     </td>
                                     <td>
-                                        Las horas ingresadas superan las horas que equivalen a un día. Use un tipo de vacación por días.
+                                        Las horas ingresadas superan las horas que equivalen a un día. Use un tipo de
+                                        vacación por días.
                                     </td>
                                 </tr>
                             </tbody>

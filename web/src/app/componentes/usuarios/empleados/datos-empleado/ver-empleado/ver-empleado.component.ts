@@ -83,6 +83,7 @@ import { CrearVacunaComponent } from '../../vacunacion/crear-vacuna/crear-vacuna
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { ConteoDiasSemana } from 'src/app/interfaces/ConteoDiasSemana';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -108,6 +109,16 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   @ViewChild('tabla2') tabla2: ElementRef;
   @ViewChild('pestana') pestana!: MatTabGroup;
+
+  //VARIABLES DE LA TABLA SOLICITUDES DE VACACIONES
+  conteoDiasSemana: ConteoDiasSemana = {
+    L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0
+  };
+  @Input() permiteHoras: boolean
+  @Input() diaSemanaSeleccionado: string | null
+  @Input() horasTotales: string
+  @Input() diasTotales: number
+  documentos: any = [];
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
