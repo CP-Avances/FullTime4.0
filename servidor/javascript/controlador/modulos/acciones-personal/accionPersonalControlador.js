@@ -616,6 +616,7 @@ class AccionPersonalControlador {
             try {
                 const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local, proceso } = req.body;
                 let datosNuevos = req.body;
+                console.log('accion ', datosNuevos);
                 const fechaActual = new Date();
                 let id_empleado_negativa = null;
                 let id_empleado_comunicacion = null;
