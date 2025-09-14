@@ -59,12 +59,12 @@ export class ExcelService {
     });
   }
 
-    // OBTENER LOGO DEL MINISTERIO DE TRABAJO
+  // OBTENER LOGO DEL MINISTERIO DE TRABAJO
   logoMinisterios: any = String;
   ObtenerLogoMinisterio() {
     this.rest.LogoImagenBase64().subscribe((res) => {
       this.logoMinisterios = "data:image/jpeg;base64," + res.imagen;
-      
+
     });
   }
 
@@ -146,10 +146,10 @@ export class ExcelService {
     worksheet.getRow(12).height = 5;
     worksheet.getRow(21).height = 1;
     worksheet.getRow(22).height = 28;
-    worksheet.getRow(23).height = 200;
+    worksheet.getRow(23).height = 180;
     worksheet.getRow(24).height = 30;
     worksheet.getRow(25).height = 1;
-    for(var i=26; i<=43; i++){
+    for (var i = 26; i <= 43; i++) {
       worksheet.getRow(i).height = 20;
     }
     worksheet.getRow(44).height = 5;
@@ -163,33 +163,37 @@ export class ExcelService {
     worksheet.getRow(55).height = 30;
     worksheet.getRow(56).height = 40;
     worksheet.getRow(57).height = 20;
-    worksheet.getRow(58).height = 90;
+    worksheet.getRow(58).height = 40;
     worksheet.getRow(62).height = 20;
-    worksheet.getRow(63).height = 40;
+    worksheet.getRow(63).height = 30;
     worksheet.getRow(64).height = 1;
     worksheet.getRow(65).height = 30;
     worksheet.getRow(66).height = 1;
     worksheet.getRow(67).height = 30;
-    worksheet.getRow(69).height = 80;
-    worksheet.getRow(70).height = 80;
-    worksheet.getRow(77).height = 15;
-    worksheet.getRow(78).height = 15;
+    worksheet.getRow(69).height = 20;
+    worksheet.getRow(70).height = 30;
+    worksheet.getRow(77).height = 5;
+    worksheet.getRow(78).height = 1;
     worksheet.getRow(79).height = 1;
-    worksheet.getRow(80).height = 40;
-    worksheet.getRow(81).height = 80;
-    worksheet.getRow(82).height = 80;
-    worksheet.getRow(87).height = 100;
-    worksheet.getRow(88).height = 20;
-    worksheet.getRow(89).height = 50;
-    worksheet.getRow(90).height = 20;
-    worksheet.getRow(91).height = 40;
-    worksheet.getRow(92).height = 50;
-    worksheet.getRow(94).height = 50;
-    worksheet.getRow(100).height = 70;
-    worksheet.getRow(101).height = 70;
+    worksheet.getRow(80).height = 30;
+    worksheet.getRow(81).height = 40;
+    worksheet.getRow(82).height = 40;
+    worksheet.getRow(86).height = 10;
+    worksheet.getRow(87).height = 5;
+    worksheet.getRow(88).height = 5;
+    worksheet.getRow(89).height = 30;
+    worksheet.getRow(90).height = 5;
+    worksheet.getRow(91).height = 30;
+    worksheet.getRow(92).height = 20;
+    worksheet.getRow(94).height = 10;
+    worksheet.getRow(96).height = 15;
+    worksheet.getRow(100).height = 30;
+    worksheet.getRow(101).height = 40;
     worksheet.getRow(102).height = 30;
-    worksheet.getRow(108).height = 50;
-    worksheet.getRow(109).height = 50;
+    worksheet.getRow(103).height = 10;
+    worksheet.getRow(107).height = 10;
+    worksheet.getRow(108).height = 10;
+    worksheet.getRow(109).height = 30;
 
     // COMBINAR CELDAS
     worksheet.mergeCells("A1:D5");
@@ -321,9 +325,9 @@ export class ExcelService {
     worksheet.mergeCells("I57:P57");
     worksheet.mergeCells("A58:H58");
     worksheet.mergeCells("I58:P58");
-    
-    
-    
+
+
+
     worksheet.mergeCells("C59:G59");
     worksheet.mergeCells("C60:G60");
     worksheet.mergeCells("C61:G61");
@@ -385,7 +389,7 @@ export class ExcelService {
     worksheet.mergeCells("A86:F86");
     worksheet.mergeCells("G86:K86");
     worksheet.mergeCells("L86:P86");
-    
+
     worksheet.mergeCells("A87:E87");
     worksheet.mergeCells("F87:K87");
     worksheet.mergeCells("L87:P87");
@@ -492,7 +496,8 @@ export class ExcelService {
     worksheet.getCell("K20").value = "NO APLICA"
     worksheet.getCell("L20").value = (this.datosPedido.declaracion_jurada == false ? "X" : "");
     worksheet.getCell("B22").value = "   MOTIVACIÓN: (adjuntar anexo si lo posee) "
-    worksheet.getCell("B23").value = (this.datosPedido.adicion_base_legal != null || this.textoFijo != '' ? (this.textoFijo + '\n' + this.datosPedido.adicion_base_legal) + '\n' + ((this.datosPedido.observacion != null && this.datosPedido.observacion != '') ? 'Observación: '+this.datosPedido.observacion : '' ) : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)");
+    worksheet.getCell("B23").value = (this.datosPedido.adicion_base_legal != null || this.textoFijo != '' ? (this.textoFijo + '\n' + this.datosPedido.adicion_base_legal) + '\n' + ((this.datosPedido.observacion != null && this.datosPedido.observacion != '') ? 'Observación: ' + this.datosPedido.observacion : '') : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)");
+   
 
     worksheet.getCell("A24").value = "SITUACION ACTUAL"
     worksheet.getCell("I24").value = "SITUACION PROPUESTA"
@@ -578,20 +583,20 @@ export class ExcelService {
 
     worksheet.getCell("B71").value = "FIRMA."
     worksheet.getCell("B72").value = "NOMBRE:"
-    worksheet.getCell("C72").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.abreviatura_empleado + ". "+apellido + " " + nombres : ""
+    worksheet.getCell("C72").value = " " + this.datosPedido.numero_acta_final != '' && this.datosPedido.numero_acta_final != null ? this.datosPedido.abreviatura_empleado + ". " + apellido + " " + nombres : ""
     worksheet.getCell("B73").value = "FECHA:"
     const fecha_servidor = DateTime.fromISO(this.datosPedido.fecha_elaboracion, { zone: 'utc' }).setZone('America/Guayaquil');
-    worksheet.getCell("C73").value = " " + fecha_servidor .toFormat('yyyy-MM-dd')
+    worksheet.getCell("C73").value = " " + fecha_servidor.toFormat('yyyy-MM-dd')
     worksheet.getCell("B74").value = "HORA:"
     const hora_servidor = DateTime.fromISO(this.datosPedido.hora_elaboracion, { zone: 'utc' }).setZone('America/Guayaquil');
     worksheet.getCell("C74").value = " " + hora_servidor.toFormat('hh:mm:ss')
 
     worksheet.getCell("J71").value = "FIRMA."
     worksheet.getCell("J72").value = "NOMBRE:"
-    worksheet.getCell("K72").value = (this.datosPedido.abreviatura_testigo != null ? this.datosPedido.abreviatura_testigo+'. ' : '' )+ (this.datosPedido.empleado_testigo != null ? this.datosPedido.empleado_testigo.toUpperCase() : "");
+    worksheet.getCell("K72").value = (this.datosPedido.abreviatura_testigo != null ? this.datosPedido.abreviatura_testigo + '. ' : '') + (this.datosPedido.empleado_testigo != null ? this.datosPedido.empleado_testigo.toUpperCase() : "");
     worksheet.getCell("J73").value = "FECHA:"
     const fecha_negativa = DateTime.fromISO(this.datosPedido.fecha_testigo, { zone: 'utc' }).setZone('America/Guayaquil');
-    worksheet.getCell("K73").value = " " + ( this.datosPedido.fecha_testigo != null ? fecha_negativa.toFormat('yyyy-MM-dd') : '')
+    worksheet.getCell("K73").value = " " + (this.datosPedido.fecha_testigo != null ? fecha_negativa.toFormat('yyyy-MM-dd') : '')
     worksheet.getCell("J75").value = "RAZÓN:"
     worksheet.getCell("K74").value = "En presencia del testigo se deja constancia de que la o el servidor público tiene la negativa de recibir la comunicación de registro de esta acción de personal."
 
@@ -600,18 +605,18 @@ export class ExcelService {
     worksheet.getCell("L80").value = "RESPONSABLE DE REGISTRO Y CONTROL"
 
     worksheet.getCell("B83").value = "FIRMA: _________________________________________"
-    worksheet.getCell("B84").value = "NOMBRE: "+(this.datosPedido.abreviatura_elaboracion != null ? this.datosPedido.abreviatura_elaboracion+'. ' : '')+ (this.datosPedido.empleado_elaboracion != null ? this.datosPedido.empleado_elaboracion.toUpperCase() : '');
-    worksheet.getCell("B85").value = "PUESTO: "+(this.datosPedido.tipo_cargo_elaboracion != null ? this.datosPedido.tipo_cargo_elaboracion.toUpperCase() : "");
-    
-    worksheet.getCell("G83").value = " FIRMA: _________________________________________"
-    worksheet.getCell("G84").value = " NOMBRE: "+(this.datosPedido.abreviatura_control != null ? this.datosPedido.abreviatura_control+'. ' : '')+ (this.datosPedido.empleado_control != null ? this.datosPedido.empleado_control.toUpperCase() : "");
-    worksheet.getCell("G85").value = " PUESTO: "+(this.datosPedido.tipo_cargo_control != null ? this.datosPedido.tipo_cargo_control.toUpperCase() : "");
-    
-    worksheet.getCell("L83").value = " FIRMA: ______________________________"
-    worksheet.getCell("L84").value = " NOMBRE: "+(this.datosPedido.abreviatura_revision != null ? this.datosPedido.abreviatura_revision+'. ' : '')+ (this.datosPedido.empleado_revision != null ? this.datosPedido.empleado_revision.toUpperCase() : "");
-    worksheet.getCell("L85").value = " PUESTO: "+(this.datosPedido.tipo_cargo_revision != null ? this.datosPedido.tipo_cargo_revision.toUpperCase() : "");
+    worksheet.getCell("B84").value = "NOMBRE: " + (this.datosPedido.abreviatura_elaboracion != null ? this.datosPedido.abreviatura_elaboracion + '. ' : '') + (this.datosPedido.empleado_elaboracion != null ? this.datosPedido.empleado_elaboracion.toUpperCase() : '');
+    worksheet.getCell("B85").value = "PUESTO: " + (this.datosPedido.tipo_cargo_elaboracion != null ? this.datosPedido.tipo_cargo_elaboracion.toUpperCase() : "");
 
-    worksheet.getCell("A89").value = "** USO EXCLUSIVO PARA TALENTO HUMANO"
+    worksheet.getCell("G83").value = " FIRMA: _________________________________________"
+    worksheet.getCell("G84").value = " NOMBRE: " + (this.datosPedido.abreviatura_control != null ? this.datosPedido.abreviatura_control + '. ' : '') + (this.datosPedido.empleado_control != null ? this.datosPedido.empleado_control.toUpperCase() : "");
+    worksheet.getCell("G85").value = " PUESTO: " + (this.datosPedido.tipo_cargo_control != null ? this.datosPedido.tipo_cargo_control.toUpperCase() : "");
+
+    worksheet.getCell("L83").value = " FIRMA: ______________________________"
+    worksheet.getCell("L84").value = " NOMBRE: " + (this.datosPedido.abreviatura_revision != null ? this.datosPedido.abreviatura_revision + '. ' : '') + (this.datosPedido.empleado_revision != null ? this.datosPedido.empleado_revision.toUpperCase() : "");
+    worksheet.getCell("L85").value = " PUESTO: " + (this.datosPedido.tipo_cargo_revision != null ? this.datosPedido.tipo_cargo_revision.toUpperCase() : "");
+
+    worksheet.getCell("A89").value = "  ** USO EXCLUSIVO PARA TALENTO HUMANO"
     worksheet.getCell("A91").value = "REGISTRO DE NOTIFICACIÓN AL SERVIDOR PÚBLICO DE LA ACCIÓN DE PERSONAL (primer inciso del art. 22 RGLOSEP, art. 101 COA , art. 66 y 126 ERJAFE) "
     worksheet.getCell("C93").value = "COMUNICACIÓN ELECTRÓNICA:"
     worksheet.getCell("D93").value = (this.datosPedido.comunicacion_electronica == true ? "X" : "");
@@ -625,7 +630,7 @@ export class ExcelService {
     worksheet.getCell("D97").value = " " + (this.datosPedido.medio_comunicacion != null && this.datosPedido.medio_comunicacion != "" ? this.datosPedido.medio_comunicacion : "");
     worksheet.getCell("F102").value = "FIRMA DEL RESPONSABLE QUE NOTIFICÓ"
     worksheet.getCell("F104").value = "NOMBRE:"
-    worksheet.getCell("G104").value = (this.datosPedido.abreviatura_comunicacion != null ? this.datosPedido.abreviatura_comunicacion+'. ' : '')+ (this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "");
+    worksheet.getCell("G104").value = (this.datosPedido.abreviatura_comunicacion != null ? this.datosPedido.abreviatura_comunicacion + '. ' : '') + (this.datosPedido.empleado_comunicacion != null ? this.datosPedido.empleado_comunicacion.toUpperCase() : "");
     worksheet.getCell("F105").value = "PUESTO:"
     worksheet.getCell("G105").value = " " + (this.datosPedido?.cargo_comunicacion != null ? this.datosPedido.cargo_comunicacion.toUpperCase() : "");
 
@@ -634,12 +639,12 @@ export class ExcelService {
     worksheet.getCell("I109").value = "Fecha de actualización de formato: 2024-08-23  /  Versión: 01.1   /  Página 1 de 2"
 
     worksheet.addImage(this.imagen, {
-      tl: { col: 1, row: 0},
-      ext: { width: 140, height: 60},
+      tl: { col: 1, row: 0 },
+      ext: { width: 140, height: 60 },
     });
 
     worksheet.addImage(this.imagenMinisterio, {
-      tl:  { col: 4, row: 0},
+      tl: { col: 4, row: 0 },
       ext: { width: 210, height: 60 }
     })
 
@@ -751,13 +756,13 @@ export class ExcelService {
           cell.border = borderbottomStyle
         }
 
-        if ((i == 23 && j == 1)){
+        if ((i == 23 && j == 1)) {
           cell.border = borderLeftStyle
         }
 
-        if(i <= 5 && j == 4){
+        if (i <= 5 && j == 4) {
           cell.border = bordertopLeftBottomStyle
-        }else if(i <= 5 && j == 10){
+        } else if (i <= 5 && j == 10) {
           cell.border = bordertopRightBottomStyle
         }
 
@@ -775,9 +780,9 @@ export class ExcelService {
           cell.border = borderbottomStyle
         } else if ((i == 63) || (i == 110 && (j >= 8 && j <= 16)) || (i == 109 && j == 16)) {
           cell.border = borderTopStyle
-          if(j==7){
+          if (j == 7) {
             cell.border = borderTopLeftStyle
-          }else if (j == 16) {
+          } else if (j == 16) {
             cell.border = borderTopRightStyle
           }
         } else if (i >= 68 && i <= 78) {
@@ -824,7 +829,7 @@ export class ExcelService {
             cell.border = borderbottomStyle
           } else if (i == 108) {
             cell.border = borderbottomStyle
-            if(j==1){
+            if (j == 1) {
               cell.border = borderbottomLeftStyle
             }
           } else if (i == 109) {
@@ -861,43 +866,43 @@ export class ExcelService {
           cell.fill = backgroundColorStyleWhite
         }
 
-        if(i == 12 || i == 21 || (i >= 26 && i <= 44) || i == 46 || i == 54 || (i >= 56 && i <= 58) || i == 62
-        || i == 68 || i == 69 || i == 70 || i == 81 || i == 82 || i == 88 || i == 89 || i == 94 || i == 96
-        || i == 107
-       ){
+        if (i == 12 || i == 21 || (i >= 26 && i <= 44) || i == 46 || i == 54 || (i >= 56 && i <= 58) || i == 62
+          || i == 68 || i == 69 || i == 70 || i == 81 || i == 82 || i == 88 || i == 89 || i == 94 || i == 96
+          || i == 107
+        ) {
           cell.border = borderTopLeftRightStyle
-        }else if ((j == 1 && (i >= 13 && i <= 20)) || (j == 1 && (i >= 47 && i <= 53)) || (j == 1 && (i >= 59 && i <= 61)) ||
+        } else if ((j == 1 && (i >= 13 && i <= 20)) || (j == 1 && (i >= 47 && i <= 53)) || (j == 1 && (i >= 59 && i <= 61)) ||
           (j == 1 && (i >= 71 && i <= 78)) || (j == 1 && (i >= 83 && i <= 85)) || (j == 1 && i == 90)
           || (j == 1 && (i >= 97 && i <= 106)) || (j == 1 && (i >= 92 && i <= 93)) || (j == 1 && i == 95) || (j == 1 && i == 108)
-        ){
+        ) {
           cell.border = borderLeftStyle
         }
 
-        if ((j == 5 && i == 87)){
+        if ((j == 5 && i == 87)) {
           cell.border = borderTopLeftStyle
-        }else if((j == 5 && i == 86) || (j == 11 && i == 86) || (j == 16 && i == 86)){
+        } else if ((j == 5 && i == 86) || (j == 11 && i == 86) || (j == 16 && i == 86)) {
           cell.border = borderbottomRighLefttStyle
-        }else if((j == 16 && i == 87)){
+        } else if ((j == 16 && i == 87)) {
           cell.border = borderRightStyle
         }
 
         if (i === 0) {
           cell.alignment = { vertical: "middle", horizontal: "center" };
-        }else {
-          cell.alignment = {vertical: "middle",};
+        } else {
+          cell.alignment = { vertical: "middle", };
         }
 
       }
     }
 
     // APLICAR ESTILO DE CENTRADO Y NEGRITA A LAS CELDAS COMBINADAS
-    ["A1", "K1", "K3", "K4", "A6", "A7", "I6", "A8", "A9", "A10","E8", "E9", "I8", "I9", "M3", "M9", "A11", "A22", "A23", "B23",
+    ["A1", "K1", "K3", "K4", "A6", "A7", "I6", "A8", "A9", "A10", "E8", "E9", "I8", "I9", "M3", "M9", "A11", "A22", "A23", "B23",
       "A24", "I24", "E10", "I10", "M10", "D13", "D14", "D15", "D16", "D17", "D18", "H13", "H14", "H15", "H16", "H17", "H18",
       "L13", "L14", "L15", "L16", "L17", "L18", "O13", "O14", "J20", "L20", "B52", "F52", "D93", "C47", "N47", "C49",
       "F49", "C60", "C61", "K60", "K61", "C72", "C73", "C74", "K72", "K73", "C84", "C85", "G84", "G85", "M84", "M85", "D95", "K95",
       "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "F13", "F14", "F15", "F16", "F17", "F18", "J13", "J14", "D97",
-      "J15", "J16", "J17", "J18", "M13", "M14", "H20", "K5", "K20", "A26", "I26", "A27",  "I7", "I27", "A28", "I28", "A29", "I29",
-      "A30", "A31", "A33", "A35", "A37", "I30", "A32", "I32", "A34", "I34", "A36", "I36", "A38", "I38", "A39", "A40", "I40", "A41", "A42", "I42", 
+      "J15", "J16", "J17", "J18", "M13", "M14", "H20", "K5", "K20", "A26", "I26", "A27", "I7", "I27", "A28", "I28", "A29", "I29",
+      "A30", "A31", "A33", "A35", "A37", "I30", "A32", "I32", "A34", "I34", "A36", "I36", "A38", "I38", "A39", "A40", "I40", "A41", "A42", "I42",
       "A44", "I44", "A45", "B47", "I47", "B48", "B49", "G49", "B51", "J52", "B53", "F53", "K53", "A55", "A56", "I56", "B59", "B60",
       "B61", "J59", "J60", "J61", "A63", "I63", "A65", "A67", "I67", "B71", "B72", "B73", "B73", "B74", "J71", "J72", "J73",
       "J75", "K74", "A80", "G80", "L80", "B83", "B84", "B85", "L83", "L84", "L85", "G83", "G84", "G85", "A89", "A91",
@@ -908,14 +913,14 @@ export class ExcelService {
         cell != 'B13' && cell != 'B14' && cell != 'B15' && cell != 'B16' && cell != 'B17' && cell != 'B18' &&
         cell != 'B19' && cell != 'B20' && cell != 'F13' && cell != 'F14' && cell != 'F15' && cell != 'F16' &&
         cell != 'F17' && cell != 'F18' && cell != 'J13' && cell != 'J14' && cell != 'J15' && cell != 'J16' &&
-        cell != 'J17' && cell != 'J18' && cell != 'M13' && cell != 'M14' && 
+        cell != 'J17' && cell != 'J18' && cell != 'M13' && cell != 'M14' &&
         cell != 'A22' && cell != 'A26' && cell != 'I26' && cell != 'A27' && cell != 'I27' &&
         cell != 'A28' && cell != 'I28' && cell != 'A29' && cell != 'I29' && cell != 'A30' && cell != 'I30' &&
         cell != 'A32' && cell != 'I32' && cell != 'A34' && cell != 'I34' && cell != 'A36' && cell != 'I36' &&
         cell != 'A38' && cell != 'I38' && cell != 'A40' && cell != 'I40' && cell != 'A42' && cell != 'I42' &&
         cell != 'A31' && cell != 'I31' && cell != 'A33' && cell != 'I33' && cell != 'A35' && cell != 'I35' &&
         cell != 'A37' && cell != 'I37' && cell != 'A39' && cell != 'I39' && cell != 'A41' && cell != 'I41' &&
-        cell != 'A44' && cell != 'I44' && cell != 'A45' && cell != 'B48' && cell != 'A89' 
+        cell != 'A44' && cell != 'I44' && cell != 'A45' && cell != 'B48' && cell != 'A89'
 
       ) {
         worksheet.getCell(cell).alignment = {
@@ -934,8 +939,8 @@ export class ExcelService {
 
       if (cell == 'K1') {
         worksheet.getCell(cell).font = { bold: true, size: 10 };
-      }else if(cell == 'A89'){
-        worksheet.getCell(cell).font = { bold: true, size: 16 };
+      } else if (cell == 'A89') {
+        worksheet.getCell(cell).font = { bold: true, size: 10 };
       } else if (
         cell == "A8" || cell == 'A9' || cell == "K3" || cell == 'K4' ||
         cell == 'A6' || cell == 'I6' || cell == 'I8' || cell == 'I9' ||
@@ -978,14 +983,14 @@ export class ExcelService {
         };
 
         worksheet.getCell(cell).font = { bold: true, size: 7 };
-      } else if (cell == "I63" || cell == "I109" || cell == "A11" || cell == "A55" || cell == 'A65' ) {
+      } else if (cell == "I63" || cell == "I109" || cell == "A11" || cell == "A55" || cell == 'A65') {
         worksheet.getCell(cell).alignment = {
           horizontal: "left",
           vertical: "middle",
         };
 
         worksheet.getCell(cell).font = { bold: true, size: 7 };
-      }else if(cell == 'B59' || cell == 'B60' || cell == 'B61' ||
+      } else if (cell == 'B59' || cell == 'B60' || cell == 'B61' ||
         cell == 'J59' || cell == 'J60' || cell == 'J61' ||
         cell == 'B71' || cell == 'B72' || cell == 'B73' ||
         cell == 'B74' || cell == 'J71' || cell == 'J72' ||
@@ -993,9 +998,9 @@ export class ExcelService {
         cell == 'B84' || cell == 'B85' || cell == 'G83' ||
         cell == 'G84' || cell == 'G85' || cell == 'L83' ||
         cell == 'F104' || cell == 'F105' ||
-        cell == 'L84' || cell == 'L85' 
-      ){
-         worksheet.getCell(cell).alignment = {
+        cell == 'L84' || cell == 'L85'
+      ) {
+        worksheet.getCell(cell).alignment = {
           horizontal: "left",
           vertical: "middle",
           wrapText: true
@@ -1003,22 +1008,22 @@ export class ExcelService {
 
 
         worksheet.getCell(cell).font = { bold: true, size: 7 };
-      }else if(cell == 'C47' || cell == 'C49' ||
+      } else if (cell == 'C47' || cell == 'C49' ||
         cell == 'C74' || cell == 'C72' || cell == 'C73' ||
         cell == 'C60' || cell == 'C61' || cell == 'K60' ||
         cell == 'K61' || cell == 'K72' || cell == 'K73' ||
-        cell == 'C84' || cell == 'C85' || cell == 'G84' || 
-        cell == 'G85' || cell == 'M84' || cell == 'M85' || 
+        cell == 'C84' || cell == 'C85' || cell == 'G84' ||
+        cell == 'G85' || cell == 'M84' || cell == 'M85' ||
         cell == 'D95' || cell == 'K95' || cell == 'M15' ||
-        cell == 'G104' || cell == 'G105' || cell == 'H19'){
+        cell == 'G104' || cell == 'G105' || cell == 'H19') {
         worksheet.getCell(cell).alignment = {
           horizontal: "left",
           vertical: "middle",
         };
-        worksheet.getCell(cell).font = {size: 8 };
+        worksheet.getCell(cell).font = { size: 8 };
       }
 
-      if (cell == "K74" || cell == "A11" ) {
+      if (cell == "K74" || cell == "A11") {
         worksheet.getCell(cell).alignment = {
           horizontal: "left",
           vertical: "middle",
@@ -1037,5 +1042,6 @@ export class ExcelService {
     }
 
   }
+
 
 }

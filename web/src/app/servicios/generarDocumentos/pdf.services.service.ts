@@ -56,7 +56,7 @@ export class PdfServicesService {
     console.log('datos tipo accion personal: ', this.tipos_accion);
     this.tipos_accion.forEach((item: any) => {
       if (item.descripcion == datosPedidoSelected[0].descripcion) {
-        this.textoFijo = item.base_legal + ' ';
+        this.textoFijo = item.base_legal.replace(/\n\s*\n/g, ' ');
       }
     });
 
@@ -251,7 +251,7 @@ export class PdfServicesService {
         vLineWidth: () => 0,
         hLineColor: () => '#999999', // color gris
         paddingLeft: () => 0,
-        paddingRight: () => 30,
+        paddingRight: () => 20,
         paddingTop: () => 0,
         paddingBottom: () => 0
       }
@@ -972,7 +972,7 @@ export class PdfServicesService {
             {
               text: ' MOTIVACIÓN: (adjuntar anexo si lo posee)',
               bold: true,
-              fontSize: 7,
+              fontSize: 8,
               fillColor: '#f2f2f2',
               margin: [5, 2, 0, 2],
               border: [true, false, true, true],
@@ -988,9 +988,8 @@ export class PdfServicesService {
           [
             {
 
-              text: this.datosPedido.adicion_base_legal,
-              bold: true,
-              fontSize: 7,
+              text: this.datosPedido.adicion_base_legal != null || this.textoFijo != "" ? (this.textoFijo + '\n' + this.datosPedido.adicion_base_legal) + '\n' + ((this.datosPedido.observacion != null && this.datosPedido.observacion != '') ? 'Observación: ' + this.datosPedido.observacion : '')  : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)",
+              fontSize: 8,
               margin: [5, 5, 0, 5],
               noWrap: false, // permite salto de línea automático
               border: [true, false, true, true],
@@ -1035,9 +1034,9 @@ export class PdfServicesService {
                     {
                       text: 'SITUACION ACTUAL',
                       bold: true,
-                      fontSize: 7,
+                      fontSize: 8,
                       fillColor: '#f2f2f2',
-                      margin: [0, 1, 0, 1],
+                      margin: [0, 2, 0, 2],
                       border: [false, false, true, false],
                       noWrap: false,
                       alignment: 'center', // centra horizontalmente
@@ -1053,9 +1052,9 @@ export class PdfServicesService {
                     {
                       text: 'SITUACION PROPUESTA',
                       bold: true,
-                      fontSize: 7,
+                      fontSize: 8,
                       fillColor: '#f2f2f2',
-                      margin: [0, 1, 0, 1],
+                      margin: [0, 2, 0, 2],
                       border: [false, false, false, false],
                       noWrap: false,
                       alignment: 'center', // centra horizontalmente
@@ -1743,9 +1742,9 @@ export class PdfServicesService {
             {
               text: ' POSESIÓN DEL PUESTO',
               bold: true,
-              fontSize: 7,
+              fontSize: 8,
               fillColor: '#f2f2f2',
-              margin: [5, 2, 0, 2],
+              margin: [5, 3, 0, 2],
               border: [true, true, true, true],
               layout: {
                 defaultBorder: false, // desactiva cualquier borde por defecto
@@ -1945,7 +1944,7 @@ export class PdfServicesService {
                             {
                               text: '** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)',
                               fontSize: 7,
-                              margin: [26, 7, 0, 0],
+                              margin: [26, 8, 0, 0],
                               bold: true,
                               border: [false, false, false, false],
                               noWrap: false,
@@ -2999,7 +2998,7 @@ export class PdfServicesService {
                 }
               ],
               border: [false, false, false, false],
-              margin: [0, 40, 0, 5],
+              margin: [0, 5, 0, 5],
             }
           ],
           [{
@@ -3304,7 +3303,7 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_comunicacion+'. '+this.datosPedido.empleado_comunicacion.toUpperCase())
+                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_comunicacion ? this.datosPedido.abreviatura_comunicacion.trim()+". ": ""+(this.datosPedido.empleado_comunicacion ? this.datosPedido.empleado_comunicacion.toUpperCase().trim() : ""))
                       ],
                       [
                         {
