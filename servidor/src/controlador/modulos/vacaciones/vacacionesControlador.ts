@@ -95,7 +95,7 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
 }*/
 
   public async ObtenerSolicitudVacaciones(req: Request, res: Response) {
-    const id = req.params.id_empleado; 
+    const id = req.params.id_empleado;
     const SOLICITUD = await pool.query(
       `
       SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC
@@ -128,22 +128,22 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
   }
 
   //METODO PARA OBTENER DATOS DE LA VACACION CONFIGURADA
- /* public async ObtenerParametroIncluirVacacion(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    console.log("DATO DE OBTENER PARAMETRO:", req);
-    const SOLICITUD = await pool.query(
-      `
-    SELECT * FROM mv_configurar_vacaciones WHERE id = $1
-    `,
-      [id]
-    );
-
-    if (SOLICITUD.rowCount != 0) {
-      return res.json(SOLICITUD.rows[0]);
-    } else {
-      return res.status(404).json({ text: 'No se encuentra la configuración.' });
-    }
-  }*/
+  /* public async ObtenerParametroIncluirVacacion(req: Request, res: Response): Promise<any> {
+     const { id } = req.params;
+     console.log("DATO DE OBTENER PARAMETRO:", req);
+     const SOLICITUD = await pool.query(
+       `
+     SELECT * FROM mv_configurar_vacaciones WHERE id = $1
+     `,
+       [id]
+     );
+ 
+     if (SOLICITUD.rowCount != 0) {
+       return res.json(SOLICITUD.rows[0]);
+     } else {
+       return res.status(404).json({ text: 'No se encuentra la configuración.' });
+     }
+   }*/
 
   //METODO PARA LISTAR VACACIONES CONFIGURADAS
   public async ListarVacacionesConfiguradas(req: Request, res: Response): Promise<any> {
@@ -444,6 +444,50 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
       await pool.query('ROLLBACK');
       console.error('Error en CrearVacaciones:', error);
       return res.status(500).jsonp({ message: 'Error al guardar la solicitud de vacaciones.' });
+    }
+  }
+
+  public EditarSolicitudVacaciones = async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+    const { ...data } = req.body
+
+    try {
+      const response = await pool.query(
+        `UPDATE mv_solicitud_vacacion SET
+          id_empleado = $1, id_cargo_vigente = $2, id_periodo_vacacion = $3,
+          fecha_inicio = $4, fecha_final = $5, estado = $6, numero_dias_lunes = $7,
+          numero_dias_martes = $8, numero_dias_miercoles = $9, numero_dias_jueves = $10,
+          numero_dias_viernes = $11, numero_dias_sabado = $12, numero_dias_domingo = $13,
+          numero_dias_totales = $14, incluir_feriados = $15, documento = $16, minutos_totales = $17
+        WHERE id = $18 RETURNING *`
+        [
+        data.id_empleado,
+        data.id_cargo_vigente,
+        data.id_periodo_vacacion,
+        data.fecha_inicio,
+        data.fecha_final,
+        data.estado,
+        data.numero_dias_lunes,
+        data.numero_dias_martes,
+        data.numero_dias_miercoles,
+        data.numero_dias_jueves,
+        data.numero_dias_viernes,
+        data.numero_dias_sabado,
+        data.numero_dias_domingo,
+        data.numero_dias_totales,
+        data.incluir_feriados,
+        data.documento,
+        data.minutos_totales,
+        data.id
+        ]
+      );
+
+      res.json(response.rows[0]);
+      res.status(200).json({ message: "Solicitud actualizada exitosamente" });
+
+    } catch (error) {
+      res.status(500).json({ error: "Error al actualizar una solicitud" })
     }
   }
 
@@ -1106,7 +1150,6 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
       return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
   };
-
 }
 
 export const VACACIONES_CONTROLADOR = new VacacionesControlador();

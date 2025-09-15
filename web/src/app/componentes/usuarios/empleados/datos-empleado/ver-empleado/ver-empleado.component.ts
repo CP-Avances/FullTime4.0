@@ -64,7 +64,6 @@ import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizacio
 import { EditarSolicitudComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
 import { PlanificacionComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
 import { EditarPlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
-import { RegistrarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
 import { CancelarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/cancelar-vacaciones/cancelar-vacaciones.component';
 import { CancelarHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
 import { EditarPlanComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';

@@ -2105,7 +2105,7 @@
                                 <div style="text-align: right; margin-right: 10px;">
                                     <i class="fas fa-edit" id="edit" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro.">
-                                        <p>Editar</p>
+                                        <p><app-solicitudes-vacaciones /></p>
                                     </i>
                                     <i class="fas fa-times-circle" id="cerrar" matSuffix matTooltipPosition="right"
                                         matTooltip="Eliminar solicitudes de vacaciones.">
@@ -2185,10 +2185,11 @@
             </mat-card>
         </div>
         <!-- *** REGISTRO DE VACACIONES INDIVIDUALES *** -->
-        <div style="padding-top: 20px;" *ngIf="activar_vacacion_individual">
-            <app-registrar-vacaciones [data]="empleadoUno">
-            </app-registrar-vacaciones>
+        @if (activar_vacacion_individual) {
+        <div style="padding-top: 20px;">
+            <app-registrar-solicitudes-vacaciones [data]="empleadoUno" />
         </div>
+        }
     </mat-tab>
 
     <!-- HORAS EXTRAS -->

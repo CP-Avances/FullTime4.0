@@ -66,14 +66,14 @@ label {
 }
 
 .circulo {
-  width: 12px;
-  height: 12px;
-  min-width: 12px;
-  min-height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0; 
-  flex-grow: 0; 
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 .td_ob {
@@ -157,13 +157,12 @@ label {
 }
 
 .dia-seleccionado {
-  background-color: rgb(98, 249, 87); 
-  color: white;
-  font-weight: bold;
+    background-color: rgb(98, 249, 87);
+    color: white;
+    font-weight: bold;
 }
 
 table {
     width: 100%;
     font-size: 13px;
 }
-

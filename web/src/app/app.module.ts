@@ -198,7 +198,6 @@ import { ListarVacacionesComponent } from './componentes/modulos/vacaciones/list
 import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
 import { RegistrarPeriodoVComponent } from './componentes/modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPeriodoVacacionesComponent } from './componentes/modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
-import { RegistrarVacacionesComponent } from './componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
 import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/ver-configurar-vacacion/ver-configurar-vacacion.component';
 import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
 import { ConfigurarVacacionMultipleComponent } from './componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
@@ -349,6 +348,9 @@ import { MainNavService } from './componentes/generales/main-nav/main-nav.servic
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
 import { GraficasService } from './servicios/graficas/graficas.service';
+import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
+import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
+import { RegistrarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/registrar-solicitudes-vacaciones/registrar-solicitudes-vacaciones.component';
 
 @NgModule({
   declarations: [
@@ -517,7 +519,6 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     VerVacacionComponent,
     RegistrarPeriodoVComponent,
     EditarPeriodoVacacionesComponent,
-    RegistrarVacacionesComponent,
     VerConfigurarVacacionComponent,
     GenerarPeriodoManualComponent,
     ConfigurarVacacionMultipleComponent,
@@ -658,6 +659,9 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     AsistenciaMacroComponent,
     RetrasosMacroComponent,
     InformacionNovedadesComponent,
+    SolicitudesVacacionesComponent,
+    EditarSolicitudesVacacionesComponent,
+    RegistrarSolicitudesVacacionesComponent
   ],
 
   imports: [
@@ -725,6 +729,9 @@ import { GraficasService } from './servicios/graficas/graficas.service';
     PrincipalDepartamentoComponent,
     HorarioMultipleEmpleadoComponent,
     PermisosMultiplesEmpleadosComponent,
+    SolicitudesVacacionesComponent,
+    RegistrarSolicitudesVacacionesComponent,
+    EditarSolicitudesVacacionesComponent
   ],
   exports: [CommonModule, TimbreMultipleComponent, EmpleadoProcesoComponent],
 

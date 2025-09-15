@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SocketService } from 'src/app/servicios/socket/socket.service';
 import { Socket } from 'ngx-socket-io';
+import { SolicitudVacacion } from 'src/app/interfaces/SolicitudesVacacion';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -66,7 +68,7 @@ export class VacacionesService {
   }
 
   //METODO PARA VERIFICAR VACACIONES MULTIPLE
-  VerificarVacacionesMultiples(datosVerificacion: {empleados: number[],fechaInicio: string, fechaFin: string, incluirFeriados: boolean}) {
+  VerificarVacacionesMultiples(datosVerificacion: { empleados: number[], fechaInicio: string, fechaFin: string, incluirFeriados: boolean }) {
     const url = `${localStorage.getItem('empresaURL') as string}/vacaciones/verificar-empleados`;
     return this.http.post(url, datosVerificacion);
   }
@@ -116,6 +118,10 @@ export class VacacionesService {
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/xmlDownload`, data);
+  }
+
+  EditarSolicitudesVacaciones(id: number, data: SolicitudVacacion): Observable<SolicitudVacacion> {
+    return this.http.put<SolicitudVacacion>(`${(localStorage.getItem('empresaURL') as string)}/vacacion-solicitada/${id}`, data);
   }
 
 }

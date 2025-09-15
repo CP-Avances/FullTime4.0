@@ -69,6 +69,7 @@ class VacacionesRutas {
         // CREAR REGISTRO DE VACACIONES
         this.router.post('/', verificarToken_1.TokenValidation, vacacionesControlador_1.default.CrearVacaciones);
         // EDITAR REGISTRO DE VACACIONES
+        this.router.put('/vacacion-solicitada/:id', verificarToken_1.TokenValidation, vacacionesControlador_1.default.EditarSolicitudVacaciones);
         //this.router.put('/:id/vacacion-solicitada', TokenValidation, VACACIONES_CONTROLADOR.EditarVacaciones);
         // BUSQUEDA DE VACACIONES MEDIANTE ID
         //this.router.get('/listar/vacacion/:id', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionId);

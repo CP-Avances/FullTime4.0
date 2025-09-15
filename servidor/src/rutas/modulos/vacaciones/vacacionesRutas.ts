@@ -78,6 +78,7 @@ class VacacionesRutas {
         // CREAR REGISTRO DE VACACIONES
         this.router.post('/', TokenValidation, VACACIONES_CONTROLADOR.CrearVacaciones);
         // EDITAR REGISTRO DE VACACIONES
+        this.router.put('/vacacion-solicitada/:id', TokenValidation, VACACIONES_CONTROLADOR.EditarSolicitudVacaciones);
         //this.router.put('/:id/vacacion-solicitada', TokenValidation, VACACIONES_CONTROLADOR.EditarVacaciones);
         // BUSQUEDA DE VACACIONES MEDIANTE ID
         //this.router.get('/listar/vacacion/:id', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionId);
@@ -95,7 +96,7 @@ class VacacionesRutas {
         this.router.get('/verificar-solicitud/:id_empleado/:fecha_inicio/:fecha_final', TokenValidation, VACACIONES_CONTROLADOR.VerificarExistenciaSolicitud);
 
         // MÉTODO PARA GUARDAR DOCUMENTO EN VACACIONES
-        this.router.put('/:id/documento/:id_empleado',[TokenValidation, upload.single('uploads')],VACACIONES_CONTROLADOR.GuardarDocumento);
+        this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACACIONES_CONTROLADOR.GuardarDocumento);
 
 
 

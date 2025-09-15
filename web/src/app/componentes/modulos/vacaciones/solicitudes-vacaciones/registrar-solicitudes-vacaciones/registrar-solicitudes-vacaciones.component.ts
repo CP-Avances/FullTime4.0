@@ -14,13 +14,13 @@ import { ConteoDiasSemana } from 'src/app/interfaces/ConteoDiasSemana';
 
 
 @Component({
-  selector: 'app-registrar-vacaciones',
+  selector: 'app-registrar-solicitudes-vacaciones',
   standalone: false,
-  templateUrl: './registrar-vacaciones.component.html',
-  styleUrls: ['./registrar-vacaciones.component.css'],
+  templateUrl: './registrar-solicitudes-vacaciones.component.html',
+  styleUrls: ['./registrar-solicitudes-vacaciones.component.css'],
 })
 
-export class RegistrarVacacionesComponent implements OnInit {
+export class RegistrarSolicitudesVacacionesComponent implements OnInit {
   @Input() data: any[] = [];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild('picker2') picker2!: MatDatepicker<Date>;
