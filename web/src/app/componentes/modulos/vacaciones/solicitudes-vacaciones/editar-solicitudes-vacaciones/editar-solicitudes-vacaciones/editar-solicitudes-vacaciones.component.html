@@ -1,6 +1,4 @@
-<p>Editar</p>
-
-<!-- <div class="container">
+<div class="container">
     <mat-card class="mat-elevation-z8">
         <div id="titulo" class="row w-100 m-auto">
             <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
@@ -10,7 +8,8 @@
                 </span>
             </div>
             <div class="col-2 col-md-2 mb-2 mb-md-0">
-                <mat-icon class="float-right" id="cerrar">highlight_off</mat-icon>
+                <mat-icon class="float-right cursor-pointer" id="cerrar">highlight_off
+                </mat-icon>
             </div>
         </div>
 
@@ -24,16 +23,42 @@
                                 matTooltip="Seleccionar tipo de vacación a solicitar.">
                                 beach_access
                             </mat-icon>
-                            <mat-select>
-
+                            <mat-select formControlName="id_periodo_vacacion">
+                                @for (tipo of tiposVacacion; track tipo.id) {
                                 <mat-option>
-
+                                    {{tipo.descripcion}}
                                 </mat-option>
-
-
+                                }
                             </mat-select>
                         </mat-form-field>
                     </div>
+
+                    <ng-container>
+                        <div class="col-md-4">
+                            <mat-form-field appearance="fill" class="w-100">
+                                <mat-label>Fecha de Inicio de Vacaciones</mat-label>
+                                <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                    formControlName="fecha_inicio">
+                                <mat-datepicker-toggle matSuffix [for]="picker"
+                                    matTooltip="Indicar la fecha de inicio de las vacaciones que se va a editar.">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4">
+                            <mat-form-field appearance="fill" class="w-100">
+                                <mat-label>Fecha FIn de Vacaciones</mat-label>
+                                <input matInput [matDatepicker]="picker2" placeholder="dd//mm//aaaa"
+                                    formControlName="fecha_final">
+                                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                    matTooltip="Indicar la fecha de finalización de las vacaciones que se va a editar."
+                                    matTooltipPosition="right">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker2></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
                 </div>
             </form>
         </div>

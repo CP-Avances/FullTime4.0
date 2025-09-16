@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -137,15 +126,33 @@ class VacacionesControlador {
         });
         this.EditarSolicitudVacaciones = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const data = __rest(req.body, []);
+            const data = req.body;
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({ error: "ID no valido" });
+            }
             try {
                 const response = yield database_1.default.query(`UPDATE mv_solicitud_vacacion SET
-          id_empleado = $1, id_cargo_vigente = $2, id_periodo_vacacion = $3,
-          fecha_inicio = $4, fecha_final = $5, estado = $6, numero_dias_lunes = $7,
-          numero_dias_martes = $8, numero_dias_miercoles = $9, numero_dias_jueves = $10,
-          numero_dias_viernes = $11, numero_dias_sabado = $12, numero_dias_domingo = $13,
-          numero_dias_totales = $14, incluir_feriados = $15, documento = $16, minutos_totales = $17
-        WHERE id = $18 RETURNING *`[data.id_empleado,
+          id_empleado = $1, 
+          id_cargo_vigente = $2, 
+          id_periodo_vacacion = $3,
+          fecha_inicio = $4, 
+          fecha_final = $5, 
+          estado = $6, 
+          numero_dias_lunes = $7,
+          numero_dias_martes = $8,
+          numero_dias_miercoles = $9,
+          numero_dias_jueves = $10,
+          numero_dias_viernes = $11, 
+          numero_dias_sabado = $12, 
+          numero_dias_domingo = $13,
+          numero_dias_totales = $14, 
+          incluir_feriados = $15, 
+          documento = $16, 
+          minutos_totales = $17,
+          fecha_actualizacion = NOW()
+        WHERE id = $18 
+        RETURNING *`, [
+                    data.id_empleado,
                     data.id_cargo_vigente,
                     data.id_periodo_vacacion,
                     data.fecha_inicio,
@@ -162,12 +169,21 @@ class VacacionesControlador {
                     data.incluir_feriados,
                     data.documento,
                     data.minutos_totales,
-                    data.id]);
-                res.json(response.rows[0]);
-                res.status(200).json({ message: "Solicitud actualizada exitosamente" });
+                    id
+                ]);
+                if (response.rows.length === 0) {
+                    return res.status(400)
+                        .json({ message: "Solicitud no encontrada" });
+                }
+                return res.status(200).json({
+                    message: "Solicitud actualizada exitosamente",
+                    detalle_de_solicitud: response.rows[0]
+                });
             }
             catch (error) {
-                res.status(500).json({ error: "Error al actualizar una solicitud" });
+                console.error("Error al ejecutar el update: ", error.message);
+                res.status(500)
+                    .json({ error: "Error al actualizar una solicitud" });
             }
         });
     }

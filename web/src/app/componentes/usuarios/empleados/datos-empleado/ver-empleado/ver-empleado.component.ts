@@ -2560,7 +2560,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         );
       });
 
-      console.log('Solicitudes vacaciones', this.solicitudesVacaciones);
+      console.log('Solicitudes vacacionesssssssssssssssssssss', this.solicitudesVacaciones);
     });
   }
 
