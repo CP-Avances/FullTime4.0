@@ -24,6 +24,86 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class VacacionesControlador {
     constructor() {
+        /*
+          public async ListarVacaciones(req: Request, res: Response) {
+            const { estado } = req.body;
+            const VACACIONES = await pool.query(
+              `
+              SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado,
+                v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_depa,
+                e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
+              FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da,
+                ed_departamentos AS depa
+              WHERE dc.id_empleado = e.id
+                AND da.id_contrato = dc.id_contrato
+                AND depa.id = da.id_depa
+                AND (v.estado = 1 OR v.estado = 2)
+                AND da.estado = $1
+              ORDER BY id DESC
+              `
+              , [estado]
+            );
+        
+            if (VACACIONES.rowCount != 0) {
+              return res.jsonp(VACACIONES.rows)
+            }
+            else {
+              return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+          }*/
+        /*
+      public async ListarVacacionesAutorizadas(req: Request, res: Response) {
+        const VACACIONES = await pool.query(
+          `
+          SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado,
+            v.id, v.id_periodo_vacacion, e.id AS id_empl_solicita, e.nombre, e.apellido,
+            (e.nombre || \' \' || e.apellido) AS fullname, dc.codigo, depa.nombre AS depa_nombre
+          FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, ed_departamentos AS depa
+          WHERE dc.id_empleado = e.id  AND depa.id = dc.id_departamento
+            AND (v.estado = 3 OR v.estado = 4)
+          ORDER BY id DESC
+          `
+        );
+        if (VACACIONES.rowCount != 0) {
+          return res.jsonp(VACACIONES.rows)
+        }
+        else {
+          return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+      }
+      
+      public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
+        const { fechaSalida, fechaIngreso } = req.body;
+        const FECHAS = await pool.query(
+          `
+          SELECT fecha FROM ef_cat_feriados WHERE fecha BETWEEN $1 AND $2 ORDER BY fecha ASC
+          `
+          , [fechaSalida, fechaIngreso]);
+        if (FECHAS.rowCount != 0) {
+          return res.jsonp(FECHAS.rows)
+        }
+        else {
+          return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+        }
+      }*/
+        this.ObtenerSolicitudVacacionesPorIdEmpleado = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            if (!id_empleado || isNaN(Number(id_empleado))) {
+                return res.status(404).json({ error: "ID no válido" });
+            }
+            try {
+                const SOLICITUD = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC`, [id_empleado]);
+                if (SOLICITUD.rowCount != 0) {
+                    return res.status(200).json(SOLICITUD.rows);
+                }
+                else {
+                    return res.status(404).json({ text: 'No se encuentran registros.' });
+                }
+            }
+            catch (error) {
+                return res.status(500).json({ error: "Error al obtener solicitud de vacaciones por id de empleados" });
+            }
+        });
         //METODO QUE REALIZA LA VERIFICACION SI LA SOLICITUD DE VACACION ES APTA PARA SU REGISTRO
         this.VerificarVacacionesMultiples = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
@@ -128,7 +208,7 @@ class VacacionesControlador {
             const { id } = req.params;
             const data = req.body;
             if (!id || isNaN(Number(id))) {
-                return res.status(400).json({ error: "ID no valido" });
+                return res.status(400).json({ error: "ID no válido" });
             }
             try {
                 const response = yield database_1.default.query(`UPDATE mv_solicitud_vacacion SET
@@ -186,6 +266,79 @@ class VacacionesControlador {
                     .json({ error: "Error al actualizar una solicitud" });
             }
         });
+        this.ObtenerSolicitudesVacaciones = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const queryResult = yield database_1.default.query(`SELECT id, 
+          id_empleado, 
+          id_cargo_vigente, 
+          id_periodo_vacacion, 
+          fecha_inicio, 
+          fecha_final, 
+          estado, 
+          numero_dias_lunes, 
+          numero_dias_martes, 
+          numero_dias_miercoles, 
+          numero_dias_jueves, 
+          numero_dias_viernes, 
+          numero_dias_sabado, 
+          numero_dias_domingo, 
+          numero_dias_totales, 
+          incluir_feriados, 
+          documento, 
+          minutos_totales, 
+          fecha_registro, 
+          fecha_actualizacion
+        FROM public.mv_solicitud_vacacion
+        ORDER BY id ASC`);
+                const solicitudes = queryResult.rows;
+                return res.status(200).json(solicitudes);
+            }
+            catch (error) {
+                console.error("Error al obtener solicitudes: ", error);
+                return res.status(500).json({ error: "Error al obtener solicitudes" });
+            }
+        });
+        this.ObtenerSolicitudVacacionesPorId = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            if (!id || isNaN(Number(id))) {
+                return res.status(404)
+                    .json({ error: "ID no válido" });
+            }
+            try {
+                const queryResult = yield database_1.default.query(`SELECT * FROM public.mv_solicitud_vacacion WHERE id = $1`, [id]);
+                if (queryResult.rows.length === 0) {
+                    return res.status(400)
+                        .json({ message: "Solicitud no encontrada" });
+                }
+                return res.status(200).json({
+                    message: "OK",
+                    solicitud: queryResult.rows[0]
+                });
+            }
+            catch (error) {
+                console.error("Error al obtener solicitud por id: ", error);
+                return res.status(500).json({ error: "Error al obtener solicitud" });
+            }
+        });
+        this.EliminarSolicitudesVacaciones = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            if (!id || isNaN(Number(id))) {
+                return res.status(404)
+                    .json({ error: "ID no válido" });
+            }
+            try {
+                const queryResult = yield database_1.default.query(`SELECT id FROM public.mv_solicitud_vacacion WHERE id = $1`, [id]);
+                if (queryResult.rows.length === 0) {
+                    return res.status(400)
+                        .json({ message: "Solicitud no encontrada" });
+                }
+                const queryDeleteResult = yield database_1.default.query(`DELETE FROM public.mv_solicitud_vacacion WHERE id = $1`, [id]);
+                return res.status(200).json({ message: "Solicitud eliminada correctamente" });
+            }
+            catch (error) {
+                return res.status(500).json({ message: "Error al eliminar solicitud" });
+            }
+        });
     }
     // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO    **USADO
     VacacionesIdPeriodo(req, res) {
@@ -202,82 +355,6 @@ class VacacionesControlador {
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    /*
-      public async ListarVacaciones(req: Request, res: Response) {
-        const { estado } = req.body;
-        const VACACIONES = await pool.query(
-          `
-          SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado,
-            v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_depa,
-            e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
-          FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da,
-            ed_departamentos AS depa
-          WHERE dc.id_empleado = e.id
-            AND da.id_contrato = dc.id_contrato
-            AND depa.id = da.id_depa
-            AND (v.estado = 1 OR v.estado = 2)
-            AND da.estado = $1
-          ORDER BY id DESC
-          `
-          , [estado]
-        );
-    
-        if (VACACIONES.rowCount != 0) {
-          return res.jsonp(VACACIONES.rows)
-        }
-        else {
-          return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-      }*/
-    /*
-  public async ListarVacacionesAutorizadas(req: Request, res: Response) {
-    const VACACIONES = await pool.query(
-      `
-      SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado,
-        v.id, v.id_periodo_vacacion, e.id AS id_empl_solicita, e.nombre, e.apellido,
-        (e.nombre || \' \' || e.apellido) AS fullname, dc.codigo, depa.nombre AS depa_nombre
-      FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, ed_departamentos AS depa
-      WHERE dc.id_empleado = e.id  AND depa.id = dc.id_departamento
-        AND (v.estado = 3 OR v.estado = 4)
-      ORDER BY id DESC
-      `
-    );
-    if (VACACIONES.rowCount != 0) {
-      return res.jsonp(VACACIONES.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-  
-  public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
-    const { fechaSalida, fechaIngreso } = req.body;
-    const FECHAS = await pool.query(
-      `
-      SELECT fecha FROM ef_cat_feriados WHERE fecha BETWEEN $1 AND $2 ORDER BY fecha ASC
-      `
-      , [fechaSalida, fechaIngreso]);
-    if (FECHAS.rowCount != 0) {
-      return res.jsonp(FECHAS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
-  }*/
-    ObtenerSolicitudVacaciones(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_empleado;
-            const SOLICITUD = yield database_1.default.query(`
-      SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC
-      `, [id]);
-            if (SOLICITUD.rowCount != 0) {
-                return res.json(SOLICITUD.rows);
-            }
-            else {
-                return res.status(404).json({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -491,7 +568,7 @@ class VacacionesControlador {
         });
     }
     /*
-    // METODO DE EDICIÓN DE REGISTRO DE VACACIONES
+    // METODO DE EDICIÓN DE REGISTRO DE VACACIONESs
     public async EditarVacaciones(req: Request, res: Response): Promise<Response> {
       try {
         const id = req.params.id

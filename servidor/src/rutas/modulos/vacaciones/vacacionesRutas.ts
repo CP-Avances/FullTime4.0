@@ -57,9 +57,6 @@ class VacacionesRutas {
 
         //this.router.post('/fechasFeriado', TokenValidation, VACACIONES_CONTROLADOR.ObtenerFechasFeriado);
 
-        this.router.get('/datosSolicitud/:id_empleado', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudVacaciones);
-
-
         this.router.get('/datosAutorizacion/:id_vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerAutorizacionVacaciones);
         this.router.get('/lista-vacacionesfechas/fechas/', TokenValidation, VACACIONES_CONTROLADOR.getlistaVacacionesByFechasyCodigo);
 
@@ -98,7 +95,17 @@ class VacacionesRutas {
         // MÉTODO PARA GUARDAR DOCUMENTO EN VACACIONES
         this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACACIONES_CONTROLADOR.GuardarDocumento);
 
+        //MÉTODO PARA OBTENER TODAS LAS SOLICITUDES DE VACACIONES
+        this.router.get('/solicitudes-vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudesVacaciones);
 
+        //MÉTODO PARA OBTENER LAS SOLICITUDES DE VACACIONES POR ID
+        this.router.get('/solicitudes-vacaciones/:id', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudVacacionesPorId);
+
+        //MÉTODO PARA OBTENER LAS SOLICITUDES DE VACACIONES POR ID DE EMPLEADOS
+        this.router.get('/datosSolicitudVacacionesPorIdEmpleado/:id_empleado', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudVacacionesPorIdEmpleado);
+
+        //MÉTODO PARA ELIMINAR UNA SOLICITUD DE VACACIONES POR SU ID
+        this.router.delete('/eliminarSolicitudVacaciones/:id', TokenValidation, VACACIONES_CONTROLADOR.EliminarSolicitudesVacaciones);
 
         /** ************************************************************************************************* **
          ** **                        METODO DE ENVIO DE NOTIFICACIONES                                    ** ** 

@@ -1,7 +1,7 @@
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { enviarCorreos, fechaHora, Credenciales, FormatearFecha, FormatearHora, dia_completo } from '../../../libs/settingsMail';
 import { RestarPeriodoVacacionAutorizada } from '../../../libs/CargarVacacion';
-import { Request, Response } from 'express';
+import { Request, response, Response } from 'express';
 import { ObtenerRutaLogos } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
@@ -95,18 +95,25 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
   }
 }*/
 
-  public async ObtenerSolicitudVacaciones(req: Request, res: Response) {
-    const id = req.params.id_empleado;
-    const SOLICITUD = await pool.query(
-      `
-      SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC
-      `
-      , [id]);
-    if (SOLICITUD.rowCount != 0) {
-      return res.json(SOLICITUD.rows)
+  public ObtenerSolicitudVacacionesPorIdEmpleado = async (req: Request, res: Response) => {
+    const { id_empleado } = req.params;
+
+    if (!id_empleado || isNaN(Number(id_empleado))) {
+      return res.status(404).json({ error: "ID no válido" });
     }
-    else {
-      return res.status(404).json({ text: 'No se encuentran registros.' });
+
+    try {
+      const SOLICITUD = await pool.query<SolicitudesVacaciones>(
+        `SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC`
+        , [id_empleado]);
+      if (SOLICITUD.rowCount != 0) {
+        return res.status(200).json(SOLICITUD.rows);
+      }
+      else {
+        return res.status(404).json({ text: 'No se encuentran registros.' });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: "Error al obtener solicitud de vacaciones por id de empleados" });
     }
   }
 
@@ -454,7 +461,7 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
     const data: Partial<SolicitudesVacaciones> = req.body
 
     if (!id || isNaN(Number(id))) {
-      return res.status(400).json({ error: "ID no valido" });
+      return res.status(400).json({ error: "ID no válido" });
     }
 
     try {
@@ -520,8 +527,110 @@ public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
     }
   }
 
+  public ObtenerSolicitudesVacaciones = async (req: Request, res: Response) => {
+
+    try {
+      const queryResult = await pool.query<SolicitudesVacaciones>(
+        `SELECT id, 
+          id_empleado, 
+          id_cargo_vigente, 
+          id_periodo_vacacion, 
+          fecha_inicio, 
+          fecha_final, 
+          estado, 
+          numero_dias_lunes, 
+          numero_dias_martes, 
+          numero_dias_miercoles, 
+          numero_dias_jueves, 
+          numero_dias_viernes, 
+          numero_dias_sabado, 
+          numero_dias_domingo, 
+          numero_dias_totales, 
+          incluir_feriados, 
+          documento, 
+          minutos_totales, 
+          fecha_registro, 
+          fecha_actualizacion
+        FROM public.mv_solicitud_vacacion
+        ORDER BY id ASC`
+      );
+
+      const solicitudes: SolicitudesVacaciones[] = queryResult.rows;
+
+      return res.status(200).json(solicitudes);
+
+    } catch (error) {
+      console.error("Error al obtener solicitudes: ", error);
+      return res.status(500).json({ error: "Error al obtener solicitudes" });
+    }
+  }
+
+  public ObtenerSolicitudVacacionesPorId = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!id || isNaN(Number(id))) {
+      return res.status(404)
+        .json({ error: "ID no válido" });
+    }
+
+    try {
+      const queryResult = await pool.query<SolicitudesVacaciones>(
+        `SELECT * FROM public.mv_solicitud_vacacion WHERE id = $1`,
+        [id]
+      );
+
+      if (queryResult.rows.length === 0) {
+        return res.status(400)
+          .json({ message: "Solicitud no encontrada" });
+      }
+
+      return res.status(200).json({
+        message: "OK",
+        solicitud: queryResult.rows[0]
+      });
+
+    } catch (error) {
+      console.error("Error al obtener solicitud por id: ", error);
+      return res.status(500).json({ error: "Error al obtener solicitud" });
+    }
+  }
+
+  public EliminarSolicitudesVacaciones = async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+
+    if (!id || isNaN(Number(id))) {
+      return res.status(404)
+        .json({ error: "ID no válido" });
+    }
+
+    try {
+
+      const queryResult = await pool.query<SolicitudesVacaciones>(
+        `SELECT id FROM public.mv_solicitud_vacacion WHERE id = $1`,
+        [id]
+      );
+
+      if (queryResult.rows.length === 0) {
+        return res.status(400)
+          .json({ message: "Solicitud no encontrada" });
+      }
+
+      const queryDeleteResult = await pool.query(
+        `DELETE FROM public.mv_solicitud_vacacion WHERE id = $1`,
+        [id]
+      );
+
+      return res.status(200).json({ message: "Solicitud eliminada correctamente" });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Error al eliminar solicitud" });
+    }
+
+  }
+
   /*
-  // METODO DE EDICIÓN DE REGISTRO DE VACACIONES
+  // METODO DE EDICIÓN DE REGISTRO DE VACACIONESs
   public async EditarVacaciones(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id
