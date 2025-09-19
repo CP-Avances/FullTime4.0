@@ -26,7 +26,9 @@
     //"types": ["node"],
     "noImplicitAny": false,
     "strictPropertyInitialization": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": [
     "src",
@@ -37,7 +39,7 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
-    "enableIvy":false,
-    "fullTemplateTypeCheck":true,
+    "enableIvy": false,
+    "fullTemplateTypeCheck": true,
   }
 }
