@@ -1989,13 +1989,13 @@
     </mat-tab>
 
     <!-- SOLICITUDES DE VACACIONES DEL EMPLEADO -->
-    <mat-tab label="periodo_vacaciones">
+    <!-- <mat-tab label="periodo_vacaciones">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
             <h6 id="items">Solicitudes de Vacaciones</h6>
         </ng-template>
 
-        <!--  *********************  PANTALLA DE SOLICITUDES DE VACACIONES  *************************  -->
+        <p>PANTALLA DE SOLICITUDES DE VACACIONES</p>
         <div class="container" style="padding-bottom: 25px;" *ngIf="ver_periodo">
             <mat-card class="mat-elevation-z8">
 
@@ -2184,7 +2184,7 @@
                 </mat-card-content>
             </mat-card>
         </div>
-        <!-- *** REGISTRO DE VACACIONES INDIVIDUALES *** -->
+        <p>REGISTRO DE VACACIONES INDIVIDUALES</p>
         @if (activar_vacacion_individual) {
         <div style="padding-top: 20px;">
             <app-registrar-solicitudes-vacaciones [data]="empleadoUno" />
@@ -2193,6 +2193,10 @@
         <div style="padding-top: 20px;">
             <app-editar-solicitudes-vacaciones />
         </div>
+    </mat-tab> -->
+
+    <mat-tab label="periodo_vacaciones">
+        <app-solicitudes-vacaciones />
     </mat-tab>
 
     <!-- HORAS EXTRAS -->

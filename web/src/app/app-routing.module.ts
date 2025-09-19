@@ -154,6 +154,9 @@ import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macr
 import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
 import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
 import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
+import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
+import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
+import { RegistrarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/registrar-solicitudes-vacaciones/registrar-solicitudes-vacaciones.component';
 
 const routes: Routes = [
 
@@ -219,6 +222,13 @@ const routes: Routes = [
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
   { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
+  {
+    path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent,
+    children: [
+      { path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
+      { path: 'registrar-solicitudes-vaciones', component: RegistrarSolicitudesVacacionesComponent }
+    ]
+  },
 
   // MODULO  --HORAS EXTRAS
   { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard] },
