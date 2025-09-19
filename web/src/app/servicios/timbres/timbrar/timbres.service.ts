@@ -11,22 +11,22 @@ export class TimbresService {
     private http: HttpClient
   ) { }
 
-  // METODO PARA LISTAR MARCACIONES    **USADO
+  // METODO PARA LISTAR MARCACIONES    **USADO**
   ObtenerTimbres() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/`);
   }
 
-  // METODO PARA REGISTRAR TIMBRE PERSONAL     **USADO
+  // METODO PARA REGISTRAR TIMBRE PERSONAL     **USADO**
   RegistrarTimbreWeb(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/`, datos);
   }
 
-  // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO
+  // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR    **USADO**
   RegistrarTimbreAdmin(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/admin/`, datos);
   }
 
-  // METODO PARA BUSCAR TIMBRES SEGUN CRITERIOS DE BUSQUEDA   **USADO
+  // METODO PARA BUSCAR TIMBRES SEGUN CRITERIOS DE BUSQUEDA   **USADO**
   ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
       .set('codigo', datos.codigo)
@@ -35,22 +35,22 @@ export class TimbresService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/timbresfechaemple`, { params });
   }
 
-  // METODO PARA EDITAR TIMBRES    **USADO
+  // METODO PARA EDITAR TIMBRES    **USADO**
   EditarTimbreEmpleado(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/timbre/editar`, data);
   }
 
-  // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO
+  // METODO PARA BUSCAR TIMBRES (ASISTENCIA)   **USADO**
   BuscarTimbresAsistencia(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/buscar/timbres-asistencia`, datos);
   }
 
-  // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)   **USADO
+  // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)   **USADO**
   BuscarTimbresPlanificacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/buscar/timbres-planificacion`, datos);
   }
 
-  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO
+  // METODO PARA LISTAR LOS TIMBRES DEL USUARIO      **USADO**
   ObtenerTimbresEmpleado(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/ver/timbres/${id}`);
   }
@@ -59,27 +59,27 @@ export class TimbresService {
    ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **
    ** ********************************************************************************** **/
 
-  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO**
   BuscarOpcionesMarcacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-opciones-timbre`, datos);
   }
 
-  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO**
   BuscarVariasOpcionesMarcacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre`, datos);
   }
 
-  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO**
   IngresarOpcionesMarcacion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/opciones-timbre`, datos);
   }
 
-  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO**
   ActualizarOpcionesMarcacion(datos: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/actualizar-opciones-timbre`, datos);
   }
 
-  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO**
   EliminarOpcionesMarcacion(datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion`;
     const httpOtions = {
@@ -93,27 +93,27 @@ export class TimbresService {
    ** **                 CONSULTAS DE OPCIONES DE MARCACIONES                         ** **
    ** ********************************************************************************** **/
 
-  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO**
   BuscarVariasOpcionesMarcacionWeb(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre-web`, datos);
   }
 
-  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA BUSCAR OPCIONES DE MARCACION   **USADO**
   BuscarVariasOpcionesMarcacionWebMultiple(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/listar-varias-opciones-timbre-web-multiple`, datos);
   }
 
-  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA INGRESAR OPCIONES DE MARCACION   **USADO**
   IngresarOpcionesMarcacionWeb(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/opciones-timbre-web`, datos);
   }
 
-  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA ACTUALIZAR OPCIONES DE MARCACION   **USADO**
   ActualizarOpcionesMarcacionWeb(datos: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/actualizar-opciones-timbre-web`, datos);
   }
 
-  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO
+  // METODO PARA ELIMINAR OPCIONES DE MARCACION   **USADO**
   EliminarOpcionesMarcacionWeb(datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-opcion-marcacion-web`;
     const httpOtions = {
@@ -127,27 +127,27 @@ export class TimbresService {
    ** **              TRATAMIENTO DE AVISOS QUE EMITE EL SISTEMA                      ** **
    ** ********************************************************************************** **/
 
-  // METODO DE CONSULTA DE AVISOS ESPECIFICOS    ** USADO
+  // METODO DE CONSULTA DE AVISOS ESPECIFICOS    **USADO**
   ObtenerUnAviso(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/aviso-individual/${id}`);
   }
 
-  // METODO UTILIZADO PARA ACTUALIZAR ESTADO DE LA NOTIFICACION   ** USADO
+  // METODO UTILIZADO PARA ACTUALIZAR ESTADO DE LA NOTIFICACION   **USADO**
   ActualizarVistaAvisos(id_noti_timbre: number, datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
-  // LISTA DE AVISOS    **USADO
+  // LISTA DE AVISOS    **USADO**
   ListarAvisos(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/avisos/${id_empleado}`);
   }
 
-  // ELIMINAR AVISOS DEL SISTEMA   **USADO
+  // ELIMINAR AVISOS DEL SISTEMA   **USADO**
   EliminarAvisos(Seleccionados: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/eliminar-multiples/avisos`, Seleccionados);
   }
 
-  // METODO DE CONSULTA DE AVISOS GENERALES   ** USADO
+  // METODO DE CONSULTA DE AVISOS GENERALES   **USADO**
   BuscarAvisosGenerales(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/timbres/avisos-generales/${id_empleado}`);
   }

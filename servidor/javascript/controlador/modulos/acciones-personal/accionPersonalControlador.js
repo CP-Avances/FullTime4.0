@@ -1091,20 +1091,6 @@ class AccionPersonalControlador {
             }
         });
     }
-    EncontrarDatosCiudades(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM e_ciudades where id = $1
-            `, [id]);
-            if (CIUDAD.rowCount != 0) {
-                return res.json(CIUDAD.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     EncontrarProcesosRecursivos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

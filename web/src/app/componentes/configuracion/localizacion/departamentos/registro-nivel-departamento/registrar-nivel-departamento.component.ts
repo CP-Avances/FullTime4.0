@@ -39,7 +39,6 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     idSucursalForm: this.idSucursal,
   });
 
-
   // ARREGLO DE NIVELES EXISTENTES
   niveles: Nivel[] = [
     { valor: 1, nombre: '1' },

@@ -4,7 +4,6 @@ import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-// import { Md5 } from 'ts-md5';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({

@@ -113,7 +113,8 @@ export class ConfigurarCodigoComponent implements OnInit {
       automatico: this.automaticoF,
       identificacion: this.cedulaF,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     }
     this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {

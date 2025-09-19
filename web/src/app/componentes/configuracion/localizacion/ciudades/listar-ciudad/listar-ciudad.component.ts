@@ -144,7 +144,7 @@ export class ListarCiudadComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
@@ -197,7 +197,6 @@ export class ListarCiudadComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
-
 
   // GENERACION DE REPORTE DE PDF
   async GenerarPdf(action = "open") {

@@ -55,7 +55,6 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private asignacionesService: AsignacionesService,
-    private socketService: SocketService,
     private urlService: UrlService,
   ) {
     this.formulario.setValue({

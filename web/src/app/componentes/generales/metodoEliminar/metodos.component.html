@@ -16,7 +16,7 @@
     <mat-card-content *ngIf="!eliminar">
         <div style="padding: 2%;">
             <p>
-                Para planificaciones horarios múltiples
+                Para planificaciones de horarios múltiples
                 <b>
                     existe la posibilidad que todos los
                     timbres realizados en la fecha indica se desconfiguren.
@@ -27,10 +27,7 @@
     </mat-card-content>
 </ng-container>
 
-
-
-
-<!-- Componentes del notificacion de registro multiple -->
+<!-- COMPONENTES DEL NOTIFICACION DE REGISTRO MULTIPLE -->
 <ng-container *ngIf="mensaje == 'registro'">
     <div id="resultados" >
         <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
@@ -66,8 +63,7 @@
 </ng-container>
 
 
-
-<!-- Componentes del notificacion de registro multiple -->
+<!-- COMPONENTES DEL NOTIFICACION DE REGISTRO MULTIPLE -->
 <ng-container *ngIf="mensaje == 'eliminar'">
     <div id="resultados" >
         <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">

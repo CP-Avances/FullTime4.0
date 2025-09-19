@@ -26,33 +26,6 @@ class AutorizaDepartamentoControlador {
         }
     }
 
-    // METODO PARA BUSCAR USUARIO AUTORIZA
-    public async EncontrarAutorizacionUsuario(req: Request, res: Response) {
-        const { id_empleado } = req.params;
-        const AUTORIZA = await pool.query(
-            `
-            SELECT cd.id AS id_depa_confi, n.id_departamento, n.departamento AS depa_autoriza, n.nivel, da.estado, 
-                da.autorizar, da.preautorizar, da.id_empleado_cargo, e.id_contrato, e.id_departamento AS depa_pertenece, 
-                cd.nombre, ce.id AS id_empresa, ce.nombre AS nom_empresa, s.id AS id_sucursal, s.nombre AS nom_sucursal 
-            FROM ed_autoriza_departamento AS da, ed_departamentos AS cd, e_empresa AS ce, 
-                e_sucursales AS s, contrato_cargo_vigente AS e, ed_niveles_departamento AS n 
-            WHERE da.id_departamento = cd.id 
-                AND cd.id_sucursal = s.id 
-                AND ce.id = s.id_empresa 
-                AND da.id_empleado = $1 
-                AND e.id_cargo = da.id_empleado_cargo
-                AND n.id_departamento_nivel = cd.id
-            `
-            , [id_empleado]);
-        if (AUTORIZA.rowCount != 0) {
-            return res.jsonp(AUTORIZA.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-
 
     // METODO PARA REGISTRAR AUTORIZACION
     public async CrearAutorizaDepartamento(req: Request, res: Response): Promise<Response> {
@@ -240,37 +213,6 @@ class AutorizaDepartamentoControlador {
         }
     }
 
-
-
-    public async ObtenerListaAutorizaDepa(req: Request, res: Response): Promise<any> {
-        const { id_depar } = req.params;
-        const { estado } = req.body;
-        const EMPLEADOS = await pool.query(
-            `
-            SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
-                da.estado, dae.id_contrato, da.id_empleado_cargo, da.id_empleado, 
-                (dae.nombre || ' ' || dae.apellido) as fullname, dae.identificacion, dae.correo, c.permiso_mail, 
-                c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, c.hora_extra_mail, 
-                c.hora_extra_notificacion  
-            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae, 
-                eu_configurar_alertas AS c, ed_departamentos AS cg 
-            WHERE n.id_departamento = $1
-                AND da.id_departamento = n.id_departamento_nivel 
-                AND dae.id_cargo = da.id_empleado_cargo 
-                AND dae.id_contrato = c.id_empleado 
-                AND cg.id = $1
-                AND dae.estado = $2
-            ORDER BY nivel ASC
-            `
-            , [id_depar, estado]);
-
-        if (EMPLEADOS.rowCount != 0) {
-            return res.jsonp(EMPLEADOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registros no encontrados' });
-        }
-    }
 
 }
 

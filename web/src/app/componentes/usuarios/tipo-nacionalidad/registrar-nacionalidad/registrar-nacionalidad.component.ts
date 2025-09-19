@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';

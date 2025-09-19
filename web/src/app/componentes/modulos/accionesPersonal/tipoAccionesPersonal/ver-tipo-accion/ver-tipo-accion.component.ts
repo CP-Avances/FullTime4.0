@@ -11,6 +11,7 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
   templateUrl: './ver-tipo-accion.component.html',
   styleUrls: ['./ver-tipo-accion.component.css']
 })
+
 export class VerTipoAccionComponent implements OnInit {
 
   @Input() idAccion: number;

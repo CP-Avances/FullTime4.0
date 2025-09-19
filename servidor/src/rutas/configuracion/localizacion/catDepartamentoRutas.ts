@@ -62,14 +62,6 @@ class DepartamentoRutas {
         // ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MASIVA   **USADO
         this.router.put('/actualizarUserDepa', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarDepartamentosUsuario);
 
-
-
-        // VERIFICAR
-        this.router.get('/busqueda-cargo/:id_cargo', TokenValidation, DEPARTAMENTO_CONTROLADOR.BuscarDepartamentoPorCargo);
-
-
-
-
     }
 }
 

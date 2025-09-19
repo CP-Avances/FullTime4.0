@@ -1273,55 +1273,6 @@ class DepartamentoControlador {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// VERIFICAR
-  public async BuscarDepartamentoPorCargo(req: Request, res: Response) {
-    const id = req.params.id_cargo
-    const departamento = await pool.query(
-      `
-      SELECT ec.id_departamento, d.nombre, ec.id AS cargo
-      FROM eu_empleado_cargos AS ec, ed_departamentos AS d 
-      WHERE d.id = ec.id_departamento AND ec.id = $1
-      ORDER BY cargo DESC
-      `
-      , [id]);
-    if (departamento.rowCount != 0) {
-      return res.json([departamento.rows[0]]);
-    } else {
-      return res.status(404).json({ text: 'No se encuentran registros' });
-    }
-  }
-
 }
 
 export const DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();

@@ -26,21 +26,6 @@ class ReportesAsistenciasRutas {
         // METODO DE BUSQUEDA DE TIMBRES INCOMPLETOS      **USADO    
         this.router.post('/timbres-incompletos/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresIncompletos);
 
-
-
-
-
-
-
-
-
-
-
-
-
-        // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
-        this.router.get('/datos_generales/:estado', TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesUsuarios);
-
     }
 }
 

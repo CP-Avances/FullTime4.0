@@ -11,21 +11,21 @@ export class EmpleadoHorariosService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA BUSCAR PLANIFICACIONES HORARIAS MULTIPLES  ** USADO
+  // METODO PARA BUSCAR PLANIFICACIONES HORARIAS MULTIPLES  **USADO**
   BuscarFechasMultiples(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/buscar-horarios-multiples`, datos);
   }
 
-  // METODO PARA VERIFICAR HORARIOS DUPLICADOS  **USADO
+  // METODO PARA VERIFICAR HORARIOS DUPLICADOS  **USADO**
   VerificarDuplicidadHorarios(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/validarFechas`, datos);
   }
-  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
+  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO**
   VerificarHorariosExistentes(id_empleado: string, datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horarios-existentes1/${id_empleado}`, datos);
   }
 
-  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO
+  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  **USADO**
   VerificarHorariosExistentesMultiples(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoHorario/horarios-existentes`, datos);
   }

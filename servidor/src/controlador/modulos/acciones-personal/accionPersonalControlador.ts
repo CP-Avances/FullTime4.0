@@ -1204,20 +1204,6 @@ class AccionPersonalControlador {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // CONSULTAS GENERACION DE PDF
     public async EncontrarDatosEmpleados(req: Request, res: Response) {
         const { id } = req.params;
@@ -1237,24 +1223,7 @@ class AccionPersonalControlador {
         }
     }
 
-    public async EncontrarDatosCiudades(req: Request, res: Response) {
-        const { id } = req.params;
-        const CIUDAD = await pool.query(
-            `
-            SELECT * FROM e_ciudades where id = $1
-            `
-            , [id]);
-        if (CIUDAD.rowCount != 0) {
-            return res.json(CIUDAD.rows)
-        } else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-
-
-
-
+    
     public async EncontrarProcesosRecursivos(req: Request, res: Response) {
         const { id } = req.params;
         const ACCION = await pool.query(

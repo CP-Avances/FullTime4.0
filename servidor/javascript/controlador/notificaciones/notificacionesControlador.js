@@ -570,54 +570,6 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    // METODO PARA CREAR NOTIFICACIONES
-    CrearNotificacion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                var tiempo = (0, settingsMail_1.fechaHora)();
-                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip, ip_local } = req.body;
-                let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-        INSERT INTO ecm_realtime_notificacion (id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, 
-          fecha_hora, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo) 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING * 
-        `, [id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, id_permiso, id_vacaciones,
-                    id_hora_extra, mensaje, tipo]);
-                const [notificiacion] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ecm_realtime_notificacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(notificiacion),
-                    ip: ip,
-                    ip_local: ip_local,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (!notificiacion)
-                    return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-                const USUARIO = yield database_1.default.query(`
-        SELECT (nombre || ' ' || apellido) AS usuario
-        FROM eu_empleados WHERE id = $1
-        `, [id_send_empl]);
-                notificiacion.usuario = USUARIO.rows[0].usuario;
-                return res.status(200)
-                    .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                console.log("Ver Error notificacion", error);
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500)
-                    .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
     ListaNotificacionesRecibidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_receive;

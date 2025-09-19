@@ -730,7 +730,8 @@ export class VerParametroComponent implements OnInit {
       descripcion: detalle,
       observacion: observacion,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
     this.parametro.IngresarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',
@@ -748,7 +749,8 @@ export class VerParametroComponent implements OnInit {
       descripcion: detalle,
       observacion: observacion,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
     this.parametro.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

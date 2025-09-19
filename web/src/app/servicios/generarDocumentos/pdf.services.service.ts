@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
-import { DateTime } from 'luxon';
-import { EmpresaService } from '../configuracion/parametrizacion/catEmpresa/empresa.service';
-import { EmpleadoService } from '../usuarios/empleado/empleadoRegistro/empleado.service';
 import { ValidacionesService } from '../generales/validaciones/validaciones.service';
 import { AccionPersonalService } from '../modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
 import { ParametrosService } from '../configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { table } from 'console';
 
 @Injectable({
   providedIn: 'root'

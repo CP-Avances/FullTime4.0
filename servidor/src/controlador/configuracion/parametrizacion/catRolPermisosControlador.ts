@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
-import { QueryResult } from 'pg';
 
 class RolPermisosControlador {
 
@@ -56,38 +55,6 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  **USADO
-  public async ObtenerIdPaginas(req: Request, res: Response): Promise<any> {
-    const { funcion, id_rol } = req.body;
-    const PAGINA_ROL = await pool.query(
-      `
-      SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 
-      `
-      , [funcion, id_rol]);
-    if (PAGINA_ROL.rowCount != 0) {
-      return res.jsonp(PAGINA_ROL.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
-  }
-
-  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA  **USADO
-  public async ObtenerIdPaginasConAcciones(req: Request, res: Response): Promise<any> {
-    const { funcion, id_rol, id_accion } = req.body;
-    const PAGINA_ROL = await pool.query(
-      `
-      SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 AND id_accion = $3
-      `
-      , [funcion, id_rol, id_accion]);
-    if (PAGINA_ROL.rowCount != 0) {
-      return res.jsonp(PAGINA_ROL.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
-  }
-
   // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL  **USADO
   public async ObtenerPaginasRol(req: Request, res: Response): Promise<any> {
     try {
@@ -128,46 +95,6 @@ class RolPermisosControlador {
     }
     else {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
-  }
-
-  // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
-  public async AsignarPaginaRol(req: Request, res: Response) {
-    try {
-      const { funcion, link, id_rol, id_accion, movil, user_name, ip, ip_local } = req.body;
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      const response: QueryResult = await pool.query(
-        `
-          INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion, movil) VALUES ($1, $2, $3, $4, $5) RETURNING *
-        `
-        , [funcion, link, id_rol, id_accion, movil]);
-      const [datosOriginales] = response.rows;
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ero_rol_permisos',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: JSON.stringify(datosOriginales),
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-
-      const [rol] = response.rows;
-      if (rol) {
-        return res.status(200).jsonp({ message: 'OK', reloj: rol })
-      }
-      else {
-        return res.jsonp({ message: 'error' })
-      }
-    } catch (error) {
-      console.log('rol permisos ', error)
-      return res.status(500).jsonp({ message: 'error' })
     }
   }
 

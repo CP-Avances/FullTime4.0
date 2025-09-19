@@ -5,12 +5,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { ParametrosService } from '../../../../servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 import { EliminarRealtimeComponent } from '../eliminar-realtime/eliminar-realtime.component';
-import { ParametrosService } from '../../../../servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { DateTime } from 'luxon';
-import { SpinnerModule } from '../../../generales/spinner/spinner.module';
 
 export interface TimbresAvisos {
   create_at: string,

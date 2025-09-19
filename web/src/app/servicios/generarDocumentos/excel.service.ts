@@ -8,7 +8,6 @@ import { EmpresaService } from '../configuracion/parametrizacion/catEmpresa/empr
 import { EmpleadoService } from '../usuarios/empleado/empleadoRegistro/empleado.service';
 import { ValidacionesService } from '../generales/validaciones/validaciones.service';
 import { AccionPersonalService } from '../modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
-import { auto } from '@popperjs/core';
 
 @Injectable({
   providedIn: 'root'

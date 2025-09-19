@@ -18,20 +18,11 @@ class RolPermisosRutas {
         // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
         this.router.post('/menu/paginasmodulos', TokenValidation, ROLPERMISOSCONTROLADOR.ListarModuloPorNombre);
 
-        // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  **USADO
-        this.router.post('/menu/paginas/ide', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerIdPaginas);
-
-        // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION  **USADO
-        this.router.post('/menu/paginas/ideaccion', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerIdPaginasConAcciones);
-
         // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
         this.router.post('/menu/todaspaginasrol', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerPaginasRol);
 
         // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL   **USADO
         this.router.post('/menu/todaspaginasmenurol', TokenValidation, ROLPERMISOSCONTROLADOR.ObtenerPaginasMenuRol);
-
-        // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
-        this.router.post('/menu/paginas/insertar', TokenValidation, ROLPERMISOSCONTROLADOR.AsignarPaginaRol);
 
         // METODO PARA ASIGNAR ACCIONES AL ROL   **USADO
         this.router.post('/menu/paginas/acciones/insertar', TokenValidation, ROLPERMISOSCONTROLADOR.AsignarAccionesRol);

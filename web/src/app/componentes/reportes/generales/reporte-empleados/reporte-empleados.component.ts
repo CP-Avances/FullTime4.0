@@ -21,7 +21,6 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
-import { log } from 'console';
 
 @Component({
   selector: 'app-reporte-empleados',

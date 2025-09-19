@@ -11,13 +11,13 @@ export class PlanificacionHorariaService {
     private http: HttpClient,
   ) { }
 
-  // VERIFICAR DATOS DE LA PLANIFICACION HORARIA   **USADO
+  // VERIFICAR DATOS DE LA PLANIFICACION HORARIA   **USADO**
   VerificarDatosPlanificacionHoraria(formData: any) {
     console.log(formData);
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraria/verificarDatos`, formData);
   }
 
-  // CARGAR PLANIFICACION HORARIA   **USADO
+  // CARGAR PLANIFICACION HORARIA   **USADO**
   RegistrarPlanificacionHoraria(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraria/registrarPlanificacion`, formData);
   }

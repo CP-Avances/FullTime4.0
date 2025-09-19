@@ -724,7 +724,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO USADO EN EL REPORTE DE NOTIFICACIONES DEL SISTEMA   **USADO
+    // METODO USADO EN EL REPORTE DE NOTIFICACIONES DEL SISTEMA MEDINATE CORREO   **USADO
     public async ObtenerImagenEmpresa(): Promise<any> {
         const file_name = await pool.query(
             `
@@ -746,26 +746,6 @@ class EmpresaControlador {
             return { imagen: codificado, nom_empresa: file_name.nombre };
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

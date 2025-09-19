@@ -19,7 +19,6 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 
-
 // IMPORTAR COMPONENTES
 import { FraseSeguridadComponent } from '../../usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { CrearTimbreComponent } from '../acciones-timbres/crear-timbre/crear-timbre.component';

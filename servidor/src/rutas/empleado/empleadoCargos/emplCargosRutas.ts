@@ -64,13 +64,7 @@ class EmpleadosCargpsRutas {
         this.router.post('/upload/revision', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CARGO_CONTROLADOR.RevisarDatos);
         // METODO PARA CARGAR DATOS DE PLANTILLA DE CARGOS   **USADO
         this.router.post('/cargar_plantilla/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.CargarPlantilla_cargos);
-
-
-
-
-
-
-        // VERIFICAR
+        // METODO PARA BUSCAR DATOS DEL USUARIO DE ACUERDO AL ID DEL CARGO   **USADO**
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
 
     }

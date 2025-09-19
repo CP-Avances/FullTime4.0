@@ -907,7 +907,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    // VERIFICAR
+    // METODO PARA BUSCAR DATOS DEL USUARIO DE ACUERDO AL ID DEL CARGO   **USADO**
     EncontrarIdCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;

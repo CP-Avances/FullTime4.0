@@ -290,7 +290,8 @@ export class AsignarUsuarioComponent implements OnInit {
       departamentos_seleccionados: this.departamentosSeleccionados,
       isPersonal: this.isPersonal,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
 
     this.usuario.RegistrarUsuarioDepartamentoMultiple(datos).subscribe({

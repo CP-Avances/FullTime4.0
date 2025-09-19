@@ -12,14 +12,7 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS   **USADO
-        this.router.get('/by-permiso/:id_permiso', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ObtenerAutorizacionPermiso);
-        this.router.get('/by-vacacion/:id_vacacion', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ObtenerAutorizacionByVacacion);
-        this.router.get('/by-hora-extra/:id_hora_extra', autorizacionesControlador_1.default.ObtenerAutorizacionByHoraExtra);
         this.router.post('/', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.CrearAutorizacion);
-        this.router.put('/estado-permiso/multiple', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ActualizarEstadoAutorizacionPermiso);
-        // ACTUALIZAR ESTADO DE APROBACION DE SOLICITUDES
-        this.router.put('/:id/estado-aprobacion', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ActualizarEstadoSolicitudes);
     }
 }
 const AUTORIZA_DEPARTAMENTO_RUTAS = new DepartamentoRutas();

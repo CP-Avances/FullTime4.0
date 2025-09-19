@@ -79,21 +79,7 @@ class UsuarioRutas {
 
 
 
-
-
-
-
-
-
-
-
-
-        // ADMINISTRACION MODULO DE ALIMENTACION
-        this.router.put('/admin/comida', TokenValidation, USUARIO_CONTROLADOR.RegistrarAdminComida);
-
-        // METODO DE BUSQUEDA DE DATOS DE USUARIO POR EL TIPO DE DEPARTAMENTO
-        this.router.get('/dato/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
-    }
+ }
 }
 
 const USUARIO_RUTA = new UsuarioRutas();

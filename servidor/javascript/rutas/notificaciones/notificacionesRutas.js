@@ -27,6 +27,16 @@ class NotificacionTiempoRealRutas {
         this.router.get('/config/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerConfigEmpleado);
         // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
         this.router.post('/config-multiple/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerConfigMultipleEmpleado);
+        // METODO PARA BUSCAR NOTIFICACIONES - MODULOS RECIBIDAS POR UN USUARIO    **USADO**
+        this.router.get('/receives/:id_receive', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ListarNotificacionUsuario);
+        // METODO PARA OBTENER UNA NOTIFICACION - MODULOS   **USADO**
+        this.router.get('/one/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerUnaNotificacion);
+        // METODO DE BUSQUEDA DE TODAS LAS NOTIFICACCIONES - MODULOS --VERIFICAR **USADO**
+        this.router.get('/all-receives/:id_receive', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ListaNotificacionesRecibidas);
+        // METODO PARA ACTUALIZAR ESTADO DE LAS NOTIFICACIONES - MODULOS    **USADO**
+        this.router.put('/vista/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ActualizarVista);
+        // ELIMINAR AVISOS DEL SISTEMA   **USADO**
+        this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EliminarMultiplesNotificaciones);
         /** ************************************************************************************ **
          ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
          ** ************************************************************************************ **/
@@ -40,25 +50,11 @@ class NotificacionTiempoRealRutas {
         this.router.get('/info-empl-recieve', verificarToken_1.TokenValidation, notificacionesControlador_1.default.getInfoEmpleadoByCodigo);
         this.router.get('/all-noti', verificarToken_1.TokenValidation, notificacionesControlador_1.default.getNotificacion);
         this.router.get('/noti-tim/all-noti', verificarToken_1.TokenValidation, notificacionesControlador_1.default.getNotificacionTimbres);
-        // ----------------------------- VERIFICAR SU USO EN LA APLICACION MOVIL
         // RUTA DE ACCESO A DATOS DE COMUNICADOS APLICACION MÓVIL
         this.router.post('/noti-comunicado-movil/', notificacionesControlador_1.default.EnviarNotificacionGeneral);
         this.router.post('/noti-comunicado-multiplador-movil/', notificacionesControlador_1.default.EnviarNotificacionGeneralMultiple);
         // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE DESDE LA APLICACION  MÓVIL
         this.router.post('/mail-multiple-movil/', notificacionesControlador_1.default.EnviarCorreoSolicitudes);
-        // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS    **USADO
-        this.router.post('/noti-comunicado/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarNotificacionGeneral);
-        // NOTIFICACIONES RECIBIDAS POR UN USUARIO
-        this.router.get('/receives/:id_receive', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ListarNotificacionUsuario);
-        // RUTA PARA CREAR NOTIFICACION
-        this.router.post('/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.CrearNotificacion);
-        // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
-        this.router.get('/one/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ObtenerUnaNotificacion);
-        this.router.get('/all-receives/:id_receive', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ListaNotificacionesRecibidas);
-        this.router.put('/vista/:id', verificarToken_1.TokenValidation, notificacionesControlador_1.default.ActualizarVista);
-        this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EliminarMultiplesNotificaciones);
-        // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE
-        this.router.post('/mail-multiple/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarCorreoSolicitudes);
     }
 }
 const NOTIFICACION_TIEMPO_REAL_RUTAS = new NotificacionTiempoRealRutas();

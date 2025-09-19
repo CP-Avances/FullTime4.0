@@ -63,27 +63,16 @@ const planGeneralRutas_1 = __importDefault(require("./rutas/horarios/planGeneral
 const timbresRutas_1 = __importDefault(require("./rutas/timbres/timbresRutas"));
 const plantillaRutas_1 = __importDefault(require("./rutas/documentos/plantillaRutas"));
 const datosGeneralesRutas_1 = __importDefault(require("./rutas/datosGenerales/datosGeneralesRutas"));
-const graficasRutas_1 = __importDefault(require("./rutas/graficas/graficasRutas"));
 const catGeneroRutas_1 = __importDefault(require("./rutas/empleado/generos/catGeneroRutas"));
 const catEstadoCivilRutas_1 = __importDefault(require("./rutas/empleado/estadoCivil/catEstadoCivilRutas"));
 // CON MODULOS
 const notificacionesRutas_1 = __importDefault(require("./rutas/notificaciones/notificacionesRutas"));
-const autorizacionesRutas_1 = __importDefault(require("./rutas/autorizaciones/autorizacionesRutas"));
-// MODULO PERMISO
-const catTipoPermisosRutas_1 = __importDefault(require("./rutas/modulos/permisos/catTipoPermisosRutas"));
-const permisosRutas_1 = __importDefault(require("./rutas/modulos/permisos/permisosRutas"));
+788;
 // MODULO VACACIONES
 const periodoVacacionRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/periodoVacacionRutas"));
 const vacacionesRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/vacacionesRutas"));
-const kardexVacacionesRutas_1 = __importDefault(require("./rutas/reportes/kardexVacacionesRutas"));
 const configurarVacacionesRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/configurarVacacionesRutas"));
-// MODULO HORAS EXTRA
-const catHorasExtrasRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/catHorasExtrasRutas"));
-const horaExtraRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/horaExtraRutas"));
-const planHoraExtraRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/planHoraExtraRutas"));
 // MODULO ALIMENTACION
-const catTipoComidasRuta_1 = __importDefault(require("./rutas/modulos/alimentacion/catTipoComidasRuta"));
-const planComidasRutas_1 = __importDefault(require("./rutas/modulos/alimentacion/planComidasRutas"));
 const alimentacionRutas_1 = __importDefault(require("./rutas/reportes/alimentacionRutas"));
 // MODULO ACCIONES DE PERSONAL
 const catProcesoRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/catProcesoRutas"));
@@ -94,7 +83,6 @@ const grupoOcupacional_1 = __importDefault(require("./rutas/modulos/acciones-per
 // MODULO GEOLOCALIZACION
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/modulos/geolocalizacion/emplUbicacionRutas"));
 // REPORTES
-const reportesRutas_1 = __importDefault(require("./rutas/reportes/reportesRutas"));
 const reportesAsistenciaRutas_1 = __importDefault(require("./rutas/reportes/reportesAsistenciaRutas"));
 const reporteVacunasRutas_1 = __importDefault(require("./rutas/reportes/reporteVacunasRutas"));
 const reportesFaltasRutas_1 = __importDefault(require("./rutas/reportes/reportesFaltasRutas"));
@@ -102,10 +90,7 @@ const reportesAtrasosRutas_1 = __importDefault(require("./rutas/reportes/reporte
 const reportesTiempoLaboradoRutas_1 = __importDefault(require("./rutas/reportes/reportesTiempoLaboradoRutas"));
 const salidasAntesRutas_1 = __importDefault(require("./rutas/reportes/salidasAntesRutas"));
 const reportesTimbresMrlRutas_1 = __importDefault(require("./rutas/reportes/reportesTimbresMrlRutas"));
-const reportesNotificacionRutas_1 = __importDefault(require("./rutas/reportes/reportesNotificacionRutas"));
 const auditoriaRutas_1 = __importDefault(require("./rutas/reportes/auditoriaRutas"));
-const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
-const reporteHoraExtraRutas_1 = __importDefault(require("./rutas/reportes/reporteHoraExtraRutas"));
 class Servidor {
     constructor() {
         this.app = (0, express_1.default)();
@@ -186,24 +171,14 @@ class Servidor {
         this.app.use(`/${ruta}/planificacion_general`, planGeneralRutas_1.default);
         this.app.use(`/${ruta}/plantillaD`, plantillaRutas_1.default);
         this.app.use(`/${ruta}/generalidades`, datosGeneralesRutas_1.default);
-        this.app.use(`/${ruta}/notificacionSistema`, reportesNotificacionRutas_1.default);
-        this.app.use(`/${ruta}/metricas`, graficasRutas_1.default);
         this.app.use(`/${ruta}/generos`, catGeneroRutas_1.default);
         this.app.use(`/${ruta}/estado-civil`, catEstadoCivilRutas_1.default);
         // CON MODULOS
-        this.app.use(`/${ruta}/autorizaciones`, autorizacionesRutas_1.default);
         this.app.use(`/${ruta}/noti-real-time`, notificacionesRutas_1.default);
-        // MODULO PERMISOS
-        this.app.use(`/${ruta}/empleadoPermiso`, permisosRutas_1.default);
-        this.app.use(`/${ruta}/tipoPermisos`, catTipoPermisosRutas_1.default);
         // MODULO VACACIONES
         this.app.use(`/${ruta}/perVacacion`, periodoVacacionRutas_1.default);
         this.app.use(`/${ruta}/vacaciones`, vacacionesRutas_1.default);
         this.app.use(`/${ruta}/configurarVacacion`, configurarVacacionesRutas_1.default);
-        // MODULO HORAS EXTRAS
-        this.app.use(`/${ruta}/horas-extras-pedidas`, horaExtraRutas_1.default);
-        this.app.use(`/${ruta}/horasExtras`, catHorasExtrasRutas_1.default);
-        this.app.use(`/${ruta}/planificacionHoraExtra`, planHoraExtraRutas_1.default);
         // MODULO GEOLOCALIZACION
         this.app.use(`/${ruta}/ubicacion`, emplUbicacionRutas_1.default);
         // MODULO ACCIONES DE PERSONAL
@@ -213,13 +188,8 @@ class Servidor {
         this.app.use(`/${ruta}/grado`, gradoRutas_1.default);
         this.app.use(`/${ruta}/grupoOcupacional`, grupoOcupacional_1.default);
         // MODULO ALIMENTACION
-        this.app.use(`/${ruta}/tipoComidas`, catTipoComidasRuta_1.default);
-        this.app.use(`/${ruta}/planComidas`, planComidasRutas_1.default);
         this.app.use(`/${ruta}/alimentacion`, alimentacionRutas_1.default);
         // REPORTES
-        this.app.use(`/${ruta}/reportes/vacacion`, kardexVacacionesRutas_1.default);
-        this.app.use(`/${ruta}/reportes/hora-extra`, reporteHoraExtraRutas_1.default);
-        this.app.use(`/${ruta}/reporte`, reportesRutas_1.default);
         this.app.use(`/${ruta}/reporte-faltas/`, reportesFaltasRutas_1.default);
         this.app.use(`/${ruta}/reportes-asistencias/`, reportesAsistenciaRutas_1.default);
         this.app.use(`/${ruta}/reporte-salidas-antes/`, salidasAntesRutas_1.default);
@@ -228,7 +198,6 @@ class Servidor {
         this.app.use(`/${ruta}/reporte-timbres-mrl/`, reportesTimbresMrlRutas_1.default);
         this.app.use(`/${ruta}/reportes-auditoria`, auditoriaRutas_1.default);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, reporteVacunasRutas_1.default);
-        this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, solicitudVacacionesRutas_1.default);
     }
     start() {
         this.app.set('trust proxy', true);

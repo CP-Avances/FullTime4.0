@@ -710,7 +710,8 @@ export class CatDiscapacidadComponent implements OnInit {
     const mensaje = 'eliminar';
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()

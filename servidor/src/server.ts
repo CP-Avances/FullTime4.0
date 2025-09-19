@@ -51,27 +51,15 @@ import PLAN_GENERAL_RUTAS from './rutas/horarios/planGeneralRutas';
 import TIMBRES_RUTAS from './rutas/timbres/timbresRutas';
 import PLANTILLA_RUTAS from './rutas/documentos/plantillaRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
-import GRAFICAS_RUTAS from './rutas/graficas/graficasRutas';
 import GENERO_RUTAS from './rutas/empleado/generos/catGeneroRutas'
 import ESTADO_CIVIL_RUTAS from './rutas/empleado/estadoCivil/catEstadoCivilRutas'
 // CON MODULOS
-import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
-import AUTORIZACIONES_RUTAS from './rutas/autorizaciones/autorizacionesRutas';
-// MODULO PERMISO
-import TIPO_PERMISOS_RUTAS from './rutas/modulos/permisos/catTipoPermisosRutas';
-import PERMISOS_RUTAS from './rutas/modulos/permisos/permisosRutas';
+import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';788
 // MODULO VACACIONES
 import PERIODO_VACACION__RUTAS from './rutas/modulos/vacaciones/periodoVacacionRutas';
 import VACACIONES__RUTAS from './rutas/modulos/vacaciones/vacacionesRutas';
-import KARDEX_VACACION_RUTAS from './rutas/reportes/kardexVacacionesRutas';
 import CONFIGURAR_VACACIONES_RUTAS from './rutas/modulos/vacaciones/configurarVacacionesRutas';
-// MODULO HORAS EXTRA
-import HORAS_EXTRAS_RUTAS from './rutas/modulos/horas-extras/catHorasExtrasRutas';
-import HORA_EXTRA_PEDIDA_RUTAS from './rutas/modulos/horas-extras/horaExtraRutas';
-import PLAN_HORAS_EXTRAS_RUTAS from './rutas/modulos/horas-extras/planHoraExtraRutas';
 // MODULO ALIMENTACION
-import TIPO_COMIDAS_RUTA from './rutas/modulos/alimentacion/catTipoComidasRuta';
-import PLAN_COMIDAS_RUTAS from './rutas/modulos/alimentacion/planComidasRutas';
 import ALIMENTACION_RUTAS from './rutas/reportes/alimentacionRutas';
 // MODULO ACCIONES DE PERSONAL
 import PROCESO_RUTA from './rutas/modulos/acciones-personal/catProcesoRutas';
@@ -83,7 +71,6 @@ import GRUPO_OCUPACIONAL_RUTAS from './rutas/modulos/acciones-personal/grupoOcup
 // MODULO GEOLOCALIZACION
 import UBICACION_RUTAS from './rutas/modulos/geolocalizacion/emplUbicacionRutas';
 // REPORTES
-import REPORTES_RUTAS from './rutas/reportes/reportesRutas';
 import REPORTES_A_RUTAS from './rutas/reportes/reportesAsistenciaRutas';
 import VACUNAS_REPORTE_RUTAS from './rutas/reportes/reporteVacunasRutas';
 import FALTAS_RUTAS from './rutas/reportes/reportesFaltasRutas';
@@ -91,10 +78,7 @@ import REPORTES_ATRASOS_RUTAS from './rutas/reportes/reportesAtrasosRutas';
 import REPORTES_TIEMPO_LABORADO_RUTAS from './rutas/reportes/reportesTiempoLaboradoRutas';
 import SALIDAS_ANTICIPADAS_RUTAS from './rutas/reportes/salidasAntesRutas';
 import REPORTES_TIMBRES_MRL_RUTAS from './rutas/reportes/reportesTimbresMrlRutas';
-import NOTIFICACION_RUTAS from './rutas/reportes/reportesNotificacionRutas';
 import AUDITORIA_RUTAS from './rutas/reportes/auditoriaRutas';
-import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
-import REPORTE_HORA_EXTRA_RUTAS from './rutas/reportes/reporteHoraExtraRutas';
 
 class Servidor {
 
@@ -188,24 +172,14 @@ class Servidor {
         this.app.use(`/${ruta}/planificacion_general`, PLAN_GENERAL_RUTAS);
         this.app.use(`/${ruta}/plantillaD`, PLANTILLA_RUTAS);
         this.app.use(`/${ruta}/generalidades`, DATOS_GENERALES_RUTAS);
-        this.app.use(`/${ruta}/notificacionSistema`, NOTIFICACION_RUTAS);
-        this.app.use(`/${ruta}/metricas`, GRAFICAS_RUTAS);
         this.app.use(`/${ruta}/generos`, GENERO_RUTAS);
         this.app.use(`/${ruta}/estado-civil`, ESTADO_CIVIL_RUTAS);
         // CON MODULOS
-        this.app.use(`/${ruta}/autorizaciones`, AUTORIZACIONES_RUTAS);
         this.app.use(`/${ruta}/noti-real-time`, NOTIFICACION_TIEMPO_REAL_RUTAS);
-        // MODULO PERMISOS
-        this.app.use(`/${ruta}/empleadoPermiso`, PERMISOS_RUTAS);
-        this.app.use(`/${ruta}/tipoPermisos`, TIPO_PERMISOS_RUTAS);
         // MODULO VACACIONES
         this.app.use(`/${ruta}/perVacacion`, PERIODO_VACACION__RUTAS);
         this.app.use(`/${ruta}/vacaciones`, VACACIONES__RUTAS);
         this.app.use(`/${ruta}/configurarVacacion`, CONFIGURAR_VACACIONES_RUTAS)
-        // MODULO HORAS EXTRAS
-        this.app.use(`/${ruta}/horas-extras-pedidas`, HORA_EXTRA_PEDIDA_RUTAS);
-        this.app.use(`/${ruta}/horasExtras`, HORAS_EXTRAS_RUTAS);
-        this.app.use(`/${ruta}/planificacionHoraExtra`, PLAN_HORAS_EXTRAS_RUTAS);
         // MODULO GEOLOCALIZACION
         this.app.use(`/${ruta}/ubicacion`, UBICACION_RUTAS);
         // MODULO ACCIONES DE PERSONAL
@@ -215,13 +189,8 @@ class Servidor {
         this.app.use(`/${ruta}/grado`, GRADO_RUTAS);
         this.app.use(`/${ruta}/grupoOcupacional`, GRUPO_OCUPACIONAL_RUTAS);
         // MODULO ALIMENTACION
-        this.app.use(`/${ruta}/tipoComidas`, TIPO_COMIDAS_RUTA);
-        this.app.use(`/${ruta}/planComidas`, PLAN_COMIDAS_RUTAS);
         this.app.use(`/${ruta}/alimentacion`, ALIMENTACION_RUTAS);
         // REPORTES
-        this.app.use(`/${ruta}/reportes/vacacion`, KARDEX_VACACION_RUTAS);
-        this.app.use(`/${ruta}/reportes/hora-extra`, REPORTE_HORA_EXTRA_RUTAS);
-        this.app.use(`/${ruta}/reporte`, REPORTES_RUTAS);
         this.app.use(`/${ruta}/reporte-faltas/`, FALTAS_RUTAS);
         this.app.use(`/${ruta}/reportes-asistencias/`, REPORTES_A_RUTAS);
         this.app.use(`/${ruta}/reporte-salidas-antes/`, SALIDAS_ANTICIPADAS_RUTAS);
@@ -230,7 +199,6 @@ class Servidor {
         this.app.use(`/${ruta}/reporte-timbres-mrl/`, REPORTES_TIMBRES_MRL_RUTAS);
         this.app.use(`/${ruta}/reportes-auditoria`, AUDITORIA_RUTAS);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, VACUNAS_REPORTE_RUTAS);
-        this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, VACACIONES_REPORTES_RUTAS);
     }
 
     start(): void {

@@ -70,6 +70,8 @@ class TimbresRutas {
         this.router.get('/noti-timbres/avisos/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosTimbresEmpleado);
         // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS    **USADO
         this.router.put('/eliminar-multiples/avisos', TokenValidation, TIMBRES_CONTROLADOR.EliminarMultiplesAvisos);
+        // METODO DE BUSQUEDA DE AVISOS GENERALES
+        this.router.get('/avisos-generales/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosColaborador);
 
 
 
@@ -83,8 +85,6 @@ class TimbresRutas {
         this.router.get('/timbreEmpleado/:idUsuario', TokenValidation, TIMBRES_CONTROLADOR.getTimbreByCodigo);
 
 
-        // METODO DE BUSQUEDA DE AVISOS GENERALES
-        this.router.get('/avisos-generales/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosColaborador);
 
 
     }

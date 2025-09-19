@@ -270,7 +270,8 @@ export class EditarCargoComponent implements OnInit {
       cargo: form.tipoForm,
       jefe: form.jefeForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     }
 
     // FORMATEAR HORAS
@@ -378,7 +379,8 @@ export class EditarCargoComponent implements OnInit {
       let tipo_cargo = {
         cargo: form.cargoForm,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales,
+        ip: this.ip,
+        ip_local: this.ips_locales,
       }
       this.restEmplCargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
@@ -509,7 +511,8 @@ export class EditarCargoComponent implements OnInit {
       personal: form.personalForm,
       administra: form.administraForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     }
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
     });
@@ -520,7 +523,8 @@ export class EditarCargoComponent implements OnInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
     this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });

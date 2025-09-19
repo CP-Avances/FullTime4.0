@@ -209,7 +209,6 @@ export class VerDepartamentoComponent implements OnInit {
     var id_depa = departamento.id_departamento_nivel;
     this.depa = departamento.departamento_nombre_nivel;
     this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
-      //console.log('ver empleados ', datos)
       this.empleados = datos;
       this.mostrar = false;
     }, error => {

@@ -39,7 +39,6 @@ class DepartamentoRutas {
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], ACCION_PERSONAL_CONTROLADOR.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CargarPlantilla);
-
         // METODO PARA CONSULTAR TIPOS DE ACCION PERSONAL   **USADO
         this.router.get('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarTipoAccion);
         // METODO PARA REGISTRAR UNA ACCION DE PERSONAL   **USADO
@@ -48,34 +47,20 @@ class DepartamentoRutas {
         this.router.get('/tipo/accion/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarTipoAccionPersonalId);
         // METODO PARA BUSCAR DATOS DEL DETALLE DE ACCION DE PERSONAL PARA EDICION   **USADO
         this.router.get('/editar/accion/tipo/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarTipoAccionEdicion);
-
         // METODO DE REGISTRO DE DOCUMENTO ACCION DE PERSONAL     **USADO
         this.router.post('/pedido/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearPedidoAccionPersonal);
         // METODO DE ACTUALIZACION DE DATOS DEL DOCUMENTO DE ACCION PERSONAL   **USADO
         this.router.put('/pedido/accion/editar', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ActualizarPedidoAccionPersonal);
         // METODO DE BUSQUEDA DE DATOS DE DOCUMENTOS DE ACCION DE PERSONAL    **USADO
         this.router.get('/pedido/informacion/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarPedidoAccion);
-          // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
-          this.router.get('/pedidos/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarPedidoAccion);
-          
+        // METODO PARA BUSCAR PEDIDOS DE ACCION DE PERSONAL  **USADO
+        this.router.get('/pedidos/accion', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarPedidoAccion);
         // VER LOGO DE MINISTERIO TRABAJO     **USADO
         this.router.get('/logo/ministerio/codificado', TokenValidation, ACCION_PERSONAL_CONTROLADOR.verLogoMinisterio);
-
-
-
-
-
-
-
-
-
-        // CONSULTAS PEDIDOS ACCIONES DE PERSONAL
+        // METODO PARA BUSCAR LISTA DE PROCESOS   **USADO**
         this.router.get('/lista/procesos/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarProcesosRecursivos);
-
+        // METODO PARA BUSCAR UN DOCUMENTO DE ACCION DE PERSONAL    **USADO**
         this.router.get('/pedidos/datos/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarDatosEmpleados);
-        this.router.get('/pedidos/ciudad/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarDatosCiudades);
-
-
 
     }
 }

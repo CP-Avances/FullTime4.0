@@ -210,39 +210,4 @@ export class ReportesService {
 
   DefaultTimbreDispositivo() { this._valueTimbreDispositivo = false; }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  ObtenerPermisosHorarios(codigo: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/horarios/${codigo}`);
-  }
-
-  ObtenerEntradaSalidaHorario(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/horarios/${codigo}`, data);
-  }
-
-  ObtenerEntradaSalidaPlanificacion(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/planificacion/${codigo}`, data);
-  }
-
-  ObtenerPermisosHorariosFechas(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
-  }
-
 }

@@ -1209,7 +1209,8 @@ RegistrarPlanificacionMultiple() {
   const datos = {
     plan_general: this.plan_general,
     user_name: this.user_name,
-    ip: this.ip, ip_local: this.ips_locales,
+    ip: this.ip, 
+    ip_local: this.ips_locales,
   };
   // Dividir el objeto plan_general en partes más pequeñas
   const partes = this.dividirPlanGeneral(datos.plan_general);
