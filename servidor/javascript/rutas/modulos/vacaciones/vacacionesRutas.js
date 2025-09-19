@@ -61,11 +61,17 @@ class VacacionesRutas {
          ** ************************************************************************************************* **/
         // CREAR REGISTRO DE VACACIONES    **USADO**
         this.router.post('/', verificarToken_1.TokenValidation, vacacionesControlador_1.default.CrearVacaciones);
-        //METODO PARA VERIFICAR VACACIONES MULTIPLES   **USADO**
+        // EDITAR REGISTRO DE VACACIONES
+        this.router.put('/vacacion-solicitada/:id', verificarToken_1.TokenValidation, vacacionesControlador_1.default.EditarSolicitudVacaciones);
+        // METODO PARA ELIMINAR UNA SOLICITUD DE VACACIONES POR SU ID
+        this.router.delete('/eliminarSolicitudVacaciones/:id', verificarToken_1.TokenValidation, vacacionesControlador_1.default.EliminarSolicitudesVacaciones);
+        // METODO PARA OBTENER TODAS LAS SOLICITUDES DE VACACIONES
+        this.router.get('/solicitudes-vacaciones', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ObtenerSolicitudesVacaciones);
+        // METODO PARA VERIFICAR VACACIONES MULTIPLES   **USADO**
         this.router.post('/verificar-empleados', verificarToken_1.TokenValidation, vacacionesControlador_1.default.VerificarVacacionesMultiples);
-        //METODO PARA BUSCAR SOLICITUD EXISTENTE   **USADO**
+        // METODO PARA BUSCAR SOLICITUD EXISTENTE   **USADO**
         this.router.get('/verificar-solicitud/:id_empleado/:fecha_inicio/:fecha_final', verificarToken_1.TokenValidation, vacacionesControlador_1.default.VerificarExistenciaSolicitud);
-        // MÉTODO PARA GUARDAR DOCUMENTO EN VACACIONES  **USADO**
+        // METODO PARA GUARDAR DOCUMENTO EN VACACIONES  **USADO**
         this.router.put('/:id/documento/:id_empleado', [verificarToken_1.TokenValidation, upload.single('uploads')], vacacionesControlador_1.default.GuardarDocumento);
         /** ************************************************************************************************* **
          ** **                        METODOS USADOS DENTRO DE LA APLICACION MOVIL                         ** **

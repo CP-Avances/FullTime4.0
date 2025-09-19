@@ -23,6 +23,146 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class VacacionesControlador {
     constructor() {
+        /** ************************************************************************************************* **
+         ** **                    METODOS USADOS EN LA CONFIGURACION DE VACACIONES                         ** **
+         ** ************************************************************************************************* **/
+        /** ************************************************************************************************* **
+         ** **                          METODOS PARA MANEJO DE VACACIONES INDIVIDUALES                     ** **
+         ** ************************************************************************************************* **/
+        this.ObtenerSolicitudVacacionesPorIdEmpleado = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.params;
+            if (!id_empleado || isNaN(Number(id_empleado))) {
+                return res.status(404).json({ error: "ID no válido" });
+            }
+            try {
+                const SOLICITUD = yield database_1.default.query(`SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC`, [id_empleado]);
+                if (SOLICITUD.rowCount != 0) {
+                    return res.status(200).json(SOLICITUD.rows);
+                }
+                else {
+                    return res.status(404).json({ text: 'No se encuentran registros.' });
+                }
+            }
+            catch (error) {
+                return res.status(500).json({ error: "Error al obtener solicitud de vacaciones por id de empleados" });
+            }
+        });
+        this.EditarSolicitudVacaciones = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const data = req.body;
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({ error: "ID no válido" });
+            }
+            try {
+                const response = yield database_1.default.query(`UPDATE mv_solicitud_vacacion SET
+          id_empleado = $1, 
+          id_cargo_vigente = $2, 
+          id_periodo_vacacion = $3,
+          fecha_inicio = $4, 
+          fecha_final = $5, 
+          estado = $6, 
+          numero_dias_lunes = $7,
+          numero_dias_martes = $8,
+          numero_dias_miercoles = $9,
+          numero_dias_jueves = $10,
+          numero_dias_viernes = $11, 
+          numero_dias_sabado = $12, 
+          numero_dias_domingo = $13,
+          numero_dias_totales = $14, 
+          incluir_feriados = $15, 
+          documento = $16, 
+          minutos_totales = $17,
+          fecha_actualizacion = NOW()
+        WHERE id = $18 
+        RETURNING *`, [
+                    data.id_empleado,
+                    data.id_cargo_vigente,
+                    data.id_periodo_vacacion,
+                    data.fecha_inicio,
+                    data.fecha_final,
+                    data.estado,
+                    data.numero_dias_lunes,
+                    data.numero_dias_martes,
+                    data.numero_dias_miercoles,
+                    data.numero_dias_jueves,
+                    data.numero_dias_viernes,
+                    data.numero_dias_sabado,
+                    data.numero_dias_domingo,
+                    data.numero_dias_totales,
+                    data.incluir_feriados,
+                    data.documento,
+                    data.minutos_totales,
+                    id
+                ]);
+                if (response.rows.length === 0) {
+                    return res.status(400)
+                        .json({ message: "Solicitud no encontrada" });
+                }
+                return res.status(200).json({
+                    message: "Solicitud actualizada exitosamente",
+                    detalle_de_solicitud: response.rows[0]
+                });
+            }
+            catch (error) {
+                console.error("Error al ejecutar el update: ", error.message);
+                res.status(500)
+                    .json({ error: "Error al actualizar una solicitud" });
+            }
+        });
+        this.ObtenerSolicitudesVacaciones = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const queryResult = yield database_1.default.query(`SELECT id, 
+          id_empleado, 
+          id_cargo_vigente, 
+          id_periodo_vacacion, 
+          fecha_inicio, 
+          fecha_final, 
+          estado, 
+          numero_dias_lunes, 
+          numero_dias_martes, 
+          numero_dias_miercoles, 
+          numero_dias_jueves, 
+          numero_dias_viernes, 
+          numero_dias_sabado, 
+          numero_dias_domingo, 
+          numero_dias_totales, 
+          incluir_feriados, 
+          documento, 
+          minutos_totales, 
+          fecha_registro, 
+          fecha_actualizacion
+        FROM public.mv_solicitud_vacacion
+        ORDER BY id ASC`);
+                const solicitudes = queryResult.rows;
+                return res.status(200).json(solicitudes);
+            }
+            catch (error) {
+                console.error("Error al obtener solicitudes: ", error);
+                return res.status(500).json({ error: "Error al obtener solicitudes" });
+            }
+        });
+        this.EliminarSolicitudesVacaciones = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            if (!id || isNaN(Number(id))) {
+                return res.status(404)
+                    .json({ error: "ID no válido" });
+            }
+            try {
+                const queryResult = yield database_1.default.query(`SELECT id FROM public.mv_solicitud_vacacion WHERE id = $1`, [id]);
+                if (queryResult.rows.length === 0) {
+                    return res.status(400)
+                        .json({ message: "Solicitud no encontrada" });
+                }
+                const queryDeleteResult = yield database_1.default.query(`DELETE FROM public.mv_solicitud_vacacion WHERE id = $1`, [id]);
+                return res.status(200).json({ message: "Solicitud eliminada correctamente" });
+            }
+            catch (error) {
+                return res.status(500).json({ message: "Error al eliminar solicitud" });
+            }
+        });
+        /** ************************************************************************************************* **
+         ** **                          METODOS PARA MANEJO DE VACACIONES MULTIPLES                        ** **
+         ** ************************************************************************************************* **/
         //METODO QUE REALIZA LA VERIFICACION SI LA SOLICITUD DE VACACION ES APTA PARA SU REGISTRO    **USADO**
         this.VerificarVacacionesMultiples = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
@@ -138,29 +278,6 @@ class VacacionesControlador {
             }
         });
     }
-    // METODO QUE CUENTA DIAS ENTRE DOS FECHAS INCLUYENDO FINES DE SEMANA, EXCLUYE FERIADOS DEPENDIENDO EL TIPO DE VACACION   **USADO
-    contarDiasSolicitados(fechaInicio, fechaFin, incluirFeriados) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let count = 0;
-            const current = new Date(fechaInicio);
-            let feriados = [];
-            if (!incluirFeriados) {
-                const result = yield database_1.default.query(`SELECT fecha FROM ef_cat_feriados`);
-                feriados = result.rows.map((row) => row.fecha.toISOString().split('T')[0]);
-            }
-            while (current <= fechaFin) {
-                const fechaStr = current.toISOString().split('T')[0];
-                if (incluirFeriados || !feriados.includes(fechaStr)) {
-                    count++;
-                }
-                current.setDate(current.getDate() + 1);
-            }
-            return count;
-        });
-    }
-    /** ********************************************************************************************* **
-     ** **                        METODOS DE REGISTROS DE VACACIONES                               ** **
-     ** ********************************************************************************************* **/
     // METODO PARA CREAR REGISTRO DE VACACIONES    **USADO
     CrearVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -297,6 +414,26 @@ class VacacionesControlador {
                 console.error('Error en CrearVacaciones:', error);
                 return res.status(500).jsonp({ message: 'Error al guardar la solicitud de vacaciones.' });
             }
+        });
+    }
+    // METODO QUE CUENTA DIAS ENTRE DOS FECHAS INCLUYENDO FINES DE SEMANA, EXCLUYE FERIADOS DEPENDIENDO EL TIPO DE VACACION   **USADO
+    contarDiasSolicitados(fechaInicio, fechaFin, incluirFeriados) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let count = 0;
+            const current = new Date(fechaInicio);
+            let feriados = [];
+            if (!incluirFeriados) {
+                const result = yield database_1.default.query(`SELECT fecha FROM ef_cat_feriados`);
+                feriados = result.rows.map((row) => row.fecha.toISOString().split('T')[0]);
+            }
+            while (current <= fechaFin) {
+                const fechaStr = current.toISOString().split('T')[0];
+                if (incluirFeriados || !feriados.includes(fechaStr)) {
+                    count++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            return count;
         });
     }
     // METODO PARA VERIFICAR EXISTENCIA DE SOLICITUD DE VACACION DE EMPLEADO EN CIERTO PERIODO DE FECHAS    **USADO**

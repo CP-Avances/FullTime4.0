@@ -8,8 +8,13 @@ import { DateTime } from 'luxon';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import { SolicitudesVacaciones } from '../../../interfaces/SolicitudesVacaciones';
 
 class VacacionesControlador {
+
+  /** ************************************************************************************************* **
+   ** **                    METODOS USADOS EN LA CONFIGURACION DE VACACIONES                         ** ** 
+   ** ************************************************************************************************* **/
 
   //METODO PARA LISTAR VACACIONES CONFIGURADAS   **USADO
   public async ListarVacacionesConfiguradas(req: Request, res: Response): Promise<any> {
@@ -26,142 +31,31 @@ class VacacionesControlador {
     }
   }
 
+  /** ************************************************************************************************* **
+   ** **                          METODOS PARA MANEJO DE VACACIONES INDIVIDUALES                     ** ** 
+   ** ************************************************************************************************* **/
 
-  //METODO QUE REALIZA LA VERIFICACION SI LA SOLICITUD DE VACACION ES APTA PARA SU REGISTRO    **USADO**
-  public VerificarVacacionesMultiples = async (req: Request, res: Response): Promise<any> => {
+  public ObtenerSolicitudVacacionesPorIdEmpleado = async (req: Request, res: Response) => {
+    const { id_empleado } = req.params;
+
+    if (!id_empleado || isNaN(Number(id_empleado))) {
+      return res.status(404).json({ error: "ID no válido" });
+    }
+
     try {
-      const { empleados, fechaInicio, fechaFin, incluirFeriados, permiteHoras, numHoras } = req.body;
-      const resultados: any[] = [];
-      const fechaIni = new Date(fechaInicio);
-      const fechaFin_ = new Date(fechaFin);
-
-      for (const idEmpleado of empleados) {
-        //VERIFICA QUE EL EMPLEADO TENGA PERIODO DE VACACION Y SI ESE PERIODO ESTA ACTIVO
-        const periodos = await pool.query(
-          `SELECT * FROM mv_periodo_vacacion WHERE id_empleado = $1`,
-          [idEmpleado]
-        );
-        if (periodos.rowCount === 0) {
-          resultados.push({ idEmpleado, observacion: 'Empleado sin periodo registrado' });
-          continue;
-        }
-        const periodoActivo = periodos.rows.find((p: any) => p.estado === true);
-        if (!periodoActivo) {
-          resultados.push({ idEmpleado, observacion: 'Empleado sin periodo activo' });
-          continue;
-        }
-
-        const inicioPeriodo = new Date(periodoActivo.fecha_inicio);
-        const finPeriodo = new Date(periodoActivo.fecha_final);
-        if (fechaIni < inicioPeriodo || fechaFin_ > finPeriodo) {
-          resultados.push({
-            idEmpleado,
-            observacion: 'Las fechas están fuera del periodo activo del empleado'
-          });
-          continue;
-        }
-
-        //FUNCION EN LA BASE DE DATOS PARA OBTENER EL SALDO DISPONIBLE DEL EMPLEADO
-        const saldoResult = await pool.query(
-          `SELECT public.fn_obtener_saldo_vacaciones($1) AS saldo`,
-          [idEmpleado]
-        );
-        const saldoDisponible = parseFloat(saldoResult.rows[0].saldo);
-
-        //VALIDACION CUANDO EL TIPO DE VACACION ES POR HORAS
-        if (permiteHoras) {
-          let horasSolicitadas: number;
-          if (typeof numHoras === 'string' && numHoras.includes(':')) {
-            const [horas, minutos] = numHoras.split(':').map(Number);
-            horasSolicitadas = horas + (minutos / 60);
-          } else {
-            horasSolicitadas = parseFloat(numHoras);
-          }
-          if (!horasSolicitadas || isNaN(horasSolicitadas)) {
-            resultados.push({
-              idEmpleado,
-              observacion: 'Número de horas inválido'
-            });
-            continue;
-          }
-          const contrato = await pool.query(`
-          SELECT car.hora_trabaja
-          FROM eu_empleado_contratos ec
-          JOIN contrato_cargo_vigente cv ON cv.id_contrato = ec.id
-          JOIN eu_empleado_cargos car ON car.id = cv.id_cargo
-          WHERE ec.id_empleado = $1
-          LIMIT 1;
-        `, [idEmpleado]);
-
-          if (contrato.rowCount === 0) {
-            resultados.push({
-              idEmpleado,
-              observacion: 'Empleado sin contrato activo'
-            });
-            continue;
-          }
-
-          const horasContrato = parseFloat(contrato.rows[0].hora_trabaja);
-          // VALIDACION DE LAS HORAS SOLICITADAS CON LAS HORAS DEL CONTRATO DE CARGO VIGENTE
-          if (horasSolicitadas >= horasContrato) {
-            resultados.push({
-              idEmpleado,
-              observacion: 'Las horas solicitadas superan las horas que equivalen a un día'
-            });
-            continue;
-          }
-
-          const diasEquivalentes = horasSolicitadas / horasContrato;
-
-          if (saldoDisponible >= diasEquivalentes) {
-            resultados.push({ idEmpleado, observacion: 'Ok' });
-          } else {
-            resultados.push({
-              idEmpleado,
-              observacion: `Saldo insuficiente`
-            });
-          }
-        }
-        //VALIDACION CUANDO EL TIPO DE VACACION ES POR DIAS
-        else {
-          const diasSolicitados = await this.contarDiasSolicitados(fechaIni, fechaFin_, incluirFeriados);
-
-          if (saldoDisponible < diasSolicitados) {
-            resultados.push({ idEmpleado, observacion: `Saldo insuficiente` });
-            continue;
-          }
-          resultados.push({ idEmpleado, observacion: 'Ok' });
-        }
+      const SOLICITUD = await pool.query<SolicitudesVacaciones>(
+        `SELECT * FROM mv_solicitud_vacacion WHERE id_empleado = $1 ORDER BY fecha_inicio DESC`
+        , [id_empleado]);
+      if (SOLICITUD.rowCount != 0) {
+        return res.status(200).json(SOLICITUD.rows);
       }
-      return res.json(resultados);
+      else {
+        return res.status(404).json({ text: 'No se encuentran registros.' });
+      }
     } catch (error) {
-      console.error('Error en VerificarVacacionesMultiples:', error);
-      return res.status(500).jsonp({ text: 'Error al verificar los empleados.' });
+      return res.status(500).json({ error: "Error al obtener solicitud de vacaciones por id de empleados" });
     }
   }
-
-  // METODO QUE CUENTA DIAS ENTRE DOS FECHAS INCLUYENDO FINES DE SEMANA, EXCLUYE FERIADOS DEPENDIENDO EL TIPO DE VACACION   **USADO
-  private async contarDiasSolicitados(fechaInicio: Date, fechaFin: Date, incluirFeriados: boolean): Promise<number> {
-    let count = 0;
-    const current = new Date(fechaInicio);
-    let feriados: string[] = [];
-    if (!incluirFeriados) {
-      const result = await pool.query(`SELECT fecha FROM ef_cat_feriados`);
-      feriados = result.rows.map((row: any) => row.fecha.toISOString().split('T')[0]);
-    }
-    while (current <= fechaFin) {
-      const fechaStr = current.toISOString().split('T')[0];
-      if (incluirFeriados || !feriados.includes(fechaStr)) {
-        count++;
-      }
-      current.setDate(current.getDate() + 1);
-    }
-    return count;
-  }
-
-  /** ********************************************************************************************* **
-   ** **                        METODOS DE REGISTROS DE VACACIONES                               ** ** 
-   ** ********************************************************************************************* **/
 
   // METODO PARA CREAR REGISTRO DE VACACIONES    **USADO
   public async CrearVacaciones(req: Request, res: Response): Promise<Response> {
@@ -313,7 +207,289 @@ class VacacionesControlador {
     }
   }
 
+
+  public EditarSolicitudVacaciones = async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+    const data: Partial<SolicitudesVacaciones> = req.body
+
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({ error: "ID no válido" });
+    }
+
+    try {
+      const response = await pool.query<SolicitudesVacaciones>(
+        `UPDATE mv_solicitud_vacacion SET
+          id_empleado = $1, 
+          id_cargo_vigente = $2, 
+          id_periodo_vacacion = $3,
+          fecha_inicio = $4, 
+          fecha_final = $5, 
+          estado = $6, 
+          numero_dias_lunes = $7,
+          numero_dias_martes = $8,
+          numero_dias_miercoles = $9,
+          numero_dias_jueves = $10,
+          numero_dias_viernes = $11, 
+          numero_dias_sabado = $12, 
+          numero_dias_domingo = $13,
+          numero_dias_totales = $14, 
+          incluir_feriados = $15, 
+          documento = $16, 
+          minutos_totales = $17,
+          fecha_actualizacion = NOW()
+        WHERE id = $18 
+        RETURNING *`,
+        [
+          data.id_empleado,
+          data.id_cargo_vigente,
+          data.id_periodo_vacacion,
+          data.fecha_inicio,
+          data.fecha_final,
+          data.estado,
+          data.numero_dias_lunes,
+          data.numero_dias_martes,
+          data.numero_dias_miercoles,
+          data.numero_dias_jueves,
+          data.numero_dias_viernes,
+          data.numero_dias_sabado,
+          data.numero_dias_domingo,
+          data.numero_dias_totales,
+          data.incluir_feriados,
+          data.documento,
+          data.minutos_totales,
+          id
+        ]
+      );
+
+      if (response.rows.length === 0) {
+        return res.status(400)
+          .json({ message: "Solicitud no encontrada" });
+      }
+
+      return res.status(200).json({
+        message: "Solicitud actualizada exitosamente",
+        detalle_de_solicitud: response.rows[0]
+      });
+
+
+    } catch (error) {
+      console.error("Error al ejecutar el update: ", error.message);
+      res.status(500)
+        .json({ error: "Error al actualizar una solicitud" })
+    }
+  }
+
+  public ObtenerSolicitudesVacaciones = async (req: Request, res: Response) => {
+
+    try {
+      const queryResult = await pool.query<SolicitudesVacaciones>(
+        `SELECT id, 
+          id_empleado, 
+          id_cargo_vigente, 
+          id_periodo_vacacion, 
+          fecha_inicio, 
+          fecha_final, 
+          estado, 
+          numero_dias_lunes, 
+          numero_dias_martes, 
+          numero_dias_miercoles, 
+          numero_dias_jueves, 
+          numero_dias_viernes, 
+          numero_dias_sabado, 
+          numero_dias_domingo, 
+          numero_dias_totales, 
+          incluir_feriados, 
+          documento, 
+          minutos_totales, 
+          fecha_registro, 
+          fecha_actualizacion
+        FROM public.mv_solicitud_vacacion
+        ORDER BY id ASC`
+      );
+
+      const solicitudes: SolicitudesVacaciones[] = queryResult.rows;
+
+      return res.status(200).json(solicitudes);
+
+    } catch (error) {
+      console.error("Error al obtener solicitudes: ", error);
+      return res.status(500).json({ error: "Error al obtener solicitudes" });
+    }
+  }
+
+  public EliminarSolicitudesVacaciones = async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+
+    if (!id || isNaN(Number(id))) {
+      return res.status(404)
+        .json({ error: "ID no válido" });
+    }
+
+    try {
+
+      const queryResult = await pool.query<SolicitudesVacaciones>(
+        `SELECT id FROM public.mv_solicitud_vacacion WHERE id = $1`,
+        [id]
+      );
+
+      if (queryResult.rows.length === 0) {
+        return res.status(400)
+          .json({ message: "Solicitud no encontrada" });
+      }
+
+      const queryDeleteResult = await pool.query(
+        `DELETE FROM public.mv_solicitud_vacacion WHERE id = $1`,
+        [id]
+      );
+
+      return res.status(200).json({ message: "Solicitud eliminada correctamente" });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Error al eliminar solicitud" });
+    }
+
+  }
+
+  /** ************************************************************************************************* **
+   ** **                          METODOS PARA MANEJO DE VACACIONES MULTIPLES                        ** ** 
+   ** ************************************************************************************************* **/
+
+  //METODO QUE REALIZA LA VERIFICACION SI LA SOLICITUD DE VACACION ES APTA PARA SU REGISTRO    **USADO**
+  public VerificarVacacionesMultiples = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const { empleados, fechaInicio, fechaFin, incluirFeriados, permiteHoras, numHoras } = req.body;
+      const resultados: any[] = [];
+      const fechaIni = new Date(fechaInicio);
+      const fechaFin_ = new Date(fechaFin);
+
+      for (const idEmpleado of empleados) {
+        //VERIFICA QUE EL EMPLEADO TENGA PERIODO DE VACACION Y SI ESE PERIODO ESTA ACTIVO
+        const periodos = await pool.query(
+          `SELECT * FROM mv_periodo_vacacion WHERE id_empleado = $1`,
+          [idEmpleado]
+        );
+        if (periodos.rowCount === 0) {
+          resultados.push({ idEmpleado, observacion: 'Empleado sin periodo registrado' });
+          continue;
+        }
+        const periodoActivo = periodos.rows.find((p: any) => p.estado === true);
+        if (!periodoActivo) {
+          resultados.push({ idEmpleado, observacion: 'Empleado sin periodo activo' });
+          continue;
+        }
+
+        const inicioPeriodo = new Date(periodoActivo.fecha_inicio);
+        const finPeriodo = new Date(periodoActivo.fecha_final);
+        if (fechaIni < inicioPeriodo || fechaFin_ > finPeriodo) {
+          resultados.push({
+            idEmpleado,
+            observacion: 'Las fechas están fuera del periodo activo del empleado'
+          });
+          continue;
+        }
+
+        //FUNCION EN LA BASE DE DATOS PARA OBTENER EL SALDO DISPONIBLE DEL EMPLEADO
+        const saldoResult = await pool.query(
+          `SELECT public.fn_obtener_saldo_vacaciones($1) AS saldo`,
+          [idEmpleado]
+        );
+        const saldoDisponible = parseFloat(saldoResult.rows[0].saldo);
+
+        //VALIDACION CUANDO EL TIPO DE VACACION ES POR HORAS
+        if (permiteHoras) {
+          let horasSolicitadas: number;
+          if (typeof numHoras === 'string' && numHoras.includes(':')) {
+            const [horas, minutos] = numHoras.split(':').map(Number);
+            horasSolicitadas = horas + (minutos / 60);
+          } else {
+            horasSolicitadas = parseFloat(numHoras);
+          }
+          if (!horasSolicitadas || isNaN(horasSolicitadas)) {
+            resultados.push({
+              idEmpleado,
+              observacion: 'Número de horas inválido'
+            });
+            continue;
+          }
+          const contrato = await pool.query(`
+          SELECT car.hora_trabaja
+          FROM eu_empleado_contratos ec
+          JOIN contrato_cargo_vigente cv ON cv.id_contrato = ec.id
+          JOIN eu_empleado_cargos car ON car.id = cv.id_cargo
+          WHERE ec.id_empleado = $1
+          LIMIT 1;
+        `, [idEmpleado]);
+
+          if (contrato.rowCount === 0) {
+            resultados.push({
+              idEmpleado,
+              observacion: 'Empleado sin contrato activo'
+            });
+            continue;
+          }
+
+          const horasContrato = parseFloat(contrato.rows[0].hora_trabaja);
+          // VALIDACION DE LAS HORAS SOLICITADAS CON LAS HORAS DEL CONTRATO DE CARGO VIGENTE
+          if (horasSolicitadas >= horasContrato) {
+            resultados.push({
+              idEmpleado,
+              observacion: 'Las horas solicitadas superan las horas que equivalen a un día'
+            });
+            continue;
+          }
+
+          const diasEquivalentes = horasSolicitadas / horasContrato;
+
+          if (saldoDisponible >= diasEquivalentes) {
+            resultados.push({ idEmpleado, observacion: 'Ok' });
+          } else {
+            resultados.push({
+              idEmpleado,
+              observacion: `Saldo insuficiente`
+            });
+          }
+        }
+        //VALIDACION CUANDO EL TIPO DE VACACION ES POR DIAS
+        else {
+          const diasSolicitados = await this.contarDiasSolicitados(fechaIni, fechaFin_, incluirFeriados);
+
+          if (saldoDisponible < diasSolicitados) {
+            resultados.push({ idEmpleado, observacion: `Saldo insuficiente` });
+            continue;
+          }
+          resultados.push({ idEmpleado, observacion: 'Ok' });
+        }
+      }
+      return res.json(resultados);
+    } catch (error) {
+      console.error('Error en VerificarVacacionesMultiples:', error);
+      return res.status(500).jsonp({ text: 'Error al verificar los empleados.' });
+    }
+  }
+
+  // METODO QUE CUENTA DIAS ENTRE DOS FECHAS INCLUYENDO FINES DE SEMANA, EXCLUYE FERIADOS DEPENDIENDO EL TIPO DE VACACION   **USADO
+  private async contarDiasSolicitados(fechaInicio: Date, fechaFin: Date, incluirFeriados: boolean): Promise<number> {
+    let count = 0;
+    const current = new Date(fechaInicio);
+    let feriados: string[] = [];
+    if (!incluirFeriados) {
+      const result = await pool.query(`SELECT fecha FROM ef_cat_feriados`);
+      feriados = result.rows.map((row: any) => row.fecha.toISOString().split('T')[0]);
+    }
+    while (current <= fechaFin) {
+      const fechaStr = current.toISOString().split('T')[0];
+      if (incluirFeriados || !feriados.includes(fechaStr)) {
+        count++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
+    return count;
+  }
+
   // METODO PARA VERIFICAR EXISTENCIA DE SOLICITUD DE VACACION DE EMPLEADO EN CIERTO PERIODO DE FECHAS    **USADO**
+
   public async VerificarExistenciaSolicitud(req: Request, res: Response): Promise<Response> {
     const { id_empleado, fecha_inicio, fecha_final } = req.params;
     try {
@@ -546,7 +722,6 @@ class VacacionesControlador {
       return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
   };
-
 }
 
 export const VACACIONES_CONTROLADOR = new VacacionesControlador();

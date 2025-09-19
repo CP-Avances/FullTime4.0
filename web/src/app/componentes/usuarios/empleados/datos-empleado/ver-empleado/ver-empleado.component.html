@@ -1624,7 +1624,7 @@
     <mat-tab *ngIf="habilitarVacaciones" label="periodo_vacaciones">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon" id="icono_pestaña">flight_takeoff</mat-icon>
-            <h6 id="items"> Vacaciones</h6>
+            <h6 id="items"> Período de Vacaciones</h6>
         </ng-template>
 
         <!--  *********************  PANTALLA DE EDICION DE PERIODO DE VACACIONES  *************************  -->
@@ -1709,6 +1709,10 @@
                                         <label>
                                             {{ p.dias_iniciales > 0 ? p.dias_iniciales : p.saldo_transferido }}
                                         </label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Datos usados o utilizados:</label>
+                                        <label>Dato de Prueba</label>
                                     </div>
                                 </div>
                             </div>
@@ -1844,6 +1848,15 @@
             </mat-card>
         </div>
 
+    </mat-tab>
+
+    <!-- SOLICITUDES DE VACACIONES DEL EMPLEADO -->
+    <mat-tab label="periodo_vacaciones">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
+            <h6 id="items">Solicitudes de Vacaciones</h6>
+        </ng-template>
+
         <!--  *********************  PANTALLA DE SOLICITUDES DE VACACIONES  *************************  -->
         <div class="container" style="padding-bottom: 25px;" *ngIf="ver_periodo">
             <mat-card class="mat-elevation-z8">
@@ -1866,14 +1879,16 @@
                 <mat-card-content>
                     
                 </mat-card-content>
-
-
             </mat-card>
         </div>
         <!-- *** REGISTRO DE VACACIONES INDIVIDUALES *** -->
-        <div style="padding-top: 20px;" *ngIf="activar_vacacion_individual">
-            <app-registrar-vacaciones [data]="empleadoUno">
-            </app-registrar-vacaciones>
+        @if (activar_vacacion_individual) {
+        <div style="padding-top: 20px;">
+            <app-registrar-solicitudes-vacaciones [data]="empleadoUno" />
+        </div>
+        }
+        <div style="padding-top: 20px;">
+            <app-editar-solicitudes-vacaciones />
         </div>
     </mat-tab>
 

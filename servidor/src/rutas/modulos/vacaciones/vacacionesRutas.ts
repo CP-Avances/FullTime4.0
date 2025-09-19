@@ -53,7 +53,7 @@ class VacacionesRutas {
         // METODO PARA LISTAR VACACIONES CONFIGURADAS   **USADO
         this.router.get('/lista-todas-configuraciones', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionesConfiguradas);
 
-        
+
         /** ************************************************************************************************* **
          ** **                          METODOS PARA MANEJO DE VACACIONES                                  ** ** 
          ** ************************************************************************************************* **/
@@ -61,13 +61,22 @@ class VacacionesRutas {
         // CREAR REGISTRO DE VACACIONES    **USADO**
         this.router.post('/', TokenValidation, VACACIONES_CONTROLADOR.CrearVacaciones);
 
-        //METODO PARA VERIFICAR VACACIONES MULTIPLES   **USADO**
+        // EDITAR REGISTRO DE VACACIONES
+        this.router.put('/vacacion-solicitada/:id', TokenValidation, VACACIONES_CONTROLADOR.EditarSolicitudVacaciones);
+
+        // METODO PARA ELIMINAR UNA SOLICITUD DE VACACIONES POR SU ID
+        this.router.delete('/eliminarSolicitudVacaciones/:id', TokenValidation, VACACIONES_CONTROLADOR.EliminarSolicitudesVacaciones);
+
+        // METODO PARA OBTENER TODAS LAS SOLICITUDES DE VACACIONES
+        this.router.get('/solicitudes-vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudesVacaciones);
+
+        // METODO PARA VERIFICAR VACACIONES MULTIPLES   **USADO**
         this.router.post('/verificar-empleados', TokenValidation, VACACIONES_CONTROLADOR.VerificarVacacionesMultiples);
 
-        //METODO PARA BUSCAR SOLICITUD EXISTENTE   **USADO**
+        // METODO PARA BUSCAR SOLICITUD EXISTENTE   **USADO**
         this.router.get('/verificar-solicitud/:id_empleado/:fecha_inicio/:fecha_final', TokenValidation, VACACIONES_CONTROLADOR.VerificarExistenciaSolicitud);
 
-        // MÉTODO PARA GUARDAR DOCUMENTO EN VACACIONES  **USADO**
+        // METODO PARA GUARDAR DOCUMENTO EN VACACIONES  **USADO**
         this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACACIONES_CONTROLADOR.GuardarDocumento);
 
 

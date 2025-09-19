@@ -1,8 +1,9 @@
 <!-- *** VENTANA DE SOLICITUDES MULTIPLES DE VACACIONES *** -->
-<div style="padding-top: 20px;" *ngIf="activar_vacacion">
-    <app-registrar-vacaciones [data]="data">
-    </app-registrar-vacaciones>
+@if(activar_vacacion){
+<div style="padding-top: 20px;">
+    <app-registrar-solicitudes-vacaciones [data]="data" />
 </div>
+}
 
 <!-- *** BUSQUEDA DE USUARIOS DE QUIENES SE CREARA VACACIONES DE FORMA MASIVA *** -->
 <div style="padding-top: 20px;" *ngIf="activar_busqueda">
@@ -14,7 +15,7 @@
             </div>
             <br>
             <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
-            <form >
+            <form>
                 <div class="row">
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
@@ -69,7 +70,8 @@
             </form>
 
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros()" *ngIf="getRegistrarVacacionessMultiples()">Registrar vacaciones</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros()"
+                    *ngIf="getRegistrarVacacionessMultiples()">Registrar vacaciones</button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
 
@@ -79,7 +81,7 @@
             <div class="mat-elevation-z8" style="background: white;">
 
                 <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">  
+                    <div class="col-12 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
                     </div>
                     <div class="col-12 col-md-8 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
                         <span>
@@ -88,8 +90,8 @@
                     </div>
                     <div class="col-12 col-md-2 mb-2 mb-md-0 order-3 order-md-2">
                         <button type="submit" class="btn btn-outline-light btn-sm btn_eliminar"
-                        (click)="MostrarLista()">
-                        Mostrar lista
+                            (click)="MostrarLista()">
+                            Mostrar lista
                         </button>
                     </div>
                 </div>

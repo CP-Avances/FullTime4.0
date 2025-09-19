@@ -1,7 +1,7 @@
 import { SocketService } from 'src/app/servicios/socket/socket.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Socket } from 'ngx-socket-io';
+import { Socket } from 'socket.io-client';
 
 @Injectable({
   providedIn: 'root'

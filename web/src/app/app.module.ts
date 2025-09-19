@@ -174,7 +174,6 @@ import { EditarConfigurarVacacionComponent } from './componentes/modulos/vacacio
 import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
 import { RegistrarPeriodoVComponent } from './componentes/modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPeriodoVacacionesComponent } from './componentes/modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
-import { RegistrarVacacionesComponent } from './componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
 import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/ver-configurar-vacacion/ver-configurar-vacacion.component';
 import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/periodoVacaciones/generar-periodo-manual/generar-periodo-manual.component';
 import { ConfigurarVacacionMultipleComponent } from './componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
@@ -268,6 +267,11 @@ import { TokenInterceptorService } from './servicios/login/token-interceptor.ser
 import { MainNavService } from './componentes/generales/main-nav/main-nav.service';
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
+
+import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
+import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
+import { RegistrarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/registrar-solicitudes-vacaciones/registrar-solicitudes-vacaciones.component';
+
 
 @NgModule({
   declarations: [
@@ -414,7 +418,6 @@ import { PlantillaReportesService } from './componentes/reportes/plantilla-repor
     ListarConfigurarVacacionComponent,
     RegistrarPeriodoVComponent,
     EditarPeriodoVacacionesComponent,
-    RegistrarVacacionesComponent,
     VerConfigurarVacacionComponent,
     GenerarPeriodoManualComponent,
     ConfigurarVacacionMultipleComponent,
@@ -500,7 +503,9 @@ import { PlantillaReportesService } from './componentes/reportes/plantilla-repor
     EditarAniversarioComponent,
 
     InformacionNovedadesComponent,
-
+    SolicitudesVacacionesComponent,
+    EditarSolicitudesVacacionesComponent,
+    RegistrarSolicitudesVacacionesComponent
   ],
 
   imports: [
@@ -558,6 +563,10 @@ import { PlantillaReportesService } from './componentes/reportes/plantilla-repor
     ListarCiudadFeriadosComponent,
     PrincipalDepartamentoComponent,
     HorarioMultipleEmpleadoComponent,
+
+    SolicitudesVacacionesComponent,
+    RegistrarSolicitudesVacacionesComponent,
+    EditarSolicitudesVacacionesComponent
   ],
   exports: [CommonModule, TimbreMultipleComponent, EmpleadoProcesoComponent],
 
