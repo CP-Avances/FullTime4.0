@@ -52,4 +52,8 @@ export class VacacionesService {
     return this.http.put<SolicitudVacacion>(`${(localStorage.getItem('empresaURL') as string)}/vacacion-solicitada/${id}`, data);
   }
 
+  ObtenerSolicitudes(): Observable<SolicitudVacacion[]> {
+    return this.http.get<SolicitudVacacion[]>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/solicitudes-vacaciones`)
+  }
+
 }

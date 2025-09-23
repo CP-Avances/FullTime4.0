@@ -1,1 +1,82 @@
-<h1>Hola Mundo</h1>
+<div class="container" style="padding-bottom: 25px;">
+  <mat-card class="mat-elevation-z8">
+
+    <div id="titulo" class="row w-100 m-auto">
+      <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
+        <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
+          <span>
+            SOLICITUDES VACACIONES
+          </span>
+        </div>
+        <!--  <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+          <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
+            (click)="AbrirVentanaVacaciones()" *ngIf="getCrearDatos()">{{btnTitulo}}
+          </button>
+        </div> -->
+      </div>
+    </div>
+
+    <mat-card-content>
+      @for(vacacion of solicitudes; track vacacion.id){
+      <div>
+        <div class="container">
+          <div class="row">
+            <div class="col-md">
+              <div class="espacio d-flex justify-content-start">
+                <label>Inicio de Vacaciones: </label>
+                <label>{{vacacion.fecha_inicio}}</label>
+              </div>
+            </div>
+            <div class="col-md">
+              <div class="espacio d-flex justify-content-start">
+                <label>Fin de Vacaciones: </label>
+                <label>{{vacacion.fecha_final}}</label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md">
+                <div class="espacio d-flex justify-content-start">
+                  <label>Cantidad Solicitada: </label>
+                  <label>{{vacacion.numero_dias_totales}} días</label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="espacio d-flex justify-content-start">
+                  <label>Incluye Feriados: </label>
+                  <label>{{vacacion.incluir_feriados}}</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md">
+                <div class="espacio d-flex justify-content-start">
+                  <label>Fecha de Registro: </label>
+                  <label>{{vacacion.fecha_registro}}</label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="espacio d-flex justify-content-start">
+                  <label>Fecha de Actualización: </label>
+                  <label>{{vacacion.fecha_actualizacion}}</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md">
+                <div class="espacio d-flex justify-content-start">
+                  <label>Documento: </label>
+                  <label>{{vacacion.documento}}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </mat-card-content>
+
+  </mat-card>
+</div>
