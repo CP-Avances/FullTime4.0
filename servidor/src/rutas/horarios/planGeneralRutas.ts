@@ -32,14 +32,6 @@ class DepartamentoRutas {
         this.router.post('/buscar-asistencia', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarAsistencia);
         // METODO PARA ACTUALIZAR ASISTENCIA MANUAL   **USADO
         this.router.post('/actualizar-asistencia/manual', TokenValidation, PLAN_GENERAL_CONTROLADOR.ActualizarManual);
-
-
-
-
-
-
-        // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS
-        this.router.post('/horario-general-fechas', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarHorarioFechas);
     }
 }
 

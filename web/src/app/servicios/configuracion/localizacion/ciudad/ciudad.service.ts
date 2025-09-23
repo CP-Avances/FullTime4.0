@@ -11,32 +11,32 @@ export class CiudadService {
     private http: HttpClient,
   ) { }
 
-  // BUSCAR INFORMACION DE LA CIUDAD  **USADO
+  // BUSCAR INFORMACION DE LA CIUDAD  **USADO**
   BuscarInformacionCiudad(id_ciudad: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/informacion-ciudad/${id_ciudad}`);
   }
 
-  // BUSQUEDA DE CIUDADES   **USADO
+  // BUSQUEDA DE CIUDADES   **USADO**
   ConsultarCiudades() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/listaCiudad`);
   }
 
-  // BUSCAR CIUDADES POR PROVINCIA  **USADO
+  // BUSCAR CIUDADES POR PROVINCIA  **USADO**
   BuscarCiudadProvincia(id_provincia: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/ciudad-provincia/${id_provincia}`);
   }
 
-  // REGISTRAR CIUDAD  **USADO
+  // REGISTRAR CIUDAD  **USADO**
   RegistrarCiudad(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/ciudades`, data);
   }
 
-  // BUSQUEDA DE NOMBRE CIUDADES - PROVINCIAS  **USADO
+  // BUSQUEDA DE NOMBRE CIUDADES - PROVINCIAS  **USADO**
   ListarNombreCiudadProvincia() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO  **USADO
+  // METODO PARA ELIMINAR REGISTRO  **USADO**
   EliminarCiudad(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/ciudades/eliminar/${id}`;
     const httpOtions = {
@@ -45,7 +45,7 @@ export class CiudadService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD   **USADO
+  // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD   **USADO**
   BuscarUnaCiudad(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/${id}`);
   }

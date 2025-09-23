@@ -345,9 +345,9 @@ export class RegistrarSolicitudesVacacionesComponent implements OnInit {
   CerrarVentana() {
 
     if (this.verEmpleadoComponente) {
-      const solicitudes = this.verEmpleadoComponente.ObtenerVacaciones(this.verEmpleadoComponente.formato_fecha);
+      //const solicitudes = this.verEmpleadoComponente.ObtenerVacaciones(this.verEmpleadoComponente.formato_fecha);
       //this.verEmpleadoComponente.ObtenerSolicitudesVacaciones(this.verEmpleadoComponente.formato_fecha);
-      console.log("solicitudes: ", solicitudes)
+      //console.log("solicitudes: ", solicitudes)
       this.verEmpleadoComponente.ver_periodo = true;
       this.verEmpleadoComponente.activar_vacacion_individual = false;
     }

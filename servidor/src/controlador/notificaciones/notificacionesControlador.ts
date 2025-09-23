@@ -606,24 +606,6 @@ class NotificacionTiempoRealControlador {
   };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
   public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
     const { arregloNotificaciones, user_name, ip, ip_local } = req.body;
@@ -698,67 +680,7 @@ class NotificacionTiempoRealControlador {
 
   }
 
-  // METODO PARA CREAR NOTIFICACIONES
-  public async CrearNotificacion(req: Request, res: Response): Promise<Response> {
-    try {
-      var tiempo = fechaHora();
 
-      const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso,
-        id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip, ip_local } = req.body;
-
-      let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      const response: QueryResult = await pool.query(
-        `
-        INSERT INTO ecm_realtime_notificacion (id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, 
-          fecha_hora, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo) 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING * 
-        `,
-        [id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, id_permiso, id_vacaciones,
-          id_hora_extra, mensaje, tipo]);
-
-      const [notificiacion] = response.rows;
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ecm_realtime_notificacion',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: JSON.stringify(notificiacion),
-        ip: ip,
-        ip_local: ip_local,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-
-      if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-
-      const USUARIO = await pool.query(
-        `
-        SELECT (nombre || ' ' || apellido) AS usuario
-        FROM eu_empleados WHERE id = $1
-        `
-        , [id_send_empl]);
-
-      notificiacion.usuario = USUARIO.rows[0].usuario;
-
-      return res.status(200)
-        .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
-
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      console.log("Ver Error notificacion", error)
-      await pool.query('ROLLBACK');
-      return res.status(500)
-        .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-    }
-  }
 
   public async ListaNotificacionesRecibidas(req: Request, res: Response): Promise<any> {
     const id = req.params.id_receive;

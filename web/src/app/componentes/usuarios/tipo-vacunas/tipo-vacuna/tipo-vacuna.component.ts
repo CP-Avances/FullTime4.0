@@ -54,7 +54,8 @@ export class TipoVacunaComponent {
     let vacuna = {
       vacuna: form.vacuna,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     this.rest.CrearVacuna(vacuna).subscribe(response => {
       if (response.status == '200') {

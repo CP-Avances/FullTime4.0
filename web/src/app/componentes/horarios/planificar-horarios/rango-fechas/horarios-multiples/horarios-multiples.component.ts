@@ -1124,7 +1124,8 @@ export class HorariosMultiplesComponent implements OnInit {
     const datosParcial = {
       parte: partes[parteIndex],
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
       parteIndex: parteIndex, // ENVIAR EL ÍNDICE DE LA PARTE ACTUAL
       totalPartes: totalPartes // ENVIAR EL TOTAL DE PARTES
     };

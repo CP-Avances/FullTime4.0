@@ -637,7 +637,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO USADO EN EL REPORTE DE NOTIFICACIONES DEL SISTEMA   **USADO
+    // METODO USADO EN EL REPORTE DE NOTIFICACIONES DEL SISTEMA MEDINATE CORREO   **USADO
     ObtenerImagenEmpresa() {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`

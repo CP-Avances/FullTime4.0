@@ -6,7 +6,6 @@ import fs from 'fs';
 import path from 'path';
 import pool from '../../../database';
 import Excel from 'exceljs';
-import { Credenciales } from '../../../libs/settingsMail';
 
 class DiscapacidadControlador {
 

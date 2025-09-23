@@ -689,49 +689,7 @@ class PlanGeneralControlador {
             return res.jsonp({ message: 'error', error: error });
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
-    public async BuscarHorarioFechas(req: Request, res: Response) {
-        try {
-            const { id_empleado, lista_fechas } = req.body;
-
-            const HORARIO = await pool.query(
-                `
-                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.id_empleado, pg.estado_origen 
-                FROM eu_asistencia_general AS pg, eu_empleado_cargos AS c 
-                WHERE pg.fecha_horario IN (${lista_fechas}) 
-                    AND pg.id_empleado = $1 AND c.id = pg.id_empleado_cargo 
-                    AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
-                ORDER BY pg.fecha_horario ASC
-                `
-                , [id_empleado]);
-
-            if (HORARIO.rowCount != 0) {
-                return res.jsonp(HORARIO.rows)
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-        }
-        catch (error) {
-            return res.jsonp({ message: 'error' });
-        }
-    }
-
+    
 }
 
 // METODO PARA BUSCAR DATOS DE EMPLEADOS    **USADO

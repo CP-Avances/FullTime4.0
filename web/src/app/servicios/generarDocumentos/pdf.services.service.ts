@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
-import { DateTime } from 'luxon';
-import { EmpresaService } from '../configuracion/parametrizacion/catEmpresa/empresa.service';
-import { EmpleadoService } from '../usuarios/empleado/empleadoRegistro/empleado.service';
 import { ValidacionesService } from '../generales/validaciones/validaciones.service';
 import { AccionPersonalService } from '../modulos/modulo-acciones-personal/accionPersonal/accion-personal.service';
 import { ParametrosService } from '../configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { table } from 'console';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +52,7 @@ export class PdfServicesService {
     console.log('datos tipo accion personal: ', this.tipos_accion);
     this.tipos_accion.forEach((item: any) => {
       if (item.descripcion == datosPedidoSelected[0].descripcion) {
-        this.textoFijo = item.base_legal + ' ';
+        this.textoFijo = item.base_legal.replace(/\n\s*\n/g, ' ');
       }
     });
 
@@ -95,7 +91,7 @@ export class PdfServicesService {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('pedido_accion_personal_'+this.datosPedido.nombres+'.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('pedido_accion_personal_' + this.datosPedido.nombres + '.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -133,7 +129,7 @@ export class PdfServicesService {
     return {
       table: {
         widths: [8], // ancho del cuadrito
-        heights: [8], // alto del cuadrito
+        heights: [7], // alto del cuadrito
         body: [[{
           text: valor.toLocaleLowerCase() == accion.toLocaleLowerCase() ? 'X' : '',
           alignment: 'center',
@@ -241,7 +237,7 @@ export class PdfServicesService {
           valign: 'bottom'
         }]]
       },
-      margin: [1, 7, 3, 0],
+      margin: [1, 5, 3, 0],
       border: [false, false, false, false],
       layout: {
         hLineWidth: function (i, node) {
@@ -251,7 +247,7 @@ export class PdfServicesService {
         vLineWidth: () => 0,
         hLineColor: () => '#999999', // color gris
         paddingLeft: () => 0,
-        paddingRight: () => 30,
+        paddingRight: () => 20,
         paddingTop: () => 0,
         paddingBottom: () => 0
       }
@@ -294,7 +290,7 @@ export class PdfServicesService {
         body: [[{
           text: valor ? valor : '',
           alignment: 'left',
-          fontSize: 8,
+          fontSize: 7,
           noWrap: false,
           valign: 'bottom'
         }]]
@@ -344,9 +340,9 @@ export class PdfServicesService {
                                   text: 'ACCIÓN DE PERSONAL',
                                   alignment: 'center',
                                   bold: true,
-                                  fontSize: 11,
+                                  fontSize: 9,
                                   fillColor: '#f2f2f2',
-                                  margin: [0, 5, 0, 5],
+                                  margin: [0, 2, 0, 2],
                                   border: [false, false, false, true],
                                 }
                               ],
@@ -401,9 +397,9 @@ export class PdfServicesService {
                                   text: 'FECHA DE ELABORACIÓN',
                                   alignment: 'center',
                                   bold: true,
-                                  fontSize: 8,
+                                  fontSize: 7,
                                   fillColor: '#f2f2f2',
-                                  margin: [0, 2, 0, 2],
+                                  margin: [0, 1, 0, 1],
                                   border: [false, false, false, true],
                                 },
                               ]
@@ -425,8 +421,8 @@ export class PdfServicesService {
                                 {
                                   text: this.datosPedido.fecha_elaboracion,
                                   alignment: 'center',
-                                  fontSize: 8,
-                                  margin: [0, 1, 0, 1],
+                                  fontSize: 7,
+                                  margin: [0, 1, 0, 0],
                                 }
                               ]
                             ]
@@ -473,18 +469,18 @@ export class PdfServicesService {
                           text: 'APELLIDOS',
                           alignment: 'center',
                           bold: true,
-                          fontSize: 8,
+                          fontSize: 7,
                           fillColor: '#f2f2f2',
-                          margin: [0, 2, 0, 2],
+                          margin: [0, 1, 0, 1],
                           border: [false, false, true, false]
                         },
                         {
                           text: 'NOMBRES',
                           alignment: 'center',
                           bold: true,
-                          fontSize: 8,
+                          fontSize: 7,
                           fillColor: '#f2f2f2',
-                          margin: [0, 2, 0, 2],
+                          margin: [0, 1, 0, 1],
                           border: [false, false, false, false]
                         },
 
@@ -520,14 +516,14 @@ export class PdfServicesService {
                       text: this.datosPedido.nombres.split(' ')[2].toUpperCase() + ' ' + this.datosPedido.nombres.split(' ')[3].toUpperCase(),
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 3, 0, 3],
+                      margin: [0, 2, 0, 2],
                       border: [false, false, true, false]
                     },
                     {
                       text: this.datosPedido.nombres.split(' ')[0].toUpperCase() + ' ' + this.datosPedido.nombres.split(' ')[1].toUpperCase(),
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 3, 0, 3],
+                      margin: [0, 2, 0, 2],
                       border: [false, false, false, false]
                     },
                   ]
@@ -561,7 +557,7 @@ export class PdfServicesService {
                               bold: true,
                               fontSize: 7,
                               fillColor: '#f2f2f2',
-                              margin: [0, 7, 0, 7],
+                              margin: [0, 6, 0, 7],
                               border: [false, false, true, true]
                             },
                             {
@@ -570,7 +566,7 @@ export class PdfServicesService {
                               bold: true,
                               fontSize: 7,
                               fillColor: '#f2f2f2',
-                              margin: [0, 7, 0, 7],
+                              margin: [0, 6, 0, 7],
                               border: [false, false, false, true]
                             }
                           ]
@@ -594,7 +590,7 @@ export class PdfServicesService {
                               text: 'RIGE:',
                               alignment: 'center',
                               bold: true,
-                              fontSize: 8,
+                              fontSize: 7,
                               fillColor: '#f2f2f2',
                               margin: [0, 0, 0, 0],
                               border: [false, false, false, true]
@@ -672,7 +668,7 @@ export class PdfServicesService {
                       text: "CÉDULA",
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 3, 0, 3],
+                      margin: [0, 1, 0, 1],
                       border: [false, false, true, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -687,7 +683,7 @@ export class PdfServicesService {
                       text: this.datosPedido.cedula_empleado,
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 3, 0, 3],
+                      margin: [0, 1, 0, 1],
                       border: [false, false, true, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -702,7 +698,7 @@ export class PdfServicesService {
                       text: this.datosPedido.fecha_rige_desde,
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 3, 0, 3],
+                      margin: [0, 1, 0, 1],
                       border: [false, false, true, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -717,7 +713,7 @@ export class PdfServicesService {
                       text: this.datosPedido.fecha_rige_hasta,
                       alignment: 'center',
                       fontSize: 8,
-                      margin: [0, 3, 0, 3],
+                      margin: [0, 1, 0, 1],
                       border: [false, false, false, false],
                       layout: {
                         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -850,7 +846,7 @@ export class PdfServicesService {
                 defaultBorder: false, // desactiva cualquier borde por defecto
                 paddingLeft: () => 5,
                 paddingRight: () => 0,
-                paddingTop: () => 5,
+                paddingTop: () => 2,
                 paddingBottom: () => 0
               }
             }
@@ -964,7 +960,7 @@ export class PdfServicesService {
                 paddingLeft: () => 2,
                 paddingRight: () => 0,
                 paddingTop: () => 0,
-                paddingBottom: () => 5
+                paddingBottom: () => 2
               }
             }
           ],
@@ -988,8 +984,7 @@ export class PdfServicesService {
           [
             {
 
-              text: this.datosPedido.adicion_base_legal,
-              bold: true,
+              text: this.datosPedido.adicion_base_legal != null || this.textoFijo != "" ? (this.textoFijo + '\n' + this.datosPedido.adicion_base_legal) + '\n' + ((this.datosPedido.observacion != null && this.datosPedido.observacion != '') ? 'Observación: ' + this.datosPedido.observacion : '') : "(Explicar el motivo por el cual se está colocando el movimiento escogido en el anterior paso)",
               fontSize: 7,
               margin: [5, 5, 0, 5],
               noWrap: false, // permite salto de línea automático
@@ -1071,7 +1066,7 @@ export class PdfServicesService {
                   ]
                 ]
               },
-              border: [true, false, true, false],
+              border: [true, false, true, true],
               layout: {
                 defaultBorder: false, // desactiva cualquier borde por defecto
                 paddingLeft: () => 0,
@@ -1087,23 +1082,7 @@ export class PdfServicesService {
               }
             }
           ],
-          [
-            {
 
-              text: '',
-              fontSize: 7,
-              margin: [0, 3, 0, 3],
-              border: [false, true, false, true],
-              layout: {
-                defaultBorder: false, // desactiva cualquier borde por defecto
-                paddingLeft: () => 0,
-                paddingRight: () => 0,
-                paddingTop: () => 0,
-                paddingBottom: () => 0
-              }
-
-            }
-          ],
           [
             {
               table: {
@@ -1148,8 +1127,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.proceso_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1163,8 +1142,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.proceso_propuesto,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1216,8 +1195,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.nivel_gestion_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1231,8 +1210,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.nivel_gestion_propuesto,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1284,8 +1263,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.unidad_administrativa,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1299,8 +1278,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.unidad_administrativa_propuesta,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1352,8 +1331,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.lugar_trabajo_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1367,8 +1346,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.lugar_trabajo_propuesto,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1420,8 +1399,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.cargo_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1435,8 +1414,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.cargo_propuesto,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1488,8 +1467,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.grupo_ocupacional_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1503,8 +1482,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.grupo_ocupacional_propuesto,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1556,8 +1535,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.grado_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1571,8 +1550,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.grado_propuesto,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1624,8 +1603,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.remuneracion_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1639,8 +1618,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.remuneracion_propuesta,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1692,8 +1671,8 @@ export class PdfServicesService {
                   [
                     {
                       text: this.datosPedido.partida_individual_actual,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, true, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1707,8 +1686,8 @@ export class PdfServicesService {
                     },
                     {
                       text: this.datosPedido.partida_individual_propuesta,
-                      fontSize: 8,
-                      margin: [5, 2, 0, 2],
+                      fontSize: 7,
+                      margin: [5, 1, 0, 1],
                       border: [false, false, false, false],
                       noWrap: false,
                       valign: 'middle',     // centra verticalmente
@@ -1743,7 +1722,7 @@ export class PdfServicesService {
             {
               text: ' POSESIÓN DEL PUESTO',
               bold: true,
-              fontSize: 7,
+              fontSize: 8,
               fillColor: '#f2f2f2',
               margin: [5, 2, 0, 2],
               border: [true, true, true, true],
@@ -1774,7 +1753,7 @@ export class PdfServicesService {
                                   [{
                                     text: 'YO, ',
                                     fontSize: 8,
-                                    margin: [20, 7, 0, 0],
+                                    margin: [20, 5, 0, 0],
                                     border: [false, false, false, false],
                                     noWrap: false,
                                     valign: 'middle',// centra verticalmente
@@ -1803,7 +1782,7 @@ export class PdfServicesService {
                                   [{
                                     text: 'CON NRO. DE DOCUMENTO DE IDENTIFICACIÓN:  ',
                                     fontSize: 8,
-                                    margin: [20, 7, 1, 0],
+                                    margin: [20, 5, 1, 0],
                                     border: [false, false, false, false],
                                     noWrap: false,
                                     valign: 'middle',     // centra verticalmente
@@ -1871,7 +1850,7 @@ export class PdfServicesService {
                                           text: 'Lugar: ',
                                           fontSize: 8,
                                           bold: true,
-                                          margin: [15, 7, 0, 0],
+                                          margin: [15, 5, 0, 0],
                                           border: [false, false, false, false],
                                           noWrap: false,
                                           valign: 'middle',     // centra verticalmente
@@ -1901,7 +1880,7 @@ export class PdfServicesService {
                                           text: 'Fecha: ',
                                           fontSize: 8,
                                           bold: true,
-                                          margin: [5, 7, 0, 0],
+                                          margin: [5, 5, 0, 0],
                                           border: [false, false, false, false],
                                           noWrap: false,
                                           valign: 'middle',     // centra verticalmente
@@ -1945,7 +1924,7 @@ export class PdfServicesService {
                             {
                               text: '** (EN CASO DE GANADOR DE CONCURSO DE MÉRITOS Y OPOSICIÓN)',
                               fontSize: 7,
-                              margin: [26, 7, 0, 0],
+                              margin: [26, 8, 0, 0],
                               bold: true,
                               border: [false, false, false, false],
                               noWrap: false,
@@ -1975,7 +1954,7 @@ export class PdfServicesService {
                                       text: 'N°. Acta final',
                                       fontSize: 7,
                                       bold: true,
-                                      margin: [20, 2, 0, 5],
+                                      margin: [20, 2, 0, 1],
                                       border: [false, false, false, false],
                                       noWrap: false,
                                       alignment: 'center',     // centra verticalmente
@@ -1991,7 +1970,7 @@ export class PdfServicesService {
                                       text: 'Fecha',
                                       fontSize: 7,
                                       bold: true,
-                                      margin: [10, 2, 0, 5],
+                                      margin: [10, 2, 0, 1],
                                       border: [false, false, false, false],
                                       noWrap: false,
                                       alignment: 'center',     // centra verticalmente
@@ -2044,7 +2023,7 @@ export class PdfServicesService {
                                       text: 'Servidor público',
                                       fontSize: 7,
                                       bold: true,
-                                      margin: [15, 2, 0, 5],
+                                      margin: [15, 2, 0, 1],
                                       border: [false, false, false, false],
                                       noWrap: false,
                                       alignment: 'center',     // centra verticalmente
@@ -2093,50 +2072,7 @@ export class PdfServicesService {
               }
             }
           ],
-          [
-            {
-              table: {
-                widths: [200, '*'],
-                body: [
-                  [{
-                    text: 'Elaborado por el Ministerio del Trabajo',
-                    fontSize: 5,
-                    alignment: 'center',// centra verticalmente
-                    margin: [0, 5, 0, 5],
-                    border: [false, false, false, false],
-                    layout: {
-                      defaultBorder: false, // desactiva cualquier borde por defecto
-                      paddingLeft: () => 0,
-                      paddingRight: () => 0,
-                      paddingTop: () => 10,
-                      paddingBottom: () => 10
-                    }
-                  }, {
-                    text: 'Fecha de actualización de formato: 2024-08-23 / Versión: 01.1 / Página 1 de 2',
-                    fontSize: 5,
-                    alignment: 'center',// centra verticalmente
-                    margin: [0, 5, 0, 5],
-                    border: [false, false, false, false],
-                    layout: {
-                      defaultBorder: false, // desactiva cualquier borde por defecto
-                      paddingLeft: () => 0,
-                      paddingRight: () => 0,
-                      paddingTop: () => 10,
-                      paddingBottom: () => 10
-                    }
-                  }]
-                ]
-              },
-              border: [false, false, false, false],
-              layout: {
-                defaultBorder: false, // desactiva cualquier borde por defecto
-                paddingLeft: () => 0,
-                paddingRight: () => 0,
-                paddingTop: () => 0,
-                paddingBottom: () => 10
-              }
-            }
-          ],
+
         ],
       }, layout: {
         defaultBorder: false, // desactiva cualquier borde por defecto
@@ -2167,7 +2103,7 @@ export class PdfServicesService {
               fillColor: '#f2f2f2',
               alignment: 'center',// centra verticalmente
               margin: [5, 2, 0, 2],
-              border: [true, true, true, true],
+              border: [true, false, true, true],
               layout: {
                 defaultBorder: false, // desactiva cualquier borde por defecto
                 paddingLeft: () => 0,
@@ -2188,7 +2124,7 @@ export class PdfServicesService {
                     fontSize: 7,
                     fillColor: '#f2f2f2',
                     alignment: 'center',// centra verticalmente
-                    margin: [0, 2, 0, 2],
+                    margin: [0, 1, 0, 1],
                     border: [false, false, false, true],
                     layout: {
                       defaultBorder: false, // desactiva cualquier borde por defecto
@@ -2204,7 +2140,7 @@ export class PdfServicesService {
                     fontSize: 7,
                     fillColor: '#f2f2f2',
                     alignment: 'center',// centra verticalmente
-                    margin: [0, 2, 0, 2],
+                    margin: [0, 1, 0, 1],
                     border: [true, false, false, true],
                     layout: {
                       defaultBorder: false, // desactiva cualquier borde por defecto
@@ -2220,11 +2156,11 @@ export class PdfServicesService {
                       body: [
                         [{
                           text: '',
-                          margin: [0, 30, 0, 0]
+                          margin: [0, 30, 0, 10]
                         },
                         {
                           text: '',
-                          margin: [0, 30, 0, 0]
+                          margin: [0, 30, 0, 10]
                         }],
                         [{
                           text: 'FIRMA:  ',
@@ -2276,11 +2212,11 @@ export class PdfServicesService {
                         }, this.getCellPosecionFirmasText(this.datosPedido.cargo_director)],
                         [{
                           text: '',
-                          margin: [0, 0, 0, 5],
+                          margin: [0, 0, 0, 10],
                           border: [false, false, false, false],
                         }, {
                           text: '',
-                          margin: [0, 0, 0, 5],
+                          margin: [0, 0, 0, 10],
                           border: [false, false, false, false],
                         }]
                       ]
@@ -2300,11 +2236,11 @@ export class PdfServicesService {
                       body: [
                         [{
                           text: '',
-                          margin: [0, 30, 0, 0]
+                          margin: [0, 30, 0, 10]
                         },
                         {
                           text: '',
-                          margin: [0, 30, 0, 0]
+                          margin: [0, 30, 0, 10]
                         }],
                         [{
                           text: 'FIRMA:  ',
@@ -2383,6 +2319,66 @@ export class PdfServicesService {
               layout: {
                 defaultBorder: false, // desactiva cualquier borde por defecto
                 paddingLeft: () => 10,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 0
+              }
+            }
+          ],
+          [
+            {
+              table: {
+                widths: [200, '*'],
+                body: [
+                  [{
+                    text: 'Elaborado por el Ministerio del Trabajo',
+                    fontSize: 5,
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 5, 0, 5],
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 10,
+                      paddingBottom: () => 10
+                    }
+                  }, {
+                    text: 'Fecha de actualización de formato: 2024-08-23 / Versión: 01.1 / Página 1 de 2',
+                    fontSize: 5,
+                    alignment: 'center',// centra verticalmente
+                    margin: [0, 5, 0, 5],
+                    border: [false, false, false, false],
+                    layout: {
+                      defaultBorder: false, // desactiva cualquier borde por defecto
+                      paddingLeft: () => 0,
+                      paddingRight: () => 0,
+                      paddingTop: () => 10,
+                      paddingBottom: () => 10
+                    }
+                  }]
+                ]
+              },
+              border: [false, false, false, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
+                paddingRight: () => 0,
+                paddingTop: () => 0,
+                paddingBottom: () => 10
+              }
+            }
+          ],
+          [
+            {
+              text: '',
+              fontSize: 5,
+              alignment: 'center',// centra verticalmente
+              margin: [0, 9, 0, 9],
+              border: [false, false, false, false],
+              layout: {
+                defaultBorder: false, // desactiva cualquier borde por defecto
+                paddingLeft: () => 0,
                 paddingRight: () => 0,
                 paddingTop: () => 0,
                 paddingBottom: () => 0
@@ -2489,7 +2485,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_empleado+'. '+this.datosPedido.nombres.toUpperCase())],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_empleado + '. ' + this.datosPedido.nombres.toUpperCase())],
                       [{
                         text: 'FECHA:  ',
                         bold: true,
@@ -2581,9 +2577,9 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_testigo+'. '+this.datosPedido.empleado_testigo)],
-                      
-                      [{ 
+                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_testigo + '. ' + this.datosPedido.empleado_testigo)],
+
+                      [{
                         text: 'FECHA:  ',
                         bold: true,
                         fontSize: 7,
@@ -2600,7 +2596,7 @@ export class PdfServicesService {
                           paddingBottom: () => 0
                         }
                       }, this.getCellPosecionFirmasText(this.datosPedido.fecha_testigo)],
-                    
+
                       [{
                         text: 'RAZÓN:  ',
                         bold: true,
@@ -2750,7 +2746,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_elaboracion+'. '+this.datosPedido.empleado_elaboracion)],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_elaboracion + '. ' + this.datosPedido.empleado_elaboracion)],
                       [{
                         text: 'PUESTO:  ',
                         bold: true,
@@ -2833,7 +2829,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_revision+'. '+this.datosPedido.empleado_revision)],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_revision + '. ' + this.datosPedido.empleado_revision)],
                       [{
                         text: 'PUESTO:  ',
                         bold: true,
@@ -2915,7 +2911,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_control+'. '+this.datosPedido.empleado_control)],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_control + '. ' + this.datosPedido.empleado_control)],
                       [{
                         text: 'PUESTO:  ',
                         bold: true,
@@ -2999,7 +2995,7 @@ export class PdfServicesService {
                 }
               ],
               border: [false, false, false, false],
-              margin: [0, 40, 0, 5],
+              margin: [0, 5, 0, 5],
             }
           ],
           [{
@@ -3304,7 +3300,7 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_comunicacion+'. '+this.datosPedido.empleado_comunicacion.toUpperCase())
+                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_comunicacion ? this.datosPedido.abreviatura_comunicacion.trim() + ". " : "" + (this.datosPedido.empleado_comunicacion ? this.datosPedido.empleado_comunicacion.toUpperCase().trim() : ""))
                       ],
                       [
                         {

@@ -655,31 +655,6 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
-    BuscarHorarioFechas(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_empleado, lista_fechas } = req.body;
-                const HORARIO = yield database_1.default.query(`
-                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.id_empleado, pg.estado_origen 
-                FROM eu_asistencia_general AS pg, eu_empleado_cargos AS c 
-                WHERE pg.fecha_horario IN (${lista_fechas}) 
-                    AND pg.id_empleado = $1 AND c.id = pg.id_empleado_cargo 
-                    AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
-                ORDER BY pg.fecha_horario ASC
-                `, [id_empleado]);
-                if (HORARIO.rowCount != 0) {
-                    return res.jsonp(HORARIO.rows);
-                }
-                else {
-                    res.status(404).jsonp({ text: 'Registros no encontrados.' });
-                }
-            }
-            catch (error) {
-                return res.jsonp({ message: 'error' });
-            }
-        });
-    }
 }
 // METODO PARA BUSCAR DATOS DE EMPLEADOS    **USADO
 function BuscarEmpleadoPorParametro(parametro, valor) {

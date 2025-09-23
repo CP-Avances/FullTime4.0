@@ -734,7 +734,8 @@ export class ListarTitulosComponent implements OnInit {
   Eliminar(id_titulo: number) {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     };
     this.rest.EliminarRegistro(id_titulo, data).subscribe((res: any) => {
       if (res.message === 'error') {

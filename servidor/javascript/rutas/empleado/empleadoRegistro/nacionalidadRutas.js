@@ -14,8 +14,6 @@ class NacionalidadRutas {
     configuracion() {
         // METODO PARA LISTAR NACIONALIDAD   **USADO
         this.router.get('/', verificarToken_1.TokenValidation, nacionalidadControlador_1.default.ListarNacionalidades);
-        // METODO PARA BUSCAR NACIONALIDAD POR SU NOMBRE   **USADO
-        this.router.get('/buscar/:nacionalidad', verificarToken_1.TokenValidation, nacionalidadControlador_1.default.ObtenerNacionalidad);
         // METODO PARA REGISTRAR NACIONALIDAD   **USADO
         this.router.post('/', verificarToken_1.TokenValidation, nacionalidadControlador_1.default.CrearNacionalidad);
         // METODO PARA ACTUALIZAR REGISTRO DE NACIONALIDAD   **USADO

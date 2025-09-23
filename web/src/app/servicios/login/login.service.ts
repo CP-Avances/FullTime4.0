@@ -21,23 +21,23 @@ export class LoginService {
   ) { }
 
 
-  // VALIDACIONES DE INGRESO AL SISTEMA     **USADO
+  // VALIDACIONES DE INGRESO AL SISTEMA     **USADO**
   async ValidarCredenciales(data: any) {
     const response = await firstValueFrom(this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/login`, data));
     return response;
   }
 
-  // METODO PARA CAMBIAR CONTRASEÑA    **USADO
+  // METODO PARA CAMBIAR CONTRASEÑA    **USADO**
   EnviarCorreoContrasena(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/recuperar-contrasenia/`, data)
   }
 
-  // METODO PARA CAMBIAR CONTRASEÑA   **USADO
+  // METODO PARA CAMBIAR CONTRASEÑA   **USADO**
   ActualizarContrasenia(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/cambiar-contrasenia`, data)
   }
 
-  // AUDITAR INICIO DE SESION    **USADO
+  // AUDITAR INICIO DE SESION    **USADO**
   AuditarInicio(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/registrar_acceso`, data)
   }
@@ -70,7 +70,7 @@ export class LoginService {
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
 
-  // SELECTOR DE EMPRESAS
+  // SELECTOR DE EMPRESAS  **USADO**
   getEmpresa(data: any) {
     return this.http.post<any>(`${environment.url}/fulltime`, data);
   }

@@ -38,7 +38,6 @@ class ProcesoRutas {
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], PROCESO_CONTROLADOR.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla', TokenValidation, PROCESO_CONTROLADOR.CargarPlantilla);
-
         // METODO DE REGISTRO DE EMPLEADO - PROCESOS    **USADO
         this.router.post('/registrarProcesos', TokenValidation, PROCESO_CONTROLADOR.RegistrarProcesos);
         // METODO PARA ACTUALIZAR EL PROCESO   **USADO
@@ -49,19 +48,6 @@ class ProcesoRutas {
         this.router.post('/cargar_plantilla/registro_empleadoProceso', TokenValidation, PROCESO_CONTROLADOR.RegistrarEmpleadoProceso);
         // METODO PARA ELIMINAR PROCESOS DE MANERA MULTIPLE   **USADO
         this.router.post('/eliminarProcesoMultiple', TokenValidation, PROCESO_CONTROLADOR.EliminarProcesoMultiple);
-
-
-
-
-
-
-
-        this.router.get('/:id', TokenValidation, PROCESO_CONTROLADOR.getOne);
-
-
-
-
-
 
     }
 }

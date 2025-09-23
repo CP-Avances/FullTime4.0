@@ -1296,18 +1296,6 @@ class ProcesoControlador {
             }
         });
     }
-    getOne(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const unaProvincia = yield database_1.default.query(`
-      SELECT * FROM map_cat_procesos WHERE id = $1
-      `, [id]);
-            if (unaProvincia.rowCount != 0) {
-                return res.jsonp(unaProvincia.rows);
-            }
-            res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });
-        });
-    }
 }
 exports.PROCESOS_CONTROLADOR = new ProcesoControlador();
 exports.default = exports.PROCESOS_CONTROLADOR;

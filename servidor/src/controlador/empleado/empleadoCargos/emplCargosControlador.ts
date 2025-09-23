@@ -1058,16 +1058,7 @@ class EmpleadoCargosControlador {
     }
   }
 
-
-
-
-
-
-
-
-
-
-  // VERIFICAR
+  // METODO PARA BUSCAR DATOS DEL USUARIO DE ACUERDO AL ID DEL CARGO   **USADO**
   public async EncontrarIdCargo(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const CARGO = await pool.query(

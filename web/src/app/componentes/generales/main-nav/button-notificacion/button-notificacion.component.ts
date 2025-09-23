@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Socket } from 'ngx-socket-io';
+import { Socket } from 'socket.io-client';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { SocketService } from 'src/app/servicios/socket/socket.service';

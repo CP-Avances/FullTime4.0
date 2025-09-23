@@ -25,27 +25,27 @@ export class EmpleadoService {
    ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
    ** ********************************************************************************************* **/
 
-  // METODO PARA BUSCAR CONFIGURACION DE CODIGO DE USUARIO   **USADO
+  // METODO PARA BUSCAR CONFIGURACION DE CODIGO DE USUARIO   **USADO**
   ObtenerCodigo() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleado/encontrarDato/codigo`);
   }
 
-  // METODO PRA REGISTRAR CODIGO DE USUARIO    **USADO
+  // METODO PRA REGISTRAR CODIGO DE USUARIO    **USADO**
   CrearCodigo(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/crearCodigo`, datos);
   }
 
-  // METODO DE BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA   **USADO
+  // METODO DE BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA   **USADO**
   ObtenerCodigoMAX() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleado/encontrarDato/codigo/empleado`);
   }
 
-  // METODO PARA ACTUALIZAR VALOR DE CODIGO    **USADO
+  // METODO PARA ACTUALIZAR VALOR DE CODIGO    **USADO**
   ActualizarCodigoTotal(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/cambiarValores`, datos);
   }
 
-  // METODO DE ACTUALIZACION DE CODIGO DE USUARIO    **USADO
+  // METODO DE ACTUALIZACION DE CODIGO DE USUARIO    **USADO**
   ActualizarCodigo(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/cambiarCodigo`, datos);
   }
@@ -55,18 +55,18 @@ export class EmpleadoService {
    ** **                     METODO PARA MANEJAR DATOS DE EMPLEADO                                ** **
    ** ********************************************************************************************** **/
 
-  // BUSCAR UN REGISTRO DE USUARIO  **USADO
+  // BUSCAR UN REGISTRO DE USUARIO  **USADO**
   BuscarUnEmpleado(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/${id}`);
   }
 
-  // REGISTRAR EMPLEADOS    **USADO
+  // REGISTRAR EMPLEADOS    **USADO**
   RegistrarEmpleados(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado`, data).pipe(
       catchError(data));
   }
 
-  // ACTUALIZAR EMPLEADOS    **USADO
+  // ACTUALIZAR EMPLEADOS    **USADO**
   ActualizarEmpleados(data: any, id: number) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/${id}/usuario`, data).pipe(
       catchError(error => {
@@ -75,12 +75,12 @@ export class EmpleadoService {
     );
   }
 
-  // SERVICIO PARA OBTENER LISTA DE NACIONALIDADES    **USADO
+  // SERVICIO PARA OBTENER LISTA DE NACIONALIDADES    **USADO**
   BuscarNacionalidades() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/nacionalidades`)
   }
 
-  // METODO PARA LISTAR EMPLEADOS ACTIVOS    **USADO
+  // METODO PARA LISTAR EMPLEADOS ACTIVOS    **USADO**
   ListarEmpleadosActivos() {
     const headers = new HttpHeaders({
       'Cache-Control': 'no-cache',
@@ -90,7 +90,7 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado`, { headers });
   }
 
-  // METODO PARA LISTAR EMPLEADOS DESACTIVADOS    **USADO
+  // METODO PARA LISTAR EMPLEADOS DESACTIVADOS    **USADO**
   ListaEmpleadosDesactivados() {
     const headers = new HttpHeaders({
       'Cache-Control': 'no-cache',
@@ -100,27 +100,27 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/desactivados/empleados`, { headers });
   }
 
-  // DESACTIVAR VARIOS EMPLEADOS SELECCIONADOS   **USADO
+  // DESACTIVAR VARIOS EMPLEADOS SELECCIONADOS   **USADO**
   async DesactivarVariosUsuarios(data: any): Promise<any> {
     return firstValueFrom(this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/desactivar/masivo`, data));
   }
 
-  // ACTIVAR VARIOS EMPLEADOS    **USADO
+  // ACTIVAR VARIOS EMPLEADOS    **USADO**
   async ActivarVariosUsuarios(data: any): Promise<any> {
     return firstValueFrom(this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/activar/masivo`, data));
   }
 
-  // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
+  // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO**
   SubirImagen(formData: any, idEmpleado: number) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/${idEmpleado}/uploadImage`, formData)
   }
 
-  // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO **USADO
+  // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO **USADO**
   ObtenerImagen(id: any, imagen: any) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/img/codificado/${id}/${imagen}`)
   }
 
-  // METODO PARA ELIMINAR REGISTRO    **USADO
+  // METODO PARA ELIMINAR REGISTRO    **USADO**
   EliminarEmpleados(empleados: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/empleado/eliminar`;
     const httpOtions = {
@@ -133,23 +133,23 @@ export class EmpleadoService {
     );
   }
 
-  // BUSCAR LISTA DE EMPLEADOS QUE SE MUESTRAN EN LA BUSQUEDA   ** USADO
+  // BUSCAR LISTA DE EMPLEADOS QUE SE MUESTRAN EN LA BUSQUEDA   **USADO**
   BuscarListaEmpleados() {
     this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
     return this.http.get<any>(`${(this.url as string)}/empleado/buscador/empleado`);
   }
 
-  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO     **USADO
+  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO     **USADO**
   BuscarEmpleadoNombre(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/buscar/informacion`, data);
   }
 
-  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA AUTOMATICA    **USADO
+  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA AUTOMATICA    **USADO**
   VerificarArchivoExcel_Automatico(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/verificar/automatico/plantillaExcel/`, formData);
   }
 
-  // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS    **USADO
+  // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS    **USADO**
   CrearCarpetasUsuarios(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/crear_carpetas`, data).pipe(
       catchError(error => {
@@ -158,7 +158,7 @@ export class EmpleadoService {
     );
   }
 
-  // METODO PARA CONSULTAR INFORMACION DE CONTRATOS   **USADO
+  // METODO PARA CONSULTAR INFORMACION DE CONTRATOS   **USADO**
   ObtenerContratosCargos(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/infoContratoCargos`, data).pipe(
       catchError(error => {
@@ -167,17 +167,17 @@ export class EmpleadoService {
     );
   }
 
-  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO AUTOMATICO   **USADO
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO AUTOMATICO   **USADO**
   SubirArchivoExcel_Automatico(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/cargar_automatico/plantillaExcel/`, formData);
   }
 
-  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA MANUAL    **USADO
+  // VERIFICAR DATOS DE LA PLANTILLA DE DATOS CON CODIGO GENERADO DE FORMA MANUAL    **USADO**
   VerificarArchivoExcel_Manual(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/verificar/manual/plantillaExcel/`, formData);
   }
 
-  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO**
   SubirArchivoExcel_Manual(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/cargar_manual/plantillaExcel/`, formData);
   }
@@ -187,27 +187,27 @@ export class EmpleadoService {
    ** **       METODOS PARA MANEJO DE DATOS DE TITULO PROFESIONAL             **
    ** *********************************************************************** **/
 
-  // METODO PARA BUSCAR TITULO DE EMPLEADO    **USADO
+  // METODO PARA BUSCAR TITULO DE EMPLEADO    **USADO**
   BuscarTituloUsuario(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleado/emplTitulos/${id}`);
   }
 
-  // METODO PARA REGISTRAR TITULO PROFESIONAL    **USADO
+  // METODO PARA REGISTRAR TITULO PROFESIONAL    **USADO**
   RegistrarTitulo(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/emplTitulos`, data);
   }
 
-  // METODO PARA BUSCAR TITULO ESPECIFICO DEL USUARIO   **USADO
+  // METODO PARA BUSCAR TITULO ESPECIFICO DEL USUARIO   **USADO**
   BuscarTituloEspecifico(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/emplTitulos/usuario`, data);
   }
 
-  // METODO PARA ACTUALIZAR TITULO DEL USUARIO   **USADO
+  // METODO PARA ACTUALIZAR TITULO DEL USUARIO   **USADO**
   ActualizarTitulo(id: number, data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/${id}/titulo`, data);
   }
 
-  // METODO DE ELIMINACION DE TITULO DE EMPLEADO   **USADO
+  // METODO DE ELIMINACION DE TITULO DE EMPLEADO   **USADO**
   EliminarTitulo(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/empleado/eliminar/titulo/${id}`;
     const httpOtions = {
@@ -221,12 +221,12 @@ export class EmpleadoService {
    ** **         CONTROL DE GEOLOCALIZACION EN EL SISTEMA                     **
    ** *********************************************************************** **/
 
-  // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
+  // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO**
   ActualizarDomicilio(id: number, data: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/geolocalizacion/${id}`, data)
   }
 
-  // METODO PARA OBTENER LA UBICACION DE DOMICILIO DEL USUARIO    **USADO
+  // METODO PARA OBTENER LA UBICACION DE DOMICILIO DEL USUARIO    **USADO**
   BuscarUbicacion(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/ubicacion/${id}`);
   }
@@ -236,17 +236,17 @@ export class EmpleadoService {
    ** **                 METODOS MODALIDAD DE TRABAJO O TIPO DE CONTRATOS                   ** **
    ** **************************************************************************************** **/
 
-  // BUSCAR LISTA MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO
+  // BUSCAR LISTA MODALIDAD DE TRABAJO O TIPO DE CONTRATOS   **USADO**
   BuscarTiposContratos() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/modalidad/trabajo`);
   }
 
-  // REGISTRAR MODALIDAD DE TRABAJO   **USADO
+  // REGISTRAR MODALIDAD DE TRABAJO   **USADO**
   CrearTiposContrato(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/modalidad/trabajo`, datos);
   }
 
-  // BUSCAR MODALIDAD DE TRABAJO POR SU NOMBRE    **USADO
+  // BUSCAR MODALIDAD DE TRABAJO POR SU NOMBRE    **USADO**
   BuscarModalidadLaboralNombre(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
@@ -255,77 +255,77 @@ export class EmpleadoService {
    ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** **
    ** ***************************************************************************************** **/
 
-  // REGISTRO DE DATOS DE CONTRATO   **USADO
+  // REGISTRO DE DATOS DE CONTRATO   **USADO**
   CrearContratoEmpleado(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado`, datos);
   }
 
-  // CARGAR DOCUMENTO CONTRATO    **USADO
+  // CARGAR DOCUMENTO CONTRATO    **USADO**
   SubirContrato(formData: any, id: number) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/${id}/documento-contrato`, formData)
   }
 
-  // BUSCAR CONTRATOS POR ID DE EMPLEADO   **USADO
+  // BUSCAR CONTRATOS POR ID DE EMPLEADO   **USADO**
   BuscarContratosEmpleado(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/contrato-empleado/${id}`);
   }
 
-  // BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR    **USADO
+  // BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR    **USADO**
   BuscarContratosEmpleadoEditar(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/contrato-empleado-editar`, data);
   }
 
-  // EDITAR DATOS DE CONTRATO     **USADO
+  // EDITAR DATOS DE CONTRATO     **USADO**
   ActualizarContratoEmpleado(id: number, data: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/${id}/actualizar/`, data);
   }
 
-  // ELIMINAR DOCUMENTO DE CONTRATO   **USADO
+  // ELIMINAR DOCUMENTO DE CONTRATO   **USADO**
   EliminarArchivo(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/eliminar_contrato/base_servidor`, datos)
   }
 
-  // ELIMINAR DOCUMENTO DE CONTRATO DEL SERVIDOR   **USADO
+  // ELIMINAR DOCUMENTO DE CONTRATO DEL SERVIDOR   **USADO**
   EliminarArchivoServidor(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/eliminar_contrato/servidor`, datos)
   }
 
-  // METODO PARA BUSCAR ID DE CONTRATO ACTUAL   **USADO
+  // METODO PARA BUSCAR ID DE CONTRATO ACTUAL   **USADO**
   BuscarIDContratoActual(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/contratoActual/${id}`);
   }
 
-  // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO
+  // METODO PARA BUSCAR DATOS DE CONTRATO POR ID   **USADO**
   BuscarDatosContrato(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/contrato/${id}`);
   }
 
-  // METODO PARA ELIMINAR EL CONTRATO POR EL ID         **USADO
+  // METODO PARA ELIMINAR EL CONTRATO POR EL ID         **USADO**
   EliminarContrato(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/eliminarContrato`, data);
   }
 
-  // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO
+  // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO**
   BuscarFechaContrato(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/buscarFecha`, datos);
   }
 
-  // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO
+  // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO**
   BuscarFechaContratoUsuarios(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/buscarFechaUsuarios`, datos);
   }
 
-  // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
+  // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO**
   BuscarFechaIdContrato(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/buscarFecha/contrato`, datos);
   }
 
-  // METODO PARA REVISAR DATOS DE PLANTILLA CONTRATOS   **USADO
+  // METODO PARA REVISAR DATOS DE PLANTILLA CONTRATOS   **USADO**
   RevisarFormato(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/upload/revision`, formData);
   }
 
-  // METODO PARA SUBIR DATOS DE CONTRATOS   **USADO
+  // METODO PARA SUBIR DATOS DE CONTRATOS   **USADO**
   SubirArchivoExcelContrato(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/cargar_plantilla/`, formData);
   }

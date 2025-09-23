@@ -12,17 +12,17 @@ export class TituloService {
   ) { }
 
 
-  // METODO PARA LISTAR TITULOS   **USADO
+  // METODO PARA LISTAR TITULOS   **USADO**
   ListarTitulos() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/titulo/`);
   }
 
-  // METODO PARA BUSCAR EL NOMBRE DE UN TITULO PROFESIONAL   **USADO
+  // METODO PARA BUSCAR EL NOMBRE DE UN TITULO PROFESIONAL   **USADO**
   BuscarTituloNombre(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo/titulo-nombre`, data);
   }
 
-  // METODO PARA ELIMINAR REGISTRO   **USADO
+  // METODO PARA ELIMINAR REGISTRO   **USADO**
   EliminarRegistro(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/titulo/eliminar/${id}`;
     const httpOtions = {
@@ -31,22 +31,22 @@ export class TituloService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA REGISTRAR TITULO    **USADO
+  // METODO PARA REGISTRAR TITULO    **USADO**
   RegistrarTitulo(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO
+  // METODO PARA ACTUALIZAR REGISTRO DE TITULO   **USADO**
   ActualizarUnTitulo(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/titulo`, datos);
   }
 
-  // METODO DE VALIDACION DE DATOS DE PLANTILLA  **USADO
+  // METODO DE VALIDACION DE DATOS DE PLANTILLA  **USADO**
   RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/titulo/upload/revision', formData);
   }
 
-  // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA   **USADO
+  // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA   **USADO**
   RegistrarTitulosPlantilla(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo/registrarTitulos`, data);
   }

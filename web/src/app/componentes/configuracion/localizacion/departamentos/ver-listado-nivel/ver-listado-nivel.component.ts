@@ -6,11 +6,6 @@ import { PageEvent } from '@angular/material/paginator';
 
 import { AutorizaDepartamentoService } from 'src/app/servicios/configuracion/localizacion/autorizaDepartamento/autoriza-departamento.service';
 
-interface Nivel {
-  valor: number;
-  nombre: string
-}
-
 @Component({
   selector: 'app-ver-listado-nivel',
   standalone: false,

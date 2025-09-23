@@ -402,7 +402,8 @@ export class EditarHorarioComponent implements OnInit {
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
     });

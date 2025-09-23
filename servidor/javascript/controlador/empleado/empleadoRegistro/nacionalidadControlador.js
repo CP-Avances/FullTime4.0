@@ -30,21 +30,6 @@ class NacionalidadControlador {
             }
         });
     }
-    // METODO PARA BUSCAR NACIONALIDAD POR SU NOMBRE   **USADO
-    ObtenerNacionalidad(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
-            const unNacionalidades = yield database_1.default.query(`
-      SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-      `, [nombre]);
-            if (unNacionalidades.rowCount != 0) {
-                return res.jsonp(unNacionalidades.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     // METODO PARA REGISTRAR NACIONALIDAD   **USADO
     CrearNacionalidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

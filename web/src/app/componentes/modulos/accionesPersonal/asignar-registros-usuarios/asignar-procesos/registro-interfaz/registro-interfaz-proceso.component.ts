@@ -16,7 +16,6 @@ import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoC
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
-import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 
 @Component({

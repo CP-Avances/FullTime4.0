@@ -11,22 +11,22 @@ export class DiscapacidadService {
 
   ) { }
 
-  // METODO PARA BUSCAR DATOS DE UN USUARIO   **USADO
+  // METODO PARA BUSCAR DATOS DE UN USUARIO   **USADO**
   BuscarDiscapacidadUsuario(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/${id}`);
   }
 
-  // METODO PARA REGISTRAR DISCAPACIDAD    **USADO
+  // METODO PARA REGISTRAR DISCAPACIDAD    **USADO**
   RegistroDiscapacidad(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/discapacidad`, data);
   }
 
-  // METODO PARA ACTUALIZACION DE REGISTRO   **USADO
+  // METODO PARA ACTUALIZACION DE REGISTRO   **USADO**
   ActualizarDiscapacidad(id: number, data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/${id}`, data);
   }
 
-  // METODO PARA ELIMINAR REGISTRO   **USADO
+  // METODO PARA ELIMINAR REGISTRO   **USADO**
   EliminarDiscapacidad(id: number, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/discapacidad/eliminar/${id}`;
     const httpOtions = {
@@ -39,17 +39,17 @@ export class DiscapacidadService {
    ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** **
    ** *************************************************************************************** **/
 
-  // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD    **USADO
+  // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD    **USADO**
   RegistrarTipo(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo`, data);
   }
 
-  // BUSCAR TIPO DE DISCAPACIDAD    **USADO
+  // BUSCAR TIPO DE DISCAPACIDAD    **USADO**
   ListarTipoDiscapacidad() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo/tipo`);
   }
 
-  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE    **USADO
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE    **USADO**
   BuscarDiscapacidadNombre(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo/nombre`, data);
   }

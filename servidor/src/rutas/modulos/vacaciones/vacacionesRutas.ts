@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../../libs/verificarToken'
-import { ObtenerRutaVacacion } from '../../../libs/accesoCarpetas';
 import VACACIONES_CONTROLADOR from '../../../controlador/modulos/vacaciones/vacacionesControlador';
-import multer from 'multer';
+import { ObtenerRutaVacacion } from '../../../libs/accesoCarpetas';
+import { TokenValidation } from '../../../libs/verificarToken'
 import { DateTime } from 'luxon';
+import { Router } from 'express';
+import multer from 'multer';
 import pool from '../../../database';
 
 const storage = multer.diskStorage({
@@ -37,8 +37,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-
-
 class VacacionesRutas {
     public router: Router = Router();
 
@@ -47,76 +45,50 @@ class VacacionesRutas {
     }
 
     configuracion(): void {
-        //this.router.get('/', TokenValidation, VACACIONES_CONTROLADOR.ListarVacaciones);
-        //METODO PARA LISTAR VACACIONES CONFIGURADAS
+
+        /** ************************************************************************************************* **
+         ** **                    METODOS USADOS EN LA CONFIGURACION DE VACACIONES                         ** ** 
+         ** ************************************************************************************************* **/
+
+        // METODO PARA LISTAR VACACIONES CONFIGURADAS   **USADO
         this.router.get('/lista-todas-configuraciones', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionesConfiguradas);
-
-        //this.router.get('/estado-solicitud', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionesAutorizadas);
-        // METODO PARA BUSCAR VACACIONES POR ID DE PERIODO   **USADO
-        this.router.get('/:id', TokenValidation, VACACIONES_CONTROLADOR.VacacionesIdPeriodo);
-
-        //this.router.post('/fechasFeriado', TokenValidation, VACACIONES_CONTROLADOR.ObtenerFechasFeriado);
-
-        this.router.get('/datosAutorizacion/:id_vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerAutorizacionVacaciones);
-        this.router.get('/lista-vacacionesfechas/fechas/', TokenValidation, VACACIONES_CONTROLADOR.getlistaVacacionesByFechasyCodigo);
-
-        //METODO PARA CONSULTAR DATO DE INCLUUIR FERIADO
-        //this.router.get('/datosConfiguracion/:id_configuracion', TokenValidation, VACACIONES_CONTROLADOR.ObtenerParametroIncluirVacacion);
-
-
-
-
 
 
         /** ************************************************************************************************* **
          ** **                          METODOS PARA MANEJO DE VACACIONES                                  ** ** 
          ** ************************************************************************************************* **/
 
-        // CREAR REGISTRO DE VACACIONES
+        // CREAR REGISTRO DE VACACIONES    **USADO**
         this.router.post('/', TokenValidation, VACACIONES_CONTROLADOR.CrearVacaciones);
+
         // EDITAR REGISTRO DE VACACIONES
         this.router.put('/vacacion-solicitada/:id', TokenValidation, VACACIONES_CONTROLADOR.EditarSolicitudVacaciones);
-        //this.router.put('/:id/vacacion-solicitada', TokenValidation, VACACIONES_CONTROLADOR.EditarVacaciones);
-        // BUSQUEDA DE VACACIONES MEDIANTE ID
-        //this.router.get('/listar/vacacion/:id', TokenValidation, VACACIONES_CONTROLADOR.ListarVacacionId);
-        // ELIMINAR SOLICITUD DE VACACIONES
-        this.router.delete('/eliminar/:id_vacacion', TokenValidation, VACACIONES_CONTROLADOR.EliminarVacaciones);
-        // EDITAR ESTADO DE VACACIONES
-        this.router.put('/:id/estado', TokenValidation, VACACIONES_CONTROLADOR.ActualizarEstado);
-        // BUSCAR DATOS DE VACACIONES POR ID DE VACACION
-        //this.router.get('/one/:id', TokenValidation, VACACIONES_CONTROLADOR.ListarUnaVacacion);
 
-        //METODO PARA VERIFICAR VACACIONES MULTIPLES
-        this.router.post('/verificar-empleados', TokenValidation, VACACIONES_CONTROLADOR.VerificarVacacionesMultiples);
-
-        //METODO PARA BUSCAR SOLICITUD EXISTENTE
-        this.router.get('/verificar-solicitud/:id_empleado/:fecha_inicio/:fecha_final', TokenValidation, VACACIONES_CONTROLADOR.VerificarExistenciaSolicitud);
-
-        // MÉTODO PARA GUARDAR DOCUMENTO EN VACACIONES
-        this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACACIONES_CONTROLADOR.GuardarDocumento);
-
-        //MÉTODO PARA OBTENER TODAS LAS SOLICITUDES DE VACACIONES
-        this.router.get('/solicitudes-vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudesVacaciones);
-
-        //MÉTODO PARA OBTENER LAS SOLICITUDES DE VACACIONES POR ID
-        this.router.get('/solicitudes-vacaciones/:id', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudVacacionesPorId);
-
-        //MÉTODO PARA OBTENER LAS SOLICITUDES DE VACACIONES POR ID DE EMPLEADOS
-        this.router.get('/datosSolicitudVacacionesPorIdEmpleado/:id_empleado', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudVacacionesPorIdEmpleado);
-
-        //MÉTODO PARA ELIMINAR UNA SOLICITUD DE VACACIONES POR SU ID
+        // METODO PARA ELIMINAR UNA SOLICITUD DE VACACIONES POR SU ID
         this.router.delete('/eliminarSolicitudVacaciones/:id', TokenValidation, VACACIONES_CONTROLADOR.EliminarSolicitudesVacaciones);
 
+        // METODO PARA OBTENER TODAS LAS SOLICITUDES DE VACACIONES
+        this.router.get('/solicitudes-vacaciones', TokenValidation, VACACIONES_CONTROLADOR.ObtenerSolicitudesVacaciones);
+
+        // METODO PARA VERIFICAR VACACIONES MULTIPLES   **USADO**
+        this.router.post('/verificar-empleados', TokenValidation, VACACIONES_CONTROLADOR.VerificarVacacionesMultiples);
+
+        // METODO PARA BUSCAR SOLICITUD EXISTENTE   **USADO**
+        this.router.get('/verificar-solicitud/:id_empleado/:fecha_inicio/:fecha_final', TokenValidation, VACACIONES_CONTROLADOR.VerificarExistenciaSolicitud);
+
+        // METODO PARA GUARDAR DOCUMENTO EN VACACIONES  **USADO**
+        this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACACIONES_CONTROLADOR.GuardarDocumento);
+
+
         /** ************************************************************************************************* **
-         ** **                        METODO DE ENVIO DE NOTIFICACIONES                                    ** ** 
+         ** **                        METODOS USADOS DENTRO DE LA APLICACION MOVIL                         ** ** 
          ** ************************************************************************************************* **/
 
-        // ENVIO DE CORREO DE VACACIONES DESDE APLICACIONES WEB
-        this.router.post('/mail-noti/', TokenValidation, VACACIONES_CONTROLADOR.EnviarCorreoVacacion);
         // ENVIO DE CORREO DE VACACIONES DESDE APLICACION MOVIL
         this.router.post('/mail-noti-vacacion-movil/:id_empresa', VACACIONES_CONTROLADOR.EnviarCorreoVacacionesMovil);
 
-
+        // METODO PARA MOSTRAR LAS SOLICITUDES DE VACACIONES DEL EMPLEADO POR SU CODIGO
+        this.router.get('/lista-vacacionesfechas/fechas/', TokenValidation, VACACIONES_CONTROLADOR.getlistaVacacionesByFechasyCodigo);
 
 
     }

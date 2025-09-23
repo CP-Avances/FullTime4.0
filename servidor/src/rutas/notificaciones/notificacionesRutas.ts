@@ -28,6 +28,16 @@ class NotificacionTiempoRealRutas {
         this.router.get('/config/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerConfigEmpleado);
         // METODO DE BUSQUEDA DE CONFIGURACION DE RECEPCION DE NOTIFICACIONES    **USADO
         this.router.post('/config-multiple/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerConfigMultipleEmpleado);
+        // METODO PARA BUSCAR NOTIFICACIONES - MODULOS RECIBIDAS POR UN USUARIO    **USADO**
+        this.router.get('/receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListarNotificacionUsuario);
+        // METODO PARA OBTENER UNA NOTIFICACION - MODULOS   **USADO**
+        this.router.get('/one/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerUnaNotificacion);
+        // METODO DE BUSQUEDA DE TODAS LAS NOTIFICACCIONES - MODULOS --VERIFICAR **USADO**
+        this.router.get('/all-receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListaNotificacionesRecibidas);
+        // METODO PARA ACTUALIZAR ESTADO DE LAS NOTIFICACIONES - MODULOS    **USADO**
+        this.router.put('/vista/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarVista);
+        // ELIMINAR AVISOS DEL SISTEMA   **USADO**
+        this.router.put('/eliminar-multiples/avisos', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EliminarMultiplesNotificaciones);
 
         /** ************************************************************************************ **
          ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
@@ -45,49 +55,11 @@ class NotificacionTiempoRealRutas {
         this.router.get('/info-empl-recieve', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getInfoEmpleadoByCodigo);
         this.router.get('/all-noti', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacion);
         this.router.get('/noti-tim/all-noti', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.getNotificacionTimbres);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // ----------------------------- VERIFICAR SU USO EN LA APLICACION MOVIL
         // RUTA DE ACCESO A DATOS DE COMUNICADOS APLICACION MÓVIL
         this.router.post('/noti-comunicado-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
         this.router.post('/noti-comunicado-multiplador-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneralMultiple);
         // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE DESDE LA APLICACION  MÓVIL
         this.router.post('/mail-multiple-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoSolicitudes);
-
-
-
-
-
-        // METODO DE ENVIO DE NOTIFICACIONES DE COMUNICADOS    **USADO
-        this.router.post('/noti-comunicado/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarNotificacionGeneral);
-        // NOTIFICACIONES RECIBIDAS POR UN USUARIO
-        this.router.get('/receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListarNotificacionUsuario);
-        // RUTA PARA CREAR NOTIFICACION
-        this.router.post('/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearNotificacion);
-        // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
-        this.router.get('/one/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerUnaNotificacion);
-        this.router.get('/all-receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListaNotificacionesRecibidas);
-        this.router.put('/vista/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarVista);
-        this.router.put('/eliminar-multiples/avisos', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EliminarMultiplesNotificaciones);
-        // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE
-        this.router.post('/mail-multiple/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoSolicitudes);
 
     }
 }

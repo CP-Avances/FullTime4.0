@@ -48,7 +48,6 @@ class ProcesoRutas {
         this.router.post('/cargar_plantilla/registro_empleadoProceso', verificarToken_1.TokenValidation, catProcesoControlador_1.default.RegistrarEmpleadoProceso);
         // METODO PARA ELIMINAR PROCESOS DE MANERA MULTIPLE   **USADO
         this.router.post('/eliminarProcesoMultiple', verificarToken_1.TokenValidation, catProcesoControlador_1.default.EliminarProcesoMultiple);
-        this.router.get('/:id', verificarToken_1.TokenValidation, catProcesoControlador_1.default.getOne);
     }
 }
 const PROCESO_RUTAS = new ProcesoRutas();

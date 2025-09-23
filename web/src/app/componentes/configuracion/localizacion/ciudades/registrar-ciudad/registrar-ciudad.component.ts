@@ -193,7 +193,8 @@ export class RegistrarCiudadComponent implements OnInit {
         descripcion: form.nombreForm,
         id_provincia: provinciaId,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       };
       // VERIFICAR SI CIUDAD --- NO EXISTE REGISTRO
       if (this.ciudades.length === 0) {

@@ -12,7 +12,6 @@ class ParametrosRutas {
         this.configuracion();
     }
     configuracion() {
-        this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
         // BUSCAR LISTA DE DETALLE DE PARAMETROS  **USADO
@@ -31,6 +30,11 @@ class ParametrosRutas {
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
         // METODO PARA COMPARAR COORDENADAS   **USADO
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);
+        /** ********************************************************************************************************************* **
+         ** **                        M E T O D O S    D E    L A    A P L I C A C I O N    M O V I L                          ** **
+         ** ********************************************************************************************************************* */
+        // METODO PARA BUSCAR FORMATO DE FECHAS
+        this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
     }
 }
 const PARAMETROS_RUTAS = new ParametrosRutas();

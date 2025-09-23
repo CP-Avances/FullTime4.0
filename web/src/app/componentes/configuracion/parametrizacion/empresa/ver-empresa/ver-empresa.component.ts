@@ -499,7 +499,8 @@ export class VerEmpresaComponent implements OnInit {
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     };
     this.ingresar = false;
     this.contador = 0;

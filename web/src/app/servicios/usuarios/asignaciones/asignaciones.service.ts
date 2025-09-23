@@ -16,7 +16,7 @@ export class AsignacionesService {
     this.ObtenerEstado();
   }
 
-  // METODO PARA OBTENER ASIGNAICONES   **USADO
+  // METODO PARA OBTENER ASIGNAICONES   **USADO**
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
 
     this.asignacionesAcceso = [];

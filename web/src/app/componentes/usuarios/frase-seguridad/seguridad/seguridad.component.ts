@@ -4,7 +4,6 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-// import { Md5 } from 'ts-md5';
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -76,9 +75,6 @@ export class SeguridadComponent implements OnInit {
 
   // METODO PARA COMPARAR CONTRASENIA
   CompararContrasenia(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    // const md5 = new Md5();
-    // let pass = md5.appendStr(form.aPass).end();
     let pass = '';
     this.datosUser = [];
     this.restUser.BuscarDatosUser(parseInt(this.usuario)).subscribe(data => {

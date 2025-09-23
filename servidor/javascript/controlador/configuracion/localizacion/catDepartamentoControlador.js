@@ -1155,24 +1155,6 @@ class DepartamentoControlador {
             }
         });
     }
-    // VERIFICAR
-    BuscarDepartamentoPorCargo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_cargo;
-            const departamento = yield database_1.default.query(`
-      SELECT ec.id_departamento, d.nombre, ec.id AS cargo
-      FROM eu_empleado_cargos AS ec, ed_departamentos AS d 
-      WHERE d.id = ec.id_departamento AND ec.id = $1
-      ORDER BY cargo DESC
-      `, [id]);
-            if (departamento.rowCount != 0) {
-                return res.json([departamento.rows[0]]);
-            }
-            else {
-                return res.status(404).json({ text: 'No se encuentran registros' });
-            }
-        });
-    }
 }
 exports.DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();
 exports.default = exports.DEPARTAMENTO_CONTROLADOR;

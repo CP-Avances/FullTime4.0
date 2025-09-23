@@ -26,7 +26,6 @@ export class MetodosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //console.log('ver mensaje ', this.mensaje)
     if (this.mensaje === 'asistencia') {
       this.eliminar = false;
     }

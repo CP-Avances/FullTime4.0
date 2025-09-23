@@ -616,6 +616,7 @@ class AccionPersonalControlador {
             try {
                 const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip, ip_local, proceso } = req.body;
                 let datosNuevos = req.body;
+                console.log('accion ', datosNuevos);
                 const fechaActual = new Date();
                 let id_empleado_negativa = null;
                 let id_empleado_comunicacion = null;
@@ -1084,20 +1085,6 @@ class AccionPersonalControlador {
             `, [id]);
             if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    EncontrarDatosCiudades(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM e_ciudades where id = $1
-            `, [id]);
-            if (CIUDAD.rowCount != 0) {
-                return res.json(CIUDAD.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });

@@ -473,7 +473,8 @@ export class ListarTipoAccionComponent implements OnInit {
       const data = {
         plantilla: this.listaTipoAccionesCorrectas,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       }
       this.rest.RegistrarPlantilla(data).subscribe({
         next: (response: any) => {

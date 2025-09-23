@@ -1088,7 +1088,7 @@ export class CrearPedidoAccionComponent implements OnInit {
           lugar_posesion: form3.habilitarForm4 ? lugar_trabajo_actual : null,
           fecha_posesion: form3.habilitarForm4 ? form4.fechaPosesionForm : null,
           actaFinal: form3.habilitarForm4 ? form4.actaFinalForm : null,
-          fechaActa: form3.habilitarForm4 ? form4.fechaActaFinalForm : null,
+          fechaActa: form3.habilitarForm4 ? (form4.fechaActaFinalForm != '' ? form4.fechaActaFinalForm : null) : null,
         },
 
         // PARTE FORMULARIO 5
@@ -1225,6 +1225,11 @@ export class CrearPedidoAccionComponent implements OnInit {
 
       this.ListaEmpleadosFirmas(this.idUserSelect);
       this.habilitarformPosesion = formValue.habilitarForm4
+      if(this.habilitarformPosesion){
+        var f = DateTime.now();
+        this.FechaActual = f.toFormat("yyyy-MM-dd");
+        this.fourthFormGroup.controls["fechaPosesionForm"].setValue(this.FechaActual);
+      }
       stepper.next();
     }
   }

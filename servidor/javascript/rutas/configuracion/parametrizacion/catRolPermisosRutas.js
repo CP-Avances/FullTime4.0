@@ -18,16 +18,10 @@ class RolPermisosRutas {
         this.router.get('/menu/modulos/:tipo', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuModulosRoles);
         // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
         this.router.post('/menu/paginasmodulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarModuloPorNombre);
-        // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  **USADO
-        this.router.post('/menu/paginas/ide', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginas);
-        // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION  **USADO
-        this.router.post('/menu/paginas/ideaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginasConAcciones);
         // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
         this.router.post('/menu/todaspaginasrol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasRol);
         // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL CON EL MENU LATERAL   **USADO
         this.router.post('/menu/todaspaginasmenurol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasMenuRol);
-        // METODO PARA ASIGNAR FUNCIONES AL ROL  **USADO
-        this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
         // METODO PARA ASIGNAR ACCIONES AL ROL   **USADO
         this.router.post('/menu/paginas/acciones/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarAccionesRol);
         // METODO PARA ELIMINAR REGISTRO  **USADO

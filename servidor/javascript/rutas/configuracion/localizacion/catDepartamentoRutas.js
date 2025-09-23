@@ -60,8 +60,6 @@ class DepartamentoRutas {
         this.router.post('/cargar_plantillaNivel/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CargarPlantillaNivelesDep);
         // ACTUALIZAR DEPARTAMENTOS DE USUARIOS DE MANERA MASIVA   **USADO
         this.router.put('/actualizarUserDepa', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarDepartamentosUsuario);
-        // VERIFICAR
-        this.router.get('/busqueda-cargo/:id_cargo', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.BuscarDepartamentoPorCargo);
     }
 }
 const DEPARTAMENTO_RUTAS = new DepartamentoRutas();

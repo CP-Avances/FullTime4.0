@@ -112,7 +112,8 @@ export class EditarVacunaComponent implements OnInit {
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     }
     // VERIFICAR SI EL REGISTRO ES SIMILAR AL EXISTENTE
     if (vacuna.fecha === this.dvacuna.fecha && vacuna.id_tipo_vacuna === this.dvacuna.id_vacuna) {

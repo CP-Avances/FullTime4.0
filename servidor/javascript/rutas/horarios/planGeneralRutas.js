@@ -34,8 +34,6 @@ class DepartamentoRutas {
         this.router.post('/buscar-asistencia', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarAsistencia);
         // METODO PARA ACTUALIZAR ASISTENCIA MANUAL   **USADO
         this.router.post('/actualizar-asistencia/manual', verificarToken_1.TokenValidation, planGeneralControlador_1.default.ActualizarManual);
-        // METODO PARA BUSCAR HORARIO DE UN USUARIO POR FECHAS
-        this.router.post('/horario-general-fechas', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarHorarioFechas);
     }
 }
 const PLAN_GENERAL_RUTAS = new DepartamentoRutas();

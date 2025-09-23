@@ -8,7 +8,7 @@ export class FaltasService {
 
   constructor(private http: HttpClient) { }
 
-  // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO
+  // METODO DE BUSQUEDA DE DATOS DE FALTAS    **USADO**
   BuscarFaltas(data: any, inicio: string, fin: string) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/reporte-faltas/faltas/${inicio}/${fin}`, data);
   }

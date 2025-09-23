@@ -65,6 +65,8 @@ class TimbresRutas {
         this.router.get('/noti-timbres/avisos/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosTimbresEmpleado);
         // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS    **USADO
         this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarMultiplesAvisos);
+        // METODO DE BUSQUEDA DE AVISOS GENERALES
+        this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
         /** *************************************************************************************************************** **
          ** **                 M E T O D O S    U S A D O S     E N    L A    A P L I C A C I O N    M O V I L           ** **
          ** *************************************************************************************************************** **/
@@ -73,8 +75,6 @@ class TimbresRutas {
         this.router.post('/timbre/admin', verificarToken_1.TokenValidation, timbresControlador_1.default.crearTimbreJustificadoAdmin);
         this.router.post('/filtroTimbre', verificarToken_1.TokenValidation, timbresControlador_1.default.FiltrarTimbre);
         this.router.get('/timbreEmpleado/:idUsuario', verificarToken_1.TokenValidation, timbresControlador_1.default.getTimbreByCodigo);
-        // METODO DE BUSQUEDA DE AVISOS GENERALES
-        this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
     }
 }
 const TIMBRES_RUTAS = new TimbresRutas();

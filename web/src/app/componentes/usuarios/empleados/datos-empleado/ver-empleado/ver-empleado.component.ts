@@ -15,7 +15,6 @@ import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
 
-
 // USO DE MAPAS EN EL SISTEMA
 import * as L from 'leaflet';
 
@@ -34,12 +33,8 @@ import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHora
 import { EmpleadoProcesosService } from 'src/app/servicios/modulos/modulo-acciones-personal/empleadoProcesos/empleado-procesos.service';
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { PerfilEmpleadoService } from 'src/app/servicios/usuarios/empleado/perfilEmpleado/perfil-empleado.service';
-import { PlanHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/planHoraExtra/plan-hora-extra.service';
 import { DiscapacidadService } from 'src/app/servicios/usuarios/empleado/discapacidad/discapacidad.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { AutorizacionService } from 'src/app/servicios/modulos/autorizacion/autorizacion.service';
-import { PedHoraExtraService } from 'src/app/servicios/modulos/modulo-horas-extras/horaExtra/ped-hora-extra.service';
-import { PlanComidasService } from 'src/app/servicios/modulos/modulo-alimentacion/planComidas/plan-comidas.service';
 import { PlanGeneralService } from 'src/app/servicios/horarios/planGeneral/plan-general.service';
 import { VacunacionService } from 'src/app/servicios/usuarios/empleado/empleadoVacunas/vacunacion.service';
 import { EmplCargosService } from 'src/app/servicios/usuarios/empleado/empleadoCargo/empl-cargos.service';
@@ -48,7 +43,6 @@ import { DocumentosService } from 'src/app/servicios/notificaciones/documentos/d
 import { VacacionesService } from 'src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
-import { PermisosService } from 'src/app/servicios/modulos/modulo-permisos/permisos/permisos.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
@@ -56,23 +50,12 @@ import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.serv
 import { ScriptService } from 'src/app/servicios/usuarios/empleado/script.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
-
 // IMPORTAR COMPONENTES
-import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
-import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
-import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
-import { EditarSolicitudComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
-import { PlanificacionComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
-import { EditarPlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
-import { CancelarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/cancelar-vacaciones/cancelar-vacaciones.component';
-import { CancelarHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
-import { EditarPlanComidasComponent } from 'src/app/componentes/modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
+import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/autoriza-departamento/registro-autorizacion-depa/registro-autorizacion-depa.component';
+import { EditarAutorizacionDepaComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/autoriza-departamento/editar-autorizacion-depa/editar-autorizacion-depa.component';
 import { CambiarContrasenaComponent } from 'src/app/componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
-import { AdministraComidaComponent } from 'src/app/componentes/modulos/alimentacion/administra-comida/administra-comida.component';
-import { CancelarPermisoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
 import { FraseSeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { TituloEmpleadoComponent } from '../../asignar-titulo/titulo-empleado/titulo-empleado.component';
-import { PlanHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/planificacionHoraExtra/plan-hora-extra/plan-hora-extra.component';
 import { DiscapacidadComponent } from '../../discapacidad/discapacidad.component';
 import { EditarTituloComponent } from '../../asignar-titulo/editar-titulo/editar-titulo.component';
 import { CambiarFraseComponent } from 'src/app/componentes/usuarios/frase-seguridad/cambiar-frase/cambiar-frase.component';
@@ -165,18 +148,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS EMPLEADO
     public restEmpleHorario: EmpleadoHorariosService, // SERVICIO DATOS HORARIO DE EMPLEADOS
     public restDiscapacidad: DiscapacidadService, // SERVICIO DATOS DISCAPACIDAD
-    public restPlanComidas: PlanComidasService, // SERVICIO DATOS DE PLANIFICACIÓN COMIDAS
     public restVacaciones: VacacionesService, // SERVICIO DATOS DE VACACIONES
     public restDocumentos: DocumentosService, // SERVICIO DE DOCUMENTOS
     public restAutoridad: AutorizaDepartamentoService, // SERVICIO DATOS JEFES
     public restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public restGenero: GenerosService,
     public restEstadoCivil: EstadoCivilService,
-    public restPermiso: PermisosService, // SERVICIO DATOS PERMISOS
     public restEmpresa: EmpresaService, // SERVICIO DATOS EMPRESA
     public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACION
     public restTitulo: TituloService, // SERVICIO DATOS TITULO PROFESIONAL
-    public plan_hora: PlanHoraExtraService,
     public restCargo: EmplCargosService, // SERVICIO DATOS CARGO
     public parametro: ParametrosService,
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
@@ -187,14 +167,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     private restU: UsuarioService, // SERVICIO DATOS USUARIO
     private restF: FuncionesService, // SERVICIO DATOS FUNCIONES DEL SISTEMA
     private toastr: ToastrService, // VARIABLE MANEJO DE MENSAJES DE NOTIFICACIONES
-    private restHE: PedHoraExtraService, // SERVICIO DATOS PEDIDO HORA EXTRA
     private sesion: LoginService,
     private informacion: DatosGeneralesService,
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private scriptService: ScriptService, // SERVICIO DATOS EMPLEADO - REPORTE
     private activatedRoute: ActivatedRoute,
     private restPlanGeneral: PlanGeneralService, // SERVICIO DATOS DE PLANIFICACION
-    private aprobar: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIONES
     private perfil: PerfilEmpleadoService, // SERVICIO DE DATOS DE PERFIL DE EMPLEADO
 
   ) {
@@ -205,7 +183,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.ObtenerSolicitudesVacaciones(this.idEmpleado);
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
@@ -312,17 +289,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.cargoEmpleado = [];
     this.datosVacuna = [];
     this.datoActual = [];
-    // PERMISOS
-    this.permisosTotales = [];
     // VACACIONES
     this.idPerVacacion = [];
-    this.vacaciones = [];
-    // HORAS EXTRAS
-    this.hora_extra_plan = [];
-    this.hora_extra = [];
     // ALIMENTACION
-    this.planComidas = [];
-    this.solicitaComida = [];
     this.administra_comida = [];
     // AUTORIZACIONES SOLICITUDES
     this.autorizacionesTotales = [];
@@ -360,7 +329,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
     else if (event.tab.textLabel === 'solicitudes_permisos') {
       if (this.HabilitarPermisos === true && this.solicitudes_permisos === 0) {
-        this.ObtenerPermisos(this.formato_fecha, this.formato_hora);
+        // AQUI LOGICA DE PERMISOS
         this.solicitudes_permisos = 1;
       }
     }
@@ -371,22 +340,19 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.contrato_cargo = 1;
       }
       if (this.habilitarVacaciones === true && this.periodo_vacciones === 0) {
-        this.ObtenerVacaciones(this.formato_fecha);
+        // AQUI LOGICA VACACIONES
         this.periodo_vacciones = 1;
       }
     }
     else if (event.tab.textLabel === 'solicitudes_horas_extras') {
       if (this.HabilitarHorasE === true && this.solicitudes_horas_extras === 0) {
-        this.ObtenerlistaHorasExtrasEmpleado(this.formato_fecha, this.formato_hora);
-        this.ObtenerPlanHorasExtras(this.formato_fecha, this.formato_hora);
+        // AQUI LOGICA DE HORAS EXTRAS
         this.solicitudes_horas_extras = 1;
       }
     }
     else if (event.tab.textLabel === 'alimentacion') {
       if (this.HabilitarAlimentacion === true && this.alimentacion === 0) {
         this.VerAdminComida();
-        this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
-        this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
         this.alimentacion = 1;
       }
     }
@@ -1283,7 +1249,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       user_name: this.user_name,
       id_cargo: datos.id,
       estado: estado,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
       this.VerificarAsignaciones(datos, estado);
@@ -1308,7 +1275,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       personal: true,
       administra: datos.jefe,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
 
     let principal_false = 0;
@@ -1376,7 +1344,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     };
     this.restU.EliminarUsuarioDepartamento(datos).subscribe(data => {
     });
@@ -1853,488 +1822,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-
-  /** **************************************************************************************** **
-   ** **                METODO DE PRESENTACION DE DATOS DE PERMISOS                         ** **
-   ** **************************************************************************************** **/
-
-  // METODO PARA IMPRIMIR DATOS DEL PERMISO
-  permisosTotales: any = [];
-  ObtenerPermisos(formato_fecha: string, formato_hora: string) {
-    this.permisosTotales = [];
-    this.permisosTotales.splice(0, this.permisosTotales.length);
-    this.restPermiso.BuscarPermisoEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
-      this.permisosTotales = datos;
-      this.permisosTotales.forEach((p: any) => {
-        // TRATAMIENTO DE FECHAS Y HORAS
-        p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        p.fec_inicio_ = this.validar.FormatearFecha(p.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        p.fec_final_ = this.validar.FormatearFecha(p.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-
-        p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, formato_hora);
-        p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, formato_hora);
-      })
-    })
-  }
-
-  // VENTANA PARA REGISTRAR PERMISOS DEL EMPLEADO
-  solicita_permiso: any = [];
-  solicitudes_permiso: boolean = true;
-  formulario_permiso: boolean = false;
-  AbrirVentanaPermiso(): void {
-    if (this.datoActual.id_contrato != undefined && this.datoActual.id_cargo != undefined) {
-      this.formulario_permiso = true;
-      this.solicitudes_permiso = false;
-      this.solicita_permiso = [];
-      this.solicita_permiso = [
-        {
-          id_empleado: parseInt(this.idEmpleado),
-          id_contrato: this.datoActual.id_contrato,
-          id_cargo: this.datoActual.id_cargo,
-          ventana: 'empleado'
-        }
-      ]
-    }
-    else {
-      this.formulario_permiso = false;
-      this.solicitudes_permiso = true;
-      this.toastr.info('El usuario no tiene registrado un Contrato o Cargo.', '', {
-        timeOut: 6000,
-      })
-    }
-  }
-
-  // METODO EDICION DE PERMISOS
-  formulario_editar_permiso: boolean = false;
-  EditarPermiso(permisos: any) {
-    this.formulario_editar_permiso = true;
-    this.solicitudes_permiso = false;
-    this.solicita_permiso = [];
-    this.solicita_permiso = [
-      {
-        id_empleado: parseInt(this.idEmpleado),
-        permiso: permisos,
-        ventana: 'empleado'
-      }
-    ]
-  }
-
-  // METODO PARA ELIMINAR PERMISOS DEL USUARIO
-  CancelarPermiso(dataPermiso: any) {
-    this.ventana.open(CancelarPermisoComponent,
-      {
-        width: '450px',
-        data: { info: dataPermiso, id_empleado: parseInt(this.idEmpleado) }
-      }).afterClosed().subscribe(items => {
-        this.ObtenerPermisos(this.formato_fecha, this.formato_hora);
-      });
-  }
-
-  // MANEJO DE FILTRO DE DATOS DE PERMISOS
-  fechaF = new FormControl('');
-
-  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
-  public formulario = new FormGroup({
-    fechaForm: this.fechaF,
-  });
-
-  // METODO PARA LIMPIAR FORMULARIO
-  LimpiarCamposPermisos() {
-    this.fechaF.setValue('');
-    this.ObtenerPermisos(this.formato_fecha, this.formato_hora);
-  }
-
-  // METODO PARA CONSULTAR DATOS DEL USUARIO QUE SOLICITA EL PERMISO
-  unPermiso: any = [];
-  ConsultarPermisoIndividual(id: number) {
-    this.unPermiso = [];
-    this.restPermiso.ObtenerInformeUnPermiso(id).subscribe(datos => {
-      this.unPermiso = datos[0];
-      // TRATAMIENTO DE FECHAS Y HORAS
-      this.unPermiso.fec_creacion_ = this.validar.FormatearFecha(this.unPermiso.fec_creacion, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-      this.unPermiso.fec_inicio_ = this.validar.FormatearFecha(this.unPermiso.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-      this.unPermiso.fec_final_ = this.validar.FormatearFecha(this.unPermiso.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-
-      this.unPermiso.hora_ingreso_ = this.validar.FormatearHora(this.unPermiso.hora_ingreso, this.formato_hora);
-      this.unPermiso.hora_salida_ = this.validar.FormatearHora(this.unPermiso.hora_salida, this.formato_hora);
-
-      this.ConsultarAprobacionPermiso(id);
-    })
-  }
-
-  // METODO PARA VER LA INFORMACION DE LA APROBACION DEL PERMISO
-  aprobacionPermiso: any = [];
-  empleado_estado: any = [];
-  lectura: number = 0;
-  ConsultarAprobacionPermiso(id: number) {
-    this.aprobacionPermiso = [];
-    this.empleado_estado = [];
-    this.lectura = 1;
-    this.aprobar.BuscarAutorizacionPermiso(id).subscribe(data => {
-      this.aprobacionPermiso = data[0];
-      if (this.aprobacionPermiso.id_autoriza_estado === '' || this.aprobacionPermiso.id_autoriza_estado === null) {
-        this.GenerarPDFPermisos('open');
-      }
-      else {
-        // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-        var autorizaciones = this.aprobacionPermiso.id_autoriza_estado.split(',');
-        autorizaciones.map((obj: string) => {
-          this.lectura = this.lectura + 1;
-          if (obj != '') {
-            let empleado_id = obj.split('_')[0];
-            var estado_auto = obj.split('_')[1];
-
-            // CAMBIAR DATO ESTADO INT A VARCHAR
-            if (estado_auto === '1') {
-              estado_auto = 'Pendiente';
-            }
-            if (estado_auto === '2') {
-              estado_auto = 'Preautorizado';
-            }
-            if (estado_auto === '3') {
-              estado_auto = 'Autorizado';
-            }
-            if (estado_auto === '4') {
-              estado_auto = 'Permiso Negado';
-            }
-            // CREAR ARRAY DE DATOS DE COLABORADORES
-            var data = {
-              id_empleado: empleado_id,
-              estado: estado_auto
-            }
-            this.empleado_estado = this.empleado_estado.concat(data);
-            // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACION DE AUTORIZACION
-            if (this.lectura === autorizaciones.length) {
-              this.VerInformacionAutoriza(this.empleado_estado);
-            }
-          }
-        })
-      }
-    });
-  }
-
-  // METODO PARA INGRESAR NOMBRE Y CARGO DEL USUARIO QUE REVIZO LA SOLICITUD
-  cadena_texto: string = ''; // VARIABLE PARA ALMACENAR TODOS LOS USUARIOS
-  cont: number = 0;
-  VerInformacionAutoriza(array: any) {
-    this.cont = 0;
-    array.map((empl: any) => {
-      this.informacion.InformarEmpleadoAutoriza(parseInt(empl.id_empleado)).subscribe(data => {
-        this.cont = this.cont + 1;
-        empl.nombre = data[0].fullname;
-        empl.cargo = data[0].cargo;
-        empl.departamento = data[0].departamento;
-        if (this.cadena_texto === '') {
-          this.cadena_texto = data[0].fullname + ': ' + empl.estado;
-        } else {
-          this.cadena_texto = this.cadena_texto + ' --.-- ' + data[0].fullname + ': ' + empl.estado;
-        }
-        if (this.cont === array.length) {
-          this.GenerarPDFPermisos('open');
-        }
-      })
-    })
-  }
-
-
-  /** **************************************************************************************************** **
-   **                        METODO PARA EXPORTAR A PDF SOLICITUDES DE PERMISOS                            **
-   ** **************************************************************************************************** **/
-
-
-  // METODO PARA DESCARGAR SOLICITUD DE PERMISO
-  async GenerarPDFPermisos(action = 'open') {
-    const pdfMake = await this.validar.ImportarPDF();
-    var documentDefinition: any;
-    if (this.empleado_estado.length === 0) {
-      documentDefinition = this.CabeceraDocumentoPermisoEmpleado();
-    }
-    else {
-      documentDefinition = this.CabeceraDocumentoPermisoAprobacion();
-    }
-    switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
-    }
-  }
-
-  // CABECERA Y PIE DE PAGINA DEL DOCUMENTO
-  CabeceraDocumentoPermisoEmpleado() {
-    return {
-      // ENCABEZADO DE LA PAGINA
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-
-      // PIE DE PAGINA
-      footer: function (currentPage: { toString: () => string; }, pageCount: string, fecha: string, hora: string) {
-        var f = DateTime.now();
-        fecha = f.toFormat('yyyy-MM-dd');
-        hora = f.toFormat('HH:mm:ss');
-        return {
-          margin: 10,
-          columns: [
-            'Fecha: ' + fecha + ' Hora: ' + hora,
-            {
-              text: [
-                {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
-                  alignment: 'right', color: 'blue',
-                  opacity: 0.5
-                }
-              ],
-            }
-          ], fontSize: 10, color: '#A4B8FF',
-        }
-      },
-      content: [
-        { image: this.logoE, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.unPermiso.empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -25, 0, 20] },
-        { text: 'SOLICITUD DE PERMISO', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 20] },
-        this.InformarEmpleado(),
-      ],
-      styles: {
-        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, },
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0], },
-        itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
-        itemsTable: { fontSize: 10, alignment: 'center', }
-      }
-    };
-  }
-
-  // METODO PARA MOSTRAR LA INFORMACION DE LA SOLICITUD DEL PERMISO
-  InformarEmpleado() {
-    return {
-      table: {
-        widths: ['*'],
-        body: [
-          [{ text: 'INFORMACIÓN GENERAL', style: 'tableHeader' }],
-          [{
-            columns: [
-              { text: [{ text: 'FECHA SOLICITUD: ' + this.unPermiso.fec_creacion_, style: 'itemsTableD' }] },
-              { text: [{ text: '', style: 'itemsTableD' }] },
-              { text: [{ text: 'CIUDAD: ' + this.unPermiso.ciudad, style: 'itemsTableD' }] }
-            ]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'APELLIDOS: ' + this.unPermiso.nombre, style: 'itemsTableD' }] },
-              { text: [{ text: 'NOMBRES: ' + this.unPermiso.apellido, style: 'itemsTableD' }] },
-              { text: [{ text: 'IDENTIFICACIÓN: ' + this.unPermiso.identificacion, style: 'itemsTableD' }] }
-            ]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'RÉGIMEN: ' + this.unPermiso.regimen, style: 'itemsTableD' }] },
-              { text: [{ text: 'Sucursal: ' + this.unPermiso.sucursal, style: 'itemsTableD' }] },
-              { text: [{ text: 'N°. Permiso: ' + this.unPermiso.num_permiso, style: 'itemsTableD' }] }
-            ]
-          }],
-          [{ text: 'MOTIVO', style: 'tableHeader' }],
-          [{
-            columns: [
-              { text: [{ text: 'TIPO DE SOLICITUD: ' + this.unPermiso.tipo_permiso, style: 'itemsTableD' }] },
-              { text: [{ text: '', style: 'itemsTableD' }] },
-              { text: [{ text: 'FECHA DESDE: ' + this.unPermiso.fec_inicio_, style: 'itemsTableD' }] },]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'OBSERVACIÓN: ' + this.unPermiso.descripcion, style: 'itemsTableD' }] },
-              { text: [{ text: '', style: 'itemsTableD' }] },
-              { text: [{ text: 'FECHA HASTA: ' + this.unPermiso.fec_final_, style: 'itemsTableD' }] },
-            ]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'APROBACIÓN: ' + this.cadena_texto, style: 'itemsTableD' }] },
-            ]
-          }],
-          [{
-            columns: [
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] },],
-                        [{ text: this.unPermiso.nombre + ' ' + this.unPermiso.apellido + '\n' + this.unPermiso.cargo, style: 'itemsTable' },]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              }
-            ]
-          }],
-        ]
-      },
-      layout: {
-        hLineColor: function (i: number, node: { table: { body: string | any[]; }; }) {
-          return (i === 0 || i === node.table.body.length) ? 'rgb(80,87,97)' : 'rgb(80,87,97)';
-        },
-        paddingLeft: function (i: any, node: any) { return 40; },
-        paddingRight: function (i: any, node: any) { return 40; },
-        paddingTop: function (i: any, node: any) { return 10; },
-        paddingBottom: function (i: any, node: any) { return 10; }
-      }
-    };
-  }
-
-  // CABECERA Y PIE DE PAGINA DEL DOCUMENTO
-  CabeceraDocumentoPermisoAprobacion() {
-    return {
-      // ENCABEZADO DE LA PAGINA
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-
-      // PIE DE PAGINA
-      footer: function (currentPage: { toString: () => string; }, pageCount: string, fecha: string, hora: string) {
-        var f = DateTime.now();
-        fecha = f.toFormat('yyyy-MM-dd');
-        hora = f.toFormat('HH:mm:ss');
-        return {
-          margin: 10,
-          columns: [
-            'Fecha: ' + fecha + ' Hora: ' + hora,
-            {
-              text: [
-                {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
-                  alignment: 'right', color: 'blue',
-                  opacity: 0.5
-                }
-              ],
-            }
-          ], fontSize: 10, color: '#A4B8FF',
-        }
-      },
-      content: [
-        { image: this.logoE, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.unPermiso.empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -25, 0, 20] },
-        { text: 'SOLICITUD DE PERMISO', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 20] },
-        this.InformarAprobacion(),
-      ],
-      styles: {
-        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, },
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0], },
-        itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
-        itemsTable: { fontSize: 10, alignment: 'center', }
-      }
-    };
-  }
-
-  // METODO PARA MOSTRAR LA INFORMACION DEL PERMISO CON APROBACION
-  InformarAprobacion() {
-    return {
-      table: {
-        widths: ['*'],
-        body: [
-          [{ text: 'INFORMACIÓN GENERAL', style: 'tableHeader' }],
-          [{
-            columns: [
-              { text: [{ text: 'FECHA SOLICITUD: ' + this.unPermiso.fec_creacion_, style: 'itemsTableD' }] },
-              { text: [{ text: '', style: 'itemsTableD' }] },
-              { text: [{ text: 'CIUDAD: ' + this.unPermiso.ciudad, style: 'itemsTableD' }] }
-            ]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'APELLIDOS: ' + this.unPermiso.nombre, style: 'itemsTableD' }] },
-              { text: [{ text: 'NOMBRES: ' + this.unPermiso.apellido, style: 'itemsTableD' }] },
-              { text: [{ text: 'IDENTIFICACIÓN: ' + this.unPermiso.identificacion, style: 'itemsTableD' }] }
-            ]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'RÉGIMEN: ' + this.unPermiso.regimen, style: 'itemsTableD' }] },
-              { text: [{ text: 'Sucursal: ' + this.unPermiso.sucursal, style: 'itemsTableD' }] },
-              { text: [{ text: 'N°. Permiso: ' + this.unPermiso.num_permiso, style: 'itemsTableD' }] }
-            ]
-          }],
-          [{ text: 'MOTIVO', style: 'tableHeader' }],
-          [{
-            columns: [
-              { text: [{ text: 'TIPO DE SOLICITUD: ' + this.unPermiso.tipo_permiso, style: 'itemsTableD' }] },
-              { text: [{ text: '', style: 'itemsTableD' }] },
-              { text: [{ text: 'FECHA DESDE: ' + this.unPermiso.fec_inicio_, style: 'itemsTableD' }] },]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'OBSERVACIÓN: ' + this.unPermiso.descripcion, style: 'itemsTableD' }] },
-              { text: [{ text: '', style: 'itemsTableD' }] },
-              { text: [{ text: 'FECHA HASTA: ' + this.unPermiso.fec_final_, style: 'itemsTableD' }] },
-            ]
-          }],
-          [{
-            columns: [
-              { text: [{ text: 'APROBACIÓN: ', style: 'itemsTableD' }] },
-            ]
-          }],
-          [{
-            columns: [
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: this.empleado_estado[this.empleado_estado.length - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] },],
-                        [{ text: this.empleado_estado[this.empleado_estado.length - 1].nombre + '\n' + this.empleado_estado[this.empleado_estado.length - 1].cargo, style: 'itemsTable' },]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              },
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] },],
-                        [{ text: this.unPermiso.nombre + ' ' + this.unPermiso.apellido + '\n' + this.unPermiso.cargo, style: 'itemsTable' },]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              }
-            ]
-          }],
-        ]
-      },
-      layout: {
-        hLineColor: function (i: number, node: { table: { body: string | any[]; }; }) {
-          return (i === 0 || i === node.table.body.length) ? 'rgb(80,87,97)' : 'rgb(80,87,97)';
-        },
-        paddingLeft: function (i: any, node: any) { return 40; },
-        paddingRight: function (i: any, node: any) { return 40; },
-        paddingTop: function (i: any, node: any) { return 10; },
-        paddingBottom: function (i: any, node: any) { return 10; }
-      }
-    };
-  }
-
-
   /** **************************************************************************************** **
    ** **            METODO DE PRESENTACION DE DATOS DE PERIODO DE VACACIONES                ** **
    ** **************************************************************************************** **/
@@ -2466,32 +1953,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.tamanio_paginaP = e.pageSize;
   }
 
-  /** **************************************************************************************** **
-   ** **                 METODO DE PRESENTACION DE DATOS DE VACACIONES                      ** **
-   ** **************************************************************************************** **/
-
-  // METODO PARA IMPRIMIR DATOS DE VACACIONES
-  vacaciones: any = [];
-  ObtenerVacaciones(formato_fecha: string) {
-    this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
-      this.idPerVacacion = datos;
-      this.restVacaciones.ObtenerVacacionesPorIdPeriodo(this.idPerVacacion[0].id).subscribe(res => {
-        this.vacaciones = res;
-        console.log("VACACIONES DEL EMPLEADO CON PERIODO ACTIVO:", this.vacaciones);
-        this.vacaciones.forEach((v: any) => {
-          // TRATAMIENTO DE FECHAS Y HORAS
-          v.fecha_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-          v.fecha_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-          v.fecha_actualizacion_ = this.validar.FormatearFecha(v.fecha_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-          v.fecha_registro_ = this.validar.FormatearFecha(v.fecha_registro, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-          v.fecha_actualizacion_ = v.fecha_actualizacion
-            ? this.validar.FormatearFecha(v.fecha_actualizacion, formato_fecha, this.validar.dia_completo, this.idioma_fechas)
-            : null;
-        })
-      });
-    });
-  }
-
   //METODOS AUXILIARES PARA VISUALIZACION DE SOLICITUD DE VACACION
   esPorDias(s: any): boolean {
     const nd = Number(s?.numero_dias_totales ?? 0);
@@ -2537,285 +1998,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // METODO PARA OBTENER VACACIONES DE UN EMPLEADO
-  solicitudesVacaciones: any;
-  ObtenerSolicitudesVacaciones(formato_fecha: string) {
-    this.solicitudesVacaciones = [];
-
-    this.restVacaciones.BuscarDatosSolicitud(parseInt(this.idEmpleado)).subscribe(datos => {
-      this.solicitudesVacaciones = datos;
-
-      this.solicitudesVacaciones.forEach((v: any) => {
-        v.fecha_inicio_ = this.validar.FormatearFecha(
-          v.fecha_inicio,
-          formato_fecha,
-          this.validar.dia_completo,
-          this.idioma_fechas
-        );
-        v.fecha_final_ = this.validar.FormatearFecha(
-          v.fecha_final,
-          formato_fecha,
-          this.validar.dia_completo,
-          this.idioma_fechas
-        );
-      });
-
-      console.log('Solicitudes vacacionesssssssssssssssssssss', this.solicitudesVacaciones);
-    });
-  }
-
-
-
-
-
-  // METODO PARA EDITAR REGISTRO DE VACACION
-  EditarVacaciones(v: any) {
-    this.ventana.open(EditarVacacionesEmpleadoComponent,
-      {
-        width: '900px',
-        data: {
-          info: v, id_empleado: parseInt(this.idEmpleado),
-          id_contrato: this.datoActual.id_contrato,
-        }
-      }).afterClosed().subscribe(items => {
-
-        this.ObtenerVacaciones(this.formato_fecha);
-      });
-  }
-
-  // METODO PARA ELIMINAR REGISTRO DE VACACIONES
-  CancelarVacaciones(v: any) {
-    this.ventana.open(CancelarVacacionesComponent,
-      {
-        width: '450px',
-        data: {
-          id: v.id, id_empleado: parseInt(this.idEmpleado),
-          id_contrato: this.datoActual.id_contrato
-        }
-      }).afterClosed().subscribe(items => {
-        this.ObtenerVacaciones(this.formato_fecha);
-      });
-  }
-
-
-  /** *************************************************************************************** **
-   ** **                 METODO PARA MOSTRAR DATOS DE HORAS EXTRAS                         ** **
-   ** *************************************************************************************** **/
-
-  // METODO DE BUSQUEDA DE HORAS EXTRAS
-  hora_extra: any = [];
-  solicita_horas: boolean = true;
-  ObtenerlistaHorasExtrasEmpleado(formato_fecha: string, formato_hora: string) {
-    this.hora_extra = [];
-    this.restHE.ObtenerListaEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
-      this.hora_extra = res;
-      this.hora_extra.forEach((h: any) => {
-        if (h.estado === 1) {
-          h.estado = 'Pendiente';
-        }
-        else if (h.estado === 2) {
-          h.estado = 'Pre-autorizado';
-        }
-        else if (h.estado === 3) {
-          h.estado = 'Autorizado';
-        }
-        else if (h.estado === 4) {
-          h.estado = 'Negado';
-        }
-
-        h.fecha_inicio_ = this.validar.FormatearFecha(DateTime.fromISO(h.fec_inicio).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        h.hora_inicio_ = this.validar.FormatearHora(DateTime.fromISO(h.fec_inicio).toFormat('HH:mm:ss'), formato_hora);
-
-        h.fecha_fin_ = this.validar.FormatearFecha(DateTime.fromISO(h.fec_final).toFormat('yyyy-MM-dd'), formato_fecha, this.validar.dia_completo, this.idioma_fechas);;
-        h.hora_fin_ = this.validar.FormatearHora(DateTime.fromISO(h.fec_final).toFormat('HH:mm:ss'), formato_hora);
-
-        h.fec_solicita_ = this.validar.FormatearFecha(h.fec_solicita, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-      })
-
-    });
-  }
-
-  CancelarHoraExtra(h: any) {
-    this.ventana.open(CancelarHoraExtraComponent,
-      { width: '450px', data: h }).afterClosed().subscribe(items => {
-        console.log(items);
-        this.ObtenerlistaHorasExtrasEmpleado(this.formato_fecha, this.formato_hora);
-      });
-  }
-
-  /** *************************************************************************************** **
-   ** **                 METODO PARA MOSTRAR DATOS DE HORAS EXTRAS                         ** **
-   ** *************************************************************************************** **/
-
-  // METODO DE BUSQUEDA DE HORAS EXTRAS
-  hora_extra_plan: any = [];
-  plan_horas: boolean = false;
-  ObtenerPlanHorasExtras(formato_fecha: string, formato_hora: string) {
-    this.hora_extra_plan = [];
-    this.plan_hora.ListarPlanificacionUsuario(parseInt(this.idEmpleado)).subscribe(res => {
-      this.hora_extra_plan = res;
-      this.hora_extra_plan.forEach((h: any) => {
-        if (h.estado === 1) {
-          h.estado = 'Pendiente';
-        }
-        else if (h.estado === 2) {
-          h.estado = 'Pre-autorizado';
-        }
-        else if (h.estado === 3) {
-          h.estado = 'Autorizado';
-        }
-        else if (h.estado === 4) {
-          h.estado = 'Negado';
-        }
-
-        h.fecha_inicio_ = this.validar.FormatearFecha(h.fecha_desde, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        h.hora_inicio_ = this.validar.FormatearHora(h.hora_inicio, formato_hora);
-
-        h.fecha_fin_ = this.validar.FormatearFecha(h.fecha_hasta, formato_fecha, this.validar.dia_completo, this.idioma_fechas);;
-        h.hora_fin_ = this.validar.FormatearHora(h.hora_fin, formato_hora);
-      })
-
-    });
-  }
-
-  MostrarPlanH() {
-    this.solicita_horas = false;
-    this.plan_horas = true;
-  }
-
-  MostrarSolicitaH() {
-    this.solicita_horas = true;
-    this.plan_horas = false;
-  }
-
-  // METODO PARA ABRIR FORMULARIO DE INGRESO DE PLANIFICACION DE HE
-  PlanificarHoras() {
-    if (this.datoActual.id_contrato != undefined && this.datoActual.id_cargo != undefined) {
-      let datos = {
-        id_contrato: this.datoActual.id_contrato,
-        id_cargo: this.datoActual.id_cargo,
-        nombre: this.datoActual.nombre + ' ' + this.datoActual.apellido,
-        identificacion: this.datoActual.identificacion,
-        codigo: this.datoActual.codigo,
-        correo: this.datoActual.correo,
-        id: this.datoActual.id,
-      }
-      this.ventana.open(
-        PlanHoraExtraComponent,
-        {
-          width: '800px',
-          data: { planifica: datos, actualizar: false }
-        })
-        .afterClosed().subscribe(item => {
-          this.ObtenerPlanHorasExtras(this.formato_fecha, this.formato_hora);
-        });
-    }
-    else {
-      this.toastr.info('El usuario no tiene registrado Contrato o Cargo.', '', {
-        timeOut: 6000,
-      })
-    }
-  }
-
-  AbrirEditarPlan(datoSeleccionado: any) {
-    this.ventana.open(EditarPlanHoraExtraComponent, {
-      width: '600px',
-      data: { planifica: datoSeleccionado, modo: 'individual' }
-    })
-      .afterClosed().subscribe(id_plan => {
-        this.ObtenerPlanHorasExtras(this.formato_fecha, this.formato_hora);
-      });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDeletePlan(datos: any) {
-    (document.activeElement as HTMLElement)?.blur();
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarPlanEmpleado(datos.id_plan, datos.id_empleado, datos);
-        }
-      });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
-  EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
-    const data = {
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    // LECTURA DE DATOS DE USUARIO
-    let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.identificacion + '</th></tr>';
-    let cuenta_correo = datos.correo;
-
-    // LECTURA DE DATOS DE LA PLANIFICACIÓN
-    let desde = this.validar.FormatearFecha(datos.fecha_desde, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-    let hasta = this.validar.FormatearFecha(datos.fecha_hasta, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-    let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
-    let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
-
-    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado, data).subscribe(res => {
-      this.NotificarPlanHora(desde, hasta, h_inicio, h_fin, id_empleado);
-      this.EnviarCorreoPlanH(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerPlanHorasExtras(this.formato_fecha, this.formato_hora);
-    });
-  }
-
-  // METODO DE ENVIO DE NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS
-  NotificarPlanHora(desde: any, hasta: any, h_inicio: any, h_fin: any, recibe: number) {
-    let mensaje = {
-      id_empl_envia: this.idEmpleadoLogueado,
-      id_empl_recive: recibe,
-      tipo: 10, // PLANIFICACION DE HORAS EXTRAS
-      mensaje: 'Planificación de horas extras eliminada desde ' +
-        desde + ' hasta ' +
-        hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    this.plan_hora.EnviarNotiPlanificacion(mensaje).subscribe(res => {
-      this.aviso.RecibirNuevosAvisos(res.respuesta);
-    });
-  }
-
-  // METODO DE ENVIO DE CORREO DE PLANIFICACION DE HORAS EXTRAS
-  EnviarCorreoPlanH(datos: any, cuenta_correo: any, usuario: any, desde: any, hasta: any, h_inicio: any, h_fin: any) {
-
-    // DATOS DE ESTRUCTURA DEL CORREO
-    let DataCorreo = {
-      tipo_solicitud: 'ELIMINA',
-      id_empl_envia: this.idEmpleadoLogueado,
-      observacion: datos.descripcion,
-      proceso: 'eliminado',
-      correos: cuenta_correo,
-      nombres: usuario,
-      asunto: 'ELIMINACION DE PLANIFICACION DE HORAS EXTRAS',
-      inicio: h_inicio,
-      desde: desde,
-      hasta: hasta,
-      horas: DateTime.fromISO(datos.horas_totales).toFormat('HH:mm'),
-      fin: h_fin,
-    }
-
-    // METODO ENVIO DE CORREO DE PLANIFICACION DE HE
-    this.plan_hora.EnviarCorreoPlanificacion(DataCorreo).subscribe(res => {
-      if (res.message === 'ok') {
-        this.toastr.success('Correo de planificación enviado exitosamente.', '', {
-          timeOut: 6000,
-        });
-      }
-      else {
-        this.toastr.warning('Ups algo salio mal !!!', 'No fue posible enviar correo de planificación.', {
-          timeOut: 6000,
-        });
-      }
-    })
-  }
-
   /** ****************************************************************************************** **
    ** **         METODO PARA MOSTRAR DATOS DE ADMINISTRACION MODULO DE ALIMENTACION           ** **
    ** ****************************************************************************************** **/
@@ -2828,241 +2010,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.administra_comida = res;
     });
   }
-
-  // VENTANA PARA REGISTRAR ADMINISTRACION DE MÓDULO DE ALIMENTACIÓN
-  AbrirVentanaAdminComida(): void {
-    this.ventana.open(AdministraComidaComponent,
-      { width: '450px', data: { idEmpleado: this.idEmpleado } })
-      .afterClosed().subscribe(item => {
-        this.VerAdminComida();
-      });
-  }
-
-  /** *************************************************************************************** **
-   ** **          METODO DE PRESENTACION DE DATOS DE SERVICIO DE ALIMENTACION              ** **
-   ** *************************************************************************************** **/
-
-  // METODO PARA MOSTRAR DATOS DE PLANIFICACION DE ALMUERZOS
-  planComidas: any = [];
-  ObtenerPlanComidasEmpleado(formato_fecha: string, formato_hora: string) {
-    this.planComidas = [];
-    this.restPlanComidas.ObtenerPlanComidaPorIdEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
-      this.planComidas = res;
-      this.FormatearFechas(this.planComidas, formato_fecha, formato_hora);
-    });
-  }
-
-  // METODO PARA FORMATEAR FECHAS Y HORAS
-  FormatearFechas(datos: any, formato_fecha: string, formato_hora: string) {
-    datos.forEach((c: any) => {
-      // TRATAMIENTO DE FECHAS Y HORAS
-      c.fecha_ = this.validar.FormatearFecha(c.fecha, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-
-      if (c.fec_comida != undefined) {
-        c.fec_comida_ = this.validar.FormatearFecha(c.fec_comida, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-      }
-      else {
-        c.fec_inicio_ = this.validar.FormatearFecha(c.fec_inicio, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-        c.fec_final_ = this.validar.FormatearFecha(c.fec_final, formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-      }
-
-      c.hora_inicio_ = this.validar.FormatearHora(c.hora_inicio, formato_hora);
-      c.hora_fin_ = this.validar.FormatearHora(c.hora_fin, formato_hora);
-
-    })
-  }
-
-  // VENTANA PARA INGRESAR PLANIFICACION DE COMIDAS
-  AbrirVentanaPlanificacion(): void {
-    var info = {
-      id_contrato: this.datoActual.id_contrato,
-      id_cargo: this.datoActual.id_cargo,
-      nombre: this.datoActual.nombre + ' ' + this.datoActual.apellido,
-      identificacion: this.datoActual.identificacion,
-      correo: this.datoActual.correo,
-      codigo: this.datoActual.codigo,
-      id: this.datoActual.id,
-    }
-    this.ventana.open(PlanificacionComidasComponent, {
-      width: '600px',
-      data: { servicios: info }
-    })
-      .afterClosed().subscribe(item => {
-        this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
-      });
-  }
-
-  // VENTANA PARA EDITAR PLANIFICACION DE COMIDAS
-  AbrirEditarPlanComidas(datoSeleccionado: any) {
-    if (datoSeleccionado.fec_inicio != undefined) {
-      // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
-      let datosConsumido = {
-        id_plan_comida: datoSeleccionado.id,
-        id_empleado: datoSeleccionado.id_empleado
-      }
-      this.restPlanComidas.EncontrarPlanComidaEmpleadoConsumido(datosConsumido).subscribe(consu => {
-        this.toastr.info('No es posible actualizar la planificación de alimentación de ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + ' ya que presenta registros de servicio de alimentación consumidos.', '', {
-          timeOut: 6000,
-        })
-      }, error => {
-        this.VentanaEditarPlanComida(datoSeleccionado, EditarPlanComidasComponent, 'individual');
-      });
-    }
-    else {
-      this.VentanaEditarPlanComida(datoSeleccionado, EditarSolicitudComidaComponent, 'administrador')
-    }
-  }
-
-  // VENTANA DE PLANIFICACION DE COMIDAS
-  VentanaEditarPlanComida(datoSeleccionado: any, componente: any, forma: any) {
-    this.ventana.open(componente, {
-      width: '600px',
-      data: { solicitud: datoSeleccionado, modo: forma }
-    })
-      .afterClosed().subscribe(item => {
-        this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
-      });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDeletePlanComidas(datos: any) {
-    // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
-    let datosConsumido = {
-      id_plan_comida: datos.id,
-      id_empleado: datos.id_empleado
-    }
-    this.restPlanComidas.EncontrarPlanComidaEmpleadoConsumido(datosConsumido).subscribe(consu => {
-      this.toastr.info('Proceso no válido. Usuario ' + this.empleadoUno[0].nombre + ' '
-        + this.empleadoUno[0].apellido + ' tiene registros de alimentación consumidos.', '', {
-        timeOut: 6000,
-      })
-    }, error => {
-      (document.activeElement as HTMLElement)?.blur();
-      this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-        .subscribe((confirmado: Boolean) => {
-          if (confirmado) {
-            this.EliminarPlanComidas(datos.id, datos.id_empleado, datos);
-          } else {
-            this.router.navigate(['/verEmpleado/', this.idEmpleado]);
-          }
-        });
-    });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
-  EliminarPlanComidas(id_plan: number, id_empleado: number, datos: any) {
-
-    // LECTURA DE DATOS DE USUARIO
-    let usuario = '<tr><th>' + datos.nombre +
-      '</th><th>' + datos.identificacion + '</th></tr>';
-    let cuenta_correo = datos.correo;
-
-    // LECTURA DE DATOS DE LA PLANIFICACIÓN
-    let desde = this.validar.FormatearFecha(datos.fec_inicio, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-    let hasta = this.validar.FormatearFecha(datos.fec_final, this.formato_fecha, this.validar.dia_completo, this.idioma_fechas);
-
-    let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
-    let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
-
-    const data = {
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
-    }
-    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
-      this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
-      this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
-    });
-  }
-
-  /** ***************************************************************************************************** **
-   ** **                METODO DE BUSQUEDA DE PLANIFICACIONES DE SERVICIO DE ALIMENTACION                ** **
-   ** ***************************************************************************************************** **/
-  plan_comida: boolean = false;
-  MostrarPlanComida() {
-    this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
-    this.solicita_comida = false;
-    this.plan_comida = true;
-  }
-
-  solicita_comida: boolean = true;
-  MostrarSolicitaComida() {
-    this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
-    this.solicita_comida = true;
-    this.plan_comida = false;
-  }
-
-  // METODO PARA MOSTRAR DATOS DE PLANIFICACIÓN DE ALMUERZOS
-  solicitaComida: any = [];
-  ObtenerSolComidas(formato_fecha: string, formato_hora: string) {
-    this.solicitaComida = [];
-    this.restPlanComidas.ObtenerSolComidaPorIdEmpleado(parseInt(this.idEmpleado)).subscribe(sol => {
-      this.solicitaComida = sol;
-      this.FormatearFechas(this.solicitaComida, formato_fecha, formato_hora);
-    });
-  }
-
-
-  /** ***************************************************************************************************** **
-   ** **               METODO DE ENVIO DE NOTIFICACIONES DE PLANIFICACION DE ALIMENTACION                ** **
-   ** ***************************************************************************************************** **/
-
-  // METODO DE ENVIO DE NOTIFICACIONES DE PLANIFICACION DE SERVICIO DE ALIMENTACION
-  NotificarPlanificacion(datos: any, desde: any, hasta: any, h_inicio: any, h_fin: any, id_empleado_recibe: number) {
-    let mensaje = {
-      id_comida: datos.id_detalle,
-      id_empl_envia: this.idEmpleadoLogueado,
-      id_empl_recive: id_empleado_recibe,
-      tipo: 20, // PLANIFICACION DE ALIMENTACION
-      mensaje: 'Planificación de alimentación eliminada desde ' +
-        desde + ' hasta ' +
-        hasta +
-        ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
-      user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
-    }
-    this.restPlanComidas.EnviarMensajePlanComida(mensaje).subscribe(res => {
-    })
-  }
-
-  // METODO DE ENVIO DE CORREO DE PLANIFICACION DE SERVICIO DE ALIMENTACION
-  EnviarCorreo(datos: any, cuenta_correo: any, usuario: any, desde: any, hasta: any, h_inicio: any, h_fin: any) {
-    // DATOS DE ESTRUCTURA DEL CORREO
-    let DataCorreo = {
-      tipo_solicitud: 'ELIMINA',
-      observacion: datos.observacion,
-      id_comida: datos.id_detalle,
-      id_envia: this.idEmpleadoLogueado,
-      nombres: usuario,
-      proceso: 'eliminado',
-      asunto: 'ELIMINACION DE PLANIFICACION DE ALIMENTACION',
-      correo: cuenta_correo,
-      inicio: h_inicio,
-      extra: datos.extra,
-      desde: desde,
-      hasta: hasta,
-      final: h_fin,
-    }
-
-    // METODO ENVIO DE CORREO DE PLANIFICACION DE ALIMENTACION
-    this.restPlanComidas.EnviarCorreoPlan(DataCorreo).subscribe(res => {
-      if (res.message === 'ok') {
-        this.toastr.success('Correo de planificación enviado exitosamente.', '', {
-          timeOut: 6000,
-        });
-      }
-      else {
-        this.toastr.warning('Ups! algo salio mal.', 'No fue posible enviar correo de planificación.', {
-          timeOut: 6000,
-        });
-      }
-    })
-  }
-
-
 
   /** ******************************************************************************************* **
    ** **                METODO DE PRESENTACION DE DATOS DE AUTORIZACION                        ** **

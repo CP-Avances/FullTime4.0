@@ -144,7 +144,8 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     else {
       const data = {
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales,
+        ip: this.ip, 
+        ip_local: this.ips_locales,
       };
 
       datos.forEach((obj: any) => {

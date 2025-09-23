@@ -679,6 +679,7 @@ class AccionPersonalControlador {
             const { formulario1, formulario2, formulario3, formulario4, formulario5, formulario6, user_name, ip,
                 ip_local, proceso } = req.body;
             let datosNuevos = req.body;
+            console.log('accion ', datosNuevos);
             const fechaActual = new Date();
 
             let id_empleado_negativa = null;
@@ -1203,20 +1204,6 @@ class AccionPersonalControlador {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // CONSULTAS GENERACION DE PDF
     public async EncontrarDatosEmpleados(req: Request, res: Response) {
         const { id } = req.params;
@@ -1236,24 +1223,7 @@ class AccionPersonalControlador {
         }
     }
 
-    public async EncontrarDatosCiudades(req: Request, res: Response) {
-        const { id } = req.params;
-        const CIUDAD = await pool.query(
-            `
-            SELECT * FROM e_ciudades where id = $1
-            `
-            , [id]);
-        if (CIUDAD.rowCount != 0) {
-            return res.json(CIUDAD.rows)
-        } else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-
-
-
-
+    
     public async EncontrarProcesosRecursivos(req: Request, res: Response) {
         const { id } = req.params;
         const ACCION = await pool.query(

@@ -21,24 +21,6 @@ class NacionalidadControlador {
     }
   }
 
-  // METODO PARA BUSCAR NACIONALIDAD POR SU NOMBRE   **USADO
-  public async ObtenerNacionalidad(req: Request, res: Response): Promise<any> {
-    const { nombre } = req.params;
-
-    const unNacionalidades = await pool.query(
-      `
-      SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-      `
-      , [nombre]);
-
-    if (unNacionalidades.rowCount != 0) {
-      return res.jsonp(unNacionalidades.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
   // METODO PARA REGISTRAR NACIONALIDAD   **USADO
   public async CrearNacionalidad(req: Request, res: Response): Promise<Response> {
     try {

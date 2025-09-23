@@ -65,10 +65,6 @@ class UsuarioRutas {
         this.router.post('/ingresarIDdispositivo', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ingresarIDdispositivo);
         this.router.get('/usuarioEmpresa', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getEmpleadosActivos);
         this.router.get('/usuario/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getUserById);
-        // ADMINISTRACION MODULO DE ALIMENTACION
-        this.router.put('/admin/comida', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.RegistrarAdminComida);
-        // METODO DE BUSQUEDA DE DATOS DE USUARIO POR EL TIPO DE DEPARTAMENTO
-        this.router.get('/dato/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

@@ -326,7 +326,8 @@ export class ListarEstadoCivilComponent {
     Eliminar(id_nivel: number) {
       const data = {
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       };
       this.restEC.EliminarEstadoCivil(id_nivel, data).subscribe((res: any) => {
         if (res.message === 'error') {

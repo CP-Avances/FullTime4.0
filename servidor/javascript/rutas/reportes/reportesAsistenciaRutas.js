@@ -22,8 +22,6 @@ class ReportesAsistenciasRutas {
         this.router.post('/timbres-horario-abierto/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbierto);
         // METODO DE BUSQUEDA DE TIMBRES INCOMPLETOS      **USADO    
         this.router.post('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
-        // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
-        this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
     }
 }
 const REPORTES_A_RUTAS = new ReportesAsistenciasRutas();

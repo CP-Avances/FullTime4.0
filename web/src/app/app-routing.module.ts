@@ -44,28 +44,10 @@ import { ListarFeriadosComponent } from './componentes/horarios/catFeriados/feri
 import { PrincipalHorarioComponent } from './componentes/horarios/catHorarios/horario/principal-horario/principal-horario.component';
 import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/planificar-horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
-// MODULO  --PERMISOS
-import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
-import { ListarEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
-import { VerEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/ver-empleado-permiso/ver-empleado-permiso.component';
-import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permisos/multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 // MODULO  --VACACIONES
-import { ListarVacacionesComponent } from './componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
-import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
 import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
-import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/generar-periodo-manual/generar-periodo-manual.component';
+import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/periodoVacaciones/generar-periodo-manual/generar-periodo-manual.component';
 import { ConfigurarVacacionMultipleComponent } from './componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
-// MODULO  --HORAS EXTRAS
-import { ListaHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/lista-horas-extras/lista-horas-extras.component';
-import { ListaEmplePlanHoraEComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/empleados-planificar/lista-emple-plan-hora-e.component';
-import { ListaPlanificacionesComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/lista-planificaciones/lista-planificaciones.component';
-import { ListaPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/lista-pedido-hora-extra/lista-pedido-hora-extra.component';
-import { VerPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/ver-pedido-hora-extra/ver-pedido-hora-extra.component';
-// MODULO  --ALIMENTACION
-import { ListarTipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
-import { PlanComidasComponent } from './componentes/modulos/alimentacion/planifica-comida/plan-comidas/plan-comidas.component';
-import { ListarPlanificacionComponent } from './componentes/modulos/alimentacion/planifica-comida/listar-planificacion/listar-planificacion.component';
-import { ListarSolicitudComponent } from './componentes/modulos/alimentacion/solicitar-comida/listar-solicitud/listar-solicitud.component';
 // MODULO  --ACCION PERSONAL
 import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersonal/catProcesos/principal-proceso/principal-proceso.component';
 import { ListarTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/listar-tipo-accion/listar-tipo-accion.component';
@@ -96,8 +78,6 @@ import { VerDocumentosComponent } from './componentes/notificaciones/documentos/
 import { ListaArchivosComponent } from './componentes/notificaciones/documentos/lista-archivos/lista-archivos.component';
 import { MensajesNotificacionesComponent } from './componentes/notificaciones/configurar-mensajes/mensajes-notificaciones/mensajes-notificaciones.component';
 import { ComunicadosComponent } from './componentes/notificaciones/comunicados/comunicados.component';
-import { AdministradorTodasComponent } from './componentes/reportes/notificaciones/administrador-todas/administrador-todas.component';
-import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
 import { RealtimeNotificacionComponent } from './componentes/reportes/notificaciones/realtime-notificacion/realtime-notificacion.component';
 import { RealtimeAvisosComponent } from './componentes/reportes/notificaciones/realtime-avisos/realtime-avisos.component';
 import { SettingsComponent } from './componentes/notificaciones/configurar-notificaciones/settings/settings.component';
@@ -117,46 +97,17 @@ import { ReporteTimbresMultiplesComponent } from './componentes/reportes/timbres
 import { TimbreMrlComponent } from './componentes/reportes/timbres/timbre-mrl/timbre-mrl.component';
 import { TimbreAbiertosComponent } from './componentes/reportes/timbres/timbre-abiertos/timbre-abiertos.component';
 import { TimbreIncompletoComponent } from './componentes/reportes/timbres/timbre-incompleto/timbre-incompleto.component';
-// REPORTE  --MODULO PERMISOS
-import { ReportePermisosComponent } from './componentes/reportes/modulos/reporte-permisos/reporte-permisos.component';
+
 // REPORTE  --MODULO VACACIONES
-import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
-import { SolicitudVacacionComponent } from './componentes/reportes/modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
 import { ReportePeriodosComponent } from './componentes/reportes/modulos/vacaciones/reporte-periodos/reporte-periodos.component';
-// REPORTE  --MODULO HORAS EXTRAS
-import { ReporteHorasPedidasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
-import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
-import { HoraExtraMacroComponent } from './componentes/reportes/graficas-macro/hora-extra-macro/hora-extra-macro.component';
-import { JornadaVsHoraExtraMacroComponent } from './componentes/reportes/graficas-macro/jornada-vs-hora-extra-macro/jornada-vs-hora-extra-macro.component';
 // REPORTE  --MODULO APLICACION MOVIL
 import { TimbreVirtualComponent } from './componentes/reportes/modulos/timbre-virtual/timbre-virtual.component';
 // REPORTE  --MODULO TIMBRE VIRTUAL
 import { TimbreSistemaComponent } from './componentes/reportes/modulos/timbre-sistema/timbre-sistema.component';
-// REPORTE  --MODULO ALIMENTACION
-import { AlimentosGeneralComponent } from './componentes/reportes/modulos/alimentacion/alimentos-general/alimentos-general.component';
-import { DetallePlanificadosComponent } from './componentes/reportes/modulos/alimentacion/detalle-planificados/detalle-planificados.component';
-import { AlimentosInvitadosComponent } from './componentes/reportes/modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
 // REPORTE  --ANALISIS DATOS
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 // REPORTE  --AUDITORIA
 import { AuditoriaSistemaComponent } from './componentes/reportes/auditoria/auditoria-sistema/auditoria-sistema.component';
-// VERIFICAR SU USO
-import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
-import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
-import { MetricaPermisosComponent } from './componentes/graficas/graficas-micro/metrica-permisos/metrica-permisos.component';
-import { MetricaVacacionesComponent } from './componentes/graficas/graficas-micro/metrica-vacaciones/metrica-vacaciones.component';
-import { AsistenciaConsolidadoComponent } from './componentes/reportes/asistencia/reporte-asistencia-consolidado/asistencia-consolidado.component';
-import { ReporteEntradaSalidaComponent } from './componentes/reportes/asistencia/reporte-entrada-salida/reporte-entrada-salida.component';
-import { ReportePuntualidadComponent } from './componentes/reportes/asistencia/reporte-puntualidad/reporte-puntualidad.component';
-import { TiempoJornadaVsHoraExtMacroComponent } from './componentes/reportes/graficas-macro/tiempo-jornada-vs-hora-ext-macro/tiempo-jornada-vs-hora-ext-macro.component';
-import { SalidasAntesMacroComponent } from './componentes/reportes/graficas-macro/salidas-antes-macro/salidas-antes-macro.component';
-import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macro/inasistencia-macro/inasistencia-macro.component';
-import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
-import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
-import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
-import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
-import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
-import { RegistrarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/registrar-solicitudes-vacaciones/registrar-solicitudes-vacaciones.component';
 
 const routes: Routes = [
 
@@ -212,13 +163,7 @@ const routes: Routes = [
   { path: 'horariosMultiples', component: HorarioMultipleEmpleadoComponent, canActivate: [AuthGuard] },
   { path: 'asistencia', component: BuscarAsistenciaComponent, canActivate: [AuthGuard] },
 
-  // MODULO  --PERMISOS
-  { path: 'verTipoPermiso', component: VistaElementosComponent, canActivate: [AuthGuard] },
-  { path: 'permisosMultiples', component: PermisosMultiplesEmpleadosComponent, canActivate: [AuthGuard] },
-  { path: 'permisos-solicitados', component: ListarEmpleadoPermisoComponent, canActivate: [AuthGuard] },
-
   // MODULO  --VACACIONES
-  { path: 'vacaciones-solicitados', component: ListarVacacionesComponent, canActivate: [AuthGuard] },
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
   { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
@@ -229,18 +174,6 @@ const routes: Routes = [
       { path: 'registrar-solicitudes-vaciones', component: RegistrarSolicitudesVacacionesComponent }
     ]
   },
-
-  // MODULO  --HORAS EXTRAS
-  { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard] },
-  { path: 'planificaHoraExtra', component: ListaEmplePlanHoraEComponent, canActivate: [AuthGuard] },
-  { path: 'listadoPlanificaciones', component: ListaPlanificacionesComponent, canActivate: [AuthGuard] },
-  { path: 'horas-extras-solicitadas', component: ListaPedidoHoraExtraComponent, canActivate: [AuthGuard] },
-
-  // MODULO  --ALIMENTACION
-  { path: 'listarTipoComidas', component: ListarTipoComidasComponent, canActivate: [AuthGuard] },
-  { path: 'alimentacion', component: PlanComidasComponent, canActivate: [AuthGuard] },
-  { path: 'listaPlanComida', component: ListarPlanificacionComponent, canActivate: [AuthGuard] },
-  { path: 'listaSolicitaComida', component: ListarSolicitudComponent, canActivate: [AuthGuard] },
 
   // MODULO  --ACCION PERSONAL
   { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard] },
@@ -277,14 +210,9 @@ const routes: Routes = [
   { path: 'archivos/:filename', component: ListaArchivosComponent, canActivate: [AuthGuard] },
   { path: 'mensaje_notificaciones', component: MensajesNotificacionesComponent, canActivate: [AuthGuard] },
   { path: 'comunicados', component: ComunicadosComponent, canActivate: [AuthGuard] },
-  { path: 'listaAllNotificaciones', component: AdministradorTodasComponent, canActivate: [AuthGuard] },
-  { path: 'listaNotifacionUsuario', component: PorUsuarioComponent, canActivate: [AuthGuard] },
   { path: 'lista-notificaciones', component: RealtimeNotificacionComponent, canActivate: [AuthGuard] },
   { path: 'lista-avisos', component: RealtimeAvisosComponent, canActivate: [AuthGuard] },
   { path: 'configuraciones-alertas/:id', component: SettingsComponent, canActivate: [AuthGuard] },
-  { path: 'ver-permiso/:id', component: VerEmpleadoPermisoComponent, canActivate: [AuthGuard] },
-  { path: 'ver-vacacion/:id', component: VerVacacionComponent, canActivate: [AuthGuard] },
-  { path: 'ver-hora-extra/:id', component: VerPedidoHoraExtraComponent, canActivate: [AuthGuard] },
 
   // REPORTES  --GENERALES
   { path: 'reporteEmpleados', component: ReporteEmpleadosComponent, canActivate: [AuthGuard] },
@@ -305,19 +233,8 @@ const routes: Routes = [
   { path: 'reporte-timbre-abierto', component: TimbreAbiertosComponent, canActivate: [AuthGuard] },
   { path: 'reporte-timbre-incompleto', component: TimbreIncompletoComponent, canActivate: [AuthGuard] },
 
-  // REPORTE  --MODULO PERMISOS
-  { path: 'reportePermisos', component: ReportePermisosComponent, canActivate: [AuthGuard] },
-
   // REPORTE  --MODULO VACACIONES
-  { path: 'reporteKardex', component: ReporteKardexComponent, canActivate: [AuthGuard] },
-  { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard] },
   { path: 'reporte-periodos', component: ReportePeriodosComponent, canActivate: [AuthGuard] },
-
-  // REPORTE  --MODULO HORAS EXTRAS
-  { path: 'horas/extras', component: ReporteHorasPedidasComponent, canActivate: [AuthGuard] },
-  { path: 'reporteHorasExtras', component: ReporteHorasExtrasComponent, canActivate: [AuthGuard] },
-  { path: 'macro/hora-extra', component: HoraExtraMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/jornada-vs-hora-extra', component: JornadaVsHoraExtraMacroComponent, canActivate: [AuthGuard] },
 
   // REPORTE  --MODULO APLICACION MOVIL
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard] },
@@ -325,46 +242,12 @@ const routes: Routes = [
   // REPORTE  --MODULO TIMBRE VIRTUAL
   { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard] },
 
-  // REPORTE  --MODULO ALIMENTACION
-  { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard] },
-  { path: 'alimentosDetallado', component: DetallePlanificadosComponent, canActivate: [AuthGuard] },
-  { path: 'alimentosInvitados', component: AlimentosInvitadosComponent, canActivate: [AuthGuard] },
-
   // REPORTE  --ANALISIS DATOS
   { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard] },
 
   // REPORTE  --AUDITORIA
   { path: 'reporte-auditoria', component: AuditoriaSistemaComponent, canActivate: [AuthGuard] },
 
-  // VERIFICAR SU USO
-  { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'macro/user/horas-extras', component: MetricaHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'macro/user/permisos', component: MetricaPermisosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'macro/user/vacaciones', component: MetricaVacacionesComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'reporteAsistenciaConsolidado', component: AsistenciaConsolidadoComponent, canActivate: [AuthGuard] },
-  { path: 'reporteEntradaSalida', component: ReporteEntradaSalidaComponent, canActivate: [AuthGuard] },
-  { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard] },
-  { path: 'macro/tiempo-jornada-vs-hora-ext', component: TiempoJornadaVsHoraExtMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/salidas-antes', component: SalidasAntesMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/inasistencia', component: InasistenciaMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/marcaciones', component: MarcacionesEmpMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/asistencia', component: AsistenciaMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/retrasos', component: RetrasosMacroComponent, canActivate: [AuthGuard] },
-
-  // VERIFICAR SU USO
-  { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'macro/user/horas-extras', component: MetricaHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'macro/user/permisos', component: MetricaPermisosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'macro/user/vacaciones', component: MetricaVacacionesComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'reporteAsistenciaConsolidado', component: AsistenciaConsolidadoComponent, canActivate: [AuthGuard] },
-  { path: 'reporteEntradaSalida', component: ReporteEntradaSalidaComponent, canActivate: [AuthGuard] },
-  { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard] },
-  { path: 'macro/tiempo-jornada-vs-hora-ext', component: TiempoJornadaVsHoraExtMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/salidas-antes', component: SalidasAntesMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/inasistencia', component: InasistenciaMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/marcaciones', component: MarcacionesEmpMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/asistencia', component: AsistenciaMacroComponent, canActivate: [AuthGuard] },
-  { path: 'macro/retrasos', component: RetrasosMacroComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

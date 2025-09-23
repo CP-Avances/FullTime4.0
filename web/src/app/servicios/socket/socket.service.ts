@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
+import { io, Socket } from 'socket.io-client';
 import { UrlService } from '../url/url.service';
 import { Subscription } from 'rxjs';
 
@@ -17,14 +17,11 @@ export class SocketService {
       console.log('URL del socket disponible.');
       if (url && url !== this.serverUrl) {
         this.serverUrl = url;
-        if (!this.socketConnected) {
-          console.log('Conectando al socket...');
-          this.initSocket();
-        }
+        this.initSocket();
       }
     });
 
-    // INTENTAR CARGAR DESDE LOCALSTORAGE SI NO SE HA RECIBIDO AÚN
+    // Cargar desde localStorage si no hay aún URL recibida
     const storedUrl = localStorage.getItem('socketURL');
     if (storedUrl) {
       this.serverUrl = storedUrl;
@@ -43,15 +40,16 @@ export class SocketService {
       this.socket = null;
     }
 
-    this.socket = new Socket({ url: this.serverUrl, options: {} });
-    this.socket.connect();
-    this.socketConnected = true;
-
-    this.socket.fromEvent('connect').subscribe(() => {
-      console.log('Conectado al servidor socket:', this.serverUrl);
+    this.socket = io(this.serverUrl, {
+      transports: ['websocket'], // opcional, fuerza websocket
     });
 
-    this.socket.fromEvent('disconnect').subscribe(() => {
+    this.socket.on('connect', () => {
+      console.log('Conectado al servidor socket:', this.serverUrl);
+      this.socketConnected = true;
+    });
+
+    this.socket.on('disconnect', () => {
       console.log('Desconectado del servidor');
       this.socketConnected = false;
     });
