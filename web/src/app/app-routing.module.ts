@@ -167,13 +167,13 @@ const routes: Routes = [
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
   { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
-  {
+  /* {
     path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent,
     children: [
       { path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
       { path: 'registrar-solicitudes-vaciones', component: RegistrarSolicitudesVacacionesComponent }
     ]
-  },
+  }, */
 
   // MODULO  --ACCION PERSONAL
   { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard] },
