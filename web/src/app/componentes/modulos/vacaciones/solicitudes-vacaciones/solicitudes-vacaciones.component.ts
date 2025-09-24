@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { Subject, takeUntil } from "rxjs";
 import { SolicitudVacacion } from "src/app/interfaces/SolicitudesVacacion";
 import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service";
@@ -14,8 +14,11 @@ import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/v
 
 export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
 
+  private destroy$ = new Subject<void>;
+
   solicitudService = inject(VacacionesService);
-  solicitudes: SolicitudVacacion[] = [];
+
+  solicitudes = signal<SolicitudVacacion[]>([]);
 
   campos: string[] = [
     'fecha_inicio',
@@ -27,7 +30,6 @@ export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
     'documento'
   ]
 
-  private destroy$ = new Subject<void>;
 
   ngOnInit(): void {
     this.cargarSolicitudes();
@@ -36,13 +38,17 @@ export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
 
   cargarSolicitudes() {
     this.solicitudService.ObtenerSolicitudes()
-    .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => this.solicitudes = data,
+        next: (data) => this.solicitudes.set(data),
         error: (err) => {
           console.error('Error al cargar solicitudes', err);
         }
       })
+  }
+
+  validarFeriados(valor: boolean): string {
+    return valor ? "Sí" : "No";
   }
 
   ngOnDestroy(): void {
