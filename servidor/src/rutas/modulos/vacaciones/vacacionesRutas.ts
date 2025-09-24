@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../../libs/verificarToken'
-import { ObtenerRutaVacacion } from '../../../libs/accesoCarpetas';
 import VACACIONES_CONTROLADOR from '../../../controlador/modulos/vacaciones/vacacionesControlador';
-import multer from 'multer';
+import { ObtenerRutaVacacion } from '../../../libs/accesoCarpetas';
+import { TokenValidation } from '../../../libs/verificarToken'
 import { DateTime } from 'luxon';
+import { Router } from 'express';
+import multer from 'multer';
 import pool from '../../../database';
 
 const storage = multer.diskStorage({

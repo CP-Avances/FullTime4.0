@@ -108,6 +108,7 @@ import { TimbreSistemaComponent } from './componentes/reportes/modulos/timbre-si
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 // REPORTE  --AUDITORIA
 import { AuditoriaSistemaComponent } from './componentes/reportes/auditoria/auditoria-sistema/auditoria-sistema.component';
+import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
 
 const routes: Routes = [
 
@@ -167,6 +168,13 @@ const routes: Routes = [
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
   { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
+  {
+    path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent,
+    children: [
+      //{ path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
+      //{ path: 'registrar-solicitudes-vaciones', component: RegistrarSolicitudesVacacionesComponent }
+    ]
+  }, 
 
   // MODULO  --ACCION PERSONAL
   { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard] },
