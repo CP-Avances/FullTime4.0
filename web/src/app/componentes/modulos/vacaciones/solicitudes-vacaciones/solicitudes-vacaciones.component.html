@@ -13,6 +13,7 @@
             (click)="AbrirVentanaVacaciones()" *ngIf="getCrearDatos()">{{btnTitulo}}
           </button>
         </div> -->
+        <button [routerLink]="['registrar-solicitudes-vacaciones']">Registrar</button>
       </div>
     </div>
 
@@ -75,8 +76,41 @@
           </div>
         </div>
       </div>
+
+      <div class="row justify-content-center">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <table class="table table-sm text-center align-middle" style="width: 100%;">
+              <thead class="table-secondary">
+                <tr>
+                  <th class="col-total-compacta">Lunes</th>
+                  <th class="col-total-compacta">Martes</th>
+                  <th class="col-total-compacta">Miércoles</th>
+                  <th class="col-total-compacta">Jueves</th>
+                  <th class="col-total-compacta">Viernes</th>
+                  <th class="col-total-compacta">Sábado</th>
+                  <th class="col-total-compacta">Domingo</th>
+                  <th class="col-total-compacta">
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_lunes}}</td>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_martes}}</td>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_miercoles}}</td>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_jueves}}</td>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_viernes}}</td>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_sabado}}</td>
+                  <td class="col-total-compacta">{{vacacion.numero_dias_domingo}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       }
     </mat-card-content>
 
   </mat-card>
 </div>
+<router-outlet></router-outlet>

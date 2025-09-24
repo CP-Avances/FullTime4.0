@@ -109,6 +109,8 @@ import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/an
 // REPORTE  --AUDITORIA
 import { AuditoriaSistemaComponent } from './componentes/reportes/auditoria/auditoria-sistema/auditoria-sistema.component';
 import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
+import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
+import { RegistrarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/registrar-solicitudes-vacaciones/registrar-solicitudes-vacaciones.component';
 
 const routes: Routes = [
 
@@ -152,7 +154,14 @@ const routes: Routes = [
   { path: 'discapacidades', component: CatDiscapacidadComponent, canActivate: [AuthGuard] },
   { path: 'vacunas', component: CatVacunasComponent, canActivate: [AuthGuard] },
   { path: 'empleado', component: ListaEmpleadosComponent, canActivate: [AuthGuard] },
-  { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard] },
+  {
+    path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard],
+    children: [
+      { path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent },
+      { path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
+      { path: 'registrar-solicitudes-vacaciones', component: RegistrarSolicitudesVacacionesComponent }
+    ]
+  },
   { path: 'registrarEmpleado', component: RegistroComponent, canActivate: [AuthGuard] },
   { path: 'cargarPlantilla', component: CargarPlantillaComponent, canActivate: [AuthGuard] },
   { path: 'actualizarInformacion', component: ActualizacionInformacionComponent, canActivate: [AuthGuard] },
@@ -168,13 +177,6 @@ const routes: Routes = [
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
   { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
-  {
-    path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent,
-    children: [
-      //{ path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
-      //{ path: 'registrar-solicitudes-vaciones', component: RegistrarSolicitudesVacacionesComponent }
-    ]
-  }, 
 
   // MODULO  --ACCION PERSONAL
   { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard] },
