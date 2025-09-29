@@ -1,4 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subject, takeUntil } from "rxjs";
 import { SolicitudVacacion } from "src/app/interfaces/SolicitudesVacacion";
 import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service";
@@ -17,6 +18,8 @@ export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>;
 
   solicitudService = inject(VacacionesService);
+  router = inject(Router);
+  route = inject(ActivatedRoute);
 
   solicitudes = signal<SolicitudVacacion[]>([]);
 
@@ -49,6 +52,10 @@ export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
 
   validarFeriados(valor: boolean): string {
     return valor ? "Sí" : "No";
+  }
+
+  irRegistrar(): void {
+    this.router.navigate(['registrar'], { relativeTo: this.route });
   }
 
   ngOnDestroy(): void {

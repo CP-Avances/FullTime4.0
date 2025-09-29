@@ -158,8 +158,8 @@ const routes: Routes = [
     path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard],
     children: [
       { path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent },
+      { path: 'registrar', component: RegistrarSolicitudesVacacionesComponent },
       { path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
-      { path: 'registrar-solicitudes-vacaciones', component: RegistrarSolicitudesVacacionesComponent }
     ]
   },
   { path: 'registrarEmpleado', component: RegistroComponent, canActivate: [AuthGuard] },

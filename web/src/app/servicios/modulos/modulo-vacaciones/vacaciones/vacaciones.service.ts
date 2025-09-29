@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SocketService } from 'src/app/servicios/socket/socket.service';
 import { Socket } from 'socket.io-client';
-import { SolicitudVacacion } from 'src/app/interfaces/SolicitudesVacacion';
+import { SolicitudVacacion, SolicitudVacacionRequest } from 'src/app/interfaces/SolicitudesVacacion';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -43,8 +43,8 @@ export class VacacionesService {
   }
 
   // CREAR SOLICITUD DE VACACIONES    **USADO**
-  RegistrarVacaciones(datos: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones`, datos);
+  RegistrarVacaciones(datos: SolicitudVacacionRequest) {
+    return this.http.post<SolicitudVacacionRequest>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones`, datos);
   }
 
   // METODO EDITAR SOLICITUD DE VACACIONES
