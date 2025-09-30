@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { Validators, FormControl } from '@angular/forms';
+import { Validators, FormControl, FormGroup  } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -132,6 +132,55 @@ export class TimbreMultipleComponent implements OnInit {
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
+
+  // VARIBALES PARA SELECCIONAR VARIOS TIMBRES.
+  Items_timbres: boolean = false;
+  opciones: string[] = ['Ingreso', 'Inicio almuerzo', 'Fin almuerzo', 'Salida'];
+  valorSeleccionado: string | null = null;
+  valoresSeleccionados: string[] = [];
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  teclaFuncionF = new FormControl('');
+  observacionF = new FormControl('');
+  accionF = new FormControl('', Validators.required);
+  FechaF = new FormControl('', Validators.required);
+  HoraF = new FormControl('', Validators.required);
+  // VARIABLES DE ALMACENAMIENTO DE ARCHIVO
+  nombreDocumento = new FormControl('');
+  archivoForm = new FormControl('');
+  nameFile: string;
+  archivoSubido: Array<File>;
+  documento: boolean = false;
+  documentoBase64: string;
+  HabilitarBtn: boolean = false;
+  // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
+  nombre: string;
+  capturar_segundos: number = 60;  // 60 = TOMAR SOLO HORAS Y MINUTOS  -  1 TOMAR HORAS, MINUTOS Y SEGUNDOS
+  // VARIABLES DE ALMACENMAIENTO DE COORDENADAS
+  latitud: number;
+  longitud: number;
+  // LISTA DE ACCIONES DE TIMBRES
+  accion: any = [
+    { value: 'E', name: 'Entrada' },
+    { value: 'S', name: 'Salida' },
+    { value: 'I/A', name: 'Inicio alimentación' },
+    { value: 'F/A', name: 'Fin alimentación' },
+    { value: 'I/P', name: 'Inicio permiso' },
+    { value: 'F/P', name: 'Fin permiso' },
+  ]
+  funciones: any = [];
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+  // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO
+  public formulario = new FormGroup({
+    horaForm: this.HoraF,
+    fechaForm: this.FechaF,
+    accionForm: this.accionF,
+    teclaFuncionForm: this.teclaFuncionF,
+    observacionForm: this.observacionF,
+    nombreDocumentoForm: this.nombreDocumento,
+  });
+
 
   constructor(
     public informacion: DatosGeneralesService,
@@ -561,6 +610,17 @@ export class TimbreMultipleComponent implements OnInit {
     }
   }
 
+  agregarValor() {
+    if (this.valorSeleccionado && !this.valoresSeleccionados.includes(this.valorSeleccionado)) {
+      this.valoresSeleccionados.push(this.valorSeleccionado);
+      this.valorSeleccionado = null; // resetea selección
+    }
+  }
+
+  eliminarValor(index: number) {
+    this.valoresSeleccionados.splice(index, 1);
+  }
+
   // METODO PARA VERIFICAR TIPO DE SEGURIDAD EN EL SISTEMA
   VerificarSeguridad(seleccionados: any) {
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
@@ -584,7 +644,8 @@ export class TimbreMultipleComponent implements OnInit {
           this.AbrirSeguridad(seleccionados);
         }
         else if (datos[0].seguridad_ninguna === true) {
-          this.TimbrarVarios(seleccionados);
+          this.Items_timbres = true;
+          //this.TimbrarVarios(seleccionados);
         }
       });
   }
@@ -681,6 +742,7 @@ export class TimbreMultipleComponent implements OnInit {
 
     this.seleccion.reset();
     this.activar_boton = false;
+    this.Items_timbres = false;
   }
 
   // METODO PARA MOSTRAR LISTA DE DATOS

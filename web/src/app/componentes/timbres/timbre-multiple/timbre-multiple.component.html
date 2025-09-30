@@ -215,6 +215,76 @@
             </div>
 
             <hr>
+
+            <div class="container" *ngIf="Items_timbres">
+                <form [formGroup]="formulario">
+                    <div class="row">
+                        <div class="col-7">
+                            <span>Seleccione los timbres a registrar</span>
+                        </div>
+                        <div class="col-6">
+                            <!-- Lado izquierdo -->
+                            <div class="left">
+                                <div class="nota" id="espacio">
+                                    <span>
+                                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para
+                                        activar
+                                        el botón
+                                        Timbrar.
+                                    </span>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-between">
+                                    <mat-form-field style="width: 225px;">
+                                        <mat-label>Seleccione valor</mat-label>
+                                        <mat-select [(value)]="valorSeleccionado">
+                                            <mat-option *ngFor="let opcion of opciones" [value]="opcion">
+                                                {{opcion}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field style="width: 225px;">
+                                        <mat-label>Fecha timbre</mat-label>
+                                        <input id="i-cursor" matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                            [formControl]="FechaF" required>
+                                        <mat-datepicker-toggle matSuffix [for]="picker" matTooltipPosition="right"
+                                            matTooltip="Seleccionar fecha dando click en el icono de calendario o escribir fecha con formato día/mes/año. Ejemplo: 12/04/1993">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker touchUi #picker></mat-datepicker>
+                                    </mat-form-field>
+
+                                </div>
+
+
+                            </div>
+                            <button mat-raised-button color="primary" (click)="agregarValor()">
+                                Añadir
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <!-- Lado derecho -->
+                            <div class="right">
+                                <p *ngIf="valoresSeleccionados.length === 0">
+                                    No hay valores añadidos.
+                                </p>
+
+                                <mat-card *ngFor="let item of valoresSeleccionados; let i = index" class="item-card">
+                                    <mat-card-content>
+                                        {{ item }}
+                                        <mat-icon class="float-right" (click)="eliminarValor(i)"
+                                            id="cerrar">highlight_off</mat-icon>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <hr *ngIf="Items_timbres">
+
             <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
             <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
 

@@ -36,4 +36,29 @@ p {
 
 .mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 20px;
-  }
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+}
+
+.left, .right {
+  flex: 1;
+}
+
+.item-card {
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.placeholder {
+  color: gray;
+  font-size: 14px;
+}
