@@ -175,13 +175,17 @@ export class PdfServicesService {
   }
 
   getCheckBoxCellDeclaracio(tipo: any, valor: boolean) {
-    console.log('valor: ', valor, ' tipo: ', tipo)
+  
+    // Normalizar entradas (opcional)
+    const tipoNorm = String(tipo).toLowerCase();
+    const marcado = (tipoNorm === 'si' && valor === true) || (tipoNorm === 'no' && valor === false);
+
     return {
       table: {
         widths: [8], // ancho del cuadrito
         heights: [8], // alto del cuadrito
         body: [[{
-          text: (valor == true && tipo == 'Si' ? 'x' : (valor == false && tipo == 'No' ? 'x' : '')),
+          text: marcado ? 'X' : '',
           alignment: 'center',
           fontSize: 6,
         }]]
@@ -225,12 +229,12 @@ export class PdfServicesService {
     };
   }
 
-  getCellPosecionText(valor: string) {
+  getCellPosecionText(valor: string = '') {
     return {
       table: {
         widths: ['*'], // ancho del cuadrito
         body: [[{
-          text: valor || '',
+          text: valor.toUpperCase() || '',
           alignment: 'left',
           fontSize: 8,
           noWrap: false,
@@ -2193,7 +2197,8 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_director + '. ' + this.datosPedido.empleado_director)],
+                        }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_director ? this.datosPedido.abreviatura_director : "") + '. ' + 
+                                                          (this.datosPedido.empleado_director ? this.datosPedido.empleado_director.toUpperCase() : ""))],
                         [{
                           text: 'PUESTO:  ',
                           bold: true,
@@ -2209,7 +2214,7 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_director)],
+                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_director ? this.datosPedido.cargo_director.toUpperCase() : "")],
                         [{
                           text: '',
                           margin: [0, 0, 0, 5],
@@ -2275,7 +2280,8 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_delegado + '. ' + this.datosPedido.empleado_autoridad_delegado)],
+                        }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_delegado ? this.datosPedido.abreviatura_delegado : "") + '. ' + 
+                                                          (this.datosPedido.empleado_autoridad_delegado ? this.datosPedido.empleado_autoridad_delegado.toUpperCase() : ""))],
                         [{
                           text: 'PUESTO:  ',
                           bold: true,
@@ -2292,7 +2298,7 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_autoridad_delegado)],
+                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_autoridad_delegado ? this.datosPedido.cargo_autoridad_delegado.toUpperCase() : "")],
                         [{
                           text: '',
                           margin: [0, 0, 0, 5],
@@ -2486,7 +2492,8 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_empleado + '. ' + this.datosPedido.nombres.toUpperCase())],
+                      }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_empleado ? this.datosPedido.abreviatura_empleado : "") + '. ' + 
+                                                        (this.datosPedido.nombres ? this.datosPedido.nombres.toUpperCase() : ""))],
                       [{
                         text: 'FECHA:  ',
                         bold: true,
@@ -2578,7 +2585,8 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_testigo + '. ' + this.datosPedido.empleado_testigo)],
+                      }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_testigo ? this.datosPedido.abreviatura_testigo : "") + '. ' + 
+                                                        (this.datosPedido.empleado_testigo ? this.datosPedido.empleado_testigo.toUpperCase() : "" ))],
 
                       [{
                         text: 'FECHA:  ',
@@ -2747,7 +2755,8 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_elaboracion + '. ' + this.datosPedido.empleado_elaboracion)],
+                      }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_elaboracion ? this.datosPedido.abreviatura_elaboracion : "") + '. ' + 
+                                                        (this.datosPedido.empleado_elaboracion ? this.datosPedido.empleado_elaboracion.toUpperCase() : ""))],
                       [{
                         text: 'PUESTO:  ',
                         bold: true,
@@ -2764,7 +2773,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.tipo_cargo_elaboracion)],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.tipo_cargo_elaboracion ? this.datosPedido.tipo_cargo_elaboracion.toUpperCase() : "")],
                       [{
                         text: '',
                         margin: [0, 0, 0, 10]
@@ -2830,7 +2839,8 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_revision + '. ' + this.datosPedido.empleado_revision)],
+                      }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_revision ? this.datosPedido.abreviatura_revision : "") + '. ' + 
+                                                        (this.datosPedido.empleado_revision ? this.datosPedido.empleado_revision.toUpperCase() : ""))],
                       [{
                         text: 'PUESTO:  ',
                         bold: true,
@@ -2847,7 +2857,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.tipo_cargo_revision)],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.tipo_cargo_revision ? this.datosPedido.tipo_cargo_revision.toUpperCase() : "")],
                       [{
                         text: '',
                         margin: [0, 0, 0, 10]
@@ -2912,7 +2922,8 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_control + '. ' + this.datosPedido.empleado_control)],
+                      }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_control ? this.datosPedido.abreviatura_control : "") + '. ' + 
+                                                        (this.datosPedido.empleado_control ? this.datosPedido.empleado_control.toUpperCase() : ""))],
                       [{
                         text: 'PUESTO:  ',
                         bold: true,
@@ -2929,7 +2940,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.tipo_cargo_control)],
+                      }, this.getCellPosecionFirmasText(this.datosPedido.tipo_cargo_control ? this.datosPedido.tipo_cargo_control.toUpperCase() : "")],
                       [{
                         text: '',
                         margin: [0, 0, 0, 10]
@@ -3134,7 +3145,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.fecha_comunicacion)]
+                      }, this.getCellPosecionFirmasText(this.datosPedido.fecha_comunicacion ? this.datosPedido.fecha_comunicacion : "")]
                     ]
                   },
                   border: [false, false, false, false],
@@ -3159,7 +3170,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.hora_comunicacion)]
+                      }, this.getCellPosecionFirmasText(this.datosPedido.hora_comunicacion ? this.datosPedido.hora_comunicacion : "")]
                     ]
                   },
                   border: [false, false, false, false],
@@ -3199,7 +3210,7 @@ export class PdfServicesService {
                           paddingTop: () => 0,
                           paddingBottom: () => 0
                         }
-                      }, this.getCellPosecionFirmasText(this.datosPedido.medio_comunicacion)]
+                      }, this.getCellPosecionFirmasText(this.datosPedido.medio_comunicacion ? this.datosPedido.medio_comunicacion : "")]
                     ]
                   },
                   border: [false, false, false, false],
@@ -3301,7 +3312,8 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.abreviatura_comunicacion ? this.datosPedido.abreviatura_comunicacion.trim() + ". " : "" + (this.datosPedido.empleado_comunicacion ? this.datosPedido.empleado_comunicacion.toUpperCase().trim() : ""))
+                        }, this.getCellPosecionFirmasText((this.datosPedido.abreviatura_comunicacion ? this.datosPedido.abreviatura_comunicacion.trim() : "") + ". " + 
+                                                          (this.datosPedido.empleado_comunicacion ? this.datosPedido.empleado_comunicacion.toUpperCase() : ""))
                       ],
                       [
                         {
@@ -3319,7 +3331,7 @@ export class PdfServicesService {
                             paddingTop: () => 0,
                             paddingBottom: () => 0
                           }
-                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_comunicacion)
+                        }, this.getCellPosecionFirmasText(this.datosPedido.cargo_comunicacion ? this.datosPedido.cargo_comunicacion.toUpperCase() : "")
                       ]
                     ]
                   },

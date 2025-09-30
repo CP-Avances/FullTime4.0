@@ -134,10 +134,10 @@ export class ExcelService {
     worksheet.getRow(1).height = 29;
     worksheet.getRow(2).height = 1;
     worksheet.getRow(3).height = 25;
-    worksheet.getRow(4).height = 25;
-    worksheet.getRow(5).height = 25;
-    worksheet.getRow(6).height = 25;
-    worksheet.getRow(7).height = 26;
+    worksheet.getRow(4).height = 23;
+    worksheet.getRow(5).height = 23;
+    worksheet.getRow(6).height = 23;
+    worksheet.getRow(7).height = 24;
     worksheet.getRow(8).height = 20;
     worksheet.getRow(9).height = 20;
     worksheet.getRow(10).height = 26;
@@ -148,33 +148,39 @@ export class ExcelService {
     }
     worksheet.getRow(20).height = 22;
     worksheet.getRow(21).height = 1;
-    worksheet.getRow(22).height = 23;
-    worksheet.getRow(23).height = 80;
-    worksheet.getRow(24).height = 23;
+    worksheet.getRow(22).height = 22;
+    worksheet.getRow(23).height = 95;
+    worksheet.getRow(24).height = 22;
     worksheet.getRow(25).height = 1;
     for (var i = 26; i <= 43; i++) {
       worksheet.getRow(i).height = 20;
     }
     worksheet.getRow(44).height = 5;
-    worksheet.getRow(45).height = 24;
+    worksheet.getRow(45).height = 22;
     worksheet.getRow(46).height = 5;
     worksheet.getRow(48).height = 20;
     worksheet.getRow(49).height = 30;
     worksheet.getRow(50).height = 5;
+    worksheet.getRow(52).height = 20;
     worksheet.getRow(53).height = 19;
     worksheet.getRow(54).height = 5;
     worksheet.getRow(55).height = 24;
     worksheet.getRow(56).height = 35;
-    worksheet.getRow(57).height = 19;
+    worksheet.getRow(57).height = 15;
     worksheet.getRow(58).height = 29;
+    worksheet.getRow(60).height = 20;
+    worksheet.getRow(61).height = 20;
     worksheet.getRow(62).height = 5;
-    worksheet.getRow(63).height = 30;
+    worksheet.getRow(63).height = 23;
     worksheet.getRow(64).height = 1;
     worksheet.getRow(65).height = 30;
     worksheet.getRow(66).height = 1;
     worksheet.getRow(67).height = 30;
     worksheet.getRow(69).height = 20;
     worksheet.getRow(70).height = 30;
+    worksheet.getRow(72).height = 25;
+    worksheet.getRow(73).height = 25;
+    worksheet.getRow(74).height = 25;
     worksheet.getRow(77).height = 5;
     worksheet.getRow(78).height = 1;
     worksheet.getRow(79).height = 1;
@@ -196,7 +202,7 @@ export class ExcelService {
     worksheet.getRow(103).height = 10;
     worksheet.getRow(107).height = 10;
     worksheet.getRow(108).height = 10;
-    worksheet.getRow(109).height = 30;
+    worksheet.getRow(109).height = 23;
 
     // COMBINAR CELDAS
     worksheet.mergeCells("A1:D5");
