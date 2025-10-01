@@ -135,9 +135,9 @@ export class TimbreMultipleComponent implements OnInit {
 
   // VARIBALES PARA SELECCIONAR VARIOS TIMBRES.
   Items_timbres: boolean = false;
-  opciones: string[] = ['Ingreso', 'Inicio almuerzo', 'Fin almuerzo', 'Salida'];
   valorSeleccionado: string | null = null;
-  valoresSeleccionados: string[] = [];
+  valoresSeleccionados: any [] = [];
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   teclaFuncionF = new FormControl('');
   observacionF = new FormControl('');
@@ -611,9 +611,28 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   agregarValor() {
-    if (this.valorSeleccionado && !this.valoresSeleccionados.includes(this.valorSeleccionado)) {
-      this.valoresSeleccionados.push(this.valorSeleccionado);
-      this.valorSeleccionado = null; // resetea selección
+    if (this.FechaF.value && this.HoraF.value && this.valorSeleccionado && this.observacionF.value) {
+
+      const accionSeleccionada = this.accion.find(a => a.value === this.valorSeleccionado);
+
+      const nuevoItem = {
+        fecha: this.FechaF.value,
+        hora: this.HoraF.value,
+        accion: accionSeleccionada ? accionSeleccionada.name : this.valorSeleccionado,
+        valorAccion: this.valorSeleccionado,
+        observacion: this.observacionF.value
+      };
+
+      this.valoresSeleccionados.push(nuevoItem);
+
+      // limpiar campos
+      this.FechaF.reset();
+      this.HoraF.reset();
+      this.valorSeleccionado = null;
+      this.observacionF.reset();
+
+      console.log('timbres a enviar: ',this.valoresSeleccionados)
+
     }
   }
 
@@ -832,6 +851,35 @@ export class TimbreMultipleComponent implements OnInit {
 
   getRegistrarTimbres(){
     return this.tienePermiso('Registrar Timbres Múltiples');
+  }
+
+   // METODO DE INGRESO DE TIMBRES
+  contador: number = 0;
+  InsertarTimbre(form: any) {
+    console.log('formulario a enviar: ',form)
+    var hora_timbre = form.horaForm;
+    if (this.capturar_segundos === 60) {
+      hora_timbre = form.horaForm + ':00';
+    }
+    // 
+    
+    // if (this.data.length === undefined) {
+    //   timbre.id_empleado = this.data.id;
+    //   this.ventana.close(timbre);
+    // }
+    // else {
+    //   this.contador = 0;
+    //   const ids_empleados = this.data.map((empl: any) => empl.id);
+
+    //   timbre.id_empleado = ids_empleados;
+    //   this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
+
+    //       this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.data.length + ' timbres exitosamente.', {
+    //         timeOut: 6000,
+    //       })
+    //   })
+    // }
+
   }
 
 }

@@ -62,3 +62,56 @@ p {
   color: gray;
   font-size: 14px;
 }
+
+
+.item-card {
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  mat-card-content {
+    padding: 16px;
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+
+  .titulo-card {
+    font-weight: 400;
+    color: #3f51b5;
+  }
+
+  .btn-cerrar {
+    cursor: pointer;
+    color: #f44336;
+    transition: transform 0.2s;
+  }
+
+  .btn-cerrar:hover {
+    transform: scale(1.2);
+  }
+
+  mat-icon {
+    margin-right: 6px;
+    font-size: 18px;
+  }
+}
+
+.detalle {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+
+  mat-icon {
+    margin-right: 6px;
+    font-size: 18px;
+  }
+
+  span {
+    font-size: 12px;
+  }
+}

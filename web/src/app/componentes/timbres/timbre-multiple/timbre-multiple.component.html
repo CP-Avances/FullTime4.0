@@ -219,10 +219,10 @@
             <div class="container" *ngIf="Items_timbres">
                 <form [formGroup]="formulario">
                     <div class="row">
-                        <div class="col-7">
-                            <span>Seleccione los timbres a registrar</span>
+                        <div class="col-12">
+                            <span><b>Seleccione los timbres a registrar</b></span>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <!-- Lado izquierdo -->
                             <div class="left">
                                 <div class="nota" id="espacio">
@@ -234,15 +234,8 @@
                                     </span>
                                 </div>
                                 <div class="d-flex flex-wrap justify-content-between">
-                                    <mat-form-field style="width: 225px;">
-                                        <mat-label>Seleccione valor</mat-label>
-                                        <mat-select [(value)]="valorSeleccionado">
-                                            <mat-option *ngFor="let opcion of opciones" [value]="opcion">
-                                                {{opcion}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                    <mat-form-field style="width: 225px;">
+
+                                    <mat-form-field style="width: 50%;">
                                         <mat-label>Fecha timbre</mat-label>
                                         <input id="i-cursor" matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                             [formControl]="FechaF" required>
@@ -251,34 +244,93 @@
                                         </mat-datepicker-toggle>
                                         <mat-datepicker touchUi #picker></mat-datepicker>
                                     </mat-form-field>
+                                    <mat-form-field style="width: 50%;">
+                                        <mat-label>Hora timbre</mat-label>
+                                        <input id="i-cursor" matInput [attr.step]="capturar_segundos" type="time"
+                                            [formControl]="HoraF">
+                                    </mat-form-field>
+                                    <mat-form-field style="width: 100%;">
+                                        <mat-label>Acción timbre</mat-label>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Acciónes de la marcación.">
+                                            touch_app
+                                        </mat-icon>
+                                        <mat-select [(value)]="valorSeleccionado">
+                                            <mat-option *ngFor="let opcion of accion" [value]="opcion.value">
+                                                {{opcion.name}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field style="width: 100%;">
+                                        <mat-label>Observación</mat-label>
+                                        <textarea matInput #message maxlength="100"
+                                            placeholder="Ingresar una descripción." [formControl]="observacionF">
+                                        </textarea>
+                                        <mat-hint align="start" id="letras">
+                                            <strong>Ingresar hasta 100 caracteres</strong>
+                                        </mat-hint>
+                                        <mat-hint align="end" id="letras">{{message.value.length}} / 100</mat-hint>
+                                    </mat-form-field>
 
                                 </div>
-
-
                             </div>
-                            <button mat-raised-button color="primary" (click)="agregarValor()">
-                                Añadir
-                            </button>
+                            <div style="width: 80%; margin: auto; margin-top: 10px;">
+                                <button style="width: 100%;" mat-raised-button color="primary" (click)="agregarValor()">
+                                    Añadir
+                                </button>
+                            </div>
+
                         </div>
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <!-- Lado derecho -->
                             <div class="right">
-                                <p *ngIf="valoresSeleccionados.length === 0">
-                                    No hay valores añadidos.
-                                </p>
+                                <div class="d-flex justify-content-center align-items-center w-100 h-100"
+                                    *ngIf="valoresSeleccionados.length === 0">
+                                    <span>
+                                        No hay timbres añadidos.
+                                    </span>
+                                </div>
 
                                 <mat-card *ngFor="let item of valoresSeleccionados; let i = index" class="item-card">
                                     <mat-card-content>
-                                        {{ item }}
-                                        <mat-icon class="float-right" (click)="eliminarValor(i)"
-                                            id="cerrar">highlight_off</mat-icon>
+                                        <div class="card-header">
+                                            <span class="titulo-card"><mat-icon color="warn">touch_app</mat-icon>
+                                                Acción: {{ item.accion }}</span>
+                                            <mat-icon class="btn-cerrar"
+                                                (click)="eliminarValor(i)">highlight_off</mat-icon>
+                                        </div>
+
+                                        <div class="detalle">
+                                            <mat-icon color="primary">event</mat-icon>
+                                            <span><strong>Fecha:</strong> {{ item.fecha | date:'dd/MM/yyyy'}}</span>
+                                        </div>
+
+                                        <div class="detalle">
+                                            <mat-icon color="accent">access_time</mat-icon>
+                                            <span><strong>Hora:</strong> {{ item.hora }}</span>
+                                        </div>
+                                        <div class="detalle" *ngIf="item.observacion">
+                                            <mat-icon color="primary">notes</mat-icon>
+                                            <span><strong>Observación:</strong> {{ item.observacion }}</span>
+                                        </div>
                                     </mat-card-content>
                                 </mat-card>
+
+
                             </div>
                         </div>
 
                     </div>
-
+                    <div class="row">
+                        <div class="col-12">
+                            <div style="text-align: center; padding-bottom: 5px;">
+                                <button class="btn" [disabled]="!formulario.valid"
+                                    (click)="InsertarTimbre(formulario.value)">
+                                    Timbrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
 
             </div>
