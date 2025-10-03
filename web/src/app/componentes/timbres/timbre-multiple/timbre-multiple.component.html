@@ -321,12 +321,12 @@
                         </div>
 
                     </div>
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-12">
                             <div style="text-align: center; padding-bottom: 5px;">
-                                <button class="btn" [disabled]="!formulario.valid"
-                                    (click)="InsertarTimbre(formulario.value)">
-                                    Timbrar
+                                <button class="btn" [disabled]="valoresSeleccionados.length === 0"
+                                    (click)="InsertarTimbre(valoresSeleccionados)">
+                                    Registrar Timbres
                                 </button>
                             </div>
                         </div>

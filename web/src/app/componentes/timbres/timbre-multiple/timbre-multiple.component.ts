@@ -27,6 +27,7 @@ import { SeguridadComponent } from 'src/app/componentes/usuarios/frase-seguridad
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
+import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-timbre-multiple',
@@ -171,6 +172,7 @@ export class TimbreMultipleComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+  ips_locales: any = '';
   // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
     horaForm: this.HoraF,
@@ -181,6 +183,7 @@ export class TimbreMultipleComponent implements OnInit {
     nombreDocumentoForm: this.nombreDocumento,
   });
 
+  listaUsuarios: any = []
 
   constructor(
     public informacion: DatosGeneralesService,
@@ -193,12 +196,20 @@ export class TimbreMultipleComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private restR: ReportesService,
-    private restRol: RolesService
+    private restRol: RolesService,
+    private restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.validar.ObtenerIPsLocales().then((ips) => {
+      this.ips_locales = ips;
+    });
+
     this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
@@ -221,6 +232,8 @@ export class TimbreMultipleComponent implements OnInit {
     this.nombre_rol.valueChanges.subscribe(valor => {
       this.Filtrar(valor, 8);
     });
+
+     this.VerDatosEmpleado(this.idEmpleadoLogueado);
   }
 
   ngOnDestroy() {
@@ -631,8 +644,6 @@ export class TimbreMultipleComponent implements OnInit {
       this.valorSeleccionado = null;
       this.observacionF.reset();
 
-      console.log('timbres a enviar: ',this.valoresSeleccionados)
-
     }
   }
 
@@ -664,6 +675,7 @@ export class TimbreMultipleComponent implements OnInit {
         }
         else if (datos[0].seguridad_ninguna === true) {
           this.Items_timbres = true;
+          this.listaUsuarios = seleccionados;
           //this.TimbrarVarios(seleccionados);
         }
       });
@@ -853,33 +865,79 @@ export class TimbreMultipleComponent implements OnInit {
     return this.tienePermiso('Registrar Timbres Múltiples');
   }
 
+  // METODO DE BUSQUEDA DE DATOS DE EMPLEADO
+  empleadoUno: any = [];
+  VerDatosEmpleado(idemploy: number) {
+    this.empleadoUno = [];
+    this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.empleadoUno = data;
+    })
+  }
+
    // METODO DE INGRESO DE TIMBRES
   contador: number = 0;
-  InsertarTimbre(form: any) {
-    console.log('formulario a enviar: ',form)
-    var hora_timbre = form.horaForm;
-    if (this.capturar_segundos === 60) {
-      hora_timbre = form.horaForm + ':00';
+  InsertarTimbre(timbres: any) {
+    console.log('formulario a enviar: ',timbres)
+
+    timbres.forEach(item => {
+
+      var hora_timbre = item.hora;
+      if (this.capturar_segundos === 60) {
+        hora_timbre = item.hora + ':00';
+      }
+
+      let timbre = {
+        fec_hora_timbre: item.fecha .toJSON().split('T')[0] + 'T' + hora_timbre,
+        tecl_funcion: this.TeclaFuncion(item.valorAccion),
+        observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + ', ' + item.observacion,
+        id_empleado: '',
+        id_reloj: 98,
+        longitud: this.longitud,
+        latitud: this.latitud,
+        accion: item.valorAccion,
+        documento: this.documentoBase64,
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales,
+      }
+
+      this.contador = 0;
+
+      const ids_empleados = this.listaUsuarios.map((empl: any) => empl.id);
+      timbre.id_empleado = ids_empleados;
+
+      console.log('timbre a enviar: ', timbre);
+
+      this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
+          this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.listaUsuarios.length + ' timbres exitosamente.', {
+           timeOut: 6000,
+           })
+      })
+      
+    });
+
+
+  }
+
+  // METODO DE INGRESO DE ACCIONES DEL TIMBRE
+  TeclaFuncion(opcion: string) {
+    if (opcion == 'E') {
+      return 0;
     }
-    // 
-    
-    // if (this.data.length === undefined) {
-    //   timbre.id_empleado = this.data.id;
-    //   this.ventana.close(timbre);
-    // }
-    // else {
-    //   this.contador = 0;
-    //   const ids_empleados = this.data.map((empl: any) => empl.id);
-
-    //   timbre.id_empleado = ids_empleados;
-    //   this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
-
-    //       this.toastr.success('Operación exitosa.', 'Se registro un total de ' + this.data.length + ' timbres exitosamente.', {
-    //         timeOut: 6000,
-    //       })
-    //   })
-    // }
-
+    else if (opcion == 'S') {
+      return 1
+    }
+    else if (opcion == 'I/A') {
+      return 2
+    }
+    else if (opcion == 'F/A') {
+      return 3
+    }
+    else if (opcion == 'I/P') {
+      return 4
+    }
+    else if (opcion == 'F/P') {
+      return 5
+    }
   }
 
 }
