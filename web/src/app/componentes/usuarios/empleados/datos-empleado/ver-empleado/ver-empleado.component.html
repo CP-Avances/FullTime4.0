@@ -2855,55 +2855,53 @@
   </mat-tab>
 
   <!-- SOLICITUDES DE VACACIONES DEL EMPLEADO -->
-  <!-- <mat-tab label="periodo_vacaciones">
-        <ng-template mat-tab-label>
-            <mat-icon class="example-tab-icon" id="icono_pestaña">description</mat-icon>
-            <h6 id="items">Solicitudes de Vacaciones</h6>
-        </ng-template>
-
-        <p>PANTALLA DE SOLICITUDES DE VACACIONES</p>
-        <div class="container" style="padding-bottom: 25px;" *ngIf="ver_periodo">
-            <mat-card class="mat-elevation-z8">
-
-                <div id="titulo" class="row w-100 m-auto">
-                    <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
-                    </div>
-                    <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
-                        <span>
-                            SOLICITUDES VACACIONES
-                        </span>
-                    </div>
-                    <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
-                        <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
-                            (click)="AbrirVentanaVacaciones()" *ngIf="getCrearDatos()">{{btnTitulo}}
-                        </button>
-                    </div>
-                </div>
-
-                <mat-card-content>
-
-                </mat-card-content>
-            </mat-card>
-        </div>
-        <p>REGISTRO DE VACACIONES INDIVIDUALES</p>
-        @if (activar_vacacion_individual) {
-        <div style="padding-top: 20px;">
-            <app-registrar-solicitudes-vacaciones [data]="empleadoUno" />
-        </div>
-        }
-        <div style="padding-top: 20px;">
-            <app-editar-solicitudes-vacaciones />
-        </div>
-    </mat-tab> -->
-
-  <mat-tab label="Solicitudes de Vacaciones">
+  <mat-tab label="periodo_vacaciones">
     <ng-template mat-tab-label>
       <mat-icon class="example-tab-icon" id="icono_pestaña"
         >description</mat-icon
       >
       <h6 id="items">Solicitudes de Vacaciones</h6>
     </ng-template>
-    <app-solicitudes-vacaciones />
+
+    <div
+      class="container"
+      style="padding-top: 15px; padding-bottom: 25px"
+      *ngIf="ver_periodo"
+    >
+      <mat-card class="mat-elevation-z8">
+        <div id="titulo" class="row w-100 m-auto">
+          <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2"></div>
+          <div
+            class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo"
+          >
+            <span> SOLICITUDES VACACIONES </span>
+          </div>
+          <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
+            <button
+              type="submit"
+              class="btn btn-outline-light btn-sm"
+              style="float: right"
+              (click)="AbrirVentanaVacaciones()"
+              *ngIf="getCrearDatos()"
+            >
+              {{ btnTitulo }}
+            </button>
+          </div>
+        </div>
+
+        <mat-card-content>
+          <app-solicitudes-vacaciones />
+        </mat-card-content>
+      </mat-card>
+    </div>
+    @if (activar_vacacion_individual) {
+    <div style="padding-top: 20px">
+      <app-registrar-solicitudes-vacaciones [data]="empleadoUno" />
+    </div>
+    }
+    <div style="padding-top: 20px">
+      <!-- <app-editar-solicitudes-vacaciones /> -->
+    </div>
   </mat-tab>
 
   <!-- HORAS EXTRAS -->

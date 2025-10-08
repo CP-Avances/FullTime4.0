@@ -1,5 +1,5 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Optional } from '@angular/core';
+import { Optional, Output } from '@angular/core';
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { ToastrService } from 'ngx-toastr';
@@ -283,7 +283,7 @@ export class RegistrarSolicitudesVacacionesComponent implements OnInit {
 
   formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
-  //METODO PARA CONSULTAR LA LISTA DE FERIADOS 
+  //METODO PARA CONSULTAR LA LISTA DE FERIADOS
   ObtenerFeriados(formato: string) {
     this.feriados = [];
     this.rest.ConsultarFeriado().subscribe(datos => {

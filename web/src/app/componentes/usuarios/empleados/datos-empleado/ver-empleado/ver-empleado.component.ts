@@ -1249,7 +1249,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       user_name: this.user_name,
       id_cargo: datos.id,
       estado: estado,
-      ip: this.ip, 
+      ip: this.ip,
       ip_local: this.ips_locales,
     }
     this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
@@ -1275,7 +1275,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       personal: true,
       administra: datos.jefe,
       user_name: this.user_name,
-      ip: this.ip, 
+      ip: this.ip,
       ip_local: this.ips_locales,
     }
 
@@ -1344,7 +1344,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip, 
+      ip: this.ip,
       ip_local: this.ips_locales
     };
     this.restU.EliminarUsuarioDepartamento(datos).subscribe(data => {
