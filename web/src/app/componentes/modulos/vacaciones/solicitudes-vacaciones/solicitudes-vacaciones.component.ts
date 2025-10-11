@@ -1,5 +1,4 @@
-import { ConteoDiasSemana } from './../../../../interfaces/ConteoDiasSemana';
-import { Component, inject, Input, OnDestroy, OnInit, signal } from "@angular/core";
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal } from "@angular/core";
 import { Subject, takeUntil } from "rxjs";
 import { SolicitudVacacion } from "src/app/interfaces/SolicitudesVacacion";
 import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service";
@@ -14,6 +13,8 @@ import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/v
 
 
 export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
+
+  @Output() editarSolicitud = new EventEmitter<any>();
 
   solicitudService = inject(VacacionesService);
 
@@ -42,6 +43,10 @@ export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
           console.error('Error al cargar solicitudes', err);
         }
       })
+  }
+
+  onEditarSolicitudes(solicitud: any) {
+    this.editarSolicitud.emit(solicitud);
   }
 
   ngOnDestroy(): void {

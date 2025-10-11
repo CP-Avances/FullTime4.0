@@ -2890,7 +2890,19 @@
         </div>
 
         <mat-card-content>
-          <app-solicitudes-vacaciones />
+          <app-solicitudes-vacaciones
+            (editarSolicitud)="abrirEditarSolicitudes($event)"
+          />
+
+          <div class="text-center mt-3">
+            <button
+              class="btn btn-primary btn-sm"
+              (click)="abrirVentanaEditarVacaciones()"
+              style="margin-bottom: 10px"
+            >
+              Editar Solicitudes
+            </button>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
@@ -2898,10 +2910,14 @@
     <div style="padding-top: 20px">
       <app-registrar-solicitudes-vacaciones [data]="empleadoUno" />
     </div>
-    }
+    } @if(activar_editar_solicitudes){
     <div style="padding-top: 20px">
-      <!-- <app-editar-solicitudes-vacaciones /> -->
+      <app-editar-solicitudes-vacaciones
+        [data]="empleadoUno"
+        (cerrar)="cerrarEditarSolicitudes()"
+      />
     </div>
+    }
   </mat-tab>
 
   <!-- HORAS EXTRAS -->

@@ -1,3 +1,4 @@
+import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
@@ -168,7 +169,13 @@ const routes: Routes = [
   { path: 'configurar-vacacion', component: ListarConfigurarVacacionComponent, canActivate: [AuthGuard] },
   { path: 'generar-periodo', component: GenerarPeriodoManualComponent, canActivate: [AuthGuard] },
   { path: "configurar-vacacion-multiple", component: ConfigurarVacacionMultipleComponent },
-  {path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent}, 
+  {
+    path: 'solicitudes-vacaciones', component: SolicitudesVacacionesComponent,
+    children: [
+      { path: 'editar-solicitudes-vacaciones', component: EditarSolicitudesVacacionesComponent },
+    ]
+  },
+
 
   // MODULO  --ACCION PERSONAL
   { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard] },
