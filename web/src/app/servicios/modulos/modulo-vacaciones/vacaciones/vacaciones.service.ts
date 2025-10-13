@@ -48,8 +48,8 @@ export class VacacionesService {
   }
 
   // METODO EDITAR SOLICITUD DE VACACIONES
-  EditarSolicitudesVacaciones(id: number, data: SolicitudVacacion): Observable<SolicitudVacacion> {
-    return this.http.put<SolicitudVacacion>(`${(localStorage.getItem('empresaURL') as string)}/vacacion-solicitada/${id}`, data);
+  EditarSolicitudesVacaciones(data: SolicitudVacacion): Observable<SolicitudVacacion> {
+    return this.http.put<SolicitudVacacion>(`${(localStorage.getItem('empresaURL') as string)}/vacacion-solicitada/${data.id}`, data);
   }
 
   ObtenerSolicitudes(): Observable<SolicitudVacacion[]> {
