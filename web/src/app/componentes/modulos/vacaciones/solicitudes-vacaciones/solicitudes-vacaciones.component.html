@@ -1,36 +1,20 @@
-<div class="container" style="padding-bottom: 25px;">
+<div class="container" style="padding-top: 15px; padding-bottom: 25px">
   <mat-card class="mat-elevation-z8">
-
-    <div id="titulo" class="row w-100 m-auto">
-      <div class="col-9 col-md-2 mb-2 mb-md-0 order-2 order-md-2">
-        <div class="col-12 col-md-7 mb-2 mb-md-0 order-1 order-md-2 Tabla_titulo">
-          <span>
-            SOLICITUDES VACACIONES
-          </span>
-        </div>
-        <!--  <div class="col-3 col-md-3 mb-2 mb-md-0 order-3 order-md-2">
-          <button type="submit" class="btn btn-outline-light btn-sm" style="float: right;"
-            (click)="AbrirVentanaVacaciones()" *ngIf="getCrearDatos()">{{btnTitulo}}
-          </button>
-        </div> -->
-      </div>
-    </div>
-
     <mat-card-content>
-      @for(vacacion of solicitudes; track vacacion.id){
+      @for(vacacion of solicitudes(); track vacacion.id){
       <div>
         <div class="container">
           <div class="row">
             <div class="col-md">
               <div class="espacio d-flex justify-content-start">
                 <label>Inicio de Vacaciones: </label>
-                <label>{{vacacion.fecha_inicio}}</label>
+                <label>{{ vacacion.fecha_inicio | date : "fullDate" }}</label>
               </div>
             </div>
             <div class="col-md">
               <div class="espacio d-flex justify-content-start">
                 <label>Fin de Vacaciones: </label>
-                <label>{{vacacion.fecha_final}}</label>
+                <label>{{ vacacion.fecha_final | date : "fullDate" }}</label>
               </div>
             </div>
 
@@ -38,13 +22,15 @@
               <div class="col-md">
                 <div class="espacio d-flex justify-content-start">
                   <label>Cantidad Solicitada: </label>
-                  <label>{{vacacion.numero_dias_totales}} días</label>
+                  <label>{{ vacacion.numero_dias_totales }} días</label>
                 </div>
               </div>
               <div class="col-md">
                 <div class="espacio d-flex justify-content-start">
                   <label>Incluye Feriados: </label>
-                  <label>{{vacacion.incluir_feriados}}</label>
+                  <label>{{
+                    validarFeriados(vacacion.incluir_feriados)
+                  }}</label>
                 </div>
               </div>
             </div>
@@ -53,13 +39,15 @@
               <div class="col-md">
                 <div class="espacio d-flex justify-content-start">
                   <label>Fecha de Registro: </label>
-                  <label>{{vacacion.fecha_registro}}</label>
+                  <label>{{
+                    vacacion.fecha_registro | date : "fullDate"
+                  }}</label>
                 </div>
               </div>
               <div class="col-md">
                 <div class="espacio d-flex justify-content-start">
                   <label>Fecha de Actualización: </label>
-                  <label>{{vacacion.fecha_actualizacion}}</label>
+                  <label>{{ vacacion.fecha_actualizacion }}</label>
                 </div>
               </div>
             </div>
@@ -68,15 +56,77 @@
               <div class="col-md">
                 <div class="espacio d-flex justify-content-start">
                   <label>Documento: </label>
-                  <label>{{vacacion.documento}}</label>
+                  <label>{{ vacacion.documento }}</label>
                 </div>
               </div>
             </div>
+          </div>
+          <button (click)="onEditarSolicitudes(vacacion)">Editar</button>
+        </div>
+      </div>
+
+      <div class="text-center mt-4 mb-2">
+        <strong class="fs-8 text-secondary">
+          {{
+            permiteHoras
+              ? "Horas seleccionadas por día de la semana"
+              : "Número de días (por día de la semana) en el periodo seleccionado"
+          }}
+        </strong>
+      </div>
+      <div class="row justify-contetn-center">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <table
+              class="table table-sm text-center align-middle"
+              style="width: 100%"
+            >
+              <thead class="table-secondary">
+                <tr>
+                  <th class="col-total-compacta">Lunes</th>
+                  <th class="col-total-compacta">Martes</th>
+                  <th class="col-total-compacta">Miércoles</th>
+                  <th class="col-total-compacta">Jueves</th>
+                  <th class="col-total-compacta">Viernes</th>
+                  <th class="col-total-compacta">Sábado</th>
+                  <th class="col-total-compacta">Domingo</th>
+                  <th class="col-total-compacta">Días totales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_lunes }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_martes }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_miercoles }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_jueves }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_viernes }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_sabado }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_domingo }}
+                  </td>
+                  <td class="col-total-compacta">
+                    {{ vacacion.numero_dias_totales }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
       }
     </mat-card-content>
-
   </mat-card>
 </div>
+<router-outlet></router-outlet>

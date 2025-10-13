@@ -102,6 +102,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   @Input() diasTotales: number
   documentos: any = [];
 
+  //VARIABLE PARA ALMACENAR LA SOLICITUD A EDITAR
+  solicitudSeleccionada: any;
+
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
@@ -119,6 +122,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   btnDisc = 'Añadir';
   idEmpleado: string; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO SELECCIONADO PARA VER DATOS
   editar: string = '';
+  btnTituloEditar: string = "Nueva Solicitud";
 
   idEmpleadoLogueado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESIÓN
   hipervinculo: string = (localStorage.getItem('empresaURL') as string); // VARIABLE DE MANEJO DE RUTAS CON URL
@@ -132,6 +136,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   //VARIABLES PARA VACACIONES
   activar_vacacion_individual: boolean = false;
+  activar_editar_solicitudes: boolean = false;
+  ver_perriodo: boolean = true;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -301,6 +307,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA DETECTAR EVENTO DE PESTAÑA
   DetectarEventoTab(event: MatTabChangeEvent) {
     this.pantalla = event.tab.textLabel;
+    this.reiniciarEstadosVacaciones();
 
     console.log('pantalla> ', this.pantalla)
 
@@ -778,7 +785,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
         }
       });
-      console.log("aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
   }
 
   /** ********************************************************************************************* **
@@ -1249,7 +1255,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       user_name: this.user_name,
       id_cargo: datos.id,
       estado: estado,
-      ip: this.ip, 
+      ip: this.ip,
       ip_local: this.ips_locales,
     }
     this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
@@ -1275,7 +1281,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       personal: true,
       administra: datos.jefe,
       user_name: this.user_name,
-      ip: this.ip, 
+      ip: this.ip,
       ip_local: this.ips_locales,
     }
 
@@ -1344,7 +1350,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     const datos = {
       id: id,
       user_name: this.user_name,
-      ip: this.ip, 
+      ip: this.ip,
       ip_local: this.ips_locales
     };
     this.restU.EliminarUsuarioDepartamento(datos).subscribe(data => {
@@ -1996,6 +2002,39 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         timeOut: 6000,
       });
     }
+    this.reiniciarEstadosVacaciones();
+    this.activar_vacacion_individual = true;
+    this.ver_periodo = false;
+  }
+
+  onTabChange(event: any) {
+    console.log("Cambiando de pestaña, reiniciando estados....");
+    this.reiniciarEstadosVacaciones();
+  }
+
+  reiniciarEstadosVacaciones() {
+    this.activar_vacacion_individual = false;
+    this.activar_editar_solicitudes = false;
+    this.ver_periodo = true;
+  }
+
+  abrirVentanaEditarVacaciones() {
+    this.reiniciarEstadosVacaciones();
+    this.activar_editar_solicitudes = true;
+    //this.activar_vacacion_individual = false;
+    this.ver_periodo = false;
+  }
+
+  abrirEditarSolicitudes(solicitud: any) {
+    this.solicitudSeleccionada = solicitud;
+    this.reiniciarEstadosVacaciones();
+    this.activar_editar_solicitudes = true;
+    this.ver_periodo = false;
+  }
+
+  cerrarEditarSolicitudes() {
+    this.activar_editar_solicitudes = false;
+    this.ver_periodo = true;
   }
 
   /** ****************************************************************************************** **

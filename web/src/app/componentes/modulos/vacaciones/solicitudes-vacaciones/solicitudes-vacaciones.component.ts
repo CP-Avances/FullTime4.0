@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal } from "@angular/core";
 import { Subject, takeUntil } from "rxjs";
 import { SolicitudVacacion } from "src/app/interfaces/SolicitudesVacacion";
 import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/vacaciones/vacaciones.service";
@@ -14,18 +14,14 @@ import { VacacionesService } from "src/app/servicios/modulos/modulo-vacaciones/v
 
 export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
 
-  solicitudService = inject(VacacionesService);
-  solicitudes: SolicitudVacacion[] = [];
+  @Output() editarSolicitud = new EventEmitter<any>();
 
-  campos: string[] = [
-    'fecha_inicio',
-    'fecha_final',
-    'numero_dias_totales',
-    'incluir_feriados',
-    'fecha_registro',
-    'fecha_actualizacion',
-    'documento'
-  ]
+  solicitudService = inject(VacacionesService);
+
+  solicitudes = signal<SolicitudVacacion[]>([]);
+
+  permiteHoras: boolean = false;
+
 
   private destroy$ = new Subject<void>;
 
@@ -33,16 +29,24 @@ export class SolicitudesVacacionesComponent implements OnInit, OnDestroy {
     this.cargarSolicitudes();
   }
 
+  validarFeriados(value: boolean): string {
+    return value ? "SI" : "NO";
+  }
+
 
   cargarSolicitudes() {
     this.solicitudService.ObtenerSolicitudes()
-    .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => this.solicitudes = data,
+        next: (data) => this.solicitudes.set(data),
         error: (err) => {
           console.error('Error al cargar solicitudes', err);
         }
       })
+  }
+
+  onEditarSolicitudes(solicitud: any) {
+    this.editarSolicitud.emit(solicitud);
   }
 
   ngOnDestroy(): void {
