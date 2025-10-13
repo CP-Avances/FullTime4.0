@@ -967,16 +967,16 @@ export class MainNavComponent implements OnInit {
                     this.childrenVacaciones.push({ name: 'Vacaciones Múltiples', url: '/configurar-vacacion-multiple', color: true, ver: true });
                   }
                   break;
-                case 'vacaciones-solicitados':
+                case 'vacaciones-solicitados-':
                   this.itemModulos = true;
                   this.subItemModulosVacaciones = true;
                   for (const parametrizacion of this.childrenVacaciones) {
-                    if (parametrizacion.url === '/vacaciones-solicitados') {
+                    if (parametrizacion.url === '/vacaciones-solicitados-') {
                       this.vistaModulosVacacionesVacacionesSolicitadas = true;
                     }
                   }
                   if (!this.vistaModulosVacacionesVacacionesSolicitadas) {
-                    this.childrenVacaciones.push({ name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados', color: true, ver: true });
+                    this.childrenVacaciones.push({ name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados-', color: true, ver: true });
                   }
                   break;
                 case 'listaHorasExtras':
