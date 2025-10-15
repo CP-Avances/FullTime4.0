@@ -14,7 +14,15 @@
       </div>
     </div>
 
-    <div *ngIf="solicitud" style="background: #f0f8ff; padding: 10px; margin: 10px; border: 1px solid #ccc;">
+    <div
+      *ngIf="solicitud"
+      style="
+        background: #f0f8ff;
+        padding: 10px;
+        margin: 10px;
+        border: 1px solid #ccc;
+      "
+    >
       <h6>DEBUG - Datos de la solicitud:</h6>
       <p>ID: {{ solicitud.id }}</p>
       <p>Fecha Inicio: {{ solicitud.fecha_inicio }}</p>
@@ -40,7 +48,7 @@
               <mat-select [formControl]="vacacionSeleccionada">
                 @for(vacacion of tiposVacacion; track vacacion.id){
                 <mat-option [value]="vacacion.id">
-                  {{ vacacion.descripcion }}
+                  {{ vacacion.descripcion }} - {{ vacacion.id }}
                 </mat-option>
                 }
               </mat-select>
@@ -235,9 +243,96 @@
           <div class="col-md-4">
             <div class="row m-auto text-center">
               <div class="col-12 m-auto">
-                <div class="separar">
-                  <form></form>
+                @if(solicitud.documento && !mostrarSubidaDocumento){
+                <div
+                  class="mb-2 p-2"
+                  style="background: #e8f5e8; border-radius: 5px"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <div class="text-left">
+                      <small class="text-success">
+                        <strong>Documento actual: </strong>
+                      </small>
+                      <br />
+                      <small>{{ solicitud.documento }}</small>
+                    </div>
+                  </div>
                 </div>
+                } @if(solicitud?.documento && !mostrarSubidaDocumento){
+                <div class="mb-2">
+                  <button
+                    class="btn-2"
+                    type="button"
+                    (click)="cambiarDocumento()"
+                  >
+                    <mat-icon tyle="vertical-align: middle; font-size: 16px;">
+                      swap_horiz
+                    </mat-icon>
+                    Cambiar Documento
+                  </button>
+                </div>
+                } @if(!solicitud.documento || mostrarSubidaDocumento){
+                <div class="separar">
+                  <form method="post" enctype="multipart/form-data">
+                    <input
+                      (click)="reseteoArchivo($event)"
+                      (change)="fileChange($event)"
+                      type="file"
+                      [formControl]="archivoF"
+                      id="file"
+                    />
+                    <label
+                      for="file"
+                      class="btn-2"
+                      (click)="limpiarNombreArchivo()"
+                      matSuffix
+                      matTooltipPosition="right"
+                      matTooltip="Subir certificado o documento"
+                    >
+                      {{
+                        solicitud?.documento
+                          ? "Subir nuevo documento"
+                          : "Subir documento"
+                      }}
+                    </label>
+                  </form>
+                </div>
+                } @if(!solicitud?.documento || mostrarSubidaDocumento){
+                <div class="col-11 m-auto">
+                  <div class="separar">
+                    <input
+                      type="text"
+                      readonly
+                      id="letras"
+                      placeholder="Ningún archivo seleccionado"
+                      class="form-control"
+                      style="width: 200px"
+                      [formControl]="certificadoF"
+                    />
+                    @if(habilitarBtn){
+                    <i
+                      class="fa fa-trash-alt"
+                      style="color: red; margin-left: 5px"
+                      id="i-cursor"
+                      (click)="retirarArchivo()"
+                      matuffix
+                      matTooltipPosition="right"
+                      matTooltip="Eliminar archivo seleccionado"
+                    ></i>
+                    } @if(solicitud?.documento && mostrarSubidaDocumento){
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary ml-2"
+                      (click)="cancelarSubida()"
+                    >
+                      Cancelar
+                    </button>
+                    }
+                  </div>
+                </div>
+                }
               </div>
             </div>
           </div>

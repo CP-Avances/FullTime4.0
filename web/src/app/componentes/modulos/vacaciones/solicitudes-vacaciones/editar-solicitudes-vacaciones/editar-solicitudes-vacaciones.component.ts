@@ -47,6 +47,7 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
   permiteHoras: boolean = false;
   horasTotales: string = '00:00';
   diaSemanaSeleccionado: string | null = null;
+  mostrarSubidaDocumento: boolean = false;
 
   //Configuración
   formato_fecha: string = 'dd/MM/yyyy';
@@ -85,24 +86,22 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
       this.fechaInicio.setValue(new Date(this.solicitud.fecha_inicio));
       this.fechaFinal.setValue(new Date(this.solicitud.fecha_final));
 
-      if (this.solicitud.id_configuracion) {
+      if (this.solicitud.id_tipo_vacacion) {
         const tipoEncontrado = this.tiposVacacion.find(
-          t => t.id === this.solicitud.id_configuracion
+          t => t.id_periodo === this.solicitud.id_tipo_vacacion
         );
 
         if (tipoEncontrado) {
           this.vacacionSeleccionada.setValue(tipoEncontrado.id);
-          console.log('✅ Tipo vacación cargado:', tipoEncontrado.id, '-', tipoEncontrado.descripcion);
+          console.log('✅ Tipo vacación cargado:', tipoEncontrado);
         } else {
-          console.warn('⚠️ No se encontró tipo de vacación para id_configuracion:', this.solicitud.id_configuracion);
+          console.warn('⚠️ No se encontró tipo de vacación para id_configuracion:', this.solicitud.id_periodo_vacacion);
 
           if (this.tiposVacacion.length > 0) {
             this.vacacionSeleccionada.setValue(this.tiposVacacion[0].id);
           }
         }
       }
-      /* this.vacacionSeleccionada.setValue(this.solicitud.id_tipo_vacacion);
-      console.log('✅ Tipo vacación cargado:', this.vacacionSeleccionada.value); */
 
       if (this.solicitud.permite_horas !== undefined && this.solicitud.permite_horas !== null) {
         this.permiteHoras = Boolean(this.solicitud.permite_horas);
@@ -365,13 +364,11 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.tiposVacacion = Array.isArray(data) ? data : [];
-          this.cargarDatosSolicitudExistente();
-          console.log('📊 Tipos de vacación cargados:', this.tiposVacacion);
 
           if (this.solicitud) {
-            console.log('🎯 Solicitud tiene id_configuracion:', this.solicitud.id_configuracion);
+            console.log('🎯 Solicitud tiene id_configuracion:', this.solicitud.id_tipo_vacacion);
             const tipoQueDeberiaCargarse = this.tiposVacacion.find(
-              t => t.id === this.solicitud.id_configuracion
+              t => t.id === this.solicitud.id_tipo_vacacion
             );
             console.log('🔍 Tipo que debería cargarse:', tipoQueDeberiaCargarse);
           }
@@ -528,6 +525,34 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
     this.certificadoF.reset();
     this.archivoF.reset();
     this.habilitarBtn = false;
+  }
+
+  cambiarDocumento() {
+    if (confirm('¿Está seguro de que desea cambiar el documento actual? Se eliminará el documento existente.')) {
+      console.log('🔄 Cambiando documento:', this.solicitud.documento);
+
+      // 1. Limpiar el documento en la solicitud
+      this.solicitud.documento = null;
+
+      // 2. Mostrar la sección de subida
+      this.mostrarSubidaDocumento = true;
+
+      // 3. Limpiar inputs
+      this.limpiarInputs();
+
+      this.toastr.info('Documento eliminado. Seleccione el nuevo documento.');
+    }
+  }
+
+  cancelarSubida(): void {
+    // Si había un documento antes de intentar cambiar, restaurarlo
+    if (this.solicitud.documento) {
+      console.log('↩️ Restaurando documento original');
+    }
+
+    this.mostrarSubidaDocumento = false;
+    this.limpiarInputs();
+    this.toastr.info('Cambio de documento cancelado');
   }
 
   cerrarEdicion() {
