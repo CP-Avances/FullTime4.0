@@ -14,6 +14,15 @@
       </div>
     </div>
 
+    <div *ngIf="solicitud" style="background: #f0f8ff; padding: 10px; margin: 10px; border: 1px solid #ccc;">
+      <h6>DEBUG - Datos de la solicitud:</h6>
+      <p>ID: {{ solicitud.id }}</p>
+      <p>Fecha Inicio: {{ solicitud.fecha_inicio }}</p>
+      <p>Fecha Final: {{ solicitud.fecha_final }}</p>
+      <p>Tipo Vacación ID: {{ solicitud.id_tipo_vacacion }}</p>
+      <p>Permite Horas: {{ solicitud.permite_horas }}</p>
+    </div>
+
     <div class="container mt-3">
       <form>
         <div class="row g-3">
@@ -30,7 +39,9 @@
               </mat-icon>
               <mat-select [formControl]="vacacionSeleccionada">
                 @for(vacacion of tiposVacacion; track vacacion.id){
-                <mat-option>{{ vacacion.descripcion }} </mat-option>
+                <mat-option [value]="vacacion.id">
+                  {{ vacacion.descripcion }}
+                </mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -146,7 +157,15 @@
             </span>
             <strong>activado</strong>
           </div>
-          }@else { notaDesactivado }
+          }@else {
+          <div class="nota" style="text-align: justify">
+            <span>
+              NOTA: Los días feriados serán contabilizados en los Días totales
+              porque el parámetro está
+            </span>
+            <strong>desactivado</strong>
+          </div>
+          }
           <ng-template #notaDesactivado>
             <div class="nota" style="text-align: justify">
               <span>
@@ -217,9 +236,7 @@
             <div class="row m-auto text-center">
               <div class="col-12 m-auto">
                 <div class="separar">
-                  <form>
-
-                  </form>
+                  <form></form>
                 </div>
               </div>
             </div>

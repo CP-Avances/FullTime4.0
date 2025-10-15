@@ -2913,7 +2913,8 @@
     } @if(activar_editar_solicitudes){
     <div style="padding-top: 20px">
       <app-editar-solicitudes-vacaciones
-        [data]="empleadoUno"
+        [solicitud]="solicitudSeleccionada"
+        [empleado]="empleadoUno"
         (cerrar)="cerrarEditarSolicitudes()"
       />
     </div>

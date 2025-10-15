@@ -63,7 +63,7 @@ class VacacionesControlador {
       const {
         id_empleado, fecha_inicio, fecha_final, incluir_feriados, num_lunes, num_martes,
         num_miercoles, num_jueves, num_viernes, num_sabado, num_domingo, num_dias_totales,
-        user_name, ip, ip_local, subir_documento, permite_horas, num_horas
+        user_name, ip, ip_local, subir_documento, permite_horas, num_horas, id_tipo_vacacion
       } = req.body;
 
       if (subir_documento === true) {
@@ -161,20 +161,20 @@ class VacacionesControlador {
       // INSERTAR SOLICITUD
       const response: QueryResult = await pool.query(`
       INSERT INTO mv_solicitud_vacacion (
-        id_empleado, id_cargo_vigente, id_periodo_vacacion,
+        id_empleado, id_cargo_vigente, id_periodo_vacacion, id_configuracion,
         fecha_inicio, fecha_final, estado, incluir_feriados,
         numero_dias_lunes, numero_dias_martes, numero_dias_miercoles, numero_dias_jueves,
         numero_dias_viernes, numero_dias_sabado, numero_dias_domingo, numero_dias_totales,
         minutos_totales, fecha_registro
       ) VALUES (
-        $1, $2, $3,
-        $4, $5, 1, $6,
-        $7, $8, $9, $10,
-        $11, $12, $13, $14,
-        $15, CURRENT_DATE
+        $1, $2, $3, $4, 
+        $5::DATE, $6::DATE, 1, $7, 
+        $8, $9, $10, $11,
+        $12, $13, $14, $15, 
+        $16, CURRENT_DATE
       ) RETURNING *
     `, [
-        id_empleado, id_cargo_vigente, id_periodo_vacacion,
+        id_empleado, id_cargo_vigente, id_periodo_vacacion, id_tipo_vacacion,
         fecha_inicio, fecha_final, incluir_feriados,
         diasSemana.lunes, diasSemana.martes, diasSemana.miercoles, diasSemana.jueves,
         diasSemana.viernes, diasSemana.sabado, diasSemana.domingo,
@@ -223,27 +223,29 @@ class VacacionesControlador {
           id_empleado = $1, 
           id_cargo_vigente = $2, 
           id_periodo_vacacion = $3,
-          fecha_inicio = $4, 
-          fecha_final = $5, 
-          estado = $6, 
-          numero_dias_lunes = $7,
-          numero_dias_martes = $8,
-          numero_dias_miercoles = $9,
-          numero_dias_jueves = $10,
-          numero_dias_viernes = $11, 
-          numero_dias_sabado = $12, 
-          numero_dias_domingo = $13,
-          numero_dias_totales = $14, 
-          incluir_feriados = $15, 
-          documento = $16, 
-          minutos_totales = $17,
+          id_configuracion = $4,
+          fecha_inicio = $5, 
+          fecha_final = $6, 
+          estado = $7, 
+          numero_dias_lunes = $8,
+          numero_dias_martes = $9,
+          numero_dias_miercoles = $10,
+          numero_dias_jueves = $11,
+          numero_dias_viernes = $12, 
+          numero_dias_sabado = $13, 
+          numero_dias_domingo = $14,
+          numero_dias_totales = $15, 
+          incluir_feriados = $16, 
+          documento = $17, 
+          minutos_totales = $18,
           fecha_actualizacion = NOW()
-        WHERE id = $18 
+        WHERE id = $19 
         RETURNING *`,
         [
           data.id_empleado,
           data.id_cargo_vigente,
           data.id_periodo_vacacion,
+          data.id_tipo_vacacion,
           data.fecha_inicio,
           data.fecha_final,
           data.estado,

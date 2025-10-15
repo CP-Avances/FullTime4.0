@@ -27,15 +27,10 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
   @Output() cerrar = new EventEmitter<void>();
   @ViewChild('picker2') picker2!: MatDatepicker<Date>;
 
-  validar = inject(ValidacionesService);
-  rest = inject(FeriadosService);
-  vacaServ = inject(VacacionesService);
-  toastr = inject(ToastrService);
-
   //Variables principales
   ips_locales: string = "";
-  user_name: string | null;
-  ip: string | null;
+  user_name: string = '';
+  ip: string = '';
 
   //Arrays y objetos de datos
   tiposVacacion: any[] = [];
@@ -57,20 +52,67 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
   formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
 
+  constructor(
+    public validar: ValidacionesService,
+    private rest: FeriadosService,
+    private vacaServ: VacacionesService,
+    private toastr: ToastrService
+  ) {
+    this.user_name = localStorage.getItem('usuario') as string;
+    this.ip = localStorage.getItem('ip') as string;
+  }
+
   ngOnInit(): void {
-    console.log('Componente Editar en construcción.');
+
+    console.log('📋 Solicitud recibida:', this.solicitud);
+    console.log('👤 Empleado recibido:', this.empleado);
+
+    this.validar.ObtenerIPsLocales()
+      .then((ips) => {
+        this.ips_locales = ips as string;
+      });
+
+    this.obtenerFeriados(this.formato_fecha);
+    this.registrarSuscripciones();
+    this.cargarTiposVacacion();
   }
 
   cargarDatosSolicitudExistente(): void {
     if (this.solicitud) {
+
+      console.log('🔄 Cargando datos de solicitud:', this.solicitud);
+
       this.fechaInicio.setValue(new Date(this.solicitud.fecha_inicio));
       this.fechaFinal.setValue(new Date(this.solicitud.fecha_final));
-      this.vacacionSeleccionada.setValue(this.solicitud.id_tipo_vacacion);
 
-      if (this.solicitud.permite_horas) {
-        this.horaInicio.setValue(this.solicitud.hora_inicio);
-        this.horaFinal.setValue(this.solicitud.hora_final);
-        this.fechaHoras.setValue(new Date(this.solicitud.fecha_inicio));
+      if (this.solicitud.id_configuracion) {
+        const tipoEncontrado = this.tiposVacacion.find(
+          t => t.id === this.solicitud.id_configuracion
+        );
+
+        if (tipoEncontrado) {
+          this.vacacionSeleccionada.setValue(tipoEncontrado.id);
+          console.log('✅ Tipo vacación cargado:', tipoEncontrado.id, '-', tipoEncontrado.descripcion);
+        } else {
+          console.warn('⚠️ No se encontró tipo de vacación para id_configuracion:', this.solicitud.id_configuracion);
+
+          if (this.tiposVacacion.length > 0) {
+            this.vacacionSeleccionada.setValue(this.tiposVacacion[0].id);
+          }
+        }
+      }
+      /* this.vacacionSeleccionada.setValue(this.solicitud.id_tipo_vacacion);
+      console.log('✅ Tipo vacación cargado:', this.vacacionSeleccionada.value); */
+
+      if (this.solicitud.permite_horas !== undefined && this.solicitud.permite_horas !== null) {
+        this.permiteHoras = Boolean(this.solicitud.permite_horas);
+        console.log('✅ Permite horas:', this.permiteHoras);
+
+        if (this.permiteHoras) {
+          this.horaInicio.setValue(this.solicitud.hora_inicio);
+          this.horaFinal.setValue(this.solicitud.hora_final);
+          this.fechaHoras.setValue(new Date(this.solicitud.fecha_inicio));
+        }
       }
       this.calculoAutomatico();
       this.validarHoras();
@@ -194,7 +236,7 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
     const inicio = this.horaInicio.value;
     const fin = this.horaFinal.value;
     const tipo = this.tiposVacacion.find(
-      v => v.id = this.vacacionSeleccionada.value
+      v => v.id === this.vacacionSeleccionada.value
     );
     const minimoHoras = tipo?.minimo_horas ?? '00:00:00';
     if (!inicio || !fin || !tipo) return;
@@ -261,7 +303,7 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
 
     if (!fecha || !inicio || !fin) return;
 
-    const dia = new Date(fecha).getDate();
+    const dia = new Date(fecha).getDay();
     const dias = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
     this.diaSemanaSeleccionado = dias[dia];
     const [h1, m1] = inicio.split(':').map(Number);
@@ -296,7 +338,7 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
     const tipo = this.tiposVacacion.find(
       v => v.id === this.vacacionSeleccionada.value
     );
-    const incluyeFeriados = tipo.incluir_feriados ?? false;
+    const incluyeFeriados = tipo?.incluir_feriados ?? false;
     if (!fecha || incluyeFeriados) {
       this.fechaHoras.setErrors(null);
       return;
@@ -323,9 +365,20 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.tiposVacacion = Array.isArray(data) ? data : [];
+          this.cargarDatosSolicitudExistente();
+          console.log('📊 Tipos de vacación cargados:', this.tiposVacacion);
+
+          if (this.solicitud) {
+            console.log('🎯 Solicitud tiene id_configuracion:', this.solicitud.id_configuracion);
+            const tipoQueDeberiaCargarse = this.tiposVacacion.find(
+              t => t.id === this.solicitud.id_configuracion
+            );
+            console.log('🔍 Tipo que debería cargarse:', tipoQueDeberiaCargarse);
+          }
+          this.cargarDatosSolicitudExistente();
         },
         error: () => {
-          this.toastr.warning('Nos e pudieron cargar los tipos de vacaciones');
+          this.toastr.warning('No se pudieron cargar los tipos de vacaciones');
         }
       });
   }
@@ -343,7 +396,7 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
       v => v.id === this.vacacionSeleccionada.value
     );
 
-    if (tipoVacacion.documento === true && (!this.archivoF.value || this.archivoF.value === '')) {
+    if (tipoVacacion?.documento === true && (!this.archivoF.value || this.archivoF.value === '')) {
       this.toastr.warning('Este tipo de vacación requiere subir un archivo adjunto.', 'Archivo requerido');
       return;
     }

@@ -3,6 +3,8 @@ export interface SolicitudesVacaciones {
     id_empleado: number;
     id_cargo_vigente: number;
     id_periodo_vacacion: number;
+    id_configuracion?: number;
+    id_tipo_vacacion?: number;
     fecha_inicio: string;
     fecha_final: string;
     estado: string;
