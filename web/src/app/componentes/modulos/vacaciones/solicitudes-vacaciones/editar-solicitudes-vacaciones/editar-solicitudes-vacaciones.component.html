@@ -336,8 +336,240 @@
               </div>
             </div>
           </div>
+          <div class="text-center mt-4 mb-2">
+            <strong class="fs-8 text-secondary">
+              {{
+                permiteHoras
+                  ? "Horas seleccionadas por días de la semana"
+                  : "Número de días (por día de la semana) en el período seleccionado"
+              }}
+            </strong>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-md-12">
+              <div class="table-responsive">
+                <table
+                  class="table table-sm text-center align-middle"
+                  style="width: 100%"
+                >
+                  <thead class="table-secondary">
+                    <tr>
+                      <th class="col-total-compacta">Lunes</th>
+                      <th class="col-total-compacta">Martes</th>
+                      <th class="col-total-compacta">Miércoles</th>
+                      <th class="col-total-compacta">Jueves</th>
+                      <th class="col-total-compacta">Viernes</th>
+                      <th class="col-total-compacta">Sábado</th>
+                      <th class="col-total-compacta">Domingo</th>
+                      <th class="col-total-compacta">
+                        {{ permiteHoras ? "Horas totales" : "Días totales" }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'L'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.L }}
+                      </td>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'M'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.M }}
+                      </td>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'X'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.X }}
+                      </td>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'J'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.J }}
+                      </td>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'V'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.V }}
+                      </td>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'S'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.S }}
+                      </td>
+                      <td
+                        class="col-total-compacta"
+                        [ngClass]="{
+                          'dia-seleccionado':
+                            permiteHoras && diaSemanaSeleccionado === 'D'
+                        }"
+                      >
+                        {{ permiteHoras ? "" : conteoDiasSemana.D }}
+                      </td>
+                      <td class="col-total-compacta text-bold">
+                        {{
+                          permiteHoras ? horasTotales + "horas" : diasTotales
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </form>
+      <div
+        class="d-flex flex-wrap justify-content-center"
+        style="padding-top: 20px; margin-bottom: 2%"
+      >
+        <button
+          class="btn btn-sm btn-primary"
+          [disabled]="
+            (!permiteHoras &&
+              (!fechaInicio.value ||
+                !fechaFinal.value ||
+                fechaFinal.value < fechaInicio.value ||
+                fechaFinal.hasError('minDias'))) ||
+            (permiteHoras &&
+              (!horaInicio.value ||
+                !horaFinal.value ||
+                !fechaHoras.value ||
+                horaFinal.hasError('horaInvalida') ||
+                horaFinal.hasError('minHoras') ||
+                fechaHoras.hasError('esFeriado')))
+          "
+          (click)="verificarEmpleadosVacacion()"
+        >
+          Verificar
+        </button>
+        @if(verificacionRealizada){
+        <button
+          class="btn btn-sm btn-success"
+          [disabled]="!hayAlMenosUnEmpleadoValido()"
+          (click)="actualizarSolicitud()"
+        >
+          RegistrarSolicitud
+        </button>
+        }
+      </div>
+      <mat-accordion class="mt-4">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header
+            style="background: rgb(58, 132, 242); font-size: 14px"
+          >
+            <mat-panel-title style="color: white">
+              <span style="margin-left: 15px">INDICACIONES</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <tbody>
+                <tr>
+                  <td>
+                    <i
+                      class="fa fa-circle"
+                      style="color: rgba(249, 9, 9, 1)"
+                    ></i>
+                  </td>
+                  <td>
+                    El empleado no cuenta con saldo suficiente para realizar la
+                    solicitud de vacaciones.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i
+                      class="fa fa-circle"
+                      style="color: rgba(244, 150, 10, 1)"
+                    ></i>
+                  </td>
+                  <td>
+                    El empleado no cuenta con un periodo de vacaciones
+                    registrado en el sistema.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i
+                      class="fa fa-circle"
+                      style="color: rgba(33, 219, 229, 1)"
+                    ></i>
+                  </td>
+                  <td>
+                    El empleado no cuenta con un periodo de vacaciones activo en
+                    este momento.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i
+                      class="fa fa-circle"
+                      style="color: rgba(222, 162, 73, 1)"
+                    ></i>
+                  </td>
+                  <td>
+                    Las fechas ingresadas están fuera del periodo activo del
+                    empleado.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i
+                      class="fa fa-circle"
+                      style="color: rgba(174, 49, 242, 1)"
+                    ></i>
+                  </td>
+                  <td>
+                    Las horas ingresadas superan las horas que equivalen a un
+                    día. Use un tipo de vacación por días.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i
+                      class="fa fa-circle"
+                      style="color: rgba(33, 231, 19, 1)"
+                    ></i>
+                  </td>
+                  <td>
+                    Datos validados y correctos se va a cargar en el sistema
+                    (ok).
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <div style="height: 24px;"></div>
     </div>
   </mat-card>
 </div>

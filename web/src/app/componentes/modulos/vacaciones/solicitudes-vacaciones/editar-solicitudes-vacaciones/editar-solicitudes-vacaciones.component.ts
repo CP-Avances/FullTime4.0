@@ -1,3 +1,4 @@
+import { map } from 'rxjs';
 import { vacacion } from './../../../../../model/reportes.model';
 import { Component, inject, Input, OnDestroy, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -40,6 +41,9 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
   conteoDiasSemana: ConteoDiasSemana = {
     L: 0, M: 0, X: 0, J: 0, V: 0, S: 0, D: 0
   }
+  usuariosCorrectos: number = 0;
+  verificacionRealizada: boolean = false;
+  estadoVerificacion: string = '';
 
   //Variables de cálculo
   diasTotales: number = 0;
@@ -52,6 +56,11 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
   //Configuración
   formato_fecha: string = 'dd/MM/yyyy';
   idioma_fechas: string = 'es';
+
+  //variables para verificar los requisitos de solicitudes
+  verificaciones: any[] = [];
+  mostrarTablaVerificación = false;
+  listUsuariosCorrectas: any = [];
 
   constructor(
     public validar: ValidacionesService,
@@ -553,6 +562,146 @@ export class EditarSolicitudesVacacionesComponent implements OnInit {
     this.mostrarSubidaDocumento = false;
     this.limpiarInputs();
     this.toastr.info('Cambio de documento cancelado');
+  }
+
+  verificarEmpleadosVacacion(): void {
+    this.inicializarVerificacion();
+
+    const datosVerificacion = this.prepararDatosVerificacion();
+
+    this.ejecutarVerificacionMultiples(datosVerificacion);
+  }
+
+  inicializarVerificacion(): void {
+    this.listUsuariosCorrectas = [];
+    this.verificaciones = [];
+    this.verificacionRealizada = false;
+    this.estadoVerificacion = '';
+  }
+
+  prepararDatosVerificacion(): any {
+    const datosVerificacion: any = {
+      empleados: this.data.map(emp => emp.id),
+      incluirFeriados: this.incluirFeriadosSeleccionado ?? false,
+      permiteHoras: this.permiteHoras
+    };
+
+    if (!this.permiteHoras) {
+      this.agregarDatosPorDias(datosVerificacion);
+    } else {
+      this.agregarDatosPorHoras(datosVerificacion);
+    }
+
+    return datosVerificacion;
+  }
+
+  agregarDatosPorDias(datosVerificacion: any): void {
+    const inicio = new Date(this.fechaInicio.value!);
+    const fin = new Date(this.fechaFinal.value!);
+    datosVerificacion.fechaInicio = inicio.toISOString().split('T')[0];
+    datosVerificacion.fechaFin = fin.toISOString().split('T')[0];
+    datosVerificacion.numHoras = this.horasTotales ?? 0;
+  }
+
+  agregarDatosPorHoras(datosVerificacion: any): void {
+    const fecha = new Date(this.fechaHoras.value!);
+    datosVerificacion.fechaInicio = fecha.toISOString().split('T')[0];
+    datosVerificacion.fechaFin = fecha.toISOString().split('T')[0];
+    datosVerificacion.numHoras = this.horasTotales ?? 0;
+  }
+
+  ejecutarVerificacionMultiples(datosVerificacion: any) {
+    this.vacaServ.VerificarVacacionesMultiples(datosVerificacion)
+      .subscribe({
+        next: (res: any) => {
+          this.procesarRespuestaVerificacion(res, datosVerificacion);
+        },
+        error: (error) => {
+          this.manejarErrorVerificacion(error);
+        }
+      });
+  }
+
+  procesarRespuestaVerificacion(res: any, datosVerificacion: any): void {
+    this.actualizarDatosEmpleados(res);
+    this.verificarSolicitudesExistentes(datosVerificacion);
+  }
+
+  actualizarDatosEmpleados(res: any): void {
+    this.data = this.data.map((emp: any) => {
+      const resultado = res.find((r: any) => r.idEmpleado === emp.id);
+      return {
+        ...emp,
+        observacion: resultado?.observacion ?? 'No validado (verificar)',
+        tipoVacacion: this.vacacionSeleccionada.value
+      };
+    });
+  }
+
+  verificarSolicitudesExistentes(datosVerificacion: any): void {
+    let pendientes = this.data.lenght;
+
+    const finalizarVerificacionSiListo = () => {
+      pendientes--;
+      if (pendientes === 0) {
+        this.finalizarProcesoVerificacion();
+      }
+    };
+
+    this.data.forEach((emp: any) => {
+      this.verificarSolicitudExistenteEmpleado(emp, datosVerificacion, finalizarVerificacionSiListo);
+    });
+  }
+
+  verificarSolicitudExistenteEmpleado(emp: any, datosVerificacion: any, callback: () => void): void {
+    const verificacion = {
+      id_empleado: emp.id,
+      fecha_inicio: datosVerificacion.fechaInicio,
+      fecha_final: datosVerificacion.fechaFin
+    };
+
+    this.vacaServ.BuscarSolicitudExistente(verificacion)
+      .subscribe({
+        next: (existente) => {
+          emp.observacion = 'Ya existe una solicitud para este rango de fechas.';
+          callback();
+        },
+        error: (vacio) => {
+          if (emp.observacion === 'Ok') {
+            this.listUsuariosCorrectas.push(emp);
+          }
+          callback();
+        }
+      });
+  }
+
+  finalizarProcesoVerificacion(): void {
+    this.usuariosCorrectos = this.listUsuariosCorrectas.lenght;
+    this.mostrarTablaVerificación = true;
+    this.verificacionRealizada = true;
+
+    this.estadoVerificacion = this.determinarEstadoVerificacion();
+  }
+
+  determinarEstadoVerificacion(): string {
+    return this.data.length === 1 && this.data[0]?.observacion === 'Ok'
+      ? 'ok'
+      : 'rechazado';
+  }
+
+  manejarErrorVerificacion(error: any): void {
+    console.error('Error en verificación de vacaciones: ', error);
+    this.toastr.error('Error al verificar los empleados para vacaciones.');
+    this.verificacionRealizada = false;
+    this.estadoVerificacion = '';
+  }
+
+  hayAlMenosUnEmpleadoValido(): boolean {
+    if (this.data.length === 1) {
+      return this.estadoVerificacion === 'ok';
+    } else {
+      return this.listUsuariosCorrectas.length > 0;
+    }
   }
 
   cerrarEdicion() {
