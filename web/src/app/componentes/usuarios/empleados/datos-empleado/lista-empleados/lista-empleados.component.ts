@@ -28,6 +28,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { EmpleadoElemento } from 'src/app/model/empleado.model';
 (ExcelJS as any).crypto = null; // Desactiva funciones no soportadas en el navegador
@@ -122,6 +123,7 @@ export class ListaEmpleadosComponent implements OnInit {
     private datosGenerales: DatosGeneralesService,
     private restGenero: GenerosService,
     private restEstadosCiviles: EstadoCivilService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -787,27 +789,37 @@ export class ListaEmpleadosComponent implements OnInit {
    ** **                             PARA LA EXPORTACION DE ARCHIVOS PDF                             ** **
    ** ************************************************************************************************* **/
 
+  async generarReporteEmpleados(
+    action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print',
+    numero: 1 | 2 // 1 = activos, 2 = inactivos
+  ) {
+    const fuente = numero === 1 ? (this.empleado || []) : (this.desactivados || []);
 
-async GenerarPdf(action = 'open', numero: any) {
-  if (action === 'download') {
-    const empleados = (numero === 1 ? this.empleado : this.desactivados).map((obj: any) => {
+    const empleados = fuente.map((obj: any) => {
       const estado = this.EstadoSelect[obj.estado - 1];
       const nacionalidad = this.nacionalidades.find((n: any) => n.id === obj.id_nacionalidad)?.nombre || '';
       const genero = this.generos.find((g: any) => g.id === obj.genero)?.genero || '';
       const estadoCivil = this.estadosCiviles.find((e: any) => e.id === obj.estado_civil)?.estado_civil || '';
+      const fecha = obj.fecha_nacimiento ? obj.fecha_nacimiento.split('T')[0] : '';
 
       return {
+        // Campos ya usados por el PDF
         codigo: obj.codigo,
         nombreCompleto: `${obj.apellido} ${obj.nombre}`,
         identificacion: obj.identificacion,
-        fechaNacimiento: obj.fecha_nacimiento?.split("T")[0],
+        fechaNacimiento: fecha,
         correo: obj.correo,
-        genero: genero,
-        estadoCivil: estadoCivil,
+        genero,
+        estadoCivil,
         domicilio: obj.domicilio,
         telefono: obj.telefono,
         estadoTexto: estado,
-        nacionalidad: nacionalidad
+        nacionalidad,
+        // Extensiones para Excel (no rompen PDF)
+        apellido: obj.apellido,
+        nombre: obj.nombre,
+        fecha_nacimiento: fecha, // alias para Excel legacy
+        estado: estado            // alias para Excel legacy
       };
     });
 
@@ -817,35 +829,61 @@ async GenerarPdf(action = 'open', numero: any) {
       fraseMarcaAgua: this.frase,
       logoBase64: this.logo,
       colorPrincipal: this.p_color,
-      empleados: empleados
+      empleados
     };
 
-    console.log("Enviando al microservicio:", data);
-
-    this.validar.generarReporteEmpleados(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'Empleados.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-                      console.error("Error al generar PDF desde el microservicio:", error);
-
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-    });
-
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF(numero);
-
     switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
-    }
-  }
-}
+      case 'pdf':
+        this.reportes.generarReporte('empleados', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('empleados', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'csv':
+        this.reportes.generarReporte('empleados', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar CSV:', error);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('empleados', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar XML:', error);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF(numero);
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
+    }
+
+  }
 
   DefinirInformacionPDF(numero: any) {
     return {
@@ -1172,9 +1210,6 @@ async GenerarPdf(action = 'open', numero: any) {
 
 
 
-
-
-
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **
    ** ************************************************************************************************* **/
@@ -1256,8 +1291,6 @@ async GenerarPdf(action = 'open', numero: any) {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
-
-
 
   ExportToCSV(numero: any) {
     if (numero === 1) {

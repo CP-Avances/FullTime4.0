@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-timbre-virtual',
@@ -128,6 +129,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -312,19 +314,22 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   }
 
   // METODO PARA MOSTRAR INFORMACION
-  MostrarInformacion(seleccionados: any, accion: any) {
+  MostrarInformacion(
+    seleccionados: any,
+    accion: 'excel' | 'ver' | 'open' | 'print' | 'download'
+  ) {
     this.data_pdf = [];
-    this.R_asistencias.ReporteTimbreRelojVirtual(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'excel': this.generarExcel(); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    this.R_asistencias
+      .ReporteTimbreRelojVirtual(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final)
+      .subscribe({
+        next: (res) => {
+          this.data_pdf = res;
+          this.generarReporteTimbresVirtualesMovil(accion);
+        },
+        error: (err) => this.toastr.error(err.error.message)
+      });
   }
+
 
 
   /** ****************************************************************************************** **
@@ -355,78 +360,150 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-  async GenerarPDF(action: any) {
-    if (action === 'download') {
-      const data = {
-        usuario: localStorage.getItem('fullname_print') as string,      // Nombre del usuario que imprime
-        empresa: (localStorage.getItem('name_empresa') as string).toUpperCase(),  // Empresa en mayúsculas
-        fraseMarcaAgua: this.frase,         // Marca de agua visible (ej: "FullTime")
-        logoBase64: this.logo,              // Logo en formato base64
-        colorPrincipal: this.p_color,       // Color principal para encabezados
-        colorSecundario: this.s_color,      // Color secundario para bloques de información
-        opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
-        periodo: {
-          inicio: this.rangoFechas.fec_inico,  // Fecha inicial del filtro
-          fin: this.rangoFechas.fec_final      // Fecha final del filtro
-        },
-        filtrosAplicados: {                 
-          bool_reg: this.bool.bool_reg,
-          bool_dep: this.bool.bool_dep,
-          bool_cargo: this.bool.bool_cargo,
-          bool_suc: this.bool.bool_suc,
-          bool_emp: this.bool.bool_emp
-        },
-        timbreDispositivo: this.timbreDispositivo, 
-        data_pdf: this.data_pdf.map((selec: any) => ({
-          sucursal: selec.sucursal,
-          ciudad: selec.ciudad,
-          nombre: selec.nombre,               
-          departamento: selec.departamento,
-          empleados: selec.empleados.map((empl: any) => ({
-            identificacion: empl.identificacion,
-            apellido: empl.apellido,
-            nombre: empl.nombre,
-            codigo: empl.codigo,
-            regimen: empl.regimen,
-            departamento: empl.departamento,
-            cargo: empl.cargo,
-            timbres: empl.timbres.map((t: any) => ({
-              fecha_hora_timbre_validado: t.fecha_hora_timbre_validado, 
+  // Traductor de códigos de acción a texto legible
+  private mapAccionTexto(cod: string): string {
+    switch (cod) {
+      case 'EoS': return 'Entrada o salida';
+      case 'AES': return 'Inicio o fin alimentación';
+      case 'PES': return 'Inicio o fin permiso';
+      case 'E': return 'Entrada';
+      case 'S': return 'Salida';
+      case 'I/A': return 'Inicio alimentación';
+      case 'F/A': return 'Fin alimentación';
+      case 'I/P': return 'Inicio permiso';
+      case 'F/P': return 'Fin permiso';
+      case 'HA': return 'Timbre libre';
+      default: return 'Desconocido';
+    }
+  }
+
+  async generarReporteTimbresVirtualesMovil(
+    action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf' = 'open'
+  ) {
+    const acc = action === 'download' ? 'pdf' : action;
+
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Timbres virtuales móvil');
+      return;
+    }
+
+    const baseName = `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    const data = {
+      usuario: localStorage.getItem('fullname_print') as string,
+      empresa: (localStorage.getItem('name_empresa') as string)?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      opcionBusqueda: this.opcionBusqueda,
+      periodo: {
+        inicio: this.rangoFechas.fec_inico,
+        fin: this.rangoFechas.fec_final
+      },
+      filtrosAplicados: {
+        bool_reg: this.bool?.bool_reg,
+        bool_dep: this.bool?.bool_dep,
+        bool_cargo: this.bool?.bool_cargo,
+        bool_suc: this.bool?.bool_suc,
+        bool_emp: this.bool?.bool_emp
+      },
+      timbreDispositivo: this.timbreDispositivo,
+      data_pdf: this.data_pdf.map((grupo: any) => ({
+        sucursal: grupo.sucursal,
+        ciudad: grupo.ciudad,
+        nombre: grupo.nombre,
+        departamento: grupo.departamento,
+        empleados: (grupo.empleados || []).map((emp: any) => ({
+          identificacion: emp.identificacion,
+          apellido: emp.apellido,
+          nombre: emp.nombre,
+          codigo: emp.codigo,
+          regimen: emp.regimen,
+          departamento: emp.departamento,
+          cargo: emp.cargo,
+          // ➕ extras para Excel (consistencia): heredar si no vienen en emp
+          ciudad: emp.ciudad ?? grupo.ciudad,
+          sucursal: emp.sucursal ?? grupo.sucursal,
+          timbres: (emp.timbres || []).map((t: any) => {
+            const servidorFecha = t?.fecha_hora_timbre_validado
+              ? new Date(t.fecha_hora_timbre_validado)
+              : null;
+            const servidorHora = t?.fecha_hora_timbre_validado
+              ? this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora)
+              : '';
+            const horaTimbre = t?.fecha_hora_timbre
+              ? this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+              : '';
+            return {
+              // Nombres usados por el PDF (no tocar):
+              fecha_hora_timbre_validado: t.fecha_hora_timbre_validado,
               fecha_hora_timbre: t.fecha_hora_timbre,
               id_reloj: t.id_reloj,
               accion: t.accion,
               observacion: t.observacion,
               longitud: t.longitud,
-              latitud: t.latitud
-            }))
-          }))
+              latitud: t.latitud,
+              // ➕ extras usados por Excel únicamente:
+              servidor_fecha: servidorFecha,
+              servidor_hora: servidorHora,
+              horaTimbre,
+              accionTexto: this.mapAccionTexto(t.accion),
+            };
+          })
         }))
-      };
+      }))
+    };
 
-      console.log("Enviando al microservicio:", data);
-      this.validar.generarReporteTimbresVirtualesMovil(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'Error'
-        );
-      });
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporte('timbres-virtuales-movil', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF:', err);
+            this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = `Timbres_virtuales_movil_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+      case 'excel':
+        this.reportes.generarReporte('timbres-virtuales-movil', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel:', err);
+            this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
+      case 'ver':
+        this.VerDatos();
+        break;
+
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            acc === 'print' ? pdf.print() : pdf.open();
+          } catch (error) {
+            console.error('Error al preparar PDF local:', error);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
       }
+
+      default:
+        // Sin acción
+        break;
     }
+
   }
+
 
   DefinirInformacionPDF() {
     // DEFINIR ORIENTACION DE LA PAGINA

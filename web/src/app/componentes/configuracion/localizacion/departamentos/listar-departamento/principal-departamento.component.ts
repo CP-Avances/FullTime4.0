@@ -16,6 +16,7 @@ import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asi
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/configuracion/localizacion/departamentos/editar-departamento/editar-departamento.component';
@@ -102,6 +103,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.scriptService.load('pdfMake', 'vfsFonts');
@@ -443,49 +445,77 @@ export class PrincipalDepartamentoComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                       METODO PARA EXPORTAR A PDF                             ** **
    ** ************************************************************************************************** **/
-
-
   // GENERACION DE REPORTE DE PDF
-  async GenerarPdf(action = 'open') {
-    if (action === 'download') {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        departamentos: this.departamentos.map((d: any) => ({
-          id: d.id,
-          nombre: d.nombre,
-          nivel: d.nivel,
-          departamento_padre: d.departamento_padre,
-          nomsucursal: d.nomsucursal
-        }))
-      };
+  async generarReporteDepartamentos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      departamentos: this.departamentos.map((d: any) => ({
+        id: d.id,
+        nombre: d.nombre,
+        nivel: d.nivel,
+        departamento_padre: d.departamento_padre,
+        nomsucursal: d.nomsucursal,
+        id_sucursal: d.id_sucursal
+      }))
+    };
 
-      this.validar.generarReporteDepartamentos(data).subscribe((pdfBlob: Blob) => {
-        const nombreArchivo = 'Departamentos.pdf';
-        FileSaver.saveAs(pdfBlob, nombreArchivo);
-      }, error => {
-        console.error('Error al generar PDF desde el microservicio:', error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('departamentos', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('departamentos', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+      case 'csv':
+        this.reportes.generarReporte('departamentos', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('departamentos', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
-  }
 
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -573,7 +603,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                 ** **
    ** ************************************************************************************************** **/
-
   async generarExcelDepartamento() {
 
     const departamentoslista: any[] = [];

@@ -12,6 +12,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import * as xml2js from 'xml2js';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RegistrarNacionalidadComponent } from '../registrar-nacionalidad/registrar-nacionalidad.component';
@@ -63,6 +64,7 @@ export class ListarNacionalidadComponent {
     public ventana: MatDialog,
     private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
+    private reportes: ReportesMicroService
 
 
 
@@ -343,54 +345,74 @@ export class ListarNacionalidadComponent {
   }
 
 
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        nacionalidades: this.nacionalidades.map((obj: any) => ({
-          id: obj.id,
-          nombre: obj.nombre
-        }))
-      };
+  async generarReporteNacionalidades(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+    this.OrdenarDatos(this.nacionalidades);
 
-      console.log("Enviando al microservicio:", data);
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      nacionalidades: this.nacionalidades.map((n: any) => ({
+        id: n.id,
+        nombre: n.nombre
+      }))
+    };
 
-      this.validar.generarReporteNacionalidades(data).subscribe((pdfBlob: Blob) => {
-        const nombreArchivo = 'Nacionalidades.pdf';
-        FileSaver.saveAs(pdfBlob, nombreArchivo);
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('nacionalidades', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar PDF:', e);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('nacionalidades', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+      case 'csv':
+        this.reportes.generarReporte('nacionalidades', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
+      case 'xml':
+        this.reportes.generarReporte('nacionalidades', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print': {
+        const pdfMake = await this.validar.ImportarPDF();
+        const docDef = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(docDef);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
       }
     }
+
   }
-
-
 
   DefinirInformacionPDF() {
     return {
@@ -432,7 +454,6 @@ export class ListarNacionalidadComponent {
       }
     };
   }
-
 
   PresentarDataPDF() {
     return {
@@ -592,8 +613,6 @@ export class ListarNacionalidadComponent {
     }
     array.sort(compare);
   }
-
-
 
 
   /** ************************************************************************************************** **

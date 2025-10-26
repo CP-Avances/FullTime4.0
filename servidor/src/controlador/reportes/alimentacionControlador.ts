@@ -244,6 +244,7 @@ class AlimentacionControlador {
 
         if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de timbres de alimentación.' })
 
+        console.log(JSON.stringify(nuevo));
         return res.status(200).jsonp(nuevo)
     }
 
@@ -273,13 +274,32 @@ const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string
 }
 
 // METODO PARA AGRUPAR TIMBRES
+// METODO PARA AGRUPAR TIMBRES (empareja por acción, sin validar hora)
 const AgruparTimbres = async function (listaTimbres: any) {
-    const timbresAgrupados: any[] = [];
-    for (let i = 0; i < listaTimbres.length; i += 2) {
-        timbresAgrupados.push({
-            inicioAlimentacion: listaTimbres[i],
-            finAlimentacion: i + 1 < listaTimbres.length ? listaTimbres[i + 1] : null
-        });
+  const timbresAgrupados: any[] = [];
+  let abierto: any = null;
+
+  for (let i = 0; i < listaTimbres.length; i++) {
+    const t = listaTimbres[i];
+    if (!t) continue;
+
+    if (t.accion === 'I/A') {
+      // si había uno abierto, lo cerramos como incompleto y abrimos el nuevo
+      if (abierto) timbresAgrupados.push({ inicioAlimentacion: abierto, finAlimentacion: null });
+      abierto = t;
+    } else if (t.accion === 'F/A') {
+      if (abierto) {
+        // emparejar directamente con el siguiente F/A, sin validar hora
+        timbresAgrupados.push({ inicioAlimentacion: abierto, finAlimentacion: t });
+        abierto = null;
+      } else {
+        // F/A sin I/A previo: se ignora para mantener tu comportamiento original
+      }
     }
-    return timbresAgrupados;
-}
+  }
+
+  // si quedó un I/A sin su F/A
+  if (abierto) timbresAgrupados.push({ inicioAlimentacion: abierto, finAlimentacion: null });
+
+  return timbresAgrupados;
+};

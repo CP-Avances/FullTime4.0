@@ -19,6 +19,8 @@ import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.servi
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
+
 
 @Component({
   selector: 'app-vacuna-multiple',
@@ -159,6 +161,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     public validar: ValidacionesService,
     private restGenero: GenerosService,
     private restNacionalidades: NacionalidadService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -353,23 +356,22 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.R_vacuna.ReporteVacunasMultiples(seleccionados).subscribe(
       (res) => {
         this.data_pdf = res;
-        switch (accion) {
-          case 'excel':
-            this.generarExcel();
-            break;
-          case 'ver':
-            this.VerDatos();
-            break;
-          default:
-            this.GenerarPDF(accion);
-            break;
+
+        if (accion === 'ver') {
+          this.VerDatos();
+          return;
         }
+
+        // normalizamos: 'download' -> 'pdf' (descarga)
+        const accionNormalizada = (accion === 'download') ? 'pdf' : accion;
+        this.generarReporteVacunacionUsuarios(accionNormalizada as 'pdf' | 'excel' | 'open' | 'print');
       },
       (err) => {
-        this.toastr.error(err.error.message);
+        this.toastr.error(err.error?.message || 'Error al obtener datos para el reporte.');
       }
     );
   }
+
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -415,88 +417,129 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
 
-  async GenerarPDF(action: any) {
-    const doc_name = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-    if (action === 'download') {
-      if (this.data_pdf.length === 0) {
-        this.toastr.info('No hay datos para generar el reporte', 'Vacunación');
-        return;
-      }
+  async generarReporteVacunacionUsuarios(action: 'pdf' | 'excel' | 'open' | 'print') {
+    const docBase = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-      const data = {
-        usuario: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-        empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        titulo: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
-        tipoFiltro: this.obtenerTipoFiltro(),
-        datos: this.data_pdf.map((selec: any) => ({
-          sucursal: selec.sucursal,
-          nombre: selec.nombre,
-          ciudad: selec.ciudad,
-          departamento: selec.departamento,
-          empleados: selec.empleados.map((empl: any) => {
-            const generoObj = this.generos.find((g: any) => g.id === empl.genero);
-            const nombreGenero = generoObj ? generoObj.genero : "No especificado";
-
-            const nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
-            const nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
-
-            return {
-              identificacion: empl.identificacion,
-              nombre: empl.nombre,
-              apellido: empl.apellido,
-              correo: empl.correo,
-              genero: nombreGenero, 
-              nacionalidad: nombreNacionalidad,
-              cargo: empl.cargo,
-              regimen: empl.regimen,
-              codigo: empl.codigo,
-              rol: empl.rol,
-              departamento: empl.departamento,
-              vacunas: empl.vacunas.map((vac: any) => ({
-                tipo_vacuna: vac.tipo_vacuna,
-                fecha: vac.fecha,
-                descripcion: vac.descripcion
-              }))
-            };
-          })
-        }))
-      };
-
-      console.log("Enviando al microservicio:", data);
-
-      this.validar.generarReporteVacunacionUsuarios(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, doc_name);
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
-
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-
-      switch (action) {
-        case 'open':
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case 'print':
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Vacunación');
+      return;
     }
+
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      titulo: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
+      tipoFiltro: this.obtenerTipoFiltro(),
+
+      // Igual que el PDF que ya funcionaba, con 2 extras mínimos para Excel:
+      // - ciudad y sucursal a nivel de empleado (heredados del bloque)
+      // - carnet dentro de cada vacuna (para el Sí/No del Excel legacy)
+      datos: this.data_pdf.map((selec: any) => ({
+        sucursal: selec.sucursal,
+        nombre: selec.nombre,
+        ciudad: selec.ciudad,
+        departamento: selec.departamento,
+        empleados: (selec.empleados || []).map((empl: any) => {
+          const generoObj = this.generos.find((g: any) => g.id === empl.genero);
+          const nombreGenero = generoObj ? generoObj.genero : 'No especificado';
+          const nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+          const nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : 'No especificado';
+
+          return {
+            identificacion: empl.identificacion,
+            nombre: empl.nombre,
+            apellido: empl.apellido,
+            correo: empl.correo,
+            genero: nombreGenero,
+            nacionalidad: nombreNacionalidad,
+            cargo: empl.cargo,
+            regimen: empl.regimen,
+            codigo: empl.codigo,
+            rol: empl.rol,
+            departamento: empl.departamento,
+
+            // 🔹 ciudad/sucursal propias del empleado, con fallback al contexto de selección
+            ciudad: (empl.ciudad ?? selec.ciudad) ?? null,
+            sucursal: (empl.sucursal ?? selec.sucursal) ?? null,
+
+            vacunas: (empl.vacunas || []).map((vac: any) => ({
+              tipo_vacuna: vac.tipo_vacuna,
+              fecha: vac.fecha, // si viene con 'T', el micro puede formatearlo
+              descripcion: vac.descripcion,
+              // 🔹 extra para Excel (legacy: vac.carnet?.length ? 'Si' : 'No')
+              carnet: vac.carnet ?? null
+            }))
+          };
+        })
+      }))
+    };
+
+  switch (action) {
+    case 'pdf':
+      this.reportes.generarReporte('vacunacion-usuarios', 'pdf', data).subscribe({
+        next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+        error: (error) => {
+          console.error('Error al generar PDF desde el microservicio:', error);
+          this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
+        }
+      });
+      break;
+
+    case 'excel': // también puedes usar 'xlsx'; el service normaliza
+      this.reportes.generarReporte('vacunacion-usuarios', 'excel', data).subscribe({
+        next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+        error: (error) => {
+          console.error('Error al generar Excel desde el microservicio:', error);
+          this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+        }
+      });
+      break;
+
+    case 'open':
+      this.reportes.generarReporte('vacunacion-usuarios', 'pdf', data).subscribe({
+        next: ({ blob }) => {
+          const url = URL.createObjectURL(blob);
+          const win = window.open(url, '_blank');
+          if (!win) this.toastr.warning('Habilita las ventanas emergentes para ver el PDF.');
+          setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        },
+        error: (error) => {
+          console.error('Error al abrir PDF desde el microservicio:', error);
+          this.toastr.error('No se pudo abrir el PDF. Inténtelo más tarde.', 'Error');
+        }
+      });
+      break;
+
+    case 'print':
+      this.reportes.generarReporte('vacunacion-usuarios', 'pdf', data).subscribe({
+        next: ({ blob }) => {
+          const url = URL.createObjectURL(blob);
+          const win = window.open(url, '_blank');
+          if (!win) {
+            this.toastr.warning('Habilita las ventanas emergentes para imprimir el PDF.');
+            URL.revokeObjectURL(url);
+            return;
+          }
+          setTimeout(() => { try { win.focus(); win.print(); } catch {} }, 500);
+          setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        },
+        error: (error) => {
+          console.error('Error al preparar impresión desde el microservicio:', error);
+          this.toastr.error('No se pudo preparar la impresión. Inténtelo más tarde.', 'Error');
+        }
+      });
+      break;
+
+    default:
+      break;
   }
 
+
+  }
 
   DefinirInformacionPDF() {
     return {

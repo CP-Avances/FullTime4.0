@@ -20,6 +20,7 @@ import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/m
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
@@ -96,6 +97,7 @@ export class ListarRegimenComponent implements OnInit {
     public router: Router, // VARIABLE DE NAVEGACION DE PAGINAS CON URL
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS
     public validar: ValidacionesService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -281,95 +283,99 @@ export class ListarRegimenComponent implements OnInit {
    ** **                               PARA LA EXPORTACION DE ARCHIVOS PDF                           ** **
    ** ************************************************************************************************* **/
 
-
-  // METODO PARA GENERAR ARCHIVO PDF
-  async GenerarPDF(action: any) {
+  async generarReporteRegimen(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
     this.OrdenarDatos(this.regimen);
 
-    if (action === 'download') {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido, // Usuario que imprime
-        empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(), // Empresa en mayúsculas
-        fraseMarcaAgua: this.frase,         // Marca de agua
-        logoBase64: this.logo,              // Logo en base64
-        colorPrincipal: this.p_color,       // Color de fondo de los encabezados de bloque
-        colorSecundario: this.s_color,      // Color de fondo de encabezados de tabla
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      regimenes: this.regimen.map((reg: any) => {
+        const rangos = this.rangos_antiguedad.find(r => r.id_regimen === reg.id)?.rangos || [];
+        const periodos = this.periodos_vacacionales.find(p => p.id_regimen === reg.id)?.periodos || [];
+        return {
+          id: reg.id,
+          descripcion: reg.descripcion,
+          pais: reg.pais,
+          continuidad_laboral: reg.continuidad_laboral,
+          mes_periodo: reg.mes_periodo,
+          dias_mes: reg.dias_mes,
+          trabajo_minimo_mes: reg.trabajo_minimo_mes,
+          trabajo_minimo_horas: reg.trabajo_minimo_horas,
+          antiguedad: reg.antiguedad,
 
-        regimenes: this.regimen.map((reg: any) => {
-          const rangos = this.rangos_antiguedad.find(r => r.id_regimen === reg.id)?.rangos || [];
-          const periodos = this.periodos_vacacionales.find(p => p.id_regimen === reg.id)?.periodos || [];
+          // VACACIONES (config)
+          vacacion_dias_laboral: reg.vacacion_dias_laboral,
+          vacacion_dias_libre: reg.vacacion_dias_libre,
+          vacacion_dias_calendario: reg.vacacion_dias_calendario,
+          acumular: reg.acumular,
+          dias_maximo_acumulacion: reg.acumular ? reg.dias_maximo_acumulacion : null,
+          vacacion_divisible: reg.vacacion_divisible,
+          periodos_vacacionales: reg.vacacion_divisible
+            ? (periodos.length ? periodos.map((p: any) => ({ descripcion: p.descripcion, dias_vacacion: p.dias_vacacion })) : [])
+            : [],
 
-          return {
-            id: reg.id,
-            descripcion: reg.descripcion,
-            pais: reg.pais,
-            continuidad_laboral: reg.continuidad_laboral,
-            mes_periodo: reg.mes_periodo,
-            dias_mes: reg.dias_mes,
-            trabajo_minimo_mes: reg.trabajo_minimo_mes,
-            trabajo_minimo_horas: reg.trabajo_minimo_horas,
-            antiguedad: reg.antiguedad,
+          // VACACIONES ganadas
+          vacacion_dias_laboral_mes: reg.vacacion_dias_laboral_mes,
+          vacacion_dias_calendario_mes: reg.vacacion_dias_calendario_mes,
+          laboral_dias: reg.laboral_dias,
+          calendario_dias: reg.calendario_dias,
 
-            // CONFIGURACIÓN DE VACACIONES
-            vacacion_dias_laboral: reg.vacacion_dias_laboral,
-            vacacion_dias_libre: reg.vacacion_dias_libre,
-            vacacion_dias_calendario: reg.vacacion_dias_calendario,
-            acumular: reg.acumular,
-            dias_maximo_acumulacion: reg.acumular ? reg.dias_maximo_acumulacion : null,
-            vacacion_divisible: reg.vacacion_divisible,
-            periodos_vacacionales: reg.vacacion_divisible ? (
-              periodos.length > 0 ? periodos.map(p => ({
-                descripcion: p.descripcion,
-                dias_vacacion: p.dias_vacacion
-              })) : []
-            ) : [],
+          // ANTIGÜEDAD
+          antiguedad_fija: reg.antiguedad_fija,
+          anio_antiguedad: reg.antiguedad_fija ? reg.anio_antiguedad : null,
+          dias_antiguedad: reg.antiguedad_fija ? reg.dias_antiguedad : null,
 
-            // VACACIONES GANADAS
-            vacacion_dias_laboral_mes: reg.vacacion_dias_laboral_mes,
-            vacacion_dias_calendario_mes: reg.vacacion_dias_calendario_mes,
-            laboral_dias: reg.laboral_dias,
-            calendario_dias: reg.calendario_dias,
+          antiguedad_variable: reg.antiguedad_variable,
+          rangos_antiguedad: reg.antiguedad_variable
+            ? (rangos.length ? rangos.map((r: any) => ({ anio_desde: r.anio_desde, anio_hasta: r.anio_hasta, dias_antiguedad: r.dias_antiguedad })) : [])
+            : []
+        };
+      })
+    };
 
-            // CONFIGURACIÓN DE ANTIGÜEDAD
-            antiguedad_fija: reg.antiguedad_fija,
-            anio_antiguedad: reg.antiguedad_fija ? reg.anio_antiguedad : null,
-            dias_antiguedad: reg.antiguedad_fija ? reg.dias_antiguedad : null,
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('regimen', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: () => this.toastr.error('No se pudo generar el PDF.', 'Error')
+        });
+        break;
 
-            antiguedad_variable: reg.antiguedad_variable,
-            rangos_antiguedad: reg.antiguedad_variable ? (
-              rangos.length > 0 ? rangos.map(r => ({
-                anio_desde: r.anio_desde,
-                anio_hasta: r.anio_hasta,
-                dias_antiguedad: r.dias_antiguedad
-              })) : []
-            ) : []
-          };
-        })
-      };
+      case 'excel': // el service normaliza excel → xlsx
+        this.reportes.generarReporte('regimen', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: () => this.toastr.error('No se pudo generar el Excel.', 'Error')
+        });
+        break;
 
-      console.log("ENVIANDO AL MICROSERVICIO", data);
-      this.validar.generarReporteRegimenLaboral(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = 'Regimen_laboral.pdf';
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
-          'Error'
-        );
-      });
+      case 'csv':
+        this.reportes.generarReporte('regimen', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: () => this.toastr.error('No se pudo generar el CSV.', 'Error')
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = 'Regimen_laboral.pdf';
+      case 'xml':
+        this.reportes.generarReporte('regimen', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: () => this.toastr.error('No se pudo generar el XML.', 'Error')
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const doc = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(doc);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
+
 
     this.ObtenerRegimen();
   }

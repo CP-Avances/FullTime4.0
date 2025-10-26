@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-reporte-horas-trabajadas',
@@ -133,6 +134,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -318,9 +320,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.reportesTiempoLaborado.ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.generarExcel(); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
+        default: this.generarReporteTiempoLaborado(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -354,11 +354,15 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
+  async generarReporteTiempoLaborado(action: 'pdf' | 'excel' | 'open' | 'print') {
+    const docBase = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Tiempo laborado');
+      return;
+    }
 
-  async GenerarPDF(action: any) {
-    if (action === 'download') {
-      const data = {
+    const data = {
         usuario: localStorage.getItem('fullname_print'),
         empresa: localStorage.getItem('name_empresa'),
         fraseMarcaAgua: this.frase,
@@ -409,6 +413,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             regimen: emp.regimen,
             departamento: emp.departamento,
             cargo: emp.cargo,
+            ciudad: emp.ciudad,
+            sucursal: emp.sucursal,
 
             tLaborado: emp.tLaborado.map(reg => {
               const [minPlan, minLab] = this.CalcularDiferenciaFechas(reg);
@@ -449,30 +455,51 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         }))
       };
 
-      console.log("ENVIANDO AL MICROSERVICIO", data);
-      this.validar.generarReporteTiempoLaborado(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'Error'
-        );
-      });
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('tiempo-laborado', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = `Tiempo_laborado_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+      case 'excel':
+        this.reportes.generarReporte('tiempo-laborado', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            action === 'print' ? pdf.print() : pdf.open();
+          } catch (error) {
+            console.error('Error al preparar PDF local:', error);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
       }
+
+      default:
+        // Sin acción
+        break;
     }
+
   }
+
 
   DefinirInformacionPDF() {
     return {

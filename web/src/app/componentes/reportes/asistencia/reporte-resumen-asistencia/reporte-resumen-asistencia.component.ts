@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-reporte-resumen-asistencia',
@@ -134,6 +135,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -332,19 +334,19 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
-    this.data_pdf = []
-    this.reportesTiempoLaborado.ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      console.log("ver datos del RESUMEN GENERAL DE ASISTENCIA: ", this.data_pdf)
-      switch (accion) {
-        case 'excel': this.generarExcel(); break;
-        case 'ver': this.verDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    this.data_pdf = [];
+    this.reportesTiempoLaborado
+      .ReporteTiempoLaborado(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final)
+      .subscribe({
+        next: (res) => {
+          this.data_pdf = res;
+          if (accion === 'ver') { this.verDatos(); return; }
+          this.generarReporteResumenAsistencia(accion); // 'open' | 'print' | 'download' | 'excel'
+        },
+        error: (err) => this.toastr.error(err.error.message)
+      });
   }
+
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -373,91 +375,126 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-  async GenerarPDF(action: any) {
-    if (action === 'download') {
-      const data = {
-        usuario: localStorage.getItem('fullname_print'),
-        empresa: localStorage.getItem('name_empresa'),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        fechaInicio: this.rangoFechas.fec_inico,
-        fechaFin: this.rangoFechas.fec_final,
-        opcionBusqueda: this.opcionBusqueda,
-        resumen: this.bool,
-        grupos: this.data_pdf.map(grupo => ({
-          sucursal: grupo.sucursal,
-          ciudad: grupo.ciudad,
-          nombre: grupo.nombre,
-          departamento: grupo.departamento,
-          empleados: grupo.empleados.map(emp => ({
-            identificacion: emp.identificacion,
-            codigo: emp.codigo,
-            nombre: emp.nombre,
-            apellido: emp.apellido,
-            regimen: emp.regimen,
-            departamento: emp.departamento,
-            cargo: emp.cargo,
-            tLaborado: emp.tLaborado.map(reg => ({
-              tipo: reg.tipo,
-              origen: reg.origen,
-              control: reg.control,
-              entrada: {
-                fecha_horario: reg.entrada?.fecha_horario,
-                fecha_hora_horario: reg.entrada?.fecha_hora_horario,
-                fecha_hora_timbre: reg.entrada?.fecha_hora_timbre,
-              },
-              salida: {
-                fecha_horario: reg.salida?.fecha_horario,
-                fecha_hora_horario: reg.salida?.fecha_hora_horario,
-                fecha_hora_timbre: reg.salida?.fecha_hora_timbre,
-              },
-              inicioAlimentacion: {
-                fecha_horario: reg.inicioAlimentacion?.fecha_horario,
-                fecha_hora_horario: reg.inicioAlimentacion?.fecha_hora_horario,
-                fecha_hora_timbre: reg.inicioAlimentacion?.fecha_hora_timbre,
-                minutos_alimentacion: reg.inicioAlimentacion?.minutos_alimentacion,
-              },
-              finAlimentacion: {
-                fecha_horario: reg.finAlimentacion?.fecha_horario,
-                fecha_hora_horario: reg.finAlimentacion?.fecha_hora_horario,
-                fecha_hora_timbre: reg.finAlimentacion?.fecha_hora_timbre,
-              },
-              minLaborados: reg.minLaborados,
-              minPlanificados: reg.minPlanificados,
-              minAlimentacion: reg.minAlimentacion,
-              minAtrasos: reg.minAtrasos,
-              minSalidasAnticipadas: reg.minSalidasAnticipadas
-            }))
+  async generarReporteResumenAsistencia(action: 'pdf' | 'excel' | 'open' | 'print' | 'download') {
+    // Normalizar 'download' → 'pdf'
+    const acc = action === 'download' ? 'pdf' : action;
+
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Resumen de asistencia');
+      return;
+    }
+
+    const docBase = `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    // Payload: idéntico al usado hoy en el PDF (no cambiamos nombres)
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: localStorage.getItem('name_empresa'),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      fechaInicio: this.rangoFechas.fec_inico,
+      fechaFin: this.rangoFechas.fec_final,
+      opcionBusqueda: this.opcionBusqueda,
+      resumen: this.bool,
+      grupos: this.data_pdf.map((grupo: any) => ({
+        sucursal: grupo.sucursal,
+        ciudad: grupo.ciudad,
+        nombre: grupo.nombre,
+        departamento: grupo.departamento,
+        empleados: grupo.empleados.map((emp: any) => ({
+          identificacion: emp.identificacion,
+          codigo: emp.codigo,
+          nombre: emp.nombre,
+          apellido: emp.apellido,
+          regimen: emp.regimen,
+          departamento: emp.departamento,
+          cargo: emp.cargo,
+          ciudad: emp.ciudad,
+          sucursal: emp.sucursal,
+          tLaborado: emp.tLaborado.map((reg: any) => ({
+            tipo: reg.tipo,
+            origen: reg.origen,
+            control: reg.control,
+            entrada: {
+              fecha_horario: reg.entrada?.fecha_horario,
+              fecha_hora_horario: reg.entrada?.fecha_hora_horario,
+              fecha_hora_timbre: reg.entrada?.fecha_hora_timbre,
+            },
+            salida: {
+              fecha_horario: reg.salida?.fecha_horario,
+              fecha_hora_horario: reg.salida?.fecha_hora_horario,
+              fecha_hora_timbre: reg.salida?.fecha_hora_timbre,
+            },
+            inicioAlimentacion: {
+              fecha_horario: reg.inicioAlimentacion?.fecha_horario,
+              fecha_hora_horario: reg.inicioAlimentacion?.fecha_hora_horario,
+              fecha_hora_timbre: reg.inicioAlimentacion?.fecha_hora_timbre,
+              minutos_alimentacion: reg.inicioAlimentacion?.minutos_alimentacion,
+            },
+            finAlimentacion: {
+              fecha_horario: reg.finAlimentacion?.fecha_horario,
+              fecha_hora_horario: reg.finAlimentacion?.fecha_hora_horario,
+              fecha_hora_timbre: reg.finAlimentacion?.fecha_hora_timbre,
+            },
+            minLaborados: reg.minLaborados,
+            minPlanificados: reg.minPlanificados,
+            minAlimentacion: reg.minAlimentacion,
+            minAtrasos: reg.minAtrasos,
+            minSalidasAnticipadas: reg.minSalidasAnticipadas
           }))
         }))
-      };
+      }))
+    };
 
-      console.log("ENVIAND AL MICROSERVICIO:", data)
-      // Llamar al microservicio
-      this.validar.generarReporteAsistencia(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-        FileSaver.saveAs(pdfBlob, doc_name);
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
-          'Error'
-        );
-      });
+    console.log('Payload reporte resumen asistencia:', data);
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
+switch (acc) {
+  case 'pdf':
+    this.reportes.generarReporte('asistencia', 'pdf', data).subscribe({
+      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+      error: (err) => {
+        console.error('Error al generar PDF desde el microservicio:', err);
+        this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
       }
-    }
+    });
+    break;
+
+  case 'excel':
+    this.reportes.generarReporte('asistencia', 'excel', data).subscribe({
+      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+      error: (err) => {
+        console.error('Error al generar Excel desde el microservicio:', err);
+        this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+      }
+    });
+    break;
+
+  case 'open':
+  case 'print': {
+    const run = async () => {
+      try {
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        acc === 'print' ? pdf.print() : pdf.open();
+      } catch (error) {
+        console.error('Error al preparar PDF local:', error);
+        this.toastr.error('No se pudo abrir/imprimir el PDF local. Inténtelo más tarde.', 'Error');
+      }
+    };
+    run();
+    break;
   }
+
+  default:
+    // Sin acción
+    break;
+}
+
+  }
+
 
 
   DefinirInformacionPDF() {

@@ -170,19 +170,19 @@
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
-                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                <i (click)="generarReporteFeriados('pdf')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Feriados en formato PDF.">
                     <p>PDF</p>
                 </i>
-                <i (click)="generarExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                <i (click)="generarReporteFeriados('excel')" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Feriados en formato EXCEL.">
                     <p>XLSL</p>
                 </i>
-                <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                <i (click)="generarReporteFeriados('csv')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Feriados en formato CSV.">
                     <p>CSV</p>
                 </i>
-                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                <i (click)="generarReporteFeriados('xml')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
                     matTooltip="Descargar Lista de Feriados en formato XML.">
                     <p>XML</p>
                 </i>

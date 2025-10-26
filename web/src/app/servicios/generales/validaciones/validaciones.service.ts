@@ -613,219 +613,732 @@ export class ValidacionesService {
 
   //MICROSERVICIO
 
-
-  generarReporteParametrosGenerales(data: any) {
+  //REPORTE PARAMETROS GENERALES
+  /*generarReporteParametrosGenerales(data: any) {
     return this.http.post('http://localhost:8080/api/reporte/parametros/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteParametrosGeneralesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/parametros/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteParametrosGeneralesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/parametros/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteParametrosGeneralesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/parametros/xml', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTES GENEROS
   generarReporteGeneros(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/generos/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/generos/pdf', data, {
       responseType: 'blob'
     });
   }
 
-  generarReporteRoles(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/roles/pdf', data, {
+  generarReporteGenerosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/generos/xlsx', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteGenerosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/generos/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteGenerosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/generos/xml', data, {
+      responseType: 'blob'
+    });
+  }  */
+
+  //REPORTES ROLES
+  /*generarReporteRoles(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/roles/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRolesExcel(data: any) {
+    // Mismo patrón que Parametros: POST y responseType 'blob'
+    return this.http.post('http://localhost:8080/api/reporte/roles/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRolesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/roles/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRolesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/roles/xml', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTES REGIMEN LABORAL
   generarReporteRegimenLaboral(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/regimen/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/regimen/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteRegimenLaboralExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/regimen/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRegimenLaboralCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/regimen/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteRegimenLaboralXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/regimen/xml', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+
+  //REPORTES MODALIDAD LABORAL
   generarReporteModalidadLaboral(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/modalidad-laboral/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/modalidad-laboral/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteModalidadLaboralExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/modalidad-laboral/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteModalidadLaboralCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/modalidad-laboral/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteModalidadLaboralXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/modalidad-laboral/xml', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTES CARGOS
   generarReporteTipoCargos(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/cargos/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/cargos/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTipoCargosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/cargos/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTipoCargosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/cargos/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTipoCargosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/cargos/xml', data, {
+      responseType: 'blob'
+    });
+  } 
+
+  
+  //REPORTE PROVINCIAS
   generarReporteProvincias(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/provincias/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/provincias/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteProvinciasExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/provincias/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteProvinciasCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/provincias/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteProvinciasXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/provincias/xml', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTES CIUDADES
   generarReporteCiudades(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/ciudades/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/ciudades/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteCiudadesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/ciudades/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteCiudadesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/ciudades/csv', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteCiudadesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/ciudades/xml', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTE SUCURSALES/ESTABLECIMIENTOS
   generarReporteSucursales(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/sucursales/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/sucursales/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteSucursalesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/sucursales/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteSucursalesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/sucursales/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+  
+  generarReporteSucursalesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/sucursales/xml', data, { 
+      responseType: 'blob' 
+    });
+  }  
+
+  //REPORTES DEPARTAMENTOS
   generarReporteDepartamentos(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/departamentos/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/departamentos/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteDepartamentosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/departamentos/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteDepartamentosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/departamentos/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteDepartamentosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/departamentos/xml', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  //REPORTES ESTADOS CIVIL
   generarReporteEstadosCivil(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/estado-civil/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/estado-civil/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteEstadosCivilExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/estado-civil/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteEstadosCivilCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/estado-civil/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+  
+  generarReporteEstadosCivilXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/estado-civil/xml', data, { 
+      responseType: 'blob' 
+    });
+  }  
+
+  //REPORTES NACIONALIDADES
   generarReporteNacionalidades(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/nacionalidades/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/nacionalidades/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteNacionalidadesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/nacionalidades/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteNacionalidadesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/nacionalidades/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteNacionalidadesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/nacionalidades/xml', data, { 
+      responseType: 'blob' 
+    });
+  }  
+
+  //REPORTES NIVELES DE TITULOS
   generarReporteNivelesTitulos(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/niveles-titulos/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/niveles-titulos/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteNivelesTitulosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/niveles-titulos/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteNivelesTitulosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/niveles-titulos/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteNivelesTitulosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/niveles-titulos/xml', data, { 
+      responseType: 'blob' 
+    });
+  }  
+
+  //REPORTES TITULOS
   generarReporteTitulos(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/titulos/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/titulos/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTitulosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/titulos/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTitulosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/titulos/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteTitulosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/titulos/xml', data, { 
+      responseType: 'blob' 
+    });
+  } 
+
+  //REPORTES DISCAPACIDADES
   generarReporteDiscapacidades(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/discapacidades/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/discapacidades/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteDiscapacidadesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/discapacidades/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteDiscapacidadesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/discapacidades/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+  generarReporteDiscapacidadesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/discapacidades/xml', data, { 
+      responseType: 'blob' 
+    });
+  }  
+
+  //REPORTES VACUNAS
   generarReporteVacunas(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/vacunas/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/vacunas/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteVacunasExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/vacunas/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteVacunasCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/vacunas/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteVacunasXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/vacunas/xml', data, { 
+      responseType: 'blob' 
+    });
+  } 
+
+  //REPORTES EMPLEADOS
   generarReporteEmpleados(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/empleados/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/empleados/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteEmpleadosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/empleados/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteEmpleadosCSV(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/empleados/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteEmpleadosXML(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/empleados/xml', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  //REPORTES FERIADOS
   generarReporteFeriados(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/feriados/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/feriados/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteFeriadosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/feriados/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteFeriadosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/feriados/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteFeriadosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/feriados/xml', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+
+  //REPORTES HORARIOS
   generarReporteHorarios(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/horarios/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/horarios/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteHorariosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/horarios/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteHorariosCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/horarios/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteHorariosXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/horarios/xml', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  //REPORTES COORDENADAS
   generarReporteCoordenadas(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/coordenadas/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/coordenadas/pdf', data, {
       responseType: 'blob'
     });
   }
 
-  generarReporteRelojes(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/relojes/pdf', data, {
+  generarReporteCoordenadasExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/coordenadas/xlsx', data, {
       responseType: 'blob'
+    });
+  }
+
+  generarReporteCoordenadasCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/coordenadas/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteCoordenadasXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/coordenadas/xml', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  //REPORTES RELOJES
+  generarReporteRelojes(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/relojes/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRelojesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/relojes/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteRelojesCsv(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/relojes/csv', data, { 
+      responseType: 'blob' 
+    });
+  }
+
+  generarReporteRelojesXml(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/relojes/xml', data, { 
+      responseType: 'blob' 
     });
   }
 
   generarReporteVacunacionUsuarios(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/vacunacion-usuarios/pdf', data, {
+    console.log("ver data servicio ", data)
+    return this.http.post('http://localhost:8080/api/reporte/vacunacion-usuarios/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteVacunacionUsuariosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/vacunacion-usuarios/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE USUARIOS
   generarReporteUsuarios(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/usuarios/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/usuarios/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteUsuariosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/usuarios/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTE DE PLANIFICACION
   generarReportePlanificacion(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/planificacion/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/planificacion/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReportePlanificacionExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/planificacion/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE ASISTENCIA
   generarReporteAsistencia(data: any) {
-    return this.http.post('http://localhost:8080/reporte/asistencia/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/asistencia/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteAsistenciaExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/asistencia/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE FALTAS
   generarReporteFaltas(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/faltas/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/faltas/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteFaltasExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/faltas/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE TIMBRES INCOMPLETOS
   generarReporteTimbreIncompleto(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/timbres-incompletos/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-incompletos/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTimbreIncompletoExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-incompletos/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE TIMBRES USUARIOS
   generarReporteTimbresUsuarios(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/timbres-usuarios/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-usuarios/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTimbresUsuariosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-usuarios/xlsx', data, {
+      responseType: 'blob'
+    }
+    );
+  }
+
+  //REPORTE DE TIMBRES VIRTUALES MOVIL
   generarReporteTimbresVirtualesMovil(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/timbres-virtuales-movil/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-virtuales-movil/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTimbresVirtualesMovilExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-virtuales-movil/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE TIMBRES VIRTUALES
   generarReporteTimbresVirtuales(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/timbres-virtuales/pdf', data, {
-      responseType: 'blob'
-    });
-  }
-  generarReporteAuditoria(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/auditoria/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-virtuales/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTimbresVirtualesExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-virtuales/xlsx', data, {
+      responseType: 'blob'
+    });
+  }*/
+
+
+  generarReporteAuditoria(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/auditoria/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  /*
+  //REPORTE DE SALIDAS ANTICIPADAS
   generarReporteSalidasAnticipadas(data: any) {
     return this.http.post('http://localhost:8080/api/reporte/salidas-anticipadas/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteSalidasAnticipadasExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/salidas-anticipadas/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+
+  //REPORTE DE TIEMPO DE ALIMENTACION
   generarReporteTiempoAlimentacion(data: any) {
     return this.http.post('http://localhost:8080/api/reporte/tiempo-alimentacion/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteTiempoAlimentacionExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/tiempo-alimentacion/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
+
+  //REPORTE DE TIEMPO LABORADO
   generarReporteTiempoLaborado(data: any) {
-    return this.http.post('http://localhost:8080/api/reportes/tiempo-laborado/pdf', data, {
+    return this.http.post('http://localhost:8080/api/reporte/tiempo-laborado/pdf', data, {
+      responseType: 'blob'
+    });
+  }
+
+  generarReporteTiempoLaboradoExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/tiempo-laborado/xlsx', data, {
       responseType: 'blob'
     });
   }
 
 
+  //REPORTE DE ATRASOS
   generarReporteAtrasos(data: any) {
     return this.http.post('http://localhost:8080/api/reporte/atrasos/pdf', data, {
       responseType: 'blob'
     });
   }
 
+  generarReporteAtrasosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/atrasos/xlsx', data, {
+      responseType: 'blob'
+    });
+  }
 
+  generarReporteTimbresLibresUsuarios(data: any) {
+    console.log('Payload Timbres Libres:', data);
+    return this.http.post('http://localhost:8080/api/reporte/timbres-libres/pdf', data, {
+      responseType: 'blob'
+    });
+  }
 
+  generarReporteTimbresLibresUsuariosExcel(data: any) {
+    return this.http.post('http://localhost:8080/api/reporte/timbres-libres/xlsx', data, {
+      responseType: 'blob'
+    });
+  }*/
 
 
 

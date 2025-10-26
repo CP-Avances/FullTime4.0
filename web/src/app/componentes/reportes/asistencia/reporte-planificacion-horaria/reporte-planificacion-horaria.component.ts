@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-reporte-planificacion-horaria',
@@ -165,6 +166,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private plan: PlanGeneralService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -521,12 +523,14 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   }
 
   EjecutarAccion() {
-    switch (this.accion) {
-      case 'excel': this.generarExcel(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(this.accion); break;
+    if (this.accion === 'ver') {
+      this.VerDatos();
+      return;
     }
+    const acc = this.accion as 'pdf' | 'excel' | 'open' | 'print' | 'download';
+    this.generarReportePlanificacion(acc);
   }
+
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -566,40 +570,97 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   }
 
 
-  async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    let doc_name = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+  // Unificado: PDF / Excel / open / print
+  async generarReportePlanificacion(action: 'pdf' | 'excel' | 'open' | 'print' | 'download') {
+    // Normalizar 'download' → 'pdf'
+    const acc = action === 'download' ? 'pdf' : action;
 
-    if (action === 'download') {
-      const data = {
-        usuario: localStorage.getItem('fullname_print'),
-        empresa: (localStorage.getItem('name_empresa') as string).toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        tipoFiltro: this.obtenerTipoFiltro(),
-        titulo: `REPORTE DE PLANIFICACIÓN HORARIA - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
-        datos: this.horariosEmpleado,
-        detalle_acciones: this.detalle_acciones,
-        nomenclatura: this.nomenclatura,
-        periodoInicio: this.mes_inicio,
-        periodoFin: this.mes_fin,
-
-      };
-      console.log("ENVIANDO AL MICROSERVICIO: ",data)
-      this.validar.generarReportePlanificacion(data).subscribe(blob => {
-        FileSaver.saveAs(blob, doc_name);
-      });
-    } else {
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+    if (!this.horariosEmpleado || this.horariosEmpleado.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Planificación horaria');
+      return;
     }
+
+    const docBase = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    // Payload idéntico al usado en PDF (sirve para XLSX también)
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      tipoFiltro: this.obtenerTipoFiltro(),
+      titulo: `REPORTE DE PLANIFICACIÓN HORARIA - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
+      datos: this.horariosEmpleado,          // ← antes this.horariosEmpleado
+      detalle_acciones: this.detalle_acciones,
+      nomenclatura: this.nomenclatura,
+      periodoInicio: this.mes_inicio,
+      periodoFin: this.mes_fin,
+    };
+
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporte('planificacion', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('planificacion', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+        this.reportes.generarReporte('planificacion', 'pdf', data).subscribe({
+          next: ({ blob }) => {
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) this.toastr.warning('Habilita las ventanas emergentes para ver el PDF.');
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          },
+          error: (error) => {
+            console.error('Error al abrir PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo abrir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'print':
+        this.reportes.generarReporte('planificacion', 'pdf', data).subscribe({
+          next: ({ blob }) => {
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) {
+              this.toastr.warning('Habilita las ventanas emergentes para imprimir el PDF.');
+              URL.revokeObjectURL(url);
+              return;
+            }
+            setTimeout(() => { try { win.focus(); win.print(); } catch {} }, 500);
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          },
+          error: (error) => {
+            console.error('Error al preparar impresión desde el microservicio:', error);
+            this.toastr.error('No se pudo preparar la impresión. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      default:
+        break;
+    }
+
   }
+
 
 
   DefinirInformacionPDF() {

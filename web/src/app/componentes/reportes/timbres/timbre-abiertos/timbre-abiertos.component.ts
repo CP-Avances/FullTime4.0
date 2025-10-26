@@ -19,6 +19,9 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-timbre-abiertos',
@@ -131,6 +134,10 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private restGenero: GenerosService,
+    private restNacionalidades: NacionalidadService,
+    private reportes: ReportesMicroService
+    
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -317,15 +324,21 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
   MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbreHorarioAbierto(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'excel': this.generarExcel(); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
+        this.data_pdf = res;
+
+        if (accion === 'ver') {
+          this.VerDatos();
+          return;
+        }
+
+        // normalizamos: 'download' -> 'pdf' (descarga)
+        const accionNormalizada = (accion === 'download') ? 'pdf' : accion;
+        this.generarReporteTimbresLibresUsuarios(accionNormalizada as 'pdf' | 'excel' | 'open' | 'print');
+      },
+      (err) => {
+        this.toastr.error(err.error?.message || 'Error al obtener datos para el reporte.');
       }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    );
   }
 
   /** ****************************************************************************************** **
@@ -353,6 +366,139 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
+
+  obtenerTipoFiltro(): string {
+    if (this.bool.bool_reg) return 'regimen';
+    if (this.bool.bool_dep) return 'departamento';
+    if (this.bool.bool_cargo) return 'cargo';
+    if (this.bool.bool_suc) return 'ciudad';
+    if (this.bool.bool_emp) return 'empleado';
+    return 'desconocido';
+  }
+
+   async generarReporteTimbresLibresUsuarios(action: 'pdf' | 'excel' | 'open' | 'print') {
+    const docBase = `Timbres_libres_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Timbres Libres');
+      return;
+    }
+
+    const payload = {
+      usuario: (localStorage.getItem('fullname_print') || '').trim(),
+      empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      titulo: `LISTA DE TIMBRES LIBRES - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
+      tipoFiltro: this.obtenerTipoFiltro ? this.obtenerTipoFiltro() : null,
+      opcionBusqueda: this.opcionBusqueda,
+      periodo: {
+        inicio: this.rangoFechas.fec_inico,
+        fin: this.rangoFechas.fec_final
+      },
+      datos: this.data_pdf.map((selec: any) => ({
+        sucursal: selec.sucursal ?? null,
+        ciudad: selec.ciudad ?? null,
+        departamento: selec.departamento ?? null,
+        empleados: (selec.empleados || []).map((empl: any) => ({
+          identificacion: empl.identificacion,
+          nombre: empl.nombre,
+          apellido: empl.apellido,
+          correo: empl.correo ?? null,
+          genero: this.generos?.find((g: any) => g.id === empl.genero)?.genero ?? 'No especificado',
+          nacionalidad: this.nacionalidades?.find((n: any) => n.id === empl.id_nacionalidad)?.nombre ?? 'No especificado',
+          cargo: empl.cargo ?? null,
+          regimen: empl.regimen ?? null,
+          codigo: empl.codigo ?? null,
+          rol: empl.rol ?? null,
+          departamento: empl.departamento ?? selec.departamento ?? null,
+          ciudad: empl.ciudad ?? selec.ciudad ?? null,
+          sucursal: empl.sucursal ?? selec.sucursal ?? null,
+
+          // 🔹 TIMBRES
+          timbres: (empl.timbres || []).map((t: any) => {
+            const [fechaServ, horaServ] = t.fecha_hora_timbre_validado
+              ? t.fecha_hora_timbre_validado.split(' ')
+              : [null, null];
+            const [fechaDisp, horaDisp] = t.fecha_hora_timbre
+              ? t.fecha_hora_timbre.split(' ')
+              : [null, null];
+
+            const mapAccion = (cod: string) => {
+              switch (cod?.trim()?.toUpperCase()) {
+                case 'EOS': return 'Entrada o salida';
+                case 'AES': return 'Inicio o fin alimentación';
+                case 'PES': return 'Inicio o fin permiso';
+                case 'E': return 'Entrada';
+                case 'S': return 'Salida';
+                case 'I/A': return 'Inicio alimentación';
+                case 'F/A': return 'Fin alimentación';
+                case 'I/P': return 'Inicio permiso';
+                case 'F/P': return 'Fin permiso';
+                case 'HA': return 'Timbre libre';
+                default: return 'Desconocido';
+              }
+            };
+
+            return {
+              fechaServidor: fechaServ,
+              horaServidor: horaServ,
+              fechaDispositivo: this.timbreDispositivo ? fechaDisp : null,
+              horaDispositivo: this.timbreDispositivo ? horaDisp : null,
+              id_reloj: t.id_reloj ?? null,
+              accion: mapAccion(t.accion),
+              observacion: t.observacion ?? '',
+              latitud: t.latitud ?? '',
+              longitud: t.longitud ?? ''
+            };
+          })
+        }))
+      }))
+    };
+
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('timbres-libres', 'pdf', payload).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF Timbres Libres:', err);
+            this.toastr.error('No se pudo generar el reporte PDF.', 'Error');
+          }
+        });
+        break;
+
+      case 'excel':
+        this.reportes.generarReporte('timbres-libres', 'excel', payload).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel Timbres Libres:', err);
+            this.toastr.error('No se pudo generar el reporte Excel.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            action === 'print' ? pdf.print() : pdf.open();
+          } catch (err) {
+            console.error('Error al preparar PDF local:', err);
+            this.toastr.error('No se pudo abrir/imprimir el PDF.', 'Error');
+          }
+        };
+        run();
+        break;
+      }
+    }
+
+  }
+
 
 
   async GenerarPDF(action: any) {
@@ -632,6 +778,20 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
+
+  generos: any = [];
+  ObtenerGeneros() {
+    this.restGenero.ListarGeneros().subscribe(datos => {
+      this.generos = datos;
+    })
+  }
+
+  nacionalidades: any = [];
+  ObtenerNacionalidades() {
+    this.restNacionalidades.ListarNacionalidad().subscribe(datos => {
+      this.nacionalidades = datos;
+    })
+  }
 
   async generarExcel() {
     let datos: any[] = [];

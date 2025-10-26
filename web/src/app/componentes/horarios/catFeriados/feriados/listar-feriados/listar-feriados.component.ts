@@ -21,6 +21,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/horarios/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableFeriados } from 'src/app/model/reportes.model';
@@ -110,6 +111,7 @@ export class ListarFeriadosComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE DE USO DE VENTANAS DE DIÁLOGO
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -529,54 +531,73 @@ export class ListarFeriadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
+  async generarReporteFeriados(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      feriados: this.feriados.map((f: any) => ({
+      id: f.id,
+      descripcion: f.descripcion,
+      fecha: (f.fecha_ ?? '').toString().split('T')[0],
+      fechaRecuperacion: (f.fec_recuperacion_ ?? '').toString().split('T')[0],
+      }))
+    };
 
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('feriados', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-  async GenerarPdf(action = 'open') {
-    if (action === 'download') {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        feriados: this.feriados.map((obj: any) => ({
-          id: obj.id,
-          descripcion: obj.descripcion,
-          fecha: obj.fecha_,
-          fechaRecuperacion: obj.fec_recuperacion_
-        }))
-      };
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('feriados', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      console.log("Enviando al microservicio:", data);
+      case 'csv':
+        this.reportes.generarReporte('feriados', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar CSV:', error);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteFeriados(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Feriados.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
+      case 'xml':
+        this.reportes.generarReporte('feriados', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar XML:', error);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-
-      });
-
-    } else {
-      this.OrdenarDatos(this.feriados);  // si aplica ordenamiento
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
-
-      this.BuscarParametro();  // si deseas mantener esta llamada
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
-  }
 
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -656,9 +677,6 @@ export class ListarFeriadosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
-
-
-
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;

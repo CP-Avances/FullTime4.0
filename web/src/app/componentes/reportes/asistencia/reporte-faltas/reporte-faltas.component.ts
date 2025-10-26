@@ -19,6 +19,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-reporte-faltas',
@@ -134,6 +135,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     public restUsuario: UsuarioService,
     private restGenero: GenerosService,
     private restNacionalidades: NacionalidadService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -325,17 +327,17 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
     this.data_pdf = [];
-    this.restFaltas.BuscarFaltas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
-      switch (accion) {
-        case 'excel': this.generarExcel(); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+    this.restFaltas
+      .BuscarFaltas(seleccionados, this.rangoFechas.fec_inico, this.rangoFechas.fec_final)
+      .subscribe({
+        next: (res) => {
+          this.data_pdf = res;
+          this.generarReporteFaltas(accion); // 'excel' | 'ver' | 'open' | 'print' | 'download'
+        },
+        error: (err) => this.toastr.error(err.error.message)
+      });
   }
+
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                **
@@ -365,29 +367,38 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-  async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const doc_name = `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+  async generarReporteFaltas(action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf') {
+    // Normalizamos 'download' a 'pdf'
+    const acc = action === 'download' ? 'pdf' : action;
 
-    // Si la acción es 'download', enviar al microservicio
-    if (action === 'download') {
-      const data = {
-        usuario: localStorage.getItem('fullname_print'),
-        empresa: localStorage.getItem('name_empresa'),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        fechaInicio: this.rangoFechas.fec_inico,
-        fechaFin: this.rangoFechas.fec_final,
-        opcionBusqueda: this.opcionBusqueda,
-        resumen: this.bool.bool_emp,
-        grupos: this.data_pdf.map(grupo => ({
-          sucursal: grupo.sucursal,
-          ciudad: grupo.ciudad,
-          nombre: grupo.nombre,
-          departamento: grupo.departamento,
-          empleados: grupo.empleados.map(emp => ({
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Faltas');
+      return;
+    }
+
+    const docBase = `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    // Armamos payload extendido (MISMO esquema del PDF + extras para Excel)
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: localStorage.getItem('name_empresa'),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      fechaInicio: this.rangoFechas.fec_inico,
+      fechaFin: this.rangoFechas.fec_final,
+      opcionBusqueda: this.opcionBusqueda,
+      resumen: this.bool.bool_emp,
+      grupos: this.data_pdf.map((grupo: any) => ({
+        sucursal: grupo.sucursal,
+        ciudad: grupo.ciudad,
+        nombre: grupo.nombre,
+        departamento: grupo.departamento,
+        empleados: grupo.empleados.map((emp: any) => {
+          const generoNombre = this.generos.find((g: any) => g.id === emp.genero)?.genero ?? 'No especificado';
+          const nacionalidadNombre = this.nacionalidades.find((n: any) => n.id === emp.id_nacionalidad)?.nombre ?? 'No especificado';
+          return {
             identificacion: emp.identificacion,
             codigo: emp.codigo,
             nombre: emp.nombre,
@@ -397,36 +408,71 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             correo: emp.correo,
             cargo: emp.cargo,
             rol: emp.rol,
-            genero: emp.genero,
+            genero: emp.genero,                 // id (como en PDF)
+            generoNombre,                       // string para Excel
             id_nacionalidad: emp.id_nacionalidad,
-            faltas: emp.faltas.map((f: any) => ({
+            nacionalidadNombre,                 // string para Excel
+            ciudad: emp.ciudad ?? grupo.ciudad, // redundancia útil para Excel
+            sucursal: emp.sucursal ?? grupo.sucursal,
+            faltas: (emp.faltas || []).map((f: any) => ({
               fecha: f.fecha
             }))
-          }))
-        }))
-      };
+          };
+        })
+      }))
+    };
 
-      this.validar.generarReporteFaltas(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, doc_name);
-        console.log("✅ PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("❌ Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Inténtelo más tarde.',
-          'Error'
-        );
-      });
-
-    } else {
-      // Para open y print sigue usando pdfMake
-      const documentDefinition = this.DefinirInformacionPDF();
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
+switch (acc) {
+  case 'pdf':
+    this.reportes.generarReporte('faltas', 'pdf', data).subscribe({
+      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+      error: (error) => {
+        console.error('Error al generar PDF desde el microservicio:', error);
+        this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
       }
-    }
+    });
+    break;
+
+  case 'excel':
+    this.reportes.generarReporte('faltas', 'excel', data).subscribe({
+      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+      error: (error) => {
+        console.error('Error al generar Excel desde el microservicio:', error);
+        this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+      }
+    });
+    break;
+
+  case 'open':
+  case 'print': {
+    const run = async () => {
+      try {
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        acc === 'print' ? pdf.print() : pdf.open();
+      } catch (error) {
+        console.error('Error al preparar PDF local:', error);
+        this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+      }
+    };
+    run();
+    break;
   }
+
+  case 'ver': {
+    this.VerDatos();
+    break;
+  }
+
+  default:
+    // Sin acción
+    break;
+}
+
+    }
+  
+
 
 
   DefinirInformacionPDF() {

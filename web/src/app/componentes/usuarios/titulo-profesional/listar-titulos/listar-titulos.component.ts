@@ -24,6 +24,7 @@ import { NivelTitulosService } from 'src/app/servicios/usuarios/nivelTitulos/niv
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/usuarios/catTitulos/titulo.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { ITableProvincias } from 'src/app/model/reportes.model';
 
@@ -101,6 +102,7 @@ export class ListarTitulosComponent implements OnInit {
     public validar: ValidacionesService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    private reportes: ReportesMicroService
   ) { }
 
   ngOnInit(): void {
@@ -408,56 +410,73 @@ export class ListarTitulosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                              PARA LA EXPORTACION DE ARCHIVOS PDF                            ** **
    ** ************************************************************************************************* **/
+  async generarReporteTitulos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      titulos: this.verTitulos.map((t: any) => ({
+        id: t.id,
+        nivel: t.nivel,
+        nombre: t.nombre
+      }))
+    };
 
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('titulos', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        titulos: this.verTitulos.map((obj: any) => ({
-          id: obj.id,
-          nivel: obj.nivel,
-          nombre: obj.nombre
-        }))
-      };
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('titulos', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      console.log("Enviando al microservicio:", data);
+      case 'csv':
+        this.reportes.generarReporte('titulos', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteTitulos(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Titulos.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
+      case 'xml':
+        this.reportes.generarReporte('titulos', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
-
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
+
   }
-
-
 
   DefinirInformacionPDF() {
     return {
@@ -539,7 +558,6 @@ export class ListarTitulosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS EXCEL                            ** **
    ** ************************************************************************************************* **/
-
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -649,8 +667,6 @@ export class ListarTitulosComponent implements OnInit {
       return "left";
     }
   }
-
-
 
   /** ************************************************************************************************* **
    ** **                             PARA LA EXPORTACION DE ARCHIVOS XML                             ** **

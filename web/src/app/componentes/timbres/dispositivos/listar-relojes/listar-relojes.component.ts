@@ -21,6 +21,8 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { RelojesService } from 'src/app/servicios/timbres/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
+import { color } from 'echarts/core';
 
 @Component({
   selector: 'app-listar-relojes',
@@ -100,6 +102,7 @@ export class ListarRelojesComponent implements OnInit {
     private rest: RelojesService,
     private toastr: ToastrService,
     private asignaciones: AsignacionesService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -472,64 +475,99 @@ export class ListarRelojesComponent implements OnInit {
    ** **                        GENERACION DE PDFs                                   ** **
    ** ********************************************************************************* **/
 
-
-  async GenerarPdf(action = 'open') {
+  async generarReporteRelojes(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
     if (!this.relojes || this.relojes.length === 0) {
       this.toastr.info('No hay datos para mostrar en el reporte.');
       return;
     }
 
-    if (action === 'download') {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        relojes: this.relojes.map((obj: any) => ({
-          codigo: obj.codigo,
-          nomempresa: obj.nomempresa,
-          nomciudad: obj.nomciudad,
-          nomsucursal: obj.nomsucursal,
-          nomdepar: obj.nomdepar,
-          nombre: obj.nombre,
-          ip: obj.ip,
-          puerto: obj.puerto,
-          marca: obj.marca,
-          modelo: obj.modelo,
-          serie: obj.serie,
-          mac: obj.mac,
-          idFabricacion: obj.id_fabricacion,
-          fabricante: obj.fabricante,
-          zonaHorariaDispositivo: obj.zona_horaria_dispositivo,
-          formatoGmtDispositivo: obj.formato_gmt_dispositivo
-        }))
-      };
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      relojes: this.relojes.map((r: any) => ({
+        codigo: r.codigo,
+        nomempresa: r.nomempresa,
+        nomciudad: r.nomciudad,
+        nomsucursal: r.nomsucursal,
+        nomdepar: r.nomdepar,
+        nombre: r.nombre,
+        ip: r.ip,
+        puerto: r.puerto,
+        marca: r.marca,
+        modelo: r.modelo,
+        serie: r.serie,
+        mac: r.mac,
+        idFabricacion: r.id_fabricacion,
+        fabricante: r.fabricante,
+        zonaHorariaDispositivo: r.zona_horaria_dispositivo,
+        formatoGmtDispositivo: r.formato_gmt_dispositivo,
 
-      console.log("Enviando al microservicio:", data);
+        // extras que Excel necesitaba
+        id: r.id,
+        contrasenia: r.contrasenia,
+        tipoConexion: (r.tipo_conexion === true || r.tipo_conexion === 'true' || r.tipo_conexion === 1 || r.tipo_conexion === '1')? 'Interna': 'Externa',
+        idSucursal: r.id_sucursal,
+        idDepartamento: r.id_departamento,
+        temperatura: (r.temperatura === true || r.temperatura === 'true' || r.temperatura === 1 || r.temperatura === '1') ? 'Si' : 'No'
+      }))
+    };
 
-      this.validar.generarReporteRelojes(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Lista_Dispositivos.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('relojes', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF:', err);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('relojes', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel:', err);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'csv':
+        this.reportes.generarReporte('relojes', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('relojes', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
-  }
 
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -636,7 +674,6 @@ export class ListarRelojesComponent implements OnInit {
   /** ********************************************************************************* **
    ** **                              GENERACION DE EXCEL                            ** **
    ** ********************************************************************************* **/
-
 
   async generarExcel() {
     if (!this.relojes || this.relojes.length === 0) {
@@ -801,8 +838,6 @@ export class ListarRelojesComponent implements OnInit {
       return "left";
     }
   }
-
-
 
   /** ********************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A CSV                                  ** **

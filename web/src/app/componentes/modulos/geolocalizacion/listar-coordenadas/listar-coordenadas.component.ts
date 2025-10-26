@@ -16,6 +16,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { CrearCoordenadasComponent } from '../crear-coordenadas/crear-coordenadas.component';
@@ -75,6 +76,7 @@ export class ListarCoordenadasComponent implements OnInit {
     private router: Router,
     private validar: ValidacionesService,
     private funciones: MainNavService,
+    private reportes: ReportesMicroService
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -92,10 +94,10 @@ export class ListarCoordenadasComponent implements OnInit {
     }
     else {
       this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');  
+      this.ip = localStorage.getItem('ip');
       this.validar.ObtenerIPsLocales().then((ips) => {
-      this.ips_locales = ips;
-    }); 
+        this.ips_locales = ips;
+      });
       this.ObtenerCoordenadas();
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerLogo();
@@ -245,51 +247,74 @@ export class ListarCoordenadasComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A PDF                                      ** **
    ** ************************************************************************************************** **/
-
-
-async GenerarPdf(action = 'open') {
-  if (action === 'download') {
+  async generarReporteCoordenadas(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
       empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
       fraseMarcaAgua: this.frase,
       logoBase64: this.logo,
       colorPrincipal: this.p_color,
-      coordenadas: this.coordenadas.map((obj: any) => ({
-        id: obj.id,
-        descripcion: obj.descripcion,
-        latitud: obj.latitud,
-        longitud: obj.longitud
+      colorSecundario: this.s_color,
+      coordenadas: this.coordenadas.map((c: any) => ({
+        id: c.id,
+        descripcion: c.descripcion,
+        latitud: c.latitud,
+        longitud: c.longitud
       }))
     };
 
-    console.log("Enviando al microservicio:", data);
-
-    this.validar.generarReporteCoordenadas(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'CoordenadasGeograficas.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-                      console.error("Error al generar PDF desde el microservicio:", error);
-
-
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-    });
-
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-
     switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
-    }
-  }
-}
+      case 'pdf':
+        this.reportes.generarReporte('coordenadas', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF:', err);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('coordenadas', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel:', err);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'csv':
+        this.reportes.generarReporte('coordenadas', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('coordenadas', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF(); // flujo local
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
+    }
+
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -499,7 +524,7 @@ async GenerarPdf(action = 'open') {
     this.coordenadas.forEach((obj: any) => {
       worksheet.addRow(obj);
     });
-  
+
     workbook.csv.writeBuffer().then((buffer) => {
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "CoordenadasGeograficasCSV.csv");
@@ -572,23 +597,23 @@ async GenerarPdf(action = 'open') {
     }
   }
 
-  getRegistrarPerimetro(){
+  getRegistrarPerimetro() {
     return this.tienePermiso('Registrar Ubicación');
   }
 
-  getVer(){
+  getVer() {
     return this.tienePermiso('Ver Ubicación');
   }
 
-  getEditar(){
+  getEditar() {
     return this.tienePermiso('Editar Ubicación');
   }
 
-  getEliminar(){
+  getEliminar() {
     return this.tienePermiso('Eliminar Ubicación');
   }
 
-  getDescargarReportes(){
+  getDescargarReportes() {
     return this.tienePermiso('Descargar Reportes Ubicación');
   }
 

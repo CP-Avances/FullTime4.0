@@ -11,6 +11,7 @@ import * as FileSaver from 'file-saver';
 import ExcelJS, { FillPattern } from "exceljs";
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
@@ -65,6 +66,7 @@ export class ListarParametroComponent implements OnInit {
     public restEmpre: EmpresaService,
     private restP: ParametrosService,
     private toastr: ToastrService,
+    private reportes: ReportesMicroService
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -187,50 +189,77 @@ export class ListarParametroComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 
-
-  async GenerarPDF(action: any) {
-    if (action === 'download') {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido, 
-        empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(), 
-        fraseMarcaAgua: this.frase,         
-        logoBase64: this.logo,              
-        colorPrincipal: this.p_color,       
-        colorSecundario: this.s_color,     
-        parametros: this.parametros.map((param: any) => ({
-          id: param.id,                    
-          descripcion: param.descripcion,   
-          detalles: param.detalles.map((d: any) => ({
-            id: d.id,                       
-            descripcion: d.descripcion,    
-            observacion: d.observacion    
-          }))
+  async generarReporteParametros(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      parametros: this.parametros.map((param: any) => ({
+        id: param.id,
+        descripcion: param.descripcion,
+        detalles: param.detalles.map((d: any) => ({
+          id: d.id,
+          descripcion: d.descripcion,
+          observacion: d.observacion
         }))
-      };
+      }))
+    };
 
-      console.log("ENVIANDO AL MICROSERVICIO", data);
-      this.validar.generarReporteParametrosGenerales(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = 'Parametros_generales.pdf';
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'Error'
-        );
-      });
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('parametros', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = 'Parametros_generales.pdf';
+      case 'excel': // puedes pasar 'excel' o 'xlsx'
+        this.reportes.generarReporte('parametros', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+      case 'csv':
+        this.reportes.generarReporte('parametros', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('parametros', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        // Flujo local para abrir/imprimir (pdfMake)
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
+
   }
 
   DefinirInformacionPDF() {

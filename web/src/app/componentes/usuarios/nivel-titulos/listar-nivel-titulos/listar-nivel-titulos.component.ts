@@ -21,6 +21,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { NivelTitulosService } from 'src/app/servicios/usuarios/nivelTitulos/nivel-titulos.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -96,6 +97,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -387,49 +389,74 @@ export class ListarNivelTitulosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
+  async generarReporteNivelesTitulos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    this.OrdenarDatos(this.nivelTitulos);
 
-
-async GenerarPdf(action = 'open') {
-  if (action === 'download') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
       fraseMarcaAgua: this.frase,
       logoBase64: this.logo,
       colorPrincipal: this.p_color,
-      nivelesTitulos: this.nivelTitulos.map((obj: any) => ({
-        id: obj.id,
-        nombre: obj.nombre
+      colorSecundario: this.s_color,
+      nivelesTitulos: this.nivelTitulos.map((n: any) => ({
+        id: n.id,
+        nombre: n.nombre
       }))
     };
 
-    console.log("Enviando al microservicio:", data);
-
-    this.validar.generarReporteNivelesTitulos(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'Niveles_titulos.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-                      console.error("Error al generar PDF desde el microservicio:", error);
-
-
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-    });
-
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-
     switch (action) {
-      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      default: pdfMake.createPdf(documentDefinition).open(); break;
-    }
-  }
-}
+      case 'pdf':
+        this.reportes.generarReporte('niveles-titulos', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF:', err);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('niveles-titulos', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'csv':
+        this.reportes.generarReporte('niveles-titulos', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('niveles-titulos', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
+    }
+
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -619,7 +646,6 @@ async GenerarPdf(action = 'open') {
       return "left";
     }
   }
-
 
 
   /** ************************************************************************************************* **

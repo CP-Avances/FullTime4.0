@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-salidas-antes',
@@ -132,6 +133,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -362,82 +364,104 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
 
-  async GenerarPDF(action: any) {
-    if (action === 'download') {
-      const data = {
-        // Información general del encabezado del reporte
-        usuario: localStorage.getItem('fullname_print'),
-        empresa: localStorage.getItem('name_empresa'),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        fechaInicio: this.rangoFechas.fec_inico,
-        fechaFin: this.rangoFechas.fec_final,
-        opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
+  async GenerarPDF(action: 'pdf' | 'excel' | 'open' | 'print' | 'download') {
+    const acc = action === 'download' ? 'pdf' : action;
+    const docName = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-        // Filtros aplicados para agrupar la información
-        resumen: {
-          bool_reg: this.bool.bool_reg,
-          bool_dep: this.bool.bool_dep,
-          bool_cargo: this.bool.bool_cargo,
-          bool_suc: this.bool.bool_suc,
-          bool_emp: this.bool.bool_emp
-        },
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Salidas anticipadas');
+      return;
+    }
 
-        // Información agrupada para presentar el detalle
-        grupos: this.data_pdf.map(grupo => ({
-          sucursal: grupo.sucursal,
-          ciudad: grupo.ciudad,
-          departamento: grupo.departamento,
-          nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
-
-          empleados: grupo.empleados.map(emp => ({
-            identificacion: emp.identificacion,
-            codigo: emp.codigo,
-            nombre: emp.nombre,
-            apellido: emp.apellido,
-            regimen: emp.regimen,
-            departamento: emp.departamento,
-            cargo: emp.cargo,
-
-            salidas: emp.salidas.map(salida => ({
-              fecha_hora_horario: salida.fecha_hora_horario,     // Ej: '2025-07-03 17:00:00'
-              fecha_hora_timbre: salida.fecha_hora_timbre,       // Ej: '2025-07-03 16:35:00'
-              diferencia: salida.diferencia,                     // en segundos
-
-              // Estos campos aparecen como columnas vacías visualmente, pero se reservan:
-              tipo_permiso: salida.tipo_permiso ?? null,
-              desde: salida.desde ?? null,
-              hasta: salida.hasta ?? null
-            }))
+    // Payload único
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: localStorage.getItem('name_empresa'),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      fechaInicio: this.rangoFechas.fec_inico,
+      fechaFin: this.rangoFechas.fec_final,
+      opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
+      resumen: {
+        bool_reg: this.bool.bool_reg,
+        bool_dep: this.bool.bool_dep,
+        bool_cargo: this.bool.bool_cargo,
+        bool_suc: this.bool.bool_suc,
+        bool_emp: this.bool.bool_emp
+      },
+      grupos: this.data_pdf.map((grupo: any) => ({
+        sucursal: grupo.sucursal,
+        ciudad: grupo.ciudad,
+        departamento: grupo.departamento,
+        nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
+        empleados: (grupo.empleados || []).map((emp: any) => ({
+          identificacion: emp.identificacion,
+          codigo: emp.codigo,
+          nombre: emp.nombre,
+          apellido: emp.apellido,
+          regimen: emp.regimen,
+          departamento: emp.departamento,
+          cargo: emp.cargo,
+          // necesarias para Excel y para mostrar en PDF si aplica
+          ciudad: emp.ciudad ?? grupo.ciudad ?? null,
+          sucursal: emp.sucursal ?? grupo.sucursal ?? null,
+          salidas: (emp.salidas || []).map((salida: any) => ({
+            fecha_hora_horario: salida.fecha_hora_horario,
+            fecha_hora_timbre: salida.fecha_hora_timbre,
+            diferencia: salida.diferencia, // en segundos
+            tipo_permiso: salida.tipo_permiso ?? null,
+            desde: salida.desde ?? null,
+            hasta: salida.hasta ?? null
           }))
         }))
-      };
+      }))
+    };
 
-      console.log("ENVIANDO AL MICROSERVCIO", data);
-      this.validar.generarReporteSalidasAnticipadas(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'Error'
-        );
-      });
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporte('salidas-anticipadas', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+      case 'excel':
+        this.reportes.generarReporte('salidas-anticipadas', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            acc === 'print' ? pdf.print() : pdf.open();
+          } catch (err) {
+            console.error('Error al preparar PDF local:', err);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
       }
+
+      default:
+        // sin acción
+        break;
     }
+
   }
 
 

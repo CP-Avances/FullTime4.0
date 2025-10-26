@@ -21,6 +21,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.servi
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { NacionalidadService } from 'src/app/servicios/usuarios/catNacionalidad/nacionalidad.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 import { log } from 'console';
 
 @Component({
@@ -166,6 +167,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     private restP: ParametrosService,
     private restGenero: GenerosService,
     private resNacionalidades: NacionalidadService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -350,14 +352,24 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion(seleccionados: any, accion: any) {
-    this.data_pdf = [];
-    this.data_pdf = seleccionados;
-    switch (accion) {
-      case 'excel': this.generarExcel(); break;
-      case 'ver': this.VerDatos(); break;
-      default: this.GenerarPDF(accion); break;
+    this.data_pdf = seleccionados || [];
+
+    if (this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Usuarios');
+      return;
     }
+
+    // 'ver' sigue mostrando la vista previa local
+    if (accion === 'ver') {
+      this.VerDatos();
+      return;
+    }
+
+    // normalizamos: 'download' -> 'pdf'
+    const accionNormalizada = (accion === 'download') ? 'pdf' : accion;
+    this.generarReporteUsuarios(accionNormalizada as 'pdf' | 'excel' | 'open' | 'print');
   }
+
 
 
   /** ****************************************************************************************** **
@@ -397,80 +409,114 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   }
 
 
-  async GenerarPDF(action: any) {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-    const doc_name = `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+  // Unificado: PDF/Excel/abrir/imprimir
+  async generarReporteUsuarios(action: 'pdf' | 'excel' | 'open' | 'print') {
+    const docBase = `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-    if (action === 'download') {
-      if (this.data_pdf.length === 0) {
-        this.toastr.info('No hay datos para generar el reporte', 'Usuarios');
-        return;
-      }
+    // Mismo payload que tu PDF actual (sin agregar campos nuevos)
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      tipoFiltro: this.obtenerTipoFiltro(),
+      titulo: `USUARIOS - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
+      datos: this.data_pdf.map((selec: any) => ({
+        sucursal: selec.sucursal,
+        ciudad: selec.ciudad,
+        nombre: selec.nombre,
+        departamento: selec.departamento,
+        empleados: (selec.empleados || []).map((empl: any) => {
+          const generoObj = this.generos.find((g: any) => g.id === empl.genero);
+          const nombreGenero = generoObj ? generoObj.genero : 'No especificado';
 
-      const data = {
-        usuario: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-        empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        tipoFiltro: this.obtenerTipoFiltro(),
-        titulo: `USUARIOS - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
-        datos: this.data_pdf.map((selec: any) => ({
-          sucursal: selec.sucursal,
-          ciudad: selec.ciudad,
-          nombre: selec.nombre,
-          departamento: selec.departamento,
-          empleados: selec.empleados.map((empl: any) => {
-            const generoObj = this.generos.find((g: any) => g.id === empl.genero);
-            const nombreGenero = generoObj ? generoObj.genero : "No especificado";
+          const nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
+          const nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : 'No especificado';
 
-            const nacionalidadObj = this.nacionalidades.find((n: any) => n.id === empl.id_nacionalidad);
-            const nombreNacionalidad = nacionalidadObj ? nacionalidadObj.nombre : "No especificado";
+          return {
+            identificacion: empl.identificacion,
+            codigo: empl.codigo,
+            nombre: empl.nombre,
+            apellido: empl.apellido,
+            usuario: empl.usuario,
+            genero: nombreGenero,
+            nacionalidad: nombreNacionalidad,
+            ciudad: empl.ciudad,
+            sucursal: empl.sucursal,
+            regimen: empl.regimen,
+            departamento: empl.departamento,
+            cargo: empl.cargo,
+            rol: empl.rol,
+            correo: empl.correo
+          };
+        })
+      }))
+    };
 
-            return {
-              identificacion: empl.identificacion,
-              codigo: empl.codigo,
-              nombre: empl.nombre,
-              apellido: empl.apellido,
-              usuario: empl.usuario,
-              genero: nombreGenero,
-              nacionalidad: nombreNacionalidad,
-              ciudad: empl.ciudad,
-              sucursal: empl.sucursal,
-              regimen: empl.regimen,
-              departamento: empl.departamento,
-              cargo: empl.cargo,
-              rol: empl.rol,
-              correo: empl.correo
-            };
-          })
-        }))
-      };
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('usuarios', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-      console.log("Enviando al microservicio:", data);
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('usuarios', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteUsuarios(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, doc_name);
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+      case 'open':
+        this.reportes.generarReporte('usuarios', 'pdf', data).subscribe({
+          next: ({ blob }) => {
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) this.toastr.warning('Habilita las ventanas emergentes para ver el PDF.');
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          },
+          error: (error) => {
+            console.error('Error al abrir PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo abrir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      // Usar lógica local para open / print
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+      case 'print':
+        this.reportes.generarReporte('usuarios', 'pdf', data).subscribe({
+          next: ({ blob }) => {
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) {
+              this.toastr.warning('Habilita las ventanas emergentes para imprimir el PDF.');
+              URL.revokeObjectURL(url);
+              return;
+            }
+            setTimeout(() => { try { win.focus(); win.print(); } catch {} }, 500);
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          },
+          error: (error) => {
+            console.error('Error al preparar impresión desde el microservicio:', error);
+            this.toastr.error('No se pudo preparar la impresión. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      default:
+        break;
     }
+
   }
+
 
 
   // METODO PARA ARMAR LA INFORMACION DEL PDF

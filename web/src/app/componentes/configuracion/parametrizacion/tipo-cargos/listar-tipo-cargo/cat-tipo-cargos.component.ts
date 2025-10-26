@@ -19,6 +19,7 @@ import { CatTipoCargosService } from 'src/app/servicios/configuracion/parametriz
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
 import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';
@@ -94,6 +95,7 @@ export class CatTipoCargosComponent {
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public parametro: ParametrosService,
     public validar: ValidacionesService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -438,54 +440,77 @@ export class CatTipoCargosComponent {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-
-  async GenerarPdf(action = 'open') {
+  async generarReporteTipoCargos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
     this.OrdenarDatos(this.listaTipoCargos);
 
-    if (action === 'download') {
       const data = {
         usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+        empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
         fraseMarcaAgua: this.frase,
         logoBase64: this.logo,
         colorPrincipal: this.p_color,
+        colorSecundario: this.s_color, // mantenemos contrato general
         cargos: this.listaTipoCargos.map((item: any) => ({
           id: item.id,
           cargo: item.cargo
         }))
       };
 
-      console.log("Enviando al microservicio:", data);
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('cargos', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar PDF:', e);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteTipoCargos(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Modalidad_Laboral.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error('Error al generar PDF desde el microservicio:', error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('cargos', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+      case 'csv':
+        this.reportes.generarReporte('cargos', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open':
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case 'print':
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
+      case 'xml':
+        this.reportes.generarReporte('cargos', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default: {
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
       }
     }
-    this.BuscarParametro();
-  }
+
+
+      this.BuscarParametro();
+    }
 
   DefinirInformacionPDF() {
     return {
@@ -724,8 +749,6 @@ export class CatTipoCargosComponent {
   /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
-
-
 
   ExportToCSV() {
     this.OrdenarDatos(this.listaTipoCargos);

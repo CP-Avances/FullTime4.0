@@ -15,6 +15,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 import { error } from 'console';
 import FileSaver from 'file-saver';
 
@@ -121,6 +122,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -294,7 +296,6 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       console.log('Respuesta del backend:', res);  // Imprime la respuesta para verificar
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.ExportarExcel(); break;
         case 'ver': this.verDatos(); break;
         default: this.GenerarPDF(accion); break;
       }
@@ -329,109 +330,127 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
    ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
 
+  async GenerarPDF(action: 'pdf' | 'excel' | 'open' | 'print' | 'download') {
+    const acc = action === 'download' ? 'pdf' : action;
+    const docName = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-  async GenerarPDF(action: any) {
-    if (action === 'download') {
-      const data = {
-        usuario: localStorage.getItem('fullname_print'),
-        empresa: localStorage.getItem('name_empresa'),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        fechaInicio: this.rangoFechas.fec_inico,
-        fechaFin: this.rangoFechas.fec_final,
-        opcionBusqueda: this.opcionBusqueda,
-
-        resumen: this.bool,
-
-        totales: this.data_pdf.map(grupo => {
-          let totalExceso = 0;
-          grupo.empleados.forEach(emp => {
-            emp.alimentacion.forEach(reg => {
-              const min = reg.inicioAlimentacion.minutos_alimentacion;
-              const tomados = this.CalcularDiferenciaFechas(
-                reg.inicioAlimentacion.fecha_hora_timbre,
-                reg.finAlimentacion.fecha_hora_timbre
-              );
-              totalExceso += this.CalcularExcesoTiempo(min, tomados);
-            });
-          });
-
-          const nombre = this.bool.bool_dep ? grupo.departamento : grupo.nombre;
-
-          return {
-            sucursal: grupo.sucursal,
-            nombre,
-            totalMinExceso: totalExceso
-          };
-        }),
-
-        grupos: this.data_pdf.map(grupo => ({
-          sucursal: grupo.sucursal,
-          ciudad: grupo.ciudad,
-          departamento: grupo.departamento,
-          nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
-
-          empleados: grupo.empleados.map(emp => ({
-            identificacion: emp.identificacion,
-            codigo: emp.codigo,
-            nombre: emp.nombre,
-            apellido: emp.apellido,
-            regimen: emp.regimen,
-            departamento: emp.departamento,
-            cargo: emp.cargo,
-
-            alimentacion: emp.alimentacion.map(registro => {
-              const minAlimentacion = registro.inicioAlimentacion.minutos_alimentacion;
-              const minutosTomados = this.CalcularDiferenciaFechas(
-                registro.inicioAlimentacion.fecha_hora_timbre,
-                registro.finAlimentacion.fecha_hora_timbre
-              );
-              const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-
-              return {
-                fecha: this.validar.FormatearFecha(
-                  registro.inicioAlimentacion.fecha_horario,
-                  this.formato_fecha,
-                  this.validar.dia_abreviado,
-                  this.idioma_fechas
-                ),
-                inicioAlimentacion: registro.inicioAlimentacion.fecha_hora_timbre,
-                finAlimentacion: registro.finAlimentacion.fecha_hora_timbre,
-                minutosPermitidos: minAlimentacion,
-                minutosTomados: minutosTomados !== null ? minutosTomados : minAlimentacion,
-                minutosExceso: exceso
-              };
-            })
-          }))
-        }))
-      };
-
-      console.log("ENVIANDO AL MICROSERVICIO", data);
-      this.validar.generarReporteTiempoAlimentacion(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'Error'
-        );
-      });
-
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Tiempo de alimentación');
+      return;
     }
+
+    // Payload único para PDF/Excel
+    const data = {
+      usuario: localStorage.getItem('fullname_print'),
+      empresa: localStorage.getItem('name_empresa'),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      fechaInicio: this.rangoFechas.fec_inico,
+      fechaFin: this.rangoFechas.fec_final,
+      opcionBusqueda: this.opcionBusqueda, // 1 activos, 2 inactivos
+      resumen: this.bool,
+      totales: this.data_pdf.map((grupo: any) => {
+        let totalExceso = 0;
+        (grupo.empleados || []).forEach((emp: any) => {
+          (emp.alimentacion || []).forEach((reg: any) => {
+            const min = reg.inicioAlimentacion.minutos_alimentacion;
+            const tomados = this.CalcularDiferenciaFechas(
+              reg.inicioAlimentacion.fecha_hora_timbre,
+              reg.finAlimentacion.fecha_hora_timbre
+            );
+            totalExceso += this.CalcularExcesoTiempo(min, tomados);
+          });
+        });
+        const nombre = this.bool.bool_dep ? grupo.departamento : grupo.nombre;
+        return { sucursal: grupo.sucursal, nombre, totalMinExceso: totalExceso };
+      }),
+      grupos: this.data_pdf.map((grupo: any) => ({
+        sucursal: grupo.sucursal,
+        ciudad: grupo.ciudad,
+        departamento: grupo.departamento,
+        nombre: this.bool.bool_dep ? grupo.departamento : grupo.nombre,
+        empleados: (grupo.empleados || []).map((emp: any) => ({
+          identificacion: emp.identificacion,
+          codigo: emp.codigo,
+          nombre: emp.nombre,
+          apellido: emp.apellido,
+          regimen: emp.regimen,
+          departamento: emp.departamento,
+          cargo: emp.cargo,
+          ciudad: emp.ciudad,
+          sucursal: emp.sucursal,
+          alimentacion: (emp.alimentacion || []).map((registro: any) => {
+            const minAlimentacion = registro.inicioAlimentacion.minutos_alimentacion;
+            const minutosTomados = this.CalcularDiferenciaFechas(
+              registro.inicioAlimentacion.fecha_hora_timbre,
+              registro.finAlimentacion.fecha_hora_timbre
+            );
+            const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
+            return {
+              fecha: this.validar.FormatearFecha(
+                registro.inicioAlimentacion.fecha_horario,
+                this.formato_fecha,
+                this.validar.dia_abreviado,
+                this.idioma_fechas
+              ),
+              inicioAlimentacion: registro.inicioAlimentacion.fecha_hora_timbre,
+              finAlimentacion: registro.finAlimentacion.fecha_hora_timbre,
+              minutosPermitidos: minAlimentacion,
+              minutosTomados: minutosTomados !== null ? minutosTomados : minAlimentacion,
+              minutosExceso: exceso
+            };
+          })
+        }))
+      }))
+    };
+
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporte('tiempo-alimentacion', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'excel':
+        this.reportes.generarReporte('tiempo-alimentacion', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            acc === 'print' ? pdf.print() : pdf.open();
+          } catch (err) {
+            console.error('Error al preparar PDF local:', err);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
+      }
+
+      default:
+        // sin acción
+        break;
+    }
+
   }
+
 
   DefinirInformacionPDF() {
     return {

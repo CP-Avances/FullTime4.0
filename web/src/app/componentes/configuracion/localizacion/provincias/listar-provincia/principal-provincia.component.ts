@@ -17,6 +17,7 @@ import { ProvinciaService } from '../../../../../servicios/configuracion/localiz
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 import ExcelJS, { FillPattern } from "exceljs";
 
 import { SelectionModel } from '@angular/cdk/collections';
@@ -80,6 +81,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -197,51 +199,74 @@ export class PrincipalProvinciaComponent implements OnInit {
   ** **                                      METODO PARA EXPORTAR A PDF                              ** **
   ** ************************************************************************************************** **/
   // GENERACION DE REPORTE DE PDF
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        provincias: this.provincias.map((obj: any) => ({
-          pais: obj.pais,
-          nombre: obj.nombre
-        }))
-      };
+  async generarReporteProvincias(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      provincias: this.provincias.map((obj: any) => ({
+        id: obj.id,
+        nombre: obj.nombre,
+        id_pais: obj.id_pais,
+        pais: obj.pais
+      }))
+    };
 
-      console.log("Enviando al microservicio:", data);
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('provincias', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteProvincias(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Provincias.pdf');
-        console.log("PDF descargado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('provincias', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+      case 'csv':
+        this.reportes.generarReporte('provincias', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+      case 'xml':
+        this.reportes.generarReporte('provincias', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
-  }
 
+  }
 
   DefinirInformacionPDF() {
 
@@ -351,8 +376,6 @@ export class PrincipalProvinciaComponent implements OnInit {
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
-
-
   async generarExcelProvincias() {
 
     const provinciaslista: any[] = [];

@@ -16,6 +16,7 @@ import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoReg
 import { CatVacunasService } from 'src/app/servicios/usuarios/catVacunas/cat-vacunas.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';
 import { TipoVacunaComponent } from '../tipo-vacuna/tipo-vacuna.component';
@@ -92,6 +93,7 @@ export class CatVacunasComponent implements OnInit {
     private rest: CatVacunasService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public validar: ValidacionesService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -386,55 +388,73 @@ export class CatVacunasComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
+  async generarReporteVacunas(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      vacunas: this.vacunas.map((v: any) => ({
+        id: v.id,
+        nombre: v.nombre
+      }))
+    };
 
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('vacunas', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar PDF:', e);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        vacunas: this.vacunas.map((obj: any) => ({
-          id: obj.id,
-          nombre: obj.nombre
-        }))
-      };
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('vacunas', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      console.log("Enviando al microservicio:", data);
+      case 'csv':
+        this.reportes.generarReporte('vacunas', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteVacunas(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Vacunas.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
+      case 'xml':
+        this.reportes.generarReporte('vacunas', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
-
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
+      case 'open':
+      case 'print': {
+        const pdfMake = await this.validar.ImportarPDF();
+        const docDef = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(docDef);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
       }
     }
-  }
 
-
+    }
+    
   DefinirInformacionPDF() {
     return {
       // ENCABEZADO DE LA PAGINA
@@ -514,7 +534,6 @@ export class CatVacunasComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
-
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;
@@ -620,8 +639,6 @@ export class CatVacunasComponent implements OnInit {
       return "left";
     }
   }
-
-
 
 
   /** ************************************************************************************************* **

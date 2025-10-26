@@ -19,6 +19,7 @@ import { ParametrosService } from 'src/app/servicios/configuracion/parametrizaci
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { HorarioService } from 'src/app/servicios/horarios/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 // IMPORTAR COMPONENTES
 import { DetalleCatHorarioComponent } from 'src/app/componentes/horarios/catHorarios/detalle/detalle-cat-horario/detalle-cat-horario.component';
@@ -124,6 +125,7 @@ export class PrincipalHorarioComponent implements OnInit {
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
     private restD: DetalleCatHorariosService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -526,62 +528,85 @@ export class PrincipalHorarioComponent implements OnInit {
    ** **                                METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************* **/
 
-
   // GENERAR ARCHIVO PDF
-  async GenerarPDF(action = 'open') {
-    if (action === 'download') {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        colorSecundario: this.s_color,
-        horarios: this.horarios.map((h: any) => ({
-          codigo: h.codigo,
-          nombre: h.nombre,
-          horaTrabajo: h.hora_trabajo,
-          minutosComida: h.minutos_comida,
-          noturno: h.noturno,
-          documento: h.documento,
-          detalles: h.detalles.map((d: any) => ({
-            orden: d.orden,
-            hora: d.hora,
-            tolerancia: d.tolerancia,
-            tipoAccionShow: d.tipo_accion_show,
-            segundoDia: d.segundo_dia,
-            minutosAntes: d.minutos_antes,
-            minutosDespues: d.minutos_despues
-          }))
+  async generarReporteHorarios(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      horarios: this.horarios.map((h: any) => ({
+        codigo: h.codigo,
+        nombre: h.nombre,
+        horaTrabajo: h.hora_trabajo,
+        minutosComida: h.minutos_comida,
+        noturno: h.noturno,
+        documento: h.documento,
+        detalles: h.detalles.map((d: any) => ({
+          orden: d.orden,
+          hora: d.hora,
+          tolerancia: d.tolerancia,
+          tipoAccionShow: d.tipo_accion_show,
+          segundoDia: d.segundo_dia,
+          minutosAntes: d.minutos_antes,
+          minutosDespues: d.minutos_despues
         }))
-      };
+      }))
+    };
 
-      console.log("Enviando al microservicio:", data);
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('horarios', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteHorarios(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Horarios.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-                console.error("Error al generar PDF desde el microservicio:", error);
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('horarios', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
+      case 'csv':
+        this.reportes.generarReporte('horarios', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      });
+      case 'xml':
+        this.reportes.generarReporte('horarios', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.EstructurarPDF();
-
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
-      }
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.EstructurarPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
+
   }
 
 
@@ -712,7 +737,6 @@ export class PrincipalHorarioComponent implements OnInit {
     });
     return n;
   }
-
 
   /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **

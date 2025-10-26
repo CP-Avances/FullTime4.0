@@ -15,6 +15,7 @@ import { CatDiscapacidadService } from 'src/app/servicios/usuarios/catDiscapacid
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ITableDiscapacidad } from 'src/app/model/reportes.model';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { RegistroDiscapacidadComponent } from '../registrar-discapacidad/registrar-discapacidad.component';
 import { EditarDiscapacidadComponent } from '../editar-discapacidad/editar-discapacidad.component';
@@ -95,6 +96,7 @@ export class CatDiscapacidadComponent implements OnInit {
     private rest: CatDiscapacidadService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public validar: ValidacionesService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -391,55 +393,72 @@ export class CatDiscapacidadComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
-
-
-async GenerarPdf(action = "open") {
-  if (action === "download") {
+  async generarReporteDiscapacidades(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
       empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
       fraseMarcaAgua: this.frase,
       logoBase64: this.logo,
       colorPrincipal: this.p_color,
-      discapacidades: this.discapacidades.map((obj: any) => ({
-        id: obj.id,
-        nombre: obj.nombre
+      colorSecundario: this.s_color,
+      discapacidades: this.discapacidades.map((d: any) => ({
+        id: d.id,
+        nombre: d.nombre
       }))
     };
 
-    console.log("Enviando al microservicio:", data);
-
-    this.validar.generarReporteDiscapacidades(data).subscribe((pdfBlob: Blob) => {
-      FileSaver.saveAs(pdfBlob, 'Discapacidades.pdf');
-      console.log("PDF generado correctamente desde el microservicio.");
-    }, error => {
-                      console.error("Error al generar PDF desde el microservicio:", error);
-
-
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-    });
-
-  } else {
-    const pdfMake = await this.validar.ImportarPDF();
-    const documentDefinition = this.DefinirInformacionPDF();
-
     switch (action) {
-      case "open":
-        pdfMake.createPdf(documentDefinition).open();
+      case 'pdf':
+        this.reportes.generarReporte('discapacidades', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar PDF:', e);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
         break;
-      case "print":
-        pdfMake.createPdf(documentDefinition).print();
-        break;
-      default:
-        pdfMake.createPdf(documentDefinition).open();
-        break;
-    }
-  }
-}
 
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('discapacidades', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'csv':
+        this.reportes.generarReporte('discapacidades', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('discapacidades', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print': {
+        const pdfMake = await this.validar.ImportarPDF();
+        const docDef = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(docDef);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
+      }
+    }
+
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -520,7 +539,6 @@ async GenerarPdf(action = "open") {
   /** ************************************************************************************************* **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
    ** ************************************************************************************************* **/
-
   async generarExcel() {
     let datos: any[] = [];
     let n: number = 1;

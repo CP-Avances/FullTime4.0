@@ -167,19 +167,19 @@
             <!--  *************************  DESCARGAR REPORTES  *****************************  -->
             <div>
                 <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                    <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    <i (click)="generarReporteSucursales('pdf')" id="pdf" class="fas fa-file-pdf" matSuffix
                         matTooltipPosition="right" matTooltip="Descargar Lista de Sucursales en formato PDF.">
                         <p>PDF</p>
                     </i>
-                    <i (click)="generarExcelSucursales()" id="excel" class="fas fa-file-excel" matSuffix
+                    <i (click)="generarReporteSucursales('excel')" id="excel" class="fas fa-file-excel" matSuffix
                         matTooltipPosition="right" matTooltip="Descargar Lista de Sucursales en formato EXCEL.">
                         <p>XLSL</p>
                     </i>
-                    <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    <i (click)="generarReporteSucursales('csv')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                         matTooltip="Descargar Lista de Sucursales en formato CSV.">
                         <p>CSV</p>
                     </i>
-                    <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    <i (click)="generarReporteSucursales('xml')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
                         matTooltip="Descargar Lista de Sucursales en formato XML.">
                         <p>XML</p>
                     </i>

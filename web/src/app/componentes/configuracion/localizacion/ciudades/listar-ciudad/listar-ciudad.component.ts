@@ -17,6 +17,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableCiudades } from 'src/app/model/reportes.model';
 import { CiudadService } from 'src/app/servicios/configuracion/localizacion/ciudad/ciudad.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-listar-ciudad',
@@ -75,6 +76,7 @@ export class ListarCiudadComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restEmpre: EmpresaService,
+    private reportes: ReportesMicroService
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -190,51 +192,65 @@ export class ListarCiudadComponent implements OnInit {
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
 
-
   // GENERACION DE REPORTE DE PDF
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        ciudades: this.datosCiudades.map((obj: any) => ({
-          provincia: obj.provincia,
-          nombre: obj.nombre
-        }))
-      };
+  async generarReporteCiudades(action: 'pdf'|'excel'|'csv'|'xml') {
+     const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color, // mantener paridad con otros módulos
+      ciudades: this.datosCiudades.map((obj: any) => ({
+        id: obj.id,
+        nombre: obj.nombre,
+        provincia: obj.provincia,
+        id_prov: obj.id_prov   // requerido por tu Excel/CSV previos
+      }))
+    };
 
-      console.log("Enviando al microservicio:", data);
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('ciudades', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar PDF:', e);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteCiudades(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Ciudades.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('ciudades', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+      case 'csv':
+        this.reportes.generarReporte('ciudades', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+      case 'xml':
+        this.reportes.generarReporte('ciudades', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
     }
+
   }
 
 

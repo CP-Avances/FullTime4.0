@@ -244,6 +244,7 @@ class AlimentacionControlador {
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
                 return res.status(400).jsonp({ message: 'No se ha encontrado registro de timbres de alimentación.' });
+            console.log(JSON.stringify(nuevo));
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -268,15 +269,35 @@ const BuscarAlimentacion = function (fec_inicio, fec_final, id_empleado) {
     });
 };
 // METODO PARA AGRUPAR TIMBRES
+// METODO PARA AGRUPAR TIMBRES (empareja por acción, sin validar hora)
 const AgruparTimbres = function (listaTimbres) {
     return __awaiter(this, void 0, void 0, function* () {
         const timbresAgrupados = [];
-        for (let i = 0; i < listaTimbres.length; i += 2) {
-            timbresAgrupados.push({
-                inicioAlimentacion: listaTimbres[i],
-                finAlimentacion: i + 1 < listaTimbres.length ? listaTimbres[i + 1] : null
-            });
+        let abierto = null;
+        for (let i = 0; i < listaTimbres.length; i++) {
+            const t = listaTimbres[i];
+            if (!t)
+                continue;
+            if (t.accion === 'I/A') {
+                // si había uno abierto, lo cerramos como incompleto y abrimos el nuevo
+                if (abierto)
+                    timbresAgrupados.push({ inicioAlimentacion: abierto, finAlimentacion: null });
+                abierto = t;
+            }
+            else if (t.accion === 'F/A') {
+                if (abierto) {
+                    // emparejar directamente con el siguiente F/A, sin validar hora
+                    timbresAgrupados.push({ inicioAlimentacion: abierto, finAlimentacion: t });
+                    abierto = null;
+                }
+                else {
+                    // F/A sin I/A previo: se ignora para mantener tu comportamiento original
+                }
+            }
         }
+        // si quedó un I/A sin su F/A
+        if (abierto)
+            timbresAgrupados.push({ inicioAlimentacion: abierto, finAlimentacion: null });
         return timbresAgrupados;
     });
 };

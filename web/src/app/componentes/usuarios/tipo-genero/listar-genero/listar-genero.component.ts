@@ -13,6 +13,7 @@ import { ValidacionesService } from 'src/app/servicios/generales/validaciones/va
 import * as xml2js from 'xml2js';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RegistrarGeneroComponent } from '../registrar-genero/registrar-genero.component';
@@ -65,6 +66,7 @@ export class ListarGeneroComponent {
     public ventana: MatDialog,
     private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
+    private reportes: ReportesMicroService
 
 
 
@@ -343,48 +345,75 @@ export class ListarGeneroComponent {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        generos: this.generos
-      };
-      console.log("Enviando al microservicio:", data);
 
-      this.validar.generarReporteGeneros(data).subscribe((pdfBlob: Blob) => {
-        const nombreArchivo = 'Géneros.pdf';
-        FileSaver.saveAs(pdfBlob, nombreArchivo);
-        console.log("Recibido del microservicio:");
-      }, error => {
-        console.error('Error al generar PDF desde el microservicio:', error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
-    }
-    else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+  async generarReporteGeneros(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+    this.OrdenarDatos(this.generos);
 
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      generos: this.generos.map((g: any) => ({
+        id: g.id,
+        genero: g.genero
+      }))
+    };
+
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('generos', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF:', error);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'excel': // también puedes recibir 'xlsx' y el service normaliza
+        this.reportes.generarReporte('generos', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel:', error);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'csv':
+        this.reportes.generarReporte('generos', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('generos', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
+
   }
-
 
   DefinirInformacionPDF() {
     return {
@@ -427,7 +456,6 @@ export class ListarGeneroComponent {
     };
   }
 
-
   PresentarDataPDF() {
     return {
       columns: [
@@ -461,7 +489,6 @@ export class ListarGeneroComponent {
       ]
     };
   }
-
 
   async generarExcelGeneros() {
     this.OrdenarDatos(this.generos);
@@ -586,8 +613,6 @@ export class ListarGeneroComponent {
   }
 
 
-
-
   /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A CSV                              ** **
    ** ************************************************************************************************** **/
@@ -655,8 +680,6 @@ export class ListarGeneroComponent {
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
-
-
 
 
 }

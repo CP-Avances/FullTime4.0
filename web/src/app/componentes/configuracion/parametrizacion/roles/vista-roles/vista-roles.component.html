@@ -9,7 +9,8 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z8">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarRol()" *ngIf="getCrearRol()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarRol()"
+                            *ngIf="getCrearRol()">
                             Crear rol
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
@@ -84,7 +85,8 @@
                             <td style="font-size: 14px;">{{rol.nombre}}</td>
                             <td class="d-flex justify-content-center">
                                 <i matSuffix matTooltipPosition="right" matTooltip="Agregar funciones a este Rol."
-                                    class="fas fa-grip-horizontal" id="funtion" (click)="VerFunciones(rol.id)" *ngIf="getVerFuncionesRol()">
+                                    class="fas fa-grip-horizontal" id="funtion" (click)="VerFunciones(rol.id)"
+                                    *ngIf="getVerFuncionesRol()">
                                     <p>Funciones</p>
                                 </i>
                                 <i *ngIf="rol.id != 1 && getEditarRol()" matSuffix (click)="AbrirVentanaEditar(rol)"
@@ -92,16 +94,17 @@
                                     matTooltip="Modificar datos generales de este registro." class="fas fa-edit">
                                     <p>Editar</p>
                                 </i>
-                                <i *ngIf="rol.id != 1 && getEliminarRol()" class="far fa-trash-alt" (click)="ConfirmarDelete(rol)"
-                                    id="t-eliminar" matSuffix matTooltipPosition="right"
+                                <i *ngIf="rol.id != 1 && getEliminarRol()" class="far fa-trash-alt"
+                                    (click)="ConfirmarDelete(rol)" id="t-eliminar" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar registro.">
                                     <p>Eliminar</p>
                                 </i>
-                                <i (click)="GenerarPdf('download', rol.id)" id="documento" class="fas fa-file-pdf"
+                                <i (click)="generarReporteRoles('pdf', rol.id)" id="documento" class="fas fa-file-pdf"
                                     matSuffix matTooltipPosition="right" *ngIf="getDescargarReportes()"
                                     matTooltip="Descargar Funciones de Rol en formato PDF.">
                                     <p>Reporte</p>
                                 </i>
+
                             </td>
                         </tr>
                     </tbody>
@@ -113,19 +116,21 @@
             <!--  ************************************  DESCARGA DE REPORTES  ***************************  -->
             <div *ngIf="getDescargarReportes()">
                 <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                    <i (click)="GenerarPdf('download', 0)" id="pdf" class="fas fa-file-pdf" matSuffix
+                    <i (click)="generarReporteRoles('pdf', 0)" id="pdf" class="fas fa-file-pdf" matSuffix
                         matTooltipPosition="right" matTooltip="Descargar Lista de Roles en formato PDF.">
                         <p>PDF</p>
                     </i>
-                    <i (click)="generarExcelRoles()" id="excel" class="fas fa-file-excel" matSuffix
+
+                    <i (click)="generarReporteRoles('excel', 0)" id="excel" class="fas fa-file-excel" matSuffix
                         matTooltipPosition="right" matTooltip="Descargar Lista de Roles en formato EXCEL.">
-                        <p>XLSL</p>
+                        <p>XLSX</p>
                     </i>
-                    <i (click)="ExportToCSV()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+
+                    <i (click)="generarReporteRoles('csv', 0)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
                         matTooltip="Descargar Lista de Roles en formato CSV.">
                         <p>CSV</p>
                     </i>
-                    <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    <i (click)="generarReporteRoles('xml', 0)" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
                         matTooltip="Descargar Lista de Roles en formato XML.">
                         <p>XML</p>
                     </i>

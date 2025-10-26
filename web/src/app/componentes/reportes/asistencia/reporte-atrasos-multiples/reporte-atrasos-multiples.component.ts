@@ -17,6 +17,7 @@ import { ReportesService } from '../../../../servicios/reportes/reportes.service
 import { AtrasosService } from 'src/app/servicios/reportes/atrasos/atrasos.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-reporte-atrasos-multiples',
@@ -136,6 +137,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public restUsuario: UsuarioService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
@@ -334,11 +336,15 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       if (this.tolerancia !== '1') {
         this.FiltrarTolerancia();
       }
-      switch (accion) {
-        case 'excel': this.generarExcel(); break;
-        case 'ver': this.VerDatos(); break;
-        default: this.GenerarPDF(accion); break;
-      }
+
+      if (accion === 'ver') {
+          this.VerDatos();
+          return;
+        }
+
+        // normalizamos: 'download' -> 'pdf' (descarga)
+        const accionNormalizada = (accion === 'download') ? 'pdf' : accion;
+        this.GenerarPDF(accionNormalizada as 'pdf' | 'excel' | 'open' | 'print');
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -372,9 +378,14 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
    ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
 
-
   async GenerarPDF(action: any) {
-    if (action === 'download') {
+    const docBase = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Atrasos');
+      return;
+    }
+
       const data = {
         usuario: localStorage.getItem('fullname_print'),
         empresa: localStorage.getItem('name_empresa'),
@@ -422,6 +433,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             regimen: emp.regimen,
             departamento: emp.departamento,
             cargo: emp.cargo,
+            ciudad: emp.ciudad,
+            sucursal: emp.sucursal,
 
             atrasos: emp.atrasos.map(reg => {
               const fechaHorario = reg.fecha_hora_horario.split(' ')[0];
@@ -453,29 +466,50 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         }))
       };
 
-      console.log("ENVIANDO AL MICROSERVICIO", data);
-      this.validar.generarReporteAtrasos(data).subscribe((pdfBlob: Blob) => {
-        const doc_name = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
-        FileSaver.saveAs(pdfBlob, doc_name);
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.',
-          'Error'
-        );
-      });
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('atrasos', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
-      const doc_name = `Atrasos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
+      case 'excel':
+        this.reportes.generarReporte('atrasos', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case 'open': pdfMake.createPdf(documentDefinition).open(); break;
-        case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-        default: pdfMake.createPdf(documentDefinition).open(); break;
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            action === 'print' ? pdf.print() : pdf.open();
+          } catch (error) {
+            console.error('Error al preparar PDF local:', error);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
       }
+
+      default:
+        // Sin acción
+        break;
     }
+  
+ 
   }
 
 

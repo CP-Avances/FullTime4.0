@@ -8,9 +8,9 @@ const pg_pool_1 = __importDefault(require("pg-pool"));
 const pool = new pg_pool_1.default({
     user: 'postgres',
     host: 'localhost',
-    port: 5433,
-    database: 'empresa_verificar',
-    password: 'KAte1234'
+    port: 5434,
+    database: 'pruebas_marcacion',
+    password: 'KAte1727.'
 });
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {

@@ -24,6 +24,7 @@ import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizac
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRoles } from 'src/app/model/reportes.model';
@@ -88,6 +89,7 @@ export class VistaRolesComponent implements OnInit {
     private rest: RolesService, // SERVICIO DATOS DE ROLES
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public validar: ValidacionesService,
+    private reportes: ReportesMicroService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -242,59 +244,81 @@ export class VistaRolesComponent implements OnInit {
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
-
   // METODO PARA CREAR ARCHIVO PDF
-  async GenerarPdf(action = "open", id: number) {
-    this.SeleccionarDatos(id); // ← ya carga this.datos_archivo correctamente
+  async generarReporteRoles(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print', id: number) {
+    this.SeleccionarDatos(id); // ← esto ya carga this.datos_archivo
 
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logoE,
-        colorSecundario: this.s_color,
-        colorPrincipal: this.p_color,
-        roles: this.datos_archivo.map((rol: any) => ({
-          nombre: rol.nombre,
-          funciones: rol.funciones.map((f: any) => ({
-            pagina: f.pagina,
-            accion: f.accion,
-            nombre_modulo: f.nombre_modulo,
-            movil: f.movil
-          }))
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logoE,
+      colorSecundario: this.s_color,
+      colorPrincipal: this.p_color,
+      roles: this.datos_archivo.map((rol: any) => ({
+        // ⬇️ si tienes rol.id en this.datos_archivo, inclúyelo para calcado del XML antiguo
+        id: rol.id,
+        nombre: rol.nombre,
+        funciones: rol.funciones.map((f: any) => ({
+          pagina: f.pagina,
+          accion: f.accion,
+          nombre_modulo: f.nombre_modulo,
+          movil: f.movil
         }))
-      };
+      }))
+    };
 
-      console.log("Enviando al microservicio:", data);
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('roles', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible.', 'Error');
+          }
+        });
+        break;
 
-      this.validar.generarReporteRoles(data).subscribe((pdfBlob: Blob) => {
-        const nombreArchivo = 'Roles.pdf';
-        FileSaver.saveAs(pdfBlob, nombreArchivo);
-        console.log("Recibido del microservicio correctamente.");
-      }, error => {
-        console.error('Error al generar PDF desde el microservicio:', error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('roles', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF(); // versión local de pdfMake
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+      case 'csv':
+        this.reportes.generarReporte('roles', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('roles', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print':
+      default:
+        const pdfMake = await this.validar.ImportarPDF();
+        const documentDefinition = this.DefinirInformacionPDF();
+        const pdf = pdfMake.createPdf(documentDefinition);
+        action === 'print' ? pdf.print() : pdf.open();
+        break;
     }
+
   }
 
 

@@ -20,6 +20,7 @@ import { RegistrarEstadoCivilComponent } from '../registrar-estado-civil/registr
 import { EditarEstadoCivilComponent } from '../editar-estado-civil/editar-estado-civil.component';
 
 import { EstadoCivilService } from 'src/app/servicios/usuarios/catEstadoCivil/estado-civil.service';
+import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 @Component({
   selector: 'app-listar-estado-civil',
@@ -68,6 +69,7 @@ export class ListarEstadoCivilComponent {
     public ventana: MatDialog,
     private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
+    private reportes: ReportesMicroService
 
 
 
@@ -347,51 +349,65 @@ export class ListarEstadoCivilComponent {
   }
 
 
-  async GenerarPdf(action = "open") {
-    if (action === "download") {
-      const data = {
-        usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
-        empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
-        fraseMarcaAgua: this.frase,
-        logoBase64: this.logo,
-        colorPrincipal: this.p_color,
-        estadosCivil: this.estadosCivil.map((obj: any) => ({
-          id: obj.id,
-          estadoCivil: obj.estado_civil 
-        }))
-      };
+  async generarReporteEstadosCivil(action: 'pdf'|'excel'|'csv'|'xml') {
+    this.OrdenarDatos(this.estadosCivil);
 
-      console.log("Enviando al microservicio:", data);
+    const data = {
+      usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
+      empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      estadosCivil: this.estadosCivil.map((e: any) => ({
+        id: e.id,
+        estadoCivil: e.estado_civil
+      }))
+    };
 
-      this.validar.generarReporteEstadosCivil(data).subscribe((pdfBlob: Blob) => {
-        FileSaver.saveAs(pdfBlob, 'Estados_Civil.pdf');
-        console.log("PDF generado correctamente desde el microservicio.");
-      }, error => {
-        console.error("Error al generar PDF desde el microservicio:", error);
-        this.toastr.error(
-          'No se pudo generar el reporte. El servicio de reportes no está disponible en este momento. Intentelo mas tarde',
-          'Error'
-        );
-      });
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporte('estado-civil', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar PDF:', e);
+            this.toastr.error('No se pudo generar el PDF. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-    } else {
-      const pdfMake = await this.validar.ImportarPDF();
-      const documentDefinition = this.DefinirInformacionPDF();
+      case 'excel': // también puedes usar 'xlsx'; el service normaliza
+        this.reportes.generarReporte('estado-civil', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error al generar Excel:', e);
+            this.toastr.error('No se pudo generar el Excel. Intente más tarde.', 'Error');
+          }
+        });
+        break;
 
-      switch (action) {
-        case "open":
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-        case "print":
-          pdfMake.createPdf(documentDefinition).print();
-          break;
-        default:
-          pdfMake.createPdf(documentDefinition).open();
-          break;
-      }
+      case 'csv':
+        this.reportes.generarReporte('estado-civil', 'csv', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error CSV microservicio:', e);
+            this.toastr.error('No se pudo generar el CSV. Intente más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'xml':
+        this.reportes.generarReporte('estado-civil', 'xml', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (e) => {
+            console.error('Error XML microservicio:', e);
+            this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
+          }
+        });
+        break;
     }
-  }
 
+  }
 
   DefinirInformacionPDF() {
     return {
@@ -433,7 +449,6 @@ export class ListarEstadoCivilComponent {
       }
     };
   }
-
 
   PresentarDataPDF() {
     return {
@@ -593,8 +608,6 @@ export class ListarEstadoCivilComponent {
     }
     array.sort(compare);
   }
-
-
 
 
   /** ************************************************************************************************** **
