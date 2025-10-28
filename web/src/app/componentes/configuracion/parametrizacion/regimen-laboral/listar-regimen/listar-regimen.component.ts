@@ -283,7 +283,7 @@ export class ListarRegimenComponent implements OnInit {
    ** **                               PARA LA EXPORTACION DE ARCHIVOS PDF                           ** **
    ** ************************************************************************************************* **/
 
-  async generarReporteRegimen(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+  async generarReporteRegimen(action: 'pdf' | 'excel' | 'csv' | 'xml') {
     this.OrdenarDatos(this.regimen);
 
     const data = {
@@ -364,15 +364,6 @@ export class ListarRegimenComponent implements OnInit {
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: () => this.toastr.error('No se pudo generar el XML.', 'Error')
         });
-        break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const doc = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(doc);
-        action === 'print' ? pdf.print() : pdf.open();
         break;
     }
 

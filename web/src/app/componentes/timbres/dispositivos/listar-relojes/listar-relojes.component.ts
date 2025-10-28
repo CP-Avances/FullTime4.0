@@ -475,7 +475,7 @@ export class ListarRelojesComponent implements OnInit {
    ** **                        GENERACION DE PDFs                                   ** **
    ** ********************************************************************************* **/
 
-  async generarReporteRelojes(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+  async generarReporteRelojes(action: 'pdf' | 'excel' | 'csv' | 'xml') {
     if (!this.relojes || this.relojes.length === 0) {
       this.toastr.info('No hay datos para mostrar en el reporte.');
       return;
@@ -556,17 +556,7 @@ export class ListarRelojesComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
     }
-
   }
 
   DefinirInformacionPDF() {

@@ -790,7 +790,7 @@ export class ListaEmpleadosComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   async generarReporteEmpleados(
-    action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print',
+    action: 'pdf'|'excel'|'csv'|'xml',
     numero: 1 | 2 // 1 = activos, 2 = inactivos
   ) {
     const fuente = numero === 1 ? (this.empleado || []) : (this.desactivados || []);
@@ -872,17 +872,7 @@ export class ListaEmpleadosComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF(numero);
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
     }
-
   }
 
   DefinirInformacionPDF(numero: any) {

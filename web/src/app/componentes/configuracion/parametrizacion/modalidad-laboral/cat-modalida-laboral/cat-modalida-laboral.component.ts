@@ -406,7 +406,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
-  async generarReporteModalidadLaboral(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+  async generarReporteModalidadLaboral(action: 'pdf'|'excel'|'csv'|'xml') {
     this.OrdenarDatos(this.listaModalida_Laboral);
 
     const data = {
@@ -462,19 +462,7 @@ export class CatModalidaLaboralComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default: {
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
-      }
     }
-
-
     this.BuscarParametro();
   }
 

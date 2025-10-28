@@ -189,7 +189,7 @@ export class ListarParametroComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 
-  async generarReporteParametros(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+  async generarReporteParametros(action: 'pdf' | 'excel' | 'csv' | 'xml') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
       empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
@@ -247,16 +247,6 @@ export class ListarParametroComponent implements OnInit {
             this.toastr.error('No se pudo generar el reporte. El servicio de reportes no está disponible en este momento.', 'Error');
           }
         });
-        break;
-
-      case 'open':
-      case 'print':
-      default:
-        // Flujo local para abrir/imprimir (pdfMake)
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
         break;
     }
 

@@ -346,7 +346,7 @@ export class ListarGeneroComponent {
   }
 
 
-  async generarReporteGeneros(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+  async generarReporteGeneros(action: 'pdf'|'excel'|'csv'|'xml') {
     this.OrdenarDatos(this.generos);
 
     const data = {
@@ -402,17 +402,7 @@ export class ListarGeneroComponent {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
     }
-
   }
 
   DefinirInformacionPDF() {

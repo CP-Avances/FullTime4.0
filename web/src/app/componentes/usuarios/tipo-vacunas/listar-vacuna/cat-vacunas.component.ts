@@ -388,7 +388,7 @@ export class CatVacunasComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
-  async generarReporteVacunas(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+  async generarReporteVacunas(action: 'pdf'|'excel'|'csv'|'xml') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
       empresa: (localStorage.getItem('name_empresa') ?? '').toUpperCase(),
@@ -442,17 +442,7 @@ export class CatVacunasComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print': {
-        const pdfMake = await this.validar.ImportarPDF();
-        const docDef = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(docDef);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
-      }
     }
-
     }
     
   DefinirInformacionPDF() {

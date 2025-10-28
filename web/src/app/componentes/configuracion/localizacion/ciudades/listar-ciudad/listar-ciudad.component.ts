@@ -200,12 +200,12 @@ export class ListarCiudadComponent implements OnInit {
       fraseMarcaAgua: this.frase,
       logoBase64: this.logo,
       colorPrincipal: this.p_color,
-      colorSecundario: this.s_color, // mantener paridad con otros módulos
+      colorSecundario: this.s_color, 
       ciudades: this.datosCiudades.map((obj: any) => ({
         id: obj.id,
         nombre: obj.nombre,
         provincia: obj.provincia,
-        id_prov: obj.id_prov   // requerido por tu Excel/CSV previos
+        id_prov: obj.id_prov  
       }))
     };
 

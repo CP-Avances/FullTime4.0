@@ -389,7 +389,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
-  async generarReporteNivelesTitulos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+  async generarReporteNivelesTitulos(action: 'pdf'|'excel'|'csv'|'xml') {
     this.OrdenarDatos(this.nivelTitulos);
 
     const data = {
@@ -445,17 +445,7 @@ export class ListarNivelTitulosComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
     }
-
   }
 
   DefinirInformacionPDF() {

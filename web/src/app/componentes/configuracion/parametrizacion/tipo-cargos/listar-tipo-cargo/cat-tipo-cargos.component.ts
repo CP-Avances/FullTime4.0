@@ -440,7 +440,7 @@ export class CatTipoCargosComponent {
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-  async generarReporteTipoCargos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+  async generarReporteTipoCargos(action: 'pdf'|'excel'|'csv'|'xml') {
     this.OrdenarDatos(this.listaTipoCargos);
 
       const data = {
@@ -496,19 +496,7 @@ export class CatTipoCargosComponent {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default: {
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
-      }
     }
-
-
       this.BuscarParametro();
     }
 

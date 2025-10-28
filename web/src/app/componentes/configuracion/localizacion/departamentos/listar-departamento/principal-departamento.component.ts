@@ -446,7 +446,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
    ** **                                       METODO PARA EXPORTAR A PDF                             ** **
    ** ************************************************************************************************** **/
   // GENERACION DE REPORTE DE PDF
-  async generarReporteDepartamentos(action: 'pdf'|'excel'|'csv'|'xml'|'open'|'print') {
+  async generarReporteDepartamentos(action: 'pdf'|'excel'|'csv'|'xml') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
       empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
@@ -503,15 +503,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.toastr.error('No se pudo generar el XML. Intente más tarde.', 'Error');
           }
         });
-        break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
         break;
     }
 

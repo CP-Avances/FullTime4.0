@@ -245,7 +245,7 @@ export class VistaRolesComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   // METODO PARA CREAR ARCHIVO PDF
-  async generarReporteRoles(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print', id: number) {
+  async generarReporteRoles(action: 'pdf' | 'excel' | 'csv' | 'xml', id: number) {
     this.SeleccionarDatos(id); // ← esto ya carga this.datos_archivo
 
     const data = {
@@ -308,17 +308,7 @@ export class VistaRolesComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
     }
-
   }
 
 

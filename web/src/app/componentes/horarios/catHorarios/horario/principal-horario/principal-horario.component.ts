@@ -529,7 +529,7 @@ export class PrincipalHorarioComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   // GENERAR ARCHIVO PDF
-  async generarReporteHorarios(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+  async generarReporteHorarios(action: 'pdf' | 'excel' | 'csv' | 'xml') {
     const data = {
       usuario: this.empleado[0].nombre + ' ' + this.empleado[0].apellido,
       empresa: localStorage.getItem('name_empresa')?.toUpperCase(),
@@ -596,17 +596,7 @@ export class PrincipalHorarioComponent implements OnInit {
           }
         });
         break;
-
-      case 'open':
-      case 'print':
-      default:
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.EstructurarPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
     }
-
   }
 
 

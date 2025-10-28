@@ -345,7 +345,7 @@ export class ListarNacionalidadComponent {
   }
 
 
-  async generarReporteNacionalidades(action: 'pdf' | 'excel' | 'csv' | 'xml' | 'open' | 'print') {
+  async generarReporteNacionalidades(action: 'pdf' | 'excel' | 'csv' | 'xml') {
     this.OrdenarDatos(this.nacionalidades);
 
     const data = {
@@ -401,17 +401,7 @@ export class ListarNacionalidadComponent {
           }
         });
         break;
-
-      case 'open':
-      case 'print': {
-        const pdfMake = await this.validar.ImportarPDF();
-        const docDef = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(docDef);
-        action === 'print' ? pdf.print() : pdf.open();
-        break;
-      }
     }
-
   }
 
   DefinirInformacionPDF() {
