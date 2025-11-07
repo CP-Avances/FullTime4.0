@@ -422,7 +422,6 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
           regimen: emp.regimen,
           departamento: emp.departamento,
           cargo: emp.cargo,
-          // ➕ extras para Excel (consistencia): heredar si no vienen en emp
           ciudad: emp.ciudad ?? grupo.ciudad,
           sucursal: emp.sucursal ?? grupo.sucursal,
           timbres: (emp.timbres || []).map((t: any) => {
@@ -436,7 +435,6 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               ? this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : '';
             return {
-              // Nombres usados por el PDF (no tocar):
               fecha_hora_timbre_validado: t.fecha_hora_timbre_validado,
               fecha_hora_timbre: t.fecha_hora_timbre,
               id_reloj: t.id_reloj,
@@ -444,7 +442,6 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               observacion: t.observacion,
               longitud: t.longitud,
               latitud: t.latitud,
-              // ➕ extras usados por Excel únicamente:
               servidor_fecha: servidorFecha,
               servidor_hora: servidorHora,
               horaTimbre,
@@ -457,7 +454,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
     switch (acc) {
       case 'pdf':
-        this.reportes.generarReporte('timbres-virtuales-movil', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('timbres-virtuales-movil', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF:', err);
@@ -467,7 +464,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('timbres-virtuales-movil', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('timbres-virtuales-movil', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel:', err);

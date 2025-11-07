@@ -287,7 +287,7 @@ export class ListaSucursalesComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('sucursales', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('sucursales', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF:', error);
@@ -296,8 +296,8 @@ export class ListaSucursalesComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('sucursales', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('sucursales', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel:', error);
@@ -307,7 +307,7 @@ export class ListaSucursalesComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('sucursales', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('sucursales', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -317,7 +317,7 @@ export class ListaSucursalesComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('sucursales', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('sucursales', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

@@ -558,7 +558,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('horarios', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('horarios', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF:', error);
@@ -567,8 +567,8 @@ export class PrincipalHorarioComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('horarios', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('horarios', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel:', error);
@@ -578,7 +578,7 @@ export class PrincipalHorarioComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('horarios', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('horarios', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -588,7 +588,7 @@ export class PrincipalHorarioComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('horarios', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('horarios', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

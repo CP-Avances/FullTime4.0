@@ -404,7 +404,7 @@ export class CatVacunasComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('vacunas', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('vacunas', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar PDF:', e);
@@ -413,8 +413,8 @@ export class CatVacunasComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('vacunas', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('vacunas', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar Excel:', e);
@@ -424,7 +424,7 @@ export class CatVacunasComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('vacunas', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('vacunas', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -434,7 +434,7 @@ export class CatVacunasComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('vacunas', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('vacunas', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

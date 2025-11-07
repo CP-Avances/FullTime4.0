@@ -468,7 +468,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('atrasos', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('atrasos', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF desde el microservicio:', error);
@@ -478,7 +478,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('atrasos', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('atrasos', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel desde el microservicio:', error);
@@ -509,7 +509,6 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         break;
     }
   
- 
   }
 
 

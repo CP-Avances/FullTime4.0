@@ -417,7 +417,6 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
           ciudad: empl.ciudad ?? selec.ciudad ?? null,
           sucursal: empl.sucursal ?? selec.sucursal ?? null,
 
-          // 🔹 TIMBRES
           timbres: (empl.timbres || []).map((t: any) => {
             const [fechaServ, horaServ] = t.fecha_hora_timbre_validado
               ? t.fecha_hora_timbre_validado.split(' ')
@@ -460,7 +459,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('timbres-libres', 'pdf', payload).subscribe({
+        this.reportes.generarReporteServicio('timbres-libres', 'pdf', payload).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF Timbres Libres:', err);
@@ -470,7 +469,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('timbres-libres', 'excel', payload).subscribe({
+        this.reportes.generarReporteServicio('timbres-libres', 'excel', payload).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel Timbres Libres:', err);

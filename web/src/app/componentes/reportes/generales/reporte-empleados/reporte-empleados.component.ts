@@ -409,11 +409,9 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   }
 
 
-  // Unificado: PDF/Excel/abrir/imprimir
   async generarReporteUsuarios(action: 'pdf' | 'excel' | 'open' | 'print') {
     const docBase = `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-    // Mismo payload que tu PDF actual (sin agregar campos nuevos)
     const data = {
       usuario: localStorage.getItem('fullname_print'),
       empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
@@ -457,7 +455,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('usuarios', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('usuarios', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF desde el microservicio:', err);
@@ -466,8 +464,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('usuarios', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('usuarios', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel desde el microservicio:', err);
@@ -477,7 +475,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         break;
 
       case 'open':
-        this.reportes.generarReporte('usuarios', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('usuarios', 'pdf', data).subscribe({
           next: ({ blob }) => {
             const url = URL.createObjectURL(blob);
             const win = window.open(url, '_blank');
@@ -492,7 +490,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         break;
 
       case 'print':
-        this.reportes.generarReporte('usuarios', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('usuarios', 'pdf', data).subscribe({
           next: ({ blob }) => {
             const url = URL.createObjectURL(blob);
             const win = window.open(url, '_blank');

@@ -435,9 +435,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       titulo: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
       tipoFiltro: this.obtenerTipoFiltro(),
 
-      // Igual que el PDF que ya funcionaba, con 2 extras mínimos para Excel:
-      // - ciudad y sucursal a nivel de empleado (heredados del bloque)
-      // - carnet dentro de cada vacuna (para el Sí/No del Excel legacy)
       datos: this.data_pdf.map((selec: any) => ({
         sucursal: selec.sucursal,
         nombre: selec.nombre,
@@ -462,15 +459,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             rol: empl.rol,
             departamento: empl.departamento,
 
-            // 🔹 ciudad/sucursal propias del empleado, con fallback al contexto de selección
             ciudad: (empl.ciudad ?? selec.ciudad) ?? null,
             sucursal: (empl.sucursal ?? selec.sucursal) ?? null,
 
             vacunas: (empl.vacunas || []).map((vac: any) => ({
               tipo_vacuna: vac.tipo_vacuna,
-              fecha: vac.fecha, // si viene con 'T', el micro puede formatearlo
+              fecha: vac.fecha, 
               descripcion: vac.descripcion,
-              // 🔹 extra para Excel (legacy: vac.carnet?.length ? 'Si' : 'No')
               carnet: vac.carnet ?? null
             }))
           };
@@ -478,65 +473,65 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       }))
     };
 
-  switch (action) {
-    case 'pdf':
-      this.reportes.generarReporte('vacunacion-usuarios', 'pdf', data).subscribe({
-        next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-        error: (error) => {
-          console.error('Error al generar PDF desde el microservicio:', error);
-          this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
-        }
-      });
-      break;
-
-    case 'excel': // también puedes usar 'xlsx'; el service normaliza
-      this.reportes.generarReporte('vacunacion-usuarios', 'excel', data).subscribe({
-        next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-        error: (error) => {
-          console.error('Error al generar Excel desde el microservicio:', error);
-          this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
-        }
-      });
-      break;
-
-    case 'open':
-      this.reportes.generarReporte('vacunacion-usuarios', 'pdf', data).subscribe({
-        next: ({ blob }) => {
-          const url = URL.createObjectURL(blob);
-          const win = window.open(url, '_blank');
-          if (!win) this.toastr.warning('Habilita las ventanas emergentes para ver el PDF.');
-          setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        },
-        error: (error) => {
-          console.error('Error al abrir PDF desde el microservicio:', error);
-          this.toastr.error('No se pudo abrir el PDF. Inténtelo más tarde.', 'Error');
-        }
-      });
-      break;
-
-    case 'print':
-      this.reportes.generarReporte('vacunacion-usuarios', 'pdf', data).subscribe({
-        next: ({ blob }) => {
-          const url = URL.createObjectURL(blob);
-          const win = window.open(url, '_blank');
-          if (!win) {
-            this.toastr.warning('Habilita las ventanas emergentes para imprimir el PDF.');
-            URL.revokeObjectURL(url);
-            return;
+    switch (action) {
+      case 'pdf':
+        this.reportes.generarReporteServicio('vacunacion-usuarios', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
           }
-          setTimeout(() => { try { win.focus(); win.print(); } catch {} }, 500);
-          setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        },
-        error: (error) => {
-          console.error('Error al preparar impresión desde el microservicio:', error);
-          this.toastr.error('No se pudo preparar la impresión. Inténtelo más tarde.', 'Error');
-        }
-      });
-      break;
+        });
+        break;
 
-    default:
-      break;
-  }
+      case 'excel':
+        this.reportes.generarReporteServicio('vacunacion-usuarios', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+        this.reportes.generarReporteServicio('vacunacion-usuarios', 'pdf', data).subscribe({
+          next: ({ blob }) => {
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) this.toastr.warning('Habilita las ventanas emergentes para ver el PDF.');
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          },
+          error: (error) => {
+            console.error('Error al abrir PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo abrir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'print':
+        this.reportes.generarReporteServicio('vacunacion-usuarios', 'pdf', data).subscribe({
+          next: ({ blob }) => {
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) {
+              this.toastr.warning('Habilita las ventanas emergentes para imprimir el PDF.');
+              URL.revokeObjectURL(url);
+              return;
+            }
+            setTimeout(() => { try { win.focus(); win.print(); } catch {} }, 500);
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          },
+          error: (error) => {
+            console.error('Error al preparar impresión desde el microservicio:', error);
+            this.toastr.error('No se pudo preparar la impresión. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      default:
+        break;
+    }
 
 
   }

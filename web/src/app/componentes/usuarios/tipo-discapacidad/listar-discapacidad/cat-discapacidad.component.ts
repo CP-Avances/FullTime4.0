@@ -409,7 +409,7 @@ export class CatDiscapacidadComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('discapacidades', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('discapacidades', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar PDF:', e);
@@ -418,8 +418,8 @@ export class CatDiscapacidadComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('discapacidades', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('discapacidades', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar Excel:', e);
@@ -429,7 +429,7 @@ export class CatDiscapacidadComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('discapacidades', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('discapacidades', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -439,7 +439,7 @@ export class CatDiscapacidadComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('discapacidades', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('discapacidades', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

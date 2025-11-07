@@ -376,7 +376,6 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
 
   async generarReporteResumenAsistencia(action: 'pdf' | 'excel' | 'open' | 'print' | 'download') {
-    // Normalizar 'download' → 'pdf'
     const acc = action === 'download' ? 'pdf' : action;
 
     if (!this.data_pdf || this.data_pdf.length === 0) {
@@ -386,7 +385,6 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
 
     const docBase = `Resumen_asistencia_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-    // Payload: idéntico al usado hoy en el PDF (no cambiamos nombres)
     const data = {
       usuario: localStorage.getItem('fullname_print'),
       empresa: localStorage.getItem('name_empresa'),
@@ -448,50 +446,48 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
       }))
     };
 
-    console.log('Payload reporte resumen asistencia:', data);
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporteServicio('asistencia', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
 
-switch (acc) {
-  case 'pdf':
-    this.reportes.generarReporte('asistencia', 'pdf', data).subscribe({
-      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-      error: (err) => {
-        console.error('Error al generar PDF desde el microservicio:', err);
-        this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+      case 'excel':
+        this.reportes.generarReporteServicio('asistencia', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel desde el microservicio:', err);
+            this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            acc === 'print' ? pdf.print() : pdf.open();
+          } catch (error) {
+            console.error('Error al preparar PDF local:', error);
+            this.toastr.error('No se pudo abrir/imprimir el PDF local. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
       }
-    });
-    break;
 
-  case 'excel':
-    this.reportes.generarReporte('asistencia', 'excel', data).subscribe({
-      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-      error: (err) => {
-        console.error('Error al generar Excel desde el microservicio:', err);
-        this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
-      }
-    });
-    break;
-
-  case 'open':
-  case 'print': {
-    const run = async () => {
-      try {
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        acc === 'print' ? pdf.print() : pdf.open();
-      } catch (error) {
-        console.error('Error al preparar PDF local:', error);
-        this.toastr.error('No se pudo abrir/imprimir el PDF local. Inténtelo más tarde.', 'Error');
-      }
-    };
-    run();
-    break;
-  }
-
-  default:
-    // Sin acción
-    break;
-}
+      default:
+        // Sin acción
+        break;
+    }
 
   }
 

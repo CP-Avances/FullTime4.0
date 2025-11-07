@@ -548,7 +548,7 @@ export class ListarFeriadosComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('feriados', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('feriados', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF:', error);
@@ -557,8 +557,8 @@ export class ListarFeriadosComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('feriados', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('feriados', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel:', error);
@@ -568,7 +568,7 @@ export class ListarFeriadosComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('feriados', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('feriados', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar CSV:', error);
@@ -578,7 +578,7 @@ export class ListarFeriadosComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('feriados', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('feriados', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar XML:', error);

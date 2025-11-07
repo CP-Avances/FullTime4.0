@@ -256,7 +256,6 @@ export class VistaRolesComponent implements OnInit {
       colorSecundario: this.s_color,
       colorPrincipal: this.p_color,
       roles: this.datos_archivo.map((rol: any) => ({
-        // ⬇️ si tienes rol.id en this.datos_archivo, inclúyelo para calcado del XML antiguo
         id: rol.id,
         nombre: rol.nombre,
         funciones: rol.funciones.map((f: any) => ({
@@ -270,7 +269,7 @@ export class VistaRolesComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('roles', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('roles', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF desde el microservicio:', error);
@@ -279,8 +278,8 @@ export class VistaRolesComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('roles', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('roles', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel desde el microservicio:', error);
@@ -290,7 +289,7 @@ export class VistaRolesComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('roles', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('roles', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -300,7 +299,7 @@ export class VistaRolesComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('roles', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('roles', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

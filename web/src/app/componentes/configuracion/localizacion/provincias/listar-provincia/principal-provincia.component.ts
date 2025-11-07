@@ -217,7 +217,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('provincias', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('provincias', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF:', error);
@@ -226,8 +226,8 @@ export class PrincipalProvinciaComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('provincias', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('provincias', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel:', error);
@@ -237,7 +237,7 @@ export class PrincipalProvinciaComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('provincias', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('provincias', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -247,7 +247,7 @@ export class PrincipalProvinciaComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('provincias', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('provincias', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

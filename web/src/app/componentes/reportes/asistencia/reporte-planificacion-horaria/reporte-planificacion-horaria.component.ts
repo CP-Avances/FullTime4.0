@@ -570,9 +570,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   }
 
 
-  // Unificado: PDF / Excel / open / print
   async generarReportePlanificacion(action: 'pdf' | 'excel' | 'open' | 'print' | 'download') {
-    // Normalizar 'download' → 'pdf'
     const acc = action === 'download' ? 'pdf' : action;
 
     if (!this.horariosEmpleado || this.horariosEmpleado.length === 0) {
@@ -582,7 +580,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
     const docBase = `Planificacion_horaria_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-    // Payload idéntico al usado en PDF (sirve para XLSX también)
     const data = {
       usuario: localStorage.getItem('fullname_print'),
       empresa: (localStorage.getItem('name_empresa') || '').toUpperCase(),
@@ -592,7 +589,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
       colorSecundario: this.s_color,
       tipoFiltro: this.obtenerTipoFiltro(),
       titulo: `REPORTE DE PLANIFICACIÓN HORARIA - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
-      datos: this.horariosEmpleado,          // ← antes this.horariosEmpleado
+      datos: this.horariosEmpleado,
       detalle_acciones: this.detalle_acciones,
       nomenclatura: this.nomenclatura,
       periodoInicio: this.mes_inicio,
@@ -601,7 +598,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
 
     switch (acc) {
       case 'pdf':
-        this.reportes.generarReporte('planificacion', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('planificacion', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF desde el microservicio:', err);
@@ -610,8 +607,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('planificacion', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('planificacion', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel desde el microservicio:', err);
@@ -621,7 +618,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         break;
 
       case 'open':
-        this.reportes.generarReporte('planificacion', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('planificacion', 'pdf', data).subscribe({
           next: ({ blob }) => {
             const url = URL.createObjectURL(blob);
             const win = window.open(url, '_blank');
@@ -636,7 +633,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         break;
 
       case 'print':
-        this.reportes.generarReporte('planificacion', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('planificacion', 'pdf', data).subscribe({
           next: ({ blob }) => {
             const url = URL.createObjectURL(blob);
             const win = window.open(url, '_blank');

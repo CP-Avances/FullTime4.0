@@ -372,7 +372,6 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         fechaInicio: this.rangoFechas.fec_inico,
         fechaFin: this.rangoFechas.fec_final,
         opcionBusqueda: this.opcionBusqueda,
-
         resumen: this.bool,
 
         totales: this.data_pdf.map(grupo => {
@@ -420,9 +419,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               const [minPlan, minLab] = this.CalcularDiferenciaFechas(reg);
 
               return {
-                tipo: reg.tipo,           // Ej: "EAS"
-                origen: reg.origen,       // Ej: "FD", "L", etc.
-                control: reg.control,     // boolean
+                tipo: reg.tipo, 
+                origen: reg.origen, 
+                control: reg.control, 
 
                 entrada: {
                   fecha_horario: reg.entrada?.fecha_horario,
@@ -457,7 +456,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('tiempo-laborado', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('tiempo-laborado', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF desde el microservicio:', error);
@@ -467,7 +466,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('tiempo-laborado', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('tiempo-laborado', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel desde el microservicio:', error);

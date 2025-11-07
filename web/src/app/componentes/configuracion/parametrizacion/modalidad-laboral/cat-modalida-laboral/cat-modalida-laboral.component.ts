@@ -424,7 +424,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('modalidad-laboral', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('modalidad-laboral', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar PDF:', e);
@@ -433,8 +433,8 @@ export class CatModalidaLaboralComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('modalidad-laboral', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('modalidad-laboral', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar Excel:', e);
@@ -444,7 +444,7 @@ export class CatModalidaLaboralComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('modalidad-laboral', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('modalidad-laboral', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -454,7 +454,7 @@ export class CatModalidaLaboralComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('modalidad-laboral', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('modalidad-laboral', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

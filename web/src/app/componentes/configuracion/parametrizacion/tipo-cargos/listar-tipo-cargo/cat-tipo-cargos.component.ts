@@ -449,7 +449,7 @@ export class CatTipoCargosComponent {
         fraseMarcaAgua: this.frase,
         logoBase64: this.logo,
         colorPrincipal: this.p_color,
-        colorSecundario: this.s_color, // mantenemos contrato general
+        colorSecundario: this.s_color,
         cargos: this.listaTipoCargos.map((item: any) => ({
           id: item.id,
           cargo: item.cargo
@@ -458,7 +458,7 @@ export class CatTipoCargosComponent {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('cargos', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('cargos', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar PDF:', e);
@@ -467,8 +467,8 @@ export class CatTipoCargosComponent {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('cargos', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('cargos', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar Excel:', e);
@@ -478,7 +478,7 @@ export class CatTipoCargosComponent {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('cargos', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('cargos', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -488,7 +488,7 @@ export class CatTipoCargosComponent {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('cargos', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('cargos', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

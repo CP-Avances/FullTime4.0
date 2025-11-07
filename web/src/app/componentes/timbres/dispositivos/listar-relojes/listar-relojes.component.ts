@@ -506,7 +506,6 @@ export class ListarRelojesComponent implements OnInit {
         zonaHorariaDispositivo: r.zona_horaria_dispositivo,
         formatoGmtDispositivo: r.formato_gmt_dispositivo,
 
-        // extras que Excel necesitaba
         id: r.id,
         contrasenia: r.contrasenia,
         tipoConexion: (r.tipo_conexion === true || r.tipo_conexion === 'true' || r.tipo_conexion === 1 || r.tipo_conexion === '1')? 'Interna': 'Externa',
@@ -518,7 +517,7 @@ export class ListarRelojesComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('relojes', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('relojes', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF:', err);
@@ -527,8 +526,8 @@ export class ListarRelojesComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('relojes', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('relojes', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel:', err);
@@ -538,7 +537,7 @@ export class ListarRelojesComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('relojes', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('relojes', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -548,7 +547,7 @@ export class ListarRelojesComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('relojes', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('relojes', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

@@ -407,7 +407,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('niveles-titulos', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('niveles-titulos', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF:', err);
@@ -416,8 +416,8 @@ export class ListarNivelTitulosComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('niveles-titulos', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('niveles-titulos', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error al generar Excel:', e);
@@ -427,7 +427,7 @@ export class ListarNivelTitulosComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('niveles-titulos', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('niveles-titulos', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -437,7 +437,7 @@ export class ListarNivelTitulosComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('niveles-titulos', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('niveles-titulos', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

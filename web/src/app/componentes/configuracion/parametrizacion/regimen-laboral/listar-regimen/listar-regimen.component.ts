@@ -307,7 +307,7 @@ export class ListarRegimenComponent implements OnInit {
           trabajo_minimo_horas: reg.trabajo_minimo_horas,
           antiguedad: reg.antiguedad,
 
-          // VACACIONES (config)
+          // VACACIONES CONFIGURACION
           vacacion_dias_laboral: reg.vacacion_dias_laboral,
           vacacion_dias_libre: reg.vacacion_dias_libre,
           vacacion_dias_calendario: reg.vacacion_dias_calendario,
@@ -318,13 +318,13 @@ export class ListarRegimenComponent implements OnInit {
             ? (periodos.length ? periodos.map((p: any) => ({ descripcion: p.descripcion, dias_vacacion: p.dias_vacacion })) : [])
             : [],
 
-          // VACACIONES ganadas
+          // VACACIONES GANADAS
           vacacion_dias_laboral_mes: reg.vacacion_dias_laboral_mes,
           vacacion_dias_calendario_mes: reg.vacacion_dias_calendario_mes,
           laboral_dias: reg.laboral_dias,
           calendario_dias: reg.calendario_dias,
 
-          // ANTIGÜEDAD
+          // ANTIGUEDAD
           antiguedad_fija: reg.antiguedad_fija,
           anio_antiguedad: reg.antiguedad_fija ? reg.anio_antiguedad : null,
           dias_antiguedad: reg.antiguedad_fija ? reg.dias_antiguedad : null,
@@ -339,28 +339,28 @@ export class ListarRegimenComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('regimen', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('regimen', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: () => this.toastr.error('No se pudo generar el PDF.', 'Error')
         });
         break;
 
-      case 'excel': // el service normaliza excel → xlsx
-        this.reportes.generarReporte('regimen', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('regimen', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: () => this.toastr.error('No se pudo generar el Excel.', 'Error')
         });
         break;
 
       case 'csv':
-        this.reportes.generarReporte('regimen', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('regimen', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: () => this.toastr.error('No se pudo generar el CSV.', 'Error')
         });
         break;
 
       case 'xml':
-        this.reportes.generarReporte('regimen', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('regimen', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: () => this.toastr.error('No se pudo generar el XML.', 'Error')
         });

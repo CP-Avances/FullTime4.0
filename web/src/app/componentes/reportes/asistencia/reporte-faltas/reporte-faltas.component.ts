@@ -368,7 +368,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
 
   async generarReporteFaltas(action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf') {
-    // Normalizamos 'download' a 'pdf'
     const acc = action === 'download' ? 'pdf' : action;
 
     if (!this.data_pdf || this.data_pdf.length === 0) {
@@ -378,7 +377,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
     const docBase = `Faltas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-    // Armamos payload extendido (MISMO esquema del PDF + extras para Excel)
     const data = {
       usuario: localStorage.getItem('fullname_print'),
       empresa: localStorage.getItem('name_empresa'),
@@ -408,11 +406,11 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             correo: emp.correo,
             cargo: emp.cargo,
             rol: emp.rol,
-            genero: emp.genero,                 // id (como en PDF)
-            generoNombre,                       // string para Excel
+            genero: emp.genero,                
+            generoNombre,                       
             id_nacionalidad: emp.id_nacionalidad,
-            nacionalidadNombre,                 // string para Excel
-            ciudad: emp.ciudad ?? grupo.ciudad, // redundancia útil para Excel
+            nacionalidadNombre,       
+            ciudad: emp.ciudad ?? grupo.ciudad,
             sucursal: emp.sucursal ?? grupo.sucursal,
             faltas: (emp.faltas || []).map((f: any) => ({
               fecha: f.fecha
@@ -422,59 +420,56 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       }))
     };
 
-switch (acc) {
-  case 'pdf':
-    this.reportes.generarReporte('faltas', 'pdf', data).subscribe({
-      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-      error: (error) => {
-        console.error('Error al generar PDF desde el microservicio:', error);
-        this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporteServicio('faltas', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar PDF desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'excel':
+        this.reportes.generarReporteServicio('faltas', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (error) => {
+            console.error('Error al generar Excel desde el microservicio:', error);
+            this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            acc === 'print' ? pdf.print() : pdf.open();
+          } catch (error) {
+            console.error('Error al preparar PDF local:', error);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
       }
-    });
-    break;
 
-  case 'excel':
-    this.reportes.generarReporte('faltas', 'excel', data).subscribe({
-      next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-      error: (error) => {
-        console.error('Error al generar Excel desde el microservicio:', error);
-        this.toastr.error('No se pudo generar el reporte Excel. Inténtelo más tarde.', 'Error');
+      case 'ver': {
+        this.VerDatos();
+        break;
       }
-    });
-    break;
 
-  case 'open':
-  case 'print': {
-    const run = async () => {
-      try {
-        const pdfMake = await this.validar.ImportarPDF();
-        const documentDefinition = this.DefinirInformacionPDF();
-        const pdf = pdfMake.createPdf(documentDefinition);
-        acc === 'print' ? pdf.print() : pdf.open();
-      } catch (error) {
-        console.error('Error al preparar PDF local:', error);
-        this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
-      }
-    };
-    run();
-    break;
-  }
-
-  case 'ver': {
-    this.VerDatos();
-    break;
-  }
-
-  default:
-    // Sin acción
-    break;
-}
-
+      default:
+        // Sin acción
+        break;
     }
+
+  }
   
-
-
-
   DefinirInformacionPDF() {
     return {
       pageSize: 'A4',

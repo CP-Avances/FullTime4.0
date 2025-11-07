@@ -417,7 +417,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         bool_suc: this.bool?.bool_suc,
         bool_emp: this.bool?.bool_emp
       },
-      timbreDispositivo: this.timbreDispositivo, // respeta tu flag para columnas
+      timbreDispositivo: this.timbreDispositivo,
       data_pdf: this.data_pdf.map((grupo: any) => ({
         sucursal: grupo.sucursal,
         ciudad: grupo.ciudad,
@@ -431,7 +431,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           regimen: emp.regimen,
           departamento: emp.departamento,
           cargo: emp.cargo,
-          // ➕ extras para Excel: heredar si no existen en el empleado
           ciudad: emp.ciudad ?? grupo.ciudad,
           sucursal: emp.sucursal ?? grupo.sucursal,
           timbres: (emp.timbres || []).map((t: any) => {
@@ -445,7 +444,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               ? this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : '';
             return {
-              // nombres usados por el PDF:
               fecha_hora_timbre_validado: t.fecha_hora_timbre_validado,
               fecha_hora_timbre: t.fecha_hora_timbre,
               id_reloj: t.id_reloj,
@@ -453,7 +451,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               observacion: t.observacion,
               longitud: t.longitud,
               latitud: t.latitud,
-              // ➕ extras para Excel:
               servidor_fecha: servidorFecha,
               servidor_hora: servidorHora,
               horaTimbre,
@@ -466,7 +463,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
     switch (acc) {
       case 'pdf':
-        this.reportes.generarReporte('timbres-usuarios', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('timbres-usuarios', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF:', err);
@@ -476,7 +473,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('timbres-usuarios', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('timbres-usuarios', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel:', err);

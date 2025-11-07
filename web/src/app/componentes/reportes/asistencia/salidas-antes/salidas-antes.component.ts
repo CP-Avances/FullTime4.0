@@ -373,7 +373,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Payload único
     const data = {
       usuario: localStorage.getItem('fullname_print'),
       empresa: localStorage.getItem('name_empresa'),
@@ -383,7 +382,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       colorSecundario: this.s_color,
       fechaInicio: this.rangoFechas.fec_inico,
       fechaFin: this.rangoFechas.fec_final,
-      opcionBusqueda: this.opcionBusqueda, // 1 = activos, 2 = inactivos
+      opcionBusqueda: this.opcionBusqueda,
       resumen: {
         bool_reg: this.bool.bool_reg,
         bool_dep: this.bool.bool_dep,
@@ -404,13 +403,12 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           regimen: emp.regimen,
           departamento: emp.departamento,
           cargo: emp.cargo,
-          // necesarias para Excel y para mostrar en PDF si aplica
           ciudad: emp.ciudad ?? grupo.ciudad ?? null,
           sucursal: emp.sucursal ?? grupo.sucursal ?? null,
           salidas: (emp.salidas || []).map((salida: any) => ({
             fecha_hora_horario: salida.fecha_hora_horario,
             fecha_hora_timbre: salida.fecha_hora_timbre,
-            diferencia: salida.diferencia, // en segundos
+            diferencia: salida.diferencia,
             tipo_permiso: salida.tipo_permiso ?? null,
             desde: salida.desde ?? null,
             hasta: salida.hasta ?? null
@@ -421,7 +419,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     switch (acc) {
       case 'pdf':
-        this.reportes.generarReporte('salidas-anticipadas', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('salidas-anticipadas', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF desde el microservicio:', err);
@@ -431,7 +429,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('salidas-anticipadas', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('salidas-anticipadas', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel desde el microservicio:', err);

@@ -364,7 +364,7 @@ export class ListarGeneroComponent {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('generos', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('generos', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF:', error);
@@ -373,8 +373,8 @@ export class ListarGeneroComponent {
         });
         break;
 
-      case 'excel': // también puedes recibir 'xlsx' y el service normaliza
-        this.reportes.generarReporte('generos', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('generos', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel:', error);
@@ -384,7 +384,7 @@ export class ListarGeneroComponent {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('generos', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('generos', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -394,7 +394,7 @@ export class ListarGeneroComponent {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('generos', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('generos', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

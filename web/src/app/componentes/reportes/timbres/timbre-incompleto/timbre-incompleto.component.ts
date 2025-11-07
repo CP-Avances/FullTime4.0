@@ -382,9 +382,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     }
   }
 
-  async generarReporteTimbresIncompletos(
-    action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf' = 'open'
-  ) {
+  async generarReporteTimbresIncompletos(action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf' = 'open'){
     const acc = action === 'download' ? 'pdf' : action;
 
     if (!this.data_pdf || this.data_pdf.length === 0) {
@@ -394,7 +392,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
     const baseName = `Timbres_incompletos_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
 
-    // Payload: mantenemos nombres del PDF y añadimos campos extra para Excel
     const data = {
       usuario: localStorage.getItem('fullname_print') as string,
       empresa: (localStorage.getItem('name_empresa') as string)?.toUpperCase(),
@@ -443,11 +440,10 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         }))
       }))
     };
-    console.log('DATA REPORTE TIMBRES INCOMPLETOS', data);
 
     switch (acc) {
       case 'pdf':
-        this.reportes.generarReporte('timbres-incompletos', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('timbres-incompletos', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF:', err);
@@ -457,7 +453,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('timbres-incompletos', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('timbres-incompletos', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel:', err);

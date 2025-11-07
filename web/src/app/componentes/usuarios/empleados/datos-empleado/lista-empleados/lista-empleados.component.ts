@@ -789,10 +789,7 @@ export class ListaEmpleadosComponent implements OnInit {
    ** **                             PARA LA EXPORTACION DE ARCHIVOS PDF                             ** **
    ** ************************************************************************************************* **/
 
-  async generarReporteEmpleados(
-    action: 'pdf'|'excel'|'csv'|'xml',
-    numero: 1 | 2 // 1 = activos, 2 = inactivos
-  ) {
+  async generarReporteEmpleados(action: 'pdf'|'excel'|'csv'|'xml',numero: 1 | 2 ){
     const fuente = numero === 1 ? (this.empleado || []) : (this.desactivados || []);
 
     const empleados = fuente.map((obj: any) => {
@@ -803,7 +800,6 @@ export class ListaEmpleadosComponent implements OnInit {
       const fecha = obj.fecha_nacimiento ? obj.fecha_nacimiento.split('T')[0] : '';
 
       return {
-        // Campos ya usados por el PDF
         codigo: obj.codigo,
         nombreCompleto: `${obj.apellido} ${obj.nombre}`,
         identificacion: obj.identificacion,
@@ -815,11 +811,10 @@ export class ListaEmpleadosComponent implements OnInit {
         telefono: obj.telefono,
         estadoTexto: estado,
         nacionalidad,
-        // Extensiones para Excel (no rompen PDF)
         apellido: obj.apellido,
         nombre: obj.nombre,
-        fecha_nacimiento: fecha, // alias para Excel legacy
-        estado: estado            // alias para Excel legacy
+        fecha_nacimiento: fecha,
+        estado: estado
       };
     });
 
@@ -834,7 +829,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('empleados', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('empleados', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF:', error);
@@ -843,8 +838,8 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         break;
 
-      case 'excel': // también puedes usar 'xlsx'; el service normaliza
-        this.reportes.generarReporte('empleados', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('empleados', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel:', error);
@@ -854,7 +849,7 @@ export class ListaEmpleadosComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('empleados', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('empleados', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar CSV:', error);
@@ -864,7 +859,7 @@ export class ListaEmpleadosComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('empleados', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('empleados', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar XML:', error);

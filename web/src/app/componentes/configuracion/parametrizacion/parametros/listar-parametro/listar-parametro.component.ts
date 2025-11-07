@@ -210,7 +210,7 @@ export class ListarParametroComponent implements OnInit {
 
     switch (action) {
       case 'pdf':
-        this.reportes.generarReporte('parametros', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('parametros', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar PDF desde el microservicio:', error);
@@ -219,8 +219,8 @@ export class ListarParametroComponent implements OnInit {
         });
         break;
 
-      case 'excel': // puedes pasar 'excel' o 'xlsx'
-        this.reportes.generarReporte('parametros', 'excel', data).subscribe({
+      case 'excel':
+        this.reportes.generarReporteServicio('parametros', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (error) => {
             console.error('Error al generar Excel desde el microservicio:', error);
@@ -230,7 +230,7 @@ export class ListarParametroComponent implements OnInit {
         break;
 
       case 'csv':
-        this.reportes.generarReporte('parametros', 'csv', data).subscribe({
+        this.reportes.generarReporteServicio('parametros', 'csv', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error CSV microservicio:', e);
@@ -240,7 +240,7 @@ export class ListarParametroComponent implements OnInit {
         break;
 
       case 'xml':
-        this.reportes.generarReporte('parametros', 'xml', data).subscribe({
+        this.reportes.generarReporteServicio('parametros', 'xml', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (e) => {
             console.error('Error XML microservicio:', e);

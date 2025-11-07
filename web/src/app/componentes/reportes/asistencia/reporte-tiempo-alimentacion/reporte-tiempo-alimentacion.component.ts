@@ -339,7 +339,6 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Payload único para PDF/Excel
     const data = {
       usuario: localStorage.getItem('fullname_print'),
       empresa: localStorage.getItem('name_empresa'),
@@ -349,7 +348,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       colorSecundario: this.s_color,
       fechaInicio: this.rangoFechas.fec_inico,
       fechaFin: this.rangoFechas.fec_final,
-      opcionBusqueda: this.opcionBusqueda, // 1 activos, 2 inactivos
+      opcionBusqueda: this.opcionBusqueda,
       resumen: this.bool,
       totales: this.data_pdf.map((grupo: any) => {
         let totalExceso = 0;
@@ -408,7 +407,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
     switch (acc) {
       case 'pdf':
-        this.reportes.generarReporte('tiempo-alimentacion', 'pdf', data).subscribe({
+        this.reportes.generarReporteServicio('tiempo-alimentacion', 'pdf', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar PDF desde el microservicio:', err);
@@ -418,7 +417,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         break;
 
       case 'excel':
-        this.reportes.generarReporte('tiempo-alimentacion', 'excel', data).subscribe({
+        this.reportes.generarReporteServicio('tiempo-alimentacion', 'excel', data).subscribe({
           next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
           error: (err) => {
             console.error('Error al generar Excel desde el microservicio:', err);

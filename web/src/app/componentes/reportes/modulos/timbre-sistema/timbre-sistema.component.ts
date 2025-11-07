@@ -366,153 +366,147 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
    ** **                           METODO PARA GENERAR PDF                                    ** **
    ** ****************************************************************************************** **/
 
+  async generarReporteTimbresSistema(
+    action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf' = 'open'
+  ) {
+    const acc = action === 'download' ? 'pdf' : action;
 
-// En tu componente
-async generarReporteTimbresSistema(
-  action: 'excel' | 'ver' | 'open' | 'print' | 'download' | 'pdf' = 'open'
-) {
-  const acc = action === 'download' ? 'pdf' : action;
-
-  if (!this.data_pdf || this.data_pdf.length === 0) {
-    this.toastr.info('No hay datos para generar el reporte', 'Timbres del sistema');
-    return;
-  }
-
-  const baseName = `Timbres_virtuales_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
-
-  // Armar payload UNA sola vez (igual al PDF actual; extras sólo para Excel)
-  const data = {
-    usuario: localStorage.getItem('fullname_print') as string,
-    empresa: (localStorage.getItem('name_empresa') as string)?.toUpperCase(),
-    fraseMarcaAgua: this.frase,
-    logoBase64: this.logo,
-    colorPrincipal: this.p_color,
-    colorSecundario: this.s_color,
-    opcionBusqueda: this.opcionBusqueda,
-    periodo: {
-      inicio: this.rangoFechas.fec_inico,
-      fin: this.rangoFechas.fec_final
-    },
-    filtrosAplicados: {
-      bool_reg: this.bool?.bool_reg,
-      bool_dep: this.bool?.bool_dep,
-      bool_cargo: this.bool?.bool_cargo,
-      bool_suc: this.bool?.bool_suc,
-      bool_emp: this.bool?.bool_emp
-    },
-    timbreDispositivo: this.timbreDispositivo,
-    data_pdf: this.data_pdf.map((grupo: any) => ({
-      sucursal: grupo.sucursal,
-      ciudad: grupo.ciudad,
-      nombre: grupo.nombre,
-      departamento: grupo.departamento,
-      empleados: (grupo.empleados || []).map((emp: any) => ({
-        identificacion: emp.identificacion,
-        apellido: emp.apellido,
-        nombre: emp.nombre,
-        codigo: emp.codigo,
-        regimen: emp.regimen,
-        departamento: emp.departamento,
-        cargo: emp.cargo,
-        ciudad: emp.ciudad ?? grupo.ciudad,
-        sucursal: emp.sucursal ?? grupo.sucursal,
-        timbres: (emp.timbres || []).map((t: any) => {
-          const servidorFecha = t?.fecha_hora_timbre_validado
-            ? new Date(t.fecha_hora_timbre_validado)
-            : null;
-          const servidorHora = t?.fecha_hora_timbre_validado
-            ? this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora)
-            : '';
-          const horaTimbre = t?.fecha_hora_timbre
-            ? this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora)
-            : '';
-
-          return {
-            // Nombres esperados por el PDF (no tocar):
-            fecha_hora_timbre_validado: t.fecha_hora_timbre_validado,
-            fecha_hora_timbre: t.fecha_hora_timbre,
-            id_reloj: t.id_reloj,
-            accion: t.accion,
-            observacion: t.observacion,
-            longitud: t.longitud,
-            latitud: t.latitud,
-            // Extras (para Excel):
-            servidor_fecha: servidorFecha,
-            servidor_hora: servidorHora,
-            horaTimbre,
-            accionTexto: this.mapAccionTexto(t.accion),
-          };
-        })
-      }))
-    }))
-  };
-
-  switch (acc) {
-    case 'pdf':
-      this.reportes.generarReporte('timbres-virtuales', 'pdf', data).subscribe({
-        next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-        error: (err) => {
-          console.error('Error al generar PDF:', err);
-          this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
-        }
-      });
-      break;
-
-    case 'excel':
-      this.reportes.generarReporte('timbres-virtuales', 'excel', data).subscribe({
-        next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
-        error: (err) => {
-          console.error('Error al generar Excel:', err);
-          this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
-        }
-      });
-      break;
-
-    case 'ver':
-      this.VerDatos();
-      break;
-
-    case 'open':
-    case 'print': {
-      const run = async () => {
-        try {
-          const pdfMake = await this.validar.ImportarPDF();
-          const documentDefinition = this.DefinirInformacionPDF();
-          const pdf = pdfMake.createPdf(documentDefinition);
-          acc === 'print' ? pdf.print() : pdf.open();
-        } catch (error) {
-          console.error('Error al preparar PDF local:', error);
-          this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
-        }
-      };
-      run();
-      break;
+    if (!this.data_pdf || this.data_pdf.length === 0) {
+      this.toastr.info('No hay datos para generar el reporte', 'Timbres del sistema');
+      return;
     }
 
-    default:
-      // Sin acción
-      break;
+    const baseName = `Timbres_virtuales_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}`;
+
+    const data = {
+      usuario: localStorage.getItem('fullname_print') as string,
+      empresa: (localStorage.getItem('name_empresa') as string)?.toUpperCase(),
+      fraseMarcaAgua: this.frase,
+      logoBase64: this.logo,
+      colorPrincipal: this.p_color,
+      colorSecundario: this.s_color,
+      opcionBusqueda: this.opcionBusqueda,
+      periodo: {
+        inicio: this.rangoFechas.fec_inico,
+        fin: this.rangoFechas.fec_final
+      },
+      filtrosAplicados: {
+        bool_reg: this.bool?.bool_reg,
+        bool_dep: this.bool?.bool_dep,
+        bool_cargo: this.bool?.bool_cargo,
+        bool_suc: this.bool?.bool_suc,
+        bool_emp: this.bool?.bool_emp
+      },
+      timbreDispositivo: this.timbreDispositivo,
+      data_pdf: this.data_pdf.map((grupo: any) => ({
+        sucursal: grupo.sucursal,
+        ciudad: grupo.ciudad,
+        nombre: grupo.nombre,
+        departamento: grupo.departamento,
+        empleados: (grupo.empleados || []).map((emp: any) => ({
+          identificacion: emp.identificacion,
+          apellido: emp.apellido,
+          nombre: emp.nombre,
+          codigo: emp.codigo,
+          regimen: emp.regimen,
+          departamento: emp.departamento,
+          cargo: emp.cargo,
+          ciudad: emp.ciudad ?? grupo.ciudad,
+          sucursal: emp.sucursal ?? grupo.sucursal,
+          timbres: (emp.timbres || []).map((t: any) => {
+            const servidorFecha = t?.fecha_hora_timbre_validado
+              ? new Date(t.fecha_hora_timbre_validado)
+              : null;
+            const servidorHora = t?.fecha_hora_timbre_validado
+              ? this.validar.FormatearHora(t.fecha_hora_timbre_validado.split(' ')[1], this.formato_hora)
+              : '';
+            const horaTimbre = t?.fecha_hora_timbre
+              ? this.validar.FormatearHora(t.fecha_hora_timbre.split(' ')[1], this.formato_hora)
+              : '';
+
+            return {
+              fecha_hora_timbre_validado: t.fecha_hora_timbre_validado,
+              fecha_hora_timbre: t.fecha_hora_timbre,
+              id_reloj: t.id_reloj,
+              accion: t.accion,
+              observacion: t.observacion,
+              longitud: t.longitud,
+              latitud: t.latitud,
+              servidor_fecha: servidorFecha,
+              servidor_hora: servidorHora,
+              horaTimbre,
+              accionTexto: this.mapAccionTexto(t.accion),
+            };
+          })
+        }))
+      }))
+    };
+
+    switch (acc) {
+      case 'pdf':
+        this.reportes.generarReporteServicio('timbres-virtuales', 'pdf', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar PDF:', err);
+            this.toastr.error('No se pudo generar el PDF. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'excel':
+        this.reportes.generarReporteServicio('timbres-virtuales', 'excel', data).subscribe({
+          next: ({ blob, filename }) => FileSaver.saveAs(blob, filename),
+          error: (err) => {
+            console.error('Error al generar Excel:', err);
+            this.toastr.error('No se pudo generar el Excel. Inténtelo más tarde.', 'Error');
+          }
+        });
+        break;
+
+      case 'ver':
+        this.VerDatos();
+        break;
+
+      case 'open':
+      case 'print': {
+        const run = async () => {
+          try {
+            const pdfMake = await this.validar.ImportarPDF();
+            const documentDefinition = this.DefinirInformacionPDF();
+            const pdf = pdfMake.createPdf(documentDefinition);
+            acc === 'print' ? pdf.print() : pdf.open();
+          } catch (error) {
+            console.error('Error al preparar PDF local:', error);
+            this.toastr.error('No se pudo abrir/imprimir el PDF. Inténtelo más tarde.', 'Error');
+          }
+        };
+        run();
+        break;
+      }
+
+      default:
+        // Sin acción
+        break;
+    }
+
   }
 
-}
-
-// Helper para mostrar el texto de la acción (reutilízalo si ya lo tienes)
-private mapAccionTexto(codigo: string): string {
-  switch (codigo) {
-    case 'EoS': return 'Entrada o salida';
-    case 'AES': return 'Inicio o fin alimentación';
-    case 'PES': return 'Inicio o fin permiso';
-    case 'E':   return 'Entrada';
-    case 'S':   return 'Salida';
-    case 'I/A': return 'Inicio alimentación';
-    case 'F/A': return 'Fin alimentación';
-    case 'I/P': return 'Inicio permiso';
-    case 'F/P': return 'Fin permiso';
-    case 'HA':  return 'Timbre libre';
-    default:    return 'Desconocido';
+  // Helper para mostrar el texto de la acción 
+  private mapAccionTexto(codigo: string): string {
+    switch (codigo) {
+      case 'EoS': return 'Entrada o salida';
+      case 'AES': return 'Inicio o fin alimentación';
+      case 'PES': return 'Inicio o fin permiso';
+      case 'E':   return 'Entrada';
+      case 'S':   return 'Salida';
+      case 'I/A': return 'Inicio alimentación';
+      case 'F/A': return 'Fin alimentación';
+      case 'I/P': return 'Inicio permiso';
+      case 'F/P': return 'Fin permiso';
+      case 'HA':  return 'Timbre libre';
+      default:    return 'Desconocido';
+    }
   }
-}
-
 
 
   DefinirInformacionPDF() {
