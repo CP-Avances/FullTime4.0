@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.nacionalidadControlador = void 0;
-const database_1 = __importDefault(require("../../../database"));
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const database_1 = __importDefault(require("../../../database"));
 class NacionalidadControlador {
-    // LISTA DE GENEROS
+    // METODO PARA LISTAR NACIONALIDAD   **USADO
     ListarNacionalidades(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const NACIONALIDADES = yield database_1.default.query(`
@@ -30,23 +30,7 @@ class NacionalidadControlador {
             }
         });
     }
-    //METODO PARA BUSCAR NACIONALIDAD POR NOMBRE
-    ObtenerNacionalidad(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
-            console.log("Buscando nacionalidades:", nombre);
-            const unNacionalidades = yield database_1.default.query(`
-      SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-      `, [nombre]);
-            if (unNacionalidades.rowCount != 0) {
-                return res.jsonp(unNacionalidades.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    // METODO PARA REGISTRAR NACIONALIDAD 
+    // METODO PARA REGISTRAR NACIONALIDAD   **USADO
     CrearNacionalidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -84,14 +68,14 @@ class NacionalidadControlador {
             }
         });
     }
-    //METODO PARA ACTUALIZAR NACIONALIDAD
+    // METODO PARA ACTUALIZAR REGISTRO DE NACIONALIDAD   **USADO
     ActualizarNacionalidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { nacionalidad, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
@@ -136,7 +120,7 @@ class NacionalidadControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR NACIONALIDAD  
+    // ELIMIAR REGISTRO NACIONALIDAD   **USADO  
     EliminarNacionalidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -144,7 +128,7 @@ class NacionalidadControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

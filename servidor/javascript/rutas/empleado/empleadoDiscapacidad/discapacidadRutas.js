@@ -23,13 +23,12 @@ class DiscapacidadRutas {
         /** *************************************************************************************** **
          ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** **
          ** *************************************************************************************** **/
-        // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD
+        // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD 
         this.router.post('/buscarTipo', verificarToken_1.TokenValidation, discapacidadControlador_1.default.RegistrarTipo);
         // METODO PARA BUSCAR LISTA DE TIPOS DE DISCAPACIDAD   **USADO
         this.router.get('/buscarTipo/tipo', verificarToken_1.TokenValidation, discapacidadControlador_1.default.ListarTipo);
         // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE   **USADO
         this.router.post('/buscarTipo/nombre', verificarToken_1.TokenValidation, discapacidadControlador_1.default.BuscarDiscapacidadNombre);
-        this.router.get('/', verificarToken_1.TokenValidation, discapacidadControlador_1.default.list);
     }
 }
 const DISCAPACIDAD_RUTAS = new DiscapacidadRutas();

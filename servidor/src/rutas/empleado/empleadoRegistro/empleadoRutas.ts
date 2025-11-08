@@ -56,8 +56,6 @@ class EmpleadoRutas {
 
         // LISTAR DATOS DE UN USUARIO  **USANDO
         this.router.get('/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleado);
-        // LISTAR EMPLEADOS REGISTRADOS
-        this.router.get('/buscador/empleado', TokenValidation, EMPLEADO_CONTROLADOR.ListarBusquedaEmpleados);
         // REGISTRO DE EMPLEADOS   **USADO
         this.router.post('/', TokenValidation, EMPLEADO_CONTROLADOR.InsertarEmpleado);
         // EDICION DE EMPLEADOS   **USUARIO
@@ -72,12 +70,28 @@ class EmpleadoRutas {
         this.router.put('/activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ActivarMultiplesEmpleados);
         // METODO PARA CARGAR IMAGEN DEL USUARIO   **USADO
         this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload_plantilla.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
-        // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
-        this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
+        // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO
+        this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.CodificarImagenBase64);
         // METODO PARA ELIMINAR EMPLEADOS   **USADO
         this.router.delete('/eliminar', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
-
-
+        // LISTAR EMPLEADOS REGISTRADOS   **USADO
+        this.router.get('/buscador/empleado', TokenValidation, EMPLEADO_CONTROLADOR.ListarBusquedaEmpleados);
+        // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO     **USADO
+        this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
+        // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
+        this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
+        // METODO PARA CONSULTAR INFORMACION DE CONTRATOS   **USADO
+        this.router.post('/infoContratoCargos/', TokenValidation, EMPLEADO_CONTROLADOR.getContratosCargos);
+        // BUSCAR IMAGEN DEL USUARIO    **USADO
+        this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);
+        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMATICA     **USADO
+        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
+        // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
+        this.router.post('/cargar_automatico/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
+        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL   **USADO
+        this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
+        // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
+        this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
         /** **************************************************************************************** **
@@ -102,40 +116,19 @@ class EmpleadoRutas {
 
         // METODO PARA CONSULTAR COORDENADAS DEL DOMICILIO DEL USUARIO    **USADO
         this.router.get('/ubicacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarCoordenadas);
-        this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
+        // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO   **USADO
+        this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
 
 
-        // INFORMACION DE LA IMAGEN
-        this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);
 
-        // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO
-        this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.CodificarImagenBase64);
-
-        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMATICA     **USADO
-        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
-        // METODO PARA REGISTRAR DATOS DE PLANTILLA CODIGO AUTOMATICO   **USADO
-        this.router.post('/cargar_automatico/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
-
-        // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL   **USADO
-        this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
-        // METODO PARA REGISTRAR DATOS DE LA PLANTILLA CODIGO MANUAL   **USADO
-        this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
-
-
-        /** **************************************************************************************** **
-         ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
-         ** **************************************************************************************** **/
-        // METODO PARA CREAR CARPETAS DE ALMACENAMIENTO    **USADO
-        this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
-
-        //--------------------------------------------------------------- METODO APP MOVIL -------------------------------------------------------------------
+        /** ********************************************************************************************************* **
+         ** **             M E T O D O S    U S A D O S    E N    A P L I C A C I O N    M O V I L                 ** ** 
+         ** ********************************************************************************************************* **/
         this.router.get('/horarios/horariosEmpleado', TokenValidation, EMPLEADO_CONTROLADOR.getHorariosEmpleadoByCodigo);
         this.router.get('/todosempleados/lista', TokenValidation, EMPLEADO_CONTROLADOR.getListaEmpleados);
-        this.router.get('/horariosempleado/planificacionHorarioEmplCodigo',TokenValidation, EMPLEADO_CONTROLADOR.getPlanificacionMesesCodigoEmple);
-    
-        this.router.post('/infoContratoCargos/', TokenValidation, EMPLEADO_CONTROLADOR.getContratosCargos)
-    
-    }        
+        this.router.get('/horariosempleado/planificacionHorarioEmplCodigo', TokenValidation, EMPLEADO_CONTROLADOR.getPlanificacionMesesCodigoEmple);
+
+    }
 
 
 }

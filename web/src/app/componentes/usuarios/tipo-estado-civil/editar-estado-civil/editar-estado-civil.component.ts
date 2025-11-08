@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -17,8 +17,6 @@ export class EditarEstadoCivilComponent {
   ips_locales: any = '';
 
   constructor(
-    // private ntitulo: NivelTitulosService,
-    // private rest: TituloService,
     private estadoS: EstadoCivilService,
 
     private toastr: ToastrService,
@@ -71,7 +69,8 @@ export class EditarEstadoCivilComponent {
       id: this.data.id,
       estado: form.EstadoForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
     // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
     if ((estado.estado).toUpperCase() === (this.data.estado_civil).toUpperCase()) {

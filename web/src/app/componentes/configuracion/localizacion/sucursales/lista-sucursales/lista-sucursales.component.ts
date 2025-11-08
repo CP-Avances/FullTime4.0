@@ -123,29 +123,8 @@ export class ListaSucursalesComponent implements OnInit {
       this.datosCiudades = datos;
     });
 
-    this.bordeCompleto = {
-      top: { style: "thin" as ExcelJS.BorderStyle },
-      left: { style: "thin" as ExcelJS.BorderStyle },
-      bottom: { style: "thin" as ExcelJS.BorderStyle },
-      right: { style: "thin" as ExcelJS.BorderStyle },
-    };
+    this.ManejarEstilos();
 
-    this.bordeGrueso = {
-      top: { style: "medium" as ExcelJS.BorderStyle },
-      left: { style: "medium" as ExcelJS.BorderStyle },
-      bottom: { style: "medium" as ExcelJS.BorderStyle },
-      right: { style: "medium" as ExcelJS.BorderStyle },
-    };
-
-    this.fillAzul = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
-    };
-
-    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
-
-    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -174,6 +153,33 @@ export class ListaSucursalesComponent implements OnInit {
       this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // Azul claro
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA MANEJAR LA PAGINACION
@@ -411,9 +417,7 @@ export class ListaSucursalesComponent implements OnInit {
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
   async generarExcelSucursales() {
-
     const sucursaleslista: any[] = [];
-
     this.sucursales.forEach((sucursales: any, index: number) => {
       sucursaleslista.push([
         index + 1,
@@ -422,17 +426,12 @@ export class ListaSucursalesComponent implements OnInit {
         sucursales.nombre,
       ]);
     });
-
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Sucursales");
-
-
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
     });
-
     worksheet.addImage(this.imagen, {
       tl: { col: 0, row: 0 },
       ext: { width: 220, height: 105 },
@@ -457,14 +456,12 @@ export class ListaSucursalesComponent implements OnInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "id", width: 20 },
       { key: "cuidad", width: 20 },
       { key: "nombre", width: 30 },
     ];
-
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
@@ -485,7 +482,6 @@ export class ListaSucursalesComponent implements OnInit {
       columns: columnas,
       rows: sucursaleslista,
     });
-
 
     const numeroFilas = sucursaleslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -543,10 +539,10 @@ export class ListaSucursalesComponent implements OnInit {
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('EstablecimientosCSV');
-    //  Agregar encabezados dinámicos basados en las claves del primer objeto
-    const keys = Object.keys(listExcelSucursales[0] || {}); // Obtener las claves
+    //  AGREGAR ENCABEZADOS DINÁMICOS BASADOS EN LAS CLAVES DEL PRIMER OBJETO
+    const keys = Object.keys(listExcelSucursales[0] || {}); // OBTENER LAS CLAVES
     worksheet.columns = keys.map(key => ({ header: key, key, width: 20 }));
-    // Llenar las filas con los datos
+    // LLENAR LAS FILAS CON LOS DATOS
     listExcelSucursales.forEach((obj: any) => {
       worksheet.addRow(obj);
     });
@@ -565,7 +561,7 @@ export class ListaSucursalesComponent implements OnInit {
   urlxml: string;
   data: any = [];
   exportToXML() {
-    var objeto;
+    var objeto: any;
     var arregloSucursales: any = [];
     this.sucursales.forEach((obj: any) => {
       objeto = {

@@ -1,6 +1,5 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +11,17 @@ export class AuditoriaService {
     private http: HttpClient,
   ) { }
 
-  ConsultarAuditoriaPorTablaEmpaquetados(data: any){
+  // METODO PARA CONSULTAR DATOS EMPAQUETADOS - AUDITORIA     **USADO**
+  ConsultarAuditoriaPorTablaEmpaquetados(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reportes-auditoria/auditarportablaempaquetados`, data, {
       observe: 'response',
-      responseType: 'blob' // Indicar que esperamos una respuesta de tipo Blob (para la transmisión)
+      responseType: 'blob' // INDICAR QUE ESPERAMOS UNA RESPUESTA DE TIPO BLOB (PARA LA TRANSMISIÓN)
     });
+  }
+
+  // METODO DE CONSULTA DE AUDITORIA DE INICIOS DE SESION    **USADO**
+  ConsultarAuditoriaAccesos(data: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/reportes-auditoria/auditarAccesos`, data);
   }
 
 }

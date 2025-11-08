@@ -1,7 +1,7 @@
-import { Router } from 'express';
 import GRUPO_OCUPACIONAL_CONTROLADOR from '../../../controlador/modulos/acciones-personal/grupoOcupacionalControlador';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
 import multer from 'multer';
 
 const storage = multer.diskStorage({
@@ -24,11 +24,15 @@ class GrupoOcupacionalRutas {
     }
 
     configuracion(): void {
-        // METODO PARA CONSULTAR GRUPO OCUPACIONAL
+        // METODO DE CONSULTA DE GRUPO OCUPACIONAL     **USADO
         this.router.get('/', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.ListaGrupoOcupacional);
-        this.router.get('/infoGrupo/:id_empleado', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.GrupoOcupacionalByEmple)
+        // METODO PARA OBTENER GRUPO OCUPACIONAL DEL USUARIO   **USADO
+        this.router.get('/infoGrupo/:id_empleado', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.GrupoOcupacionalByEmple);
+        // METODO PARA INGRESAR REGISTRO  **USADO
         this.router.post('/', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.IngresarGrupoOcupacional);
+        // METODO PARA EDITAR REGISTRO  **USADO
         this.router.put('/update', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EditarGrupoOcupacional);
+        // METODO PARA ElIMINAR REGISTRO  **USADO
         this.router.delete('/delete', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EliminarGrupoOcupacional);
         // METODO PARA ELIMINAR EL GRUPO OCUPACIONAL POR EMPLEADO **USADO
         this.router.delete('/deleteGrupoOcupacional/:id', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EliminarEmpleGrupoOcupacional);
@@ -36,7 +40,7 @@ class GrupoOcupacionalRutas {
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], GRUPO_OCUPACIONAL_CONTROLADOR.RevisarDatos);
         // METODO PARA GUARDAR DATOS DE PLANTILLA    **USADO
         this.router.post('/cargar_plantilla', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.CargarPlantilla);
-        // METODO PARA GUARDAR GRUPO MACIVOS POR INTERFAZ
+        // METODO PARA REGISTRAR EMPLEADO - GRUPO OCUPACIONAL   **USADO
         this.router.post('/registrarGrupo', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.RegistrarGrupo);
         // METODO PARA LEER DATOS DE PLANTILLA    **USADO
         this.router.post('/upload/revision_empleadoGrupoOcupacional', [TokenValidation, upload.single('uploads')], GRUPO_OCUPACIONAL_CONTROLADOR.RevisarPantillaEmpleadoGrupoOcu);
@@ -45,7 +49,7 @@ class GrupoOcupacionalRutas {
         // METODO PARA ACTUALIZAR EL GRUPO   **USADO
         this.router.post('/actualizacionGrupo', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EditarRegistroGrupoEmple);
         // METODO PARA ELIMINAR GRUPOS DE MANERA MULTIPLE   **USADO
-        this.router.post('/eliminarGrupoOcuMult', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EliminarGrupoMultiple);
+        this.router.post('/eliminarGrupoMultiple', TokenValidation, GRUPO_OCUPACIONAL_CONTROLADOR.EliminarGrupoMultiple);
 
     }
 }

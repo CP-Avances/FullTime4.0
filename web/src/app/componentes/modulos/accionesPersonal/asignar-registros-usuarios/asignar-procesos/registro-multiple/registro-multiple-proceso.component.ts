@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
 
 import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/metodos.component';
-import { ProcesoService } from 'src/app/servicios/modulos/modulo-acciones-personal/catProcesos/proceso.service';
-import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-registro-multiple-proceso',
@@ -26,14 +27,14 @@ export class RegistroMultipleProcesoComponent {
   ips_locales: any = '';
 
   archivoForm = new FormControl('', Validators.required);
+
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string =  (localStorage.getItem('empresaURL') as string);
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_paginaMul: number = 5;
@@ -47,19 +48,19 @@ export class RegistroMultipleProcesoComponent {
 
   constructor(
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
-    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public validar: ValidacionesService,
     private rest: ProcesoService,
+    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
+    });
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
@@ -69,8 +70,8 @@ export class RegistroMultipleProcesoComponent {
   }
 
   /** ************************************************************************************************************* **
-** **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
-** ************************************************************************************************************* **/
+  **  **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
+  **  ************************************************************************************************************* **/
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CARGOS EMPLEADOS
   nameFileCargo: string;
   archivoSubidoCargo: Array<File>;
@@ -120,18 +121,15 @@ export class RegistroMultipleProcesoComponent {
   VerificarPlantilla() {
     this.listaProcesosCorrectas = [];
     let formData = new FormData();
-    
+
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormatoEMPLEPROCESO(formData).subscribe(res => {
-        this.Datos_procesos = res.data;
-        this.messajeExcel = res.message;
-
-        console.log('this.Datos_procesos: ',this.Datos_procesos)
-
+      this.Datos_procesos = res.data;
+      this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -168,10 +166,10 @@ export class RegistroMultipleProcesoComponent {
         timeOut: 4000,
       });
     });
-    
+
   }
   // FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE DATOS DEL ARCHIVO EXCEL
-  ConfirmarRegistroMultiple() { 
+  ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
@@ -181,75 +179,72 @@ export class RegistroMultipleProcesoComponent {
         }
       });
   }
-   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
-   colorCelda: string = ''
-   EstiloCelda(observacion: string): string {
-     let arrayObservacion = observacion.split(" ");
-     if (observacion == 'Registro duplicado') {
-       return 'rgb(156, 214, 255)';
-     } else if (observacion == 'ok') {
-       return 'rgb(159, 221, 154)';
-     } else if (observacion == 'Ya existe un registro activo con este Proceso.') {
-       return 'rgb(239, 203, 106)';
-     } else if (observacion  == 'La identificación ingresada no esta registrada en el sistema' ||
-       observacion == 'Proceso ingresado no esta registrado en el sistema'
-     ) {
-       return 'rgb(255, 192, 203)';
-     } else {
-       return 'rgb(242, 21, 21)';
-     }
-   }
- 
-   colorTexto: string = '';
-   EstiloTextoCelda(texto: string): string {
-     texto = texto.toString()
-     let arrayObservacion = texto.split(" ");
-     if (arrayObservacion[0] == 'No') {
-       return 'rgb(255, 80, 80)';
-     } else {
-       return 'black'
-     }
-   }
- 
-   // METODO PARA REGISTRAR DATOS
-   RegistrarProcesos() {
-     console.log('listaProcesosCorrectas: ',this.listaProcesosCorrectas.length)
-     if (this.listaProcesosCorrectas?.length > 0) {
-       const data = {
-         plantilla: this.listaProcesosCorrectas,
-         user_name: this.user_name,
-         ip: this.ip, ip_local: this.ips_locales
-       }
-       this.rest.RegistrarPlantillaEmpleProce(data).subscribe({
-         next: (response: any) => {
-           this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
-             timeOut: 5000,
-           });
-           if (this.listaProcesosCorrectas?.length > 0) {
-             setTimeout(() => {
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  EstiloCelda(observacion: string): string {
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe un registro activo con este Proceso.') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'La identificación ingresada no esta registrada en el sistema' ||
+      observacion == 'Proceso ingresado no esta registrado en el sistema'
+    ) {
+      return 'rgb(255, 192, 203)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+
+  colorTexto: string = '';
+  EstiloTextoCelda(texto: string): string {
+    texto = texto.toString()
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
+  // METODO PARA REGISTRAR DATOS
+  RegistrarProcesos() {
+    if (this.listaProcesosCorrectas?.length > 0) {
+      const data = {
+        plantilla: this.listaProcesosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip, ip_local: this.ips_locales
+      }
+      this.rest.RegistrarPlantillaEmpleProceso(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Plantilla de Procesos importada.', 'Operación exitosa.', {
+            timeOut: 5000,
+          });
+          if (this.listaProcesosCorrectas?.length > 0) {
+            setTimeout(() => {
               this.cerrarComponente.emit(false);
-             }, 500);
-           }
-           
-         },
-         error: (error) => {
-           this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
-             timeOut: 4000,
-           });
-           this.archivoForm.reset();
-         }
-       });
-     } else {
-       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
-         timeOut: 4000,
-       });
-       this.archivoForm.reset();
-     }
- 
-     this.archivoSubido = [];
-     this.nameFile = '';
- 
-   }
+            }, 500);
+          }
+
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+    this.archivoSubido = [];
+    this.nameFile = '';
+  }
 
 
 }

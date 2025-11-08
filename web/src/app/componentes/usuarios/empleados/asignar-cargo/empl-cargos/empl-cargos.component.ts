@@ -249,7 +249,8 @@ export class EmplCargosComponent implements OnInit {
       cargo: form.tipoForm,
       jefe: form.jefeForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {

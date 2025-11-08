@@ -132,6 +132,7 @@ const faltasIndividual = function (desde, hasta) {
             }
             if (arregloEmpleados.length != 0) {
                 arregloEmpleados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    console.log('ver item ', item);
                     console.log("ver nombre de todos los empleados: ", item.nombre + ' ' + item.apellido);
                     if (item.faltas_mail) {
                         console.log("ver nombre de los enviado correo: ", item.nombre + ' ' + item.apellido);
@@ -216,7 +217,7 @@ const faltasIndividual = function (desde, hasta) {
                         let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
                         // MENSAJE NOTIFICACION
                         let mensaje = '';
-                        mensaje = fecha + '//Falta registrada. No se ha reportado asistencia en el horario correspondiente.';
+                        mensaje = item.faltas[0].fecha + '//Falta registrada. No se ha reportado asistencia en el horario correspondiente.';
                         console.log('mensajes ', mensaje);
                         const response = yield database_1.default.query(`
                             INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, 
@@ -774,7 +775,7 @@ const EstructurarDatosPDF = function (data) {
                                 { text: 'FECHA', style: 'tableHeader' },
                             ],
                             ...empl.faltas.map((usu) => {
-                                const fecha = (0, exports.FormatearFecha)(usu.fecha_horario, formato_fecha, dia_abreviado, idioma_fechas);
+                                const fecha = (0, exports.FormatearFecha)(usu.fecha, formato_fecha, dia_abreviado, idioma_fechas);
                                 totalFaltasEmpleado++;
                                 c = c + 1;
                                 return [

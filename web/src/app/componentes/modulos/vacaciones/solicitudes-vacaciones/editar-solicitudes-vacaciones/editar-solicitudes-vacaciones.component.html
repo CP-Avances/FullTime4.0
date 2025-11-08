@@ -1,0 +1,231 @@
+<div class="container">
+  <mat-card class="mat-elevation-z8">
+    <div id="titulo" class="row w-100 m-auto">
+      <div class="col-2 col-md-2 mb-2 mb-md-0"></div>
+      <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+          EDITAR SOLICITUD DE VACACIÓN
+        </span>
+      </div>
+      <div class="col-2 col-md-2 mb-2 mb-md-0">
+        <mat-icon class="float-right" id="cerrar" (click)="cerrarEdicion()">
+          highlight_off
+        </mat-icon>
+      </div>
+    </div>
+
+    <div class="container mt-3">
+      <form>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Tipo de Vacación</mat-label>
+              <mat-icon
+                id="i-cursor"
+                matSuffix
+                matTooltipPosition="right"
+                matTooltip="Seleccionar tipo de vacación a solicitar."
+              >
+                beach_access
+              </mat-icon>
+              <mat-select [formControl]="vacacionSeleccionada">
+                @for(vacacion of tiposVacacion; track vacacion.id){
+                <mat-option>{{ vacacion.descripcion }} </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          @if(!permiteHoras){
+          <ng-container>
+            <div class="col-md-4">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-label>Fecha Inicio de Vacaciones</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  placeholder="dd/mm/aaaa"
+                  [formControl]="fechaInicio"
+                  required
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                  id="i-cursor"
+                  matTooltip="Indicar la fecha de inicio de las vacaciones que va a editar"
+                  matTooltipPosition="right"
+                >
+                </mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-label>Fecha Fin de Vacaciones</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker2"
+                  placeholder="dd/mm/aaaa"
+                  [formControl]="fechaFinal"
+                  required
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker2"
+                  id="i-cursor"
+                  matTooltip="Indicar la fecha de finalización de las vacaciones que va a editar"
+                  matTooltipPosition="right"
+                >
+                </mat-datepicker-toggle>
+
+                <mat-datepicker touchUi #picker2></mat-datepicker>
+
+                @if(fechaFinal.hasError('fechaInvalida')){
+                <mat-error>
+                  La fecha final debe ser posterior a la fecha de inicio
+                </mat-error>
+                } @if(fechaFinal.hasError('minDias')){
+                <mat-error>
+                  El mínimo de días requeridos para este tipo de vacación es
+                  {{ getMinDias() }}
+                </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </ng-container>
+          } @if(permiteHoras){
+          <ng-container>
+            <div class="col-md-4">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-label>Hora Inicio de Vacaciones</mat-label>
+                <input
+                  matInput
+                  type="time"
+                  [formControl]="horaInicio"
+                  required
+                  (keypress)="ingresarSoloNumerosEnteros($event)"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-label>Hora Fin de Vacaciones</mat-label>
+                <input
+                  matInput
+                  type="time"
+                  [formControl]="horaFinal"
+                  required
+                  (keypress)="ingresarSoloNumerosEnteros($event)"
+                />
+                @if(horaFinal.hasError('horaInvalida')){
+                <mat-error>
+                  La hora final debe ser posterior a la hora de inicio
+                </mat-error>
+                } @if(!horaFinal.hasError('horaInvalida') &&
+                horaFinal.hasError('minHoras')){
+                <mat-error>
+                  El mínimo de horas requerido para este tipo de vacaión es
+                  {{ getMinimoHoras() }}
+                </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </ng-container>
+          }
+        </div>
+
+        @if(vacacionSeleccionada.value != null){
+        <div class="mt-2">
+          @if(incluirFeriadosSeleccionado()){
+          <div class="nota" style="text-align: justify">
+            <span>
+              NOTA: Los días feriados serán contabilizados en los Días totales
+              porque el parámetro está
+            </span>
+            <strong>activado</strong>
+          </div>
+          }@else { notaDesactivado }
+          <ng-template #notaDesactivado>
+            <div class="nota" style="text-align: justify">
+              <span>
+                NOTA: Los días feriados no serán contabilizados en los Días
+                totales porque el parámetro está
+              </span>
+              <strong>desactivado</strong>.
+            </div>
+          </ng-template>
+        </div>
+        }
+
+        <div class="row align-items-center" style="min-height: 100px">
+          @if(permiteHoras){
+          <div class="col-md-4">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Fecha de Vacación (por horas)</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerFechaHoras"
+                placeholder="dd/mm/aaaa"
+                [formControl]="fechaHoras"
+                required
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerFechaHoras"
+                id="i-cursor"
+                matTooltip="Fecha en la que se tomarán las horas de vacación."
+                matTooltipPosition="right"
+              ></mat-datepicker-toggle>
+              <mat-datepicker touchUi #pickerFechaHoras></mat-datepicker>
+              <mat-error *ngIf="fechaHoras.hasError('esFeriado')">
+                La fecha seleccionada es feriado y este tipo de vacación no lo
+                permite.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          } @if(!permiteHoras){
+          <div class="col-md-4">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Vacaciones: días Feriados</mat-label>
+              <input matInput [value]="diasFeriados" readonly />
+              <mat-icon
+                matSuffix
+                matTooltip="Días de feriado en las fechas seleccionadas."
+              >
+                help_outline
+              </mat-icon>
+            </mat-form-field>
+          </div>
+          } @if(permiteHoras){
+          <div class="col-md-4">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Vacaciones: días Feriados</mat-label>
+              <input matInput [value]="diasFeriados" readonly />
+              <mat-icon
+                matSuffix
+                matTooltip="Días de feriado en las fechas seleccionadas."
+              >
+                help_outline
+              </mat-icon>
+            </mat-form-field>
+          </div>
+          }
+
+          <div class="col-md-4">
+            <div class="row m-auto text-center">
+              <div class="col-12 m-auto">
+                <div class="separar">
+                  <form>
+
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-card>
+</div>

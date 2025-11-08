@@ -65,7 +65,8 @@ export class TituloEmpleadoComponent implements OnInit {
       id_empleado: this.empleado,
       id_titulo: form.idTituloForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     }
     // VERIFICAR DUPLICADO DE REGISTRO
     this.restEmpleado.BuscarTituloEspecifico(titulo).subscribe(data => {

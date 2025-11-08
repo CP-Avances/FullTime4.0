@@ -109,7 +109,6 @@ const atrasosIndividual = function (desde, hasta) {
             const imagenEmpresa = yield catEmpresaControlador_1.EMPRESA_CONTROLADOR.ObtenerImagenEmpresa();
             const fecha = (0, exports.FormatearFecha)(luxon_1.DateTime.now().toISO(), formato_fecha, dia_completo, idioma_fechas);
             const hora_reporte = (0, exports.FormatearHora)(luxon_1.DateTime.now().toFormat('HH:mm:ss'), formato_hora);
-            console.log('ejecutandose hora ', hora, ' minuto ', minutos, 'fecha ', fecha);
             // VERIFICAR HORA DE ENVIO
             const Empre = yield database_1.default.query(`
                 SELECT  

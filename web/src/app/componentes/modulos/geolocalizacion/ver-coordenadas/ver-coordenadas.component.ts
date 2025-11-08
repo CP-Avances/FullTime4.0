@@ -18,7 +18,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';

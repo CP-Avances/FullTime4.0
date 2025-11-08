@@ -5,8 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/configuracion/localizacion/catDepartamentos/departamentos.service';
-import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { SucursalService } from 'src/app/servicios/configuracion/localizacion/sucursales/sucursal.service';
 
 @Component({
   selector: 'app-editar-departamento',

@@ -51,7 +51,8 @@ export class RegistrarEstadoCivilComponent {
     let genero = {
       estado: estadoFormateado,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let estado = (genero.estado).toUpperCase();

@@ -12,7 +12,7 @@ import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerale
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';

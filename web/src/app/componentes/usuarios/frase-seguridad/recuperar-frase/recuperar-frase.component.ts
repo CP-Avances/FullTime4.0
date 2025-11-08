@@ -3,10 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { LoginService } from 'src/app/servicios/login/login.service';
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
 
 @Component({
   selector: 'app-recuperar-frase',
@@ -14,6 +15,7 @@ import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/
   templateUrl: './recuperar-frase.component.html',
   styleUrls: ['./recuperar-frase.component.css']
 })
+
 export class RecuperarFraseComponent implements OnInit {
   ips_locales: any = '';
 

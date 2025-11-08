@@ -156,12 +156,6 @@
                                                                     Todas las acciones
                                                                 </label>
                                                             </ng-container>
-                                                            <ng-container *ngIf="pagina.length === 1">
-                                                                <label
-                                                                    style="margin-left: -20px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 2px;">
-                                                                    Todas las acciones
-                                                                </label>
-                                                            </ng-container>
 
                                                             <!-- LISTADO DE ACCIONES INDIVIDUALES -->
                                                             <div class="col-md-6 col-lg-12 col-12"
@@ -170,7 +164,7 @@
                                                                 <input class="form-check-input" type="checkbox"
                                                                     name="accionesSeleccionadasPorPagina"
                                                                     id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
-                                                                    (change)="SeleccionarIndividualAccion($event, n.id, accion)">
+                                                                    (change)="SeleccionarIndividualAccion($event, n.id, accion, j)">
                                                                 <label style="margin-left: 10px; font-size: 11px;"
                                                                     class="form-check-label"
                                                                     [for]="n.id + 'accionesSeleccionadasPorPagina' + i">
@@ -195,7 +189,7 @@
         </form>
         <mat-action-row>
             <div class="container" style="text-align: center;">
-                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()" value="Guardar">
+                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginasRol()" value="Guardar">
                     Guardar
                 </button>
             </div>
@@ -207,7 +201,7 @@
         <mat-expansion-panel-header style="background: rgb(52, 65, 84); font-size: 14px; color: white;">
             <div class="row w-100 m-auto text-center">
                 <mat-panel-title class="panel-title" style="color: white;">
-                    <span class="m-2">FUNCIONES DE LA APLICACIÓN MÓVIL</span>
+                    <span class="m-2">MÓDULOS DE LA APLICACIÓN MÓVIL</span>
                 </mat-panel-title>
             </div>
         </mat-expansion-panel-header>
@@ -264,12 +258,6 @@
                                                                     Todas las acciones
                                                                 </label>
                                                             </ng-container>
-                                                            <ng-container *ngIf="pagina.length === 1">
-                                                                <label
-                                                                    style="margin-left: -20px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 2px;">
-                                                                    Todas las acciones
-                                                                </label>
-                                                            </ng-container>
 
                                                             <!-- CHECKBOX INDIVIDUALES -->
                                                             <div class="col-md-6 col-lg-12 col-12"
@@ -278,7 +266,7 @@
                                                                 <input class="form-check-input" type="checkbox"
                                                                     name="accionesSeleccionadasPorPagina"
                                                                     id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
-                                                                    (change)="SeleccionarIndividualAccion($event, n.id, accion)">
+                                                                    (change)="SeleccionarIndividualAccion($event, n.id, accion, j)">
                                                                 <label style="margin-left: 10px; font-size: 11px;"
                                                                     class="form-check-label"
                                                                     for="{{n.id}}accionesSeleccionadasPorPagina{{i}}">

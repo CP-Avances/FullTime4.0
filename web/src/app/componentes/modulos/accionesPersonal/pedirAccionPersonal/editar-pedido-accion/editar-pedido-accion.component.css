@@ -1,24 +1,171 @@
-.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
-
-mat-form-field { padding: 10px 0px 0px 10px; width: 350px;}
-
-.abrv {  padding: 10px 10px 0px 10px; width: 80px; font-size: 14px;}
-
-.nombre {  padding: 10px 10px 0px 0px; width: 280px; font-size: 14px;}
-
-.letra { font-size: 14px; }
-
-.numero { font-size: 11px; }
-
-.contenedor-medio{
-    width: 9rem;
+.btn {
+  margin-left: 15px;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
-.contenedor-completo{
-    width: 18rem;
+mat-form-field {
+  padding: 10px 0px 0px 10px;
+  width: 350px;
 }
 
-.columna{
-    margin-top: 1.5rem;
+.inputText {
+  padding: 10px 0px 0px 10px;
+  width: 350px;
 }
 
+.inputDate {
+  padding: 10px 0px 0px 10px;
+  width: 200px;
+}
+
+.abrv {
+  padding: 10px 10px 0px 10px;
+  width: 80px;
+  font-size: 14px;
+}
+
+.nombre {
+  padding: 10px 10px 0px 0px;
+  width: 280px;
+  font-size: 14px;
+}
+
+.letra {
+  font-size: 14px;
+}
+
+.numero {
+  font-size: 11px;
+}
+
+.contenedor-medio {
+  width: 9rem;
+}
+
+.contenedor-completo {
+  width: 18rem;
+}
+
+.columna {
+  margin-top: 1.5rem;
+}
+
+.nota {
+  margin-left: 20px;
+}
+
+.inputCedula {
+  width: 30%;
+}
+
+.componente-superpuesto {
+  position: absolute;
+  top: 95%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  color: white;
+  padding: 15px;
+}
+
+.example-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+}
+
+.example-radio-button {
+  margin: 5px;
+}
+
+/*Estilo para ajustar el texto del titulo de las tablas*/
+@media (max-width: 530px) {
+  .nota {
+    margin-left: 0px;
+  }
+
+  mat-horizontal-stepper {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  mat-card {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .container {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  mat-step {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .inputCedula {
+    width: 90%;
+  }
+
+  .componente-superpuesto {
+    top: 97%;
+  }
+}
+
+.subtitulo {
+  font-size: small;
+  font-weight: 900;
+}
+
+.declaracion-radio-group {
+  margin: 1rem 0;
+}
+
+.declaracion-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 16px;
+}
+
+.radio-options {
+  align-items: center;
+}
+
+mat-radio-button {
+  font-size: 15px;
+}
+
+label {
+  font-size: small;
+}
+
+#cerrar {
+  font-size: 24px;
+}
+
+button[mat-icon-button] {
+  padding: 0;
+  height: auto;
+}
+
+.motivacion {
+  font-size: x-small;
+  display: block;
+  text-align: justify;
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: 120px;
+  font-style: italic;
+}
+
+.razon {
+  font-size: x-small;
+  display: block;
+  text-align: justify;
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-style: italic;
+}

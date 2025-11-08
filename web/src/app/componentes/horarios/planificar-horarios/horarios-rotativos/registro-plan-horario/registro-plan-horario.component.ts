@@ -206,19 +206,12 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
   ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
     // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    console.log("ver fec_inicio", fec_inicio)
-    console.log("ver fec_fin", fec_fin)
-    console.log("ver formulario", formulario)
-
     let inicio = DateTime.fromJSDate(fec_inicio).set({ day: 1 }).toFormat('dd/MM/yyyy');
     const lastDayOfMonth = fec_fin.endOf('month').day;
     const formattedDate = `${lastDayOfMonth}/${fec_fin.toFormat('MM/yyyy')}`;
     let final = formattedDate;
     let feci = DateTime.fromFormat(inicio, 'dd/M/yyyy').toFormat('yyyy/MM/dd')
     let fecf = DateTime.fromFormat(final, 'dd/M/yyyy').toFormat('yyyy/MM/dd')
-    console.log("ver feci", feci)
-    console.log("ver fecf", fecf)
-
     // VERIFICAR SI LAS FECHAS ESTAN INGRESADAS DE FORMA CORRECTA
     if (Date.parse(feci) <= Date.parse(fecf)) {
       let datosBusqueda = {
@@ -257,23 +250,16 @@ export class RegistroPlanHorarioComponent implements OnInit {
     this.ver_horario = true;
     this.cargar = false;
     this.ControlarBotones(true, false);
-
     if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
-      console.log('fecha 1 ', this.fechaInicialF.value)
-      console.log('fecha 2 ', this.fechaFinalF.value)
       let inicio = DateTime.fromJSDate(new Date(this.fechaInicialF.value)).toFormat('yyyy-MM-dd');
       let final = DateTime.fromJSDate(new Date(this.fechaFinalF.value)).toFormat('yyyy-MM-dd');
-      console.log('fecha 1 ', inicio)
-      console.log('fecha 2 ', final)
       this.BuscarFeriados(inicio, final);
     }
     else {
       const now = DateTime.now();
-      // Formatear la fecha de inicio como '01/MM/YYYY'
+      // FORMATEAR LA FECHA DE INICIO COMO '01/MM/YYYY'
       let inicio = now.set({ day: 1 }).toFormat('yyyy-MM-dd');
       let final = now.endOf('month').toFormat('yyyy-MM-dd');
-      console.log('fecha 1 ', inicio)
-      console.log('fecha 2 ', final)
       this.BuscarFeriados(inicio, final);
     }
   }
@@ -282,22 +268,20 @@ export class RegistroPlanHorarioComponent implements OnInit {
   fechas_mes: any = [];
   hora_feriado: boolean = false;
   ListarFechas(fecha_inicio: any, fecha_final: any) {
-    //console.log('dia i... ', fecha_inicio, ' dia f... ', fecha_final)
     this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
-    // Convertimos las fechas de inicio y fin a DateTime de Luxon
+    // CONVERTIMOS LAS FECHAS DE INICIO Y FIN A DateTime DE Luxon
     let dia_inicio = DateTime.fromISO(fecha_inicio).setLocale(this.idioma_fecha);
     let dia_fin = DateTime.fromISO(fecha_final).setLocale(this.idioma_fecha);
-    //console.log('dia i ', dia_inicio, ' dia f ', dia_fin)
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
     while (dia_inicio <= dia_fin) {
       let fechas = {
         fecha: dia_inicio.toFormat('yyyy-MM-dd'),
-        dia: dia_inicio.toFormat('EEEE').toUpperCase(), // Nombre del día completo
-        num_dia: dia_inicio.weekday, // Día de la semana (1-7, donde 1 es lunes)
-        formato: dia_inicio.toFormat('MMMM, EEE. dd, yyyy').toUpperCase(), // Formato largo de la fecha
-        formato_: dia_inicio.toFormat('MMM. EEE. dd, yyyy').toUpperCase(), // Formato corto de la fecha
-        mes: dia_inicio.toFormat('MMMM').toUpperCase(), // Mes en texto completo
-        anio: dia_inicio.toFormat('yyyy'), // Año
+        dia: dia_inicio.toFormat('EEEE').toUpperCase(), // NOMBRE DEL DIA COMPLETO
+        num_dia: dia_inicio.weekday, // DIA DE LA SEMANA (1-7, DONDE 1 ES LUNES)
+        formato: dia_inicio.toFormat('MMMM, EEE. dd, yyyy').toUpperCase(), // FORMATO LARGO DE LA FECHA
+        formato_: dia_inicio.toFormat('MMM. EEE. dd, yyyy').toUpperCase(), // FORMATO CORTO DE LA FECHA
+        mes: dia_inicio.toFormat('MMMM').toUpperCase(), // MES EN TEXTO COMPLETO
+        anio: dia_inicio.toFormat('yyyy'), // AÑO
         horarios: [],
         registrados: [],
         tipo_dia: '-',
@@ -311,15 +295,11 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.fechas_mes.push(fechas);
       dia_inicio = dia_inicio.plus({ days: 1 });
     }
-    console.log(" fechas_mes : ", this.fechas_mes)
-    console.log(" feriados : ", this.feriados)
-
     // TRATAMIENTO DE FERIADOS
     this.fechas_mes.forEach((obj: any) => {
       // BUSCAR FERIADOS
       if (this.feriados.length != 0) {
         for (let i = 0; i < this.feriados.length; i++) {
-          console.log("ver fecha en el if formateada: ", DateTime.fromISO(this.feriados[i].fecha).toFormat('yyyy-MM-dd'))
           if (DateTime.fromISO(this.feriados[i].fecha).toFormat('yyyy-MM-dd') === obj.fecha) {
             obj.tipo_dia = 'FD';
             obj.estado = true;
@@ -507,16 +487,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA INGRESAR HORARIO
   lista_eliminar: any = [];
   IngresarHorario(index: number) {
-    if (
-      this.fechas_mes[index].horarios_existentes === '***' ||
-      this.fechas_mes[index].horarios.length > 0
-    ) {
-      this.toastr.warning('Ya existe un horario registrado en esta fecha. No se permite modificar desde aquí.', 'Ups! VERIFICAR.', {
-        timeOut: 6000,
-      });
-      return;
-    }
-
     let verificador = 0;
     let procesar = 0;
     this.ControlarBotones(true, false);
@@ -540,7 +510,17 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     // PROCESAMIENTO DE LOS DATOS AL CUMPLIR LAS CONDICIONES
     if (procesar === 0) {
-
+      // EXISTEN HORARIOS REGISTRADOS
+      if (this.fechas_mes[index].registrados.length === 1) {
+        if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
+          let eliminar = {
+            fecha: this.fechas_mes[index].fecha,
+            id_horarios: this.fechas_mes[index].registrados[0].id_horario,
+          }
+          this.lista_eliminar = this.lista_eliminar.concat(eliminar);
+          this.fechas_mes[index].registrados = [];
+        }
+      }
       // DIA REGISTRADO COMO LIBRE
       if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
         this.EliminarLibre(index)
@@ -716,7 +696,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
     })
     if (verificador > 0) {
-      console.log('ingresa ver datos seleccionados ', this.data_horarios)
       this.VerificarDuplicidad(opcion);
     }
     else {
@@ -735,51 +714,53 @@ export class RegistroPlanHorarioComponent implements OnInit {
     this.sin_duplicidad = [];
     let total = 0;
     this.data_horarios.forEach((obj: any) => {
-      total = total + obj.horarios.length
-    })
+      total += obj.horarios.length;
+    });
+
     this.contar_duplicado = 0;
     this.leer_horario = 0;
     this.iterar = 0;
     this.data_horarios.forEach((obj: any) => {
-      this.iterar = this.iterar + 1;
+      this.iterar += 1;
+
       obj.horarios.forEach((h: any) => {
-        const [horario] = this.horarios.filter((o: any) => {
-          return o.codigo === h.horario
-        })
-        let fechas = {
+        const [horario] = this.horarios.filter((o: any) => o.codigo === h.horario);
+
+        const fechas = {
           fechaInicio: obj.fecha,
           fechaFinal: obj.fecha,
-          id_horario: horario.id
+          id_horario: horario.id,
+          ids: [this.datoEmpleado.idEmpleado]
         };
         h.verificar = 'OK';
         obj.supera_jornada = '';
         obj.horas_superadas = '';
-        this.horario.VerificarDuplicidadHorarios(this.datoEmpleado.idEmpleado, fechas).subscribe(existe => {
-          this.leer_horario = this.leer_horario + 1;
+
+        this.horario.VerificarDuplicidadHorarios(fechas).subscribe(existe => {
+          this.leer_horario += 1;
           this.contar_duplicado = 1;
           h.verificar = 'Horario ya existe.';
-          if (this.iterar === this.data_horarios.length) {
-            if (this.leer_horario === total) {
-              this.ValidarHorarioByHorasTrabaja(opcion)
-            }
+
+          if (this.iterar === this.data_horarios.length && this.leer_horario === total) {
+            this.ValidarHorarioByHorasTrabaja(opcion);
           }
         }, error => {
-          this.leer_horario = this.leer_horario + 1;
-          if (this.iterar === this.data_horarios.length) {
-            if (this.leer_horario === total) {
-              this.ValidarHorarioByHorasTrabaja(opcion)
-            }
+          this.leer_horario += 1;
+
+          if (this.iterar === this.data_horarios.length && this.leer_horario === total) {
+            this.ValidarHorarioByHorasTrabaja(opcion);
           }
         });
-      })
-    })
+      });
+    });
+
     this.data_horarios.forEach((obj: any) => {
       this.fechas_mes.forEach((fec: any) => {
         if (obj.fecha === fec.fecha) {
           fec.horarios = obj.horarios;
         }
-      })
-    })
+      });
+    });
   }
 
   // METODO PARA VALIDAR HORAS DE TRABAJO SEGUN ULTIMO CARGO
@@ -1078,6 +1059,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         id_horario: eliminar.id_horarios,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        datos.id_plan = [].concat(...datos.id_plan, ...(res as any[]).map((item: any) => item.id));
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
         this.restP.EliminarRegistro(datos).subscribe(datos => {
           verificador = verificador + 1;

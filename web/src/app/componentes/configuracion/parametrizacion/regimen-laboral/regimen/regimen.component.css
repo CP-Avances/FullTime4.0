@@ -1,169 +1,166 @@
 .btn {
-    margin-left: 15px;
-    background-color: rgb(80, 87, 97);
-    color: white;
+  margin-left: 15px;
+  background-color: rgb(80, 87, 97);
+  color: white;
 }
 
 p {
-    font-size: x-small;
+  font-size: x-small;
 }
 
 #validar {
-    text-align: center;
-    position: relative;
-    top: 15px;
-    left: 10px;
-    cursor: pointer;
-    color: red;
+  text-align: center;
+  position: relative;
+  top: 15px;
+  left: 10px;
+  cursor: pointer;
+  color: red;
 }
 
 #correcto {
-    text-align: center;
-    position: relative;
-    top: 15px;
-    float: right;
-    cursor: pointer;
-    color: darkgreen;
+  text-align: center;
+  position: relative;
+  top: 15px;
+  float: right;
+  cursor: pointer;
+  color: darkgreen;
 }
 
 mat-form-field {
-    width: 320px;
-    padding: 10px 10px 0px 10px;
+  width: 320px;
+  padding: 10px 10px 0px 10px;
 }
-
 
 /** ESTILO TAMAÑO DE mat-form-field */
 #periodo {
-    width: 160px;
-    padding: 0px 10px 0px 5px;
+  width: 200px;
+  padding: 10px 10px 0px 10px;
 }
 
 #periodo_calculo {
-    width: 170px;
-    padding: 0px 10px 0px 5px;
+  width: 170px;
+  padding: 0px 10px 0px 5px;
 }
 
 #Vacacion_periodo {
-    width: 240px;
-    padding: 0px 5px 0px 5px;
+  width: 240px;
+  padding: 0px 5px 0px 5px;
 }
 
 #Maximo_dias {
-    width: 220px;
-    padding: 10px 10px 0px 10px;
+  width: 220px;
+  padding: 10px 10px 0px 10px;
 }
 
 #campos {
-    width: 140px;
-    padding: 0px 10px 0px 10px;
+  width: 140px;
+  padding: 0px 10px 0px 10px;
 }
 
 #campos_antiguedad {
-    width: 120px;
-    padding: 0px 5px 0px 5px;
+  width: 120px;
+  padding: 0px 5px 0px 5px;
 }
 
 #campos_calculos {
-    width: 260px;
-    padding: 5px 5px 0px 10px;
-}
-
-#campos_antiguedad_hasta {
-    width: 125px;
-    padding: 0px 10px 0px 10px;
+  width: 260px;
+  padding: 5px 5px 0px 10px;
 }
 
 button {
-    margin: 5px 10px 5px 10px;
+  margin: 5px 10px 5px 10px;
 }
 
 .button {
-    margin: 5px 10px 5px 10px;
+  margin: 5px 10px 5px 10px;
 }
 
 label {
-    font-size: small;
+  font-size: small;
 }
 
 /** ESTILOS TAMAÑO DE LETRA **/
 #letras_1 {
-    font-size: 11px;
+  font-size: 11px;
 }
 
 #letras_2 {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 #letras_3 {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 #letras_4 {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 #check {
-    width: 300px;
-    padding: 15px 20px 15px 20x;
-    margin-bottom: 10px;
-    margin-top: 20px;
-    margin-right: 20px;
-    margin-left: 0px;
-    font-size: 12px;
+  width: 300px;
+  padding: 15px 20px 15px 20x;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  margin-right: 20px;
+  margin-left: 0px;
+  font-size: 12px;
 }
 
 .check {
-    width: 210px;
-    padding: 15px 10px 15px 10x;
-    margin-bottom: 10px;
-    margin-top: 20px;
-    margin-right: 5px;
-    font-size: 14px;
+  width: 210px;
+  padding: 15px 10px 15px 10x;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  margin-right: 5px;
+  font-size: 14px;
 }
 
 #check_ {
-    width: 210px;
-    padding: 15px 20px 5px 20x;
-    margin-top: 20px;
-    margin-right: 20px;
-    margin-left: 0px;
-    font-size: 14px;
+  width: 210px;
+  padding: 15px 20px 5px 20x;
+  margin-top: 20px;
+  margin-right: 20px;
+  margin-left: 0px;
+  font-size: 14px;
 }
 
-
 mat-radio-group {
-    padding: 20px 20px 20px 20x;
-    margin-bottom: 10px;
+  padding: 20px 20px 20px 20x;
+  margin-bottom: 10px;
 }
 
 .subtitulo {
-    font-size: 15px;
-    font-weight: bold;
-    color: rgb(0, 0, 0);
+  font-size: 15px;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
 }
 
 #icono {
-    color: rgba(8, 10, 124, 0.828);
+  color: rgba(8, 10, 124, 0.828);
 }
 
 #error {
-    font-size: xx-small;
-    color: red;
-    width: max-content;
-    margin: 0%;
-    padding: 0%;
+  font-size: xx-small;
+  color: red;
+  width: max-content;
+  margin: 0%;
+  padding: 0%;
 }
 
 #error_ {
-    font-size: xx-small;
-    color: red;
-    width: max-content;
+  font-size: xx-small;
+  color: red;
+  width: max-content;
 }
 
 hr {
-    background-color: rgb(243, 239, 239);
+  background-color: rgb(243, 239, 239);
 }
 
 .mat-mdc-radio-button ~ .mat-mdc-radio-button {
-    margin-left: 40px;
-  }
+  margin-left: 40px;
+}
+
+mat-divider {
+  background: rgba(131, 131, 131, 0.609);
+}

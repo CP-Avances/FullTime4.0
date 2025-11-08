@@ -19,6 +19,9 @@ class LoginRuta {
         // METODO PARA CAMBIAR CONTRASEÑA
         this.router.post('/cambiar-contrasenia/', LOGIN_CONTROLADOR.CambiarContrasenia);
 
+        // METODO PARA AUDITAR INICIO DE SESION    **USADO
+        this.router.post('/registrar_acceso/', LOGIN_CONTROLADOR.RegistrarAuditoriaLogin);
+
     }
 
 }

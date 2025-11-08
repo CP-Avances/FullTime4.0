@@ -47,7 +47,7 @@ class VacunaRutas {
 
     configuracion(): void {
 
-        // METODO PARA LISTAR REGISTROS DE UN USUARIO   **USADO
+        // METODO PARA BUSCAR REGISTROS DE VACUNA DE UN EMPLEADO   **USADO
         this.router.get('/:id_empleado', TokenValidation, VACUNA_CONTROLADOR.ListarUnRegistro);
         // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS   **USADO
         this.router.get('/lista/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.ListarTipoVacuna);
@@ -68,12 +68,6 @@ class VacunaRutas {
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs/:id', VACUNA_CONTROLADOR.ObtenerDocumento);
 
-
-
-
-
-        // METODO PARA LEER TODOS LOS REGISTROS DE VACUNACION
-        this.router.get('/', TokenValidation, VACUNA_CONTROLADOR.ListarRegistro);
     }
 }
 

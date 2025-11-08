@@ -1,10 +1,10 @@
 
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { FormatearFechaBase, FormatearFecha2 } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { DateTime } from 'luxon';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import Excel from 'exceljs';
 import pool from '../../database';
 import path from 'path';
@@ -185,6 +185,7 @@ class FeriadosControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
+
     // METODO PARA ACTUALIZAR UN FERIADO   **USADO
     public async ActualizarFeriado(req: Request, res: Response): Promise<Response> {
         try {
@@ -323,6 +324,7 @@ class FeriadosControlador {
         }
     }
 
+    // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS MULTIPLE  **USADO
     public async FeriadosCiudadMultiplesEmpleados(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, ids } = req.body;
@@ -377,7 +379,7 @@ class FeriadosControlador {
     }
 
 
-    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS MULTIPLE  **USADO
     public async FeriadosRecuperacionCiudadMultiplesEmpleados(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, ids } = req.body;
@@ -405,7 +407,6 @@ class FeriadosControlador {
             return res.jsonp({ message: 'error' });
         }
     }
-
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR   **USADO
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
@@ -479,7 +480,7 @@ class FeriadosControlador {
                         data.fec_recuperacion = FECHA_RECUPERACION;
                         data.observacion = 'no registrada'
 
-                         //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                        //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                         data.fecha = data.fecha.trim();
                         data.descripcion = data.descripcion.trim();
                         data.fec_recuperacion = data.fec_recuperacion.trim();
@@ -1012,8 +1013,11 @@ class FeriadosControlador {
         return res.status(200).jsonp({ message: 'ok' });
     }
 
+
+
+
     /** ********************************************************************************************* **
-     ** **                          METODOS DE APLICACION MOVIL                                    ** **
+     ** **             M E T O D O S    D E    A P L I C A C I O N    M O V I L                    ** **
      ** ********************************************************************************************* **/
 
     // METODO PARA LEER FERIADOS   **USADO

@@ -1,13 +1,13 @@
 // IMPORTACION DE LIBRERIAS
 import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { catchError, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { forkJoin, of } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
@@ -20,6 +20,7 @@ import { MetodosComponent } from 'src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTACION DE SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
+import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { RolPermisosService } from 'src/app/servicios/configuracion/parametrizacion/catRolPermisos/rol-permisos.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
@@ -28,7 +29,6 @@ import { ReportesMicroService } from 'src/app/servicios/generales/reportes/repor
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRoles } from 'src/app/model/reportes.model';
-import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-vista-roles',
@@ -103,6 +103,11 @@ export class VistaRolesComponent implements OnInit {
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRoles();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -519,7 +524,6 @@ export class VistaRolesComponent implements OnInit {
       { key: "appmovil", width: 30 },
     ];
 
-
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
       { name: "ROL", totalsRowLabel: "Total:", filterButton: true },
@@ -528,7 +532,6 @@ export class VistaRolesComponent implements OnInit {
       { name: "MÓDULO", totalsRowLabel: "", filterButton: true },
       { name: "APLICACIÓN WEB", totalsRowLabel: "", filterButton: true },
       { name: "APLICACIÓN MÓVIL", totalsRowLabel: "", filterButton: true },
-
     ];
 
     worksheet.addTable({
@@ -543,7 +546,6 @@ export class VistaRolesComponent implements OnInit {
       columns: columnas,
       rows: datos,
     });
-
 
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -661,15 +663,15 @@ export class VistaRolesComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
-
   ExportToCSV() {
-    // 1. Crear un nuevo workbook
+    // 1. CREAR UN NUEVO WORKBOOK
     const workbook = new ExcelJS.Workbook();
     let n: number = 1;
 
-    // 2. Crear una hoja en el workbook
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
     const worksheet = workbook.addWorksheet('RolesCSV');
-    // 3. Agregar encabezados de las columnas
+
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
     worksheet.columns = [
       { header: 'n', key: 'n', width: 10 },
       { header: 'rol', key: 'rol', width: 30 },
@@ -680,7 +682,7 @@ export class VistaRolesComponent implements OnInit {
       { header: 'aplicacion_movil', key: 'aplicacion_movil', width: 15 },
 
     ];
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     this.data_general.forEach((obj: any) => {
       obj.funciones.forEach((det: any) => {
         worksheet.addRow({
@@ -713,9 +715,9 @@ export class VistaRolesComponent implements OnInit {
         }).commit();
       })
     });
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "RolesCSV.csv");
     });

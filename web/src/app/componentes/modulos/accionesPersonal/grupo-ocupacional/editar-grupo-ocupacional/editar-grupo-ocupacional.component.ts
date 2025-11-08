@@ -1,9 +1,10 @@
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { CatGrupoOcupacionalService } from 'src/app/servicios/modulos/modulo-acciones-personal/catGrupoOcupacional/cat-grupo-ocupacional.service';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-editar-grupo-ocupacional',
@@ -66,7 +67,8 @@ export class EditarGrupoOcupacionalComponent implements OnInit {
       id_grupo: this.data.id,
       grupo: form.grupoForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip,
+      ip_local: this.ips_locales
     };
 
     this._grupoOp.EditarGrupoOcupacion(dataGrado).subscribe({

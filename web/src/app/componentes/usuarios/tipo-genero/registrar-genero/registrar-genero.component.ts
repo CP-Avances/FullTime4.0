@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
+import { GenerosService } from 'src/app/servicios/usuarios/catGeneros/generos.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-registrar-genero',

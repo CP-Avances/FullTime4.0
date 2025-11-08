@@ -12,17 +12,15 @@ class ReportesAsistenciasRutas {
         this.configuracion();
     }
     configuracion() {
-        // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
-        this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
-        // REPORTES DE TIMBRES MULTIPLE     
+        // METODO PARA CONSULTAR LISTA DE TIMBRES DEL USUARIO    **USADO    
         this.router.post('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA      
+        // METODO DE BUSQUEDA DE TIMBRES DE TIMBRE VIRTUAL      **USADO      
         this.router.post('/timbres-sistema/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistema);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL   
+        // METODO DE BUSQUEDA DE TIMBRES DEL RELOJ VIRTUAL    **USADO 
         this.router.post('/timbres-reloj-virtual/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreRelojVirtual);
-        // REPORTES DE TIMBRES HORARIO ABIERTO   
+        // METODO DE BUSQUEDA DE TIMBRES HORARIO ABIERTO    **USADO  
         this.router.post('/timbres-horario-abierto/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbierto);
-        // REPORTES DE TIMBRES INCOMPLETOS     
+        // METODO DE BUSQUEDA DE TIMBRES INCOMPLETOS      **USADO    
         this.router.post('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
     }
 }

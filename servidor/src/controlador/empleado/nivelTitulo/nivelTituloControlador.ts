@@ -1,9 +1,7 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
-
 import pool from '../../../database';
 import Excel from 'exceljs'
 import path from 'path';
@@ -35,7 +33,7 @@ class NivelTituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -138,7 +136,7 @@ class NivelTituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM et_cat_nivel_titulo WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -257,8 +255,8 @@ class NivelTituloControlador {
             // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
             const existe_nivelProfecional = await pool.query(
               `
-            SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
-            `
+              SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+              `
               , [data.nombre]);
             if (existe_nivelProfecional.rowCount == 0) {
               data.fila = ITEM;
@@ -394,10 +392,9 @@ class NivelTituloControlador {
     if (error) {
       return res.status(500).jsonp({ message: 'error' });
     }
-
     return res.status(200).jsonp({ message: 'ok' });
-
   }
+
 }
 
 export const NIVEL_TITULO_CONTROLADOR = new NivelTituloControlador();

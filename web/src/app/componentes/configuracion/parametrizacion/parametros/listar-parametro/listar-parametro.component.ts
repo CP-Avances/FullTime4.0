@@ -5,10 +5,10 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { ToastrService } from 'ngx-toastr';
+import ExcelJS, { FillPattern } from "exceljs";
 
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import ExcelJS, { FillPattern } from "exceljs";
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
@@ -83,29 +83,8 @@ export class ListarParametroComponent implements OnInit {
     this.ObtenerParametros();
     this.ObtenerColores();
     this.ObtenerLogo();
-    this.bordeCompleto = {
-      top: { style: "thin" as ExcelJS.BorderStyle },
-      left: { style: "thin" as ExcelJS.BorderStyle },
-      bottom: { style: "thin" as ExcelJS.BorderStyle },
-      right: { style: "thin" as ExcelJS.BorderStyle },
-    };
+    this.ManejarEstilos();
 
-    this.bordeGrueso = {
-      top: { style: "medium" as ExcelJS.BorderStyle },
-      left: { style: "medium" as ExcelJS.BorderStyle },
-      bottom: { style: "medium" as ExcelJS.BorderStyle },
-      right: { style: "medium" as ExcelJS.BorderStyle },
-    };
-
-    this.fillAzul = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
-    };
-
-    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
-
-    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -136,13 +115,40 @@ export class ListarParametroComponent implements OnInit {
     });
   }
 
-  // EVENTO PARA MANEJAR PAGINACIÓN EN TABLAS
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
+    this.bordeCompleto = {
+      top: { style: "thin" as ExcelJS.BorderStyle },
+      left: { style: "thin" as ExcelJS.BorderStyle },
+      bottom: { style: "thin" as ExcelJS.BorderStyle },
+      right: { style: "thin" as ExcelJS.BorderStyle },
+    };
+
+    this.bordeGrueso = {
+      top: { style: "medium" as ExcelJS.BorderStyle },
+      left: { style: "medium" as ExcelJS.BorderStyle },
+      bottom: { style: "medium" as ExcelJS.BorderStyle },
+      right: { style: "medium" as ExcelJS.BorderStyle },
+    };
+
+    this.fillAzul = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
+    };
+
+    this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
+
+    this.fontHipervinculo = { color: { argb: "0000FF" }, underline: true };
+  }
+
+  // EVENTO PARA MANEJAR PAGINACION EN TABLAS
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
 
-  // METODO PARA LISTAR PARÁMETROS
+  // METODO PARA LISTAR PARAMETROS
   parametros: any = [];
   ObtenerParametros() {
     this.parametros = [];
@@ -359,10 +365,8 @@ export class ListarParametroComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
   async generarExcelParametros() {
-
     const parametroslista: any[] = [];
     let n: number = 1;
-
     this.parametros.forEach((obj: any) => {
       if (obj.detalles && obj.detalles.length > 0) {
         obj.detalles.forEach((det: any) => {
@@ -417,7 +421,6 @@ export class ListarParametroComponent implements OnInit {
       worksheet.getCell(cell).font = { bold: true, size: 14 };
     });
 
-
     worksheet.columns = [
       { key: "n", width: 10 },
       { key: "codigo", width: 25 },
@@ -425,7 +428,6 @@ export class ListarParametroComponent implements OnInit {
       { key: "detalle", width: 20 },
       { key: "descripcion", width: 160 },
     ];
-
 
     const columnas = [
       { name: "ITEM", totalsRowLabel: "Total:", filterButton: false },
@@ -447,7 +449,6 @@ export class ListarParametroComponent implements OnInit {
       columns: columnas,
       rows: parametroslista,
     });
-
 
     const numeroFilas = parametroslista.length;
     for (let i = 0; i <= numeroFilas; i++) {
@@ -490,13 +491,14 @@ export class ListarParametroComponent implements OnInit {
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
   ExportToCSV() {
-    // 1. Crear un nuevo workbook
+    // 1. CREAR UN NUEVO WORKBOOK
     const workbook = new ExcelJS.Workbook();
     let n: number = 1;
 
-    // 2. Crear una hoja en el workbook
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
     const worksheet = workbook.addWorksheet('ParametrosGeneralesCSV');
-    // 3. Agregar encabezados de las columnas
+
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
     worksheet.columns = [
       { header: 'n', key: 'n', width: 10 },
       { header: 'codigoParametro', key: 'codigo', width: 10 },
@@ -504,7 +506,7 @@ export class ListarParametroComponent implements OnInit {
       { header: 'detalle', key: 'detalle', width: 15 },
       { header: 'descripcion', key: 'descripcion', width: 15 }
     ];
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     this.parametros.forEach((obj: any) => {
       if (obj.detalles && obj.detalles.length > 0) {
         obj.detalles.forEach((det: any) => {
@@ -526,9 +528,9 @@ export class ListarParametroComponent implements OnInit {
         }).commit();
       }
     });
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "ParametrosGeneralesCSV.csv");
     });

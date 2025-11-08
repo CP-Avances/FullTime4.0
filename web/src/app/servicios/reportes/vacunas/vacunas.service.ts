@@ -10,7 +10,7 @@ export class VacunasService {
     private http: HttpClient
   ) { }
 
-  // METODO DE BUSQUEDA DE DATOS DE VACUNAS    **USADO
+  // METODO DE BUSQUEDA DE DATOS DE VACUNAS    **USADO**
   ReporteVacunasMultiples(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado-vacunas-multiples/vacunas-multiples/`, data);
   }

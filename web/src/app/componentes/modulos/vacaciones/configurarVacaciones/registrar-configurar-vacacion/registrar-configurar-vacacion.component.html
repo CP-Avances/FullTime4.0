@@ -1,0 +1,169 @@
+<div class="container" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo" class="row w-100 m-auto">
+            <div class="col-2 col-md-2 mb-2 mb-md-0">
+            </div>
+            <div class="col-8 col-md-8 mb-2 mb-md-0 Tabla_titulo">
+                <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+                    REGISTRAR CONFIGURACIÓN DE VACACIONES
+                </span>
+            </div>
+            <div class="col-2 col-md-2 mb-2 mb-md-0">
+                <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1,0)">highlight_off</mat-icon>
+            </div>
+        </div>
+        <mat-horizontal-stepper [linear]="isLinear" #stepper>
+            <mat-step [stepControl]="primeroFormGroup">
+                <form [formGroup]="primeroFormGroup">
+                    <ng-template matStepLabel>
+                        <mat-icon id="seccion_permiso" matSuffix matTooltipPosition="right"
+                            matTooltip="Sección 1: Información General">
+                            settings icon
+                        </mat-icon>
+                    </ng-template>
+                    <div class="subtitulo">
+                        <span>Configuración Vacaciones</span>
+                    </div>
+                    <br>
+                    <div class="nota">
+                        <span>
+                            Por favor llenar todos los campos obligatorios (*) del formulario y dar click en
+                            Siguiente para continuar.
+                        </span>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field>
+                                        <mat-label>Descripción</mat-label>
+                                        <input matInput placeholder="Vacaciones"
+                                            formControlName="nombreForm" id="nombreTP" required>
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Detalle que describa la configuración de vacaciones.">
+                                            article
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row p-0 m-0">
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px;">
+                                    <mat-form-field style="width: 100%;">
+                                        <mat-label style="font-size: small;">Solicitar vacaciones por:</mat-label>
+                                        <mat-select formControlName="diasHorasForm" required>
+                                            <mat-option *ngFor="let dh of diasHoras" [value]="dh.valor"
+                                                (click)="ActivarDiasHoras(primeroFormGroup.value)">
+                                                {{dh.nombre}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field *ngIf="!HabilitarDias" style="width: 100%;">
+                                        <mat-label style="font-size: smaller;">Días mínimos de vacaciones</mat-label>
+                                        <input matInput placeholder="Ej: 3" (keypress)="IngresarSoloNumeros($event)"
+                                            formControlName="numDiaMaximoForm" id="dias">
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Ingresar número de días mínimos de vacaciones.">
+                                            event
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <mat-form-field *ngIf="!HabilitarHoras" style="width: 100%;">
+                                        <mat-label>Horas y minutos mínimos de vacaciones</mat-label>
+                                        <input matInput type="time" placeholder="Ej: 04:30"
+                                            (keypress)="IngresarSoloNumeros($event)" formControlName="numHoraMaximoForm"
+                                            id="horas">
+                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Ingresar número de horas y minutos mínimos de vacaciones.">
+                                            access_time
+                                        </mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <mat-radio-group aria-label="Select an option" formControlName="documentoForm" required>
+                                    <label class="d-flex justify-content-center">
+                                        <span id="fuente">Obligatorio cargar un documento*</span>
+                                    </label>
+                                    <div class="d-flex justify-content-center">
+                                        <mat-radio-button value="true" matSuffix matTooltipPosition="right"
+                                            matTooltip="El usuario deberá cargar un documento al solicitar su solicitud de vacaciones.">
+                                            <label id="textoradiobtn">Si</label>
+                                        </mat-radio-button>
+                                        <mat-radio-button value="false" matSuffix matTooltipPosition="right"
+                                            matTooltip="El usuario podrá cargar el documento tiempo de después.">
+                                            <label id="textoradiobtn">No</label>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <label style="padding-top: 20px; position: relative; font-size: 12px;">
+                                        Incluir en la solicitud:
+                                    </label>
+                                </div>
+
+                                <div class="d-flex flex-wrap justify-content-center"
+                                    style="position: relative; left: 10px;">
+                                    <mat-checkbox matSuffix matTooltipPosition="right" formControlName="feriadosForm"
+                                        matTooltip="Si en la solicitud se encuentran días de feriado estos serán considerados como días normales.">
+                                        <label id="textoradiobtn">Feriados</label>
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br>
+                <div class="d-flex justify-content-between">
+                    <button mat-raised-button id="btn-raised" matStepperNext class="float-left">Siguiente</button>
+                    <button id="btn-raised" class="btn btn-sm float-right"
+                        (click)="InsertarConfiguracion(primeroFormGroup.value, segundoFormGroup.value);"
+                        [disabled]="!primeroFormGroup.valid" value="Guardar">
+                        Guardar
+                    </button>
+                </div>
+            </mat-step>
+            <mat-step [stepControl]="segundoFormGroup">
+                <ng-template matStepLabel>
+                    <mat-icon id="seccion_permiso" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 2: Acciones de personal">
+                        description
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Configuración Acciones de Personal</span>
+                </div>
+                <br>
+                <div class="nota">
+                    <span>
+                        Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Guardar
+                        para continuar.
+                    </span>
+                </div>
+                <form [formGroup]="segundoFormGroup">
+                    <div class="row">
+                        <div class="col">
+                        </div>
+                    </div>
+                </form>
+                <br>
+                <div class="d-flex justify-content-between">
+                    <button id="btn-raised" matStepperPrevious class="btn btn-sm float-left">
+                        Atrás
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm"
+                        (click)="InsertarConfiguracion(primeroFormGroup.value, segundoFormGroup.value);"
+                        [disabled]="!primeroFormGroup.valid" value="Guardar">
+                        Guardar
+                    </button>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </mat-card>
+</div>

@@ -50,7 +50,8 @@ export class EditarNivelTituloComponent implements OnInit {
       id: this.data.id,
       nombre: form.nombreForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     };
     // VERIFICAR SI EL NOMBRE DEL NIVEL ES DIFERENTE DEL REGISTRO
     if ((this.data.nombre).toUpperCase() === (nivel.nombre).toUpperCase()) {

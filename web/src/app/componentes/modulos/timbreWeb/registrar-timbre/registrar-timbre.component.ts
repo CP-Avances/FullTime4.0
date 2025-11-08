@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
+import { WebcamImage} from 'ngx-webcam';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { Component, OnInit } from '@angular/core';

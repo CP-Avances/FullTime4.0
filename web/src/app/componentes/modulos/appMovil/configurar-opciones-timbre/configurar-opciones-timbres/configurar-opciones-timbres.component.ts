@@ -14,7 +14,7 @@ import { checkOptions, FormCriteriosBusqueda, } from 'src/app/model/reportes.mod
 // IMPORTAR SERVICIOS
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';

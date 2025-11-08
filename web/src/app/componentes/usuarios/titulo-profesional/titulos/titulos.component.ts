@@ -109,7 +109,8 @@ export class TitulosComponent implements OnInit {
     let nivel = {
       nombre: form.nombreNivelForm,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();

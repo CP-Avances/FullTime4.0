@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-const { DateTime } = require("luxon");
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
@@ -133,7 +132,7 @@ export class ButtonAvisosComponent implements OnInit {
   LeerAvisos(formato_fecha: string, formato_hora: string) {
     this.aviso.BuscarAvisosGenerales(this.id_empleado_logueado).subscribe(res => {
       this.avisos = res;
-      //console.log('ver avisos leidos ', this.avisos)
+      console.log('ver avisos leidos ', this.avisos)
       if (!this.avisos.message) {
         if (this.avisos.length > 0) {
           // LEER TODOS LOS AVISOS

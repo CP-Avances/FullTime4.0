@@ -1,7 +1,7 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../../database';
@@ -9,12 +9,12 @@ import Excel from 'exceljs';
 
 class ModalidaLaboralControlador {
 
-    // METODO PARA LISTAR MODALIDAD LABORAL
+    // METODO PARA LISTAR REGISTROS DE MODALIDAD LABORAL   ** USADO
     public async ListaModalidadLaboral(req: Request, res: Response) {
         try {
             const MODALIDAL_LABORAL = await pool.query(
                 `
-                SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
+                    SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `
             );
             if (MODALIDAL_LABORAL.rowCount != 0) {
@@ -92,13 +92,13 @@ class ModalidaLaboralControlador {
 
             const modalExiste = await pool.query(
                 `
-                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
+                    SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
                 `
                 , [modali.toUpperCase(), id]);
 
             const consulta = await pool.query(
                 `
-                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                    SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
                 `
                 , [id]);
 
@@ -130,8 +130,8 @@ class ModalidaLaboralControlador {
 
                 const response: QueryResult = await pool.query(
                     `
-                    UPDATE e_cat_modalidad_trabajo SET descripcion = $2
-                    WHERE id = $1 RETURNING *
+                        UPDATE e_cat_modalidad_trabajo SET descripcion = $2
+                        WHERE id = $1 RETURNING *
                     `
                     , [id, modali]);
 
@@ -281,7 +281,7 @@ class ModalidaLaboralControlador {
                             data.fila = ITEM;
                             data.modalida_laboral = MODALIDAD_LABORAL;
                             data.observacion = 'no registrada';
-                            
+
                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                             data.modalida_laboral = data.modalida_laboral.trim();
                             data.observacion = data.observacion.trim();

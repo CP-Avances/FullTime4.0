@@ -2,29 +2,14 @@ import nodemailer from 'nodemailer'
 import pool from '../database';
 import { DateTime } from 'luxon';
 
-export let email: string = process.env.EMAIL || '';
-let pass: string = process.env.PASSWORD || '';
-export let nombre: string = process.env.NOMBRE || '';
-export let logo_: string = process.env.LOGO || '';
-export let pie_firma: string = process.env.PIEF || '';
-export let cabecera_firma: string = process.env.CABECERA || '';
-export let servidor: string = process.env.SERVIDOR || '';
-export let puerto: string = process.env.PUERTO || '';
+// METODO DE BUSQUEDA DE CREDENCIALES DEL SERVIDOR DE CORREO
+export const Credenciales = async function (id_empresa: number) {
+  let credenciales = [];
+  credenciales = await DatosCorreo(id_empresa);
+  return credenciales;
+}
 
-export const Credenciales =
-  async function (id_empresa: number, correo = process.env.EMAIL!,
-    password = process.env.PASSWORD!, empresa = process.env.NOMBRE!,
-    img = process.env.LOGO!, img_pie = process.env.PIEF!,
-    img_cabecera = process.env.CABECERA!, port = process.env.PUERTO!,
-    host = process.env.SERVIDOR!) {
-    let credenciales = [];
-    credenciales = await DatosCorreo(id_empresa);
-
-    return credenciales.message;
-
-  }
-
-
+// BUSQUEDA DE DATOS DEL SERVIDOR DE CORREO
 async function DatosCorreo(id_empresa: number): Promise<any> {
 
   let credenciales = await pool.query(
@@ -37,19 +22,13 @@ async function DatosCorreo(id_empresa: number): Promise<any> {
     .then(result => {
       return result.rows;
     })
-  console.log('correo... ', credenciales)
   if (credenciales.length === 0) {
     return { message: 'error' }
   }
   else {
-    email = credenciales[0].correo;
-    pass = credenciales[0].password_correo;
-    nombre = credenciales[0].nombre;
-    logo_ = credenciales[0].logo;
-    pie_firma = credenciales[0].pie_firma;
-    cabecera_firma = credenciales[0].cabecera_firma;
-    servidor = credenciales[0].servidor;
-    puerto = credenciales[0].puerto;
+
+    var pie_firma = credenciales[0].pie_firma;
+    var cabecera_firma = credenciales[0].cabecera_firma;
 
     if (cabecera_firma === null || cabecera_firma === '') {
       cabecera_firma = 'cabecera_firma.png';
@@ -58,35 +37,22 @@ async function DatosCorreo(id_empresa: number): Promise<any> {
     if (pie_firma === null || pie_firma === '') {
       pie_firma = 'pie_firma.png';
     }
-    return { message: 'ok' }
+
+    let informacion = {
+      email: credenciales[0].correo,
+      pass: credenciales[0].password_correo,
+      nombre: credenciales[0].nombre,
+      logo_: credenciales[0].logo,
+      servidor: credenciales[0].servidor,
+      puerto: credenciales[0].puerto,
+      pie_firma: pie_firma,
+      cabecera_firma: cabecera_firma,
+    };
+    return { message: 'ok', informacion }
   }
-
-}
-
-export const enviarMail = function (servidor: any, puerto: number) {
-  var seguridad: boolean = false;
-  if (puerto === 465) {
-    seguridad = true;
-  } else {
-    seguridad = false;
-  }
-
-  const transporter = nodemailer.createTransport({
-    //pool: true,
-    host: servidor,
-    port: puerto,
-    secure: seguridad,
-    auth: {
-      user: email,
-      pass: pass
-    },
-  });
-
-  return transporter;
 }
 
 export const enviarCorreos = function (servidor: any, puerto: number, email: string, pass: string) {
-  console.log('ver email y pass', email, pass, servidor, puerto);
   var seguridad: boolean = false;
   if (puerto === 465) {
     seguridad = true;
@@ -96,10 +62,7 @@ export const enviarCorreos = function (servidor: any, puerto: number, email: str
 
   const transporter = nodemailer.createTransport({
     pool: true,
-    //maxConnections: 2,
     maxMessages: Infinity,
-    //rateLimit: 14, // 14 emails/second max
-    //rateDelta: 1000,
     host: servidor,
     port: puerto,
     secure: seguridad,
@@ -108,7 +71,6 @@ export const enviarCorreos = function (servidor: any, puerto: number, email: str
       pass: pass
     },
   });
-
   return transporter;
 }
 
@@ -135,45 +97,38 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
   const fechaLuxon = DateTime.fromISO(fecha);
   console.log("ver fechaLuxon", fechaLuxon)
 
-  let diaFormateado =''
-  /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-    fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
-    if (dia == "dddd") {
-       diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
-       diaFormateado = diaFormateado.replace('.', '');
-       // Asegúrate de que la primera letra esté en mayúscula
-       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-    }else{
-       diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
-       diaFormateado = diaFormateado.replace('.', '');
-       // Asegúrate de que la primera letra esté en mayúscula
-       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-    }
+  let diaFormateado = '';
+  if (dia == "dddd") {
+    diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
+    diaFormateado = diaFormateado.replace('.', '');
+    // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
+    diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+  } else {
+    diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
+    diaFormateado = diaFormateado.replace('.', '');
+    // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
+    diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+  }
   const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
-
   const valor = `${diaFormateado}, ${fechaFormateada}`;
-
-  console.log(' fecha.. ', fechaFormateada);
   return valor;
 }
 
 export const FormatearFechaPlanificacion = async function (fecha: string, dia: string) {
   const formato = await BuscarFecha();
   const fechaLuxon = DateTime.fromJSDate(new Date(fecha));
-  let diaFormateado =''
-  /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-    fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
-    if (dia == "dddd") {
-       diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
-       diaFormateado = diaFormateado.replace('.', '');
-       // Asegúrate de que la primera letra esté en mayúscula
-       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-    }else{
-       diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
-       diaFormateado = diaFormateado.replace('.', '');
-       // Asegúrate de que la primera letra esté en mayúscula
-       diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-    }
+  let diaFormateado = '';
+  if (dia == "dddd") {
+    diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' })
+    diaFormateado = diaFormateado.replace('.', '');
+    // ASEGURATE DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
+    diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+  } else {
+    diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' })
+    diaFormateado = diaFormateado.replace('.', '');
+    // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
+    diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+  }
   const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
 
   const valor = `${diaFormateado}, ${fechaFormateada}`;
@@ -191,7 +146,7 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
   if (!regex.test(fecha) && !regexSinHora.test(fecha)) {
     console
     const date = new Date(fecha);
-    // Obtener las partes de la fecha y formatearlas con dos dígitos
+    // OBTENER LAS PARTES DE LA FECHA Y FORMATEARLAS CON DOS DÍGITOS
     const year = date.getUTCFullYear();
     const month = String(date.getUTCMonth() + 1).padStart(2, '0');
     const day = String(date.getUTCDate()).padStart(2, '0');
@@ -199,29 +154,29 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
     const minutes = String(date.getUTCMinutes()).padStart(2, '0');
     const seconds = String(date.getUTCSeconds()).padStart(2, '0');
 
-    // Devolver la fecha formateada
+    // DEVOLVER LA FECHA FORMATEADA
     fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
-  const fechaObj = DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
-  // Formatear el día
+  const fechaObj = DateTime.fromSQL(fecha); // UTILIZA fromSQL PARA UNA CADENA EN FORMATO 'YYYY-MM-DD HH:mm:ss' 
+  // FORMATEAR EL DÍA
   if (dia == "ddd") {
     let diaFormateado = fechaObj.toFormat("EEE", { locale: 'es' });
-    // Limpia el día formateado de puntos no deseados
+    // LIMPIA EL DÍA FORMATEADO DE PUNTOS NO DESEADOS
     diaFormateado = diaFormateado.replace('.', '');
-    // Asegúrate de que la primera letra esté en mayúscula
+    // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
     diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-    // Formatear la fecha
+    // FORMATEAR LA FECHA
     const fechaFormateada = fechaObj.toFormat(formato.fecha);
     let valor = `${diaFormateado}, ${fechaFormateada}`;
 
     return valor;
   } else if (dia == "dddd") {
     let diaFormateado = fechaObj.toFormat("EEEE", { locale: 'es' });
-    // Limpia el día formateado de puntos no deseados
+    // LIMPIA EL DÍA FORMATEADO DE PUNTOS NO DESEADOS
     diaFormateado = diaFormateado.replace('.', '');
-    // Asegúrate de que la primera letra esté en mayúscula
+    // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
     diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-    // Formatear la fecha
+    // FORMATEAR LA FECHA
     const fechaFormateada = fechaObj.toFormat(formato.fecha);
     let valor = `${diaFormateado}, ${fechaFormateada}`;
     return valor;
@@ -270,12 +225,12 @@ function transformDate(date: any): any {
 
 export const FormatearHora = async function (hora: string) {
   console.log("ver hora: ", hora)
-  const formato = await BuscarHora(); // Obtenemos el formato deseado desde la función
+  const formato = await BuscarHora(); // OBTENEMOS EL FORMATO DESEADO DESDE LA FUNCIÓN
   const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
-  
+
   const horaFormateada = horaConSegundos.length === 7 ? `0${horaConSegundos}` : horaConSegundos;
 
-  const valor = DateTime.fromFormat(horaFormateada , 'HH:mm:ss').toFormat(formato.hora);
+  const valor = DateTime.fromFormat(horaFormateada, 'HH:mm:ss').toFormat(formato.hora);
   return valor;
 };
 

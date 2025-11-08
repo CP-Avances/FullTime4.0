@@ -1,5 +1,59 @@
-import pool from '../database'
 import AUDITORIA_CONTROLADOR from '../controlador/reportes/auditoriaControlador';
+import { DateTime } from 'luxon';
+import pool from '../database'
+
+// METODO PARA GENERAR PERIODO DE VACACIONES
+export const generar_periodo = async function () {
+    // OBTENER FECHA
+    const fecha = DateTime.now().toFormat('yyyy-MM-dd');
+    console.log('Fecha usada para generar periodo:', fecha);
+    try {
+        const PERIODOS = await pool.query(
+            `SELECT fn_test_nuevos_periodos($1);`,
+            [fecha]
+        );
+
+        console.log('Resultado de fn_test_nuevos_periodos:', PERIODOS.rows);
+
+    } catch (error) {
+        console.error('Error al generar el periodo de vacaciones:', error);
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: number, user_name: string, ip: string, ip_local: string) {
 
@@ -36,7 +90,7 @@ export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: numb
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
 
-        // CONSULTAR DATOSORIGINALES
+        // CONSULTAR DATOS ORIGINALES
         const consulta = await pool.query(`SELECT * FROM mv_periodo_vacacion WHERE id = $1`, [vacacion.id_peri_vacacion]);
         const [datosOriginales] = consulta.rows;
 

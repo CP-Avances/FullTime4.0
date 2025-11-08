@@ -39,12 +39,11 @@ class FeriadosRuta {
         this.router.get('/:id', TokenValidation, FERIADOS_CONTROLADOR.ObtenerUnFeriado);
         // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
         this.router.post('/listar-feriados/ciudad', TokenValidation, FERIADOS_CONTROLADOR.FeriadosCiudad);
+        // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS MULTIPLE  **USADO
         this.router.post('/listar-feriados/ciudad2', TokenValidation, FERIADOS_CONTROLADOR.FeriadosCiudadMultiplesEmpleados);
-
-        // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
+        // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
         this.router.post('/listar-feriados-recuperar/ciudad', TokenValidation, FERIADOS_CONTROLADOR.FeriadosRecuperacionCiudad);
-
-        // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  **USADO
+        // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS MULTIPLE  **USADO
         this.router.post('/listar-feriados-recuperar/ciudad2', TokenValidation, FERIADOS_CONTROLADOR.FeriadosRecuperacionCiudadMultiplesEmpleados);
         // METODO PARA VALIDAR DATOS DE PLANTILLA   **USADO
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos);

@@ -65,8 +65,6 @@ export class EliminarIndividualComponent implements OnInit {
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
     }); 
-    
-
   }
 
   // METODO PARA VERIFICAR QUE CAMPOS DE FECHAS NO SE ENCUENTREN VACIOS
@@ -112,7 +110,6 @@ export class EliminarIndividualComponent implements OnInit {
     this.horariosSeleccionados = [];
     this.fechaInicioFormluxon = this.validar.DarFormatoFecha(form.fechaInicioForm, 'yyyy-MM-dd');
     this.fechaFinFormluxon = this.validar.DarFormatoFecha(form.fechaFinalForm, 'yyyy-MM-dd');
-    console.log("ver fecha_inicio", form.fechaInicioForm)
     let busqueda = {
       fecha_inicio: this.fechaInicioFormluxon,
       fecha_final: this.fechaFinFormluxon,
@@ -173,7 +170,7 @@ export class EliminarIndividualComponent implements OnInit {
 
   // METODO PARA RETIRAR OBJETO
   QuitarHorario(data: any) {
-    this.horariosSeleccionados = this.horariosSeleccionados.filter(s => s !== data);
+    this.horariosSeleccionados = this.horariosSeleccionados.filter((s: any) => s !== data);
   }
 
   // AGREGAR DATOS MULTIPLES
@@ -182,7 +179,6 @@ export class EliminarIndividualComponent implements OnInit {
     for (var i = 0; i <= this.lista_horarios.length - 1; i++) {
       (<HTMLInputElement>document.getElementById('horariosSeleccionados' + i)).checked = true;
     }
-    console.log("ver horarios seleccionados: ", this.horariosSeleccionados)
   }
 
   // QUITAR TODOS LOS DATOS SELECCIONADOS
@@ -209,12 +205,12 @@ export class EliminarIndividualComponent implements OnInit {
     };
 
     this.rest.BuscarFechasMultiples(datos).subscribe(res => {
-      console.log("Ver horairos a eliminar: ", res)
       this.lista_eliminar = res;
       let datosEliminar = {
         id_plan: res,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales
+        ip: this.ip, 
+        ip_local: this.ips_locales
       };
       this.EliminarDatos(datosEliminar);
     }, error => {

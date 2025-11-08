@@ -24,7 +24,7 @@ class ProvinciaRutas {
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.EliminarProvincia);
         // METODO PARA REGISTRAR PROVINCIA  **USADO
         this.router.post('/', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.CrearProvincia);
-        // METODO PARA BUSCAR DATOS DE UNA PROVINCIA
+        // METODO PARA BUSCAR DATOS DE UNA PROVINCIA   **USADO
         this.router.get('/buscar/:id', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ObtenerProvincia);
         // METODO PARA BUSCAR DATOS DE UN PAIS     *USADO
         this.router.get('/buscar/pais/:id', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ObtenerPais);

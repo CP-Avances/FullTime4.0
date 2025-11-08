@@ -1,12 +1,12 @@
+import AUDITORIA_CONTROLADOR from "../reportes/auditoriaControlador";
+import { DateTime } from "luxon";
 import { Request, Response } from "express";
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
-import AUDITORIA_CONTROLADOR from "../reportes/auditoriaControlador";
 import path from 'path';
 import Excel from 'exceljs';
 import pool from '../../database';
 import fs from 'fs';
-import { DateTime } from "luxon";
 
 class PlanificacionHorariaControlador {
 
@@ -75,7 +75,6 @@ class PlanificacionHorariaControlador {
                 return Object.keys(data).length > 1;
             });
 
-
             // ESTRUCTURAR PLANTILLA PLANIFICACION HORARIA
             let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data: any) => {
                 let nuevoObjeto: { identificacion: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { identificacion: data.IDENTIFICACION, dias: {} };
@@ -89,7 +88,6 @@ class PlanificacionHorariaControlador {
                         nuevoObjeto.dias[fechaFormateada] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
                     }
                 }
-
                 return nuevoObjeto;
             });
 
@@ -127,7 +125,7 @@ class PlanificacionHorariaControlador {
                     data.cedula_empleado = empleadoVerificado[1].identificacion;
 
                     const feriados = await ConsultarFeriados(fechaInicial, fechaFinal, empleadoVerificado[1].id);
-                    // consultar fechas del mes desde inicil hasta final si en data.dias falta alguna fecha agregarla con el codigo DEFAULT-FERIADO si es feriado si no omitir y no agregar a data.dias
+                    // CONSULTAR FECHAS DEL MES DESDE INICIL HASTA FINAL SI EN data.dias FALTA ALGUNA FECHA AGREGARLA CON EL CODIGO DEFAULT-FERIADO SI ES FERIADO SI NO OMITIR Y NO AGREGAR A data.dias
                     let fechasMes = ObtenerFechasMes(fechaInicial, fechaFinal);
                     for (let fecha of fechasMes) {
                         if (!data.dias[fecha]) {
@@ -322,7 +320,6 @@ class PlanificacionHorariaControlador {
                                 minutos_alimentacion: horarioDefaultLibre.entrada.minutos_comida
                             };
 
-
                             salida = {
                                 id_empleado: data.id_empleado,
                                 id_empl_cargo: data.id_empl_cargo,
@@ -436,18 +433,25 @@ class PlanificacionHorariaControlador {
     }
 }
 
-// FUNCION PARA VERIFICAR EXISTENCIA DE EMPLEADO EN LA BASE DE DATOS
+
+export const PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
+
+export default PLANIFICACION_HORARIA_CONTROLADOR;
+
+// FUNCION PARA VERIFICAR EXISTENCIA DE EMPLEADO EN LA BASE DE DATOS     **USADO
 async function VerificarEmpleado(identificacion: string): Promise<[boolean, any, string]> {
     try {
         let observacion = '';
         let empleadoValido = false;
 
-        const empleado = await pool.query(`
-            SELECT e.*, dae.id_cargo, dae.hora_trabaja 
-            FROM eu_empleados e 
-            LEFT JOIN informacion_general dae ON e.identificacion = dae.identificacion 
-            WHERE LOWER(e.identificacion) = $1
-        `, [identificacion.toLowerCase()]);
+        const empleado = await pool.query(
+            `
+                SELECT e.*, dae.id_cargo, dae.hora_trabaja 
+                FROM eu_empleados e 
+                LEFT JOIN informacion_general dae ON e.identificacion = dae.identificacion 
+                WHERE LOWER(e.identificacion) = $1
+            `
+            , [identificacion.toLowerCase()]);
 
         if (empleado.rowCount === 0) {
             observacion = 'Empleado no válido';
@@ -463,8 +467,8 @@ async function VerificarEmpleado(identificacion: string): Promise<[boolean, any,
     }
 }
 
+// METODO PARA VERIFICAR HORARIOS     **USADO
 async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any> {
-
     try {
         let { dias, fecha_inicio, fecha_final, id_empleado, hora_trabaja } = datos;
         // CONSULTAR FERIADOS
@@ -536,7 +540,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios): Promise<any>
     }
 }
 
-// FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS
+// FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS     **USADO
 async function VerificarHorario(codigo: any): Promise<[boolean, any]> {
     try {
         const horario = await pool.query('SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1',
@@ -556,7 +560,7 @@ async function VerificarHorario(codigo: any): Promise<[boolean, any]> {
     }
 }
 
-// FUNCION PARA VERIFICAR SOBREPOSICION DE HORARIOS
+// FUNCION PARA VERIFICAR SOBREPOSICION DE HORARIOS    **USADO
 async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposicionHorarios): Promise<any> {
 
     try {
@@ -680,14 +684,13 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                 dias[dia].observacion = `Rangos similares`;
             }
         }
-
         return dias;
     } catch (error) {
         throw error;
     }
 }
 
-// FUNCIÓN PARA VERIFICAR SI DOS HORARIOS SE SOBREPONEN
+// FUNCION PARA VERIFICAR SI DOS HORARIOS SE SOBREPONEN     **USADO
 function SeSuperponen(horario1: any, horario2: any) {
     return (horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
         (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha) ||
@@ -695,7 +698,7 @@ function SeSuperponen(horario1: any, horario2: any) {
         (horario1.salida.fecha <= horario2.salida.fecha && horario1.salida.fecha >= horario2.entrada.fecha);
 }
 
-// FUNCIÓN PARA ACTUALIZAR OBSERVACIONES Y RANGOS SIMILARES
+// FUNCION PARA ACTUALIZAR OBSERVACIONES Y RANGOS SIMILARES     **USADO
 function ActualizarObservacionesYRangosSimilares(horario1: any, horario2: any, rangosSimilares: any, horariosModificados: boolean) {
     if (horario1.dia === horario2.dia && horario1.codigo === horario2.codigo) {
         horario1.observacion = `Ya existe planificación`;
@@ -710,12 +713,9 @@ function ActualizarObservacionesYRangosSimilares(horario1: any, horario2: any, r
 
 }
 
-
-// METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL EMPLEADO   --**VERIFICADO
+// METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL EMPLEADO   **USADO
 async function ListarPlanificacionHoraria(id_empleado: number, fecha_inicio: string, fecha_final: string): Promise<any> {
-
     try {
-
         const horario = await pool.query(`
             SELECT p_g.id_empleado AS id_e, fecha_horario AS fecha, id_horario AS id, 
             horario.codigo AS codigo_dia, horario.default_ AS tipo_dia
@@ -739,7 +739,7 @@ async function ListarPlanificacionHoraria(id_empleado: number, fecha_inicio: str
     }
 }
 
-// FUNCION PARA CONSULTAR FERIADOS
+// FUNCION PARA CONSULTAR FERIADOS     **USADO
 async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_usuario: number): Promise<any> {
     try {
 
@@ -765,7 +765,7 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
     }
 }
 
-// FUNCION PARA CONSULTAR HORARIOS DEFAULT Y SUS DETALLES
+// FUNCION PARA CONSULTAR HORARIOS DEFAULT Y SUS DETALLES     **USADO
 async function ConsultarHorarioDefault(codigo: string): Promise<any> {
     try {
         const horario: any = await pool.query(
@@ -778,7 +778,7 @@ async function ConsultarHorarioDefault(codigo: string): Promise<any> {
         );
 
         if (horario.rowCount != 0) {
-            //SEPARAR LOS TIPOS DE ACCIONES DE LOS HORARIOS
+            // SEPARAR LOS TIPOS DE ACCIONES DE LOS HORARIOS
             let horarioEstructurado: any;
             const entrada = horario.rows.find((o: any) => o.tipo_accion === 'E');
             const salida = horario.rows.find((o: any) => o.tipo_accion === 'S');
@@ -800,7 +800,7 @@ async function ConsultarHorarioDefault(codigo: string): Promise<any> {
     }
 }
 
-// FUNCION PARA CREAR PLANIFICACION HORARIA
+// FUNCION PARA CREAR PLANIFICACION HORARIA    **USADO
 async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, datosUsuario: DatosUsuario): Promise<any> {
     try {
         // DESESCTRUCTURAR PLANIFICACION HORARIA
@@ -1006,6 +1006,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
     }
 }
 
+// METODO PARA ELIMINAR PLANIFICACION     **USADO
 async function EliminarPlanificacionNormalDiaFeriado(id_empleado: number, fecha: string): Promise<any> {
     await pool.query(
         `
@@ -1014,7 +1015,7 @@ async function EliminarPlanificacionNormalDiaFeriado(id_empleado: number, fecha:
         , [id_empleado, fecha]);
 }
 
-// FUNCION PARA CONVERTIR HORAS A MINUTOS
+// FUNCION PARA CONVERTIR HORAS A MINUTOS    **USADO
 function ConvertirHorasAMinutos(hora: string): number {
     const partes = hora.split(':');
     const horas = parseInt(partes[0], 10);
@@ -1022,13 +1023,14 @@ function ConvertirHorasAMinutos(hora: string): number {
     return horas * 60 + minutos;
 }
 
-// FUNCION PARA CONVERTIR MINUT0S A HORAS
+// FUNCION PARA CONVERTIR MINUT0S A HORAS   **USADO
 function ConvertirMinutosAHoras(minutos: number): string {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;
     return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
 }
 
+// METODO PARA OBTENER FECHAS DEL MES    **USADO
 function ObtenerFechasMes(fechaInicial: string, fechaFinal: string) {
     let fechas: string[] = [];
     let fechaInicio = DateTime.fromISO(fechaInicial, { zone: 'utc' });
@@ -1042,6 +1044,7 @@ function ObtenerFechasMes(fechaInicial: string, fechaFinal: string) {
     return fechas;
 }
 
+// FUNCION PARA ELIMINAR LA PLANTILLA DEL ALMACENAMIENTO TEMPORAL   **USADO
 function EliminarPlantilla(ruta: string) {
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -1098,7 +1101,3 @@ interface DatosUsuario {
     ip: string,
     ip_local: string,
 }
-
-export const PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
-
-export default PLANIFICACION_HORARIA_CONTROLADOR;

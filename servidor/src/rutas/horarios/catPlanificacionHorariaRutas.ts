@@ -1,9 +1,8 @@
+import PLANIFICACION_HORARIA_CONTROLADOR from '../../controlador/horarios/catPlanificacionHorariaControlador';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
-
-import PLANIFICACION_HORARIA_CONTROLADOR from '../../controlador/horarios/catPlanificacionHorariaControlador';
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 
 const storage = multer.diskStorage({
 
@@ -18,7 +17,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
 
 class PlanificacionHorariaRutas{
     public router: Router = Router();

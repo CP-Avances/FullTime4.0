@@ -194,14 +194,9 @@ export class RegistrarAsistenciaComponent implements OnInit {
       if (data.message === 'OK') {
         this.timbres = data.respuesta;
         this.timbres.forEach((obj: any) => {
-          console.log('obj.t_hora_timbre: ', obj.t_hora_timbre)
-          console.log('this.informacion.detalle.hora_horario: ', this.informacion.detalle.hora_horario)
 
           var h_horario = DateTime.fromFormat(obj.t_hora_timbre, 'HH:mm:ss');
           var h_timbre = DateTime.fromFormat(this.informacion.detalle.hora_horario, 'HH:mm:ss');
-          console.log("h_horario: ", h_horario)
-          console.log("h_timbre: ", h_timbre)
-
 
           if (this.informacion.detalle.hora_horario < obj.t_hora_timbre) {
             var duration = h_horario.diff(h_timbre, 'hours').hours;

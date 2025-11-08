@@ -12,7 +12,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/generales/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/generales/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario/usuario.service';
 import { AsignacionesService } from 'src/app/servicios/usuarios/asignaciones/asignaciones.service';
@@ -1070,7 +1070,8 @@ export class ListaWebComponent implements OnInit {
       array: seleccionados,
       web_habilita: seleccionados[0].web_habilita,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip, 
+      ip_local: this.ips_locales,
     }
     this.informacion.ActualizarEstadoTimbreWeb(datos).subscribe(res => {
       this.toastr.success(res.message)
@@ -1285,11 +1286,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   getActivarUsuarios(){
-    return this.tienePermiso('Activar Usuarios', 48);
+    return this.tienePermiso('Activar Usuarios', 50);
   }
 
   getDesactivarUsuarios(){
-    return this.tienePermiso('Inactivar Usuarios', 48);
+    return this.tienePermiso('Inactivar Usuarios', 50);
   }
 
 }

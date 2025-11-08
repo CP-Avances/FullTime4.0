@@ -13,12 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AUDITORIA_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../database"));
 const stream_1 = require("stream");
+const database_1 = __importDefault(require("../../database"));
 class AuditoriaControlador {
     constructor() {
+        // INSERTAR REGISTRO DE AUDITORIA POR LOTES DE DATOS   **USADO
         this.InsertarAuditoriaPorLotes = (data, user_name, ip, ip_local) => __awaiter(this, void 0, void 0, function* () {
-            const batchSize = 1000; // Tamaño del lote, puedes ajustarlo según tus necesidades
+            const batchSize = 1000; // TAMAÑO DEL LOTE, PUEDES AJUSTARLO SEGUN TUS NECESIDADES
             const totalResults = [];
             for (let i = 0; i < data.length; i += batchSize) {
                 const batch = data.slice(i, i + batchSize);
@@ -26,10 +27,10 @@ class AuditoriaControlador {
                 const placeholders = [];
                 for (let j = 0; j < batch.length; j++) {
                     const auditoria = batch[j];
-                    const index = j * 10; // 9 es el número de campos a insertar
-                    valores.push("APLICACION WEB", // Asumiendo que la plataforma es siempre "APLICACION WEB"
+                    const index = j * 10; // 9 ES EL NUMERO DE CAMPOS A INSERTAR
+                    valores.push("APLICACION WEB", // ASUMIENDO QUE LA PLATAFORMA ES SIEMPRE "APLICACION WEB"
                     auditoria.tabla, user_name, new Date(), auditoria.accion, auditoria.datosOriginales, auditoria.datosNuevos, ip, auditoria.observacion, ip_local);
-                    // Crear los placeholders para la consulta de inserción masiva
+                    // CREAR LOS PLACEHOLDERS PARA LA CONSULTA DE INSERCION MASIVA
                     placeholders.push(`($${index + 1}, $${index + 2}, $${index + 3}, $${index + 4}, $${index + 5}, $${index + 6}, $${index + 7}, $${index + 8}, $${index + 9}, $${index + 10})`);
                 }
                 const query = `
@@ -37,7 +38,7 @@ class AuditoriaControlador {
                     plataforma, table_name, user_name, fecha_hora,
                     action, original_data, new_data, ip_address, observacion, ip_address_local
                 ) VALUES ${placeholders.join(', ')}
-            `;
+                `;
                 try {
                     // INICIAR TRANSACCIÓN
                     yield database_1.default.query('BEGIN');
@@ -60,14 +61,15 @@ class AuditoriaControlador {
             }
         });
     }
+    // METODO PARA CONSULTAR DATOS EMPAQUETADOS - AUDITORIA     **USADO
     BuscarDatosAuditoriaporTablasEmpaquetados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { tabla, desde, hasta, action } = req.body;
-            // Convertir las cadenas de acciones en arrays
+            // CONVERTIR LAS CADENAS DE ACCIONES EN ARRAYS
             const actionsArray = action.split(',').map((a) => a.trim().replace(/'/g, ''));
-            // Construir cláusula dinámica IN para acciones
+            // CONSTRUIR CLAUSULA DINAMICA IN PARA ACCIONES
             const actionClause = `action IN (${actionsArray.map((_, i) => `$${i + 2}`).join(', ')})`;
-            // Asegúrate de que las fechas sean correctamente formateadas
+            // ASEGURATE DE QUE LAS FECHAS SEAN CORRECTAMENTE FORMATEADAS
             const fechaDesde = new Date(desde).toISOString();
             const fechaHasta = new Date(hasta + 'T23:59:59').toISOString();
             const params = [tabla, ...actionsArray, fechaDesde, fechaHasta];
@@ -95,7 +97,7 @@ class AuditoriaControlador {
                     result.rows.forEach(row => {
                         dataStream.push(JSON.stringify(row));
                     });
-                    dataStream.push(null); // Fin del stream
+                    dataStream.push(null); // FIN DEL STREAM
                     res.set('Content-Type', 'application/json');
                     dataStream.pipe(res);
                 }
@@ -108,7 +110,30 @@ class AuditoriaControlador {
             }
         });
     }
-    // INSERTAR REGISTRO DE AUDITORIA
+    // METODO DE CONSULTA DE AUDITORIA DE INICIOS DE SESION    **USADO
+    BuscarDatosAuditoriaAcceso(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { desde, hasta } = req.body;
+            const AUDITORIA = yield database_1.default.query(`
+            SELECT 
+                a.plataforma, a.user_name, CAST(a.fecha AS VARCHAR), a.hora, a.acceso, a.ip_addres, 
+                a.observaciones, a.ip_addres_local               
+            FROM 
+                audit.acceso_sistema AS a
+            WHERE 
+                a.fecha BETWEEN $1 AND $2
+            ORDER BY 
+                a.fecha DESC;
+            `, [desde, hasta]);
+            if (AUDITORIA.rowCount != 0) {
+                return res.jsonp({ message: 'ok', datos: AUDITORIA.rows });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'No se han encontrado registro.' });
+            }
+        });
+    }
+    // INSERTAR REGISTRO DE AUDITORIA    **USADO
     InsertarAuditoria(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

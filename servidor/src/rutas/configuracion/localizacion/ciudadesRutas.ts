@@ -13,7 +13,7 @@ class CiudadRutas {
 
         // BUSCAR INFORMACION DE LA CIUDAD  **USADO
         this.router.get('/informacion-ciudad/:id_ciudad', TokenValidation, CIUDAD_CONTROLADOR.ListarInformacionCiudad);
-        // BUSQUEDA DE LISTA DE CIUDADES
+        // BUSQUEDA DE LISTA DE CIUDADES   **USADO
         this.router.get('/listaCiudad', TokenValidation, CIUDAD_CONTROLADOR.ListarCiudades);
         // LISTAR CIUDADES POR PROVINCIA  ** USADO
         this.router.get('/ciudad-provincia/:id_provincia', TokenValidation, CIUDAD_CONTROLADOR.ListarCiudadesProvincia);

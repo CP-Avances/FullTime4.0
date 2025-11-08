@@ -12,12 +12,20 @@ class DepartamentoRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA BUSCAR PERIODO DE VACACIONES   **USADO
-        this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarIdPerVacaciones);
+        // METODO PARA CREAR PERIODO DE VACACIONES   **USADO
+        this.router.post('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CrearPerVacaciones);
+        // METODO PARA ACTUALIZAR PERIODO DE VACACIONES   **USADO
+        this.router.put('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ActualizarPeriodo);
         // METODO PARA CONSULTAR DATOS DE PERIODO DE VACACION    **USADO
         this.router.get('/infoPeriodo/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarPerVacaciones);
-        this.router.post('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CrearPerVacaciones);
-        this.router.put('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ActualizarPeriodo);
+        // METODO PARA BUSCAR PERIODO DE VACACIONES   **USADO
+        this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarIdPerVacaciones);
+        // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
+        this.router.post('/cerrar-periodos', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CerrarPeriodoVacaciones);
+        // METODO PARA CREAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
+        this.router.post('/periodo-crear-manual', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.GenerarPeriodoManual);
+        // METODO PARA CONSULTAR LISTA DE PERIODOS DE VACACIONES DEL USUARIO    **USADO    
+        this.router.post('/buscar-periodos/:estado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ReportePeriodosVacaciones);
     }
 }
 const PERIODO_VACACION__RUTAS = new DepartamentoRutas();

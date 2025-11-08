@@ -142,6 +142,11 @@ export class PrincipalHorarioComponent implements OnInit {
     this.ObtenerColores();
     this.ObtenerHorarios();
     this.ObtenerEmpleados();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -159,7 +164,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
@@ -399,7 +404,6 @@ export class PrincipalHorarioComponent implements OnInit {
     this.rest.VerificarDatosHorario(formData).subscribe({
       next: (res) => {
         this.dataHorarios = res;
-        console.log("DETALLE DE HORARIO", this.dataHorarios)
         this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
           if (obj.OBSERVACION == 'Ok') {
             this.listaHorariosCorrectos.push(obj);
@@ -476,7 +480,8 @@ export class PrincipalHorarioComponent implements OnInit {
       horarios: this.listaHorariosCorrectos,
       detalles: this.listaDetalleCorrectos,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
@@ -834,7 +839,6 @@ export class PrincipalHorarioComponent implements OnInit {
       rows: datos,
     });
 
-
     const numeroFilas = datos.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 14; j++) {
@@ -894,7 +898,7 @@ export class PrincipalHorarioComponent implements OnInit {
       { header: 'minutos_antes', key: 'minutos_antes', width: 15 },
       { header: 'minutos_despues', key: 'minutos_despues', width: 15 },
     ];
-    // 4. Llenar las filas con los datos
+    // 4. LLENAR LAS FILAS CON LOS DATOS
     let n: number = 1;
 
     this.horarios.forEach((obj: any) => {
@@ -918,9 +922,9 @@ export class PrincipalHorarioComponent implements OnInit {
       })
     })
 
-    // 5. Escribir el CSV en un buffer
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
     workbook.csv.writeBuffer().then((buffer) => {
-      // 6. Crear un blob y descargar el archivo
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
       const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
       FileSaver.saveAs(data, "HorariosCSV.csv");
     });

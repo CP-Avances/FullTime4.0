@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -16,8 +16,6 @@ export class EditarGeneroComponent {
   ips_locales: any = '';
 
   constructor(
-    // private ntitulo: NivelTitulosService,
-    // private rest: TituloService,
     private generoS: GenerosService,
 
     private toastr: ToastrService,

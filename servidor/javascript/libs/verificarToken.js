@@ -27,7 +27,6 @@ const TokenValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         return res.status(401).send('No contienen token de autenticación.');
     }
     try {
-        //next();
         // SI EL TOKEN NO ESTA VACIO
         // SE EXTRAE LOS DATOS DEL TOKEN 
         const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET || 'llaveSecreta');
@@ -37,7 +36,7 @@ const TokenValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         const EMPRESA = yield database_1.default.query(`
             SELECT public_key, id AS id_empresa FROM e_empresa
             `);
-        const { public_key, id_empresa } = EMPRESA.rows[0];
+        const { public_key } = EMPRESA.rows[0];
         const licenciaData = yield fetch(`${process.env.DIRECCIONAMIENTO}/licencia`, {
             method: "POST",
             headers: {
@@ -60,7 +59,6 @@ const TokenValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
             req.userIdCargo = payload.cargo;
             req.userCodigo = payload.codigo;
             req.acciones_timbres = payload._acc_tim;
-            //req.modulos = payload.modulos;
             next();
         }
         else {

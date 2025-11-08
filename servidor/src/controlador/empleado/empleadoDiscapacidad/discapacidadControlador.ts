@@ -78,7 +78,7 @@ class DiscapacidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
@@ -134,7 +134,7 @@ class DiscapacidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const discapacidad = await pool.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
@@ -263,21 +263,6 @@ class DiscapacidadControlador {
       res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
-
-  public async list(req: Request, res: Response) {
-    const DISCAPACIDAD = await pool.query(
-      `
-      SELECT * FROM eu_empleado_discapacidad
-      `
-    );
-    if (DISCAPACIDAD.rowCount != 0) {
-      return res.jsonp(DISCAPACIDAD.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
 
 }
 

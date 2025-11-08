@@ -28,6 +28,8 @@
                     school
                 </mat-icon>
             </mat-form-field>
+
+
             <mat-form-field>
                 <mat-label>Nivel</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -41,6 +43,8 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
+
+            
             <mat-form-field *ngIf="!HabilitarDescrip">
                 <mat-label>Registrar nivel</mat-label>
                 <input matInput placeholder="Ingresar nombre" formControlName="nombreNivelForm"

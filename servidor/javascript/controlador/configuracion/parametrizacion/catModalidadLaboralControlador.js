@@ -13,19 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.modalidaLaboralControlador = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../../database"));
 const exceljs_1 = __importDefault(require("exceljs"));
 class ModalidaLaboralControlador {
-    // METODO PARA LISTAR MODALIDAD LABORAL
+    // METODO PARA LISTAR REGISTROS DE MODALIDAD LABORAL   ** USADO
     ListaModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const MODALIDAL_LABORAL = yield database_1.default.query(`
-                SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
+                    SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `);
                 if (MODALIDAL_LABORAL.rowCount != 0) {
                     return res.jsonp(MODALIDAL_LABORAL.rows);
@@ -93,10 +93,10 @@ class ModalidaLaboralControlador {
                 const { id, modalidad, user_name, ip, ip_local } = req.body;
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
                 const modalExiste = yield database_1.default.query(`
-                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
+                    SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
                 `, [modali.toUpperCase(), id]);
                 const consulta = yield database_1.default.query(`
-                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                    SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
                 `, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -121,8 +121,8 @@ class ModalidaLaboralControlador {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
-                    UPDATE e_cat_modalidad_trabajo SET descripcion = $2
-                    WHERE id = $1 RETURNING *
+                        UPDATE e_cat_modalidad_trabajo SET descripcion = $2
+                        WHERE id = $1 RETURNING *
                     `, [id, modali]);
                     const [modalidadLaboral] = response.rows;
                     // REGISTRAR AUDITORIA

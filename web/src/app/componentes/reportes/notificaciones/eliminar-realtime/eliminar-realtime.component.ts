@@ -2,8 +2,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbrar/timbres.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/avisos/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 
 @Component({
@@ -64,14 +64,17 @@ export class EliminarRealtimeComponent implements OnInit {
     const datos = {
       arregloNotificaciones: this.ids,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     }
 
     const datosAvisos = {
       arregloAvisos: this.ids,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     }
+
     // ELIMINACION DE NOTIFICACIONES DE AVISOS
     if (this.Notificaciones.opcion === 1) {
       this.restAvisos.EliminarAvisos(datosAvisos).subscribe(res => {
@@ -90,7 +93,7 @@ export class EliminarRealtimeComponent implements OnInit {
         }
       });
 
-      // ELIMINACION DE NOTIFICACIONES DE PERMISOS, HORAS EXTRAS Y VACACIONES
+      // ELIMINACION DE NOTIFICACIONES DE MODULOS
     } else if (this.Notificaciones.opcion === 2) {
       this.realtime.EliminarNotificaciones(datos).subscribe(res => {
         console.log(res);

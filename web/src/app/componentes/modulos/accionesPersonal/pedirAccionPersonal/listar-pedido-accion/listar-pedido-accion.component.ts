@@ -2,11 +2,8 @@
 import { Validators, FormControl } from "@angular/forms";
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
-import { DateTime } from 'luxon';
 import { PageEvent } from "@angular/material/paginator";
-
-import * as FileSaver from "file-saver";
-
+import { DateTime } from 'luxon';
 
 // LLAMADO DE SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";;
@@ -19,6 +16,8 @@ import { EmplCargosService } from "src/app/servicios/usuarios/empleado/empleadoC
 import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from "src/app/componentes/generales/main-nav/main-nav.service";
 import { EmpresaService } from 'src/app/servicios/configuracion/parametrizacion/catEmpresa/empresa.service';
+import { ExcelService } from "src/app/servicios/generarDocumentos/excel.service";
+import { PdfServicesService } from "src/app/servicios/generarDocumentos/pdf.services.service";
 
 @Component({
   selector: "app-listar-pedido-accion",
@@ -36,6 +35,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
   codigo = new FormControl("");
+  numero_accion = new FormControl("", [Validators.minLength(2)]);
   cedula = new FormControl("", [Validators.minLength(2)]);
   nombre = new FormControl("", [Validators.minLength(2)]);
   apellido = new FormControl("", [Validators.minLength(2)]);
@@ -80,6 +80,8 @@ export class ListarPedidoAccionComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private asignaciones: AsignacionesService,
+    private documentosExcel: ExcelService,
+    private documentosPdf: PdfServicesService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -182,6 +184,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.listaPedidos = [];
     this.restAccion.BuscarDatosPedido().subscribe((data) => {
       this.listaPedidos = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
+      console.log('listaPedidos: ',this.listaPedidos);
       this.FormatearDatos(
         this.listaPedidos,
         this.formato_fecha,
@@ -197,7 +200,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // METODO PARA FORMATEAR DATOS DE FECHA
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
-    lista.forEach((data) => {
+    lista.forEach((data: any) => {
       data.fecCreacion_ = this.validar.FormatearFecha(
         data.fecha_creacion,
         formato_fecha,
@@ -264,6 +267,9 @@ export class ListarPedidoAccionComponent implements OnInit {
   idCargo: any = [];
   contador: number = 0;
   MostrarInformacion(id: number, tipo: string) {
+    console.log("id", id);
+    console.log("tipo", tipo);
+
     this.texto_color_cargo = "white";
     this.texto_color_numero = "white";
     this.texto_color_proceso = "white";
@@ -281,13 +287,19 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.empleadoProcesos = [];
     this.idCargo = [];
     this.contador = 0;
-    this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
-      this.datosPedido = data;
-      console.log("data pedido", this.datosPedido);
-      this.BuscarPedidoEmpleado(this.datosPedido, tipo);
-      this.ObtenerDecreto();
-      this.ObtenerTipoAccion();
-    });
+
+    if(tipo == 'excel'){
+      this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
+        this.datosPedido = data;
+        this.documentosExcel.generarExcel(this.datosPedido);  
+      });
+    }else{
+      this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
+        this.datosPedido = data;
+        this.documentosPdf.GenerarPdf('open', this.datosPedido);  
+      });
+    }
+
   }
 
   // METODO PARA MOSTRAR DATOS DE LOS EMPLEADOS SELECCIONADOS EN EL PEDIDO
@@ -4136,7 +4148,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   ExportToXML() {
     if (!this.listaPedidos || this.listaPedidos.length === 0) {
       this.toastr.info('No hay datos para mostrar en el reporte.');
-      return; 
+      return;
     }
     var objeto;
     var arregloPedidos: any = [];
@@ -4155,12 +4167,13 @@ export class ListarPedidoAccionComponent implements OnInit {
       arregloPedidos.push(objeto);
     });
 
-    this.restAccion.CrearXML(arregloPedidos).subscribe((res) => {
-      this.data = res;
-      this.urlxml =
-        `${(localStorage.getItem('empresaURL') as string)}/accionPersonal/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    /* este metodo ya no se usa borrar y hacer el que corresponde
+        this.restAccion.CrearXML(arregloPedidos).subscribe((res) => {
+          this.data = res;
+          this.urlxml =
+            `${(localStorage.getItem('empresaURL') as string)}/accionPersonal/download/` + this.data.name;
+          window.open(this.urlxml, "_blank");
+        });*/
   }
 
   /** ************************************************************************************************** **

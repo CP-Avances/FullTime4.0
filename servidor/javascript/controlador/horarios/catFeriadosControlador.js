@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../libs/settingsMail");
 const luxon_1 = require("luxon");
-const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
@@ -282,6 +282,7 @@ class FeriadosControlador {
             }
         });
     }
+    // METODO PARA BUSCAR FERIADOS POR CIUDAD Y RANGO DE FECHAS MULTIPLE  **USADO
     FeriadosCiudadMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -330,7 +331,7 @@ class FeriadosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS  **USADO
+    // METODO PARA BUSCAR FERIADOS SEGUN CIUDAD Y RANGO DE FECHAS MULTIPLE  **USADO
     FeriadosRecuperacionCiudadMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -878,7 +879,7 @@ class FeriadosControlador {
         });
     }
     /** ********************************************************************************************* **
-     ** **                          METODOS DE APLICACION MOVIL                                    ** **
+     ** **             M E T O D O S    D E    A P L I C A C I O N    M O V I L                    ** **
      ** ********************************************************************************************* **/
     // METODO PARA LEER FERIADOS   **USADO
     LeerFeriados(req, res) {

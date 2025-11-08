@@ -25,8 +25,6 @@ import localEsEC from '@angular/common/locales/es-EC';
 registerLocaleData(localEsEC);
 // SEGURIDAD
 import { AuthGuard } from './servicios/generales/guards/auth.guard';
-// RUTA
-import { environment } from 'src/environments/environment';
 // NOTIFICACIONES EN TIEMPO REAL
 import { SocketIoModule } from 'ngx-socket-io';
 // COMPONETE PRINCIPAL
@@ -71,7 +69,6 @@ import { MainNavComponent } from './componentes/generales/main-nav/main-nav.comp
 import { NavbarComponent } from './componentes/generales/main-nav/navbar/navbar.component';
 import { SearchComponent } from './componentes/generales/main-nav/search/search.component';
 import { AyudaComponent } from './componentes/generales/ayuda/ayuda.component';
-import { VistaMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/vista-menu/vista-menu.component';
 import { RegistroModalidadComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/registro-modalidad/registro-modalidad.component';
 import { EditarModalidadComponent } from './componentes/configuracion/parametrizacion/modalidad-laboral/editar-modalidad/editar-modalidad.component';
 import { EditarTipoCargoComponent } from './componentes/configuracion/parametrizacion/tipo-cargos/editar-tipo-cargo/editar-tipo-cargo.component';
@@ -91,8 +88,8 @@ import { EditarDepartamentoComponent } from './componentes/configuracion/localiz
 import { VerDepartamentoComponent } from './componentes/configuracion/localizacion/departamentos/ver-departamento/ver-departamento.component';
 import { RegistrarNivelDepartamentoComponent } from './componentes/configuracion/localizacion/departamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
 import { VerListadoNivelComponent } from './componentes/configuracion/localizacion/departamentos/ver-listado-nivel/ver-listado-nivel.component';
-import { RegistroAutorizacionDepaComponent } from './componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
-import { EditarAutorizacionDepaComponent } from './componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
+import { RegistroAutorizacionDepaComponent } from './componentes/configuracion/localizacion/departamentos/autoriza-departamento/registro-autorizacion-depa/registro-autorizacion-depa.component';
+import { EditarAutorizacionDepaComponent } from './componentes/configuracion/localizacion/departamentos/autoriza-departamento/editar-autorizacion-depa/editar-autorizacion-depa.component';
 // USUARIOS
 import { ConfigurarCodigoComponent } from './componentes/usuarios/configurar-codigo/configurar-codigo.component';
 import { RegistrarNivelTitulosComponent } from './componentes/usuarios/nivel-titulos/registrar-nivel-titulos/registrar-nivel-titulos.component';
@@ -138,6 +135,15 @@ import { RegistroDiscapacidadComponent } from './componentes/usuarios/tipo-disca
 import { EditarDiscapacidadComponent } from './componentes/usuarios/tipo-discapacidad/editar-discapacidad/editar-discapacidad.component';
 import { EditarVacunasComponent } from './componentes/usuarios/tipo-vacunas/editar-vacuna/editar-vacuna.component';
 import { VisualizarAsignacionesComponent } from './componentes/usuarios/administrar-informacion/visualizar-asignaciones/visualizar-asignaciones.component';
+import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
+import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
+import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
+import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
+import { RegistrarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/registrar-estado-civil/registrar-estado-civil.component';
+import { EditarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/editar-estado-civil/editar-estado-civil.component';
+import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
+import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
+import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
 // HORARIOS
 import { RegistrarFeriadosComponent } from './componentes/horarios/catFeriados/feriados/registrar-feriados/registrar-feriados.component';
 import { EditarFeriadosComponent } from './componentes/horarios/catFeriados/feriados/editar-feriados/editar-feriados.component';
@@ -162,69 +168,15 @@ import { BuscarPlanificacionComponent } from './componentes/horarios/planificar-
 import { EliminarIndividualComponent } from './componentes/horarios/planificar-horarios/eliminar-individual/eliminar-individual.component';
 import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/planificar-horarios/cargar-plantillas/cargar-plantilla-planificacion/cargar-plantilla-planificacion.component';
 import { VisualizarObservacionComponent } from './componentes/horarios/planificar-horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion.component';
-// MODULO  --PERMISOS
-import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
-import { AutorizacionesComponent } from './componentes/autorizaciones/autorizaciones/autorizaciones.component';
-import { EditarEstadoAutorizaccionComponent } from './componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
-import { RegistroEmpleadoPermisoComponent } from './componentes/modulos/permisos/gestionar-permisos/registro-empleado-permiso/registro-empleado-permiso.component';
-import { CancelarPermisoComponent } from './componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
-import { VerEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/ver-empleado-permiso/ver-empleado-permiso.component';
-import { ListarEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
-import { PermisosMultiplesComponent } from './componentes/modulos/permisos/multiples/permisos-multiples/permisos-multiples.component';
-import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permisos/multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
-import { TipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/tipo-permisos/tipo-permisos.component';
-import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/editar-tipo-permisos/editar-tipo-permisos.component';
-import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
-import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 // MODULO  --VACACIONES
-import { VacacionAutorizacionesComponent } from './componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
-import { EditarEstadoVacacionAutoriacionComponent } from './componentes/autorizaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
-import { EstadoVacacionesComponent } from './componentes/modulos/vacaciones/estado-vacaciones/estado-vacaciones.component';
-import { EditarVacacionesEmpleadoComponent } from './componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
-import { CancelarVacacionesComponent } from './componentes/modulos/vacaciones/cancelar-vacaciones/cancelar-vacaciones.component';
-import { ListarVacacionesComponent } from './componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
-import { VerVacacionComponent } from './componentes/modulos/vacaciones/ver-vacacion/ver-vacacion.component';
+import { RegistrarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/registrar-configurar-vacacion/registrar-configurar-vacacion.component';
+import { EditarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/editar-configurar-vacacion/editar-configurar-vacacion.component';
+import { ListarConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/listar-configurar-vacacion/listar-configurar-vacacion.component';
 import { RegistrarPeriodoVComponent } from './componentes/modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPeriodoVacacionesComponent } from './componentes/modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
-import { RegistrarVacacionesComponent } from './componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
-// MODULO  --HORAS EXTRAS
-import { HorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/registrar-horas-extras/horas-extras.component';
-import { EditarHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/editar-horas-extras/editar-horas-extras.component';
-import { ListaHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/lista-horas-extras/lista-horas-extras.component';
-import { VerHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/ver-horas-extras/ver-horas-extras.component';
-import { ListaEmplePlanHoraEComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/empleados-planificar/lista-emple-plan-hora-e.component';
-import { ListaPlanificacionesComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/lista-planificaciones/lista-planificaciones.component';
-import { ListaPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/lista-pedido-hora-extra/lista-pedido-hora-extra.component';
-import { HoraExtraAutorizacionesComponent } from './componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
-import { EditarEstadoHoraExtraAutorizacionComponent } from './componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
-import { VerPedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/ver-pedido-hora-extra/ver-pedido-hora-extra.component';
-import { CancelarHoraExtraComponent } from './componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
-import { EditarHoraExtraEmpleadoComponent } from './componentes/modulos/horasExtras/editar-hora-extra-empleado/editar-hora-extra-empleado.component';
-import { PlanHoraExtraComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/plan-hora-extra/plan-hora-extra.component';
-import { EditarPlanHoraExtraComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
-import { ListaPlanHoraExtraComponent } from './componentes/modulos/horasExtras/planificacionHoraExtra/lista-plan-hora-extra/lista-plan-hora-extra.component';
-import { PedidoHoraExtraComponent } from './componentes/modulos/horasExtras/solicitar-hora-extra/pedido-hora-extra/pedido-hora-extra.component';
-import { HoraExtraRealComponent } from './componentes/modulos/horasExtras/calculos/hora-extra-real/hora-extra-real.component';
-import { TiempoAutorizadoComponent } from './componentes/modulos/horasExtras/tiempo-autorizado/tiempo-autorizado.component';
-import { CalculoHoraExtraComponent } from './componentes/modulos/horasExtras/calculos/calculo-hora-extra/calculo-hora-extra.component';
-import { EstadoHoraExtraComponent } from './componentes/modulos/horasExtras/estado-hora-extra/estado-hora-extra.component';
-import { PlanHoraExtraAutorizaComponent } from './componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
-// MODULO  --ALIMENTACION
-import { ListarTipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
-import { TipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/tipo-comidas/tipo-comidas.component';
-import { EditarTipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/editar-tipo-comidas/editar-tipo-comidas.component';
-import { PlanComidasComponent } from './componentes/modulos/alimentacion/planifica-comida/plan-comidas/plan-comidas.component';
-import { ListarPlanificacionComponent } from './componentes/modulos/alimentacion/planifica-comida/listar-planificacion/listar-planificacion.component';
-import { ListarSolicitudComponent } from './componentes/modulos/alimentacion/solicitar-comida/listar-solicitud/listar-solicitud.component';
-import { CancelarComidaComponent } from './componentes/modulos/alimentacion/cancelar-comida/cancelar-comida.component';
-import { SolicitaComidaComponent } from './componentes/modulos/alimentacion/solicitar-comida/solicita-comida/solicita-comida.component';
-import { EditarPlanComidasComponent } from './componentes/modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
-import { AdministraComidaComponent } from './componentes/modulos/alimentacion/administra-comida/administra-comida.component';
-import { EditarSolicitudComidaComponent } from './componentes/modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
-import { PlanificacionComidasComponent } from './componentes/modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
-import { DetalleMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/detalle-menu/detalle-menu.component';
-import { EditarDetalleMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/editar-detalle-menu/editar-detalle-menu.component';
-import { AutorizaSolicitudComponent } from './componentes/modulos/alimentacion/autoriza-solicitud/autoriza-solicitud.component';
+import { VerConfigurarVacacionComponent } from './componentes/modulos/vacaciones/configurarVacaciones/ver-configurar-vacacion/ver-configurar-vacacion.component';
+import { GenerarPeriodoManualComponent } from './componentes/modulos/vacaciones/periodoVacaciones/generar-periodo-manual/generar-periodo-manual.component';
+import { ConfigurarVacacionMultipleComponent } from './componentes/modulos/vacaciones/multiples/configurar-vacacion-multiple/configurar-vacacion-multiple.component';
 // MODULO  --ACCION PERSONAL
 import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersonal/catProcesos/principal-proceso/principal-proceso.component';
 import { RegistroProcesoComponent } from './componentes/modulos/accionesPersonal/catProcesos/registro-proceso/registro-proceso.component';
@@ -237,7 +189,23 @@ import { EditarTipoAccionComponent } from './componentes/modulos/accionesPersona
 import { VerTipoAccionComponent } from './componentes/modulos/accionesPersonal/tipoAccionesPersonal/ver-tipo-accion/ver-tipo-accion.component';
 import { EditarPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/editar-pedido-accion/editar-pedido-accion.component';
 import { VerPedidoAccionComponent } from './componentes/modulos/accionesPersonal/pedirAccionPersonal/ver-pedido-accion/ver-pedido-accion.component';
-
+import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/ingresar-registros/ingresar-registros.component';
+import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
+import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
+import { RegistrarGradoComponent } from './componentes/modulos/accionesPersonal/grados/registrar-grado/registrar-grado.component';
+import { EditarGradoComponent } from './componentes/modulos/accionesPersonal/grados/editar-grado/editar-grado.component';
+import { RegistrarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
+import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/editar-grupo-ocupacional/editar-grupo-ocupacional.component';
+import { RegistroInterfazProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-interfaz/registro-interfaz-proceso.component';
+import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-multiple/registro-multiple-proceso.component';
+import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-interfaz-grado/registro-interfaz-grado.component';
+import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-multiple-grado/registro-multiple-grado.component';
+import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
+import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/empleado-proceso/empleado-proceso.component';
+import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/empleado-grado/empleado-grado.component';
+import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/empleado-grupo/empleado-grupo.component';
+import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/editar-registro/editar-registro.component';
+import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
 // MODULO  --GEOLOCALIZACION
 import { CrearCoordenadasComponent } from './componentes/modulos/geolocalizacion/crear-coordenadas/crear-coordenadas.component';
 import { EditarCoordenadasComponent } from './componentes/modulos/geolocalizacion/editar-coordenadas/editar-coordenadas.component';
@@ -288,28 +256,9 @@ import { MensajesNotificacionesComponent } from './componentes/notificaciones/co
 import { VerAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/ver-aniversario/ver-aniversario.component';
 import { RegistrarAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/registrar-aniversario/registrar-aniversario.component';
 import { EditarAniversarioComponent } from './componentes/notificaciones/configurar-mensajes/aniversario/editar-aniversario/editar-aniversario.component';
-
 // REPORTE
 import { ReportesModule } from './componentes/reportes/reportes.module';
-import { ConfigReportFirmasHorasExtrasComponent } from './componentes/reportes/configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
-import { ConfigEmpleadosComponent } from './componentes/reportes/configuracion-reportes/config-report-empleados/config-empleados.component';
-import { ConfigAsistenciaComponent } from './componentes/reportes/configuracion-reportes/config-report-asistencia/config-asistencia.component';
 import { InformacionNovedadesComponent } from './componentes/reportes/configuracion-reportes/informacion-novedades/informacion-novedades.component';
-// REPORTES  // REPORTE  --MODULO HORAS EXTRAS
-import { HoraExtraMacroComponent } from './componentes/reportes/graficas-macro/hora-extra-macro/hora-extra-macro.component';
-import { JornadaVsHoraExtraMacroComponent } from './componentes/reportes/graficas-macro/jornada-vs-hora-extra-macro/jornada-vs-hora-extra-macro.component';
-// VERIFICAR SU USO
-import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
-import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
-import { MetricaPermisosComponent } from './componentes/graficas/graficas-micro/metrica-permisos/metrica-permisos.component';
-import { MetricaVacacionesComponent } from './componentes/graficas/graficas-micro/metrica-vacaciones/metrica-vacaciones.component';
-import { TiempoJornadaVsHoraExtMacroComponent } from './componentes/reportes/graficas-macro/tiempo-jornada-vs-hora-ext-macro/tiempo-jornada-vs-hora-ext-macro.component';
-import { SalidasAntesMacroComponent } from './componentes/reportes/graficas-macro/salidas-antes-macro/salidas-antes-macro.component';
-import { InasistenciaMacroComponent } from './componentes/reportes/graficas-macro/inasistencia-macro/inasistencia-macro.component';
-import { MarcacionesEmpMacroComponent } from './componentes/reportes/graficas-macro/marcaciones-emp-macro/marcaciones-emp-macro.component';
-import { AsistenciaMacroComponent } from './componentes/reportes/graficas-macro/asistencia-macro/asistencia-macro.component';
-import { RetrasosMacroComponent } from './componentes/reportes/graficas-macro/retrasos-macro/retrasos-macro.component';
-
 // CONECCION REST SERVICIOS
 // INICIO DE SESION
 import { LoginService } from './servicios/login/login.service';
@@ -318,33 +267,11 @@ import { TokenInterceptorService } from './servicios/login/token-interceptor.ser
 import { MainNavService } from './componentes/generales/main-nav/main-nav.service';
 // REPORTES
 import { PlantillaReportesService } from './componentes/reportes/plantilla-reportes.service';
-import { GraficasService } from './servicios/graficas/graficas.service';
-import { RegistrarGeneroComponent } from './componentes/usuarios/tipo-genero/registrar-genero/registrar-genero.component';
-import { EditarGeneroComponent } from './componentes/usuarios/tipo-genero/editar-genero/editar-genero.component';
-import { ListarGeneroComponent } from './componentes/usuarios/tipo-genero/listar-genero/listar-genero.component';
-import { ListarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/listar-estado-civil/listar-estado-civil.component';
-import { RegistrarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/registrar-estado-civil/registrar-estado-civil.component';
-import { EditarEstadoCivilComponent } from './componentes/usuarios/tipo-estado-civil/editar-estado-civil/editar-estado-civil.component';
-import { IngresarRegistrosComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/ingresar-registros/ingresar-registros.component';
-import { GradosComponent } from './componentes/modulos/accionesPersonal/grados/principal-grados/grados.component';
-import { GrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/principal-grupo-ocupacional/grupo-ocupacional.component';
-import { RegistrarGradoComponent } from './componentes/modulos/accionesPersonal/grados/registrar-grado/registrar-grado.component';
-import { EditarGradoComponent } from './componentes/modulos/accionesPersonal/grados/editar-grado/editar-grado.component';
-import { RegistrarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/registrar-grupo-ocupacional/registrar-grupo-ocupacional.component';
-import { EditarGrupoOcupacionalComponent } from './componentes/modulos/accionesPersonal/grupo-ocupacional/editar-grupo-ocupacional/editar-grupo-ocupacional.component';
-import { RegistroInterfazProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-interfaz/registro-interfaz-proceso.component';
-import { RegistroMultipleProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/registro-multiple/registro-multiple-proceso.component';
-import { RegistroInterfazGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-interfaz-grado/registro-interfaz-grado.component';
-import { RegistroMultipleGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/registro-multiple-grado/registro-multiple-grado.component';
-import { RegistroInterfazGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-interfaz-grupo/registro-interfaz-grupo.component';
-import { EmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-procesos/empleado-proceso/empleado-proceso.component';
-import { EmpleadoGradoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grado/empleado-grado/empleado-grado.component';
-import { EmpleadoGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/empleado-grupo/empleado-grupo.component';
-import { EditarRegistroComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/editar-registro/editar-registro.component';
-import { EditarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/editar-nacionalidad/editar-nacionalidad.component';
-import { ListarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/listar-nacionalidad/listar-nacionalidad.component';
-import { RegistrarNacionalidadComponent } from './componentes/usuarios/tipo-nacionalidad/registrar-nacionalidad/registrar-nacionalidad.component';
-import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPersonal/asignar-registros-usuarios/asignar-grupo-ocupacional/registro-multiple-grupo/registro-multiple-grupo.component';
+
+import { SolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/solicitudes-vacaciones.component';
+import { RegistrarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/registrar-solicitudes-vacaciones/registrar-solicitudes-vacaciones.component';
+import { EditarSolicitudesVacacionesComponent } from './componentes/modulos/vacaciones/solicitudes-vacaciones/editar-solicitudes-vacaciones/editar-solicitudes-vacaciones.component';
+
 
 @NgModule({
   declarations: [
@@ -386,7 +313,6 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     NavbarComponent,
     SearchComponent,
     AyudaComponent,
-    VistaMenuComponent,
     RegistroModalidadComponent,
     EditarModalidadComponent,
     EditarTipoCargoComponent,
@@ -453,6 +379,15 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     EditarDiscapacidadComponent,
     EditarVacunasComponent,
     VisualizarAsignacionesComponent,
+    RegistrarGeneroComponent,
+    EditarGeneroComponent,
+    ListarGeneroComponent,
+    ListarEstadoCivilComponent,
+    RegistrarEstadoCivilComponent,
+    EditarEstadoCivilComponent,
+    EditarNacionalidadComponent,
+    ListarNacionalidadComponent,
+    RegistrarNacionalidadComponent,
 
     RegistrarFeriadosComponent,
     EditarFeriadosComponent,
@@ -478,68 +413,14 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     CargarPlantillaPlanificacionComponent,
     VisualizarObservacionComponent,
 
-    VistaElementosComponent,
-    AutorizacionesComponent,
-    EditarEstadoAutorizaccionComponent,
-    RegistroEmpleadoPermisoComponent,
-    CancelarPermisoComponent,
-    VerEmpleadoPermisoComponent,
-    ListarEmpleadoPermisoComponent,
-    PermisosMultiplesComponent,
-    PermisosMultiplesEmpleadosComponent,
-    TipoPermisosComponent,
-    EditarTipoPermisosComponent,
-    VerTipoPermisoComponent,
-    EditarPermisoEmpleadoComponent,
-
-    VacacionAutorizacionesComponent,
-    EditarEstadoVacacionAutoriacionComponent,
-    EstadoVacacionesComponent,
-    EditarVacacionesEmpleadoComponent,
-    CancelarVacacionesComponent,
-    ListarVacacionesComponent,
-    VerVacacionComponent,
+    RegistrarConfigurarVacacionComponent,
+    EditarConfigurarVacacionComponent,
+    ListarConfigurarVacacionComponent,
     RegistrarPeriodoVComponent,
     EditarPeriodoVacacionesComponent,
-    RegistrarVacacionesComponent,
-
-    HorasExtrasComponent,
-    EditarHorasExtrasComponent,
-    ListaHorasExtrasComponent,
-    VerHorasExtrasComponent,
-    ListaEmplePlanHoraEComponent,
-    ListaPlanificacionesComponent,
-    ListaPedidoHoraExtraComponent,
-    HoraExtraAutorizacionesComponent,
-    EditarEstadoHoraExtraAutorizacionComponent,
-    VerPedidoHoraExtraComponent,
-    CancelarHoraExtraComponent,
-    EditarHoraExtraEmpleadoComponent,
-    PlanHoraExtraComponent,
-    EditarPlanHoraExtraComponent,
-    ListaPlanHoraExtraComponent,
-    PedidoHoraExtraComponent,
-    HoraExtraRealComponent,
-    TiempoAutorizadoComponent,
-    CalculoHoraExtraComponent,
-    EstadoHoraExtraComponent,
-    PlanHoraExtraAutorizaComponent,
-
-    ListarTipoComidasComponent,
-    TipoComidasComponent,
-    EditarTipoComidasComponent,
-    PlanComidasComponent,
-    ListarPlanificacionComponent,
-    ListarSolicitudComponent,
-    CancelarComidaComponent,
-    SolicitaComidaComponent,
-    EditarPlanComidasComponent,
-    AdministraComidaComponent,
-    EditarSolicitudComidaComponent,
-    PlanificacionComidasComponent,
-    DetalleMenuComponent,
-    EditarDetalleMenuComponent,
-    AutorizaSolicitudComponent,
+    VerConfigurarVacacionComponent,
+    GenerarPeriodoManualComponent,
+    ConfigurarVacacionMultipleComponent,
 
     PrincipalProcesoComponent,
     RegistroProcesoComponent,
@@ -553,6 +434,23 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     EditarPedidoAccionComponent,
     VerPedidoAccionComponent,
     EmpleadoProcesoComponent,
+    IngresarRegistrosComponent,
+    GradosComponent,
+    GrupoOcupacionalComponent,
+    RegistrarGradoComponent,
+    EditarGradoComponent,
+    RegistrarGrupoOcupacionalComponent,
+    EditarGrupoOcupacionalComponent,
+    RegistroInterfazProcesoComponent,
+    RegistroMultipleProcesoComponent,
+    RegistroInterfazGradoComponent,
+    RegistroMultipleGradoComponent,
+    RegistroMultipleGrupoComponent,
+    RegistroInterfazGrupoComponent,
+    EmpleadoProcesoComponent,
+    EmpleadoGradoComponent,
+    EmpleadoGrupoComponent,
+    EditarRegistroComponent,
 
     CrearCoordenadasComponent,
     EditarCoordenadasComponent,
@@ -604,50 +502,10 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     RegistrarAniversarioComponent,
     EditarAniversarioComponent,
 
-    ConfigReportFirmasHorasExtrasComponent,
-    ConfigEmpleadosComponent,
-    ConfigAsistenciaComponent,
-
-    HoraExtraMacroComponent,
-    JornadaVsHoraExtraMacroComponent,
-
-    MetricaAtrasosComponent,
-    MetricaHorasExtrasComponent,
-    MetricaPermisosComponent,
-    MetricaVacacionesComponent,
-    TiempoJornadaVsHoraExtMacroComponent,
-    SalidasAntesMacroComponent,
-    InasistenciaMacroComponent,
-    MarcacionesEmpMacroComponent,
-    AsistenciaMacroComponent,
-    RetrasosMacroComponent,
     InformacionNovedadesComponent,
-    RegistrarGeneroComponent,
-    EditarGeneroComponent,
-    ListarGeneroComponent,
-    ListarEstadoCivilComponent,
-    RegistrarEstadoCivilComponent,
-    EditarEstadoCivilComponent,
-    IngresarRegistrosComponent,
-    GradosComponent,
-    GrupoOcupacionalComponent,
-    RegistrarGradoComponent,
-    EditarGradoComponent,
-    RegistrarGrupoOcupacionalComponent,
-    EditarGrupoOcupacionalComponent,
-    RegistroInterfazProcesoComponent,
-    RegistroMultipleProcesoComponent,
-    RegistroInterfazGradoComponent,
-    RegistroMultipleGradoComponent,
-    RegistroMultipleGrupoComponent,
-    RegistroInterfazGrupoComponent,
-    EmpleadoProcesoComponent,
-    EmpleadoGradoComponent,
-    EmpleadoGrupoComponent,
-    EditarRegistroComponent,
-    EditarNacionalidadComponent,
-    ListarNacionalidadComponent,
-    RegistrarNacionalidadComponent,
+    SolicitudesVacacionesComponent,
+    EditarSolicitudesVacacionesComponent,
+    RegistrarSolicitudesVacacionesComponent
   ],
 
   imports: [
@@ -691,30 +549,24 @@ import { RegistroMultipleGrupoComponent } from './componentes/modulos/accionesPe
     },
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntl },
     LoginService,
-    GraficasService,
     MainNavService,
     PlantillaReportesService,
     RelojesComponent,
     VerEmpresaComponent,
     VerSucursalComponent,
     VerEmpleadoComponent,
-    PlanComidasComponent,
     VerDipositivoComponent,
     ListarRelojesComponent,
-    AutorizacionesComponent, //--VERIFICAR
-    VistaElementosComponent,
     ListaSucursalesComponent,
-    ListarVacacionesComponent,
-    ListaHorasExtrasComponent,
     PrincipalHorarioComponent,
-    ListarTipoComidasComponent,
     BuscarPlanificacionComponent,
-    ListaEmplePlanHoraEComponent,
-    ListaPlanificacionesComponent,
     ListarCiudadFeriadosComponent,
     PrincipalDepartamentoComponent,
     HorarioMultipleEmpleadoComponent,
-    PermisosMultiplesEmpleadosComponent,
+
+    SolicitudesVacacionesComponent,
+    RegistrarSolicitudesVacacionesComponent,
+    EditarSolicitudesVacacionesComponent
   ],
   exports: [CommonModule, TimbreMultipleComponent, EmpleadoProcesoComponent],
 

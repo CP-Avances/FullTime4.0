@@ -1,13 +1,12 @@
-import { Request, Response } from 'express';
-import pool from '../../../database';
 import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
+import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import pool from '../../../database';
 
 class NacionalidadControlador {
 
-   // LISTA DE GENEROS
-
-   public async ListarNacionalidades(req: Request, res: Response) {
+  // METODO PARA LISTAR NACIONALIDAD   **USADO
+  public async ListarNacionalidades(req: Request, res: Response) {
     const NACIONALIDADES = await pool.query(
       `
       SELECT * FROM e_cat_nacionalidades  ORDER BY nombre ASC
@@ -22,26 +21,7 @@ class NacionalidadControlador {
     }
   }
 
-  //METODO PARA BUSCAR NACIONALIDAD POR NOMBRE
-  public async ObtenerNacionalidad(req: Request, res: Response): Promise<any> {
-    const { nombre } = req.params;
-
-    console.log("Buscando nacionalidades:", nombre)
-    const unNacionalidades = await pool.query(
-      `
-      SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-      `
-      , [nombre]);
-
-    if (unNacionalidades.rowCount != 0) {
-      return res.jsonp(unNacionalidades.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-  // METODO PARA REGISTRAR NACIONALIDAD 
+  // METODO PARA REGISTRAR NACIONALIDAD   **USADO
   public async CrearNacionalidad(req: Request, res: Response): Promise<Response> {
     try {
       const { nacionalidad, user_name, ip, ip_local } = req.body;
@@ -86,7 +66,7 @@ class NacionalidadControlador {
     }
   }
 
-  //METODO PARA ACTUALIZAR NACIONALIDAD
+  // METODO PARA ACTUALIZAR REGISTRO DE NACIONALIDAD   **USADO
   public async ActualizarNacionalidad(req: Request, res: Response): Promise<Response> {
     try {
       const { nacionalidad, id, user_name, ip, ip_local } = req.body;
@@ -94,7 +74,7 @@ class NacionalidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // CONSULTAR DATOSORIGINALES
+      // CONSULTAR DATOS ORIGINALES
       const rol = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
       const [datosOriginales] = rol.rows;
 
@@ -146,7 +126,7 @@ class NacionalidadControlador {
     }
   }
 
-  // METODO PARA ELIMINAR NACIONALIDAD  
+  // ELIMIAR REGISTRO NACIONALIDAD   **USADO  
   public async EliminarNacionalidad(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, ip_local } = req.body;
@@ -155,7 +135,7 @@ class NacionalidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      // OBTENER DATOSORIGINALES
+      // OBTENER DATOS ORIGINALES
       const consulta = await pool.query(`SELECT * FROM e_cat_nacionalidades WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
@@ -203,7 +183,6 @@ class NacionalidadControlador {
       return res.jsonp({ message: 'error' });
     }
   }
-
 
 
 }

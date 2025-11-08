@@ -9,12 +9,12 @@ export class UrlService {
 
   constructor() { }
 
-  // MÉTODO PARA ACTUALIZAR LA URL DEL SOCKET
+  // METODO PARA ACTUALIZAR LA URL DEL SOCKET   **USADO
   updateSocketUrl(url: string) {
     this.urlSocketSubject.next(url);
   }
 
-  // MÉTODO PARA OBTENER LA URL DEL SOCKET COMO UN OBSERVABLE
+  // METODO PARA OBTENER LA URL DEL SOCKET COMO UN OBSERVABLE   **USADO
   getSocketUrl(): Observable<string | null> {
     return this.urlSocketSubject.asObservable();
   }

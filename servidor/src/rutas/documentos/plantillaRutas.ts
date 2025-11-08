@@ -9,6 +9,7 @@ class PlantillaRutas {
     }
 
     configuracion(): void {
+        // METODO PARA DECARGAR LA PLANTILLA DE REGISTRO DE DATOS   **USADO
         this.router.get('/documento/:docs', PLANTILLA_CONTROLADOR.DescargarPlantilla);
 
     }

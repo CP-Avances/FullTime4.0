@@ -78,7 +78,7 @@ class DiscapacidadControlador {
                 const { carn_conadis, porcentaje, tipo, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const discapacidad = yield database_1.default.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = discapacidad.rows;
                 if (!datosOriginales) {
@@ -127,7 +127,7 @@ class DiscapacidadControlador {
                 const id_empleado = req.params.id_empleado;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const discapacidad = yield database_1.default.query(`SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = discapacidad.rows;
                 if (!datosOriginales) {
@@ -234,19 +234,6 @@ class DiscapacidadControlador {
       `, [nombre]);
             if (TIPO_DISCAPACIDAD.rowCount != 0) {
                 return res.jsonp(TIPO_DISCAPACIDAD.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const DISCAPACIDAD = yield database_1.default.query(`
-      SELECT * FROM eu_empleado_discapacidad
-      `);
-            if (DISCAPACIDAD.rowCount != 0) {
-                return res.jsonp(DISCAPACIDAD.rows);
             }
             else {
                 res.status(404).jsonp({ text: 'Registro no encontrado.' });

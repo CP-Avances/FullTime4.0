@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-
+javascript/
 #database no debe ser modificada
 #/src/database.ts
 

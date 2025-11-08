@@ -48,7 +48,7 @@ class RelojesControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const reloj = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE id = $1`, [id]);
                 const [datosOriginales] = reloj.rows;
                 if (!datosOriginales) {
@@ -177,7 +177,7 @@ class RelojesControlador {
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tipo_conexion, id_sucursal, id_departamento, codigo, id_real, temperatura, user_name, user_ip, zona_horaria_dispositivo, formato_gmt_dispositivo, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const reloj = yield database_1.default.query(`
                 SELECT * FROM ed_relojes WHERE id = $1
                 `, [id_real]);

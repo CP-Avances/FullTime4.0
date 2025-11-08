@@ -11,6 +11,7 @@ class PlantillaRutas {
         this.configuracion();
     }
     configuracion() {
+        // METODO PARA DECARGAR LA PLANTILLA DE REGISTRO DE DATOS   **USADO
         this.router.get('/documento/:docs', plantillaControlador_1.default.DescargarPlantilla);
     }
 }

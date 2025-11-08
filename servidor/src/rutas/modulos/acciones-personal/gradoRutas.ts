@@ -1,7 +1,7 @@
-import { Router } from 'express';
 import GRADO_CONTROLADOR from '../../../controlador/modulos/acciones-personal/gradoControlador';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
 import multer from 'multer';
 
 const storage = multer.diskStorage({
@@ -24,12 +24,16 @@ class GradoRutas {
     }
 
     configuracion(): void {
-        // METODO PARA CONSULTAR GRADOS
-        this.router.get('/', TokenValidation, GRADO_CONTROLADOR.listaGrados);
-        this.router.get('/infoGrado/:id_empleado',TokenValidation, GRADO_CONTROLADOR.GradoByEmple)
+        // METODO DE CONSULTA DE GRADOS   **USADO
+        this.router.get('/', TokenValidation, GRADO_CONTROLADOR.ListaGrados);
+        // METODO PARA OBTENER GRADO DEL USUARIO   **USADO
+        this.router.get('/infoGrado/:id_empleado', TokenValidation, GRADO_CONTROLADOR.GradoByEmple)
+        // METODO PARA INGRESAR REGISTRO  **USADO
         this.router.post('/', TokenValidation, GRADO_CONTROLADOR.IngresarGrados);
+        // METODO PARA EDITAR REGISTRO  **USADO
         this.router.put('/update', TokenValidation, GRADO_CONTROLADOR.EditarGrados);
-        this.router.delete('/delete',TokenValidation, GRADO_CONTROLADOR.EliminarGrados)
+        // METODO PARA ElIMINAR REGISTRO  **USADO
+        this.router.delete('/delete', TokenValidation, GRADO_CONTROLADOR.EliminarGrados);
         // METODO PARA ELIMINAR EL GRADO POR EMPLEADO **USADO
         this.router.delete('/deleteGradoEmple/:id', TokenValidation, GRADO_CONTROLADOR.EliminarEmpleGrado);
         // METODO PARA LEER DATOS DE PLANTILLA    **USADO
@@ -39,13 +43,13 @@ class GradoRutas {
         // METODO PARA GUARDAR PROCESOS MACIVOS POR INTERFAZ  **USADO
         this.router.post('/registrarGrados', TokenValidation, GRADO_CONTROLADOR.RegistrarGrados);
         // METODO PARA LEER DATOS DE PLANTILLA    **USADO
-        this.router.post('/upload/revision_epleadoGrado', [TokenValidation, upload.single('uploads')], GRADO_CONTROLADOR.RevisarPantillaEmpleadoGrado);
+        this.router.post('/upload/revision_empleadoGrado', [TokenValidation, upload.single('uploads')], GRADO_CONTROLADOR.RevisarPantillaEmpleadoGrado);
         // METODO PARA GUARDAR DATOS DE PLANTILLA   **USADO
-        this.router.post('/cargar_plantilla/registro_epleadoGrado', TokenValidation, GRADO_CONTROLADOR.RegistrarEmpleadoGrado);
+        this.router.post('/cargar_plantilla/registro_empleadoGrado', TokenValidation, GRADO_CONTROLADOR.RegistrarEmpleadoGrado);
         // METODO PARA ACTUALIZAR EL GRADO   **USADO
         this.router.post('/actualizacionGrado', TokenValidation, GRADO_CONTROLADOR.EditarRegistroGradoEmple);
         // METODO PARA ELIMINAR GRUPOS DE MANERA MULTIPLE   **USADO
-        this.router.post('/eliminarGradoMult', TokenValidation, GRADO_CONTROLADOR.EliminarGradoMultiple);
+        this.router.post('/eliminarGradoMultiple', TokenValidation, GRADO_CONTROLADOR.EliminarGradoMultiple);
 
     }
 }

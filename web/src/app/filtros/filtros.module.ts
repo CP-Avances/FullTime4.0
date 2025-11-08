@@ -26,6 +26,7 @@ import { PadrePipe } from './filtroProcesoPadre/padre.pipe';
 import { TipoPipe } from './tipoServicio/tipo.pipe';
 import { FiltrosGrupoPipe } from './filtrosGrupo/filtros-grupo.pipe';
 import { FiltrosGradoPipe } from './fitroGrado/filtros-grado.pipe';
+import { FiltroNumeroAccionPersonalPipe } from './filtroNumeroAccionPersonal/filtro-numero-accion-personal.pipe';
 
 // PIPE PAGINACION
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
@@ -66,7 +67,8 @@ import { FiltroNacionalidadPipe } from './filtroNacionalidad/filtro-nacionalidad
     FiltroEstadoCivilPipe,
     FiltroNacionalidadPipe,
     FiltrosGrupoPipe,
-    FiltrosGradoPipe
+    FiltrosGradoPipe,
+    FiltroNumeroAccionPersonalPipe
   ],
   exports: [
     OrdenarAsignacionesPipe,
@@ -99,7 +101,8 @@ import { FiltroNacionalidadPipe } from './filtroNacionalidad/filtro-nacionalidad
     FiltroEstadoCivilPipe,
     FiltroNacionalidadPipe,
     FiltrosGrupoPipe,
-    FiltrosGradoPipe
+    FiltrosGradoPipe,
+    FiltroNumeroAccionPersonalPipe
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

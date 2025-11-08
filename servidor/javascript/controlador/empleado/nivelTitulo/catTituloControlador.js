@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TITULO_CONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../../reportes/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
@@ -55,7 +55,7 @@ class TituloControlador {
                 const id = req.params.id;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {
@@ -106,7 +106,7 @@ class TituloControlador {
                 const { nombre, id_nivel, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
+                // CONSULTAR DATOS ORIGINALES
                 const rol = yield database_1.default.query(`SELECT * FROM et_titulos WHERE id = $1`, [id]);
                 const [datosOriginales] = rol.rows;
                 if (!datosOriginales) {

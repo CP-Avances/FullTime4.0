@@ -24,10 +24,6 @@ export class EditarTipoAccionComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  selec1: boolean = false;
-  selec2: boolean = false;
-  selec3: boolean = false;
-
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
@@ -60,30 +56,15 @@ export class EditarTipoAccionComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS
   CargarDatos() {
     this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');  
+    this.ip = localStorage.getItem('ip');
     this.validar.ObtenerIPsLocales().then((ips) => {
       this.ips_locales = ips;
-    }); 
-    this.selec1 = false;
-    this.selec2 = false;
-    this.selec3 = false;
+    });
     this.formulario.patchValue({
       tipoAccionForm: this.data.id_tipo_accion_personal,
       descripcionForm: this.data.descripcion,
       baseLegalForm: this.data.base_legal,
     })
-    if (this.data.tipo_permiso === true) {
-      this.tipoF.setValue('permiso');
-      this.CambiarEstadosPermisos();
-    }
-    if (this.data.tipo_vacacion === true) {
-      this.tipoF.setValue('vacacion');
-      this.CambiarEstadosVacaciones();
-    }
-    if (this.data.tipo_situacion_propuesta === true) {
-      this.tipoF.setValue('propuesta');
-      this.CambiarEstadosSituacion();
-    }
   }
 
   // METODO PARA CAPTURAR DATOS DEL FORMULARIO
@@ -92,16 +73,14 @@ export class EditarTipoAccionComponent implements OnInit {
       id_tipo: form.tipoAccionForm,
       descripcion: form.descripcionForm,
       base_legal: form.baseLegalForm,
-      tipo_permiso: this.selec1,
-      tipo_vacacion: this.selec2,
-      tipo_situacion_propuesta: this.selec3,
       id: this.data.id,
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales,
+      ip: this.ip,
+      ip_local: this.ips_locales,
     };
-    
+
     this.GuardarInformacion(datosAccion);
-    
+
   }
 
   // METODO PARA GUARDAR DATOS
@@ -120,7 +99,6 @@ export class EditarTipoAccionComponent implements OnInit {
       })
     } else {
       this.rest.ActualizarDatos(datosAccion).subscribe(response => {
-        console.log(response);
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         })
@@ -171,27 +149,6 @@ export class EditarTipoAccionComponent implements OnInit {
     }
   }
 
-  // METODO PARA CAMBIAR ESTADO PERMISOS
-  CambiarEstadosPermisos() {
-    this.selec2 = false;
-    this.selec3 = false;
-    this.selec1 = true;
-  }
-
-  // METODO PARA CAMBIAR ESTADO VACACIONES
-  CambiarEstadosVacaciones() {
-    this.selec1 = false;
-    this.selec3 = false;
-    this.selec2 = true;
-  }
-
-  // METODO PARA CAMBIAR ESTADO SITUACION PROPUESTA
-  CambiarEstadosSituacion() {
-    this.selec1 = false;
-    this.selec2 = false;
-    this.selec3 = true;
-  }
-
   // METODO PARA BUSQUEDA DE DATOS DE LA TABLA TIPO_ACCION
   tipos: any = [];
   ObtenerTiposAccion() {
@@ -207,9 +164,10 @@ export class EditarTipoAccionComponent implements OnInit {
       let tipo = {
         descripcion: form.otroTipoForm,
         user_name: this.user_name,
-        ip: this.ip, ip_local: this.ips_locales,
+        ip: this.ip,
+        ip_local: this.ips_locales,
       }
-      this.VerificarDuplicidad(form, tipo, datos);
+      this.VerificarDuplicidad(tipo, datos);
     }
     else {
       this.toastr.info('Ingresar una nueva opción o seleccionar una de la lista.', 'Verificar datos.', {
@@ -220,31 +178,12 @@ export class EditarTipoAccionComponent implements OnInit {
 
   // METODO PARA VERIFICAR DUPLICIDAD
   contar: number = 0;
-  VerificarDuplicidad(form: any, tipo: any, datos: any) {
-
+  VerificarDuplicidad(tipo: any, datos: any) {
     this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
       datos.id_tipo = resol.id;
       // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
       this.GuardarInformacion(datos);
     });
 
-    // this.contar = 0;
-    // this.tipos.map((obj: any) => {
-    //   if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
-    //     this.contar = this.contar + 1;
-    //   }
-    // });
-    // if (this.contar != 0) {
-    //   this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-    //     'Ups! algo salio mal.', {
-    //     timeOut: 6000,
-    //   })
-    // } else {
-    //   this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
-    //     datos.id_tipo = resol.id;
-    //     // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
-    //     this.GuardarInformacion(datos);
-    //   });
-    // }
   }
 }

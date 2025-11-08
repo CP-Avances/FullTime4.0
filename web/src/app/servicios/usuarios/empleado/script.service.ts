@@ -4,6 +4,7 @@ interface Scripts {
   name: string;
   src: string;
 }
+
 export const ScriptStore: Scripts[] = [
   { name: 'pdfMake', src: 'assets/build/pdfmake.min.js' },
   { name: 'vfsFonts', src: 'assets/build/vfs_fonts.js' }

@@ -1,0 +1,11 @@
+mat-form-field {
+  width: 260px;
+  padding: 10px 10px 0px 10px;
+}
+
+.btn {
+  margin-left: 15px;
+  background-color: rgb(80, 87, 97);
+  color: white;
+}
+

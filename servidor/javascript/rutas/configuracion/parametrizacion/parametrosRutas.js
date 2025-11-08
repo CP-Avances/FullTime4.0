@@ -3,16 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
 const parametrosControlador_1 = __importDefault(require("../../../controlador/configuracion/parametrizacion/parametrosControlador"));
 const verificarToken_1 = require("../../../libs/verificarToken");
+const express_1 = require("express");
 class ParametrosRutas {
     constructor() {
         this.router = (0, express_1.Router)();
         this.configuracion();
     }
     configuracion() {
-        this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
         // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
         // BUSCAR LISTA DE DETALLE DE PARAMETROS  **USADO
@@ -31,6 +30,11 @@ class ParametrosRutas {
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
         // METODO PARA COMPARAR COORDENADAS   **USADO
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);
+        /** ********************************************************************************************************************* **
+         ** **                        M E T O D O S    D E    L A    A P L I C A C I O N    M O V I L                          ** **
+         ** ********************************************************************************************************************* */
+        // METODO PARA BUSCAR FORMATO DE FECHAS
+        this.router.get('/buscar-formato/fecha_horas', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
     }
 }
 const PARAMETROS_RUTAS = new ParametrosRutas();

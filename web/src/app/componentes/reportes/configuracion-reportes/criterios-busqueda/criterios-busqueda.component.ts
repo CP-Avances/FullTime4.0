@@ -4,7 +4,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatRadioChange } from '@angular/material/radio';
 import { Observable, map, startWith } from 'rxjs';
 
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ReportesService } from 'src/app/servicios/reportes/opcionesReportes/reportes.service';
 import { ValidacionesService } from '../../../../servicios/generales/validaciones/validaciones.service';
 import { RolesService } from 'src/app/servicios/configuracion/parametrizacion/catRoles/roles.service';
 

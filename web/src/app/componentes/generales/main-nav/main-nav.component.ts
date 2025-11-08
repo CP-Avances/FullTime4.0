@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { map, shareReplay } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, asapScheduler } from 'rxjs';
+import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { DateTime } from 'luxon';
@@ -110,6 +110,9 @@ export class MainNavComponent implements OnInit {
   subItemModulosVacaciones: boolean = false;
   childrenVacaciones: any = [];
   vistaModulosVacacionesVacacionesSolicitadas: boolean = false;
+  vistaModulosVacacionesConfigurarVacacion: boolean = false;
+  vistaModulosVacacionesMultiples: boolean = false;
+  vistaModulosVacacionesGenerarPeriodo: boolean = false;
   subItemModulosHorasExtras: boolean = false;
   childrenHorasExtras: any = [];
   vistaModulosHorasExtrasListaHorasExtras: boolean = false;
@@ -187,6 +190,7 @@ export class MainNavComponent implements OnInit {
   childrenReportesVacaciones: any = [];
   vistaReportesVacacionesReporteKardex: boolean = false;
   vistaReportesVacacionesSolicitudVacacion: boolean = false;
+  vistaReportesVacacionesPeriodos: boolean = false;
   subItemReportesHorasExtras: boolean = false;
   childrenReportesHorasExtras: any = [];
   vistaReportesHorasExtrasHorasExtras: boolean = false;
@@ -581,7 +585,7 @@ export class MainNavComponent implements OnInit {
           complete: () => {
             //Control de vistas activas
             this.paginasMG.forEach((row: any) => {
-              // console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
+              console.log('id: ', row.id, ' funcion ', row.funcion, ' link: ', row.link, ' id_rol: ', row.id_rol, ' accion: ', row.id_accion);
               switch (row.link) {
                 case 'vistaEmpresa':
                   this.itemConfiguracion = true;
@@ -927,16 +931,52 @@ export class MainNavComponent implements OnInit {
                     this.childrenPermisos.push({ name: 'Aprobación Múltiple P.', url: '/permisos-solicitados', color: true, ver: true });
                   }
                   break;
-                case 'vacaciones-solicitados':
+                case 'configurar-vacacion':
                   this.itemModulos = true;
                   this.subItemModulosVacaciones = true;
                   for (const parametrizacion of this.childrenVacaciones) {
-                    if (parametrizacion.url === '/vacaciones-solicitados') {
+                    if (parametrizacion.url === '/configurar-vacacion') {
+                      this.vistaModulosVacacionesConfigurarVacacion = true;
+                    }
+                  }
+                  if (!this.vistaModulosVacacionesConfigurarVacacion) {
+                    this.childrenVacaciones.push({ name: 'Configurar Vacaciones', url: '/configurar-vacacion', color: true, ver: true });
+                  }
+                  break;
+                case 'generar-periodo':
+                  this.itemModulos = true;
+                  this.subItemModulosVacaciones = true;
+                  for (const parametrizacion of this.childrenVacaciones) {
+                    if (parametrizacion.url === '/generar-periodo') {
+                      this.vistaModulosVacacionesGenerarPeriodo = true;
+                    }
+                  }
+                  if (!this.vistaModulosVacacionesGenerarPeriodo) {
+                    this.childrenVacaciones.push({ name: 'Generar Periodo Vacación', url: '/generar-periodo', color: true, ver: true });
+                  }
+                  break;
+                case 'configurar-vacacion-multiple':
+                  this.itemModulos = true;
+                  this.subItemModulosVacaciones = true;
+                  for (const parametrizacion of this.childrenVacaciones) {
+                    if (parametrizacion.url === '/configurar-vacacion-multiple') {
+                      this.vistaModulosVacacionesMultiples = true;
+                    }
+                  }
+                  if (!this.vistaModulosVacacionesMultiples) {
+                    this.childrenVacaciones.push({ name: 'Vacaciones Múltiples', url: '/configurar-vacacion-multiple', color: true, ver: true });
+                  }
+                  break;
+                case 'vacaciones-solicitados-':
+                  this.itemModulos = true;
+                  this.subItemModulosVacaciones = true;
+                  for (const parametrizacion of this.childrenVacaciones) {
+                    if (parametrizacion.url === '/vacaciones-solicitados-') {
                       this.vistaModulosVacacionesVacacionesSolicitadas = true;
                     }
                   }
                   if (!this.vistaModulosVacacionesVacacionesSolicitadas) {
-                    this.childrenVacaciones.push({ name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados', color: true, ver: true });
+                    this.childrenVacaciones.push({ name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados-', color: true, ver: true });
                   }
                   break;
                 case 'listaHorasExtras':
@@ -1481,6 +1521,18 @@ export class MainNavComponent implements OnInit {
                   }
                   if (!this.vistaReportesVacacionesSolicitudVacacion) {
                     this.childrenReportesVacaciones.push({ name: 'Vacaciones Solicitadas', url: '/solicitud-vacacion', color: true, ver: true });
+                  }
+                  break;
+                case 'reporte-periodos':
+                  this.itemReportes = true;
+                  this.subItemReportesVacaciones = true;
+                  for (const parametrizacion of this.childrenReportesVacaciones) {
+                    if (parametrizacion.url === '/reporte-periodos') {
+                      this.vistaReportesVacacionesPeriodos = true;
+                    }
+                  }
+                  if (!this.vistaReportesVacacionesPeriodos) {
+                    this.childrenReportesVacaciones.push({ name: 'Periodo Vacaciones', url: '/reporte-periodos', color: true, ver: true });
                   }
                   break;
                 case 'horas/extras':

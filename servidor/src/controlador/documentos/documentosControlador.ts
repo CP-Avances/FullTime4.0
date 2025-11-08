@@ -1,8 +1,8 @@
+import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, ListarDocumentosIndividuales, DescargarArchivoIndividuales } from '../../libs/listarArchivos';
 import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { DateTime } from 'luxon';
-import AUDITORIA_CONTROLADOR from '../reportes/auditoriaControlador';
 import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
@@ -32,7 +32,7 @@ class DocumentosControlador {
         res.jsonp(await ListarContratos(nombre));
     }
 
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS           **USADO
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS    **USADO
     public async ListarCarpetaPermisos(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
         res.jsonp(await ListarPermisos(nombre));
@@ -45,13 +45,13 @@ class DocumentosControlador {
         res.jsonp(await ListarDocumentosIndividuales(nombre, tipo));
     }
 
-    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS            **USADO
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS      **USADO
     public async ListarCarpetaHorarios(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
         res.jsonp(await ListarHorarios(nombre));
     }
 
-    // METODO LISTAR ARCHIVOS DE CARPETAS             **USADO
+    // METODO LISTAR ARCHIVOS DE CARPETAS    **USADO
     public async ListarArchivosCarpeta(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
         res.jsonp(await listaCarpetas(nombre));
@@ -95,7 +95,7 @@ class DocumentosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOSORIGINALES
+            // CONSULTAR DATOS ORIGINALES
             const doc = await pool.query(`SELECT * FROM e_documentacion WHERE id = $1`, [id]);
             const [datosOriginales] = doc.rows;
 

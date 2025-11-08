@@ -138,6 +138,7 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
 
         if (arregloEmpleados.length != 0) {
             arregloEmpleados.forEach(async (item: any) => {
+                console.log('ver item ', item)
                 console.log("ver nombre de todos los empleados: ", item.nombre + ' ' + item.apellido)
                 if (item.faltas_mail) {
                     console.log("ver nombre de los enviado correo: ", item.nombre + ' ' + item.apellido)
@@ -224,7 +225,7 @@ export const faltasIndividual = async function (desde: any, hasta: any) {
                     let create_at = tiempoN.fecha_formato + ' ' + tiempoN.hora;
                     // MENSAJE NOTIFICACION
                     let mensaje = '';
-                    mensaje = fecha + '//Falta registrada. No se ha reportado asistencia en el horario correspondiente.';
+                    mensaje = item.faltas[0].fecha + '//Falta registrada. No se ha reportado asistencia en el horario correspondiente.';
                     console.log('mensajes ', mensaje)
                     const response = await pool.query(
                         `
@@ -839,7 +840,7 @@ export const EstructurarDatosPDF = async function (data: any[]): Promise<Array<a
                             { text: 'FECHA', style: 'tableHeader' },
                         ],
                         ...empl.faltas.map((usu: any) => {
-                            const fecha = FormatearFecha(usu.fecha_horario, formato_fecha, dia_abreviado, idioma_fechas);
+                            const fecha = FormatearFecha(usu.fecha, formato_fecha, dia_abreviado, idioma_fechas);
                             totalFaltasEmpleado++;
                             c = c + 1;
                             return [

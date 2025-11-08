@@ -72,7 +72,7 @@ class DepartamentoRutas {
         this.router.post('/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CrearContrato);
         // GUARDAR DOCUMENTO    **USADO
         this.router.put('/:id/documento-contrato', [verificarToken_1.TokenValidation, upload.single('uploads')], contratoEmpleadoControlador_1.default.GuardarDocumentoContrato);
-        // MOSTRAR DOCUMENTO CARGADO EN EL SISTEMA   
+        // MOSTRAR DOCUMENTO CARGADO EN EL SISTEMA   **USADO
         this.router.get('/documentos/:docs/contrato/:id', contratoEmpleadoControlador_1.default.ObtenerDocumento);
         // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO   **USADO
         this.router.get('/contrato-empleado/:id_empleado', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarContratoEmpleado);
@@ -90,9 +90,16 @@ class DepartamentoRutas {
         this.router.get('/contrato/:id', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarDatosUltimoContrato);
         // METODO PARA BUSCAR FECHAS DE CONTRATOS    **USADO
         this.router.post('/buscarFecha', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContrato);
+        // METODO PARA BUSCAR FECHA DE CONTRATOS  **USADO
         this.router.post('/buscarFechaUsuarios', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContratoUsuarios);
         // METODO PARA ELIMINAR EL CONTRATO REGISTRADO DE LA TABLA EU_EMPLEADOS_CONTRATOS       **USADO
         this.router.post('/eliminarContrato', [verificarToken_1.TokenValidation], contratoEmpleadoControlador_1.default.EliminarContrato);
+        // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
+        this.router.post('/buscarFecha/contrato', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContratoId);
+        // METODO DE REVISION DE DATOS DE PLANTILLA DE CONTRATOS   **USADO
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], contratoEmpleadoControlador_1.default.RevisarDatos);
+        // METODO PARA REGISTRAR DATOS DE PLANTILLA DE CONTRATOS   **USADO
+        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CargarPlantilla_contrato);
         /** ********************************************************************************************* **
          ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **
          ** ********************************************************************************************* **/
@@ -102,15 +109,6 @@ class DepartamentoRutas {
         this.router.get('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarTiposContratos);
         // BUSCAR MODALIDAD LABORAL POR SU NOMBRE   **USADO
         this.router.post('/modalidad/trabajo/nombre', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarModalidadLaboralNombre);
-        // METODO PARA BUSCAR FECHA DE CONTRATO SEGUN ID    **USADO
-        this.router.post('/buscarFecha/contrato', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContratoId);
-        /** ********************************************************************************************* **
-         ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **
-         ** ********************************************************************************************* **/
-        // METODO DE REVISION DE DATOS DE PLANTILLA DE CONTRATOS   **USADO
-        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], contratoEmpleadoControlador_1.default.RevisarDatos);
-        // METODO PARA REGISTRAR DATOS DE PLANTILLA DE CONTRATOS   **USADO
-        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CargarPlantilla_contrato);
     }
 }
 const CONTRATO_EMPLEADO_RUTAS = new DepartamentoRutas();

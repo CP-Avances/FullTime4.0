@@ -2,3 +2,4 @@
 .DS_Store
 /direccionamiento/node_modules
 /servidor/dist
+/servidor/javascript/

@@ -1,17 +1,15 @@
 // IMPORTACION DE LIBRERIAS
-import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { DateTime } from 'luxon';
 import { Router } from '@angular/router';
 
-import ExcelJS, { FillPattern } from "exceljs";
+import ExcelJS from "exceljs";
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
-import { FillPatterns } from 'exceljs';
-
 
 import { RegistroProcesoComponent } from '../registro-proceso/registro-proceso.component';
 import { EditarCatProcesosComponent } from 'src/app/componentes/modulos/accionesPersonal/catProcesos/editar-cat-procesos/editar-cat-procesos.component';
@@ -44,11 +42,8 @@ export class PrincipalProcesoComponent implements OnInit {
   idEmpleado: number;
 
   private bordeCompleto!: Partial<ExcelJS.Borders>;
-  private bordeGrueso!: Partial<ExcelJS.Borders>;
-  private fillAzul!: FillPatterns;
   private fontTitulo!: Partial<ExcelJS.Font>;
   private imagen: any;
-
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -169,7 +164,6 @@ export class PrincipalProcesoComponent implements OnInit {
     this.procesos = [];
     this.rest.ConsultarProcesos().subscribe(data => {
       this.procesos = data;
-      //console.log('ver datos de procesos ', this.procesos)
     });
   }
 
@@ -218,7 +212,6 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA EDITAR PROCESO
   AbrirVentanaEditar(datosSeleccionados: any): void {
-    //console.log(datosSeleccionados);
     this.ventana.open(EditarCatProcesosComponent,
       {
         width: '450px', data: { datosP: datosSeleccionados, lista: true }
@@ -249,7 +242,6 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
-    //console.log(datos);
     (document.activeElement as HTMLElement)?.blur();
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -280,14 +272,14 @@ export class PrincipalProcesoComponent implements OnInit {
         }
       });
   }
+
   EliminarMultiple() {
     const data = {
       listaEliminar: this.procesoEliminar,
       user_name: this.user_name,
       ip: this.ip, ip_local: this.ips_locales
     }
-
-    this.rest.EliminarProcesoMult(data).subscribe({
+    this.rest.EliminarProcesoMultiple(data).subscribe({
       next: (response) => {
         this.toastr.error(response.message, 'Operación exitosa.', {
           timeOut: 5000,
@@ -374,8 +366,6 @@ export class PrincipalProcesoComponent implements OnInit {
     this.mostrarbtnsubir = true;
   }
 
-
-
   // METODO PARA LEER DATOS DE PLANTILLA
   CargarPlantillaGeneral(element: any) {
     if (element.target.files && element.target.files[0]) {
@@ -384,9 +374,7 @@ export class PrincipalProcesoComponent implements OnInit {
       let arrayItems = this.nameFile.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
-
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-
         if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.VerificarPlantilla();
         } else {
@@ -415,7 +403,6 @@ export class PrincipalProcesoComponent implements OnInit {
   VerificarPlantilla() {
     this.listaProcesosCorrectas = [];
     let formData = new FormData();
-
     for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
@@ -438,7 +425,6 @@ export class PrincipalProcesoComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else {
-
         this.Datos_procesos.sort((a: any, b: any) => {
           if (a.observacion !== 'ok' && b.observacion === 'ok') {
             return -1;
@@ -448,7 +434,6 @@ export class PrincipalProcesoComponent implements OnInit {
           }
           return 0;
         });
-
         this.Datos_procesos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaProcesosCorrectas.push(item);
@@ -514,7 +499,6 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS
   RegistrarProcesos() {
-    console.log('listaProcesosCorrectas: ', this.listaProcesosCorrectas.length)
     if (this.listaProcesosCorrectas?.length > 0) {
       const data = {
         plantilla: this.listaProcesosCorrectas,
@@ -546,17 +530,14 @@ export class PrincipalProcesoComponent implements OnInit {
       });
       this.archivoForm.reset();
     }
-
     this.archivoSubido = [];
     this.nameFile = '';
-
   }
 
 
   /** ************************************************************************************************** **
    ** **                               METODO PARA EXPORTAR A PDF                                     ** **
    ** ************************************************************************************************** **/
-
 
   async GenerarPdf(action = 'open') {
     const pdfMake = await this.validar.ImportarPDF();
@@ -570,9 +551,7 @@ export class PrincipalProcesoComponent implements OnInit {
   }
 
   DefinirInformacionPDF() {
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -652,16 +631,8 @@ export class PrincipalProcesoComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   async exportToExcel() {
-
-    var f = DateTime.now();
-    let fecha = f.toFormat('yyyy-MM-dd');
-    let hora = f.toFormat('HH:mm:ss');
-    let fechaHora = 'Fecha: ' + fecha + ' Hora: ' + hora;
     const listProcesos: any[] = [];
-
-    console.log('this.procesos: ', this.procesos);
     this.procesos.forEach((accion: any, index: number) => {
-
       listProcesos.push([
         index + 1,
         accion.id,
@@ -669,15 +640,12 @@ export class PrincipalProcesoComponent implements OnInit {
         accion.proc_padre
       ]);
     });
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Procesos");
-
     this.imagen = workbook.addImage({
       base64: this.logo,
       extension: "png",
     });
-
     worksheet.addImage(this.imagen, {
       tl: { col: 0, row: 0 },
       ext: { width: 220, height: 105 },
@@ -716,8 +684,6 @@ export class PrincipalProcesoComponent implements OnInit {
       { name: "PROCESO", totalsRowLabel: "", filterButton: true },
       { name: "PROCESO SUPERIOR", totalsRowLabel: "", filterButton: true },
     ];
-    console.log("ver list Procesos", listProcesos);
-    console.log("Columnas:", columnas);
 
     worksheet.addTable({
       name: "Procesos",
@@ -732,9 +698,7 @@ export class PrincipalProcesoComponent implements OnInit {
       rows: listProcesos,
     });
 
-
     worksheet.getRow(6).font = this.fontTitulo;
-
     const numeroFilas = listProcesos.length;
     for (let i = 0; i <= numeroFilas; i++) {
       for (let j = 1; j <= 4; j++) {
@@ -772,48 +736,43 @@ export class PrincipalProcesoComponent implements OnInit {
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 
-    exportToCVS() {
-      var arreglo = this.procesos;
-      console.log('proceso: ',this.procesos)
-      // 1. Crear un nuevo workbook
-      const workbook = new ExcelJS.Workbook();
-      // 2. Crear una hoja en el workbook
-      const worksheet = workbook.addWorksheet('ProcesosCSV');
-      // 3. Agregar encabezados de las columnas
-      worksheet.columns = [
-        { header: 'ID', key: 'id', width: 30 },
-        { header: 'PROCESO', key: 'nombre', width: 15 },
-        { header: 'PROCESO_SUPERIOR', key: 'proc_padre', width: 15 }
-      ];
-  
-      // 4. Llenar las filas con los datos
-      arreglo.map((obj: any) => {
-        worksheet.addRow({
-          id: obj.id,
-          nombre: obj.nombre,
-          proc_padre: obj.proc_padre,
-        }).commit();
-      });
-  
-      // 5. Escribir el CSV en un buffer
-      workbook.csv.writeBuffer().then((buffer) => {
-        // 6. Crear un blob y descargar el archivo
-        const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
-        FileSaver.saveAs(data, "ProcesosCSV.csv");
-      });
-    }
+  exportToCVS() {
+    var arreglo = this.procesos;
+    // 1. CREAR UN NUEVO WORKBOOK
+    const workbook = new ExcelJS.Workbook();
+    // 2. CREAR UNA HOJA EN EL WORKBOOK
+    const worksheet = workbook.addWorksheet('ProcesosCSV');
+    // 3. AGREGAR ENCABEZADOS DE LAS COLUMNAS
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 30 },
+      { header: 'PROCESO', key: 'nombre', width: 15 },
+      { header: 'PROCESO_SUPERIOR', key: 'proc_padre', width: 15 }
+    ];
+    // 4. LLENAR LAS FILAS CON LOS DATOS
+    arreglo.map((obj: any) => {
+      worksheet.addRow({
+        id: obj.id,
+        nombre: obj.nombre,
+        proc_padre: obj.proc_padre,
+      }).commit();
+    });
+    // 5. ESCRIBIR EL CSV EN UN BUFFER
+    workbook.csv.writeBuffer().then((buffer) => {
+      // 6. CREAR UN BLOB Y DESCARGAR EL ARCHIVO
+      const data: Blob = new Blob([buffer], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(data, "ProcesosCSV.csv");
+    });
+  }
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
    ** ************************************************************************************************* **/
 
-   urlxml: string;
-   data: any = [];
-   exportToXML() {
-     
+  urlxml: string;
+  data: any = [];
+  exportToXML() {
     var objeto: any;
     var arregloProcesos: any = [];
-    console.log('this.procesos: ', this.procesos);
     this.procesos.forEach((obj: any) => {
       objeto = {
         "proceso": {
@@ -823,31 +782,31 @@ export class PrincipalProcesoComponent implements OnInit {
         }
       }
       arregloProcesos.push(objeto)
-     });
-     const xmlBuilder = new xml2js.Builder({ rootName: 'Procesos' });
-     const xml = xmlBuilder.buildObject(arregloProcesos);
- 
-     if (xml === undefined) {
-       return;
-     }
- 
-     const blob = new Blob([xml], { type: 'application/xml' });
-     const xmlUrl = URL.createObjectURL(blob);
- 
-     // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
-     const newTab = window.open(xmlUrl, '_blank');
-     if (newTab) {
-       newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
-       newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
-     } else {
-       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
-     }
-     const a = document.createElement('a');
-     a.href = xmlUrl;
-     a.download = 'Procesos.xml';
-     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
-     a.click();
-   }
+    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Procesos' });
+    const xml = xmlBuilder.buildObject(arregloProcesos);
+
+    if (xml === undefined) {
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Procesos.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
+  }
 
   //CONTROL BOTONES
   private tienePermiso(accion: string): boolean {
@@ -860,28 +819,28 @@ export class PrincipalProcesoComponent implements OnInit {
         return false;
       }
     } else {
-      // Si no hay datos, se permite si el rol es 1 (Admin)
+      // SI NO HAY DATOS, SE PERMITE SI EL ROL ES 1 (ADMIN)
       return parseInt(localStorage.getItem('rol') || '0') === 1;
     }
   }
 
-  getCrearProceso(){
+  getCrearProceso() {
     return this.tienePermiso('Crear Proceso');
   }
 
-  getEditarProceso(){
+  getEditarProceso() {
     return this.tienePermiso('Editar Proceso');
   }
 
-  getEliminarProceso(){
+  getEliminarProceso() {
     return this.tienePermiso('Eliminar Proceso');
   }
 
-  getCargarPlantillaProceso(){
+  getCargarPlantillaProceso() {
     return this.tienePermiso('Cargar Plantilla Proceso');
   }
 
-  getDescargarReportesProceso(){
+  getDescargarReportesProceso() {
     return this.tienePermiso('Descargar Reportes Proceso');
   }
 }

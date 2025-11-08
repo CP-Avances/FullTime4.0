@@ -12,26 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFechaPlanificacion = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
+exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFechaBase = exports.FormatearFecha2 = exports.FormatearFechaPlanificacion = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.Credenciales = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const database_1 = __importDefault(require("../database"));
 const luxon_1 = require("luxon");
-exports.email = process.env.EMAIL || '';
-let pass = process.env.PASSWORD || '';
-exports.nombre = process.env.NOMBRE || '';
-exports.logo_ = process.env.LOGO || '';
-exports.pie_firma = process.env.PIEF || '';
-exports.cabecera_firma = process.env.CABECERA || '';
-exports.servidor = process.env.SERVIDOR || '';
-exports.puerto = process.env.PUERTO || '';
-const Credenciales = function (id_empresa_1) {
-    return __awaiter(this, arguments, void 0, function* (id_empresa, correo = process.env.EMAIL, password = process.env.PASSWORD, empresa = process.env.NOMBRE, img = process.env.LOGO, img_pie = process.env.PIEF, img_cabecera = process.env.CABECERA, port = process.env.PUERTO, host = process.env.SERVIDOR) {
+// METODO DE BUSQUEDA DE CREDENCIALES DEL SERVIDOR DE CORREO
+const Credenciales = function (id_empresa) {
+    return __awaiter(this, void 0, void 0, function* () {
         let credenciales = [];
         credenciales = yield DatosCorreo(id_empresa);
-        return credenciales.message;
+        return credenciales;
     });
 };
 exports.Credenciales = Credenciales;
+// BUSQUEDA DE DATOS DEL SERVIDOR DE CORREO
 function DatosCorreo(id_empresa) {
     return __awaiter(this, void 0, void 0, function* () {
         let credenciales = yield database_1.default.query(`
@@ -42,52 +36,33 @@ function DatosCorreo(id_empresa) {
             .then(result => {
             return result.rows;
         });
-        console.log('correo... ', credenciales);
         if (credenciales.length === 0) {
             return { message: 'error' };
         }
         else {
-            exports.email = credenciales[0].correo;
-            pass = credenciales[0].password_correo;
-            exports.nombre = credenciales[0].nombre;
-            exports.logo_ = credenciales[0].logo;
-            exports.pie_firma = credenciales[0].pie_firma;
-            exports.cabecera_firma = credenciales[0].cabecera_firma;
-            exports.servidor = credenciales[0].servidor;
-            exports.puerto = credenciales[0].puerto;
-            if (exports.cabecera_firma === null || exports.cabecera_firma === '') {
-                exports.cabecera_firma = 'cabecera_firma.png';
+            var pie_firma = credenciales[0].pie_firma;
+            var cabecera_firma = credenciales[0].cabecera_firma;
+            if (cabecera_firma === null || cabecera_firma === '') {
+                cabecera_firma = 'cabecera_firma.png';
             }
-            if (exports.pie_firma === null || exports.pie_firma === '') {
-                exports.pie_firma = 'pie_firma.png';
+            if (pie_firma === null || pie_firma === '') {
+                pie_firma = 'pie_firma.png';
             }
-            return { message: 'ok' };
+            let informacion = {
+                email: credenciales[0].correo,
+                pass: credenciales[0].password_correo,
+                nombre: credenciales[0].nombre,
+                logo_: credenciales[0].logo,
+                servidor: credenciales[0].servidor,
+                puerto: credenciales[0].puerto,
+                pie_firma: pie_firma,
+                cabecera_firma: cabecera_firma,
+            };
+            return { message: 'ok', informacion };
         }
     });
 }
-const enviarMail = function (servidor, puerto) {
-    var seguridad = false;
-    if (puerto === 465) {
-        seguridad = true;
-    }
-    else {
-        seguridad = false;
-    }
-    const transporter = nodemailer_1.default.createTransport({
-        //pool: true,
-        host: servidor,
-        port: puerto,
-        secure: seguridad,
-        auth: {
-            user: exports.email,
-            pass: pass
-        },
-    });
-    return transporter;
-};
-exports.enviarMail = enviarMail;
 const enviarCorreos = function (servidor, puerto, email, pass) {
-    console.log('ver email y pass', email, pass, servidor, puerto);
     var seguridad = false;
     if (puerto === 465) {
         seguridad = true;
@@ -97,10 +72,7 @@ const enviarCorreos = function (servidor, puerto, email, pass) {
     }
     const transporter = nodemailer_1.default.createTransport({
         pool: true,
-        //maxConnections: 2,
         maxMessages: Infinity,
-        //rateLimit: 14, // 14 emails/second max
-        //rateDelta: 1000,
         host: servidor,
         port: puerto,
         secure: seguridad,
@@ -134,23 +106,20 @@ const FormatearFecha = function (fecha, dia) {
         const fechaLuxon = luxon_1.DateTime.fromISO(fecha);
         console.log("ver fechaLuxon", fechaLuxon);
         let diaFormateado = '';
-        /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-          fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
         if (dia == "dddd") {
             diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' });
             diaFormateado = diaFormateado.replace('.', '');
-            // Asegúrate de que la primera letra esté en mayúscula
+            // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
             diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
         }
         else {
             diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' });
             diaFormateado = diaFormateado.replace('.', '');
-            // Asegúrate de que la primera letra esté en mayúscula
+            // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
             diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
         }
         const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
         const valor = `${diaFormateado}, ${fechaFormateada}`;
-        console.log(' fecha.. ', fechaFormateada);
         return valor;
     });
 };
@@ -160,18 +129,16 @@ const FormatearFechaPlanificacion = function (fecha, dia) {
         const formato = yield (0, exports.BuscarFecha)();
         const fechaLuxon = luxon_1.DateTime.fromJSDate(new Date(fecha));
         let diaFormateado = '';
-        /*.setLocale('es').toFormat(dia).charAt(0).toUpperCase() +
-          fechaLuxon.setLocale('es').toFormat(dia).slice(1);*/
         if (dia == "dddd") {
             diaFormateado = fechaLuxon.toFormat("EEEE", { locale: 'es' });
             diaFormateado = diaFormateado.replace('.', '');
-            // Asegúrate de que la primera letra esté en mayúscula
+            // ASEGURATE DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
             diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
         }
         else {
             diaFormateado = fechaLuxon.toFormat("EEE", { locale: 'es' });
             diaFormateado = diaFormateado.replace('.', '');
-            // Asegúrate de que la primera letra esté en mayúscula
+            // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
             diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
         }
         const fechaFormateada = fechaLuxon.toFormat(formato.fecha);
@@ -188,36 +155,36 @@ const FormatearFecha2 = function (fecha, dia) {
         if (!regex.test(fecha) && !regexSinHora.test(fecha)) {
             console;
             const date = new Date(fecha);
-            // Obtener las partes de la fecha y formatearlas con dos dígitos
+            // OBTENER LAS PARTES DE LA FECHA Y FORMATEARLAS CON DOS DÍGITOS
             const year = date.getUTCFullYear();
             const month = String(date.getUTCMonth() + 1).padStart(2, '0');
             const day = String(date.getUTCDate()).padStart(2, '0');
             const hours = String(date.getUTCHours()).padStart(2, '0');
             const minutes = String(date.getUTCMinutes()).padStart(2, '0');
             const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-            // Devolver la fecha formateada
+            // DEVOLVER LA FECHA FORMATEADA
             fecha = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
-        const fechaObj = luxon_1.DateTime.fromSQL(fecha); // Utiliza fromSQL para una cadena en formato 'YYYY-MM-DD HH:mm:ss'  console.log("ver fechaObj", fechaObj )
-        // Formatear el día
+        const fechaObj = luxon_1.DateTime.fromSQL(fecha); // UTILIZA fromSQL PARA UNA CADENA EN FORMATO 'YYYY-MM-DD HH:mm:ss' 
+        // FORMATEAR EL DÍA
         if (dia == "ddd") {
             let diaFormateado = fechaObj.toFormat("EEE", { locale: 'es' });
-            // Limpia el día formateado de puntos no deseados
+            // LIMPIA EL DÍA FORMATEADO DE PUNTOS NO DESEADOS
             diaFormateado = diaFormateado.replace('.', '');
-            // Asegúrate de que la primera letra esté en mayúscula
+            // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
             diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-            // Formatear la fecha
+            // FORMATEAR LA FECHA
             const fechaFormateada = fechaObj.toFormat(formato.fecha);
             let valor = `${diaFormateado}, ${fechaFormateada}`;
             return valor;
         }
         else if (dia == "dddd") {
             let diaFormateado = fechaObj.toFormat("EEEE", { locale: 'es' });
-            // Limpia el día formateado de puntos no deseados
+            // LIMPIA EL DÍA FORMATEADO DE PUNTOS NO DESEADOS
             diaFormateado = diaFormateado.replace('.', '');
-            // Asegúrate de que la primera letra esté en mayúscula
+            // ASEGURAR DE QUE LA PRIMERA LETRA ESTE EN MAYUSCULA
             diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
-            // Formatear la fecha
+            // FORMATEAR LA FECHA
             const fechaFormateada = fechaObj.toFormat(formato.fecha);
             let valor = `${diaFormateado}, ${fechaFormateada}`;
             return valor;
@@ -261,7 +228,7 @@ function transformDate(date) {
 const FormatearHora = function (hora) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("ver hora: ", hora);
-        const formato = yield (0, exports.BuscarHora)(); // Obtenemos el formato deseado desde la función
+        const formato = yield (0, exports.BuscarHora)(); // OBTENEMOS EL FORMATO DESEADO DESDE LA FUNCIÓN
         const horaConSegundos = hora.length === 5 ? `${hora}:00` : hora;
         const horaFormateada = horaConSegundos.length === 7 ? `0${horaConSegundos}` : horaConSegundos;
         const valor = luxon_1.DateTime.fromFormat(horaFormateada, 'HH:mm:ss').toFormat(formato.hora);

@@ -136,7 +136,8 @@ export class RealtimeNotificacionComponent implements OnInit {
   CambiarVistaNotificacion(id_realtime: number) {
     const datos = {
       user_name: this.user_name,
-      ip: this.ip, ip_local: this.ips_locales
+      ip: this.ip, 
+      ip_local: this.ips_locales
     };
     this.realtime.ActualizarVistaNotificacion(id_realtime, datos).subscribe(res => {
     });

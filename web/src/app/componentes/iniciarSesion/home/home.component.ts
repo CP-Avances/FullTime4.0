@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 
 import { ValidacionesService } from 'src/app/servicios/generales/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/configuracion/parametrizacion/parametrosGenerales/parametros.service';
-import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { EmpleadoService } from 'src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service';
 import { MainNavService } from '../../generales/main-nav/main-nav.service';
 
@@ -31,7 +30,6 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private funciones: MainNavService,
-    private graficar: GraficasService,
     private router: Router,
     private route: ActivatedRoute,
     public validar: ValidacionesService,

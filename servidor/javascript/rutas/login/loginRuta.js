@@ -17,6 +17,8 @@ class LoginRuta {
         this.router.post('/recuperar-contrasenia/', loginControlador_1.default.EnviarCorreoContrasena);
         // METODO PARA CAMBIAR CONTRASEÑA
         this.router.post('/cambiar-contrasenia/', loginControlador_1.default.CambiarContrasenia);
+        // METODO PARA AUDITAR INICIO DE SESION    **USADO
+        this.router.post('/registrar_acceso/', loginControlador_1.default.RegistrarAuditoriaLogin);
     }
 }
 const LOGIN_RUTA = new LoginRuta();

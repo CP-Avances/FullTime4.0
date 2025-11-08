@@ -1,9 +1,9 @@
 import { ToastrService } from 'ngx-toastr';
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { DateTime } from 'luxon';
-import CryptoJS from 'crypto-js';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { DateTime } from 'luxon';
+import { Router } from '@angular/router';
+import CryptoJS from 'crypto-js';
 
 @Injectable({
   providedIn: 'root'
@@ -55,14 +55,15 @@ export class ValidacionesService {
           }
         });
       this.router.navigate(['/']);
-      // this.router.navigate(['/', { relativeTo: this.route, skipLocationChange: false }]);
     }
 
   }
 
-  /** ******************************************************************** *
-   *                  METODO PARA CONTROLAR INGRESO DE LETRAS              *
-   *  ******************************************************************** */
+
+  /** ******************************************************************** **
+   ** **             METODO PARA CONTROLAR INGRESO DE LETRAS            ** **
+   ** ******************************************************************** **/
+
   IngresarSoloLetras(e: any) {
     let key = e.keyCode || e.which;
     let tecla = String.fromCharCode(key).toString();
@@ -85,9 +86,11 @@ export class ValidacionesService {
     }
   }
 
+
   /** ******************************************************************** **
    ** **                 METODO PARA CONTROLAR INGRESO DE NUMEROS          **
    ** ** ***************************************************************** **/
+
   IngresarSoloNumeros(evt: any) {
     if (window.event) {
       var keynum = evt.keyCode;
@@ -111,13 +114,13 @@ export class ValidacionesService {
   /** ******************************************************************** **
    ** **                     FORMATO DE FECHA Y HORA                    ** **
    ** ** ***************************************************************** **/
-  // METODO PARA FORMATEAR FECHA
+
   dia_abreviado: string = 'ddd';
   dia_completo: string = 'dddd';
 
+  // METODO PARA FORMATEAR FECHA
   FormatearFecha(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    //console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaLuxon = DateTime.fromISO(fecha).setLocale(idioma);
     // MANEJAR EL FORMATO PARA EL DIA
@@ -137,16 +140,15 @@ export class ValidacionesService {
     return valor;
   }
 
+  // METODO PARA FORMATEAR HORA
   FormatearHora(hora: string, formato: string) {
-    //console.log('hora ', hora, ' formato ', formato)
     const horaLuxon = DateTime.fromFormat(hora, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;
   }
 
+  // METODO PARA FORMATEAR DIFERENTES FORMATOS DE FECHA
   DarFormatoFecha(fechaString: any, formatoSalida: any) {
-    //console.log("fechaString: ", fechaString)
-    //console.log("formatoSalida: ", formatoSalida)
     let formatos = ['yyyy-MM-dd', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd'];
     let fecha: DateTime;
     // VERIFICAR SI LA FECHA ES UN OBJETO MOMENT
@@ -167,16 +169,13 @@ export class ValidacionesService {
       }
     }
     // SI NO ES VALIDA EN NINGUNO DE LOS FORMATOS, DEVUELVE UN ERROR
-    //console.error('Formato de fecha no válido:', fechaString);
     return null;
   }
 
   FormatearFechaAuditoria(fecha: string, formato: string, dia: string, idioma: string): string {
     let valor: string;
-    //console.log('ingresa fecha ', fecha)
     // PARSEAR LA FECHA CON LUXON
     const fechaISO = fecha.replace(' ', 'T').replace(/-\d{2}$/, '');
-
     const fechaLuxon = DateTime.fromISO(fechaISO).setLocale(idioma);
 
     // MANEJAR EL FORMATO PARA EL DIA
@@ -197,17 +196,17 @@ export class ValidacionesService {
   }
 
   FormatearHoraAuditoria(hora: string, formato: string) {
-    //console.log('hora ', hora, ' formato ', formato)
     const horaSinMilisegundosYZona = hora.split('.')[0].replace(/-\d{2}$/, '');
-
     const horaLuxon = DateTime.fromFormat(horaSinMilisegundosYZona, 'HH:mm:ss');
     let valor = horaLuxon.toFormat(formato);;
     return valor;
   }
 
+
   /** ******************************************************************** **
    ** **                  METODO PARA OMITIR DUPLICADOS                    **
    ** ** ***************************************************************** **/
+
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
   OmitirDuplicadosSucursales(sucursales: any) {
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
@@ -275,6 +274,7 @@ export class ValidacionesService {
   /** ******************************************************************** **
    ** **                   METODO PARA SUMAR REGISTROS                  ** **
    ** ** ***************************************************************** **/
+
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
@@ -384,7 +384,6 @@ export class ValidacionesService {
       });
     });
     seleccionados[0].empleados = datos;
-    console.log("ver empleados web ", seleccionados)
     return seleccionados;
   }
 
@@ -479,6 +478,7 @@ export class ValidacionesService {
         id_cargo_: obj.id_cargo_, // TIPO DE CARGO
         ciudad: obj.ciudad,
         regimen: obj.name_regimen,
+        hora_estandar: obj.dia_hora_estandar,
         departamento: obj.name_dep,
         cargo: obj.name_cargo,
         hora_trabaja: obj.hora_trabaja,
@@ -1389,14 +1389,11 @@ export class ValidacionesService {
 
   DesencriptarDato(data: string): string {
     try {
-      console.log('dato ', data)
       const bytes = CryptoJS.AES.decrypt(data, this.frase);
       const originalData = bytes.toString(CryptoJS.enc.Utf8);
-
       if (!originalData) {
         throw new Error('El dato desencriptado es inválido.');
       }
-
       return originalData;
     } catch (error) {
       if (error instanceof Error) {
@@ -1408,7 +1405,48 @@ export class ValidacionesService {
     }
   }
 
+
+  /** ********************************************************************************* **
+   ** **                    CONVERTIR DIAS - HORAS - MINUTOS                         ** **
+   ** ********************************************************************************* **/
+
+  convertirDiasAHorasMinutos(
+    diasGanados: number,
+    horaTrabaja: string,         // por ejemplo '08:00'
+    diaHoraEstandar: string      // por ejemplo '08:00'
+  ): string {
+    //console.log('ver datos: ', diasGanados, ' - ', horaTrabaja, ' - ', diaHoraEstandar)
+    if (!horaTrabaja || !diaHoraEstandar) return '';
+
+    const [hEmp, mEmp] = horaTrabaja.split(':').map(Number);
+    const [hStd, mStd] = diaHoraEstandar.split(':').map(Number);
+
+    const minutosEmp = hEmp * 60 + mEmp;
+    const minutosStd = hStd * 60 + mStd;
+
+    if (minutosEmp === 0) return '';
+
+    const minutosPorDia = (minutosStd / minutosEmp) * minutosEmp;
+    const totalMinutos = diasGanados * minutosPorDia;
+
+    const dias = Math.floor(totalMinutos / minutosEmp);
+    const minutosRestantes = totalMinutos % minutosEmp;
+
+    const horas = Math.floor(minutosRestantes / 60);
+    const minutos = Math.round(minutosRestantes % 60);
+
+    const partes: string[] = [];  // SE DEFINE COMO ARREGLO DE STRINGS
+
+    if (dias > 0) partes.push(`${dias} día${dias !== 1 ? 's' : ''}`);
+    if (horas > 0) partes.push(`${horas} hora${horas !== 1 ? 's' : ''}`);
+    if (minutos > 0) partes.push(`${minutos} minuto${minutos !== 1 ? 's' : ''}`);
+
+    return partes.length ? partes.join(', ') : '0 minutos';
+  }
+
 }
+
+
 
 
 

@@ -1,0 +1,37 @@
+::ng-deep .mdc-checkbox__background {
+    background-color: #207ab6 !important; /* Cambia a tu color preferido */
+    border-color: #e0e0e0 !important; /* Cambia a tu color preferido */
+}
+
+p {
+    font-size: x-small;
+    text-align: center;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#editarF {
+    color: green;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 15px;
+}
+
+label {
+    font-size: 14px;
+}
+
+#verticalLine {
+    border-left: 1px solid rgb(52, 65, 84);
+}
+
+#color_fuente {
+    label{
+        color: rgb(8, 8, 8);
+    }
+    
+}

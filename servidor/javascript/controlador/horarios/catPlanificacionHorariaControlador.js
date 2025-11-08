@@ -13,14 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLANIFICACION_HORARIA_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
+const luxon_1 = require("luxon");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const settingsMail_1 = require("../../libs/settingsMail");
-const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
 const path_1 = __importDefault(require("path"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
-const luxon_1 = require("luxon");
 class PlanificacionHorariaControlador {
     // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA   **USADO
     VerificarDatosPlanificacionHoraria(req, res) {
@@ -120,7 +120,7 @@ class PlanificacionHorariaControlador {
                         data.hora_trabaja = ConvertirHorasAMinutos(empleadoVerificado[1].hora_trabaja);
                         data.cedula_empleado = empleadoVerificado[1].identificacion;
                         const feriados = yield ConsultarFeriados(fechaInicial, fechaFinal, empleadoVerificado[1].id);
-                        // consultar fechas del mes desde inicil hasta final si en data.dias falta alguna fecha agregarla con el codigo DEFAULT-FERIADO si es feriado si no omitir y no agregar a data.dias
+                        // CONSULTAR FECHAS DEL MES DESDE INICIL HASTA FINAL SI EN data.dias FALTA ALGUNA FECHA AGREGARLA CON EL CODIGO DEFAULT-FERIADO SI ES FERIADO SI NO OMITIR Y NO AGREGAR A data.dias
                         let fechasMes = ObtenerFechasMes(fechaInicial, fechaFinal);
                         for (let fecha of fechasMes) {
                             if (!data.dias[fecha]) {
@@ -387,18 +387,20 @@ class PlanificacionHorariaControlador {
         });
     }
 }
-// FUNCION PARA VERIFICAR EXISTENCIA DE EMPLEADO EN LA BASE DE DATOS
+exports.PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
+exports.default = exports.PLANIFICACION_HORARIA_CONTROLADOR;
+// FUNCION PARA VERIFICAR EXISTENCIA DE EMPLEADO EN LA BASE DE DATOS     **USADO
 function VerificarEmpleado(identificacion) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let observacion = '';
             let empleadoValido = false;
             const empleado = yield database_1.default.query(`
-            SELECT e.*, dae.id_cargo, dae.hora_trabaja 
-            FROM eu_empleados e 
-            LEFT JOIN informacion_general dae ON e.identificacion = dae.identificacion 
-            WHERE LOWER(e.identificacion) = $1
-        `, [identificacion.toLowerCase()]);
+                SELECT e.*, dae.id_cargo, dae.hora_trabaja 
+                FROM eu_empleados e 
+                LEFT JOIN informacion_general dae ON e.identificacion = dae.identificacion 
+                WHERE LOWER(e.identificacion) = $1
+            `, [identificacion.toLowerCase()]);
             if (empleado.rowCount === 0) {
                 observacion = 'Empleado no válido';
             }
@@ -415,6 +417,7 @@ function VerificarEmpleado(identificacion) {
         }
     });
 }
+// METODO PARA VERIFICAR HORARIOS     **USADO
 function VerificarHorarios(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -479,7 +482,7 @@ function VerificarHorarios(datos) {
         }
     });
 }
-// FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS
+// FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS     **USADO
 function VerificarHorario(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -497,7 +500,7 @@ function VerificarHorario(codigo) {
         }
     });
 }
-// FUNCION PARA VERIFICAR SOBREPOSICION DE HORARIOS
+// FUNCION PARA VERIFICAR SOBREPOSICION DE HORARIOS    **USADO
 function VerificarSuperposicionHorarios(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -606,14 +609,14 @@ function VerificarSuperposicionHorarios(datos) {
         }
     });
 }
-// FUNCIÓN PARA VERIFICAR SI DOS HORARIOS SE SOBREPONEN
+// FUNCION PARA VERIFICAR SI DOS HORARIOS SE SOBREPONEN     **USADO
 function SeSuperponen(horario1, horario2) {
     return (horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
         (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha) ||
         (horario1.entrada.fecha >= horario2.entrada.fecha && horario1.entrada.fecha <= horario2.salida.fecha) ||
         (horario1.salida.fecha <= horario2.salida.fecha && horario1.salida.fecha >= horario2.entrada.fecha);
 }
-// FUNCIÓN PARA ACTUALIZAR OBSERVACIONES Y RANGOS SIMILARES
+// FUNCION PARA ACTUALIZAR OBSERVACIONES Y RANGOS SIMILARES     **USADO
 function ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, horariosModificados) {
     if (horario1.dia === horario2.dia && horario1.codigo === horario2.codigo) {
         horario1.observacion = `Ya existe planificación`;
@@ -627,7 +630,7 @@ function ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimil
         rangosSimilares[horario2.dia] = rangosSimilares[horario2.dias] ? [...rangosSimilares[horario2.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
     }
 }
-// METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL EMPLEADO   --**VERIFICADO
+// METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL EMPLEADO   **USADO
 function ListarPlanificacionHoraria(id_empleado, fecha_inicio, fecha_final) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -653,7 +656,7 @@ function ListarPlanificacionHoraria(id_empleado, fecha_inicio, fecha_final) {
         }
     });
 }
-// FUNCION PARA CONSULTAR FERIADOS
+// FUNCION PARA CONSULTAR FERIADOS     **USADO
 function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -676,7 +679,7 @@ function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
         }
     });
 }
-// FUNCION PARA CONSULTAR HORARIOS DEFAULT Y SUS DETALLES
+// FUNCION PARA CONSULTAR HORARIOS DEFAULT Y SUS DETALLES     **USADO
 function ConsultarHorarioDefault(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -687,7 +690,7 @@ function ConsultarHorarioDefault(codigo) {
         WHERE h.codigo = $1
         `, [codigo]);
             if (horario.rowCount != 0) {
-                //SEPARAR LOS TIPOS DE ACCIONES DE LOS HORARIOS
+                // SEPARAR LOS TIPOS DE ACCIONES DE LOS HORARIOS
                 let horarioEstructurado;
                 const entrada = horario.rows.find((o) => o.tipo_accion === 'E');
                 const salida = horario.rows.find((o) => o.tipo_accion === 'S');
@@ -706,7 +709,7 @@ function ConsultarHorarioDefault(codigo) {
         }
     });
 }
-// FUNCION PARA CREAR PLANIFICACION HORARIA
+// FUNCION PARA CREAR PLANIFICACION HORARIA    **USADO
 function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -860,6 +863,7 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
         }
     });
 }
+// METODO PARA ELIMINAR PLANIFICACION     **USADO
 function EliminarPlanificacionNormalDiaFeriado(id_empleado, fecha) {
     return __awaiter(this, void 0, void 0, function* () {
         yield database_1.default.query(`
@@ -867,19 +871,20 @@ function EliminarPlanificacionNormalDiaFeriado(id_empleado, fecha) {
         `, [id_empleado, fecha]);
     });
 }
-// FUNCION PARA CONVERTIR HORAS A MINUTOS
+// FUNCION PARA CONVERTIR HORAS A MINUTOS    **USADO
 function ConvertirHorasAMinutos(hora) {
     const partes = hora.split(':');
     const horas = parseInt(partes[0], 10);
     const minutos = parseInt(partes[1], 10);
     return horas * 60 + minutos;
 }
-// FUNCION PARA CONVERTIR MINUT0S A HORAS
+// FUNCION PARA CONVERTIR MINUT0S A HORAS   **USADO
 function ConvertirMinutosAHoras(minutos) {
     const horas = Math.floor(minutos / 60);
     const minutosRestantes = minutos % 60;
     return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
 }
+// METODO PARA OBTENER FECHAS DEL MES    **USADO
 function ObtenerFechasMes(fechaInicial, fechaFinal) {
     let fechas = [];
     let fechaInicio = luxon_1.DateTime.fromISO(fechaInicial, { zone: 'utc' });
@@ -890,6 +895,7 @@ function ObtenerFechasMes(fechaInicial, fechaFinal) {
     }
     return fechas;
 }
+// FUNCION PARA ELIMINAR LA PLANTILLA DEL ALMACENAMIENTO TEMPORAL   **USADO
 function EliminarPlantilla(ruta) {
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
@@ -901,5 +907,3 @@ function EliminarPlantilla(ruta) {
         }
     });
 }
-exports.PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
-exports.default = exports.PLANIFICACION_HORARIA_CONTROLADOR;

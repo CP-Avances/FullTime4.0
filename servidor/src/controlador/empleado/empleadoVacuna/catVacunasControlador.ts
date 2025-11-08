@@ -1,7 +1,7 @@
+import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../reportes/auditoriaControlador';
 import pool from '../../../database';
 import fs from 'fs';
 import path from 'path';
@@ -19,7 +19,8 @@ class VacunaControlador {
             );
             if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows)
-            } else {
+            }
+            else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         } catch (error) {
@@ -279,7 +280,7 @@ class VacunaControlador {
                             data.vacuna = VACUNA;
                             data.observacion = 'no registrada';
 
-                             //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
+                            //USAMOS TRIM PARA ELIMINAR LOS ESPACIOS AL INICIO Y AL FINAL EN BLANCO.
                             data.vacuna = data.vacuna.trim();
 
                             listaVacunas.push(data);

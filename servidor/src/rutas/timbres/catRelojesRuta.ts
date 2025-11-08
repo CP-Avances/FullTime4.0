@@ -1,7 +1,7 @@
-import { Router } from 'express';
 import RELOJES_CONTROLADOR from '../../controlador/timbres/catRelojesControlador';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
+import { Router } from 'express';
 import multer from 'multer';
 
 const storage = multer.diskStorage({

@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DETALLE_CATALOGO_HORARIO_CONTROLADOR = void 0;
-const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../reportes/auditoriaControlador"));
+const settingsMail_1 = require("../../libs/settingsMail");
 const database_1 = __importDefault(require("../../database"));
 class DetalleCatalogoHorarioControlador {
     // METODO PARA BUSCAR DETALLE DE UN HORARIO   **USADO
@@ -119,7 +119,7 @@ class DetalleCatalogoHorarioControlador {
                 const { user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query(`SELECT * FROM eh_detalle_horarios WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
@@ -208,7 +208,7 @@ class DetalleCatalogoHorarioControlador {
                 const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id, user_name, ip, ip_local } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
+                // OBTENER DATOS ORIGINALES
                 const consulta = yield database_1.default.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {

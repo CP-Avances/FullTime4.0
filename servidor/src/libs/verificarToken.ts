@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { Licencias, Modulos } from '../class/Licencia';
+import { Modulos } from '../class/Licencia';
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
-import { ObtenerRutaLicencia } from './accesoCarpetas';
 import pool from '../database';
 
 interface IPayload {
@@ -18,11 +16,11 @@ interface IPayload {
     _licencia: string,
     _web_access: boolean,
     modulos: Modulos,
-    _acc_tim: boolean //false sin acciones || true con acciones
+    _acc_tim: boolean // false SIN ACCIONES || true CON ACCIONES
 }
 
 export const TokenValidation = async (req: Request, res: Response, next: NextFunction) => {
-    
+
     // VERIFICA SI EN LA PETICION EXISTE LA CABECERA AUTORIZACION 
     if (!req.headers.authorization) {
         return res.status(401).send('No puede solicitar, permiso denegado.');
@@ -35,21 +33,20 @@ export const TokenValidation = async (req: Request, res: Response, next: NextFun
     }
 
     try {
-        //next();
-        
+
         // SI EL TOKEN NO ESTA VACIO
         // SE EXTRAE LOS DATOS DEL TOKEN 
         const payload = jwt.verify(token, process.env.TOKEN_SECRET || 'llaveSecreta') as IPayload;
         // CUANDO SE EXTRAE LOS DATOS SE GUARDA EN UNA PROPIEDAD REQ.USERID PARA Q LAS DEMAS FUNCIONES PUEDAN UTILIZAR ESE ID 
         if (!payload._web_access) return res.status(401).send('No tiene acceso a los recursos de la aplicacion.');
-        
+
         const EMPRESA = await pool.query(
             `
             SELECT public_key, id AS id_empresa FROM e_empresa
             `
         );
-  
-        const { public_key, id_empresa } = EMPRESA.rows[0];
+
+        const { public_key } = EMPRESA.rows[0];
 
         const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`,
             {
@@ -75,18 +72,17 @@ export const TokenValidation = async (req: Request, res: Response, next: NextFun
             req.userId = payload._id;
             req.userIdEmpleado = payload._id_empleado;
             req.id_empresa = payload._empresa,
-            req.userRol = payload.rol;
+                req.userRol = payload.rol;
             req.userIdCargo = payload.cargo;
             req.userCodigo = payload.codigo;
             req.acciones_timbres = payload._acc_tim;
-            //req.modulos = payload.modulos;
             next();
         } else {
             return res.status(401).send('Ups! La licencia a expirado.');
         }
-        
+
     } catch (error) {
         return res.status(401).send(error.message);
     }
-    
+
 }

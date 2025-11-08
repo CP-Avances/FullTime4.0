@@ -11,12 +11,26 @@ class DepartamentoRutas {
 
     configuracion(): void {
 
-        // METODO PARA BUSCAR PERIODO DE VACACIONES   **USADO
-        this.router.get('/buscar/:id_empleado', TokenValidation, PERIODO_VACACION_CONTROLADOR.EncontrarIdPerVacaciones);
+        // METODO PARA CREAR PERIODO DE VACACIONES   **USADO
+        this.router.post('/', TokenValidation, PERIODO_VACACION_CONTROLADOR.CrearPerVacaciones);
+
+        // METODO PARA ACTUALIZAR PERIODO DE VACACIONES   **USADO
+        this.router.put('/', TokenValidation, PERIODO_VACACION_CONTROLADOR.ActualizarPeriodo);
+
         // METODO PARA CONSULTAR DATOS DE PERIODO DE VACACION    **USADO
         this.router.get('/infoPeriodo/:id_empleado', TokenValidation, PERIODO_VACACION_CONTROLADOR.EncontrarPerVacaciones);
-        this.router.post('/', TokenValidation, PERIODO_VACACION_CONTROLADOR.CrearPerVacaciones);
-        this.router.put('/', TokenValidation, PERIODO_VACACION_CONTROLADOR.ActualizarPeriodo);
+
+        // METODO PARA BUSCAR PERIODO DE VACACIONES   **USADO
+        this.router.get('/buscar/:id_empleado', TokenValidation, PERIODO_VACACION_CONTROLADOR.EncontrarIdPerVacaciones);
+
+        // METODO PARA CERRAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
+        this.router.post('/cerrar-periodos', TokenValidation, PERIODO_VACACION_CONTROLADOR.CerrarPeriodoVacaciones);
+
+        // METODO PARA CREAR PERIODOS DE VACACIONES DE FORMA MANUAL   **USADO
+        this.router.post('/periodo-crear-manual', TokenValidation, PERIODO_VACACION_CONTROLADOR.GenerarPeriodoManual);
+
+        // METODO PARA CONSULTAR LISTA DE PERIODOS DE VACACIONES DEL USUARIO    **USADO    
+        this.router.post('/buscar-periodos/:estado', TokenValidation, PERIODO_VACACION_CONTROLADOR.ReportePeriodosVacaciones);
 
     }
 }

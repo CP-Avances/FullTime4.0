@@ -18,13 +18,13 @@ import { MetodosComponent } from "src/app/componentes/generales/metodoEliminar/m
 
 // IMPORTAR SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
+import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 import { EmpleadoService } from "src/app/servicios/usuarios/empleado/empleadoRegistro/empleado.service";
 import { RegimenService } from 'src/app/servicios/configuracion/parametrizacion/catRegimen/regimen.service';
 import { ReportesMicroService } from 'src/app/servicios/generales/reportes/reportes.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
-import { ValidacionesService } from "src/app/servicios/generales/validaciones/validaciones.service";
 
 @Component({
   selector: "app-listar-regimen",
@@ -111,6 +111,11 @@ export class ListarRegimenComponent implements OnInit {
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
+    this.ManejarEstilos();
+  }
+
+  // METODO PARA MANEJAR ESTILOS
+  ManejarEstilos() {
     this.bordeCompleto = {
       top: { style: "thin" as ExcelJS.BorderStyle },
       left: { style: "thin" as ExcelJS.BorderStyle },
@@ -128,7 +133,7 @@ export class ListarRegimenComponent implements OnInit {
     this.fillAzul = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "4F81BD" }, // Azul claro
+      fgColor: { argb: "4F81BD" }, // AZUL CLARO
     };
 
     this.fontTitulo = { bold: true, size: 12, color: { argb: "FFFFFF" } };
@@ -629,7 +634,7 @@ export class ListarRegimenComponent implements OnInit {
           : 'NO DEFINIDO')
         : 'NO APLICA';
 
-      // Tipo antigüedad
+      // TIPO ANTIGÜEDAD
       let tipoAntiguedad = 'NO APLICA';
       if (obj.antiguedad_fija) tipoAntiguedad = 'FIJA';
       if (obj.antiguedad_variable) tipoAntiguedad = 'VARIABLE';

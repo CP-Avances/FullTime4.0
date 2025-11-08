@@ -11,7 +11,7 @@ export class SalidasAntesService {
     private http: HttpClient
   ) { }
 
-  // METODO PARA BUSCAR REGISTROS DE SALIDAS ANTICIPADAS   **USADO
+  // METODO PARA BUSCAR REGISTROS DE SALIDAS ANTICIPADAS   **USADO**
   BuscarTimbresSalidasAnticipadas(data: any, inicio: string, fin: string) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/reporte-salidas-antes/timbre-salida-anticipada/${inicio}/${fin}`, data);
   }

@@ -46,7 +46,7 @@ class ReportesTiempoLaboradoControlador {
         });
     }
 }
-// FUNCION PARA BUSCAR DATOS DE TIEMPO LABORADO
+// FUNCION PARA BUSCAR DATOS DE TIEMPO LABORADO    **USADO
 const BuscarTiempoLaborado = function (fec_inicio, fec_final, id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
@@ -66,7 +66,7 @@ const BuscarTiempoLaborado = function (fec_inicio, fec_final, id_empleado) {
         });
     });
 };
-// METODO PARA AGRUPAR TIMBRES
+// METODO PARA AGRUPAR TIMBRES    **USADO
 const AgruparTimbres = function agruparTimbresPorClave(timbres) {
     return __awaiter(this, void 0, void 0, function* () {
         const timbresAgrupadosFecha = {};
@@ -114,7 +114,7 @@ const AgruparTimbres = function agruparTimbresPorClave(timbres) {
         return timbresAgrupados;
     });
 };
-// CONSULTAR PARAMETRO DE TOLERANCIA
+// CONSULTAR PARAMETRO DE TOLERANCIA    **USADO
 function consultarParametroTolerancia(parametro) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -126,14 +126,14 @@ function consultarParametroTolerancia(parametro) {
         return ((_a = resultado.rows[0]) === null || _a === void 0 ? void 0 : _a.descripcion) || null;
     });
 }
-// CALCULAR DIREFERENCIA DE TIEMPO EN MINUTOS
+// CALCULAR DIREFERENCIA DE TIEMPO EN MINUTOS    **USADO
 function calcularDiferenciaEnMinutos(fecha1, fecha2) {
     const dt1 = luxon_1.DateTime.fromSQL(fecha1);
     const dt2 = luxon_1.DateTime.fromSQL(fecha2);
     const diff = dt2.diff(dt1, ['hours', 'minutes', 'seconds']);
     return diff.as('minutes');
 }
-// CALCULAR TIEMPO LABORADO
+// CALCULAR TIEMPO LABORADO     **USADO
 function calcularTiempoLaborado(tLaborado) {
     return __awaiter(this, void 0, void 0, function* () {
         if (['L', 'FD'].includes(tLaborado.origen))
@@ -173,6 +173,7 @@ function calcularTiempoLaborado(tLaborado) {
     });
 }
 ;
+// METODO PARA CALCULAR ATRASOS   *USADO
 function calcularAtraso(horaHorario, horaTimbre, tolerancia, parametroTolerancia) {
     const diferencia = Math.max(calcularDiferenciaEnMinutos(horaHorario, horaTimbre), 0);
     if (parametroTolerancia === '1')
@@ -182,9 +183,11 @@ function calcularAtraso(horaHorario, horaTimbre, tolerancia, parametroTolerancia
     }
     return 0;
 }
+// METODO PARA CALCULAR SALIDAS ANTICIPADAS   **USADO
 function calcularSalidaAnticipada(horaTimbre, horaHorario) {
     return Math.max(calcularDiferenciaEnMinutos(horaTimbre, horaHorario), 0);
 }
+// METODO PARA CALCULAR TIEMPO ALIMENTACION    **USADO
 function calcularTiempoAlimentacion(inicioTimbre, finTimbre, minutosPorDefecto) {
     if (inicioTimbre && finTimbre) {
         return calcularDiferenciaEnMinutos(inicioTimbre, finTimbre);

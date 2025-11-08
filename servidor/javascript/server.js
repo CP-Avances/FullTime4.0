@@ -17,6 +17,11 @@ require('dotenv').config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
+const http_1 = require("http");
+const socket_io_1 = require("socket.io");
+// IMPORTACION DE METODOS PARA ENVIO DE NOTIFICACIONES
+const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
+const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
 // RUTAS IMPORTADAS
 const indexRutas_1 = __importDefault(require("./rutas/indexRutas"));
 // EMPRESA
@@ -58,27 +63,16 @@ const planGeneralRutas_1 = __importDefault(require("./rutas/horarios/planGeneral
 const timbresRutas_1 = __importDefault(require("./rutas/timbres/timbresRutas"));
 const plantillaRutas_1 = __importDefault(require("./rutas/documentos/plantillaRutas"));
 const datosGeneralesRutas_1 = __importDefault(require("./rutas/datosGenerales/datosGeneralesRutas"));
-const graficasRutas_1 = __importDefault(require("./rutas/graficas/graficasRutas"));
-const licencias_1 = __importDefault(require("./utils/licencias"));
 const catGeneroRutas_1 = __importDefault(require("./rutas/empleado/generos/catGeneroRutas"));
 const catEstadoCivilRutas_1 = __importDefault(require("./rutas/empleado/estadoCivil/catEstadoCivilRutas"));
 // CON MODULOS
 const notificacionesRutas_1 = __importDefault(require("./rutas/notificaciones/notificacionesRutas"));
-const autorizacionesRutas_1 = __importDefault(require("./rutas/autorizaciones/autorizacionesRutas"));
-// MODULO PERMISO
-const catTipoPermisosRutas_1 = __importDefault(require("./rutas/modulos/permisos/catTipoPermisosRutas"));
-const permisosRutas_1 = __importDefault(require("./rutas/modulos/permisos/permisosRutas"));
+788;
 // MODULO VACACIONES
 const periodoVacacionRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/periodoVacacionRutas"));
 const vacacionesRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/vacacionesRutas"));
-const kardexVacacionesRutas_1 = __importDefault(require("./rutas/reportes/kardexVacacionesRutas"));
-// MODULO HORAS EXTRA
-const catHorasExtrasRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/catHorasExtrasRutas"));
-const horaExtraRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/horaExtraRutas"));
-const planHoraExtraRutas_1 = __importDefault(require("./rutas/modulos/horas-extras/planHoraExtraRutas"));
+const configurarVacacionesRutas_1 = __importDefault(require("./rutas/modulos/vacaciones/configurarVacacionesRutas"));
 // MODULO ALIMENTACION
-const catTipoComidasRuta_1 = __importDefault(require("./rutas/modulos/alimentacion/catTipoComidasRuta"));
-const planComidasRutas_1 = __importDefault(require("./rutas/modulos/alimentacion/planComidasRutas"));
 const alimentacionRutas_1 = __importDefault(require("./rutas/reportes/alimentacionRutas"));
 // MODULO ACCIONES DE PERSONAL
 const catProcesoRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/catProcesoRutas"));
@@ -88,11 +82,7 @@ const gradoRutas_1 = __importDefault(require("./rutas/modulos/acciones-personal/
 const grupoOcupacional_1 = __importDefault(require("./rutas/modulos/acciones-personal/grupoOcupacional"));
 // MODULO GEOLOCALIZACION
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/modulos/geolocalizacion/emplUbicacionRutas"));
-// MODULO RELOJ VIRTUAL
-const reloj_virtual_1 = __importDefault(require("./utils/reloj_virtual"));
 // REPORTES
-const asistenciaRutas_1 = __importDefault(require("./rutas/reportes/asistenciaRutas"));
-const reportesRutas_1 = __importDefault(require("./rutas/reportes/reportesRutas"));
 const reportesAsistenciaRutas_1 = __importDefault(require("./rutas/reportes/reportesAsistenciaRutas"));
 const reporteVacunasRutas_1 = __importDefault(require("./rutas/reportes/reporteVacunasRutas"));
 const reportesFaltasRutas_1 = __importDefault(require("./rutas/reportes/reportesFaltasRutas"));
@@ -100,13 +90,7 @@ const reportesAtrasosRutas_1 = __importDefault(require("./rutas/reportes/reporte
 const reportesTiempoLaboradoRutas_1 = __importDefault(require("./rutas/reportes/reportesTiempoLaboradoRutas"));
 const salidasAntesRutas_1 = __importDefault(require("./rutas/reportes/salidasAntesRutas"));
 const reportesTimbresMrlRutas_1 = __importDefault(require("./rutas/reportes/reportesTimbresMrlRutas"));
-const reportesNotificacionRutas_1 = __importDefault(require("./rutas/reportes/reportesNotificacionRutas"));
 const auditoriaRutas_1 = __importDefault(require("./rutas/reportes/auditoriaRutas"));
-const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
-const reporteHoraExtraRutas_1 = __importDefault(require("./rutas/reportes/reporteHoraExtraRutas"));
-const http_1 = require("http");
-const socket_io_1 = require("socket.io");
-//var io: any;
 class Servidor {
     constructor() {
         this.app = (0, express_1.default)();
@@ -114,17 +98,9 @@ class Servidor {
         this.configuracion();
         this.rutas();
         this.server = (0, http_1.createServer)(this.app);
-        /*
-        this.io = require('socket.io')(this.server, {
-            cors: {
-                origin: '*',
-                methods: ['GET', 'POST'],
-            }
-        });
-*/
         this.io = new socket_io_1.Server(this.server, {
             cors: {
-                origin: '*', // Permitir todas las conexiones (ajustar según necesidades)
+                origin: '*', // PERMITIR TODAS LAS CONEXIONES (AJUSTAR SEGÚN NECESIDADES)
                 methods: ['GET', 'POST'],
             },
         });
@@ -133,7 +109,7 @@ class Servidor {
             socket.on("connect_error", (err) => {
                 console.log("Error de conexión:", err.message);
             });
-            // Verifica la conexión
+            // VERIFICA LA CONEXION
             socket.on('disconnect', () => {
                 console.log('Cliente desconectado:', socket.id);
             });
@@ -195,23 +171,14 @@ class Servidor {
         this.app.use(`/${ruta}/planificacion_general`, planGeneralRutas_1.default);
         this.app.use(`/${ruta}/plantillaD`, plantillaRutas_1.default);
         this.app.use(`/${ruta}/generalidades`, datosGeneralesRutas_1.default);
-        this.app.use(`/${ruta}/notificacionSistema`, reportesNotificacionRutas_1.default);
-        this.app.use(`/${ruta}/metricas`, graficasRutas_1.default);
         this.app.use(`/${ruta}/generos`, catGeneroRutas_1.default);
         this.app.use(`/${ruta}/estado-civil`, catEstadoCivilRutas_1.default);
         // CON MODULOS
-        this.app.use(`/${ruta}/autorizaciones`, autorizacionesRutas_1.default);
         this.app.use(`/${ruta}/noti-real-time`, notificacionesRutas_1.default);
-        // MODULO PERMISOS
-        this.app.use(`/${ruta}/empleadoPermiso`, permisosRutas_1.default);
-        this.app.use(`/${ruta}/tipoPermisos`, catTipoPermisosRutas_1.default);
         // MODULO VACACIONES
         this.app.use(`/${ruta}/perVacacion`, periodoVacacionRutas_1.default);
         this.app.use(`/${ruta}/vacaciones`, vacacionesRutas_1.default);
-        // MODULO HORAS EXTRAS
-        this.app.use(`/${ruta}/horas-extras-pedidas`, horaExtraRutas_1.default);
-        this.app.use(`/${ruta}/horasExtras`, catHorasExtrasRutas_1.default);
-        this.app.use(`/${ruta}/planificacionHoraExtra`, planHoraExtraRutas_1.default);
+        this.app.use(`/${ruta}/configurarVacacion`, configurarVacacionesRutas_1.default);
         // MODULO GEOLOCALIZACION
         this.app.use(`/${ruta}/ubicacion`, emplUbicacionRutas_1.default);
         // MODULO ACCIONES DE PERSONAL
@@ -221,16 +188,8 @@ class Servidor {
         this.app.use(`/${ruta}/grado`, gradoRutas_1.default);
         this.app.use(`/${ruta}/grupoOcupacional`, grupoOcupacional_1.default);
         // MODULO ALIMENTACION
-        this.app.use(`/${ruta}/tipoComidas`, catTipoComidasRuta_1.default);
-        this.app.use(`/${ruta}/planComidas`, planComidasRutas_1.default);
         this.app.use(`/${ruta}/alimentacion`, alimentacionRutas_1.default);
-        // MODULO RELOJ VIRTUAL
-        this.app.use(`/${ruta}/reloj-virtual`, reloj_virtual_1.default);
         // REPORTES
-        this.app.use(`/${ruta}/asistencia`, asistenciaRutas_1.default);
-        this.app.use(`/${ruta}/reportes/vacacion`, kardexVacacionesRutas_1.default);
-        this.app.use(`/${ruta}/reportes/hora-extra`, reporteHoraExtraRutas_1.default);
-        this.app.use(`/${ruta}/reporte`, reportesRutas_1.default);
         this.app.use(`/${ruta}/reporte-faltas/`, reportesFaltasRutas_1.default);
         this.app.use(`/${ruta}/reportes-asistencias/`, reportesAsistenciaRutas_1.default);
         this.app.use(`/${ruta}/reporte-salidas-antes/`, salidasAntesRutas_1.default);
@@ -239,9 +198,6 @@ class Servidor {
         this.app.use(`/${ruta}/reporte-timbres-mrl/`, reportesTimbresMrlRutas_1.default);
         this.app.use(`/${ruta}/reportes-auditoria`, auditoriaRutas_1.default);
         this.app.use(`/${ruta}/empleado-vacunas-multiples`, reporteVacunasRutas_1.default);
-        this.app.use(`/${ruta}/empleado-vacaciones-solicitudes`, solicitudVacacionesRutas_1.default);
-        // LICENCIAS
-        this.app.use(`/${ruta}/licencias`, licencias_1.default);
     }
     start() {
         this.app.set('trust proxy', true);
@@ -269,12 +225,10 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
             socket.on("nuevo_aviso", (data) => {
-                console.log('Datos recibidos en "nuevo_aviso":', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -295,22 +249,14 @@ class Servidor {
 }
 const SERVIDOR = new Servidor();
 SERVIDOR.start();
-const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
-const tareasAutomaticas_1 = require("./libs/tareasAutomaticas");
+exports.io = SERVIDOR.io;
 /** **************************************************************************************************** **
  ** **             TAREAS QUE SE EJECUTAN CONTINUAMENTE - PROCESOS AUTOMATICOS                        ** **
  ** **************************************************************************************************** **/
 // METODO PARA INACTIVAR USUARIOS AL FIN DE SU CONTRATO
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-exports.io = SERVIDOR.io;
 // INICIO DE TAREAS AUTOMATICAS
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield tareasAutomaticas_1.tareasAutomaticas.IniciarTarea();
 }))();
-//beforeFiveDays();
-//beforeTwoDays();
-// LLAMA AL METODO DE VERIFICACION PARA CREAR UN NUEVO PERIDO DE VACACIONES SI SE ACABA EL ANTERIOR
-//Peri_Vacacion_Automatico();
-//RegistrarAsistenciaByTimbres();
-// ----------// conteoPermisos();
 //generarTimbres('1', '2023-11-01', '2023-11-02');//
